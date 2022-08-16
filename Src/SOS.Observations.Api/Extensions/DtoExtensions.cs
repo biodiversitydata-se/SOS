@@ -7,6 +7,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models;
+using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
@@ -14,6 +15,7 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.UserService;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Export;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Location;
 using SOS.Observations.Api.Dtos.Vocabulary;
@@ -1005,6 +1007,28 @@ namespace SOS.Observations.Api.Extensions
                 Name = userRole.Name,
                 ShortName = userRole.ShortName,
                 Description = userRole.Description
+            };
+        }
+
+        public static ExportJobInfoDto ToDto(this ExportJobInfo exportJobInfo)
+        {
+            if (exportJobInfo == null)
+            {
+                return null!;
+            }
+            return new ExportJobInfoDto
+            {
+                CreatedDate = exportJobInfo.CreatedDate,
+                Description = exportJobInfo.Description,
+                ExpireDate = exportJobInfo.ProcessEndDate.HasValue ? exportJobInfo.ProcessEndDate.Value.AddDays(exportJobInfo.LifetimeDays) : null,
+                Format = exportJobInfo.Format,
+                Id = exportJobInfo.Id,
+                NumberOfObservations = exportJobInfo.NumberOfObservations,
+                OutputFieldSet = exportJobInfo.OutputFieldSet,
+                PickUpUrl = exportJobInfo.PickUpUrl,
+                ProcessEndDate = exportJobInfo.ProcessEndDate,
+                ProcessStartDate = exportJobInfo.ProcessStartDate,
+                Status = exportJobInfo.Status
             };
         }
     }

@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Exceptions;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
@@ -20,8 +19,6 @@ namespace SOS.Lib.Repositories.Processed
     /// </summary>
     public class ProcessedObservationBaseRepository : ProcessRepositoryBase<Observation, string>
     {
-       
-
         /// <summary>
         /// Get core queries
         /// </summary>
@@ -53,40 +50,12 @@ namespace SOS.Lib.Repositories.Processed
                 return PublicIndexName;
             }
 
-            if (!HttpContextAccessor?.HttpContext?.User?.HasAccessToScope(ProtectedScope) ?? true)
+            if (!filter?.ExtendedAuthorization?.ExtendedAreas?.Any() ?? true)
             {
                 throw new AuthenticationRequiredException("Not authorized");
             }
 
             return ProtectedIndexName;
-        }
-
-        /// <summary>
-        /// Http context accessor.
-        /// </summary>
-        public IHttpContextAccessor HttpContextAccessor { get; set; }
-        
-
-        /// <summary>
-        /// Constructor used in public mode
-        /// </summary>
-        /// <param name="liveMode"></param>
-        /// <param name="elasticClientManager"></param>
-        /// <param name="processedConfigurationCache"></param>
-        /// <param name="httpContextAccessor"></param>
-        /// <param name="elasticConfiguration"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public ProcessedObservationBaseRepository(
-            bool liveMode,
-            IElasticClientManager elasticClientManager,
-            ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            IHttpContextAccessor httpContextAccessor,
-            ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ProcessedObservationBaseRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
-        {
-            LiveMode = liveMode;
-            HttpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         /// <summary>

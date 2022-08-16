@@ -16,6 +16,8 @@ namespace SOS.Lib.Jobs.Export
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="userId"></param>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="email"></param>
         /// <param name="description"></param>
         /// <param name="exportFormat"></param>
@@ -23,6 +25,9 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="flatOut"></param>
         /// <param name="propertyLabelType"></param>
         /// <param name="excludeNullValues"></param>
+        /// <param name="sensitiveObservations"></param>
+        /// <param name="sendMailFromZendTo"></param>
+        /// <param name="encryptPassword"></param>
         /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -31,6 +36,8 @@ namespace SOS.Lib.Jobs.Export
         [Queue("medium")]
         Task<bool> RunAsync(SearchFilter filter,
             int userId,
+            int? roleId,
+            string authorizationApplicationIdentifier,
             string email,
             string description,
             ExportFormat exportFormat,
@@ -38,6 +45,9 @@ namespace SOS.Lib.Jobs.Export
             bool flatOut,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
+            bool sensitiveObservations,
+            bool sendMailFromZendTo,
+            string encryptPassword,
             PerformContext context,
             IJobCancellationToken cancellationToken);
     }

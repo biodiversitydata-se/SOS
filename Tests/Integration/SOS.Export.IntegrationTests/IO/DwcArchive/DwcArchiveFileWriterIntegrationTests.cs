@@ -68,7 +68,6 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
-                new HttpContextAccessor(),
                 new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
             return processedObservationRepository;

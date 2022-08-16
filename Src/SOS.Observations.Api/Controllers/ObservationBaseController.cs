@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -23,8 +24,10 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="observationManager"></param>
         /// <param name="areaManager"></param>
         /// <param name="taxonManager"></param>
+        /// <param name="observationApiConfiguration"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         protected ObservationBaseController(IObservationManager observationManager,
-            IAreaManager areaManager, ITaxonManager taxonManager) : base(areaManager)
+            IAreaManager areaManager, ITaxonManager taxonManager, ObservationApiConfiguration observationApiConfiguration) : base(areaManager, observationApiConfiguration)
         {
             ObservationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));

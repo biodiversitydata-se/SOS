@@ -981,13 +981,11 @@ namespace SOS.Lib.Repositories.Processed
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             TelemetryClient telemetry,
-            IHttpContextAccessor httpContextAccessor,
             ITaxonManager taxonManager,
-            ILogger<ProcessedObservationRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, httpContextAccessor, elasticConfiguration, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
-            HttpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         /// <summary>

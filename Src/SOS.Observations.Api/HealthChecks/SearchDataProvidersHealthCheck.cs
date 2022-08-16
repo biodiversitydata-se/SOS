@@ -40,7 +40,7 @@ namespace SOS.Observations.Api.HealthChecks
                         "taxon.id"
                     }
                 };
-                providerSearchTasks.Add(provider, _observationManager.GetChunkAsync(0, null, searchFilter, 0, 1, "", SearchSortOrder.Asc));
+                providerSearchTasks.Add(provider, _observationManager.GetChunkAsync(null, 0, null, searchFilter, 0, 1, "", SearchSortOrder.Asc));
             }
 
             await Task.WhenAll(providerSearchTasks.Values);

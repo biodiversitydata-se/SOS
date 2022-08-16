@@ -10,6 +10,7 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Lib.Configuration.ObservationApi;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers
@@ -24,17 +25,19 @@ namespace SOS.Observations.Api.Controllers
         private readonly ILocationManager _locationManager;
         private readonly ILogger<LocationsController> _logger;
 
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="locationManager"></param>
-    /// <param name="areaManager"></param>
-    /// <param name="logger"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public LocationsController(
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="locationManager"></param>
+        /// <param name="areaManager"></param>
+        /// <param name="observationApiConfiguration"></param>
+        /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public LocationsController(
             ILocationManager locationManager,
             IAreaManager areaManager,
-            ILogger<LocationsController> logger) : base(areaManager)
+            ObservationApiConfiguration observationApiConfiguration,
+            ILogger<LocationsController> logger) : base(areaManager, observationApiConfiguration)
         {
             _locationManager = locationManager ??
                                   throw new ArgumentNullException(nameof(locationManager));
@@ -80,6 +83,8 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                CheckAuthorization(sensitiveObservations);
+
                 var searchFilter = new SearchFilterBaseDto { Geographics = filter };
                 var validationResult = Result.Combine(
                     ValidateSearchFilter(searchFilter),
@@ -91,7 +96,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var locations = await _locationManager.SearchAsync(roleId, authorizationApplicationIdentifier, searchFilter.ToSearchFilter("sv-SE", sensitiveObservations), skip, take);
+                var locations = await _locationManager.SearchAsync(UserId, roleId, authorizationApplicationIdentifier, searchFilter.ToSearchFilter("sv-SE", sensitiveObservations), skip, take);
 
                 return new OkObjectResult(locations);
             }

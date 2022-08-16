@@ -4,7 +4,6 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -66,7 +65,6 @@ namespace SOS.Export.IntegrationTests.Managers
                 elasticConfiguration,
                 new ProcessedConfigurationCache(processedConfigurationRepository),
                 new TelemetryClient(),
-                new HttpContextAccessor(),
                 new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
 
@@ -80,7 +78,7 @@ namespace SOS.Export.IntegrationTests.Managers
             var filterManager = new Mock<IFilterManager>();
             filterManager
                 .Setup(us => us
-                    .PrepareFilterAsync(0, null, new SearchFilter(), "Sighting", 0, false, false, true)
+                    .PrepareFilterAsync(null, 0, null, new SearchFilter(), "Sighting", 0, false, false, true)
                 );
 
             var observationManager = new ObservationManager(
@@ -136,30 +134,39 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndSendAsync(new SearchFilter{ DataProviderIds = new List<int>{1}, OutputFields = new List<string>{
-                    "datasetName",
-                    "event.startDate",
-                    "event.endDate",
-                    "identification.verified",
-                    "location.decimalLongitude",
-                    "location.decimalLatitude",
-                    "occurrence.occurrenceId",
-                    "occurrence.reportedBy",
-                    "taxon.id",
-                    "taxon.scientificName",
-                    "taxon.vernacularName"}
-                }, "mats.lindgren@slu.se", "AP", 
+                await observationManager.ExportAndSendAsync(null, null, null, 
+                    new SearchFilter{ 
+                        DataProviderIds = new List<int>{1}, OutputFields = new List<string>{
+                            "datasetName",
+                            "event.startDate",
+                            "event.endDate",
+                            "identification.verified",
+                            "location.decimalLongitude",
+                            "location.decimalLatitude",
+                            "occurrence.occurrenceId",
+                            "occurrence.reportedBy",
+                            "taxon.id",
+                            "taxon.scientificName",
+                            "taxon.vernacularName"
+                        }
+                    }, 
+                    "mats.lindgren@slu.se", 
+                    "AP", 
                     ExportFormat.GeoJson, 
-                    "en-GB", 
+                    "en-GB",
                     false,
                     PropertyLabelType.PropertyPath,
                     false,
-                    JobCancellationToken.Null);
+                    false,
+                    false,
+                    null,
+                    JobCancellationToken.Null
+                );
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
+            result.Success.Should().BeTrue();
         }
 
         [Fact]
@@ -176,7 +183,7 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndSendAsync(new SearchFilter
+                await observationManager.ExportAndSendAsync(null, null, null, new SearchFilter
                 {
                     DataProviderIds = new List<int> { 1 },
                     OutputFields = new List<string> {
@@ -191,12 +198,14 @@ namespace SOS.Export.IntegrationTests.Managers
                         "taxon.id",
                         "taxon.scientificName",
                         "taxon.vernacularName"}
-                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false,  PropertyLabelType.PropertyPath, false, JobCancellationToken.Null);
+                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false,  PropertyLabelType.PropertyPath, false, false,
+                    false,
+                    null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
+            result.Success.Should().BeTrue();
         }
     }
 }

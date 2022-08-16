@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
+using SOS.Export.Models.ZendTo;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Enums;
@@ -94,7 +93,11 @@ namespace SOS.Export.Managers
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExportAndSendAsync(SearchFilter filter, 
+        public async Task<ZendToResponse> ExportAndSendAsync(
+            int? userId, 
+            int? roleId, 
+            string authorizationApplicationIdentifier,
+            SearchFilter filter, 
             string emailAddress,
             string description,
             ExportFormat exportFormat,
@@ -102,12 +105,15 @@ namespace SOS.Export.Managers
             bool flatOut,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
+            bool sensitiveObservations,
+            bool sendMailFromZendTo,
+            string encryptPassword,
             IJobCancellationToken cancellationToken)
         {
             FileExportResult fileExportResult = null;
             try
             {
-                await _filterManager.PrepareFilterAsync(0,null, filter);
+                await _filterManager.PrepareFilterAsync(userId, roleId, authorizationApplicationIdentifier, filter);
 
                 fileExportResult = exportFormat switch
                 {
@@ -118,12 +124,20 @@ namespace SOS.Export.Managers
                 };
                 
                 // zend file to user
-                return await _zendToService.SendFile(emailAddress, description, fileExportResult.FilePath, exportFormat);
+                return await _zendToService.SendFile(
+                    emailAddress, 
+                    description, 
+                    fileExportResult.FilePath, 
+                    exportFormat, 
+                    sendMailFromZendTo, 
+                    !sensitiveObservations,// Can't include pass code if sensitive observations is selcted
+                    sensitiveObservations, // Encrypt file if sensitive observations is selcted
+                    encryptPassword);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to export and send sightings");
-                return false;
+                return new ZendToResponse();
             }
             finally
             {
@@ -152,7 +166,7 @@ namespace SOS.Export.Managers
             FileExportResult fileExportResult = null;
             try
             {
-                await _filterManager.PrepareFilterAsync(0,null, filter);
+                await _filterManager.PrepareFilterAsync(null, null, null, filter);
                 fileExportResult = await CreateDWCExportAsync(filter, fileName, cancellationToken);
 
                 // Blob Storage Containers must be in lower case
@@ -161,21 +175,14 @@ namespace SOS.Export.Managers
                 // Make sure container exists
                 await _blobStorageService.CreateContainerAsync(blobStorageContainer);
 
-                var tasks = new List<Task<bool>>
-                {
-                    // Upload file to blob storage
-                    _blobStorageService.UploadBlobAsync(fileExportResult.FilePath, blobStorageContainer),
-                };
-
+                // Upload file to blob storage
+                var success = await _blobStorageService.UploadBlobAsync(fileExportResult.FilePath, blobStorageContainer);
+           
                 if (!string.IsNullOrEmpty(emailAddress))
                 {
                     // Send file to user
-                    tasks.Add(_zendToService.SendFile(emailAddress, description, fileExportResult.FilePath, ExportFormat.DwC));
+                    success = success && ((await _zendToService.SendFile(emailAddress, description, fileExportResult.FilePath, ExportFormat.DwC))?.Success ?? false);
                 }
-
-                await Task.WhenAll(tasks);
-
-                var success = tasks.All(t => t.Result);
 
                 return success;
             }

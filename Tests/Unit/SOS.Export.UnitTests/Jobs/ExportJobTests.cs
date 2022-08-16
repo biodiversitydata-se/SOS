@@ -54,9 +54,23 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, JobCancellationToken.Null)
+                    .ExportAndSendAsync(
+                        It.IsAny<int>(), 
+                        It.IsAny<int>(), 
+                        It.IsAny<string>(), 
+                        It.IsAny<SearchFilter>(), 
+                        It.IsAny<string>(), 
+                        "", 
+                        ExportFormat.DwC, 
+                        "en-GB", false, 
+                        PropertyLabelType.PropertyName, 
+                        false,
+                        It.IsAny<bool>(),
+                        It.IsAny<bool>(),
+                        It.IsAny<string>(),
+                        JobCancellationToken.Null)
                 )
-                .ReturnsAsync(false);
+                .ReturnsAsync(new Models.ZendTo.ZendToResponse());
             _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
             _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
@@ -66,7 +80,7 @@ namespace SOS.Export.UnitTests.Jobs
 
             Func<Task> act = async () =>
             {
-                await observationManager.RunAsync(new SearchFilter(), 0, null, "", ExportFormat.DwC, "en-GB", false,  PropertyLabelType.PropertyName, false, null, JobCancellationToken.Null);
+                await observationManager.RunAsync(new SearchFilter(), 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false,  PropertyLabelType.PropertyName, false, false, false, null, null, JobCancellationToken.Null);
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -88,9 +102,25 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, JobCancellationToken.Null)
+                    .ExportAndSendAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<int>(),
+                        It.IsAny<string>(), 
+                        It.IsAny<SearchFilter>(), 
+                        It.IsAny<string>(), 
+                        "", 
+                        ExportFormat.DwC, 
+                        "en-GB", 
+                        false, 
+                        PropertyLabelType.
+                        PropertyName, 
+                        false,
+                        It.IsAny<bool>(),
+                        It.IsAny<bool>(),
+                        It.IsAny<string>(),
+                        JobCancellationToken.Null)
                 )
-                .ReturnsAsync(true);
+                .ReturnsAsync(new Models.ZendTo.ZendToResponse { Status = "OK"} );
 
             _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
             _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
@@ -99,12 +129,12 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             var observationManager = TestObject;
 
-            var result = await observationManager.RunAsync(new SearchFilter(), 0, null, "", ExportFormat.DwC, "en-GB", false,  PropertyLabelType.PropertyName, false, null, JobCancellationToken.Null);
+            var result = await observationManager.RunAsync(new SearchFilter(), 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
+            result.Should().Be(true);
         }
 
         [Fact]
@@ -116,7 +146,22 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false,  PropertyLabelType.PropertyName, false, JobCancellationToken.Null)
+                    .ExportAndSendAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<int>(),
+                        It.IsAny<string>(),
+                        It.IsAny<SearchFilter>(), 
+                        It.IsAny<string>(), 
+                        "", 
+                        ExportFormat.DwC, 
+                        "en-GB", 
+                        false,  
+                        PropertyLabelType.PropertyName, 
+                        false,
+                        It.IsAny<bool>(),
+                        It.IsAny<bool>(),
+                        It.IsAny<string>(),
+                        JobCancellationToken.Null)
                 )
                 .Throws(new Exception());
             _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
@@ -128,7 +173,7 @@ namespace SOS.Export.UnitTests.Jobs
 
             Func<Task> act = async () =>
             {
-                await observationManager.RunAsync(new SearchFilter(), 0, null, "", ExportFormat.DwC, "en-GB", false,  PropertyLabelType.PropertyName, false, null, JobCancellationToken.Null);
+                await observationManager.RunAsync(new SearchFilter(), 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, null, JobCancellationToken.Null);
             };
 
             //-----------------------------------------------------------------------------------------------------------

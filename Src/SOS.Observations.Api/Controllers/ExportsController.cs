@@ -20,6 +20,7 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Controllers.Interfaces;
+using SOS.Observations.Api.Dtos.Export;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -42,10 +43,6 @@ namespace SOS.Observations.Api.Controllers
         private readonly long _downloadExportObservationsLimit;
         private readonly string _exportPath;
         private readonly ILogger<ExportsController> _logger;
-
-        private string UserEmail => User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
-
-        private int UserId => int.Parse(User?.Claims?.FirstOrDefault(c => c.Type.Contains("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", StringComparison.CurrentCultureIgnoreCase))?.Value ?? "0");
 
         /// <summary>
         /// Use outputFieldSet passed in query if no value is passed in filter
@@ -88,26 +85,40 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Validate input for order request
+        ///  Validate input for order request
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="email"></param>
         /// <param name="userExport"></param>
+        /// <param name="sensitiveObservations"></param>
+        /// <param name="sendMailFromZendTo"></param>
+        /// <param name="encryptPassword"></param>
+        /// <param name="confirmEncryptPassword"></param>
         /// <returns></returns>
-        private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(SearchFilterDto filter, string email, UserExport userExport)
+        private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(
+            SearchFilterDto filter, 
+            string email, 
+            UserExport userExport,
+            bool sensitiveObservations,
+            bool sendMailFromZendTo,
+            string encryptPassword,
+            string confirmEncryptPassword)
         {
             var validationResults = Result.Combine(
                 ValidateSearchFilter(filter),
                 ValidateEmail(email),
-                ValidateUserExport(userExport));
+                ValidateUserExport(userExport),
+                ValidateEncryptPassword(encryptPassword, confirmEncryptPassword, sensitiveObservations),
+                sensitiveObservations && sendMailFromZendTo ? Result.Failure("You are not allowed to send e-mail from ZendTo when sensitive observations are requested") : Result.Success()
+           );
 
             if (validationResults.IsFailure)
             {
                 return (Result: BadRequest(validationResults.Error), Count: null);
             }
 
-            var exportFilter = filter.ToSearchFilter("en-GB", false);
-            var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter);
+            var exportFilter = filter.ToSearchFilter("en-GB", sensitiveObservations);
+            var matchCount = await ObservationManager.GetMatchCountAsync(UserId, 0, null, exportFilter);
 
             if (matchCount == 0)
             {
@@ -137,7 +148,7 @@ namespace SOS.Observations.Api.Controllers
             }
 
             var exportFilter = filter.ToSearchFilter("en-GB", false);
-            var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter);
+            var matchCount = await ObservationManager.GetMatchCountAsync(UserId, 0, null, exportFilter);
 
             if (matchCount == 0)
             {
@@ -159,9 +170,10 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         private Result ValidateUserExport(UserExport userExport)
         {
-            if ((userExport?.OnGoingJobIds?.Count() ?? 0) > (userExport?.Limit ?? 1))
+            var onGoingJobCount = userExport?.Jobs?.Where(j => new[] { ExportJobStatus.Queued, ExportJobStatus.Processing }.Contains(j.Status))?.Count() ?? 0;
+            if (onGoingJobCount > (userExport?.Limit ?? 1))
             {
-                return Result.Failure($"User already has {userExport.OnGoingJobIds.Count()} on going exports.");
+                return Result.Failure($"User already has {onGoingJobCount} on going exports.");
             }
 
             return Result.Success();
@@ -200,7 +212,7 @@ namespace SOS.Observations.Api.Controllers
             IFileService fileService,
             IUserExportRepository userExportRepository,
             ObservationApiConfiguration configuration,
-            ILogger<ExportsController> logger) : base(observationManager, areaManager, taxonManager)
+            ILogger<ExportsController> logger) : base(observationManager, areaManager, taxonManager, configuration)
         {
             _blobStorageManager = blobStorageManager ?? throw new ArgumentNullException(nameof(blobStorageManager));
             _exportManager = exportManager ?? throw new ArgumentNullException(nameof(exportManager));
@@ -240,9 +252,62 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
+        [HttpGet("My")]
+        [Authorize/*(Roles = "Privat")*/]
+        [ProducesResponseType(typeof(IEnumerable<ExportJobInfoDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetMyExports()
+        {
+            try
+            {
+                var userExport = await GetUserExportsAsync();
+
+                if (!userExport?.Jobs?.Any() ?? true)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
+                return new OkObjectResult(userExport?.Jobs?.Select(j => j.ToDto())?.OrderByDescending(j => j.CreatedDate));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting export files");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpGet("My/{id}")]
+        [Authorize/*(Roles = "Privat")*/]
+        [ProducesResponseType(typeof(ExportJobInfoDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetMyExport([FromRoute] string id)
+        {
+            try
+            {
+                var userExport = await GetUserExportsAsync();
+                var job = userExport?.Jobs?.Where(j => j.Id.Equals(id))?.FirstOrDefault();
+                if (job == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
+                return new OkObjectResult(job.ToDto());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting export files");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+
+        /// <inheritdoc />
         [HttpPost("Download/Csv")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> DownloadCsv(
              [FromBody] SearchFilterDto filter,
              [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
@@ -442,19 +507,29 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> OrderCsv([FromBody] SearchFilterDto filter,
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        public async Task<IActionResult> OrderCsv(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterDto filter,
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool sendMailFromZendTo = true,
+            [FromQuery] string encryptPassword = "",
+            [FromQuery] string confirmEncryptPassword = "",
             [FromQuery] string cultureCode = "sv-SE")
         {
             try
             {
+                CheckAuthorization(sensitiveObservations);
+
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
+                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -463,10 +538,9 @@ namespace SOS.Observations.Api.Controllers
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.Csv, cultureCode, false,
-                        propertyLabelType, false, null, JobCancellationToken.Null));
+                    job.RunAsync(exportFilter, UserId, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Csv, cultureCode, false,
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
 
-                userExports.OnGoingJobIds.Add(jobId);
                 var exportJobInfo = new ExportJobInfo
                 {
                     Id = jobId,
@@ -478,7 +552,6 @@ namespace SOS.Observations.Api.Controllers
                     OutputFieldSet = filter?.Output?.FieldSet
                 };
 
-                if (userExports.Jobs == null) userExports.Jobs = new List<ExportJobInfo>();
                 userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 
@@ -497,13 +570,24 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> OrderDwC([FromBody] SearchFilterDto filter, [FromQuery] string description)
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        public async Task<IActionResult> OrderDwC(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterDto filter, 
+            [FromQuery] string description,
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool sendMailFromZendTo = true,
+            [FromQuery] string encryptPassword = "",
+            [FromQuery] string confirmEncryptPassword = "")
         {
             try
             {
+                CheckAuthorization(sensitiveObservations);
+
                 var userExports = await GetUserExportsAsync();
-                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
+                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -512,10 +596,9 @@ namespace SOS.Observations.Api.Controllers
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.DwC, "en-GB", false,
-                        PropertyLabelType.PropertyName, false, null, JobCancellationToken.Null));
+                    job.RunAsync(exportFilter, UserId, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.DwC, "en-GB", false,
+                        PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
 
-                userExports.OnGoingJobIds.Add(jobId);
                 var exportJobInfo = new ExportJobInfo
                 {
                     Id = jobId,
@@ -526,7 +609,6 @@ namespace SOS.Observations.Api.Controllers
                     Description = description                    
                 };
 
-                if (userExports.Jobs == null) userExports.Jobs = new List<ExportJobInfo>();
                 userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 
@@ -545,19 +627,29 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> OrderExcel([FromBody] SearchFilterDto filter, 
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        public async Task<IActionResult> OrderExcel(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterDto filter, 
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
-            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool sendMailFromZendTo = true,
+            [FromQuery] string encryptPassword = "",
+            [FromQuery] string confirmEncryptPassword = "",
             [FromQuery] string cultureCode = "sv-SE")
         {
             try
             {
+                CheckAuthorization(sensitiveObservations);
+
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
+                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -567,10 +659,9 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
 
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.Excel, cultureCode, false,
-                        propertyLabelType, false, null, JobCancellationToken.Null));
+                    job.RunAsync(exportFilter, UserId, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Excel, cultureCode, false,
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
 
-                userExports.OnGoingJobIds.Add(jobId);
                 var exportJobInfo = new ExportJobInfo
                 {
                     Id = jobId,
@@ -582,7 +673,6 @@ namespace SOS.Observations.Api.Controllers
                     OutputFieldSet = filter?.Output?.FieldSet                    
                 };
 
-                if (userExports.Jobs == null) userExports.Jobs = new List<ExportJobInfo>();
                 userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 
@@ -601,21 +691,31 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> OrderGeoJson([FromBody] SearchFilterDto filter, 
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        public async Task<IActionResult> OrderGeoJson(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterDto filter, 
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
-            [FromQuery] string cultureCode = "sv-SE",
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool sendMailFromZendTo = true,
+            [FromQuery] string encryptPassword = "",
+            [FromQuery] string confirmEncryptPassword = "",
             [FromQuery] bool flat = true,
-            bool excludeNullValues = true)
+            [FromQuery]  bool excludeNullValues = true,
+            [FromQuery] string cultureCode = "sv-SE"            )
         {
             try
             {
+                CheckAuthorization(sensitiveObservations);
+
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
+                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -624,10 +724,9 @@ namespace SOS.Observations.Api.Controllers
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.GeoJson, cultureCode,
-                        flat, propertyLabelType, excludeNullValues, null, JobCancellationToken.Null));
+                    job.RunAsync(exportFilter, UserId, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.GeoJson, cultureCode,
+                        flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
 
-                userExports.OnGoingJobIds.Add(jobId);
                 var exportJobInfo = new ExportJobInfo
                 {
                     Id = jobId,
@@ -639,7 +738,6 @@ namespace SOS.Observations.Api.Controllers
                     OutputFieldSet = filter?.Output?.FieldSet
                 };
 
-                if (userExports.Jobs == null) userExports.Jobs = new List<ExportJobInfo>();
                 userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 

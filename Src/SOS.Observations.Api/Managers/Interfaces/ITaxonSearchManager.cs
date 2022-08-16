@@ -17,12 +17,14 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// A compleate geo tile taxa aggregation
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="zoom"></param>
         /// <returns></returns>
         Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
+            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter, 
@@ -31,6 +33,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Geo tile aggregation
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
@@ -39,6 +42,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="taxonIdPage"></param>
         /// <returns></returns>
         Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
+            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -51,11 +55,13 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// </summary>
         /// <param name="taxonIds"></param>
         /// <returns></returns>
-        Task<IEnumerable<TaxonSumAggregationItem>> GetCachedTaxonSumAggregationItemsAsync(IEnumerable<int> taxonIds);
+        Task<IEnumerable<TaxonSumAggregationItem>> GetCachedTaxonSumAggregationItemsAsync(
+            IEnumerable<int> taxonIds);
         
         /// <summary>
         /// Aggregate observations by taxon.
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
@@ -64,6 +70,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="sumUnderlyingTaxa"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -75,6 +82,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// Aggregates present observations by taxon (absent observations are excluded).
         /// The resulting items also contains sum of underlying taxa observation count.
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="taxonFilter"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
@@ -82,6 +90,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="sortOrder"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonSumAggregationItem>>> GetTaxonSumAggregationAsync(
+            int? userId,
             TaxonFilter taxonFilter,
             int? skip,
             int? take,
@@ -91,11 +100,13 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Get a indication if taxon exist in specified area
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
         Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
+            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter);

@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Elasticsearch.Net;
-using Microsoft.AspNetCore.Http;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
-using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
@@ -20,11 +18,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// </summary>
     public interface IProcessedObservationRepository : IProcessRepositoryBase<Observation, string>
     {
-        /// <summary>
-        /// Http context accessor.
-        /// </summary>
-        IHttpContextAccessor HttpContextAccessor { get; set; }
-
         /// <summary>
         ///  Add many items
         /// </summary>

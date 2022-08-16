@@ -5,7 +5,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
+using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Extensions;
+using SOS.Lib.Exceptions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
@@ -21,8 +23,9 @@ namespace SOS.Observations.Api.Controllers
         private const int MaxBatchSize = 1000;
         private const int ElasticSearchMaxRecords = 10000;
         private const int ElasticSearchMaxRecordsInternal = 100000;
-
         protected readonly IAreaManager AreaManager;
+        private ObservationApiConfiguration _observationApiConfiguration;
+        
 
         protected string ReplaceDomain(string str, string domain, string path)
         {
@@ -30,10 +33,23 @@ namespace SOS.Observations.Api.Controllers
             return Regex.Replace(str, string.Format(@"(https?:\/\/.*?)(\/{0}\/v2)?(\/.*)", path), m => domain + m.Groups[3].Value);
         }
 
+        protected void CheckAuthorization(bool sensitiveObservations)
+        {
+            if (sensitiveObservations && (!User?.HasAccessToScope(_observationApiConfiguration.ProtectedScope) ?? true))
+            {
+                throw new AuthenticationRequiredException("Not authorized");
+            }
+        }
+
         /// <summary>
-        /// Current user id
+        /// Get current users e-mail address
         /// </summary>
-        protected int CurrentUserId => int.Parse(User?.Claims?.FirstOrDefault(c => c?.Type == "sub")?.Value ?? "0");
+        protected string UserEmail => User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
+
+        /// <summary>
+        /// Get id of current user
+        /// </summary>
+        protected int UserId => int.Parse(User?.Claims?.FirstOrDefault(c => c.Type.Contains("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", StringComparison.CurrentCultureIgnoreCase))?.Value ?? "0");
 
         /// <summary>
         /// Check if passed areas exists
@@ -145,6 +161,32 @@ namespace SOS.Observations.Api.Controllers
             if (take != null && skip != null && skip + take > maxPagingRecords)
                 return Result.Failure($"Skip+Take={skip + take}. Skip+Take must be less than or equal to {maxPagingRecords}. Set Skip & Take to null if you want to retrieve all records.");
 
+            return Result.Success();
+        }
+
+        protected Result ValidateEncryptPassword(string password, string confirmPassword, bool sensitiveObservations)
+        {
+            var errors = new List<string>();
+            if (!password?.Any() ?? sensitiveObservations)
+            {
+                errors.Add("You need to state a encrypt password when you are requesting sensitive observations");
+            }
+
+            if ((password?.Trim().Length ?? 0) < 10)
+            {
+                errors.Add("Password must contain at least 10 characters");
+            }
+
+            if (password != confirmPassword)
+            {
+                errors.Add("Confirmed password is not equal to password");
+            }
+
+            if (errors.Any())
+            {
+                return Result.Failure(string.Join(". ", errors));
+            }
+    
             return Result.Success();
         }
 
@@ -309,10 +351,12 @@ namespace SOS.Observations.Api.Controllers
         /// Constructor
         /// </summary>
         /// <param name="areaManager"></param>
-        protected SearchBaseController(IAreaManager areaManager)
+        /// <param name="observationApiConfiguration"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        protected SearchBaseController(IAreaManager areaManager, ObservationApiConfiguration observationApiConfiguration)
         {
             AreaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
-           
+            _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
         }
     }
 }

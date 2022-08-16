@@ -103,11 +103,6 @@ namespace SOS.Lib.Repositories.Processed
         protected int NumberOfShards => _elasticConfiguration.NumberOfShards;
 
         /// <summary>
-        /// Protected scope
-        /// </summary>
-        protected string ProtectedScope => _elasticConfiguration.ProtectedScope;
-
-        /// <summary>
         /// Scroll batch size
         /// </summary>
         protected int ScrollBatchSize => _elasticConfiguration.ScrollBatchSize;

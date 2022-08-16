@@ -69,11 +69,6 @@ namespace SOS.Lib.Configuration.Shared
         public string UserName { get; set; }
 
         /// <summary>
-        /// Scope required for access to protected observations
-        /// </summary>
-        public string ProtectedScope { get; set; }
-
-        /// <summary>
         ///     dev, st or at. prod is empty
         /// </summary>
         public string IndexPrefix

@@ -41,9 +41,9 @@ namespace SOS.Lib.Managers
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task<List<ExtendedAuthorizationAreaFilter>> GetExtendedAuthorizationAreas(UserModel user, int roleId, string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<List<ExtendedAuthorizationAreaFilter>> GetExtendedAuthorizationAreas(int userId, int roleId, string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
-            if (user == null)
+            if (userId == 0)
             {
                 return null;
             }
@@ -52,7 +52,7 @@ namespace SOS.Lib.Managers
 
             if (roleId != 0)
             {
-                var userRoles = await _userService.GetUserRolesAsync(user.Id, authorizationApplicationIdentifier);
+                var userRoles = await _userService.GetUserRolesAsync(userId, authorizationApplicationIdentifier);
                 
                 var role = userRoles?.Where(r => r.Id.Equals(roleId))?.FirstOrDefault();
                 authorities = role?.Authorities;
@@ -60,7 +60,7 @@ namespace SOS.Lib.Managers
             else
             {
                 // Get user authorities
-                authorities = (await _userService.GetUserAuthoritiesAsync(user.Id, authorizationApplicationIdentifier))?.Where(a => a.AuthorityIdentity.Equals(authorityIdentity));
+                authorities = (await _userService.GetUserAuthoritiesAsync(userId, authorizationApplicationIdentifier))?.Where(a => a.AuthorityIdentity.Equals(authorityIdentity));
             }
             
             if (authorities == null)
@@ -383,15 +383,14 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task PrepareFilterAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
+        public async Task PrepareFilterAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
             // Get user
-            var user = await _userService.GetUserAsync();
-            (filter.ExtendedAuthorization ??= new ExtendedAuthorizationFilter()).UserId = user?.Id ?? 0;
+            (filter.ExtendedAuthorization ??= new ExtendedAuthorizationFilter()).UserId = userId ?? 0;
 
             if (filter.ExtendedAuthorization.ProtectedObservations)
             {
-                filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(user, roleId ?? 0, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
+                filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(userId ?? 0, roleId ?? 0, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
 
                 // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
                 if (filter is SearchFilter searchFilter)

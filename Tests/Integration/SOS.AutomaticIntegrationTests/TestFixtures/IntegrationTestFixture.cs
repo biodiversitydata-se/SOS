@@ -311,7 +311,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var userExportRepository = new UserExportRepository(_processClient, new NullLogger<UserExportRepository>());
             var userStatisticsManager = new UserStatisticsManager(processedObservationRepository, filterManager,
                 new NullLogger<UserStatisticsManager>());
-            UserStatisticsController = new UserStatisticsController(userStatisticsManager, taxonManager, areaManager,
+            UserStatisticsController = new UserStatisticsController(userStatisticsManager, areaManager, new ObservationApiConfiguration(),
                 new NullLogger<UserStatisticsController>());
             ObservationsController = new ObservationsController(observationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
             var checklistManager = new ChecklistManager(ProcessedChecklistRepository, processedObservationRepository, filterManager, new NullLogger<ChecklistManager>());
@@ -503,7 +503,6 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
-                new HttpContextAccessor(),
                 taxonManager,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;
@@ -519,7 +518,6 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 elasticClientManager,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
-                new HttpContextAccessor(),
                 taxonManager,
                 new NullLogger<ProcessedTaxonRepository>());
             return processedTaxonRepository;
@@ -556,7 +554,6 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var claim = new Claim("scope", "SOS.Observations.Protected");
             claimsIdentity.AddClaim(claim);
             contextAccessor.HttpContext.User.AddIdentity(claimsIdentity);
-            ProcessedObservationRepository.HttpContextAccessor = contextAccessor;
         }
 
         public void RestoreUserService()

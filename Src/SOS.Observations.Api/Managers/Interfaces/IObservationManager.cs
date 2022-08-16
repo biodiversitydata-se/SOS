@@ -31,6 +31,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Get chunk of sightings
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
@@ -39,12 +40,13 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="sortBy"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take, string sortBy,
+        Task<PagedResult<dynamic>> GetChunkAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder);
 
         /// <summary>
         /// Get observations by scroll
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
@@ -54,6 +56,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="scrollId"></param>
         /// <returns></returns>
         Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -65,6 +68,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Get aggregated data
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
@@ -72,27 +76,31 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetAggregatedChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, AggregationType aggregationType, int skip, int take);
+        Task<PagedResult<dynamic>> GetAggregatedChunkAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, AggregationType aggregationType, int skip, int take);
 
         /// <summary>
         /// Geo grid tile aggregation
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="precision"></param>
         /// <returns></returns>
-        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision);
+        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision);
 
         /// <summary>
         /// Get metric tiles aggregation
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="gridCellSizeInMeters"></param>
         /// <returns></returns>
-        Task<Result<GeoGridMetricResult>> GetMetricGridAggregationAsync(int? roleId,
+        Task<Result<GeoGridMetricResult>> GetMetricGridAggregationAsync(
+            int? userId,
+            int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter, int gridCellSizeInMeters);
 
@@ -108,17 +116,20 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Get number of matching observations
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
         Task<long> GetMatchCountAsync(
+            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier, SearchFilterBase filter);
 
         /// <summary>
         /// Get single observation
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="occurrenceId"></param>
@@ -129,35 +140,40 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="ensureArtportalenUpdated"></param>
         /// <returns></returns>
         Task<dynamic> GetObservationAsync(
+            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields, bool ensureArtportalenUpdated);
 
         /// <summary>
         /// Get user year counts
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<IEnumerable<YearCountResultDto>> GetUserYearCountAsync(SearchFilter filter);
+        Task<IEnumerable<YearCountResultDto>> GetUserYearCountAsync(int? userId, SearchFilter filter);
 
         /// <summary>
         /// Get user year month counts
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<IEnumerable<YearMonthCountResultDto>> GetUserYearMonthCountAsync(SearchFilter filter);
+        Task<IEnumerable<YearMonthCountResultDto>> GetUserYearMonthCountAsync(int? userId, SearchFilter filter);
 
         /// <summary>
         /// Count the number of user observations group by year, month and day
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="filter"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<YearMonthDayCountResultDto>> GetUserYearMonthDayCountAsync(SearchFilter filter, int skip, int take);
+        Task<IEnumerable<YearMonthDayCountResultDto>> GetUserYearMonthDayCountAsync(int? userId, SearchFilter filter, int skip, int take);
 
         /// <summary>
         /// Signal search
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
@@ -165,6 +181,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="onlyAboveMyClearance"></param>
         /// <returns></returns>
         Task<bool> SignalSearchInternalAsync(
+            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter, 

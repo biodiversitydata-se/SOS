@@ -366,7 +366,6 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
-                new HttpContextAccessor(),
                 taxonManager,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;
@@ -382,7 +381,6 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 elasticClientManager,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
-                new HttpContextAccessor(),
                 taxonManager,
                 new NullLogger<ProcessedTaxonRepository>());
             return processedTaxonRepository;
@@ -405,7 +403,6 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var claim = new Claim("scope", "SOS.Observations.Protected");
             claimsIdentity.AddClaim(claim);
             contextAccessor.HttpContext.User.AddIdentity(claimsIdentity);
-            ProcessedObservationRepository.HttpContextAccessor = contextAccessor;
         }
 
 

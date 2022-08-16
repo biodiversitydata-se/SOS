@@ -8,6 +8,5 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// </summary>
     public interface IUserExportRepository : IMongoDbProcessedRepositoryBase<UserExport, int>
     {
-       
     }
 }

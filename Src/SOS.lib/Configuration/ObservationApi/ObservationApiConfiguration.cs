@@ -29,6 +29,11 @@ namespace SOS.Lib.Configuration.ObservationApi
         public int OrderExportObservationsLimit { get; set; }
 
         /// <summary>
+        /// Protected scope
+        /// </summary>
+        public string ProtectedScope { get; set; }
+      
+        /// <summary>
         /// Taxon list id's allowed in signal search
         /// </summary>
         public IEnumerable<int> SignalSearchTaxonListIds { get; set; }

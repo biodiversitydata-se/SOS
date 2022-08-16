@@ -485,7 +485,6 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticClientManager"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
-        /// <param name="httpContextAccessor"></param>
         /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
@@ -493,9 +492,8 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            IHttpContextAccessor httpContextAccessor,
             ITaxonManager taxonManager,
-            ILogger<ProcessedTaxonRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, httpContextAccessor, elasticConfiguration, logger)
+            ILogger<ProcessedTaxonRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }

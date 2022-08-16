@@ -99,19 +99,34 @@ namespace SOS.Export.UnitTests.Managers
                 )
             ).ReturnsAsync(new FileExportResult { FilePath = "filePath" });
 
-            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat> ()))
-                .ReturnsAsync(false);
+            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat>(),
+                It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>()))
+                .ReturnsAsync(new Models.ZendTo.ZendToResponse());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyPath, false,
+            var result = await TestObject.ExportAndSendAsync(
+                It.IsAny<int>(),
+                It.IsAny<int>(),
+                It.IsAny<string>(),
+                It.IsAny<SearchFilter>(), 
+                It.IsAny<string>(), 
+                "", 
+                ExportFormat.DwC, 
+                "en-GB", 
+                false, 
+                PropertyLabelType.PropertyPath, 
+                false,
+                It.IsAny<bool>(),
+                It.IsAny<bool>(),
+                It.IsAny<string>(),
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeFalse();
+            result.Success.Should().BeFalse();
         }
 
         /// <summary>
@@ -131,13 +146,26 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false,  PropertyLabelType.PropertyPath, false,
+            var result = await TestObject.ExportAndSendAsync(
+                It.IsAny<int>(),
+                It.IsAny<int>(),
+                It.IsAny<string>(),
+                It.IsAny<SearchFilter>(), 
+                It.IsAny<string>(), 
+                "", ExportFormat.DwC, 
+                "en-GB", 
+                false,
+                PropertyLabelType.PropertyPath, 
+                false,
+                It.IsAny<bool>(),
+                It.IsAny<bool>(),
+                It.IsAny<string>(),
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeFalse();
+            result.Success.Should().BeFalse();
         }
 
         /// <summary>
