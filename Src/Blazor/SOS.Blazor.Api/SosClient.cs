@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using SOS.Blazor.Shared;
 
 namespace SOS.Blazor.Api
@@ -8,6 +9,12 @@ namespace SOS.Blazor.Api
     {
         private readonly HttpClient _client;
         private readonly string _apiUrl;
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true, 
+            Converters = { new JsonStringEnumConverter() }
+        };
+        
         public SosClient(string apiUrl)
         {
             _client = new HttpClient();
@@ -21,8 +28,22 @@ namespace SOS.Blazor.Api
             if (response.IsSuccessStatusCode)
             {
                 var resultString = response.Content.ReadAsStringAsync().Result;
-                var jsonSerializerOptions = new JsonSerializerOptions {PropertyNameCaseInsensitive = true};
-                var pagedResult = JsonSerializer.Deserialize<PagedResultDto<UserStatisticsItem>>(resultString, jsonSerializerOptions);
+                var pagedResult = JsonSerializer.Deserialize<PagedResultDto<UserStatisticsItem>>(resultString, _jsonSerializerOptions);
+                return pagedResult;
+            }
+            else
+            {
+                throw new Exception("Call to API failed, responseCode:" + response.StatusCode);
+            }
+        }
+
+        public async Task<PagedResultDto<Area>?> GetAreas(int skip, int take, AreaType areaType)
+        {
+            var response = await _client.GetAsync($"{_apiUrl}Areas?take={take}&skip={skip}&areaTypes={areaType}");
+            if (response.IsSuccessStatusCode)
+            {
+                var resultString = await response.Content.ReadAsStringAsync();
+                var pagedResult = JsonSerializer.Deserialize<PagedResultDto<Area>>(resultString, _jsonSerializerOptions);
                 return pagedResult;
             }
             else
