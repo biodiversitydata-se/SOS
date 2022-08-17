@@ -696,8 +696,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, sensitive observations index is queried if you have access rights.</param>
         /// <param name="ensureArtportalenUpdated">
-        /// If true, and the requested observation is sensitive (protected), then the original data will be returned (this requires authentication and authorization).
-        /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.
+        /// If true, a harvest and process job for that observation will be enqued to Hangfire, this action will wait for and return the updated result.
         /// </param>        
         /// <returns></returns>
         [HttpGet("Internal/{id?}")]
