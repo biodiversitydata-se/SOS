@@ -50,10 +50,10 @@ namespace SOS.Lib.Repositories.Processed
                 return PublicIndexName;
             }
 
-            if (!filter?.ExtendedAuthorization?.ExtendedAreas?.Any() ?? true)
+           /* if (!((filter?.ExtendedAuthorization?.ReportedByMe ?? false) || (filter?.ExtendedAuthorization?.ObservedByMe ?? false)) && (!filter?.ExtendedAuthorization?.ExtendedAreas?.Any() ?? true))
             {
                 throw new AuthenticationRequiredException("Not authorized");
-            }
+            }*/
 
             return ProtectedIndexName;
         }

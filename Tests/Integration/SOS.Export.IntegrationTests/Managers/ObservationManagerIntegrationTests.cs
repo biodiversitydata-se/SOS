@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.ApplicationInsights;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -78,7 +77,7 @@ namespace SOS.Export.IntegrationTests.Managers
             var filterManager = new Mock<IFilterManager>();
             filterManager
                 .Setup(us => us
-                    .PrepareFilterAsync(null, 0, null, new SearchFilter(), "Sighting", 0, false, false, true)
+                    .PrepareFilterAsync(0, null, new SearchFilter(0, false), "Sighting", 0, false, false, true)
                 );
 
             var observationManager = new ObservationManager(
@@ -112,7 +111,7 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndStoreAsync(new SearchFilter(), "Test", "all", "", JobCancellationToken.Null);
+                await observationManager.ExportAndStoreAsync(new SearchFilter(0), "Test", "all", "", JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -134,8 +133,8 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndSendAsync(null, null, null, 
-                    new SearchFilter{ 
+                await observationManager.ExportAndSendAsync(null, null, 
+                    new SearchFilter(0){ 
                         DataProviderIds = new List<int>{1}, OutputFields = new List<string>{
                             "datasetName",
                             "event.startDate",
@@ -183,7 +182,7 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndSendAsync(null, null, null, new SearchFilter
+                await observationManager.ExportAndSendAsync(null, null, new SearchFilter(0)
                 {
                     DataProviderIds = new List<int> { 1 },
                     OutputFields = new List<string> {

@@ -32,44 +32,66 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <summary>
         ///  Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter</param>
         /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
         Task<IActionResult> DownloadCsv(
+            int? roleId,
+            string authorizationApplicationIdentifier,
             SearchFilterDto filter,
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
-            bool gzip = true);
+            bool gzip = true,
+            bool sensitiveObservations = false);
 
         /// <summary>
         /// Download DwC export file. The limit is 25 000 observations. If you need to download more observations, use the OrderDwC endpoint.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter"></param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
-        Task<IActionResult> DownloadDwC(SearchFilterDto filter);
+        Task<IActionResult> DownloadDwC(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter,
+            bool sensitiveObservations = false);
 
         /// <summary>
         ///  Download Excel export file. The limit is 25 000 observations. If you need to download more observations, use the OrderExcel endpoint.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter</param>
         /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
-        Task<IActionResult> DownloadExcel(SearchFilterDto filter,
+        Task<IActionResult> DownloadExcel(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter,
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             string cultureCode = "sv-SE",
-            bool gzip = true);
+            bool gzip = true,
+            bool sensitiveObservations = false);
 
         /// <summary>
         /// Download GeoJson export file. The limit is 25 000 observations. If you need to download more observations, use the OrderGeoJson endpoint.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
         /// <param name="propertyLabelType">The label type to use if flat=false.</param>
@@ -77,14 +99,19 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
         /// <param name="excludeNullValues">Exclude properties with null values.</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
-        Task<IActionResult> DownloadGeoJson(SearchFilterDto filter,
+        Task<IActionResult> DownloadGeoJson(
+            int? roleId,
+            string authorizationApplicationIdentifier, 
+            SearchFilterDto filter,
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flat = true,
             bool excludeNullValues = true,
-            bool gzip = true);
+            bool gzip = true,
+            bool sensitiveObservations = false);
 
         /// <summary>
         /// Starts the process of creating a Csv file with observations based on provided filter.

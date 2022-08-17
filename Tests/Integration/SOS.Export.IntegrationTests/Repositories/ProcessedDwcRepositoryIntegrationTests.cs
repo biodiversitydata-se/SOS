@@ -28,7 +28,7 @@ namespace SOS.Export.IntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await processedObservationRepository.GetMultimediaBySearchAfterAsync(new SearchFilter());
+            var result = await processedObservationRepository.GetMultimediaBySearchAfterAsync(new SearchFilter(0));
             IEnumerable<SimpleMultimediaRow> multimediaRows = result.Records;
 
             //-----------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ namespace SOS.Export.IntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await processedObservationRepository.GetMeasurementOrFactsBySearchAfterAsync(new SearchFilter());
+            var result = await processedObservationRepository.GetMeasurementOrFactsBySearchAfterAsync(new SearchFilter(0));
             var projectParameters = result.Records;
 
             //-----------------------------------------------------------------------------------------------------------

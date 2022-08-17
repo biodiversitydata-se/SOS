@@ -53,12 +53,12 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<LocationSearchResultDto>> SearchAsync(int? userId, int? roleId, string authorizationApplicationIdentifier,
+        public async Task<IEnumerable<LocationSearchResultDto>> SearchAsync(int? roleId, string authorizationApplicationIdentifier,
             SearchFilter filter, int skip, int take)
         {
             try
             {
-                await _filterManager.PrepareFilterAsync(userId, roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var result = await _processedLocationRepository.SearchAsync(filter, skip, take);
 
                 return result?.Select(l => l.ToDto());

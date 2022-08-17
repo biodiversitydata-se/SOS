@@ -44,9 +44,9 @@ namespace SOS.Observations.Api.Managers
                     if (taxonAggregation == null)
                     {
                         _logger.LogInformation("Start create taxonSumAggregationCache");
-                        var searchFilter = new SearchFilter();
+                        var searchFilter = new SearchFilter(userId ?? 0, false);
                         searchFilter.PositiveSightings = true;
-                        _filterManager.PrepareFilterAsync(userId, null, null, searchFilter).Wait();
+                        _filterManager.PrepareFilterAsync(null, null, searchFilter).Wait();
                         Stopwatch sp = Stopwatch.StartNew();
                         taxonAggregation = await _processedTaxonRepository.GetTaxonSumAggregationAsync(searchFilter);
                         sp.Stop();
@@ -155,7 +155,6 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
-            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter, 
@@ -163,7 +162,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilterAsync(userId, roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedTaxonRepository.GetCompleteGeoTileTaxaAggregationAsync(filter, zoom);
             }
             catch (Exception e)
@@ -175,7 +174,6 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
-            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -185,7 +183,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilterAsync(userId, roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedTaxonRepository.GetPageGeoTileTaxaAggregationAsync(filter, zoom, geoTilePage, taxonIdPage);
             }
             catch (Exception e)
@@ -212,7 +210,7 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonSumAggregationItem>>> GetTaxonSumAggregationAsync(
-            int? userId,
+            int userId,
             TaxonFilter taxonFilter,
             int? skip,
             int? take,
@@ -280,7 +278,6 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
-            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -290,7 +287,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilterAsync(userId, roleId, authorizationApplicationIdentifier, filter);                
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);                
                 return await _processedTaxonRepository.GetTaxonAggregationAsync(filter, 
                     skip, 
                     take, 
@@ -305,14 +302,13 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
-            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter)
         {
             try
             {
-                await _filterManager.PrepareFilterAsync(userId, roleId, authorizationApplicationIdentifier, filter, "Sighting", 0, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "Sighting", 0, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
 
                 if (filter?.Taxa?.Ids?.Count() > 10000)
                 {

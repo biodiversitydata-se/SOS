@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
@@ -117,9 +118,9 @@ namespace SOS.Observations.Api.Controllers
                 return (Result: BadRequest(validationResults.Error), Count: null);
             }
 
-            var exportFilter = filter.ToSearchFilter("en-GB", sensitiveObservations);
-            var matchCount = await ObservationManager.GetMatchCountAsync(UserId, 0, null, exportFilter);
-
+            var exportFilter = filter.ToSearchFilter(UserId, sensitiveObservations, "en-GB");
+            var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter);
+            
             if (matchCount == 0)
             {
                 return (Result: NoContent(), Count: 0);
@@ -137,8 +138,9 @@ namespace SOS.Observations.Api.Controllers
         /// Validate input for download request
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="sensitiveObservations"></param>
         /// <returns></returns>
-        private async Task<IActionResult> DownloadValidateAsync(SearchFilterDto filter)
+        private async Task<IActionResult> DownloadValidateAsync(SearchFilterDto filter, bool sensitiveObservations)
         {
             var validationResults = ValidateSearchFilter(filter);
 
@@ -147,8 +149,8 @@ namespace SOS.Observations.Api.Controllers
                 return BadRequest(ValidateSearchFilter(filter).Error);
             }
 
-            var exportFilter = filter.ToSearchFilter("en-GB", false);
-            var matchCount = await ObservationManager.GetMatchCountAsync(UserId, 0, null, exportFilter);
+            var exportFilter = filter.ToSearchFilter(UserId, sensitiveObservations, "en-GB");
+            var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter);
 
             if (matchCount == 0)
             {
@@ -309,18 +311,24 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> DownloadCsv(
-             [FromBody] SearchFilterDto filter,
-             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
-             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
-             [FromQuery] string cultureCode = "sv-SE",
-             [FromQuery] bool gzip = true)
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterDto filter,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            [FromQuery] string cultureCode = "sv-SE",
+            [FromQuery] bool gzip = true,
+            [FromQuery] bool sensitiveObservations = false)
         {
-            HandleOutputFieldSet(filter, outputFieldSet);
-            cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             FileExportResult fileExportResult = null;
             try
             {
-                var validateResult = await DownloadValidateAsync(filter);
+                CheckAuthorization(sensitiveObservations);
+
+                HandleOutputFieldSet(filter, outputFieldSet);
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+               
+                var validateResult = await DownloadValidateAsync(filter, sensitiveObservations);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -330,7 +338,11 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
                
                 fileExportResult =
-                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.Csv,
+                    await _exportManager.CreateExportFileAsync(
+                        roleId,
+                        authorizationApplicationIdentifier,
+                        exportFilter,
+                        ExportFormat.Csv,
                         _exportPath, cultureCode,
                         false,
                         propertyLabelType,
@@ -343,6 +355,10 @@ namespace SOS.Observations.Api.Controllers
                     return GetFile(fileExportResult.FilePath, "Observations_Csv.zip", "application/zip");
                 else
                     return GetFile(fileExportResult.FilePath, "Observations.csv", "text/tab-separated-values"); // or "text/csv"?                
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -359,12 +375,19 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/DwC")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> DownloadDwC([FromBody] SearchFilterDto filter)
+        public async Task<IActionResult> DownloadDwC(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterDto filter,
+            [FromQuery] bool sensitiveObservations = false)
         {
             FileExportResult fileExportResult = null;
+
             try
-            {               
-                var validateResult = await DownloadValidateAsync(filter);
+            {
+                CheckAuthorization(sensitiveObservations);
+
+                var validateResult = await DownloadValidateAsync(filter, sensitiveObservations);
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
@@ -372,7 +395,10 @@ namespace SOS.Observations.Api.Controllers
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 fileExportResult =
-                    await _exportManager.CreateExportFileAsync(exportFilter, 
+                    await _exportManager.CreateExportFileAsync(
+                        roleId,
+                        authorizationApplicationIdentifier,
+                        exportFilter,
                         ExportFormat.DwC,
                         _exportPath, 
                         Cultures.en_GB, 
@@ -384,6 +410,10 @@ namespace SOS.Observations.Api.Controllers
 
                 HttpContext.LogObservationCount(fileExportResult.NrObservations);
                 return GetFile(fileExportResult.FilePath, "Observations_DwC.zip", "application/zip");
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -401,18 +431,25 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> DownloadExcel(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             [FromQuery] string cultureCode = "sv-SE",
-            [FromQuery] bool gzip = true)
+            [FromQuery] bool gzip = true,
+            [FromQuery] bool sensitiveObservations = false)
         {
-            HandleOutputFieldSet(filter, outputFieldSet);
-            cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             FileExportResult fileExportResult = null;
+
             try
             {
-                var validateResult = await DownloadValidateAsync(filter);
+                CheckAuthorization(sensitiveObservations);
+
+                HandleOutputFieldSet(filter, outputFieldSet);
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+                
+                var validateResult = await DownloadValidateAsync(filter, sensitiveObservations);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -421,8 +458,13 @@ namespace SOS.Observations.Api.Controllers
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 fileExportResult =
-                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.Excel, 
-                        _exportPath, cultureCode,
+                    await _exportManager.CreateExportFileAsync(
+                        roleId,
+                        authorizationApplicationIdentifier,
+                        exportFilter,
+                        ExportFormat.Excel, 
+                        _exportPath, 
+                        cultureCode,
                         false,
                         propertyLabelType,
                         false,
@@ -434,6 +476,10 @@ namespace SOS.Observations.Api.Controllers
                     return GetFile(fileExportResult.FilePath, "Observations_Excel.zip", "application/zip");
                 else
                     return GetFile(fileExportResult.FilePath, "Observations.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -450,21 +496,28 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/GeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> DownloadGeoJson([FromBody] SearchFilterDto filter,
+        public async Task<IActionResult> DownloadGeoJson(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterDto filter,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flat = true,
             [FromQuery] bool excludeNullValues = true,
-            [FromQuery] bool gzip = true)
+            [FromQuery] bool gzip = true,
+            [FromQuery] bool sensitiveObservations = false)
         {
-            HandleOutputFieldSet(filter, outputFieldSet);
-            cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             FileExportResult fileExportResult = null;
-            
+
             try
             {
-                var validateResult = await DownloadValidateAsync(filter);
+                CheckAuthorization(sensitiveObservations);
+
+                HandleOutputFieldSet(filter, outputFieldSet);
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+                
+                var validateResult = await DownloadValidateAsync(filter, sensitiveObservations);
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
@@ -474,6 +527,8 @@ namespace SOS.Observations.Api.Controllers
 
                 fileExportResult =
                     await _exportManager.CreateExportFileAsync(
+                        roleId,
+                        authorizationApplicationIdentifier,
                         exportFilter, 
                         ExportFormat.GeoJson, 
                         _exportPath, 
@@ -489,6 +544,10 @@ namespace SOS.Observations.Api.Controllers
                     return GetFile(fileExportResult.FilePath, "Observations_GeoJson.zip", "application/zip");
                 else                
                     return GetFile(fileExportResult.FilePath, "Observations.geojson", "application/geo+json");
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -538,7 +597,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, UserId, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Csv, cultureCode, false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Csv, cultureCode, false,
                         propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -556,6 +615,10 @@ namespace SOS.Observations.Api.Controllers
                 await UpdateUserExportsAsync(userExports);
 
                 return new OkObjectResult(jobId);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -596,7 +659,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, UserId, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.DwC, "en-GB", false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.DwC, "en-GB", false,
                         PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -613,6 +676,10 @@ namespace SOS.Observations.Api.Controllers
                 await UpdateUserExportsAsync(userExports);
 
                 return new OkObjectResult(jobId);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -659,7 +726,7 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
 
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, UserId, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Excel, cultureCode, false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Excel, cultureCode, false,
                         propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -677,6 +744,10 @@ namespace SOS.Observations.Api.Controllers
                 await UpdateUserExportsAsync(userExports);
 
                 return new OkObjectResult(jobId);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -724,7 +795,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, UserId, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.GeoJson, cultureCode,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.GeoJson, cultureCode,
                         flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -742,6 +813,10 @@ namespace SOS.Observations.Api.Controllers
                 await UpdateUserExportsAsync(userExports);
 
                 return new OkObjectResult(jobId);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {

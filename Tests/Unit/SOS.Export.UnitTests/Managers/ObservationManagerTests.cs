@@ -108,7 +108,6 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             var result = await TestObject.ExportAndSendAsync(
                 It.IsAny<int>(),
-                It.IsAny<int>(),
                 It.IsAny<string>(),
                 It.IsAny<SearchFilter>(), 
                 It.IsAny<string>(), 
@@ -147,7 +146,6 @@ namespace SOS.Export.UnitTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result = await TestObject.ExportAndSendAsync(
-                It.IsAny<int>(),
                 It.IsAny<int>(),
                 It.IsAny<string>(),
                 It.IsAny<SearchFilter>(), 

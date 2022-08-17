@@ -21,14 +21,13 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Search for locations
         /// </summary>
-        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<LocationSearchResultDto>> SearchAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, 
+        Task<IEnumerable<LocationSearchResultDto>> SearchAsync(int? roleId, string authorizationApplicationIdentifier, 
             SearchFilter filter, int skip, int take);
     }
 }

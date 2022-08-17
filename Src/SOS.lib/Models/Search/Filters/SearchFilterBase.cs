@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
-using static SOS.Lib.Models.Search.Filters.DateFilter;
 
 namespace SOS.Lib.Models.Search.Filters
 {
@@ -16,9 +14,15 @@ namespace SOS.Lib.Models.Search.Filters
         /// <summary>
         /// Constructor
         /// </summary>
-        public SearchFilterBase()
+        /// <param name="userId"></param>
+        /// <param name="sensitiveObservations"></param>
+        public SearchFilterBase(int userId, bool sensitiveObservations = false)
         {
-            ExtendedAuthorization = new ExtendedAuthorizationFilter();
+            ExtendedAuthorization = new ExtendedAuthorizationFilter
+            {
+                UserId = userId,
+                ProtectedObservations = sensitiveObservations
+            };
             Location = new LocationFilter();
         }
 

@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -545,15 +546,21 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             userServiceMock.Setup(userService => userService.GetUserAsync())
                 .ReturnsAsync(user);
             userServiceMock.Setup(userService =>
-                    userService.GetUserAuthoritiesAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+                    userService.GetUserAuthoritiesAsync(userId, It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(authorities);
-            _filterManager.UserService = userServiceMock.Object;
+            _filterManager.UserService = userServiceMock.Object;  
+        }
 
+        public void UseMockUser(ControllerBase controller, int userId, string email)
+        {
             var contextAccessor = new HttpContextAccessor() { HttpContext = new DefaultHttpContext() };
             var claimsIdentity = new ClaimsIdentity();
-            var claim = new Claim("scope", "SOS.Observations.Protected");
-            claimsIdentity.AddClaim(claim);
+            claimsIdentity.AddClaim(new Claim("scope", "SOS.Observations.Protected"));
+            claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
+            claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
             contextAccessor.HttpContext.User.AddIdentity(claimsIdentity);
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext { User = contextAccessor.HttpContext.User };
         }
 
         public void RestoreUserService()

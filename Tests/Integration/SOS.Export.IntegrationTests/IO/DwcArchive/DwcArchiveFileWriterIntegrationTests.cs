@@ -95,7 +95,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var processInfo = await processInfoRepository.GetAsync(processedObservationRepository.PublicIndexName);
             var filename = FilenameHelper.CreateFilenameWithDate("sos_dwc_archive_with_all_data");
             //var filter = new AdvancedFilter();
-            var filter = new SearchFilter { Taxa = new TaxonFilter{ Ids = new[] { 102951 } } };
+            var filter = new SearchFilter(0) { Taxa = new TaxonFilter{ Ids = new[] { 102951 } } };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -143,7 +143,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var fileExportResult = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 DataProvider.FilterSubsetDataProvider,
-                new SearchFilter(),
+                new SearchFilter(0),
                 filename,
                 processedDarwinCoreRepositoryStub.Object,
                 processInfo,

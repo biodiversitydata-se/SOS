@@ -46,7 +46,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationProcessing.D
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var nrObservations = await _fixture.DwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
-                new Lib.Models.Search.Filters.SearchFilter(),
+                new Lib.Models.Search.Filters.SearchFilter(0),
                 writeStream,
                 fieldDescriptions,
                 _fixture.ProcessedObservationRepository,

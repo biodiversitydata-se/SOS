@@ -96,7 +96,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var locations = await _locationManager.SearchAsync(UserId, roleId, authorizationApplicationIdentifier, searchFilter.ToSearchFilter("sv-SE", sensitiveObservations), skip, take);
+                var locations = await _locationManager.SearchAsync(roleId, authorizationApplicationIdentifier, searchFilter.ToSearchFilter(UserId, sensitiveObservations, "sv-SE"), skip, take);
 
                 return new OkObjectResult(locations);
             }

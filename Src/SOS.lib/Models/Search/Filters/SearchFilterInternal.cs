@@ -12,7 +12,9 @@ namespace SOS.Lib.Models.Search.Filters
         /// <summary>
         /// Constructor
         /// </summary>
-        public SearchFilterInternal() : base()
+        /// <param name="userId"></param>
+        /// <param name="sensitiveObservations"></param>
+        public SearchFilterInternal(int userId, bool sensitiveObservations = false) : base(userId, sensitiveObservations)
         {
 
         }
@@ -21,7 +23,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// Constructor
         /// </summary>
         /// <param name="searchFilter"></param>
-        public SearchFilterInternal(SearchFilter searchFilter) : base()
+        public SearchFilterInternal(SearchFilter searchFilter) : base(searchFilter?.ExtendedAuthorization?.UserId ?? 0, searchFilter?.ExtendedAuthorization?.ProtectedObservations ?? false)
         {
             if (searchFilter == null)
             {

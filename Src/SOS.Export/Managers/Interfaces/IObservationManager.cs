@@ -14,7 +14,6 @@ namespace SOS.Export.Managers.Interfaces
         /// <summary>
         ///  Create a export file and use ZendTo to send it to user
         /// </summary>
-        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
@@ -31,7 +30,6 @@ namespace SOS.Export.Managers.Interfaces
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ZendToResponse> ExportAndSendAsync(
-            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter, 

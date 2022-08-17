@@ -55,7 +55,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter,
+            var response = await _fixture.ExportsController.DownloadGeoJson(
+                null,
+                null,
+                searchFilter,
                 OutputFieldSet.Minimum,
                 PropertyLabelType.Swedish,
                 "sv-SE",
@@ -92,7 +95,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter,
+            var response = await _fixture.ExportsController.DownloadGeoJson(
+                null,
+                null,
+                searchFilter,
                 OutputFieldSet.Minimum,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
@@ -134,7 +140,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter,
+            var response = await _fixture.ExportsController.DownloadGeoJson(
+                null,
+                null,
+                searchFilter,
                 OutputFieldSet.Minimum,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
@@ -176,7 +185,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter,
+            var response = await _fixture.ExportsController.DownloadGeoJson(
+                null,
+                null,
+                searchFilter,
                 OutputFieldSet.Minimum,
                 PropertyLabelType.PropertyName,
                 "sv-SE",

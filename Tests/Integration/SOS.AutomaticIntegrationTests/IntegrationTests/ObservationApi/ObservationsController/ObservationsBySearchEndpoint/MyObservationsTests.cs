@@ -1,15 +1,11 @@
 ﻿using FizzWare.NBuilder;
 using FluentAssertions;
 using SOS.Lib.Models.Processed.Observation;
-using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos;
-using System.Linq;
-using LinqStatistics;
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
@@ -52,13 +48,14 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .WithMaxProtectionLevel(1)
                 .Build();
             _fixture.UseMockUserService(userId, authority);
+            _fixture.UseMockUser(_fixture.ObservationsController, userId, "user@test.xx");
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var searchFilter = new SearchFilterDto
             {
                 ObservedByMe = true
             };
-
+            
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -102,7 +99,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .WithMaxProtectionLevel(1)
                 .Build();
             _fixture.UseMockUserService(userId, authority);
-
+            _fixture.UseMockUser(_fixture.ObservationsController, userId, "user@test.xx");
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var searchFilter = new SearchFilterDto
             {
@@ -152,6 +149,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .WithMaxProtectionLevel(1)
                 .Build();
             _fixture.UseMockUserService(userId, authority);
+            _fixture.UseMockUser(_fixture.ObservationsController, userId, "user@test.xx");
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var searchFilter = new SearchFilterDto

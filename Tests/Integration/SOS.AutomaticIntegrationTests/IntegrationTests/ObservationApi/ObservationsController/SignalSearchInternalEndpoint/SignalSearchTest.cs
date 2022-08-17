@@ -64,9 +64,10 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             var authority = authorityBuilder
                 .WithAuthorityIdentity("SightingIndication")
                 .WithMaxProtectionLevel(1)
-                .WithAreaAccess(Lib.Enums.AreaType.County, "1")
+                .WithAreaAccess(Lib.Enums.AreaType.County, "3")
                 .Build();
-            _fixture.UseMockUserService(15, authority);
+            _fixture.UseMockUserService(userId, authority);
+            _fixture.UseMockUser(_fixture.ObservationsController, userId, "user@test.xx");
 
             var searchFilter = new SignalFilterDto
             {

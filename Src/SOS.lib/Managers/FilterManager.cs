@@ -383,14 +383,11 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task PrepareFilterAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
+        public async Task PrepareFilterAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
-            // Get user
-            (filter.ExtendedAuthorization ??= new ExtendedAuthorizationFilter()).UserId = userId ?? 0;
-
             if (filter.ExtendedAuthorization.ProtectedObservations)
             {
-                filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(userId ?? 0, roleId ?? 0, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
+                filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(filter.ExtendedAuthorization.UserId, roleId ?? 0, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
 
                 // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
                 if (filter is SearchFilter searchFilter)

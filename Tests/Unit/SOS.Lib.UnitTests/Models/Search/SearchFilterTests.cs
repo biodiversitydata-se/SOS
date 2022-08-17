@@ -17,7 +17,7 @@ namespace SOS.Lib.UnitTests.Models.Search
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var currentDate = DateTime.Now;
-            var filter = new SearchFilter
+            var filter = new SearchFilter(0)
             {
                 Location = new LocationFilter
                 {
@@ -64,7 +64,7 @@ namespace SOS.Lib.UnitTests.Models.Search
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var currentDate = DateTime.Now;
-            var filter = new SearchFilter
+            var filter = new SearchFilter(0)
             {
                 Location = new LocationFilter
                 {

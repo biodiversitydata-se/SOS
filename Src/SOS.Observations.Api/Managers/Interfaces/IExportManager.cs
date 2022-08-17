@@ -14,6 +14,8 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Create an export file and return path to the created file
         /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="exportFormat"></param>
         /// <param name="exportPath"></param>
@@ -24,7 +26,10 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<FileExportResult> CreateExportFileAsync(SearchFilter filter,
+        Task<FileExportResult> CreateExportFileAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
             ExportFormat exportFormat,
             string exportPath,
             string culture,

@@ -32,7 +32,7 @@ namespace SOS.Observations.Api.HealthChecks
 
             foreach (var provider in providers)
             {
-                var searchFilter = new SearchFilter()
+                var searchFilter = new SearchFilter(0, false)
                 {
                     DataProviderIds = new List<int>{ provider.Id },
                     OutputFields = new List<string>
@@ -40,7 +40,7 @@ namespace SOS.Observations.Api.HealthChecks
                         "taxon.id"
                     }
                 };
-                providerSearchTasks.Add(provider, _observationManager.GetChunkAsync(null, 0, null, searchFilter, 0, 1, "", SearchSortOrder.Asc));
+                providerSearchTasks.Add(provider, _observationManager.GetChunkAsync(0, null, searchFilter, 0, 1, "", SearchSortOrder.Asc));
             }
 
             await Task.WhenAll(providerSearchTasks.Values);

@@ -45,7 +45,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             await customRepository.DisableIndexingAsync(protectedIndex);
             await customRepository.AddManyAsync(observations, protectedIndex);
             await customRepository.EnableIndexingAsync(protectedIndex);
-            SearchFilter filter = new SearchFilter();
+            SearchFilter filter = new SearchFilter(0);
             var obs = await customRepository.GetObservationAsync("obs1", filter);
 
             //-----------------------------------------------------------------------------------------------------------

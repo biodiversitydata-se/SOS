@@ -15,7 +15,6 @@ namespace SOS.Lib.Jobs.Export
         /// Run export job
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="email"></param>
@@ -35,7 +34,6 @@ namespace SOS.Lib.Jobs.Export
         [AutomaticRetry(Attempts = 2, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
         [Queue("medium")]
         Task<bool> RunAsync(SearchFilter filter,
-            int userId,
             int? roleId,
             string authorizationApplicationIdentifier,
             string email,

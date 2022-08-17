@@ -50,7 +50,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observations = await processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(new SearchFilter());
+            var observations = await processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(new SearchFilter(0));
 
             var serializerSettings = new JsonSerializerSettings
             {

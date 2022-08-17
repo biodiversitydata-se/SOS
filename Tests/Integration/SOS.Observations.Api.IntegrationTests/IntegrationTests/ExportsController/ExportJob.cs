@@ -58,7 +58,13 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.Minimum, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcel(
+                null,
+                null, 
+                searchFilter, 
+                OutputFieldSet.Minimum, 
+                PropertyLabelType.Swedish, 
+                "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -100,7 +106,13 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, OutputFieldSet.Minimum, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadGeoJson(
+                null,
+                null,
+                searchFilter, 
+                OutputFieldSet.Minimum, 
+                PropertyLabelType.Swedish, 
+                "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -132,7 +144,13 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, OutputFieldSet.Minimum, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadGeoJson(
+                null,
+                null,
+                searchFilter, 
+                OutputFieldSet.Minimum, 
+                PropertyLabelType.Swedish, 
+                "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------

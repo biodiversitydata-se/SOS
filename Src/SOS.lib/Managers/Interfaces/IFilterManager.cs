@@ -18,7 +18,6 @@ namespace SOS.Lib.Managers.Interfaces
         /// <summary>
         /// Creates a with additional information if necessary. E.g. adding underlying taxon ids.
         /// </summary>
-        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
@@ -29,7 +28,6 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="setDefaultProviders"></param>
         /// <returns></returns>
         Task PrepareFilterAsync(
-            int? userId,
             int? roleId,
             string authorizationApplicationIdentifier, 
             SearchFilterBase filter,

@@ -26,7 +26,7 @@ namespace SOS.Observations.Api.HealthChecks
        
         private async Task<(TimeSpan Duration, long TotalCount)> SearchPicaPicaAsync()
         {
-            var searchFilter = new SearchFilter()
+            var searchFilter = new SearchFilter(0)
             {
                 Taxa = new TaxonFilter
                 {
@@ -42,11 +42,11 @@ namespace SOS.Observations.Api.HealthChecks
             };
 
             // Warm up
-            await _observationManager.GetChunkAsync(null, 0, null, searchFilter, 0, 2, "", SearchSortOrder.Asc);
+            await _observationManager.GetChunkAsync(0, null, searchFilter, 0, 2, "", SearchSortOrder.Asc);
 
             var sw = new Stopwatch();
             sw.Start();
-            var result = await _observationManager.GetChunkAsync(null, 0, null, searchFilter, 0, 2, "", SearchSortOrder.Asc);
+            var result = await _observationManager.GetChunkAsync(0, null, searchFilter, 0, 2, "", SearchSortOrder.Asc);
             sw.Stop();
 
             return (Duration: sw.Elapsed, TotalCount: result.TotalCount);

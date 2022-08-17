@@ -81,6 +81,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .WithMaxProtectionLevel(1)                
                 .Build();
             _fixture.UseMockUserService(15, authority);
+            _fixture.UseMockUser(_fixture.ObservationsController, 15, "user@test.xx");
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var searchFilter = new SearchFilterDto
@@ -130,6 +131,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .WithMaxProtectionLevel(3)                
                 .Build();
             _fixture.UseMockUserService(15, authority);
+            _fixture.UseMockUser(_fixture.ObservationsController, 15, "user@test.xx");
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var searchFilter = new SearchFilterDto
@@ -179,6 +181,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .WithMaxProtectionLevel(1)
                 .Build();
             _fixture.UseMockUserService(userId, authority);
+            _fixture.UseMockUser(_fixture.ObservationsController, userId, "user@test.xx");
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var searchFilter = new SearchFilterDto
@@ -228,6 +231,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .WithMaxProtectionLevel(1)
                 .Build();
             _fixture.UseMockUserService(userId, authority);
+            _fixture.UseMockUser(_fixture.ObservationsController, userId, "user@test.xx");
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var searchFilter = new SearchFilterDto

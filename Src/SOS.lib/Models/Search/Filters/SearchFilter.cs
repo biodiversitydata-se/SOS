@@ -10,7 +10,9 @@ namespace SOS.Lib.Models.Search.Filters
         /// <summary>
         /// Constructor
         /// </summary>
-        public SearchFilter() : base()
+        /// <param name="userId"></param>
+        /// <param name="sensitiveObservations"></param>
+        public SearchFilter(int userId, bool sensitiveObservations = false) : base(userId, sensitiveObservations)
         {
 
         }

@@ -94,7 +94,6 @@ namespace SOS.Export.Managers
 
         /// <inheritdoc />
         public async Task<ZendToResponse> ExportAndSendAsync(
-            int? userId, 
             int? roleId, 
             string authorizationApplicationIdentifier,
             SearchFilter filter, 
@@ -113,7 +112,7 @@ namespace SOS.Export.Managers
             FileExportResult fileExportResult = null;
             try
             {
-                await _filterManager.PrepareFilterAsync(userId, roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
 
                 fileExportResult = exportFormat switch
                 {
@@ -166,7 +165,7 @@ namespace SOS.Export.Managers
             FileExportResult fileExportResult = null;
             try
             {
-                await _filterManager.PrepareFilterAsync(null, null, null, filter);
+                await _filterManager.PrepareFilterAsync(null, null, filter);
                 fileExportResult = await CreateDWCExportAsync(filter, fileName, cancellationToken);
 
                 // Blob Storage Containers must be in lower case

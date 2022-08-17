@@ -113,8 +113,8 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(SearchFilter filter, 
-            int userId,
+        public async Task<bool> RunAsync(
+            SearchFilter filter, 
             int? roleId, 
             string authorizationApplicationIdentifier,
             string email, 
@@ -130,13 +130,16 @@ namespace SOS.Export.Jobs
             PerformContext context,
             IJobCancellationToken cancellationToken)
         {
+            var userId = filter?.ExtendedAuthorization?.UserId ?? 0;
+
             try
             {
+                
                 _logger.LogInformation("Start export and send job");
                 Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
                 await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
                 
-                var response = await _observationManager.ExportAndSendAsync(userId, roleId, authorizationApplicationIdentifier, filter, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptPassword, cancellationToken);
+                var response = await _observationManager.ExportAndSendAsync(roleId, authorizationApplicationIdentifier, filter, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptPassword, cancellationToken);
                 
                 _logger.LogInformation($"End export and send job. Success: {response.Success}");
                 await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);

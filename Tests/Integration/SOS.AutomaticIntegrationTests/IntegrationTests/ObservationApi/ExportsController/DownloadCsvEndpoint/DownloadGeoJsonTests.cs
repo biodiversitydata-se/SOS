@@ -68,6 +68,8 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var geoJsonFileResult = await _fixture.ExportsController.DownloadGeoJson(
+                null,
+                null,
                 searchFilter,
                 OutputFieldSet.Minimum,
                 gzip: false);

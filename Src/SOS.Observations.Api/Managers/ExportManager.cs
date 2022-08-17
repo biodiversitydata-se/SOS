@@ -254,7 +254,10 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<FileExportResult> CreateExportFileAsync(SearchFilter filter,
+        public async Task<FileExportResult> CreateExportFileAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
             ExportFormat exportFormat,
             string exportPath,
             string culture,
@@ -266,7 +269,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilterAsync(null, 0,null, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
 
                 var fileExportResult = exportFormat switch
                 {

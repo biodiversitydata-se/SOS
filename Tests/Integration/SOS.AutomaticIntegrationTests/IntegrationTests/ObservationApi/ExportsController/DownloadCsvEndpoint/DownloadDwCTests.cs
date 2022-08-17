@@ -104,6 +104,8 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var dwCFileResult = await _fixture.ExportsController.DownloadDwC(
+                null,
+                null,
                 searchFilter);
 
             var file = (FileContentResult)dwCFileResult;
