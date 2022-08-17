@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using SOS.Blazor.Shared;
+using SOS.Blazor.Shared.Models;
 
 namespace SOS.Blazor.Api.Controllers
 {
@@ -15,7 +15,7 @@ namespace SOS.Blazor.Api.Controllers
         }
 
         [HttpPost("PagedSpeciesCountAggregation")]
-        public async Task<PagedResultDto<UserStatisticsItem>?> GetByQuery(
+        public async Task<PagedResult<UserStatisticsItem>?> GetByQuery(
             [FromQuery] int skip, 
             [FromQuery] int take, 
             [FromBody] SpeciesCountUserStatisticsQuery query)

@@ -1,4 +1,4 @@
-﻿namespace SOS.Blazor.Shared
+﻿namespace SOS.Blazor.Shared.Models
 {
     public class UserStatisticsItem
     {

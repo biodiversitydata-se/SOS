@@ -1,4 +1,4 @@
-﻿namespace SOS.Blazor.Shared
+﻿namespace SOS.Blazor.Shared.Models
 {
     public class SpeciesCountUserStatisticsQuery
     {
@@ -6,11 +6,11 @@
         public int? Year { get; set; }
         public SpeciesGroup? SpeciesGroup { get; set; }
         public AreaType? AreaType { get; set; }
-        public string? FeatureId { get; set; }
+        public string FeatureId { get; set; }
         public int? SiteId { get; set; }
         public int? ProjectId { get; set; }
         public bool IncludeOtherAreasSpeciesCount { get; set; }
-        public string? SortByFeatureId { get; set; }
+        public string SortByFeatureId { get; set; }
     }
 
     public enum AreaType

@@ -1,5 +1,4 @@
 ﻿@page "/artportalentoplist"
-@using SOS.Blazor.Shared
 @inject HttpClient _httpClient
 @inject NavigationManager _navManager
 
@@ -47,9 +46,10 @@
         try
         {
             // Get provinces
-            var provincesResponse = await _httpClient.GetFromJsonAsync<PagedResultDto<Area>>("Areas?skip=0&take=100&areaType=Province");
+            var provincesResponse = await _httpClient.GetFromJsonAsync<PagedResult<Area>>("Areas?skip=0&take=100&areaType=Province");
             _provinces = provincesResponse.Records.OrderBy(a => Convert.ToInt32(a.FeatureId)).ToList();
-            
+            var dataProvidersResponse = await _httpClient.GetFromJsonAsync<IEnumerable<DataProviderStatus>>("DataProviders/DataProviderStatus");
+
             // Setup user statistics provider
             _userStatisticsProvider = async req =>
             {
@@ -64,7 +64,7 @@
                     query.FeatureId = _selectedProvinceFeatureId;
                 }
                 var response = await _httpClient.PostAsJsonAsync(url, query);
-                var pagedResult = await response.Content.ReadFromJsonAsync<PagedResultDto<UserStatisticsItem>>();
+                var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
                 return GridItemsProviderResult.From(
                     items: pagedResult!.Records.ToList(),
                     totalItemCount: (int)pagedResult!.TotalCount);

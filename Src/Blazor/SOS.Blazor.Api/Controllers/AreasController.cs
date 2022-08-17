@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using SOS.Blazor.Shared;
+using SOS.Blazor.Shared.Models;
 
 namespace SOS.Blazor.Api.Controllers
 {
@@ -15,7 +15,7 @@ namespace SOS.Blazor.Api.Controllers
         }
 
         [HttpGet("")]
-        public async Task<PagedResultDto<Area>?> GetAreas(
+        public async Task<PagedResult<Area>?> GetAreas(
             [FromQuery] int skip, 
             [FromQuery] int take, 
             [FromQuery] AreaType areaType)

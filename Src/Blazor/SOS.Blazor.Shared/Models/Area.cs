@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SOS.Blazor.Shared
+namespace SOS.Blazor.Shared.Models
 {
     public class Area
     {

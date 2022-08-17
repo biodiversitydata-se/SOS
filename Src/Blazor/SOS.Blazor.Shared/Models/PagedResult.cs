@@ -1,10 +1,10 @@
-﻿namespace SOS.Blazor.Shared
+﻿namespace SOS.Blazor.Shared.Models
 {
     /// <summary>
     ///     Result returned by paged query
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class PagedResultDto<T>
+    public class PagedResult<T>
     {
         /// <summary>
         ///     Ignores the specified number of items and returns a sequence starting at the item after the last skipped item (if
