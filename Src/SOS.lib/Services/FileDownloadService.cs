@@ -76,7 +76,7 @@ namespace SOS.Lib.Services
             catch (Exception e)
             {
                 _logger.LogError($"Failed to get XML-file ({url})", e);
-                return null;
+                throw;
             }
         }
 

@@ -124,8 +124,7 @@ namespace SOS.Harvest.Processors
                 cancellationToken?.ThrowIfCancellationRequested();
                 Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({batchId})");
                 var mongoDbReadTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbRead);
-                var retryPolicy = PollyHelper.GetRetryPolicy(3, 300);
-
+ 
                 // Make up to 3 attempts with 0,5 sek sleep between the attempts 
                 var verbatimObservationsBatch = await PollyHelper.GetRetryPolicy(3, 500).ExecuteAsync(async () =>
                 {

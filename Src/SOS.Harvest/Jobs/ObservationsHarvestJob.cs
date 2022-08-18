@@ -243,9 +243,9 @@ namespace SOS.Harvest.Jobs
                 }
 
                 //---------------------------------------------------------------------------------------------------------
-                // 4. Make sure mandatory providers where successful
+                // 4. Make sure all providers where successful
                 //---------------------------------------------------------------------------------------------------------
-                var success = harvestTaskByDataProvider.Where(dp => dp.Key.HarvestFailPreventProcessing)
+                var success = harvestTaskByDataProvider
                     .All(r => r.Value.Result.Status == RunStatus.Success);
 
                 _logger.LogInformation($"Finish {mode} observations harvesting. Success: { success }");

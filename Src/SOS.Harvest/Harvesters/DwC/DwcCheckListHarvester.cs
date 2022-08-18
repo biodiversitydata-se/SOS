@@ -8,6 +8,7 @@ using SOS.Harvest.Harvesters.DwC.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
@@ -163,7 +164,7 @@ namespace SOS.Harvest.Harvesters.DwC
             {
                 Status = RunStatus.Failed
             };
-            XDocument emlDocument = null;
+            XDocument emlDocument = null!;
 
             var downloadUrlEml = provider.DownloadUrls
                 ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.ChecklistEml))?.Url;
@@ -171,9 +172,12 @@ namespace SOS.Harvest.Harvesters.DwC
             {
                 try
                 {
-                    // Try to get eml document from ipt
-                    emlDocument = await _fileDownloadService.GetXmlFileAsync(downloadUrlEml);
-
+                    // Make up to 3 attempts with 1 sek sleep between the attempts 
+                    emlDocument = await PollyHelper.GetRetryPolicy(3, 1000).ExecuteAsync(async () =>
+                    {
+                        return await _fileDownloadService.GetXmlFileAsync(downloadUrlEml);
+                    });
+                   
                     if (emlDocument != null)
                     {
                         if (DateTime.TryParse(
