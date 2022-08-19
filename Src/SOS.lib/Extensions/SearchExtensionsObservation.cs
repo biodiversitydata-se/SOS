@@ -347,7 +347,7 @@ namespace SOS.Lib
         {
             var sightingTypeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
-            // Search group 2 and 128 have no effect since we don't harvest sighting type 2,5,6,7,9,10 who are the types using these groups
+            // Search group 2 no effect since we don't harvest sighting type 2,5,6,7,9 who are the types using this group
             var sightingTypeSearchGroupFilter = filter.TypeFilter switch
             {
                 SearchFilterBase.SightingTypeFilter.ShowBoth => new[] { // 1, 2, 4, 16, 32, 128
