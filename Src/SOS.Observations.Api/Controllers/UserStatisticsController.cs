@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -61,8 +62,7 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="query">The query.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
-        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
-        /// <param name="sortBy">Sort by sum or featureId.</param>
+        /// <param name="take">Max number of records to return. Max number of records is 100.</param>
         /// <param name="useCache"></param>
         /// <returns></returns>
         [HttpPost("PagedSpeciesCountAggregation")]
@@ -74,13 +74,12 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SpeciesCountUserStatisticsQuery query,
             [FromQuery] int? skip = null,
             [FromQuery] int? take = null,
-            [FromQuery] string sortBy = "sum",
             [FromQuery] bool useCache = true)
         {
             try
             {
                 // todo - add validation
-                var result = await _userStatisticsManager.PagedSpeciesCountSearchAsync(query, skip, take, sortBy, useCache);
+                var result = await _userStatisticsManager.PagedSpeciesCountSearchAsync(query, skip, take, useCache);
                 PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -91,20 +90,31 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Aggregates taxon by user.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
+        /// <param name="take">Max number of records to return. Max number of records is 100.</param>
+        /// <param name="useCache"></param>
+        /// <returns></returns>
         [HttpPost("SpeciesCountAggregation")]
-        [ProducesResponseType(typeof(IEnumerable<UserStatisticsItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResultDto<UserStatisticsItem>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> SpeciesCountAggregation(
             [FromBody] SpeciesCountUserStatisticsQuery query,
+            [FromQuery] int? skip = null,
+            [FromQuery] int? take = null,
             [FromQuery] bool useCache = true)
         {
             try
             {
                 // todo - add validation
-                var result = await _userStatisticsManager.SpeciesCountSearchAsync(query, useCache);
-                return new OkObjectResult(result);
+                var result = await _userStatisticsManager.SpeciesCountSearchAsync(query, skip, take, useCache);
+                PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
+                return new OkObjectResult(dto);
             }
             catch (Exception e)
             {
@@ -112,7 +122,47 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-        
+
+        /// <summary>
+        /// Experimental. The functionality should be the same as PagedSpeciesCountAggregation but without the need to create a new index.
+        /// Aggregates taxon by user. 
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
+        /// <param name="take">Max number of records to return. Max number of records is 100.</param>
+        /// <param name="useCache"></param>
+        /// <returns></returns>
+        [HttpPost("ProcessedObservationPagedSpeciesCountAggregation")]
+        [ProducesResponseType(typeof(PagedResultDto<UserStatisticsItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ProcessedObservationPagedSpeciesCountAggregation(
+            [FromBody] SpeciesCountUserStatisticsQuery query,
+            [FromQuery] int? skip = null,
+            [FromQuery] int? take = null,
+            [FromQuery] bool useCache = true)
+        {
+            try
+            {
+                // todo - add validation
+                Stopwatch sw = Stopwatch.StartNew();
+                _logger.LogInformation(
+                    $"Start ProcessedObservationPagedSpeciesCountAggregation(skip={skip}, take={take}, useCache={useCache})");
+                var result = await _userStatisticsManager.ProcessedObservationPagedSpeciesCountSearchAsync(query, skip, take, useCache);
+                PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
+                sw.Stop();
+                _logger.LogInformation(
+                    $"Finish ProcessedObservationPagedSpeciesCountAggregation(skip={skip}, take={take}, useCache={useCache}). Elapsed ms: {sw.ElapsedMilliseconds}");
+                return new OkObjectResult(dto);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "PagedSpeciesCountAggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
         [HttpGet("SpeciesCountByMonthAggregation")]
         [ProducesResponseType(typeof(IEnumerable<UserStatisticsByMonthItem>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]

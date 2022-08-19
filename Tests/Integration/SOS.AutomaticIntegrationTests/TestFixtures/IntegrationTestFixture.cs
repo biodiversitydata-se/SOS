@@ -78,6 +78,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         public DataProvidersController DataProvidersController { get; private set; }
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
         public ProcessedChecklistRepository ProcessedChecklistRepository { get; set; }
+        public UserObservationRepository UserObservationRepository { get; set; }
         public ArtportalenVerbatimRepository ArtportalenVerbatimRepository { get; set; }
         public ArtportalenChecklistVerbatimRepository ArtportalenChecklistVerbatimRepository { get; set; }
         private DwcaObservationFactory _darwinCoreFactory;
@@ -153,6 +154,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             CreateObservationIntegrationTestIndexAsync(false).Wait();
             CreateObservationIntegrationTestIndexAsync(true).Wait();
             CreateChecklistIntegrationTestIndexAsync().Wait();
+            CreateUserObservationIntegrationTestIndexAsync().Wait();
         }
 
         public void Dispose()
@@ -160,6 +162,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             DeleteObservationIntegrationTestIndexAsync(false).Wait();
             DeleteObservationIntegrationTestIndexAsync(true).Wait();
             DeleteChecklistIntegrationTestIndexAsync().Wait();
+            DeleteUserObservationIntegrationTestIndexAsync().Wait();
         }
 
         public void InitControllerHttpContext()
@@ -282,6 +285,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
 
             var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, _processClient, memoryCache, taxonManager);
             ProcessedChecklistRepository = CreateProcessedChecklistRepository(elasticConfiguration, elasticClientManager, _processClient);
+            UserObservationRepository = CreateUserObservationRepository(elasticConfiguration, elasticClientManager, _processClient);
             _vocabularyRepository = new VocabularyRepository(_processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(_processClient, _vocabularyRepository);
             var projectManger = CreateProjectManager(_processClient);
@@ -309,8 +313,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(_processClient, new NullLogger<UserExportRepository>());
-            var userStatisticsManager = new UserStatisticsManager(processedObservationRepository, filterManager,
-                new NullLogger<UserStatisticsManager>());
+            var userStatisticsManager = new UserStatisticsManager(UserObservationRepository, processedObservationRepository, new NullLogger<UserStatisticsManager>());
             UserStatisticsController = new UserStatisticsController(userStatisticsManager, taxonManager, areaManager,
                 new NullLogger<UserStatisticsController>());
             ObservationsController = new ObservationsController(observationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
@@ -539,6 +542,20 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return processedChecklistRepository;
         }
 
+        private UserObservationRepository CreateUserObservationRepository(
+            ElasticSearchConfiguration elasticConfiguration,
+            IElasticClientManager elasticClientManager,
+            IProcessClient processClient)
+        {
+            var userObservationRepository = new UserObservationRepository(
+                elasticClientManager,
+                elasticConfiguration,
+                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                new NullLogger<UserObservationRepository>());
+
+            return userObservationRepository;
+        }
+
         public void UseMockUserService(int userId, params AuthorityModel[] authorities)
         {
             UserModel user = new UserModel();
@@ -591,10 +608,26 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             await ProcessedChecklistRepository.DeleteCollectionAsync();
         }
 
+        private async Task CreateUserObservationIntegrationTestIndexAsync()
+        {
+            await UserObservationRepository.ClearCollectionAsync();
+        }
+        private async Task DeleteUserObservationIntegrationTestIndexAsync()
+        {
+            await UserObservationRepository.DeleteCollectionAsync();
+        }
+
         public async Task ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
         {
             var processedObservations = ProcessObservations(verbatimObservations);
             await AddObservationsToElasticsearchAsync(processedObservations);
+        }
+
+        public async Task ProcessAndAddUserObservationToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+        {
+            List<Observation> processedObservations = ProcessObservations(verbatimObservations);
+            var userObservations = processedObservations.ToUserObservations();
+            await AddUserObservationsToElasticsearchAsync(userObservations);
         }
 
         public async Task ProcessAndAddChecklistsToElasticSearch(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists)
@@ -648,6 +681,19 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             await ProcessedChecklistRepository.DisableIndexingAsync();
             await ProcessedChecklistRepository.AddManyAsync(checklists);
             await ProcessedChecklistRepository.EnableIndexingAsync();
+
+            Thread.Sleep(1000);
+        }
+
+        public async Task AddUserObservationsToElasticsearchAsync(IEnumerable<UserObservation> userObservations, bool clearExistingUserObservations = true)
+        {
+            if (clearExistingUserObservations)
+            {
+                await UserObservationRepository.DeleteAllDocumentsAsync();
+            }
+            await UserObservationRepository.DisableIndexingAsync();
+            await UserObservationRepository.AddManyAsync(userObservations);
+            await UserObservationRepository.EnableIndexingAsync();
 
             Thread.Sleep(1000);
         }

@@ -111,7 +111,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             {
                 processedObservationRepository = CreateProcessedObservationRepositoryMock(batchSize).Object;
             }
-
+            IUserObservationRepository userObservationRepository = new Mock<IUserObservationRepository>().Object;
 
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
@@ -138,6 +138,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 diffusionManager,
                 processTimeManager,
                 sightingRepository,
+                userObservationRepository,
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
         }

@@ -69,7 +69,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<VirtualHerbariumObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
         {
             _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ??
                                                              throw new ArgumentNullException(

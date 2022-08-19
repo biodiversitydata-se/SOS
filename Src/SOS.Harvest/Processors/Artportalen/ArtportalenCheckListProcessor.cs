@@ -28,11 +28,11 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ArtportalenChecklistProcessor(IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int> artportalenVerbatimRepository,
-            IProcessedChecklistRepository processedCheckListRepository,
+            IProcessedChecklistRepository processedChecklistRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
             ILogger<ArtportalenChecklistProcessor> logger) :
-                base(processedCheckListRepository, processManager, processTimeManager, logger)
+                base(processedChecklistRepository, processManager, processTimeManager, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));

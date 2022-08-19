@@ -19,6 +19,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Repositories.Processed;
 
 namespace SOS.Harvest.Processors
 {
@@ -28,6 +29,7 @@ namespace SOS.Harvest.Processors
     {
         private readonly IDiffusionManager _diffusionManager;
         private readonly bool _logGarbageCharFields;
+        private readonly ProcessConfiguration _processConfiguration;
 
         /// <summary>
         /// Commit batch
@@ -185,6 +187,7 @@ namespace SOS.Harvest.Processors
         protected readonly IVocabularyValueResolver vocabularyValueResolver;
         protected readonly IProcessedObservationRepository ProcessedObservationRepository;
         protected readonly IValidationManager ValidationManager;
+        protected readonly IUserObservationRepository _userObservationRepository;
 
         protected bool EnableDiffusion { get; }
 
@@ -198,6 +201,7 @@ namespace SOS.Harvest.Processors
         /// <param name="validationManager"></param>
         /// <param name="diffusionManager"></param>
         /// <param name="processTimeManager"></param>
+        /// <param name="userObservationRepository"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
@@ -209,6 +213,7 @@ namespace SOS.Harvest.Processors
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
             IProcessTimeManager processTimeManager,
+            IUserObservationRepository userObservationRepository,
             ProcessConfiguration processConfiguration,
             ILogger<TClass> logger) : base(processManager, processTimeManager, logger)
         {
@@ -223,6 +228,8 @@ namespace SOS.Harvest.Processors
 
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
             _logGarbageCharFields = processConfiguration?.LogGarbageCharFields ?? false;
+            _userObservationRepository = userObservationRepository;
+            _processConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
         }
 
         /// <summary>
@@ -429,6 +436,14 @@ namespace SOS.Harvest.Processors
             {
                 await WriteObservationsToDwcaCsvFiles(observations, dataProvider, batchId);
             }
+
+            if (_processConfiguration.ProcessUserObservation && mode == JobRunModes.Full && dataProvider.Id == DataProviderIdentifiers.ArtportalenId && !protectedObservations)
+            {
+                Logger.LogDebug($"Add User Observations. BatchId={batchId}, Protected={protectedObservations}, Count={observations.Count}");
+                var userObservations = observations.ToUserObservations();
+                await _userObservationRepository.AddManyAsync(userObservations);
+            }
+
             observations.Clear();
 
             return (processedCount, preValidationCount - processedCount);

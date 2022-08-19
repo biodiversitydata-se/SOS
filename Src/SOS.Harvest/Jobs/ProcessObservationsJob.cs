@@ -34,6 +34,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Lib.Repositories.Processed;
 
 namespace SOS.Harvest.Jobs
 {
@@ -50,6 +51,8 @@ namespace SOS.Harvest.Jobs
         private readonly IValidationManager _validationManager;
         private readonly ILogger<ProcessObservationsJob> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IUserObservationRepository _userObservationRepository;
+        private readonly ProcessConfiguration _processConfiguration;
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly Dictionary<DataProviderType, IObservationProcessor> _processorByType;
         private readonly IProcessTaxaJob _processTaxaJob;
@@ -121,6 +124,21 @@ namespace SOS.Harvest.Jobs
 
                 _logger.LogInformation(
                     $"Finish clear ElasticSearch index: {_processedObservationRepository.ProtectedIndexName}");
+
+                if (_processConfiguration.ProcessUserObservation)
+                {
+                    _logger.LogInformation($"_processedObservationRepository.LiveMode={_processedObservationRepository.LiveMode}");
+                    _logger.LogInformation($"_userObservationRepository.LiveMode={_userObservationRepository.LiveMode}");
+                    _userObservationRepository.LiveMode = _processedObservationRepository.LiveMode;
+                    _logger.LogInformation($"Set _userObservationRepository.LiveMode={_processedObservationRepository.LiveMode}");
+
+                    _logger.LogInformation(
+                        $"Start clear ElasticSearch index: UniqueIndexName={_userObservationRepository.UniqueIndexName}, IndexName={_userObservationRepository.IndexName}");
+                    await _userObservationRepository.ClearCollectionAsync();
+
+                    _logger.LogInformation(
+                        $"Finish clear ElasticSearch index: {_userObservationRepository.UniqueIndexName}");
+                }
             }
             else
             {
@@ -149,6 +167,13 @@ namespace SOS.Harvest.Jobs
             _logger.LogInformation($"Start disable indexing ({_processedObservationRepository.ProtectedIndexName})");
             await _processedObservationRepository.DisableIndexingAsync(true);
             _logger.LogInformation($"Finish disable indexing ({_processedObservationRepository.ProtectedIndexName})");
+
+            if (_processConfiguration.ProcessUserObservation)
+            {
+                _logger.LogInformation($"Start disable indexing ({_userObservationRepository.UniqueIndexName})");
+                await _userObservationRepository.DisableIndexingAsync();
+                _logger.LogInformation($"Finish disable indexing ({_userObservationRepository.UniqueIndexName})");
+            }
         }
 
         /// <summary>
@@ -164,6 +189,13 @@ namespace SOS.Harvest.Jobs
             _logger.LogInformation($"Start enable indexing ({_processedObservationRepository.ProtectedIndexName})");
             await _processedObservationRepository.EnableIndexingAsync(true);
             _logger.LogInformation($"Finish enable indexing ({_processedObservationRepository.ProtectedIndexName})");
+
+            if (_processConfiguration.ProcessUserObservation)
+            {
+                _logger.LogInformation($"Start enable indexing ({_userObservationRepository.UniqueIndexName})");
+                await _userObservationRepository.EnableIndexingAsync();
+                _logger.LogInformation($"Finish enable indexing ({_userObservationRepository.UniqueIndexName})");
+            }
         }
 
         /// <summary>
@@ -720,12 +752,14 @@ namespace SOS.Harvest.Jobs
         /// <param name="dwcaObservationProcessor"></param>
         /// <param name="taxonCache"></param>
         /// <param name="dataProviderCache"></param>
+        /// <param name="cacheManager"></param>
         /// <param name="processTimeManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="processTaxaJob"></param>
         /// <param name="areaHelper"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processConfiguration"></param>
+        /// <param name="userObservationRepository"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ProcessObservationsJob(IProcessedObservationRepository processedObservationRepository,
@@ -750,6 +784,7 @@ namespace SOS.Harvest.Jobs
             IAreaHelper areaHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             ProcessConfiguration processConfiguration,
+            IUserObservationRepository userObservationRepository,
             ILogger<ProcessObservationsJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -798,6 +833,8 @@ namespace SOS.Harvest.Jobs
             _runIncrementalAfterFull = processConfiguration.RunIncrementalAfterFull;
             _minObservationCount = processConfiguration.MinObservationCount;
             _enableTimeManager = processConfiguration.EnableTimeManager;
+            _processConfiguration = processConfiguration;
+            _userObservationRepository = userObservationRepository ?? throw new ArgumentNullException(nameof(userObservationRepository));
         }
 
         /// <inheritdoc />
