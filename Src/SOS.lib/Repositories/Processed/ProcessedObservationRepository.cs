@@ -869,14 +869,14 @@ namespace SOS.Lib.Repositories.Processed
            string pointInTimeId = null,
            IEnumerable<object> searchAfter = null) where T : class
         {
-            
+            var keepAlive = "5m";
             if (string.IsNullOrEmpty(pointInTimeId))
             {
                 var pitResponse = await Client.OpenPointInTimeAsync(searchIndex, pit => pit
                     .RequestConfiguration(c => c
                         .RequestTimeout(TimeSpan.FromSeconds(30))
                     )
-                    .KeepAlive("1m")
+                    .KeepAlive(keepAlive)
                 );
                 pointInTimeId = pitResponse.Id;
             }
@@ -886,7 +886,7 @@ namespace SOS.Lib.Repositories.Processed
             {
                 var queryResponse = await Client.SearchAsync<T>(searchDescriptor
                    .Sort(s => s.Ascending(SortSpecialField.ShardDocumentOrder))
-                   .PointInTime(pointInTimeId)
+                   .PointInTime(pointInTimeId, pit => pit.KeepAlive(keepAlive))
                    .SearchAfter(searchAfter)
                    .Size(ScrollBatchSize)
                    .TrackTotalHits(false)
