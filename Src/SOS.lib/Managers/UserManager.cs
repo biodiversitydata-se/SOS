@@ -42,7 +42,8 @@ namespace SOS.Lib.Managers
             var user = await UserService.GetUserAsync();
             if (user == null) throw new AuthenticationRequiredException("User is null, probably due to missing authentication header.");
             var userRoles = await UserService.GetUserRolesAsync(user.Id, applicationIdentifier, cultureCode);
-            var authorities = await UserService.GetUserAuthoritiesAsync(user.Id, applicationIdentifier, cultureCode);
+            var authorities = await UserService.GetUserAuthoritiesAsync(user.Id, applicationIdentifier, cultureCode) ??
+                              new List<AuthorityModel>();
             var userInformation = new UserInformation
             {
                 UserName = user.UserName,
