@@ -28,15 +28,20 @@
 <div class="grid">
     <QuickGrid ItemsProvider="@_userStatisticsProvider" Pagination="@_pagination">
         <PropertyColumn Property="@(u => u.UserId)"/>
-        <PropertyColumn Property="@(u => u.SpeciesCount)"/>
-        <PropertyColumn Property="@(u => u.ObservationCount)"/>
+        <PropertyColumn Property="@(u => u.SpeciesCount)" Sortable="true" IsDefaultSort="SortDirection.Descending"/>
+        <PropertyColumn Property="@(u => u.Province01SpeciesCount)" Title="Skåne" Sortable="true" Class="1" />
+        <PropertyColumn Property="@(u => u.Province02SpeciesCount)" Title="Blekinge" Sortable="true" Class="2" />
+        <PropertyColumn Property="@(u => u.Province03SpeciesCount)" Title="Småland" Sortable="true" Class="3" />
+        <PropertyColumn Property="@(u => u.Province04SpeciesCount)" Title="Öland" Sortable="true" Class="4" />
+        <PropertyColumn Property="@(u => u.Province05SpeciesCount)" Title="Gotland" Sortable="true" Class="5" />
+        @*<PropertyColumn Property="@(u => u.ObservationCount)"/>*@
     </QuickGrid>
 </div>
 <Paginator Value="@_pagination"/>
 
 
 @code {
-    GridItemsProvider<UserStatisticsItem>? _userStatisticsProvider;
+    GridItemsProvider<ProvinceUserStatisticsItem>? _userStatisticsProvider;
     PaginationState _pagination = new PaginationState { ItemsPerPage = 20 };
     private static IEnumerable<Area>? _provinces;
     private string? _selectedProvinceFeatureId;
@@ -63,10 +68,16 @@
                 {
                     query.FeatureId = _selectedProvinceFeatureId;
                 }
+                string sortByColumn = req.SortByColumn?.Class;
+                if (!string.IsNullOrEmpty(sortByColumn))
+                {
+                    query.SortByFeatureId = sortByColumn;
+                }
                 var response = await _httpClient.PostAsJsonAsync(url, query);
                 var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
+                var records = pagedResult!.Records.Select(ProvinceUserStatisticsItem.Create).ToList();
                 return GridItemsProviderResult.From(
-                    items: pagedResult!.Records.ToList(),
+                    items: records,
                     totalItemCount: (int)pagedResult!.TotalCount);
             };
 
