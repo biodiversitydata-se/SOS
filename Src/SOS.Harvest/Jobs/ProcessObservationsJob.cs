@@ -456,7 +456,7 @@ namespace SOS.Harvest.Jobs
                     {
                         _logger.LogError($"Failed to delete duplicates");
                     }
-
+             
                     // When we do a incremental harvest to live index, there is no meaning to do validation since the data is already live
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull ||
                         mode == JobRunModes.IncrementalInactiveInstance)
@@ -470,6 +470,9 @@ namespace SOS.Harvest.Jobs
                         _logger.LogInformation($"Finish validate indexes");
                         _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateIndex, validateIndexTimerSessionId);
 
+                        // Get on going job id's
+                        var onGouingJobIds = GetOnGoingJobIds(new[] { "ICreateDoiJob", "IExportAndSendJob", "IExportAndStoreJob" });
+
                         // Toggle active instance if we are done
                         _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstance} => {_processedObservationRepository.InActiveInstance}");
                         await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
@@ -479,6 +482,9 @@ namespace SOS.Harvest.Jobs
                         _logger.LogInformation($"Start clear processed configuration cache at search api");
                         await _cacheManager.ClearAsync(Cache.ProcessedConfiguration);
                         _logger.LogInformation($"Finish clear processed configuration cache at search api");
+
+                        // Restart export jobs since we have switch data base and "SearchAfter" will fale to go on
+                        RestartJobs(onGouingJobIds);
                     }
                 }
 

@@ -1,4 +1,5 @@
-﻿using SOS.Harvest.Jobs.Interfaces;
+﻿using Hangfire;
+using SOS.Harvest.Jobs.Interfaces;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -26,19 +27,27 @@ namespace SOS.Harvest.Jobs
                 processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
         }
 
-
-        /// <inheritdoc />
-        public async Task<HarvestInfo> GetHarvestInfoAsync(string id)
+        protected IEnumerable<string> GetOnGoingJobIds(IEnumerable<string> filter)
         {
-            return await _harvestInfoRepository.GetAsync(id);
+            var monitoringApi = JobStorage.Current.GetMonitoringApi();
+            return monitoringApi.ProcessingJobs(0, (int)monitoringApi.ProcessingCount())?
+                .Where(j => j.Value.InProcessingState && filter.Contains(j.Value.Job.Type.Name, StringComparer.CurrentCultureIgnoreCase))
+                .Select(j => j.Key)?.ToArray()!;
         }
-
-        /// <inheritdoc />
-        public async Task<ProcessInfo> GetProcessInfoAsync(string id)
+         
+        protected void RestartJobs(IEnumerable<string> jobIds)
         {
-            return await _processInfoRepository.GetAsync(id);
-        }
+            if (!jobIds?.Any() ?? true)
+            {
+                return;
+            }
 
+            foreach (var jobId in jobIds)
+            {
+                BackgroundJob.Delete(jobId);
+                BackgroundJob.Requeue(jobId);
+            }
+        }
 
         protected async Task SaveProcessInfo(ProcessInfo processInfo)
         {
@@ -68,6 +77,18 @@ namespace SOS.Harvest.Jobs
             }
 
             return processInfos;
+        }
+
+        /// <inheritdoc />
+        public async Task<HarvestInfo> GetHarvestInfoAsync(string id)
+        {
+            return await _harvestInfoRepository.GetAsync(id);
+        }
+
+        /// <inheritdoc />
+        public async Task<ProcessInfo> GetProcessInfoAsync(string id)
+        {
+            return await _processInfoRepository.GetAsync(id);
         }
     }
 }
