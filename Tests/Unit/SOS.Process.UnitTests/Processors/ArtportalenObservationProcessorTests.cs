@@ -35,6 +35,7 @@ namespace SOS.Process.UnitTests.Processors
         {
             _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _userObservationRepositoryMock = new Mock<IUserObservationRepository>();
             _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _processConfiguration = new ProcessConfiguration() { ArtportalenUrl = "https://www.artportalen.se" };
@@ -49,6 +50,7 @@ namespace SOS.Process.UnitTests.Processors
 
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IUserObservationRepository> _userObservationRepositoryMock;
         private readonly Mock<IVocabularyRepository> _vocabularyRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly ProcessConfiguration _processConfiguration;
@@ -71,6 +73,7 @@ namespace SOS.Process.UnitTests.Processors
             _diffusionManagerMock.Object,
             _processTimeManagerMock.Object,
             _sightingRepository.Object,
+            _userObservationRepositoryMock.Object,
             _processConfiguration,
             _loggerMock.Object);
 

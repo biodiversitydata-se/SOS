@@ -1,0 +1,17 @@
+﻿
+
+@*//IQueryable<UserStatistics> userStatistics = new[]
+//{
+    //new UserStatistics { UserId = 1, SpeciesCount = 5, ObservationCount = 11},
+    //new UserStatistics { UserId = 2, SpeciesCount = 4, ObservationCount = 9},
+    //new UserStatistics { UserId = 3, SpeciesCount = 3, ObservationCount = 8},
+    //new UserStatistics { UserId = 4, SpeciesCount = 2, ObservationCount = 4},
+    //new UserStatistics { UserId = 5, SpeciesCount = 1, ObservationCount = 4},
+//}.AsQueryable();*@
+
+IQueryable<UserStatistics>? userStatistics;
+@*<QuickGrid Items="@people">
+    <PropertyColumn Property="@(p => p.PersonId)" Sortable="true" />
+    <PropertyColumn Property="@(p => p.Name)" Sortable="true" />
+    <PropertyColumn Property="@(p => p.BirthDate)" Format="yyyy-MM-dd" Sortable="true" />
+</QuickGrid>*@

@@ -21,6 +21,11 @@
         public bool EnableTimeManager { get; set; }
 
         /// <summary>
+        /// True if user observation Elasticsearch index should be created.
+        /// </summary>
+        public bool ProcessUserObservation { get; set; }
+
+        /// <summary>
         ///     No of threads to run in parallel
         /// </summary>
         public int NoOfThreads { get; set; }

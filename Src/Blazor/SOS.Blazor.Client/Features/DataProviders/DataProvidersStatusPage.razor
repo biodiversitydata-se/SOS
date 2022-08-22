@@ -1,0 +1,36 @@
+﻿@page "/dataproviderstatus"
+@inject HttpClient _httpClient
+@inject NavigationManager _navManager
+
+<h3>Dataprovider status</h3>
+<div class="grid">
+    <QuickGrid Items="@dataProvidersQueryable">
+        <PropertyColumn Property="@(d => d.Identifier)" Sortable="true" />
+        <PropertyColumn Property="@(d => d.PublicObservationsActiveInstanceCount)" Sortable="true" Align="Align.Right" Title="Public (Active)" Format="N0" />
+        <PropertyColumn Property="@(d => d.PublicObservationsInactiveInstanceCount)" Sortable="true" Align="Align.Right" Title="Public (Inactive)" Format="N0" />
+        <PropertyColumn Property="@(d => d.PublicObservationsDifference)" Sortable="true" Align="Align.Right" Title="Diff" />
+        <PropertyColumn Property="@(d => d.ProtectedObservationsActiveInstanceCount)" Sortable="true" Align="Align.Right" Title="Protected (Active)" Format="N0" />
+        <PropertyColumn Property="@(d => d.ProtectedObservationsInactiveInstanceCount)" Sortable="true" Align="Align.Right" Title="Protected (Inactive)" Format="N0" />
+        <PropertyColumn Property="@(d => d.ProtectedObservationsDifference)" Sortable="true" Align="Align.Right" Title="Diff" />
+    </QuickGrid>
+</div>
+
+
+@code {
+    IQueryable<DataProviderStatus>? dataProvidersQueryable;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Get data providers
+            var dataProvidersResponse = await _httpClient.GetFromJsonAsync<IEnumerable<DataProviderStatus>>("DataProviders/DataProviderStatus");
+            dataProvidersQueryable = dataProvidersResponse.AsQueryable();
+
+            await base.OnInitializedAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"There was a problem in OnInitializedAsync(): {ex.Message}");
+        }
+    }
+}

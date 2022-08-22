@@ -92,7 +92,8 @@ namespace SOS.Process.IntegrationTests.Jobs
             {
                 processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
             }
-            
+            IUserObservationRepository userObservationRepository = new Mock<IUserObservationRepository>().Object;
+
             var processInfoRepository =
                 new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository =
@@ -214,6 +215,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 diffusionManager,
                 processTimeManager,
                 sightingRepository,
+                userObservationRepository,
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
 
@@ -283,7 +285,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processTaxaJob,
                 areaHelper,
                 dwcArchiveFileWriterCoordinator,
-                processConfiguration, 
+                processConfiguration,
+                userObservationRepository,
                 new NullLogger<ProcessObservationsJob>());
 
             return processJob;

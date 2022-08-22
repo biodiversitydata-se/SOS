@@ -1,6 +1,8 @@
-﻿using CSharpFunctionalExtensions;
+﻿using AgileObjects.AgileMapper.Extensions;
+using CSharpFunctionalExtensions;
 using Hangfire;
 using Hangfire.Server;
+using Hangfire.Storage;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Harvesters.AquaSupport.FishData.Interfaces;
 using SOS.Harvest.Harvesters.AquaSupport.Kul.Interfaces;
@@ -56,7 +58,7 @@ namespace SOS.Harvest.Jobs
                 cancellationToken = new JobCancellationToken(true);
 
                 cancellationToken.ThrowIfCancellationRequested();
-            };
+            }; 
         }
 
         private async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)

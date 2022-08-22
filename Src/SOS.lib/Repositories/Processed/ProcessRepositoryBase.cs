@@ -22,7 +22,7 @@ namespace SOS.Lib.Repositories.Processed
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
         private readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly bool _toggleable;
-        private readonly string _id = typeof(TEntity).Name;
+        protected string _id = typeof(TEntity).Name;
 
         /// <summary>
         ///     Disposed

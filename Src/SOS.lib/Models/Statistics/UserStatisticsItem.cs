@@ -18,14 +18,9 @@ namespace SOS.Lib.Models.Statistics
         public int SpeciesCount { get; set; }
 
         /// <summary>
-        /// Experimental. Perhaps move to another class.
+        /// Number of observations.
         /// </summary>
         public int ObservationCount { get; set; }
-
-        /// <summary>
-        /// Experimental. Perhaps move to another class.
-        /// </summary>
-        public int ReportCount { get; set; }
 
         /// <summary>
         /// Experimental. Perhaps move to another class.

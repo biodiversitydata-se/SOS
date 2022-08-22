@@ -560,6 +560,15 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 
                 obs.ObserversInternal = new List<UserInternal> { new() { Id = userId, UserServiceUserId = userId } };
                 obs.TaxonId = item.TaxonId;
+
+                if (!string.IsNullOrEmpty(item.ProvinceId))
+                {
+                    obs.Site.Province.FeatureId = item.ProvinceId;
+                }
+                if (!string.IsNullOrEmpty(item.MunicipalityId))
+                {
+                    obs.Site.Municipality.FeatureId = item.MunicipalityId;
+                }
             });
 
             return operable;

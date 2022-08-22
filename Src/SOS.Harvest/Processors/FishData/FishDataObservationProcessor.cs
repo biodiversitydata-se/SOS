@@ -67,7 +67,7 @@ namespace SOS.Harvest.Processors.FishData
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<FishDataObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
         {
             _fishDataObservationVerbatimRepository = fishDataObservationVerbatimRepository ??
                                                      throw new ArgumentNullException(
