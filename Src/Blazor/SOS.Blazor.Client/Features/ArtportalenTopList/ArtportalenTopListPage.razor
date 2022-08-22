@@ -15,6 +15,12 @@
         </select>
     }
 </div>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" @bind="_useCache">
+    <label class="form-check-label" for="flexCheckChecked">
+        Använd cache
+    </label>
+</div>
 
 <div class="page-size-chooser">
     Sidstorlek:
@@ -40,6 +46,7 @@
     PaginationState _pagination = new PaginationState { ItemsPerPage = 20 };
     private static IEnumerable<Area>? _provinces;
     private string? _selectedProvinceFeatureId;
+    private bool _useCache = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -54,7 +61,8 @@
             {
                 var url = _navManager.GetUriWithQueryParameters("UserStatistics/PagedSpeciesCountAggregation", new Dictionary<string, object?> {
                     { "skip", req.StartIndex },
-                    { "take", req.Count }
+                    { "take", req.Count },
+                    { "useCache", _useCache}
                 });
                 var query = new SpeciesCountUserStatisticsQuery();
                 if (!string.IsNullOrEmpty(_selectedProvinceFeatureId))

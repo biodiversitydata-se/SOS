@@ -17,11 +17,12 @@ namespace SOS.Blazor.Api.Controllers
         [HttpPost("PagedSpeciesCountAggregation")]
         public async Task<PagedResult<UserStatisticsItem>?> GetByQuery(
             [FromQuery] int skip, 
-            [FromQuery] int take, 
+            [FromQuery] int take,
+            [FromQuery] bool? useCache,
             [FromBody] SpeciesCountUserStatisticsQuery query)
         {
             var sosClient = new SosClient("https://sos-search-dev.artdata.slu.se/");
-            var userStatistics = await sosClient.GetUserStatisticsAsync(skip, take, query);
+            var userStatistics = await sosClient.GetUserStatisticsAsync(skip, take, useCache.GetValueOrDefault(true), query);
             return userStatistics;
         }
     }
