@@ -9,7 +9,7 @@ public class PagedSpeciesCountUserStatisticsQuery : SpeciesCountUserStatisticsQu
 
     public override string ToString()
     {
-        return $"{nameof(Skip)}: {Skip}, {nameof(Take)}: {Take}, {nameof(SortByFeatureId)}: {SortByFeatureId}, {nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}, {nameof(CacheKey)}: {CacheKey}";
+        return $"{nameof(Skip)}: {Skip}, {nameof(Take)}: {Take}, {nameof(SortByFeatureId)}: {SortByFeatureId}, {nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}";
     }
 
     protected bool Equals(PagedSpeciesCountUserStatisticsQuery other)

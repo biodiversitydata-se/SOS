@@ -74,12 +74,18 @@ namespace SOS.Observations.Api.Managers
 
                 var pagedResult = await _userObservationRepository.PagedSpeciesCountSearchAsync(sortQuery, skip, take);
                 var userIds = pagedResult.Records.Select(m => m.UserId).ToList();
-                var areaRecords = await _userObservationRepository.AreaSpeciesCountSearchAsync(query, userIds);
+                //var areaRecords = await _userObservationRepository.AreaSpeciesCountSearchAsync(query, userIds);
+                var areaRecords = await _userObservationRepository.AreaSpeciesCountSearchCompositeAsync(query, userIds);
                 var areaRecordsByUserId = areaRecords.ToDictionary(m => m.UserId, m => m);
+                var sumRecords = await _userObservationRepository.SpeciesCountSearchAsync(query, userIds);
+                var sumRecordByUserId = sumRecords.ToDictionary(m => m.UserId, m => m);
                 List<UserStatisticsItem> records = new List<UserStatisticsItem>(pagedResult.Records.Count());
                 foreach (var item in pagedResult.Records)
                 {
-                    records.Add(areaRecordsByUserId[item.UserId]);
+                    var record = areaRecordsByUserId[item.UserId];
+                    record.ObservationCount = sumRecordByUserId[item.UserId].ObservationCount;
+                    record.SpeciesCount = sumRecordByUserId[item.UserId].SpeciesCount;
+                    records.Add(record);
                 }
 
                 pagedResult.Records = records;
@@ -118,8 +124,16 @@ namespace SOS.Observations.Api.Managers
                 }
                 else
                 {
-                    // todo - use composite aggregation in order to be sure that the aggregation is correct?
-                    records = await _userObservationRepository.AreaSpeciesCountSearchAsync(query, null);
+                    var sumCountRecords = await _userObservationRepository.SpeciesCountSearchAsync(query);
+                    var sumCountRecordsByUserId = sumCountRecords.ToDictionary(m => m.UserId, m => m);
+                    //var records = await _userObservationRepository.AreaSpeciesCountSearchAsync(query, null); // Get observations without composite aggregation.
+                    records = await _userObservationRepository.AreaSpeciesCountSearchCompositeAsync(query, null);
+                    foreach (var item in records)
+                    {
+                        item.ObservationCount = sumCountRecordsByUserId[item.UserId].ObservationCount;
+                        item.SpeciesCount = sumCountRecordsByUserId[item.UserId].SpeciesCount;
+                    }
+
                     records = records
                         .OrderByDescending(m => m.SpeciesCount)
                         .ThenBy(m => m.UserId)

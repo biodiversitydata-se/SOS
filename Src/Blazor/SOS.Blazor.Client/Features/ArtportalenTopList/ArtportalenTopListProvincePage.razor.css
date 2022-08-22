@@ -1,0 +1,55 @@
+﻿::deep th.country-name {
+    width: 14rem;
+}
+
+/* Subtle stripe effect */
+::deep tr:nth-child(even) {
+    background: rgba(255,255,255,0.4);
+}
+
+/* Don't collapse rows even if they are empty */
+::deep tbody tr {
+    height: 1.8rem;
+}
+
+.page-size-chooser {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.page-size-chooser select {
+    margin: 0 1rem;
+    padding: 0.25rem 0.5rem;
+}
+
+
+/* Fix height and enable scrolling */
+/*.grid {
+    height: 16.5rem;
+    overflow-y: auto;
+}*/
+
+.grid ::deep table {
+    min-width: 100%;
+}
+
+/* Sticky header while scrolling */
+::deep thead {
+    position: sticky;
+    top: 0;
+    background-color: #eee;
+    z-index: 1;
+}
+
+/* For virtualized grids, it's essential that all rows have the same known height */
+::deep tr {
+    height: 30px;
+}
+
+::deep tbody td {
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 0;
+    text-overflow: ellipsis;
+}

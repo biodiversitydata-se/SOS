@@ -1,12 +1,12 @@
-﻿@page "/artportalentoplistloadall"
+﻿@page "/artportalentoplistprovince"
 @inject HttpClient _httpClient
 @inject NavigationManager _navManager
 
-<h3>Artportalens topplista</h3>
+<h3>Artportalens topplista - Provins</h3>
 <div class="mb-3">
     @if (_provinces != null)
     {
-        <select class="form-select" @onchange="@(async args => await OnSelectProvinceChange(args))">
+        <select class="form-select" @bind="_selectedProvinceFeatureId">
             <option value="">--Filtrera på provins--</option>
             @foreach (var item in _provinces)
             {
@@ -26,7 +26,7 @@
 </div>
 
 <div class="grid">
-    <QuickGrid Items="@userStatisticsQueryable" Pagination="@_pagination">
+    <QuickGrid ItemsProvider="@_userStatisticsProvider" Pagination="@_pagination">
         <PropertyColumn Property="@(u => u.UserId)"/>
         <PropertyColumn Property="@(u => u.SpeciesCount)"/>
         <PropertyColumn Property="@(u => u.ObservationCount)"/>
@@ -36,10 +36,10 @@
 
 
 @code {
+    GridItemsProvider<UserStatisticsItem>? _userStatisticsProvider;
     PaginationState _pagination = new PaginationState { ItemsPerPage = 20 };
     private static IEnumerable<Area>? _provinces;
     private string? _selectedProvinceFeatureId;
-    IQueryable<UserStatisticsItem>? userStatisticsQueryable;
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,8 +49,26 @@
             var provincesResponse = await _httpClient.GetFromJsonAsync<PagedResult<Area>>("Areas?skip=0&take=100&areaType=Province");
             _provinces = provincesResponse.Records.OrderBy(a => Convert.ToInt32(a.FeatureId)).ToList();
 
-            // Get user statistics
-            await GetUserStatistics();
+            // Setup user statistics provider
+            _userStatisticsProvider = async req =>
+            {
+                var url = _navManager.GetUriWithQueryParameters("UserStatistics/PagedSpeciesCountAggregation", new Dictionary<string, object?> {
+                    { "skip", req.StartIndex },
+                    { "take", req.Count }
+                });
+                var query = new SpeciesCountUserStatisticsQuery();
+                query.IncludeOtherAreasSpeciesCount = true;
+                query.AreaType = AreaType.Province;
+                if (!string.IsNullOrEmpty(_selectedProvinceFeatureId))
+                {
+                    query.FeatureId = _selectedProvinceFeatureId;
+                }
+                var response = await _httpClient.PostAsJsonAsync(url, query);
+                var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
+                return GridItemsProviderResult.From(
+                    items: pagedResult!.Records.ToList(),
+                    totalItemCount: (int)pagedResult!.TotalCount);
+            };
 
             await base.OnInitializedAsync();
         }
@@ -58,28 +76,5 @@
         {
             Console.WriteLine($"There was a problem in OnInitializedAsync(): {ex.Message}");
         }
-    }
-
-    private async Task OnSelectProvinceChange(ChangeEventArgs e)
-    {
-        _selectedProvinceFeatureId = e.Value.ToString();
-        await GetUserStatistics();
-    }
-
-    private async Task GetUserStatistics()
-    {
-        var url = _navManager.GetUriWithQueryParameters("UserStatistics/PagedSpeciesCountAggregation", new Dictionary<string, object?> {
-            { "skip", 0 },
-            { "take", 100000 }
-        });
-        var query = new SpeciesCountUserStatisticsQuery();
-        if (!string.IsNullOrEmpty(_selectedProvinceFeatureId))
-        {
-            query.AreaType = AreaType.Province;
-            query.FeatureId = _selectedProvinceFeatureId;
-        }
-        var response = await _httpClient.PostAsJsonAsync(url, query);
-        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
-        userStatisticsQueryable = pagedResult.Records.AsQueryable();
     }
 }

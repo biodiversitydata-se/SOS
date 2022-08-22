@@ -352,9 +352,10 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="filter"></param>
         /// <returns></returns>
         public async Task<List<UserStatisticsItem>> SpeciesCountSearchAsync(
-            SpeciesCountUserStatisticsQuery filter)
+            SpeciesCountUserStatisticsQuery filter, List<int> userIds = null)
         {
             var query = filter.ToQuery<UserObservation>();
+            query.TryAddTermsCriteria("userId", userIds);
             string indexName = IndexName;
             CompositeKey nextPageKey = null;
             var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
@@ -383,7 +384,7 @@ namespace SOS.Lib.Repositories.Processed
             return items;
         }
 
-        private async Task<ISearchResponse<dynamic>> SpeciesCountSearchCompositeAggregationAsync(
+        private async Task<ISearchResponse<UserObservation>> SpeciesCountSearchCompositeAggregationAsync(
             string indexName,
             ICollection<Func<QueryContainerDescriptor<UserObservation>, QueryContainer>> query,
             CompositeKey nextPage,
@@ -406,6 +407,88 @@ namespace SOS.Lib.Repositories.Processed
                     .Aggregations(aa => aa
                         .Cardinality("taxaCount", c => c
                             .Field("taxonId"))
+                        )
+                    )
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+
+            if (!searchResponse.IsValid)
+            {
+                throw new InvalidOperationException(searchResponse.DebugInformation);
+            }
+
+            return searchResponse;
+        }
+
+        public async Task<List<UserStatisticsItem>> AreaSpeciesCountSearchCompositeAsync(
+            SpeciesCountUserStatisticsQuery filter, List<int> userIds)
+        {
+            var query = filter.ToQuery<UserObservation>();
+            query.TryAddTermsCriteria("userId", userIds);
+            string indexName = IndexName;
+            CompositeKey nextPageKey = null;
+            var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
+            var userStatisticsByUserId = new Dictionary<int, UserStatisticsItem>();
+
+            do
+            {
+                var searchResponse = await AreaSpeciesCountSearchCompositeAggregationAsync(indexName, query, nextPageKey, pageTaxaAsyncTake);
+                var compositeAgg = searchResponse.Aggregations.Composite("taxonComposite");
+                foreach (var bucket in compositeAgg.Buckets)
+                {
+                    var userId = Convert.ToInt32((long)bucket.Key["userId"]);
+                    var provinceId = (string)bucket.Key["provinceId"];
+                    var observationCount = Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0));
+                    var speciesCount = Convert.ToInt32(bucket.Cardinality("taxaCount").Value.GetValueOrDefault());
+
+                    UserStatisticsItem item;
+                    if (!userStatisticsByUserId.ContainsKey(userId))
+                    {
+                        item = new UserStatisticsItem { UserId = userId, SpeciesCountByFeatureId = new Dictionary<string, int>() };
+                        userStatisticsByUserId.Add(userId, item);
+                    }
+                    else
+                    {
+                        item = userStatisticsByUserId[userId];
+                    }
+
+                    item.SpeciesCountByFeatureId.Add(provinceId, speciesCount);
+                }
+
+                nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
+            } while (nextPageKey != null);
+
+            return userStatisticsByUserId.Values.ToList();
+        }
+
+        private async Task<ISearchResponse<UserObservation>> AreaSpeciesCountSearchCompositeAggregationAsync(
+            string indexName,
+            ICollection<Func<QueryContainerDescriptor<UserObservation>, QueryContainer>> query,
+            CompositeKey nextPage,
+            int take)
+        {
+            var searchResponse = await Client.SearchAsync<UserObservation>(s => s
+                .Index(indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a.Composite("taxonComposite", g => g
+                        .Size(take)
+                        .After(nextPage ?? null)
+                        .Sources(src => src
+                            .Terms("userId", tt => tt
+                                .Field("userId"))
+                            .Terms("provinceId", p => p
+                                .Field("provinceFeatureId"))
+                        )
+                        .Aggregations(aa => aa
+                            .Cardinality("taxaCount", c => c
+                                .Field("taxonId"))
                         )
                     )
                 )
