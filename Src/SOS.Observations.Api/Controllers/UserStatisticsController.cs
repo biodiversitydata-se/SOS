@@ -58,6 +58,29 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
+        /// Clear cache.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("ClearCache")]
+        [ProducesResponseType(typeof(PagedResultDto<UserStatisticsItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ClearCache()
+        {
+            try
+            {
+                _userStatisticsManager.ClearCache();
+                return new OkObjectResult("Cache cleared");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "ClearCache error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
         /// Aggregates taxon by user.
         /// </summary>
         /// <param name="query">The query.</param>
