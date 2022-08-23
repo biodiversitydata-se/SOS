@@ -20,8 +20,8 @@ namespace SOS.Lib.Cache
     {
         private readonly MemoryCache _memoryCache = new(new MemoryCacheOptions());
         private readonly MemoryCacheEntryOptions _cacheEntryOptions = new MemoryCacheEntryOptions()
-            .SetAbsoluteExpiration(TimeSpan.FromMinutes(4));
-        private const int NumberOfEntriesCleanupLimit = 1000; // The cache will grow to approximately 250MB with limit=2000000.
+            .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
+        private const int NumberOfEntriesCleanupLimit = 1000;
         private const string CacheKey = "SpeciesCountAggregationCache";
         private readonly object _lockObject = new object();
 
