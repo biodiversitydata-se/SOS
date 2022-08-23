@@ -380,8 +380,12 @@ namespace SOS.Lib.Repositories.Processed
 
                 nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
             } while (nextPageKey != null);
-            
-            return items;
+
+            var sortedItems = items
+                .OrderByDescending(m => m.SpeciesCount)
+                .ThenBy(m => m.UserId)
+                .ToList();
+            return sortedItems;
         }
 
         private async Task<ISearchResponse<UserObservation>> SpeciesCountSearchCompositeAggregationAsync(
@@ -460,6 +464,16 @@ namespace SOS.Lib.Repositories.Processed
 
                 nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
             } while (nextPageKey != null);
+
+            // Calculate sum
+            List<UserStatisticsItem> sumItems = await SpeciesCountSearchAsync(filter, userIds);
+            Dictionary<int, UserStatisticsItem> sumItemsByUserId = sumItems.ToDictionary(m => m.UserId, m => m);
+            foreach (var pair in userStatisticsByUserId)
+            {
+                var sumItem = sumItemsByUserId[pair.Key];
+                pair.Value.ObservationCount = sumItem.ObservationCount;
+                pair.Value.SpeciesCount = sumItem.SpeciesCount;
+            }
 
             return userStatisticsByUserId.Values.ToList();
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -20,9 +19,11 @@ namespace SOS.Observations.Api.Managers
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly ILogger<UserStatisticsManager> _logger;
         private static readonly Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>> _userStatisticsItemsCache = new Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>(); // todo - use proper cache solution.
-        private static readonly Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>> _pagedUserStatisticsItemsCache = new Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>>(); // todo - use proper cache solution.
+        //private static readonly Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>> _pagedUserStatisticsItemsCache = new Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>>(); // todo - use proper cache solution.
         private static readonly Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>> _processedObservationPagedUserStatisticsItemsCache = new Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>>(); // todo - use proper cache solution.
-
+        private static readonly Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>> _userStatisticsItemsCacheNew = new Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>(); // todo - use proper cache solution.
+        private static readonly Dictionary<SpeciesCountUserStatisticsQuery, Dictionary<int, UserStatisticsItem>> _userStatisticsByUserIdCache = new Dictionary<SpeciesCountUserStatisticsQuery, Dictionary<int, UserStatisticsItem>>();
+        private const int CacheAreaItemsSkipTakeLimit = 100;
 
         /// <summary>
         /// Constructor
@@ -51,17 +52,11 @@ namespace SOS.Observations.Api.Managers
             int? take,
             bool useCache = true)
         {
-            PagedResult<UserStatisticsItem> result;
-            var pagedQuery = PagedSpeciesCountUserStatisticsQuery.Create(query, skip, take);
-            if (useCache && _pagedUserStatisticsItemsCache.ContainsKey(pagedQuery))
+            IEnumerable<UserStatisticsItem> selectedRecords = null;
+            List<UserStatisticsItem> items = null;
+            if (useCache && _userStatisticsItemsCacheNew.ContainsKey(query))
             {
-                result = _pagedUserStatisticsItemsCache[pagedQuery];
-                return result;
-            }
-
-            if (!query.IncludeOtherAreasSpeciesCount)
-            {
-                result = await _userObservationRepository.PagedSpeciesCountSearchAsync(query, skip, take);
+                items = _userStatisticsItemsCacheNew[query];
             }
             else
             {
@@ -71,32 +66,85 @@ namespace SOS.Observations.Api.Managers
                     sortQuery = query.Clone();
                     sortQuery.FeatureId = query.SortByFeatureId;
                 }
-
-                var pagedResult = await _userObservationRepository.PagedSpeciesCountSearchAsync(sortQuery, skip, take);
-                var userIds = pagedResult.Records.Select(m => m.UserId).ToList();
-                //var areaRecords = await _userObservationRepository.AreaSpeciesCountSearchAsync(query, userIds);
-                var areaRecords = await _userObservationRepository.AreaSpeciesCountSearchCompositeAsync(query, userIds);
-                var areaRecordsByUserId = areaRecords.ToDictionary(m => m.UserId, m => m);
-                var sumRecords = await _userObservationRepository.SpeciesCountSearchAsync(query, userIds);
-                var sumRecordByUserId = sumRecords.ToDictionary(m => m.UserId, m => m);
-                List<UserStatisticsItem> records = new List<UserStatisticsItem>(pagedResult.Records.Count());
-                foreach (var item in pagedResult.Records)
+                items = await _userObservationRepository.SpeciesCountSearchAsync(sortQuery);
+                if (useCache && !_userStatisticsItemsCacheNew.ContainsKey(query))
                 {
-                    var record = areaRecordsByUserId[item.UserId];
-                    record.ObservationCount = sumRecordByUserId[item.UserId].ObservationCount;
-                    record.SpeciesCount = sumRecordByUserId[item.UserId].SpeciesCount;
-                    records.Add(record);
+                    _userStatisticsItemsCacheNew.TryAdd(query, items); // todo - fix proper caching solution and concurrency handling.
+                }
+            }
+
+            UpdateSkipAndTake(ref skip, ref take, items.Count);
+            selectedRecords = items
+                .Skip(skip.GetValueOrDefault())
+                .Take(take.GetValueOrDefault())
+                .Select(m => m.Clone()).ToList(); // avoid store SpeciesCountByFeatureId in _userStatisticsItemsCache
+
+            if (query.IncludeOtherAreasSpeciesCount)
+            {
+                // todo - add semaphore to handle concurrency issues?
+                if (!_userStatisticsByUserIdCache.TryGetValue(query, out var userStatisticsById))
+                {
+                    userStatisticsById = new Dictionary<int, UserStatisticsItem>();
+                    _userStatisticsByUserIdCache.TryAdd(query, userStatisticsById);
                 }
 
-                pagedResult.Records = records;
-                result = pagedResult;
+                // Get cached values
+                var foundCachedItemsById = new Dictionary<int, UserStatisticsItem>();
+                var notFoundUserIds = new List<int>();
+                foreach (var item in selectedRecords)
+                {
+                    if (userStatisticsById.TryGetValue(item.UserId, out var userStatisticsItem))
+                    {
+                        foundCachedItemsById.Add(item.UserId, userStatisticsItem);
+                    }
+                    else
+                    {
+                        notFoundUserIds.Add(item.UserId);
+                    }
+                }
+
+                // Get values for records not found in cache
+                Dictionary<int, UserStatisticsItem> areaStatisticsByUserId = foundCachedItemsById;
+                if (notFoundUserIds.Any())
+                {
+                    var fetchedItems = await _userObservationRepository.AreaSpeciesCountSearchCompositeAsync(query, notFoundUserIds);
+                    areaStatisticsByUserId = foundCachedItemsById.Values.Union(fetchedItems).ToDictionary(m => m.UserId, m => m);
+                    if (useCache)
+                    {
+                        int nrItemsToCache = Math.Min(take.GetValueOrDefault(), CacheAreaItemsSkipTakeLimit - skip.GetValueOrDefault()); // just add the most used items to cache
+                        var itemsToCache = selectedRecords.Take(nrItemsToCache).Where(s => fetchedItems.Any(f => f.UserId == s.UserId));
+
+                        if (itemsToCache.Any())
+                        {
+                            // Add items to cache
+                            foreach (var item in itemsToCache)
+                            {
+                                userStatisticsById.TryAdd(item.UserId, item);
+                            }
+
+                            _logger.LogDebug($"Added items to userStatisticsById: [{string.Join(", ", itemsToCache.Select(m => m.UserId))}]");
+                        }
+                    }
+                }
+                
+                // Update values in selectedRecords
+                foreach (var selectedRecord in selectedRecords)
+                {
+                    var areaStatistics = areaStatisticsByUserId[selectedRecord.UserId];
+                    selectedRecord.SpeciesCount = areaStatistics.SpeciesCount;
+                    selectedRecord.ObservationCount = areaStatistics.ObservationCount;
+                    selectedRecord.SpeciesCountByFeatureId = areaStatistics.SpeciesCountByFeatureId;
+                }
             }
             
-            if (useCache && !_pagedUserStatisticsItemsCache.ContainsKey(pagedQuery))
+            var result = new PagedResult<UserStatisticsItem>()
             {
-                _pagedUserStatisticsItemsCache.Add(pagedQuery, result); // todo - fix proper caching solution and concurrency handling.
-            }
-            
+                Records = selectedRecords,
+                Skip = skip.GetValueOrDefault(),
+                Take = take.GetValueOrDefault(),
+                TotalCount = items.Count
+            };
+
             return result;
         }
 
@@ -250,3 +298,115 @@ namespace SOS.Observations.Api.Managers
         }
     }
 }
+
+//public async Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query,
+//     int? skip,
+//     int? take,
+//     bool useCache = true)
+//{
+//    PagedResult<UserStatisticsItem> result;
+//    IEnumerable<UserStatisticsItem> selectedRecords = null;
+//    List<UserStatisticsItem> items = null;
+//    //var pagedQuery = PagedSpeciesCountUserStatisticsQuery.Create(query, skip, take);
+//    if (useCache && _userStatisticsItemsCache.ContainsKey(query))
+//    {
+//        items = _userStatisticsItemsCache[query];
+//    }
+//    else
+//    {
+//        var sortQuery = query;
+//        if (!string.IsNullOrEmpty(query.SortByFeatureId))
+//        {
+//            sortQuery = query.Clone();
+//            sortQuery.FeatureId = query.SortByFeatureId;
+//        }
+//        items = await _userObservationRepository.SpeciesCountSearchAsync(sortQuery);
+//        if (useCache && !_userStatisticsItemsCache.ContainsKey(query))
+//        {
+//            _userStatisticsItemsCache.Add(query, items); // todo - fix proper caching solution and concurrency handling.
+//        }
+//    }
+
+//    UpdateSkipAndTake(ref skip, ref take, items.Count);
+//    selectedRecords = items
+//        .Skip(skip.GetValueOrDefault())
+//        .Take(take.GetValueOrDefault())
+//        .Select(m => m.Clone()).ToList(); // avoid store SpeciesCountByFeatureId in _userStatisticsItemsCache
+
+//    var selectedRecordById = selectedRecords.ToDictionary(m => m.UserId, m => m);
+
+//    if (query.IncludeOtherAreasSpeciesCount)
+//    {
+//        if (!_userStatisticsByUserIdCache.TryGetValue(query, out var userStatisticsById))
+//        {
+//            userStatisticsById = new Dictionary<int, UserStatisticsItem>();
+//            _userStatisticsByUserIdCache.Add(query, userStatisticsById);
+//        }
+
+//        var foundCachedItemsById = new Dictionary<int, UserStatisticsItem>();
+//        var foundRecordById = new Dictionary<int, UserStatisticsItem>();
+//        var notFoundUserIds = new List<int>();
+//        var notFoundRecordById = new Dictionary<int, UserStatisticsItem>();
+//        foreach (var item in selectedRecords)
+//        {
+//            if (userStatisticsById.TryGetValue(item.UserId, out var userStatisticsItem))
+//            {
+//                foundCachedItemsById.Add(item.UserId, userStatisticsItem);
+//                foundRecordById.Add(item.UserId, item);
+//            }
+//            else
+//            {
+//                notFoundUserIds.Add(item.UserId);
+//                notFoundRecordById.Add(item.UserId, item);
+//            }
+//        }
+
+//        var fetchedItemById = new Dictionary<int, UserStatisticsItem>();
+//        if (notFoundUserIds.Any())
+//        {
+//            var notFoundAreaRecords = await _userObservationRepository.AreaSpeciesCountSearchCompositeAsync(query, notFoundUserIds);
+//            Dictionary<int, UserStatisticsItem> notFoundAreaRecordsByUserId = notFoundAreaRecords.ToDictionary(m => m.UserId, m => m);
+//            List<UserStatisticsItem> notFoundSumRecords = await _userObservationRepository.SpeciesCountSearchAsync(query, notFoundUserIds);
+//            Dictionary<int, UserStatisticsItem> notFoundSumRecordByUserId = notFoundSumRecords.ToDictionary(m => m.UserId, m => m);
+//            foreach (var item in notFoundRecordById.Values)
+//            {
+//                var record = notFoundAreaRecordsByUserId[item.UserId];
+//                record.ObservationCount = notFoundSumRecordByUserId[item.UserId].ObservationCount;
+//                record.SpeciesCount = notFoundSumRecordByUserId[item.UserId].SpeciesCount;
+//                //item.SpeciesCountByFeatureId = record.SpeciesCountByFeatureId;
+//                //fetchedItemById.Add(item.UserId, item);
+//                fetchedItemById.Add(item.UserId, record);
+//            }
+//        }
+
+//        if (useCache && skip + take < 100)
+//        {
+//            // Add items to cache
+//            foreach (var item in fetchedItemById)
+//            {
+//                userStatisticsById.Add(item.Key, item.Value);
+//            }
+//        }
+
+//        Dictionary<int, UserStatisticsItem> areaStatisticsByUserId = new Dictionary<int, UserStatisticsItem>();
+//        areaStatisticsByUserId = foundCachedItemsById.Union(fetchedItemById).ToDictionary(m => m.Key, m => m.Value);
+//        foreach (var selectedRecord in selectedRecords)
+//        {
+//            var areaStatistics = areaStatisticsByUserId[selectedRecord.UserId];
+//            selectedRecord.SpeciesCount = areaStatistics.SpeciesCount;
+//            selectedRecord.ObservationCount = areaStatistics.ObservationCount;
+//            selectedRecord.SpeciesCountByFeatureId = areaStatistics.SpeciesCountByFeatureId;
+//        }
+
+//    }
+
+//    result = new PagedResult<UserStatisticsItem>()
+//    {
+//        Records = selectedRecords,
+//        Skip = skip.GetValueOrDefault(),
+//        Take = take.GetValueOrDefault(),
+//        TotalCount = items.Count
+//    };
+
+//    return result;
+//}
