@@ -26,7 +26,9 @@ namespace SOS.Blazor.Api
         public async Task<PagedResult<UserStatisticsItem>?> GetUserStatisticsAsync(int skip, int take, bool useCache, SpeciesCountUserStatisticsQuery query)
         {
             StringContent content = new StringContent(JsonSerializer.Serialize(query), Encoding.UTF8, "application/json");
-            var response = await _client.PostAsync($"{_apiUrl}UserStatistics/SpeciesCountAggregation?skip={skip}&take={take}&useCache={useCache}", content);
+            //var response = await _client.PostAsync($"{_apiUrl}UserStatistics/SpeciesCountAggregation?skip={skip}&take={take}&useCache={useCache}", content);
+            var response = await _client.PostAsync($"{_apiUrl}UserStatistics/PagedSpeciesCountAggregation?skip={skip}&take={take}&useCache={useCache}", content);
+            
             if (response.IsSuccessStatusCode)
             {
                 var resultString = response.Content.ReadAsStringAsync().Result;

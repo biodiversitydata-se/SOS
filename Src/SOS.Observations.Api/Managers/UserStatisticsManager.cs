@@ -91,11 +91,14 @@ namespace SOS.Observations.Api.Managers
 
             if (query.IncludeOtherAreasSpeciesCount)
             {
+                var userStatisticsByIdKey = query.Clone();
+                userStatisticsByIdKey.SortByFeatureId = null;
+
                 // todo - add semaphore to handle concurrency issues?
-                if (!_userStatisticsByUserIdCache.TryGetValue(query, out var userStatisticsById))
+                if (!_userStatisticsByUserIdCache.TryGetValue(userStatisticsByIdKey, out var userStatisticsById))
                 {
                     userStatisticsById = new Dictionary<int, UserStatisticsItem>();
-                    _userStatisticsByUserIdCache.TryAdd(query, userStatisticsById);
+                    _userStatisticsByUserIdCache.TryAdd(userStatisticsByIdKey, userStatisticsById);
                 }
 
                 // Get cached values
