@@ -21,7 +21,7 @@ namespace SOS.Lib.Cache
         private readonly MemoryCache _memoryCache = new(new MemoryCacheOptions());
         private readonly MemoryCacheEntryOptions _cacheEntryOptions = new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
-        private const int NumberOfEntriesCleanupLimit = 1000;
+        private const int NumberOfEntriesCleanupLimit = 1000; // 1000 = 1GB. One complete list with 30 additional individual items with province counts is about 1MB in size.
         private const string CacheKey = "SpeciesCountAggregationCache";
         private readonly object _lockObject = new object();
 
