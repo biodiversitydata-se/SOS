@@ -22,6 +22,7 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
+using SOS.Observations.Api.Dtos.Observation;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Swagger;
@@ -616,6 +617,119 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Search error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Application identifier making the request, used to get proper authorization</param>
+        /// <param name="kingdom">Taxon kingdom. Plantae, arachnida, mollusca, insecta, amphibia, aves, mammalia, reptilia, actinopterygii, animalia, fungi</param>
+        /// <param name="identificationVerificationStatus">Identification verification status. Research, casual</param>
+        /// <param name="license">none,CC-BY,CC-BY-NC,CC-BY-SA</param>
+        /// <param name="scientificName"></param>
+        /// <param name="taxonKey"></param>
+        /// <param name="issue"></param>
+        /// <param name="has">Geo,photos</param>
+        /// <param name="minEventDate"></param>
+        /// <param name="maxEventDate"></param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="skip">Start index of returned observations.</param>
+        /// <param name="take">Max number of observations to return. Max is 1000 observations in each request.</param>
+        /// <param name="sortBy">Field to sort by.</param>
+        /// <param name="sortOrder">Sort order (Asc, Desc).</param>
+        /// <returns></returns>
+        [HttpGet("Search/DwC")]
+        [ProducesResponseType(typeof(IEnumerable<DarwinCoreOccurrenceDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ObservationsBySearchDwc(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromQuery] string kingdom,
+            [FromQuery] string identificationVerificationStatus,
+            [FromQuery] string license,
+            [FromQuery] string scientificName,
+            [FromQuery] int? taxonKey,
+            [FromQuery] string issue,
+            [FromQuery] string has,
+            [FromQuery] DateTime? minEventDate,
+            [FromQuery] DateTime? maxEventDate,
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] int skip = 0,
+            [FromQuery] int take = 100,
+            [FromQuery] string sortBy = null!,
+            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc)
+        {
+            try
+            {
+                CheckAuthorization(sensitiveObservations);
+
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+                var searchFilter = new SearchFilterInternal(UserId, sensitiveObservations)
+                {
+                    FieldTranslationCultureCode = translationCultureCode
+                };
+
+                if (!string.IsNullOrEmpty(kingdom))
+                {
+                    searchFilter.Taxa = new TaxonFilter { 
+                        Kingdoms = kingdom.Split(",", StringSplitOptions.TrimEntries).Select(s => s.ToUpperFirst())
+                    };
+                }
+
+                if (!string.IsNullOrEmpty(scientificName))
+                {
+                    (searchFilter.Taxa ??= new TaxonFilter()).ScientificNames = scientificName.Split(",", StringSplitOptions.TrimEntries).Select(s => s.ToUpperFirst());
+                }
+                
+                if (!string.IsNullOrEmpty(identificationVerificationStatus))
+                {
+                    var identificationVerificationStatuses = identificationVerificationStatus.ToLower().Split(",", StringSplitOptions.TrimEntries).ToArray();
+
+                    if (identificationVerificationStatuses.Count(ivs => ivs.Equals("research") || ivs.Equals("casual")) == 2)
+                    {
+                        searchFilter.VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified;
+                    }
+                    else if (identificationVerificationStatuses.Any(ivs => ivs.Equals("research")))
+                    {
+                        searchFilter.VerificationStatus = SearchFilterBase.StatusVerification.Verified;
+                    }
+                    else if (identificationVerificationStatuses.Any(ivs => ivs.Equals("casual")))
+                    {
+                        searchFilter.VerificationStatus = SearchFilterBase.StatusVerification.NotVerified;
+                    }
+                }
+                searchFilter.OnlyWithMedia = has?.Contains("photos", StringComparison.CurrentCultureIgnoreCase) ?? false;
+                searchFilter.Licenses = license?.ToLower().Split(",");
+
+                if (minEventDate.HasValue || maxEventDate.HasValue)
+                {
+                    searchFilter.Date = new DateFilter
+                    {
+                        StartDate = minEventDate,
+                        EndDate = maxEventDate
+                    };
+                }
+
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
+                HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
+                
+                var dtos = result?.Records?.ToObservations().Select(o => o.ToDto());
+                return new OkObjectResult(dtos);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Search DwC error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

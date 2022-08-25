@@ -721,7 +721,12 @@ namespace SOS.Lib
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);                        
             query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds); 
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
-            
+
+            // Cos4Cloud specific
+            query.TryAddTermsCriteria("taxon.kingdom", filter.Taxa?.Kingdoms);
+            query.TryAddTermsCriteria("taxon.scientificName", filter.Taxa?.ScientificNames);
+            query.TryAddTermsCriteria("license", filter.Licenses);
+
             if (filter is SearchFilterInternal)
             {
                 query.AddInternalFilters(filter);

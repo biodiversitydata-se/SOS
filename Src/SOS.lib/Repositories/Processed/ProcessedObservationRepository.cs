@@ -756,18 +756,6 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
-        /// Cast dynamic to observation
-        /// </summary>
-        /// <param name="dynamicObjects"></param>
-        /// <returns></returns>
-        private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)
-        {
-            if (dynamicObjects == null) return null;
-            return JsonSerializer.Deserialize<List<Observation>>(JsonSerializer.Serialize(dynamicObjects),
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        }
-
-        /// <summary>
         /// Make sure no duplicates of occurrence id's exists in index
         /// </summary>
         /// <param name="protectedIndex"></param>
@@ -1922,7 +1910,7 @@ namespace SOS.Lib.Repositories.Processed
 
             return new SearchAfterResult<ExtendedMeasurementOrFactRow>
             {
-                Records = CastDynamicsToObservations(searchResponse.Documents)?.ToExtendedMeasurementOrFactRows(),
+                Records = searchResponse.Documents.ToObservations()?.ToExtendedMeasurementOrFactRows(),
                 PointInTimeId = searchResponse.PointInTimeId,
                 SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sorts
             };
@@ -1954,7 +1942,7 @@ namespace SOS.Lib.Repositories.Processed
 
             return new SearchAfterResult<SimpleMultimediaRow>
             {
-                Records = CastDynamicsToObservations(searchResponse.Documents)?.ToSimpleMultimediaRows(),
+                Records = searchResponse.Documents?.ToObservations().ToSimpleMultimediaRows(),
                 PointInTimeId = searchResponse.PointInTimeId,
                 SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sorts
             };
@@ -1981,7 +1969,7 @@ namespace SOS.Lib.Repositories.Processed
 
             return new SearchAfterResult<T>
             {
-                Records = (IEnumerable<T>)(typeof(T).Equals(typeof(Observation)) ? CastDynamicsToObservations(searchResponse.Documents) : searchResponse.Documents),
+                Records = (IEnumerable<T>)(typeof(T).Equals(typeof(Observation)) ? searchResponse.Documents?.ToObservations()?.ToArray() : searchResponse.Documents),
                 PointInTimeId = searchResponse.PointInTimeId,
                 SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sorts
             };

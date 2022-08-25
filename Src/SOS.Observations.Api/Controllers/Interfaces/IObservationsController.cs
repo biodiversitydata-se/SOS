@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Enums;
 using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.Controllers.Interfaces
@@ -28,6 +27,25 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool validateSearchFilter, 
             string translationCultureCode = "sv-SE",
             bool sensitiveObservations = false);
+
+        Task<IActionResult> ObservationsBySearchDwc(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            string kingdom,
+            string identificationVerificationStatus,
+            string license,
+            string scientificName,
+            int? taxonKey,
+            string issue,
+            string has,
+            DateTime? minEventDate,
+            DateTime? maxEventDate,
+            string translationCultureCode,
+            bool sensitiveObservations,
+            int skip, 
+            int take, 
+            string sortBy,
+            SearchSortOrder sortOrder);
 
         Task<IActionResult> CountInternal(
             int? roleId,

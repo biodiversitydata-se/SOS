@@ -71,6 +71,11 @@ namespace SOS.Lib.Models.Search.Filters
         public string FieldTranslationCultureCode { get; set; }
 
         /// <summary>
+        /// License filter
+        /// </summary>
+        public IEnumerable<string> Licenses { get; set; }
+
+        /// <summary>
         /// Location related filter
         /// </summary>
         public LocationFilter Location { get; set; }

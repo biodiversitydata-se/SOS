@@ -147,7 +147,10 @@ namespace SOS.Observations.Api.Managers
         public async Task<PagedResult<dynamic>> GetChunkAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
-            SearchFilter filter, int skip, int take, string sortBy,
+            SearchFilter filter, 
+            int skip, 
+            int take, 
+            string sortBy,
             SearchSortOrder sortOrder)
         {
             try

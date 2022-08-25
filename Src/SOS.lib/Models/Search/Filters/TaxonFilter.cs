@@ -37,6 +37,11 @@ namespace SOS.Lib.Models.Search.Filters
         public bool IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
+        /// Taxon kingdoms
+        /// </summary>
+        public IEnumerable<string> Kingdoms { get; set; }
+
+        /// <summary>
         /// Add (merge) or filter taxa by using taxon lists.
         /// </summary>
         public IEnumerable<int> ListIds { get; set; }
@@ -45,6 +50,11 @@ namespace SOS.Lib.Models.Search.Filters
         ///     Redlist categories to match.
         /// </summary>
         public IEnumerable<string> RedListCategories { get; set; }
+
+        /// <summary>
+        /// List if scientific names to match
+        /// </summary>
+        public IEnumerable<string> ScientificNames { get; set; }
 
         /// <summary>
         ///     Sex id's to match. Queryable values are available in sex vocabulary.
