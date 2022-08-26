@@ -203,11 +203,11 @@ namespace SOS.Export.Managers
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
         /// <param name="culture"></param>
-        /// <param name="outputFieldSet"></param>
         /// <param name="propertyLabelType"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<FileExportResult> CreateCsvExportAsync(SearchFilter filter,
+        private async Task<FileExportResult> CreateCsvExportAsync(
+            SearchFilter filter,
             string fileName,
             string culture,
             PropertyLabelType propertyLabelType,

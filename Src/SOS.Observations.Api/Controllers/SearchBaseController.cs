@@ -167,12 +167,13 @@ namespace SOS.Observations.Api.Controllers
         protected Result ValidateEncryptPassword(string password, string confirmPassword, bool sensitiveObservations)
         {
             var errors = new List<string>();
-            if (!password?.Any() ?? sensitiveObservations)
+
+            if (string.IsNullOrEmpty(password) && sensitiveObservations)
             {
                 errors.Add("You need to state a encrypt password when you are requesting sensitive observations");
             }
 
-            if ((password?.Trim().Length ?? 0) < 10)
+            if ((password?.Any() ?? false) && (password?.Trim().Length ?? 0) < 10)
             {
                 errors.Add("Password must contain at least 10 characters");
             }
@@ -181,12 +182,12 @@ namespace SOS.Observations.Api.Controllers
             {
                 errors.Add("Confirmed password is not equal to password");
             }
-
+            
             if (errors.Any())
             {
                 return Result.Failure(string.Join(". ", errors));
             }
-    
+
             return Result.Success();
         }
 

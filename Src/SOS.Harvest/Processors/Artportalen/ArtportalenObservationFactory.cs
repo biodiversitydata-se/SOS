@@ -19,6 +19,7 @@ using Location = SOS.Lib.Models.Processed.Observation.Location;
 using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
 using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
+using Nest;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -170,10 +171,8 @@ namespace SOS.Harvest.Processors.Artportalen
                 // Event
                 obs.Event = new Event(startDate, endDate);
                 obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, VocabularyId.DiscoveryMethod);
-                obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation.Projects);
-                obs.Event.SamplingProtocol = (verbatimObservation.DiscoveryMethod?.Id ?? 0) == 0
-                    ? null
-                    : verbatimObservation.DiscoveryMethod.Translate(Cultures.en_GB, Cultures.sv_SE);
+                obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation);
+                
 
                 // Identification
                 obs.Identification = new Identification();
@@ -546,30 +545,35 @@ namespace SOS.Harvest.Processors.Artportalen
         }
 
 
-        private string GetSamplingProtocol(IEnumerable<Project> projects)
+        private string GetSamplingProtocol(ArtportalenObservationVerbatim verbatimObservation)
         {
-            if (!projects?.Any() ?? true) return null;
-
-            var project = projects.First();
-
-            if (projects.Count() == 1)
+            if ((verbatimObservation.DiscoveryMethod?.Id ?? 0) > 0)
             {
-                return project?.SurveyMethod ?? project?.SurveyMethodUrl;
+                return verbatimObservation.DiscoveryMethod.Translate(Cultures.en_GB, Cultures.sv_SE);
+            }
+            
+            if (!verbatimObservation.Projects?.Any() ?? true) return null!;
+
+            var project = verbatimObservation.Projects!.First();
+
+            if (verbatimObservation.Projects!.Count() == 1)
+            {
+                return project?.SurveyMethod ?? project?.SurveyMethodUrl!;
             }
 
             var firstSurveyMethod = project.SurveyMethod;
-            if (firstSurveyMethod != null && projects.All(p => p.SurveyMethod == firstSurveyMethod))
+            if (firstSurveyMethod != null && verbatimObservation.Projects!.All(p => p.SurveyMethod == firstSurveyMethod))
             {
                 return firstSurveyMethod;
             }
 
             var firstSurveyMethodUrl = project.SurveyMethodUrl;
-            if (firstSurveyMethodUrl != null && projects.All(p => p.SurveyMethod == firstSurveyMethodUrl))
+            if (firstSurveyMethodUrl != null && verbatimObservation.Projects!.All(p => p.SurveyMethod == firstSurveyMethodUrl))
             {
                 return firstSurveyMethodUrl;
             }
 
-            return null;
+            return null!;
         }
 
         /// <summary>

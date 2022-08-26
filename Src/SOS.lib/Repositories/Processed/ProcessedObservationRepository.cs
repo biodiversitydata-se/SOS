@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Elasticsearch.Net;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
@@ -962,7 +960,6 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="telemetry"></param>
-        /// <param name="httpContextAccessor"></param>
         /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
