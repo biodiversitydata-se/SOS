@@ -1,27 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.ObservationApi;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
-using SOS.Lib.Exceptions;
-using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Gis;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Statistics;
-using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
-using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers
 { 
@@ -35,7 +24,6 @@ namespace SOS.Observations.Api.Controllers
         private readonly ILogger<UserStatisticsController> _logger;
         private readonly IUserStatisticsManager _userStatisticsManager;
         private readonly ITaxonManager _taxonManager;
-
         // Observatörsligan och Artlistan för en person är viktigast att uppdatera så snart som möjligt.
 
         /// <summary>
@@ -55,6 +43,29 @@ namespace SOS.Observations.Api.Controllers
             _userStatisticsManager = userStatisticsManager ?? throw new ArgumentNullException(nameof(userStatisticsManager));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <summary>
+        /// Clear cache.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("ClearCache")]
+        [ProducesResponseType(typeof(PagedResultDto<UserStatisticsItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ClearCache()
+        {
+            try
+            {
+                _userStatisticsManager.ClearCache();
+                return new OkObjectResult("Cache cleared");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "ClearCache error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>

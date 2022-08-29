@@ -23,7 +23,7 @@ public class SpeciesCountUserStatisticsQuery
 
     public override string ToString()
     {
-        return $"{nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}, {nameof(SortByFeatureId)}: {SortByFeatureId}, {nameof(CacheKey)}: {CacheKey}";
+        return $"{nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}, {nameof(SortByFeatureId)}: {SortByFeatureId}";
     }
 
     protected bool Equals(SpeciesCountUserStatisticsQuery other)
