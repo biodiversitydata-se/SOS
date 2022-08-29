@@ -855,7 +855,7 @@ namespace SOS.Lib.Repositories.Processed
            string pointInTimeId = null,
            IEnumerable<object> searchAfter = null) where T : class
         {
-            var keepAlive = "5m";
+            var keepAlive = "10m";
             if (string.IsNullOrEmpty(pointInTimeId))
             {
                 var pitResponse = await Client.OpenPointInTimeAsync(searchIndex, pit => pit

@@ -61,9 +61,9 @@
 		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
 		<PackageReference Include="Elastic.Apm.NLog" Version="1.5.3" />
 		<PackageReference Include="Elastic.CommonSchema.NLog" Version="1.5.3" />
-		<PackageReference Include="HangFire" Version="1.7.30" />
+		<PackageReference Include="HangFire" Version="1.7.31" />
 		<PackageReference Include="HangFire.Autofac" Version="2.3.1" />
-		<PackageReference Include="HangFire.Mongo" Version="1.7.2" />
+		<PackageReference Include="HangFire.Mongo" Version="1.7.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
