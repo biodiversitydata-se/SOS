@@ -27,7 +27,7 @@ namespace SOS.Harvest.Jobs
                 processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
         }
 
-        protected IEnumerable<string> GetOnGoingJobIds(IEnumerable<string> filter)
+        protected IEnumerable<string> GetOnGoingJobIds(params string[] filter)
         {
             var monitoringApi = JobStorage.Current.GetMonitoringApi();
             return monitoringApi.ProcessingJobs(0, (int)monitoringApi.ProcessingCount())?
@@ -45,6 +45,7 @@ namespace SOS.Harvest.Jobs
             foreach (var jobId in jobIds)
             {
                 BackgroundJob.Delete(jobId);
+                Thread.Sleep(30000); // Sleep 30s to let job finish
                 BackgroundJob.Requeue(jobId);
             }
         }

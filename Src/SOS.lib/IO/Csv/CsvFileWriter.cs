@@ -80,6 +80,8 @@ namespace SOS.Lib.IO.Excel
                 using var csvFileHelper = new CsvFileHelper();
                 csvFileHelper.InitializeWrite(fileStream, "\t");
                 csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
+
+                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
                
                 while (searchResult?.Records?.Any() ?? false)
@@ -121,6 +123,12 @@ namespace SOS.Lib.IO.Excel
                 }
 
                 csvFileHelper.FinishWrite();
+
+                // If less tha 99% of expected observations where fetched, something is wrong
+                if (nrObservations < expectedNoOfObservations * 0.99)
+                {
+                    throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
+                }
 
                 if (gzip)
                 {
