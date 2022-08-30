@@ -147,7 +147,7 @@ namespace SOS.Harvest.Processors.Taxon
                             attributeType?.TryGetValue(mainField.Value, out enumValue);
                         }
                     };
-
+                    
                     if (currentRedlistPeriodId.HasValue)
                     {
                         switch ((PeriodizeFactorEnum)taxonAttribute.FactorId)
@@ -189,7 +189,7 @@ namespace SOS.Harvest.Processors.Taxon
                                 taxon.DynamicProperties.OrganismGroup = enumValue;
                                 break;
                             case NonPeriodizeFactorEnum.ProtectedByLawSpeciesProtection:
-                                taxon.DynamicProperties.ProtectedByLawSpeciesProtection = mainField.Value == "1";
+                                taxon.DynamicProperties.ProtectedByLawSpeciesProtection = true;
                                 break;
                             case NonPeriodizeFactorEnum.ProtectedByLawBirds:
                                 taxon.DynamicProperties.ProtectedByLawBirds = mainField.Value == "1";
