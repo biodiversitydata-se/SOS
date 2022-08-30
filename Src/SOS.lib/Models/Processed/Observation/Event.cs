@@ -25,16 +25,14 @@ namespace SOS.Lib.Models.Processed.Observation
         public Event(DateTime? startDate, DateTime? endDate)
         {
             EndDate = endDate?.ToUniversalTime();
-            PlainEndDate = endDate?.ToLocalTime().ToString("yyyy-MM-dd");
-            PlainEndTime = endDate?.ToString("HH\\:mm");
-            PlainStartDate = startDate?.ToLocalTime().ToString("yyyy-MM-dd");
-            PlainStartTime = startDate?.ToString("HH\\:mm");
             StartDate = startDate?.ToUniversalTime();
             VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
 
             if (startDate != null)
             {
                 var startDateLocal = startDate.Value.ToLocalTime();
+                PlainStartDate = startDateLocal.ToString("yyyy-MM-dd");
+                PlainStartTime = startDateLocal.ToString("HH\\:mm");
                 StartYear = startDateLocal.Year;
                 StartMonth = startDateLocal.Month;
                 StartDay = startDateLocal.Day;
@@ -43,6 +41,8 @@ namespace SOS.Lib.Models.Processed.Observation
             if (endDate != null)
             {
                 var endDateLocal = endDate.Value.ToLocalTime();
+                PlainEndDate = endDateLocal.ToString("yyyy-MM-dd");
+                PlainEndTime = endDateLocal.ToString("HH\\:mm");
                 EndYear = endDateLocal.Year;
                 EndMonth = endDateLocal.Month;
                 EndDay = endDateLocal.Day;
