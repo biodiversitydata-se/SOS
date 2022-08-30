@@ -83,7 +83,9 @@ namespace SOS.Lib.IO.GeoJson
                 jsonWriter.WritePropertyName("features");
                 jsonWriter.WriteStartArray();
 
+                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);
+
                 while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
@@ -122,6 +124,13 @@ namespace SOS.Lib.IO.GeoJson
                 await jsonWriter.FlushAsync();
                 await jsonWriter.DisposeAsync();
                 fileStream.Close();
+
+                // If less tha 99% of expected observations where fetched, something is wrong
+                if (nrObservations < expectedNoOfObservations * 0.99)
+                {
+                    throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
+                }
+
                 if (gzip)
                 {
                     await StoreFilterAsync(temporaryZipExportFolderPath, filter);

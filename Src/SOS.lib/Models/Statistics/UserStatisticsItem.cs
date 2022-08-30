@@ -26,5 +26,10 @@ namespace SOS.Lib.Models.Statistics
         /// Experimental. Perhaps move to another class.
         /// </summary>
         public Dictionary<string, int> SpeciesCountByFeatureId { get; set; }
+
+        public UserStatisticsItem Clone()
+        {
+            return (UserStatisticsItem)MemberwiseClone();
+        }
     }
 }

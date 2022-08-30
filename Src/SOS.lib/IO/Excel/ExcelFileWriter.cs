@@ -75,6 +75,7 @@ namespace SOS.Lib.IO.Excel
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
 
+                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
                 var fileCount = 0;
                 var rowIndex = 0;
@@ -141,7 +142,13 @@ namespace SOS.Lib.IO.Excel
                     // Get next batch of observations.
                     searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
                 }
-                
+
+                // If less tha 99% of expected observations where fetched, something is wrong
+                if (nrObservations < expectedNoOfObservations * 0.99)
+                {
+                    throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
+                }
+
                 // If we have a package, save it
                 if (package != null)
                 {

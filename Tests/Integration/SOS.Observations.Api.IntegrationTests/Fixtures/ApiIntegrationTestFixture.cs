@@ -52,6 +52,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
     {
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
+        public UserStatisticsController UserStatisticsController { get; private set; }
         public ExportsController ExportsController { get; private set; }
         public SystemsController SystemsController { get; private set; }
         public VocabulariesController VocabulariesController { get; private set; }
@@ -244,6 +245,10 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var taxaById = taxa.ToDictionary(m => m.Id, m => m);
             var processTimeManager = new ProcessTimeManager(new ProcessConfiguration());
             SersObservationVerbatimRepository = new SersObservationVerbatimRepository(importClient, new NullLogger<SersObservationVerbatimRepository>());
+            var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
+            var userObservationRepository = new UserObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<UserObservationRepository>());
+            var userStatisticsManager = new UserStatisticsManager(userObservationRepository, processedObservationRepository, new NullLogger<UserStatisticsManager>());
+            UserStatisticsController = new UserStatisticsController(userStatisticsManager, taxonManager, areaManager, new NullLogger<UserStatisticsController>());
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)

@@ -24,6 +24,7 @@ using SOS.Lib.Factories;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Repositories.Processed;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -113,6 +114,7 @@ namespace SOS.Lib.IO.DwcArchive
                 bool emofFileCreated = false;
                 bool multimediaFileCreated = false;
                 int nrObservations = 0;
+                var expectedNoOfObservations = await processedObservationRepository.GetMatchCountAsync(filter);
 
                 // Create Occurrence.txt
                 using (var fileStream = File.Create(occurrenceCsvFilePath, 128 * 1024))
@@ -123,6 +125,12 @@ namespace SOS.Lib.IO.DwcArchive
                         fieldDescriptions,
                         processedObservationRepository,
                         cancellationToken);
+                }
+
+                // If less tha 99% of expected observations where fetched, something is wrong
+                if (nrObservations < expectedNoOfObservations * 0.99)
+                {
+                    throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
                 }
 
                 // Create ExtendedMeasurementOrFact.txt

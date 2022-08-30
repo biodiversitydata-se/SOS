@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +43,29 @@ namespace SOS.Observations.Api.Controllers
         {
             _userStatisticsManager = userStatisticsManager ?? throw new ArgumentNullException(nameof(userStatisticsManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <summary>
+        /// Clear cache.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("ClearCache")]
+        [ProducesResponseType(typeof(PagedResultDto<UserStatisticsItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ClearCache()
+        {
+            try
+            {
+                _userStatisticsManager.ClearCache();
+                return new OkObjectResult("Cache cleared");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "ClearCache error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>

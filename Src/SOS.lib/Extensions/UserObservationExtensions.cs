@@ -58,7 +58,10 @@ namespace SOS.Lib.Extensions
                 userObservation.StartDate = observation.Event.StartDate.Value;
                 userObservation.ObservationYear = userObservation.StartDate.Year;
                 userObservation.ObservationMonth = userObservation.StartDate.Month;
-                //userObservation.ProjectId = // todo - handle multiple projects?
+                if (observation.Projects != null && observation.Projects.Any())
+                {
+                    userObservation.ProjectIds = observation.Projects.Select(m => m.Id).ToList();
+                }
                 userObservation.ProtectedBySystem = observation.Sensitive;
                 //userObservation.ProtectedByUser = // todo
 

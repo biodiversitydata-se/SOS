@@ -471,7 +471,7 @@ namespace SOS.Harvest.Jobs
                         _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateIndex, validateIndexTimerSessionId);
 
                         // Get on going job id's
-                        var onGouingJobIds = GetOnGoingJobIds(new[] { "ICreateDoiJob", "IExportAndSendJob", "IExportAndStoreJob" });
+                        var onGouingJobIds = GetOnGoingJobIds( "ICreateDoiJob", "IExportAndSendJob", "IExportAndStoreJob" );
 
                         // Toggle active instance if we are done
                         _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstance} => {_processedObservationRepository.InActiveInstance}");

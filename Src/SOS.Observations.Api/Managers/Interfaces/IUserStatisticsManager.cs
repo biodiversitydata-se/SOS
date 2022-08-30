@@ -23,5 +23,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
             int? skip,
             int? take,
             bool useCache = true);
+
+        void ClearCache();
     }
 }

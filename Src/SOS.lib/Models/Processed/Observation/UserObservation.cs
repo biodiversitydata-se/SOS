@@ -23,7 +23,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime StartDate { get; set; }
         public int ObservationYear { get; set; }
         public int ObservationMonth { get; set; }
-        public int? ProjectId { get; set; }
+        public List<int> ProjectIds { get; set; }
         public bool ProtectedBySystem { get; set; }
         public bool ProtectedByUser { get; set; }
 
