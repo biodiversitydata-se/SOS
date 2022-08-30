@@ -248,7 +248,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
             var userObservationRepository = new UserObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<UserObservationRepository>());
             var userStatisticsManager = new UserStatisticsManager(userObservationRepository, processedObservationRepository, new NullLogger<UserStatisticsManager>());
-            UserStatisticsController = new UserStatisticsController(userStatisticsManager, taxonManager, areaManager, new NullLogger<UserStatisticsController>());
+            UserStatisticsController = new UserStatisticsController(userStatisticsManager, areaManager, new ObservationApiConfiguration(), new NullLogger<UserStatisticsController>());
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
