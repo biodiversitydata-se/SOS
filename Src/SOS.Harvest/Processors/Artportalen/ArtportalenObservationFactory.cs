@@ -170,10 +170,10 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 // Event
                 obs.Event = new Event(startDate, endDate);
+                obs.Event.EventId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}:event:{$"{verbatimObservation.Site?.Id ?? 0}:{obs.Event.VerbatimEventDate}".GetHashCode()}";
                 obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, VocabularyId.DiscoveryMethod);
                 obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation);
                 
-
                 // Identification
                 obs.Identification = new Identification();
                 obs.Identification.ConfirmedBy = verbatimObservation.ConfirmedBy?.Clean();

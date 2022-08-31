@@ -39,6 +39,11 @@ namespace SOS.Observations.Api.Dtos.Filter
         public int? ChecklistId { get; set; }
 
         /// <summary>
+        /// Field diary group Id's
+        /// </summary>
+        public IEnumerable<int> FieldDiaryGroupIds { get; set; }
+
+        /// <summary>
         /// Reported by Artportalen user id.
         /// </summary>
         public int? ReportedByUserId { get; set; }
