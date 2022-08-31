@@ -61,6 +61,11 @@
         public TimeSpan? EndTime { get; set; }
 
         /// <summary>
+        /// Field diary group id
+        /// </summary>
+        public int? FieldDiaryGroupId { get; set; }
+
+        /// <summary>
         ///     Taxon gender id
         /// </summary>
         public int? GenderId { get; set; }

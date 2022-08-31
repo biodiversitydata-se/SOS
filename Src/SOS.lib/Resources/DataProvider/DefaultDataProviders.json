@@ -125,7 +125,7 @@
     {
         "Id": 4,
         "Identifier": "MVM",
-        "IsActive": true,
+        "IsActive": false,
         "IncludeInScheduledHarvest": true,
         "IncludeInHealthCheck": true,
         "IncludeInSearchByDefault": true,

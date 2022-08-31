@@ -30,19 +30,27 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
         // Todo arguments for protected sightings       
         protected string SightingWhereBasics => @$" 
-            s.SightingTypeId IN ({string.Join(",", // s.SightingTypeId IN (0,1,3,8,10)
+            s.SightingTypeId IN ({string.Join(",", // s.SightingTypeId IN (0,1,2,3,5,6.7,8,9,10)
                 (int)SightingType.NormalSighting,
                 (int)SightingType.AggregationSighting,
+                (int)SightingType.AssessmentSighting,
                 (int)SightingType.ReplacementSighting,
+                (int)SightingType.AssessmentSightingForBreeding,
+                (int)SightingType.AssessmentSightingForMaxCount,
+                (int)SightingType.AssessmentSightingForDifferentSites,
                 (int)SightingType.CorrectionSighting,
+                (int)SightingType.AssessmentSightingForHerd,
                 (int)SightingType.AssessmentSightingForOwnBreeding)}) 
-            AND s.SightingTypeSearchGroupId IN ({string.Join(",", // s.SightingTypeSearchGroupId IN (1, 2, 4, 16, 32, 128). 2 is unnecessary since we don't harvest SightingTypeId 2,5,6,7,9. Remove?
+            AND s.SightingTypeSearchGroupId IN ({string.Join(",", // s.SightingTypeSearchGroupId IN (1, 2, 4, 8, 16, 32, 64, 128, 256).
                 (int)SightingTypeSearchGroup.Ordinary,
                 (int)SightingTypeSearchGroup.Assessment,
                 (int)SightingTypeSearchGroup.Aggregated,
+                (int)SightingTypeSearchGroup.AggregatedChild,
                 (int)SightingTypeSearchGroup.AssessmentChild,
                 (int)SightingTypeSearchGroup.Replacement,
-                (int)SightingTypeSearchGroup.OwnBreedingAssessment)})
+                (int)SightingTypeSearchGroup.ReplacementChild,
+                (int)SightingTypeSearchGroup.OwnBreedingAssessment,
+                (int)SightingTypeSearchGroup.OwnBreedingAssessmentChild)})
 	        AND s.ValidationStatusId <> { // s.ValidationStatusId <> 50
             (int)ValidationStatusId.Rejected} 
             AND ss.IsActive = 1

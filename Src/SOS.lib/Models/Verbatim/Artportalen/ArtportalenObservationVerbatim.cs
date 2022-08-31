@@ -71,6 +71,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public TimeSpan? EndTime { get; set; }
 
         /// <summary>
+        /// Field diary group id
+        /// </summary>
+        public int? FieldDiaryGroupId { get; set; }
+
+        /// <summary>
         /// Triggered observation rule frequency id
         /// </summary>
         public int? FrequencyId { get; set; }

@@ -91,6 +91,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                si.DeterminationMethodId,
                     s.SightingTypeId,
                     s.SightingTypeSearchGroupId,
+                    s.FieldDiaryGroupId,
 	                srDeterminer.UserId AS DeterminerUserId,
 	                srDeterminer.DeterminationYear AS DeterminationYear,
 	                srConfirmator.UserId AS ConfirmatorUserId,

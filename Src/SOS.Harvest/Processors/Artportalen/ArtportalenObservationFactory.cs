@@ -309,6 +309,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ArtportalenInternal.ConfirmationYear = verbatimObservation.ConfirmationYear;
                 obs.ArtportalenInternal.DatasourceId = verbatimObservation.DatasourceId;
                 obs.ArtportalenInternal.DeterminationYear = verbatimObservation.DeterminationYear;
+                obs.ArtportalenInternal.FieldDiaryGroupId = verbatimObservation.FieldDiaryGroupId;
                 obs.ArtportalenInternal.HasTriggeredValidationRules = verbatimObservation.HasTriggeredValidationRules;
                 obs.ArtportalenInternal.HasTriggeredVerificationRules = verbatimObservation.HasTriggeredValidationRules;
                 obs.ArtportalenInternal.HasAnyTriggeredValidationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;

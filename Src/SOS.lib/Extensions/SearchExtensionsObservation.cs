@@ -347,7 +347,7 @@ namespace SOS.Lib
         {
             var sightingTypeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
-            // Search group 2 no effect since we don't harvest sighting type 2,5,6,7,9 who are the types using this group
+           
             var sightingTypeSearchGroupFilter = filter.TypeFilter switch
             {
                 SearchFilterBase.SightingTypeFilter.ShowBoth => new[] { // 1, 2, 4, 16, 32, 128
@@ -617,7 +617,13 @@ namespace SOS.Lib
 
             if (aggregationType.IsSpeciesSightingsList())
             {
-                query.TryAddTermsCriteria("artportalenInternal.sightingTypeId", new[] { 0, 1, 3, 8, 10 });
+                query.TryAddTermsCriteria("artportalenInternal.sightingTypeId", new[] {
+                    (int)SightingType.NormalSighting,
+                    (int)SightingType.AggregationSighting,
+                    (int)SightingType.ReplacementSighting,
+                    (int)SightingType.CorrectionSighting,
+                    (int)SightingType.AssessmentSightingForOwnBreeding
+                });
             }
         }
 

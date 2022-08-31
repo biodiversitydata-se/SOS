@@ -71,6 +71,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.EditDate = entity.EditDate;
                 observation.EndDate = entity.EndDate;
                 observation.EndTime = entity.EndTime;
+                observation.FieldDiaryGroupId = entity.FieldDiaryGroupId;
                 observation.FrequencyId = entity.FrequencyId;
                 observation.Gender = entity.GenderId.HasValue && _artportalenMetadataContainer.Genders.ContainsKey(entity.GenderId.Value)
                     ? _artportalenMetadataContainer.Genders[entity.GenderId.Value]

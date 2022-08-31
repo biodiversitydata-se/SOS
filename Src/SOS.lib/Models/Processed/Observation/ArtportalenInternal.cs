@@ -36,6 +36,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? DeterminationYear { get; set; }
 
         /// <summary>
+        /// Field diary group id
+        /// </summary>
+        public int? FieldDiaryGroupId { get; set; }
+
+        /// <summary>
         ///     Has Triggered Validation Rules
         /// </summary>
         [Obsolete("Replaced by HasTriggeredVerificationRules")]

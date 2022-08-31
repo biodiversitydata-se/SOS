@@ -251,7 +251,7 @@ namespace SOS.Harvest.Jobs
                     .All(r => r.Value.Result.Status == RunStatus.Success);
 
                 _logger.LogInformation($"Finish {mode} observations harvesting. Success: { success }");
-
+     
                 return success ? harvestTaskByDataProvider.Sum(ht => ht.Value.Result.Count) : -1;
             }
             catch (JobAbortedException)
