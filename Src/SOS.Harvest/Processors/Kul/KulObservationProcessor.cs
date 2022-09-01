@@ -58,7 +58,7 @@ namespace SOS.Harvest.Processors.Kul
         /// <exception cref="ArgumentNullException"></exception>
         public KulObservationProcessor(IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,

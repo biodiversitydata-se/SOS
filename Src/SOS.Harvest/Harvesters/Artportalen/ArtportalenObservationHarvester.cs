@@ -31,7 +31,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly ISiteRepository _siteRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly ITaxonRepository _taxonRepository;
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
         private readonly IAreaHelper _areaHelper;
@@ -432,7 +432,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             IPersonRepository personRepository,
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             ITaxonRepository taxonRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
             IAreaHelper areaHelper,

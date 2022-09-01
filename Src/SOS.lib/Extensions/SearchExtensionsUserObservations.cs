@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Nest;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Statistics;
 
 namespace SOS.Lib.Extensions;
@@ -29,6 +30,7 @@ public static class SearchExtensionsUserObservations
         query.TryAddTermCriteria("year", filter.Year);
         query.TryAddTermCriteria("taxonId", filter.TaxonId);
         query.TryAddTermCriteria("speciesGroup", filter.SpeciesGroup);
+        query.AddSightingTypeFilters(SearchFilterBase.SightingTypeFilter.DoNotShowMerged);
         if (filter.AreaType.HasValue)
         {
             switch (filter.AreaType.Value)
@@ -53,7 +55,7 @@ public static class SearchExtensionsUserObservations
         this SpeciesCountUserStatisticsQuery filter) where TQueryContainer : class
     {
         var query = new List<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>>();
-
+       
         if (filter == null)
         {
             return query;
@@ -62,6 +64,8 @@ public static class SearchExtensionsUserObservations
         query.TryAddTermCriteria("year", filter.Year); // todo
         query.TryAddTermCriteria("taxon.id", filter.TaxonId);
         query.TryAddTermCriteria("speciesGroup", filter.SpeciesGroup); // todo
+        query.AddSightingTypeFilters(SearchFilterBase.SightingTypeFilter.DoNotShowMerged);
+
         if (filter.AreaType.HasValue)
         {
             switch (filter.AreaType.Value)

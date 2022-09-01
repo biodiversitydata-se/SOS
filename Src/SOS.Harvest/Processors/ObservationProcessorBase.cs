@@ -184,7 +184,7 @@ namespace SOS.Harvest.Processors
 
         protected readonly IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator;
         protected readonly IVocabularyValueResolver vocabularyValueResolver;
-        protected readonly IProcessedObservationRepository ProcessedObservationRepository;
+        protected readonly IProcessedObservationCoreRepository ProcessedObservationRepository;
         protected readonly IValidationManager ValidationManager;
         protected readonly IUserObservationRepository _userObservationRepository;
 
@@ -205,7 +205,7 @@ namespace SOS.Harvest.Processors
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         protected ObservationProcessorBase(
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,

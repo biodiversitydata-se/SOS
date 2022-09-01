@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
 using Elasticsearch.Net;
 using Nest;
 using SOS.Lib.Enums;
@@ -11,13 +10,12 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Statistics;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IProcessedObservationRepository : IProcessRepositoryBase<Observation, string>
+    public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Observation, string>
     {
         /// <summary>
         ///  Add many items
@@ -85,57 +83,15 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> EnsureNoDuplicatesAsync();
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="aggregationType"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
-        Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="aggregationType"></param>
-        /// <returns></returns>
-        Task<PagedResult<dynamic>> GetAggregatedHistogramChunkAsync(SearchFilter filter, AggregationType aggregationType);
-
-        /// <summary>
-        ///     Get chunk of objects from repository
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="sortBy"></param>
-        /// <param name="sortOrder"></param>
-        /// <returns></returns>
-        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
-            SearchSortOrder sortOrder);
-
-        /// <summary>
         /// Get a data quality report for passed organism group
         /// </summary>
         /// <param name="organismGroup"></param>
         /// <returns></returns>
         Task<DataQualityReport> GetDataQualityReportAsync(string organismGroup);
 
-        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom);
-
-        /// <summary>
-        /// Get aggregation in metric tiles 
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="gridCellSizeInMeters"></param>
-        /// <returns></returns>
-        Task<Result<GeoGridMetricResult>> GetMetricGridAggregationAsync(
-            SearchFilter filter, int gridCellSizeInMeters);
-
         /// <summary>
         /// Get index health status
         /// </summary>
-        /// <param name="activeInstance"></param>
         /// <param name="waitForStatus"></param>
         /// <param name="waitForSeconds"></param>
         /// <returns></returns>
@@ -154,20 +110,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="filter"></param>
         /// <returns></returns>
         Task<long> GetMatchCountAsync(SearchFilterBase filter);
-
-        /// <summary>
-        /// Get number of provinces matching the provided filter.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        Task<int> GetProvinceCountAsync(SearchFilterBase filter);
-
-        /// <summary>
-        /// Gets a single observation
-        /// </summary>
-        /// <param name="occurrenceId"></param>
-        /// <returns></returns>
-        Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter);
 
         /// <summary>
         /// Get observations by their occurrence id's
@@ -250,36 +192,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<IEnumerable<Observation>> GetRandomObservationsAsync(int take, bool protectedIndex);
 
         /// <summary>
-        /// Count the number of user observations group by year
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        Task<IEnumerable<YearCountResult>> GetUserYearCountAsync(SearchFilter filter);
-
-        /// <summary>
-        /// Count the number of user observations group by year and month
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        Task<IEnumerable<YearMonthCountResult>> GetUserYearMonthCountAsync(SearchFilter filter);
-
-        /// <summary>
-        /// Count the number of user observations group by year, month and day
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
-        Task<IEnumerable<YearMonthDayCountResult>> GetUserYearMonthDayCountAsync(SearchFilter filter, int skip, int take);
-
-        /// <summary>
-        /// Check if index have observations with same occurrence id
-        /// </summary>
-        /// <param name="protectedIndex"></param>
-        /// <returns></returns>
-        Task<bool> HasIndexOccurrenceIdDuplicatesAsync(bool protectedIndex);
-
-        /// <summary>
         /// Returns url to first host
         /// </summary>
         Uri HostUrl { get; }
@@ -300,16 +212,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Name of protected index 
         /// </summary>
         string ProtectedIndexName { get; }
-
-        /// <summary>
-        /// Signal search
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="onlyAboveMyClearance"></param>
-        /// <returns></returns>
-        Task<bool> SignalSearchInternalAsync(
-            SearchFilter filter,
-            bool onlyAboveMyClearance);
 
         /// <summary>
         /// Look for duplicates
@@ -342,8 +244,5 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="protectedIndex"></param>
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync(bool protectedIndex);
-
-        Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query, int? skip, int? take);
-        Task<List<UserStatisticsItem>> AreaSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery filter, List<int> userIds);
     }
 }

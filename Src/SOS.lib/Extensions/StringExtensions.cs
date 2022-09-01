@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Standart.Hash.xxHash;
+using System;
 using System.Globalization;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -395,10 +395,13 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static string ToHash(this string source)
         {
-            var sha1 = SHA1.Create();
-            var buf = Encoding.UTF8.GetBytes(source);
-            var hash = sha1.ComputeHash(buf, 0, buf.Length);
-            return BitConverter.ToString(hash).Replace("-", "");
+            if (string.IsNullOrEmpty(source))
+            {
+                return null;
+            }
+
+            byte[] data = Encoding.UTF8.GetBytes(source);
+            return $"{xxHash3.ComputeHash(data, data.Length)}";
         }
 
         /// <summary>

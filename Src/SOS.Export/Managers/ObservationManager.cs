@@ -35,7 +35,7 @@ namespace SOS.Export.Managers
         private readonly string _exportPath;
         private readonly IFileService _fileService;
         private readonly ILogger<ObservationManager> _logger;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IZendToService _zendToService;
 
@@ -59,7 +59,7 @@ namespace SOS.Export.Managers
             IExcelFileWriter excelWriter,
             IGeoJsonFileWriter geoJsonWriter,
             ICsvFileWriter csvWriter,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IFileService fileService,
             IBlobStorageService blobStorageService,

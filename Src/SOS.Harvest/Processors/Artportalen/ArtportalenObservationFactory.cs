@@ -20,6 +20,7 @@ using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
 using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 using Nest;
+using System.Linq;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -170,7 +171,8 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 // Event
                 obs.Event = new Event(startDate, endDate);
-                obs.Event.EventId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}:event:{$"{verbatimObservation.Site?.Id ?? 0}:{obs.Event.VerbatimEventDate}".GetHashCode()}";
+                var eventId = $"{verbatimObservation.Site?.Id ?? 0}:{obs.Event.VerbatimEventDate}:{(obs.Projects?.Any() ?? false ? string.Join(',', obs.Projects.Select(p => p.Id)) : "N/A")}".ToHash();
+                obs.Event.EventId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}:event:{eventId}";
                 obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, VocabularyId.DiscoveryMethod);
                 obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation);
                 

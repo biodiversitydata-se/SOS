@@ -11,14 +11,12 @@ using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson.Serialization.Conventions;
 using Moq;
 using SOS.Harvest.Managers;
-using SOS.Harvest.Processors.Artportalen;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
@@ -32,7 +30,6 @@ using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Repositories.Processed;
-using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Security;
@@ -43,6 +40,8 @@ using SOS.Observations.Api.Controllers;
 using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Repositories;
+using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.TestHelpers;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 
@@ -368,10 +367,10 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
             var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClientManager,
-                elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
                 taxonManager,
+                elasticConfiguration,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;
         }
@@ -409,7 +408,6 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             claimsIdentity.AddClaim(claim);
             contextAccessor.HttpContext.User.AddIdentity(claimsIdentity);
         }
-
 
         public void UseUserServiceWithToken(string token)
         {

@@ -13,7 +13,7 @@ namespace SOS.Administration.Gui.Managers
     public class ProtectedLogManager : IProtectedLogManager
     {
         private readonly IProtectedLogRepository _protectedLogRepository;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly ILogger<ProtectedLogManager> _logger;
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace SOS.Administration.Gui.Managers
         /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
         public ProtectedLogManager(IProtectedLogRepository protectedLogRepository, 
-            IProcessedObservationRepository processedObservationRepository, 
+            IProcessedObservationCoreRepository processedObservationRepository, 
             ILogger<ProtectedLogManager> logger)
         {
             _protectedLogRepository =

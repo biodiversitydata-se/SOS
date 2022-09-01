@@ -94,7 +94,7 @@ namespace SOS.ElasticSearch.Proxy
 
             // Add repositories
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
-            services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
 

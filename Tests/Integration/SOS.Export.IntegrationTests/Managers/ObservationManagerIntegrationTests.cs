@@ -59,13 +59,13 @@ namespace SOS.Export.IntegrationTests.Managers
             var processedConfigurationRepository = new ProcessedConfigurationRepository(processClient,
                 new NullLogger<ProcessedConfigurationRepository>());
 
-            var processedObservationRepository = new ProcessedObservationRepository(
+            var processedObservationRepository = new ProcessedObservationCoreRepository(
                 elasticClientManager,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(processedConfigurationRepository),
                 new TelemetryClient(),
                 new Mock<ITaxonManager>().Object,
-                new Mock<ILogger<ProcessedObservationRepository>>().Object);
+                new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
 
             var excelWriter = new ExcelFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
                 new NullLogger<ExcelFileWriter>());

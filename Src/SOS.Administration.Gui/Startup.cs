@@ -129,7 +129,7 @@ namespace SOS.Administration.Gui
             services.AddScoped<IProtectedLogManager, ProtectedLogManager>();
 
             services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();
-            services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

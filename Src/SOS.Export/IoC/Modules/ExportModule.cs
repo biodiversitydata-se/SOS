@@ -86,7 +86,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<FilterManager>().As<IFilterManager>().InstancePerLifetimeScope();
 
             // Repositories elastic
-            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
+            builder.RegisterType<ProcessedObservationCoreRepository>().As<IProcessedObservationCoreRepository>()
                 .InstancePerLifetimeScope();
 
             // Repositories mongo

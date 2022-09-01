@@ -58,7 +58,7 @@ namespace SOS.Harvest.Processors.FishData
         public FishDataObservationProcessor(
             IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,

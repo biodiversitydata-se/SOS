@@ -45,7 +45,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ArtportalenObservationProcessor(IArtportalenVerbatimRepository artportalenVerbatimRepository,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IVocabularyRepository processedVocabularyRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,

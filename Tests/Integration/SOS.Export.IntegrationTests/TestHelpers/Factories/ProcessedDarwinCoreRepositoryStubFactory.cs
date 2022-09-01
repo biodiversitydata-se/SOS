@@ -16,9 +16,9 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
     {
         public static string TenObservations = @"Resources\TenProcessedTestObservations.json";
 
-        public static Mock<IProcessedObservationRepository> Create(string fileName)
+        public static Mock<IProcessedObservationCoreRepository> Create(string fileName)
         {
-            var stub = new Mock<IProcessedObservationRepository>();
+            var stub = new Mock<IProcessedObservationCoreRepository>();
             var observations = LoadObservations(fileName);
             stub
                 .Setup(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), It.IsAny<string>(), It.IsAny<IEnumerable<object>>()))

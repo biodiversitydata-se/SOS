@@ -72,6 +72,8 @@ using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
+using SOS.Observations.Api.Repositories;
+using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Observations.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;

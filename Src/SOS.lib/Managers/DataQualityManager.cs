@@ -12,10 +12,10 @@ namespace SOS.Lib.Managers
     /// </summary>
     public class DataQualityManager : IDataQualityManager
     {
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly ILogger<DataQualityManager> _logger;
 
-        public DataQualityManager(IProcessedObservationRepository processedObservationRepository,
+        public DataQualityManager(IProcessedObservationCoreRepository processedObservationRepository,
         ILogger<DataQualityManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??

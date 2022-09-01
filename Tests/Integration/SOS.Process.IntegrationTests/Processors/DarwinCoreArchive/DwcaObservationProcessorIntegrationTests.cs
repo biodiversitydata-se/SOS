@@ -130,15 +130,15 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var processTimeManager = new ProcessTimeManager(processConfiguration);
-            IProcessedObservationRepository processedObservationRepository;
+            IProcessedObservationCoreRepository processedObservationRepository;
      
             if (storeProcessedObservations)
             {
-                processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, 
+                processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager, 
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new Mock<ITaxonManager>().Object,
-                    new NullLogger<ProcessedObservationRepository>());
+                    new NullLogger<ProcessedObservationCoreRepository>());
             }
             else
             {
@@ -200,9 +200,9 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             return dwcArchiveFileWriterCoordinator;
         }
 
-        private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock(int batchSize)
+        private Mock<IProcessedObservationCoreRepository> CreateProcessedObservationRepositoryMock(int batchSize)
         {
-            var mock = new Mock<IProcessedObservationRepository>();
+            var mock = new Mock<IProcessedObservationCoreRepository>();
             mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>())).ReturnsAsync(true);
             mock.Setup(m => m.ReadBatchSize).Returns(batchSize);
             mock.Setup(m => m.WriteBatchSize).Returns(batchSize);

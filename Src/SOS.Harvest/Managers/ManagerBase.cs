@@ -9,7 +9,7 @@ namespace SOS.Harvest.Managers
     public class ManagerBase<TEntity>
     {
         protected readonly ILogger<TEntity> Logger;
-        protected readonly IProcessedObservationRepository ProcessedObservationRepository;
+        protected readonly IProcessedObservationCoreRepository ProcessedObservationRepository;
 
         /// <summary>
         ///     Constructor
@@ -17,7 +17,7 @@ namespace SOS.Harvest.Managers
         /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
         public ManagerBase(
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             ILogger<TEntity> logger)
         {
             ProcessedObservationRepository = processedObservationRepository ??

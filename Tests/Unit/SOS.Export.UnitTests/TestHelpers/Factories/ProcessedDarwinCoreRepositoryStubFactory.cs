@@ -17,9 +17,9 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
     {
         public static string TenObservations = @"Resources\TenProcessedTestObservations.json";
 
-        public static Mock<IProcessedObservationRepository> Create(Observation observation)
+        public static Mock<IProcessedObservationCoreRepository> Create(Observation observation)
         {
-            var stub = new Mock<IProcessedObservationRepository>();
+            var stub = new Mock<IProcessedObservationCoreRepository>();
             
             stub.SetupSequence(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), null, null))
                 .ReturnsAsync(new SearchAfterResult<Observation>

@@ -39,7 +39,7 @@ namespace SOS.Lib.IO.DwcArchive
             SearchFilter filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IJobCancellationToken cancellationToken)
         {
             try

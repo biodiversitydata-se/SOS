@@ -28,7 +28,7 @@ namespace SOS.Lib.IO.Excel
     /// </summary>
     public class CsvFileWriter : FileWriterBase, ICsvFileWriter
     {
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ILogger<CsvFileWriter> _logger;
@@ -40,7 +40,7 @@ namespace SOS.Lib.IO.Excel
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="logger"></param>
-        public CsvFileWriter(IProcessedObservationRepository processedObservationRepository, 
+        public CsvFileWriter(IProcessedObservationCoreRepository processedObservationRepository, 
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
             ILogger<CsvFileWriter> logger)

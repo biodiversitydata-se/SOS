@@ -16,7 +16,7 @@ namespace SOS.Harvest.Managers
         /// <param name="processInfoRepository"></param>
         /// <param name="logger"></param>
         public InstanceManager(
-            IProcessedObservationRepository processedObservationRepository,            
+            IProcessedObservationCoreRepository processedObservationRepository,            
             ILogger<InstanceManager> logger) : base(processedObservationRepository, logger)
         {
             

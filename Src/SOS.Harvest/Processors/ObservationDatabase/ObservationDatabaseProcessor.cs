@@ -56,7 +56,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ObservationDatabaseProcessor(IObservationDatabaseVerbatimRepository observationDatabaseVerbatimRepository,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IDiffusionManager diffusionManager,

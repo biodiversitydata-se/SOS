@@ -57,7 +57,7 @@ namespace SOS.Harvest.Processors.Shark
         /// <exception cref="ArgumentNullException"></exception>
         public SharkObservationProcessor(ISharkObservationVerbatimRepository sharkObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,

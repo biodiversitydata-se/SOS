@@ -40,7 +40,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _personRepository = new Mock<IPersonRepository>();
             _sightingRelationRepository = new Mock<ISightingRelationRepository>();
             _speciesCollectionItemRepository = new Mock<ISpeciesCollectionItemRepository>();
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
             _taxonRepositoryMock = new Mock<ITaxonRepository>();
             _artportalenMetadataContainerMock = new Mock<IArtportalenMetadataContainer>();
             _areaHelperMock = new Mock<IAreaHelper>();
@@ -57,7 +57,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         private readonly Mock<IPersonRepository> _personRepository;
         private readonly Mock<ISightingRelationRepository> _sightingRelationRepository;
         private readonly Mock<ISpeciesCollectionItemRepository> _speciesCollectionItemRepository;
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
         private readonly Mock<ITaxonRepository> _taxonRepositoryMock;
         private readonly Mock<IArtportalenMetadataContainer> _artportalenMetadataContainerMock;
         private readonly Mock<IAreaHelper> _areaHelperMock;

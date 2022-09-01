@@ -27,7 +27,7 @@ namespace SOS.Lib.IO.Excel
     /// </summary>
     public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
     {
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ILogger<ExcelFileWriter> _logger;
@@ -39,7 +39,7 @@ namespace SOS.Lib.IO.Excel
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="logger"></param>
-        public ExcelFileWriter(IProcessedObservationRepository processedObservationRepository, 
+        public ExcelFileWriter(IProcessedObservationCoreRepository processedObservationRepository, 
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
             ILogger<ExcelFileWriter> logger)

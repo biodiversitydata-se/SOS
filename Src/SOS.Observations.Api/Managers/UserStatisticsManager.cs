@@ -4,11 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Statistics;
-using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Managers

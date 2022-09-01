@@ -25,6 +25,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Managers
 {

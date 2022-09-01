@@ -60,7 +60,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         public VirtualHerbariumObservationProcessor(
             IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,

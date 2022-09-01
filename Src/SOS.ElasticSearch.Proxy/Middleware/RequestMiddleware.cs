@@ -10,7 +10,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
     public class RequestMiddleware
     {
         private readonly RequestDelegate _nextMiddleware;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly ProxyConfiguration _proxyConfiguration;
         private readonly ILogger<RequestMiddleware> _logger;
 
@@ -110,7 +110,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public RequestMiddleware(RequestDelegate nextMiddleware, 
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             ProxyConfiguration proxyConfiguration,
             ILogger<RequestMiddleware> logger)
         {

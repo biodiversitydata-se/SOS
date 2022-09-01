@@ -40,12 +40,12 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            var processedObservationRepository = new ProcessedObservationRepository(
+            var processedObservationRepository = new ProcessedObservationCoreRepository(
                 new ElasticClientManager(elasticSearchConfiguration, true),
                 new ElasticSearchConfiguration(),
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new Mock<ITaxonManager>().Object,
-                new Mock<ILogger<ProcessedObservationRepository>>().Object);
+                new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

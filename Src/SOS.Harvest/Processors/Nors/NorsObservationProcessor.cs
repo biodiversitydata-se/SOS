@@ -58,7 +58,7 @@ namespace SOS.Harvest.Processors.Nors
         /// <exception cref="ArgumentNullException"></exception>
         public NorsObservationProcessor(INorsObservationVerbatimRepository norsObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,

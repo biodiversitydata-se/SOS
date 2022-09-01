@@ -61,15 +61,15 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                 new VocabularyConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
         }
 
-        private static ProcessedObservationRepository CreateProcessedObservationRepository(ProcessClient processClient, ElasticSearchConfiguration elasticConfiguration)
+        private static ProcessedObservationCoreRepository CreateProcessedObservationRepository(ProcessClient processClient, ElasticSearchConfiguration elasticConfiguration)
         {
-            var processedObservationRepository = new ProcessedObservationRepository(
+            var processedObservationRepository = new ProcessedObservationCoreRepository(
                 new ElasticClientManager(elasticConfiguration, true),
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
                 new Mock<ITaxonManager>().Object,
-                new Mock<ILogger<ProcessedObservationRepository>>().Object);
+                new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
             return processedObservationRepository;
 
         }

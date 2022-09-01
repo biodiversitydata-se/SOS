@@ -19,11 +19,11 @@ namespace SOS.Process.UnitTests.Managers
         /// </summary>
         public InstanceManagerTests()
         {
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
             _loggerMock = new Mock<ILogger<InstanceManager>>();
         }
 
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
         private readonly Mock<ILogger<InstanceManager>> _loggerMock;
 
         /// <summary>

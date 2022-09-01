@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Enums;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Statistics;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Extensions;

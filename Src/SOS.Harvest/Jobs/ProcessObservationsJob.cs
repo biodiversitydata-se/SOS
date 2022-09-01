@@ -50,7 +50,7 @@ namespace SOS.Harvest.Jobs
         private readonly IProcessTimeManager _processTimeManager;
         private readonly IValidationManager _validationManager;
         private readonly ILogger<ProcessObservationsJob> _logger;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IUserObservationRepository _userObservationRepository;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly ICache<int, Taxon> _taxonCache;
@@ -768,7 +768,7 @@ namespace SOS.Harvest.Jobs
         /// <param name="userObservationRepository"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public ProcessObservationsJob(IProcessedObservationRepository processedObservationRepository,
+        public ProcessObservationsJob(IProcessedObservationCoreRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IArtportalenObservationProcessor artportalenObservationProcessor,

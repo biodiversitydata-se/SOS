@@ -34,7 +34,7 @@ namespace SOS.Process.UnitTests.Processors
         public ArtportalenObservationProcessorTests()
         {
             _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
             _userObservationRepositoryMock = new Mock<IUserObservationRepository>();
             _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
@@ -49,7 +49,7 @@ namespace SOS.Process.UnitTests.Processors
         }
 
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
         private readonly Mock<IUserObservationRepository> _userObservationRepositoryMock;
         private readonly Mock<IVocabularyRepository> _vocabularyRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;

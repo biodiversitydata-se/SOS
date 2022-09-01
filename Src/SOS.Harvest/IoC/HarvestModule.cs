@@ -230,7 +230,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<ReportManager>().As<IReportManager>().InstancePerLifetimeScope();
 
             // Repositories elastic
-            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
+            builder.RegisterType<ProcessedObservationCoreRepository>().As<IProcessedObservationCoreRepository>()
                 .InstancePerLifetimeScope();
 
             // Repositories source
@@ -290,7 +290,7 @@ namespace SOS.Harvest.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedChecklistRepository>().As<IProcessedChecklistRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
+            builder.RegisterType<ProcessedObservationCoreRepository>().As<IProcessedObservationCoreRepository>()
                 .InstancePerLifetimeScope();
 
             // Add harvesters observations

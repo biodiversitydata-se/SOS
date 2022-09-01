@@ -58,6 +58,7 @@ using SOS.Observations.Api.Controllers;
 using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Repositories;
 using SOS.TestHelpers;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 
@@ -77,7 +78,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         public VocabulariesController VocabulariesController { get; private set; }
         public UserController UserController { get; private set; }
         public DataProvidersController DataProvidersController { get; private set; }
-        public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
+        public IProcessedObservationCoreRepository ProcessedObservationRepository { get; set; }
         public ProcessedChecklistRepository ProcessedChecklistRepository { get; set; }
         public UserObservationRepository UserObservationRepository { get; set; }
         public ArtportalenVerbatimRepository ArtportalenVerbatimRepository { get; set; }
@@ -494,7 +495,6 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return projectManager;
         }
         
-
         private ProcessedObservationRepository CreateProcessedObservationRepository(
             ElasticSearchConfiguration elasticConfiguration,
             IElasticClientManager elasticClientManager,
@@ -505,10 +505,10 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
             var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClientManager,
-                elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
                 taxonManager,
+                elasticConfiguration,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;
         }

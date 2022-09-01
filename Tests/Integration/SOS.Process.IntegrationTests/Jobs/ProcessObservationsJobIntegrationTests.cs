@@ -79,18 +79,18 @@ namespace SOS.Process.IntegrationTests.Jobs
             var processManager = new ProcessManager(processConfiguration);
             var processTimeManager = new ProcessTimeManager(processConfiguration);
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
-            IProcessedObservationRepository processedObservationRepository;
+            IProcessedObservationCoreRepository processedObservationRepository;
             if (storeProcessed)
             {
-                processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, 
+                processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager, 
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new Mock<ITaxonManager>().Object,
-                    new NullLogger<ProcessedObservationRepository>());
+                    new NullLogger<ProcessedObservationCoreRepository>());
             }
             else
             {
-                processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
+                processedObservationRepository = new Mock<IProcessedObservationCoreRepository>().Object;
             }
             IUserObservationRepository userObservationRepository = new Mock<IUserObservationRepository>().Object;
 
@@ -220,11 +220,11 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new NullLogger<ArtportalenObservationProcessor>());
 
             var instanceManager = new InstanceManager(
-                new ProcessedObservationRepository(elasticClientManager, 
+                new ProcessedObservationCoreRepository(elasticClientManager, 
                     new ElasticSearchConfiguration(), 
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new Mock<ITaxonManager>().Object,
-                    new NullLogger<ProcessedObservationRepository>()),
+                    new NullLogger<ProcessedObservationCoreRepository>()),
                 new NullLogger<InstanceManager>());
 
             

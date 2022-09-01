@@ -48,7 +48,7 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         public ProcessJobTests()
         {
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
             _userObservationRepositoryMock = new Mock<IUserObservationRepository>();
             _processInfoRepository = new Mock<IProcessInfoRepository>();
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
@@ -75,7 +75,7 @@ namespace SOS.Process.UnitTests.Jobs
             _processConfigurationMock = new Mock<ProcessConfiguration>();
         }
 
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
         private readonly Mock<IUserObservationRepository> _userObservationRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;

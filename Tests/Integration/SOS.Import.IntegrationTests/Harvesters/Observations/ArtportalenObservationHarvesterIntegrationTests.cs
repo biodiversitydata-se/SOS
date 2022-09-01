@@ -61,7 +61,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var siteRepositoryMock = new Mock<ISiteRepository>();
             var taxonRepository = new TaxonRepository(artportalenDataService, new Mock<ILogger<TaxonRepository>>().Object);
 
-            var processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
+            var processedObservationRepository = new Mock<IProcessedObservationCoreRepository>().Object;
             siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>())).ReturnsAsync(new List<SiteEntity>());
 
             var processedDbConfiguration = GetProcessDbConfiguration();
@@ -126,7 +126,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
             siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>()));
-            var processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
+            var processedObservationRepository = new Mock<IProcessedObservationCoreRepository>().Object;
             var taxonRepositoryMock = new Mock<ITaxonRepository>().Object;
 
             var processedDbConfiguration = GetProcessDbConfiguration();

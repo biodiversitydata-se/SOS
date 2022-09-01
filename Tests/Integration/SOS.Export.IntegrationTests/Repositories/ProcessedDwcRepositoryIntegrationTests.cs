@@ -57,7 +57,7 @@ namespace SOS.Export.IntegrationTests.Repositories
             projectParameters.Should().NotBeEmpty();
         }
 
-        private ProcessedObservationRepository GetProcessedObservationRepository()
+        private ProcessedObservationCoreRepository GetProcessedObservationRepository()
         {
             var processDbConfiguration = GetProcessDbConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
@@ -67,12 +67,12 @@ namespace SOS.Export.IntegrationTests.Repositories
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var processedObservationRepository =
-                new ProcessedObservationRepository(
+                new ProcessedObservationCoreRepository(
                     new ElasticClientManager(elasticConfiguration, true),
                     elasticConfiguration,
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new Mock<ITaxonManager>().Object,                    
-                    new NullLogger<ProcessedObservationRepository>());
+                    new NullLogger<ProcessedObservationCoreRepository>());
 
             return processedObservationRepository;
         }

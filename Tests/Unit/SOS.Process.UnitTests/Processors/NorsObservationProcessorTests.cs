@@ -35,7 +35,7 @@ namespace SOS.Process.UnitTests.Processors
         {
             _norsObservationVerbatimRepositoryMock = new Mock<INorsObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
-            _processedObservationRepository = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepository = new Mock<IProcessedObservationCoreRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _processManagerMock = new Mock<IProcessManager>();
@@ -47,7 +47,7 @@ namespace SOS.Process.UnitTests.Processors
 
         private readonly Mock<INorsObservationVerbatimRepository> _norsObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepository;
+        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepository;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IProcessManager> _processManagerMock;

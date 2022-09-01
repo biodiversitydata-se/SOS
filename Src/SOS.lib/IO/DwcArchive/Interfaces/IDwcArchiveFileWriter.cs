@@ -31,7 +31,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
             DataProvider dataProvider, 
             SearchFilter filter,
             string fileName,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken);
@@ -54,7 +54,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
             DataProvider dataProvider, 
             SearchFilter filter,
             string fileName,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
             ProcessInfo processInfo,
             string exportFolderPath,

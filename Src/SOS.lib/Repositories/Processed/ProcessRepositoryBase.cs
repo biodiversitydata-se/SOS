@@ -16,7 +16,7 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
+    public abstract class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;

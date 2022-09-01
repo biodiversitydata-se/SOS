@@ -87,15 +87,15 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
             var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
-            IProcessedObservationRepository processedObservationRepository;
+            IProcessedObservationCoreRepository processedObservationRepository;
             var processTimeManager = new ProcessTimeManager(processConfiguration);
             if (storeProcessedObservations)
             {
-                processedObservationRepository = new ProcessedObservationRepository(elasticClientManager,
+                processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager,
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new Mock<ITaxonManager>().Object,
-                    new NullLogger<ProcessedObservationRepository>());
+                    new NullLogger<ProcessedObservationCoreRepository>());
             }
             else
             {
@@ -135,9 +135,9 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new NullLogger<DwcaObservationProcessor>());
         }
 
-        private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock()
+        private Mock<IProcessedObservationCoreRepository> CreateProcessedObservationRepositoryMock()
         {
-            var mock = new Mock<IProcessedObservationRepository>();
+            var mock = new Mock<IProcessedObservationCoreRepository>();
             mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>())).ReturnsAsync(true);
             mock.Setup(m => m.ReadBatchSize).Returns(10000);
             mock.Setup(m => m.WriteBatchSize).Returns(1000);

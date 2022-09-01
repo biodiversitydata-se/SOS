@@ -23,7 +23,7 @@ namespace SOS.Lib.IO.GeoJson
 {
     public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
     {
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ILogger<GeoJsonFileWriter> _logger;
@@ -35,7 +35,7 @@ namespace SOS.Lib.IO.GeoJson
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="logger"></param>
-        public GeoJsonFileWriter(IProcessedObservationRepository processedObservationRepository,
+        public GeoJsonFileWriter(IProcessedObservationCoreRepository processedObservationRepository,
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
             ILogger<GeoJsonFileWriter> logger)

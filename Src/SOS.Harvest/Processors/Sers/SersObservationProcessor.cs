@@ -57,7 +57,7 @@ namespace SOS.Harvest.Processors.Sers
         /// <exception cref="ArgumentNullException"></exception>
         public SersObservationProcessor(ISersObservationVerbatimRepository sersObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,

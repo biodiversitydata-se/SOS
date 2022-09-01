@@ -71,7 +71,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// <exception cref="ArgumentNullException"></exception>
         public DwcaObservationProcessor(
             IVerbatimClient verbatimClient,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IVocabularyRepository processedVocabularyRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IAreaHelper areaHelper,

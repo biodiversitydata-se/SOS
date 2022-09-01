@@ -26,7 +26,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
             SearchFilter filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IJobCancellationToken cancellationToken,
             bool leaveStreamOpen = false);
 

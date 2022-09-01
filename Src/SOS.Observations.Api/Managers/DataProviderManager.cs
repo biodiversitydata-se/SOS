@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Extensions;
-using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Managers
 {

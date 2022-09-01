@@ -28,7 +28,7 @@ namespace SOS.Lib.IO.DwcArchive
             SearchFilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IJobCancellationToken cancellationToken)
         {
             try

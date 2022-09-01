@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Nest;
@@ -17,7 +16,7 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Species data service
     /// </summary>
-    public class ProcessedObservationBaseRepository : ProcessRepositoryBase<Observation, string>
+    public abstract class ProcessedObservationBaseRepository : ProcessRepositoryBase<Observation, string>
     {
         /// <summary>
         /// Get core queries

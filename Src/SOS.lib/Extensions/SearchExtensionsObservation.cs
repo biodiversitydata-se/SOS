@@ -344,12 +344,11 @@ namespace SOS.Lib
             excludeQuery.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.ExcludeVerificationStatusIds);
         }
 
-        private static void AddSightingTypeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
+        public static void AddSightingTypeFilters<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, SearchFilterBase.SightingTypeFilter sightingTypeFilter) where TQueryContainer : class
         {
-            var sightingTypeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var sightingTypeQuery = new List<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>>();
 
-           
-            var sightingTypeSearchGroupFilter = filter.TypeFilter switch
+            var sightingTypeSearchGroupFilter = sightingTypeFilter switch
             {
                 SearchFilterBase.SightingTypeFilter.ShowBoth => new[] { // 1, 2, 4, 16, 32, 128
                     (int)SightingTypeSearchGroup.Ordinary,
@@ -376,7 +375,7 @@ namespace SOS.Lib
 
             sightingTypeQuery.TryAddTermsCriteria("artportalenInternal.sightingTypeSearchGroupId", sightingTypeSearchGroupFilter);
 
-            if (filter.TypeFilter != SearchFilterBase.SightingTypeFilter.ShowOnlyMerged)
+            if (sightingTypeFilter != SearchFilterBase.SightingTypeFilter.ShowOnlyMerged)
             {
                 // Get observations from other than Artportalen too
                 sightingTypeQuery.AddNotExistsCriteria("artportalenInternal.sightingTypeSearchGroupId");
@@ -718,7 +717,7 @@ namespace SOS.Lib
             query.TryAddLocationFilter(filter.Location);
             query.TryAddModifiedDateFilter(filter.ModifiedDate);
             query.TryAddNotRecoveredFilter(filter);
-            query.AddSightingTypeFilters(filter);
+            query.AddSightingTypeFilters(filter.TypeFilter);
             query.TryAddValidationStatusFilter(filter);
             query.TryAddTaxonCriteria(filter.Taxa);
 
