@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Statistics;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Checklist;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Observations.Api.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {

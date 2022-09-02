@@ -8,8 +8,8 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.Controllers.Interfaces;
-using SOS.Observations.Api.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {

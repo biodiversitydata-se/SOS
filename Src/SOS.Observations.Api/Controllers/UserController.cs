@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.UserService;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Extensions;
-using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Observations.Api.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {

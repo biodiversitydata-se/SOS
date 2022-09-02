@@ -19,13 +19,13 @@ using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Observation;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Observations.Api.Swagger;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers
