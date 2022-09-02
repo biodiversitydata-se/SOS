@@ -415,7 +415,8 @@ namespace SOS.Observations.Api
             services.AddScoped<IUserObservationRepository, UserObservationRepository>();
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedLocationRepository, ProcessedLocationRepository>();
-            services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
+            services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>(); 
             services.AddScoped<IProcessedTaxonRepository, ProcessedTaxonRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();

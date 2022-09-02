@@ -82,14 +82,14 @@ namespace SOS.Lib.IO.Excel
                 csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
 
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-                var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
+                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter);
                
-                while (searchResult?.Records?.Any() ?? false)
+                while (scrollResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     // Fetch observations from ElasticSearch.
-                    var processedObservations = searchResult.Records.ToArray();
+                    var processedObservations = scrollResult.Records.ToObservations().ToArray();
 
                     // Resolve vocabulary values.
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
@@ -119,7 +119,7 @@ namespace SOS.Lib.IO.Excel
 
                     nrObservations += processedObservations.Length;
                     // Get next batch of observations.
-                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
 
                 csvFileHelper.FinishWrite();

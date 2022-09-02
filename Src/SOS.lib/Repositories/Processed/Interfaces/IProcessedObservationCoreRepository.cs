@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Models.Processed.Observation;
@@ -212,6 +213,37 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Name of protected index 
         /// </summary>
         string ProtectedIndexName { get; }
+
+        /// <summary>
+        /// Scroll measurement or facts
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<ExtendedMeasurementOrFactRow>> ScrollMeasurementOrFactsAsync(
+            SearchFilterBase filter,
+            string scrollId = null);
+
+        /// <summary>
+        /// Scroll multimedia
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<SimpleMultimediaRow>> ScrollMultimediaAsync(
+            SearchFilterBase filter,
+            string scrollId = null);
+
+        /// <summary>
+        /// Scroll observations
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filter"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<dynamic>> ScrollObservationsAsync(
+            SearchFilterBase filter,
+            string scrollId = null);
 
         /// <summary>
         /// Look for duplicates

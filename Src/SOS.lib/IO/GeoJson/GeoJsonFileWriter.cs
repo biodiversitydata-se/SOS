@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
@@ -84,15 +85,15 @@ namespace SOS.Lib.IO.GeoJson
                 jsonWriter.WriteStartArray();
 
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-                var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);
+                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter);
 
-                while (searchResult?.Records?.Any() ?? false)
+                while (scrollResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     if (flatOut)
                     {
-                        var processedObservations = CastDynamicsToObservations(searchResult.Records);
+                        var processedObservations = scrollResult.Records.ToObservations();
                         
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
                         
@@ -104,7 +105,7 @@ namespace SOS.Lib.IO.GeoJson
                     }
                     else
                     {
-                        var processedRecords = searchResult.Records.Cast<IDictionary<string, object>>();
+                        var processedRecords = scrollResult.Records.Cast<IDictionary<string, object>>();
                         
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
                        
@@ -115,9 +116,9 @@ namespace SOS.Lib.IO.GeoJson
                         }
                     }
 
-                    nrObservations += searchResult.Records.Count();
+                    nrObservations += scrollResult.Records.Count();
                     // Get next batch of observations.
-                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
                 jsonWriter.WriteEndArray();
                 jsonWriter.WriteEndObject();
@@ -172,13 +173,6 @@ namespace SOS.Lib.IO.GeoJson
             jsonSerializerOptions.Converters.Add(attributesTableConverter);
             jsonSerializerOptions.Converters.Add(geometryConverter);
             return jsonSerializerOptions;
-        }
-
-        private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)
-        {
-            if (dynamicObjects == null) return null;
-            return System.Text.Json.JsonSerializer.Deserialize<List<Observation>>(System.Text.Json.JsonSerializer.Serialize(dynamicObjects),
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
         private async Task WriteFeature(
