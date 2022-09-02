@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Security.Interfaces;

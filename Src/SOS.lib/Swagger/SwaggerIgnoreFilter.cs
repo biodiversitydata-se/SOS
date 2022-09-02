@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
-using SOS.Lib.Swagger;
-using SOS.Observations.Api.Dtos;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace SOS.Observations.Api.Swagger
+namespace SOS.Lib.Swagger
 {
-    
-
     /// <summary>
     ///     Swagger ignore filter
     /// </summary>
-    internal class SwaggerIgnoreFilter : ISchemaFilter
+    public class SwaggerIgnoreFilter : ISchemaFilter
     {
         /// <summary>
         ///     Apply filter
@@ -75,13 +70,6 @@ namespace SOS.Observations.Api.Swagger
             }
 
             return type.Name;
-        }
-
-        private bool ImplementsInterface(Type type, Type interfaceType)
-        {
-            var implementedInterfaces = type.GetTypeInfo().ImplementedInterfaces.ToList();
-            if (implementedInterfaces.Count == 0) return false;
-            return implementedInterfaces.Any(m => m == interfaceType);
         }
     }
 }

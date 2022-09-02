@@ -32,6 +32,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NLog.Web;
+using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
@@ -67,14 +68,13 @@ using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
-using SOS.Observations.Api.ActionFilters;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.Observations.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
@@ -340,7 +340,6 @@ namespace SOS.Observations.Api
                 .Get<BlobStorageConfiguration>();
 
             var healthCheckConfiguration = Configuration.GetSection("HealthCheckConfiguration").Get<HealthCheckConfiguration>();
-
             var artportalenApiServiceConfiguration = Configuration.GetSection("ArtportalenApiServiceConfiguration").Get<ArtportalenApiServiceConfiguration>();
 
             // Add configuration

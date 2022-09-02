@@ -1,7 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace SOS.Observations.Api.ActionFilters
+namespace SOS.Lib.ActionFilters
 {
     /// <summary>
     /// Operation filter that modifies the output of the swagger file to 

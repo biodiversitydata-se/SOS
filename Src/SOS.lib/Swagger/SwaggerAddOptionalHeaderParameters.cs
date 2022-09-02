@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace SOS.Observations.Api.Swagger
+namespace SOS.Lib.Swagger
 {
     /// <summary>
     /// Add optional headers to swagger

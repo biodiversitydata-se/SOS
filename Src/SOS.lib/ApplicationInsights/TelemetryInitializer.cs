@@ -82,7 +82,7 @@ namespace SOS.Lib.ApplicationInsights
         /// </summary>
         /// <param name="httpContextAccessor"></param>
         /// <param name="applicationInsightsConfiguration"></param>
-        public TelemetryInitializer(IHttpContextAccessor httpContextAccessor, Configuration.ObservationApi.ApplicationInsights applicationInsightsConfiguration) : base(httpContextAccessor)
+        public TelemetryInitializer(IHttpContextAccessor httpContextAccessor, Configuration.Shared.ApplicationInsights applicationInsightsConfiguration) : base(httpContextAccessor)
         {
             _loggRequestBody = applicationInsightsConfiguration.EnableRequestBodyLogging;
             _loggSearchResponseCount = applicationInsightsConfiguration.EnableSearchResponseCountLogging;

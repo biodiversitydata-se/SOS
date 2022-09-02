@@ -1,4 +1,4 @@
-﻿namespace SOS.Lib.Configuration.ObservationApi
+﻿namespace SOS.Lib.Configuration.Shared
 {
     /// <summary>
     /// Configuration for application insights

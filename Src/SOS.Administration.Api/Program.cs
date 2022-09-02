@@ -11,7 +11,6 @@ using NLog.Web;
 using SOS.Administration.Api.IoC;
 using SOS.Harvest.IoC.Modules;
 using SOS.Lib.Configuration.Import;
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;

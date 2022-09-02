@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SOS.Observations.Api.Swagger
+namespace SOS.Lib.Swagger
 {
     /// <summary>
     /// This attribute is used to indicate that an endpoint belongs to the internal API.

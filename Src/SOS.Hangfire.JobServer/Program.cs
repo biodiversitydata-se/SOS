@@ -32,7 +32,6 @@ using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.Configuration.ObservationApi;
 
 namespace SOS.Hangfire.JobServer
 {
