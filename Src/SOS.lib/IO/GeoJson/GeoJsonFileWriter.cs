@@ -16,6 +16,7 @@ using SOS.Lib.Models;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
@@ -84,15 +85,15 @@ namespace SOS.Lib.IO.GeoJson
                 jsonWriter.WriteStartArray();
 
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-                var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);
+                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync<dynamic>(filter, null);
 
-                while (searchResult?.Records?.Any() ?? false)
+                while (scrollResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     if (flatOut)
                     {
-                        var processedObservations = CastDynamicsToObservations(searchResult.Records);
+                        var processedObservations = CastDynamicsToObservations(scrollResult.Records);
                         
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
                         
@@ -104,7 +105,7 @@ namespace SOS.Lib.IO.GeoJson
                     }
                     else
                     {
-                        var processedRecords = searchResult.Records.Cast<IDictionary<string, object>>();
+                        var processedRecords = scrollResult.Records.Cast<IDictionary<string, object>>();
                         
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
                        
@@ -115,9 +116,9 @@ namespace SOS.Lib.IO.GeoJson
                         }
                     }
 
-                    nrObservations += searchResult.Records.Count();
+                    nrObservations += scrollResult.Records.Count();
                     // Get next batch of observations.
-                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync<dynamic>(filter, scrollResult.ScrollId);
                 }
                 jsonWriter.WriteEndArray();
                 jsonWriter.WriteEndObject();

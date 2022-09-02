@@ -33,8 +33,8 @@ namespace SOS.Lib.IO.DwcArchive
         {
             try
             {
-                var searchResult = await processedObservationRepository.GetMultimediaBySearchAfterAsync(filter);
-                var hasRecords = searchResult?.Records?.Any() ?? false;
+                var scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, null);
+                var hasRecords = scrollResult?.Records?.Any() ?? false;
                 if (!hasRecords) return false;
 
                 var csvFileHelper = new CsvFileHelper();
@@ -42,12 +42,12 @@ namespace SOS.Lib.IO.DwcArchive
                 // Write header row
                 WriteHeaderRow(csvFileHelper);
 
-                while (searchResult?.Records?.Any() ?? false)
+                while (scrollResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     // Fetch observations from ElasticSearch.
-                    var multimediaRows = searchResult.Records.ToArray();
+                    var multimediaRows = scrollResult.Records.ToArray();
 
                     // Write occurrence rows to CSV file.
                     foreach (var row in multimediaRows)
@@ -57,7 +57,7 @@ namespace SOS.Lib.IO.DwcArchive
                     await csvFileHelper.FlushAsync();
 
                     // Get next batch of observations.
-                    searchResult = await processedObservationRepository.GetMultimediaBySearchAfterAsync(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, scrollResult.ScrollId);
                 }
                 csvFileHelper.FinishWrite();
                 return true;

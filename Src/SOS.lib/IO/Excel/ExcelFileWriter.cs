@@ -76,19 +76,19 @@ namespace SOS.Lib.IO.Excel
                 }
 
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-                var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
+                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync<Observation>(filter, null);
                 var fileCount = 0;
                 var rowIndex = 0;
                 ExcelPackage package = null;
                 ExcelWorksheet sheet = null;
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                while (searchResult?.Records?.Any() ?? false)
+                while (scrollResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     // Fetch observations from ElasticSearch.
-                    var processedObservations = searchResult.Records.ToArray();
+                    var processedObservations = scrollResult.Records.ToArray();
                     
                     // Resolve vocabulary values.
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
@@ -140,7 +140,7 @@ namespace SOS.Lib.IO.Excel
 
                     nrObservations += processedObservations.Length;
                     // Get next batch of observations.
-                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync<Observation>(filter, scrollResult.ScrollId);
                 }
 
                 // If less tha 99% of expected observations where fetched, something is wrong

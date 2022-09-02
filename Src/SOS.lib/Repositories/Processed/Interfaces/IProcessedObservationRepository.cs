@@ -309,6 +309,36 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         string ProtectedIndexName { get; }
 
         /// <summary>
+        /// Scroll measurement or facts
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<ExtendedMeasurementOrFactRow>> ScrollMeasurementOrFactsAsync(
+            SearchFilterBase filter,
+            string scrollId);
+       
+        /// <summary>
+        /// Scroll multimedia
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<SimpleMultimediaRow>> ScrollMultimediaAsync(
+            SearchFilterBase filter,
+            string scrollId);
+
+        /// <summary>
+        /// Scroll observations
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<T>> ScrollObservationsAsync<T>(
+            SearchFilterBase filter,
+            string scrollId);
+
+        /// <summary>
         /// Signal search
         /// </summary>
         /// <param name="filter"></param>

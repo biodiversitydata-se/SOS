@@ -419,7 +419,7 @@ namespace SOS.Observations.Api.Controllers
                         gzip,
                         JobCancellationToken.Null);
 
-                HttpContext.LogObservationCount(fileExportResult.NrObservations);
+                HttpContext.LogObservationCount(fileExportResult?.NrObservations ?? 0);
                 if (gzip)                
                     return GetFile(fileExportResult.FilePath, "Observations_GeoJson.zip", "application/zip");
                 else                
