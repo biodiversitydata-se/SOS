@@ -254,6 +254,22 @@ namespace SOS.Lib
                     case DateFilterComparison.EndDate:
                         query.TryAddTermsCriteria("event.endMonth", internalFilter.Months);
                         break;
+                    case DateFilterComparison.StartDateOrEndDate:
+                        query.Add(q => q
+                            .Bool(p => p
+                                .Should(s => s
+                                        .Terms(t => t
+                                            .Field("event.startMonth")
+                                            .Terms(internalFilter.Months)),
+                                    s => s
+                                        .Terms(t => t
+                                            .Field("event.endMonth")
+                                            .Terms(internalFilter.Months))
+                                )
+                            )
+                        );
+                        
+                        break;
                     default:
                         query.TryAddTermsCriteria("event.startMonth", internalFilter.Months);
                         break;
