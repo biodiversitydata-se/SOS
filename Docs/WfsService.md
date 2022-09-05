@@ -124,4 +124,5 @@ The INSPIRE layers: SpeciesDistribution and HabitatsDistribution are available u
 
 ## Support
 Known problem: The WFS is using [GeoServer](https://geoserver.org/) and a plugin to geoServer that has a [bug](https://github.com/ngageoint/elasticgeo/issues/122) leading to that requests sometimes stop being processed and no observations are returned. This problem occurs about once a month. Currently we are restarting GeoServer once a day to avoid that this problem affects users of the WFS.
+
 In case of questions or problems, contact support at SLU Artdatabanken: artdatabanken@slu.se
