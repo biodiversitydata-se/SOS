@@ -156,7 +156,7 @@ Now you can view the details for the observation:
 
 Filter:
 
-All field can be used to filter the data. For example, if you want to get observations for Mora municipality only the filter looks like this:
+All fields can be used to filter the data. For example, if you want to get only observations for Mora municipality then the filter looks like this:
 
 ![filterObservations1a](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_filterObservations1a.jpg)
 
@@ -164,9 +164,15 @@ and the result:
 
 ![filterObservations1b](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_filterObservations1b.jpg)
 
-You can also combine filters. For example, if you want to get all observations for vascular plants in Mora municipality then you can use as filter: organismGroup = 'Kärlxäxter' AND municipality = 'Mora'. 
+You can also combine filters. For example, if you want to get all observations for vascular plants in Mora municipality then you can use as filter: organismGroup = 'Kärlxäxter' AND municipality = 'Mora'. If you instead wnat to get all observations of species classified as exotic in Sweden ('främmande arter' in Swedish) in Mora municipality your filter should look like: isInvasiveInSweden = TRUE AND municipality = 'Mora'.
 
+Number of observations returned:
 
+There is limit allowing only max 5000 observations to be returned for one request, but useing paging you can get up to 100 000 observations. To reduce the number of observations per request you can use filters like date, taxa, bounding box, municipality, etc. Using QGIS you need to specify page size (max can be 5000) when you add the new connection. Without this specification you get only a total of max 5000 observations, but specifying page size as a number between, for example, 1000 - 5000 then you can get up to 100 000 observations.
+
+![modifyConnection](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_modifyConnection_pageSize1.jpg)
+
+For example, for Trollhättans municipality there are more than 100 000 observations, therefore you need to add a filter to devide the the number of observations between several separate request. For example, you could separate request before and after a specified date: request 1) municipality = 'Trollhättan' AND startDate < '2016-01-01', request 2) municipality = 'Trollhättan' AND startDate > '2015-12-31'. 
 
 ## Support
 Known problem: The WFS is using [GeoServer](https://geoserver.org/) and a plugin to geoServer that has a [bug](https://github.com/ngageoint/elasticgeo/issues/122) leading to that requests sometimes stop being processed and no observations are returned. This problem occurs about once a month. Currently we are restarting GeoServer once a day to avoid that this problem affects users of the WFS.
