@@ -6,7 +6,7 @@ All public observations that SOS harvests are available in a OGC Web Feature Ser
 - [QGIS query examples](#qgis-query-examples)
 - [Fields](#fields)
 - [INSPIRE](#inspire)
-- [get started](#get-started)
+- [Get started](#get-started)
 - [Support](#support)
 
 ## WFS service overview
@@ -124,7 +124,23 @@ The INSPIRE layers: SpeciesDistribution and HabitatsDistribution are available u
 | URL | https://sosgeo.artdata.slu.se/geoserver/wfs |
 
 ## Get started
-(coming soon)
+Using a GIS application as ArcGIS or QGIS connect to SOS geoServer by selecting _Add layer_: 
+
+![addLayer1](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_addLayer1.jpg)
+
+Then add a new connection:
+
+![addLayer2](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_addLayer2.jpg)
+
+Select _Connect_:
+
+![addLayer3](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_addLayer3.jpg)
+
+Now select _Swedish species observations_ and select _Add_:
+
+![addLayer4](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_addLayer4.jpg)
+
+
 
 ## Support
 Known problem: The WFS is using [GeoServer](https://geoserver.org/) and a plugin to geoServer that has a [bug](https://github.com/ngageoint/elasticgeo/issues/122) leading to that requests sometimes stop being processed and no observations are returned. This problem occurs about once a month. Currently we are restarting GeoServer once a day to avoid that this problem affects users of the WFS.
