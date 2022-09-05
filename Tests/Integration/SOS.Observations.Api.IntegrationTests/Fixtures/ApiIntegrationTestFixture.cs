@@ -52,6 +52,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
     {
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
+        public LocationsController LocationsController { get; private set; }
         public UserStatisticsController UserStatisticsController { get; private set; }
         public ExportsController ExportsController { get; private set; }
         public SystemsController SystemsController { get; private set; }
@@ -249,6 +250,11 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var userObservationRepository = new UserObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<UserObservationRepository>());
             var userStatisticsManager = new UserStatisticsManager(userObservationRepository, processedObservationRepository, new NullLogger<UserStatisticsManager>());
             UserStatisticsController = new UserStatisticsController(userStatisticsManager, taxonManager, areaManager, new NullLogger<UserStatisticsController>());
+            var processedLocationController = new ProcessedLocationRepository(elasticClientManager,
+                elasticConfiguration, processedConfigurationCache, new HttpContextAccessor(),
+                new NullLogger<ProcessedLocationRepository>());
+            var locationManager = new LocationManager(processedLocationController, filterManager, new NullLogger<LocationManager>());
+            LocationsController = new LocationsController(locationManager, areaManager, new NullLogger<LocationsController>());
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
