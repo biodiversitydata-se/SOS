@@ -140,6 +140,32 @@ Now select _Swedish species observations_ and select _Add_:
 
 ![addLayer4](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_addLayer4.jpg)
 
+Now species observations are loaded. The default number of observations loaded is 10 000. If you want to get observations for a specific area you can zoom in to that area and press F5 to load observations anew using the current bounding box as a filter.
+
+![viewObservations1](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_viewObservations1.jpg)
+
+View details for an observation:
+
+To see the details for an observation select first _Identify object_ and then select the dot for the chosen observation:
+
+![viewObservations2](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_viewObservations2.jpg)
+
+Now you can view the details for the observation:
+
+![viewObservations3](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_viewObservations3.jpg)
+
+Filter:
+
+All field can be used to filter the data. For example, if you want to get observations for Mora municipality only the filter looks like this:
+
+![filterObservations1a](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_filterObservations1a.jpg)
+
+and the result:
+
+![filterObservations1b](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/Images/wfs_filterObservations1b.jpg)
+
+You can also combine filters. For example, if you want to get all observations for vascular plants in Mora municipality then you can use as filter: organismGroup = 'Kärlxäxter' AND municipality = 'Mora'. 
+
 
 
 ## Support
