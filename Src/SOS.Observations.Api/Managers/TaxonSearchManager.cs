@@ -29,7 +29,6 @@ namespace SOS.Observations.Api.Managers
         private readonly IFilterManager _filterManager;
         private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
         private readonly ILogger<TaxonSearchManager> _logger;
-
         private readonly SemaphoreSlim _taxonSumAggregationSemaphore = new SemaphoreSlim(1, 1);
 
         private async Task<Dictionary<int, TaxonSumAggregationItem>> GetCachedTaxonSumAggregation(int? userId)
@@ -44,8 +43,10 @@ namespace SOS.Observations.Api.Managers
                     if (taxonAggregation == null)
                     {
                         _logger.LogInformation("Start create taxonSumAggregationCache");
-                        var searchFilter = new SearchFilter(userId ?? 0, false);
+                        var searchFilter = new SearchFilterInternal(userId ?? 0, false);
                         searchFilter.PositiveSightings = true;
+                        searchFilter.NotPresentFilter = SightingNotPresentFilter.DontIncludeNotPresent;
+
                         _filterManager.PrepareFilterAsync(null, null, searchFilter).Wait();
                         Stopwatch sp = Stopwatch.StartNew();
                         taxonAggregation = await _processedTaxonRepository.GetTaxonSumAggregationAsync(searchFilter);
