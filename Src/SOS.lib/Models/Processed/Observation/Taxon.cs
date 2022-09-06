@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Swagger;
 
@@ -224,6 +225,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Secondary parents dyntaxa taxon ids.
         /// </summary>
         public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
+
+        /// <summary>
+        /// Species group property
+        /// </summary>
+        public SpeciesGroup SpeciesGroup { get; set; }
 
         /// <summary>
         ///     The name of the first or species epithet of

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
@@ -34,7 +31,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting taxa");
-                return null;
+                return null!;
             }
         }
     }

@@ -106,6 +106,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Species group id.
         /// </summary>
+        [Obsolete("Replaced by taxon.SpeciesGroup (Enum)")]
         public int? SpeciesGroupId { get; set; }
 
         /// <summary>
