@@ -1,7 +1,4 @@
-﻿using SOS.Lib.Enums;
-using SOS.UserStatistics.Api.Managers;
-
-namespace SOS.UserStatistics.Modules;
+﻿namespace SOS.UserStatistics.Modules;
 
 public class UserStatisticsModule : IModule
 {

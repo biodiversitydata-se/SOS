@@ -1,6 +1,6 @@
 ﻿namespace SOS.UserStatistics.Api.Extensions;
 
-public static class MappingExtensions
+internal static class MappingExtensions
 {
     public static PagedResultDto<TRecordDto> ToPagedResultDto<TRecord, TRecordDto>(
            this PagedResult<TRecord> pagedResult,

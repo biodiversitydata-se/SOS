@@ -35,13 +35,12 @@ namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Species data service
-    /// </summary>
+    /// </summary>b
     public class ProcessedObservationRepository : ProcessedObservationBaseRepository,
         IProcessedObservationRepository
     {
         private const int ElasticSearchMaxRecords = 10000;
         private readonly TelemetryClient _telemetry;
-        private readonly ITaxonManager _taxonManager;
 
         /// <summary>
         /// Add the collection
@@ -975,7 +974,6 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="processedConfigurationCache"></param>
         /// <param name="telemetry"></param>
         /// <param name="httpContextAccessor"></param>
-        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClientManager elasticClientManager,
@@ -983,11 +981,9 @@ namespace SOS.Lib.Repositories.Processed
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             TelemetryClient telemetry,
             IHttpContextAccessor httpContextAccessor,
-            ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, httpContextAccessor, elasticConfiguration, logger)
         {
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
-            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             HttpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
@@ -1003,10 +999,8 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(false, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
-            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }
 
         /// <inheritdoc />

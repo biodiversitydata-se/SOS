@@ -1,20 +1,13 @@
-﻿using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Search.Filters;
-
-namespace SOS.UserStatistics.Api.Repositories.Interfaces
+﻿namespace SOS.UserStatistics.Api.Repositories.Interfaces
 {
-    public class UserStatisticsProcessedObservationRepository : ProcessedObservationRepository
+    public class UserStatisticsProcessedObservationRepository : ProcessedObservationRepository, IUserStatisticsProcessedObservationRepository
     {
         public UserStatisticsProcessedObservationRepository(
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger
-        ) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, logger)
+        ) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, logger)
         {
 
         }

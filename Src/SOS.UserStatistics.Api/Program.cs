@@ -1,4 +1,7 @@
-var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+using SOS.UserStatistics.Api.Extensions;
+
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+var logger = NLogBuilder.ConfigureNLog($"NLog.{env}.config").GetCurrentClassLogger();
 logger.Info("Starting application...");
 
 try
@@ -9,14 +12,14 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
-
+    builder.SetupUserSecrets();
     builder.SetupDependencies();
-    //builder.RegisterModules();
+    builder.RegisterModules();
 
     var app = builder.Build();
     app.UseHttpsRedirection();
 
-    if (app.Environment.IsEnvironment("Development"))
+    if (app.Environment.IsEnvironment("local"))
     {
         app.UseSwagger();
         app.UseSwaggerUI();

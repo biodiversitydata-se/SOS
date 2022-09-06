@@ -1,12 +1,9 @@
-﻿using Nest;
-using SOS.Lib.Extensions;
-
-namespace SOS.UserStatistics.Api.Extensions
+﻿namespace SOS.UserStatistics.Api.Extensions
 {
     public static class SearchUserObservationsExtensions
     {
         /// <summary>
-        ///     Create search filter
+        /// Create search filter
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
