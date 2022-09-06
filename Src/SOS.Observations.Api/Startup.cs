@@ -366,12 +366,12 @@ namespace SOS.Observations.Api
                 .AddCheck<AzureSearchHealthCheck>("Azure search API health check", tags: new[] { "azure", "database", "elasticsearch", "query" })
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
                 .AddCheck<WFSHealthCheck>("WFS", tags: new [] { "wfs" })
-                .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" });
+                .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
+                .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" });
 
             if (CurrentEnvironment.IsEnvironment("prod"))
             {
                 healthChecks.AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] {"dwca", "export"});
-                healthChecks.AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] {"elasticsearch", "harvest"});
                 healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] {"application insights", "harvest"});
             }
 
