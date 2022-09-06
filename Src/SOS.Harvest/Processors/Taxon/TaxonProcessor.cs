@@ -256,7 +256,7 @@ namespace SOS.Harvest.Processors.Taxon
             {
                 if (taxa.TryGetValue(aptaxon.Id, out var taxon))
                 {
-                    taxon.SpeciesGroup = (SpeciesGroup)aptaxon.SpeciesGroupId!;
+                    taxon.Attributes.SpeciesGroup = (SpeciesGroup)aptaxon.SpeciesGroupId!;
                 }
             }
         }

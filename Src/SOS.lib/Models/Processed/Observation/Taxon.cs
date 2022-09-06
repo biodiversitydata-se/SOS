@@ -227,11 +227,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
 
         /// <summary>
-        /// Species group property
-        /// </summary>
-        public SpeciesGroup SpeciesGroup { get; set; }
-
-        /// <summary>
         ///     The name of the first or species epithet of
         ///     the scientificName.
         /// </summary>

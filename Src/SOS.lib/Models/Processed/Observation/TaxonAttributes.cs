@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SOS.Lib.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Processed.Observation
@@ -106,6 +107,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Systematic sort order.
         /// </summary>
         public int SortOrder { get; set; }
+
+        /// <summary>
+        /// Species group property
+        /// </summary>
+        public SpeciesGroup SpeciesGroup { get; set; }
 
         /// <summary>
         /// Information about the species occurrence in Sweden.
