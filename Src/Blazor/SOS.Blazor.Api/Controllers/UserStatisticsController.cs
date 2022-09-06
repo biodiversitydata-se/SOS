@@ -21,7 +21,7 @@ namespace SOS.Blazor.Api.Controllers
             [FromQuery] bool? useCache,
             [FromBody] SpeciesCountUserStatisticsQuery query)
         {
-            var sosClient = new SosClient("https://sos-search-dev.artdata.slu.se/");
+            var sosClient = new SosClient("https://localhost:44380/");
             var userStatistics = await sosClient.GetUserStatisticsAsync(skip, take, useCache.GetValueOrDefault(true), query);
             return userStatistics;
         }

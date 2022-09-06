@@ -54,7 +54,7 @@
         {
             // Get provinces
             var provincesResponse = await _httpClient.GetFromJsonAsync<PagedResult<Area>>("Areas?skip=0&take=100&areaType=Province");
-            _provinces = provincesResponse.Records.OrderBy(a => Convert.ToInt32(a.FeatureId)).ToList();
+            _provinces = provincesResponse?.Records.OrderBy(a => Convert.ToInt32(a.FeatureId)).ToList();
 
             // Get user statistics
             await GetUserStatistics();

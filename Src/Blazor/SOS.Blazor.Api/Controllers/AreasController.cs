@@ -20,7 +20,7 @@ namespace SOS.Blazor.Api.Controllers
             [FromQuery] int take, 
             [FromQuery] AreaType areaType)
         {
-            var sosClient = new SosClient("https://sos-search-dev.artdata.slu.se/");
+            var sosClient = new SosClient("https://localhost:44380/");
             var areas = await sosClient.GetAreas(skip, take, areaType);
             return areas;
         }

@@ -15,7 +15,7 @@ using SOS.Observations.Api.Managers.Interfaces;
 namespace SOS.Observations.Api.Controllers
 { 
     /// <summary>
-    ///     User statistics controller.
+    /// User statistics controller.
     /// </summary>
     [Route("[controller]")]
     [ApiController]

@@ -17,7 +17,7 @@ namespace SOS.Blazor.Api.Controllers
         [HttpGet("DataProviderStatus")]
         public async Task<IEnumerable<DataProviderStatus>?> GetDataProviderStatus([FromQuery] ApiEnvironment apiEnvironment = ApiEnvironment.Dev)
         {
-            var sosClient = new SosClient("https://sos-search-dev.artdata.slu.se/");
+            var sosClient = new SosClient("https://localhost:44380/");
             ProcessInfo? activeProcessInfo = await sosClient.GetProcessInfo(true);
             ProcessInfo? inactiveProcessInfo = await sosClient.GetProcessInfo(false);
             var providers = await sosClient.GetDataProviders();
