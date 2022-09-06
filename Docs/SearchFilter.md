@@ -516,12 +516,21 @@ This filter will only return observations where `observation.occurrence.isNotRed
 }
 ```
 
-This filter will only return observations where `observation.occurrence.isNotRediscoveredObservation=true`.
+This filter will only return observations where `observation.occurrence.isNotRediscoveredObservation=true`. About 230k observations.
 ```json
 {
     "notRecoveredFilter": "OnlyNotRecovered"
 }
 ```
+
+Don't apply this filter (default)
+```json
+{
+    "notRecoveredFilter": "NoFilter"
+}
+```
+
+`occurrence.isNotRediscoveredObservation` - *Indicates if this observation is a not rediscovered observation. "Not rediscovered observation" is an observation that says that the specified species was not found in a location where it has previously been observed.*
 
 ## BirdNestActivityLimit filter
 This filter returns observations where `observation.occurrence.birdNestActivityId` is lower than or equal to the filter value.

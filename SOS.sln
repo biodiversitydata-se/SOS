@@ -25,6 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7768AF04-8
 		Docs\DataProviders.md = Docs\DataProviders.md
 		Docs\Endpoints.md = Docs\Endpoints.md
 		Docs\Exports.md = Docs\Exports.md
+		Docs\ExtendedFilter.md = Docs\ExtendedFilter.md
 		Docs\FAQ.md = Docs\FAQ.md
 		Docs\FieldSets.md = Docs\FieldSets.md
 		Docs\FlatObservation.md = Docs\FlatObservation.md
