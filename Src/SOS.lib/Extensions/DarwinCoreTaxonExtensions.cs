@@ -111,7 +111,8 @@ namespace SOS.Lib.Extensions
                 CountryCode = darwinCoreVernacularName.CountryCode,
                 IsPreferredName = darwinCoreVernacularName.IsPreferredName,
                 Language = darwinCoreVernacularName.Language,
-                Name = darwinCoreVernacularName.VernacularName
+                Name = darwinCoreVernacularName.VernacularName,
+                ValidForSighting = darwinCoreVernacularName.ValidForSighting
             };
         }
 

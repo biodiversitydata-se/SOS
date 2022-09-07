@@ -114,7 +114,8 @@ namespace SOS.Harvest.Services.Taxon
                 .Map(t => t.CountryCode, 3)
                 .Map(t => t.Source, 4)
                 .Map(t => t.IsPreferredName, 5)
-                .Map(t => t.TaxonRemarks, 6);
+                .Map(t => t.TaxonRemarks, 6)
+                .Map(t => t.ValidForSighting, 7);
 
 
 
@@ -343,10 +344,10 @@ namespace SOS.Harvest.Services.Taxon
             _logger.LogDebug("Start adding vernacular names to taxon");
             // Try to get VernacularName.csv
             var vernacularNameFile = zipArchive.Entries.FirstOrDefault(f =>
-                f.Name.Equals("VernacularName.csv", StringComparison.CurrentCultureIgnoreCase));
+                f.Name.Equals("TaxonNameProperties.csv", StringComparison.CurrentCultureIgnoreCase));
             if (vernacularNameFile == null)
             {
-                _logger.LogError("Failed to open VernacularName.csv");
+                _logger.LogError("Failed to open TaxonNameProperties.csv");
                 return; // If no vernacular name file found, we can't do anything more
             }
             // Read vernacular name data
