@@ -987,6 +987,61 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
 
         [Fact]
         [Trait("Category", "AutomaticIntegrationTest")]
+        public async Task GetObservationsWithStartDateEndDateMonthRange()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------            
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+               .All()
+                   .HaveValuesFromPredefinedObservations()
+               .TheFirst(20)
+                    .With(o => o.StartDate = new DateTime(2000, 12, 30))
+                    .With(o => o.EndDate = new DateTime(2001, 1, 1))
+                .TheNext(20)
+                    .With(o => o.StartDate = new DateTime(2000, 6, 1))
+                    .With(o => o.EndDate = new DateTime(2000, 6, 1))
+                .TheNext(20)
+                    .With(o => o.StartDate = new DateTime(2000, 1, 24))
+                    .With(o => o.EndDate = new DateTime(2000, 1, 25))
+                .TheNext(20)
+                    .With(o => o.StartDate = new DateTime(2000, 12, 30))
+                    .With(o => o.EndDate = new DateTime(2000, 12, 31))
+                .TheLast(20)
+                    .With(o => o.StartDate = new DateTime(2000, 3, 1))
+                    .With(o => o.EndDate = new DateTime(2000, 3, 1))
+               .Build();
+
+            await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+            var searchFilter = new SearchFilterInternalDto
+            {
+                ExtendedFilter = new ExtendedFilterDto
+                {
+                    Months = new[] { 1, 6 },
+                    MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.StartDateEndDateMonthRange
+                }
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.ObservationsBySearchInternal(
+                null,
+                null,
+                searchFilter,
+                0,
+                100);
+            var result = response.GetResult<PagedResultDto<Observation>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            result.Should().NotBeNull();
+            result.TotalCount.Should().Be(60);
+        }
+
+        [Fact]
+        [Trait("Category", "AutomaticIntegrationTest")]
         public async Task GetObservationsWithDontIncludeNotPresent()
         {
             //-----------------------------------------------------------------------------------------------------------

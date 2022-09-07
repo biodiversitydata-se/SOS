@@ -255,6 +255,9 @@ namespace SOS.Lib
                     case DateFilterComparison.EndDate:
                         query.TryAddTermsCriteria("event.endMonth", internalFilter.Months);
                         break;
+                    case DateFilterComparison.StartDateEndDateMonthRange:
+                        query.TryAddTermsCriteria("artportalenInternal.eventMonths", internalFilter.Months);
+                        break;
                     default:
                         query.TryAddTermsCriteria("event.startMonth", internalFilter.Months);
                         break;

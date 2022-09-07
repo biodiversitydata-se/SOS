@@ -36,6 +36,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? DeterminationYear { get; set; }
 
         /// <summary>
+        /// Event month range start date => end date
+        /// </summary>
+        public IEnumerable<int> EventMonths { get; set; }
+
+        /// <summary>
         /// Field diary group id
         /// </summary>
         public int? FieldDiaryGroupId { get; set; }

@@ -344,6 +344,24 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ArtportalenInternal.TriggeredObservationRuleFrequencyId = verbatimObservation.FrequencyId;
                 obs.ArtportalenInternal.TriggeredObservationRuleReproductionId = verbatimObservation.ReproductionId;
 
+                var eventMonths = new HashSet<int>();
+                if (startDate.HasValue)
+                {
+                    eventMonths.Add(startDate.Value.Month);
+
+                    if (endDate.HasValue)
+                    {
+                        // Create a new date the 1 first day in month after start month since we allready have added start month
+                        var currentDate = new DateTime(startDate.Value.Year, startDate.Value.Month, 1).AddMonths(1);
+                        while (currentDate <= endDate.Value)
+                        {
+                            eventMonths.Add(currentDate.Month);
+                            currentDate = currentDate.AddMonths(1);
+                        }
+                    }
+                }
+                obs.ArtportalenInternal.EventMonths = eventMonths;
+
                 // Set dependent properties
                 var biotope = obs.Occurrence.Biotope?.Value;
                 obs.Event.Habitat = ((biotope != null
