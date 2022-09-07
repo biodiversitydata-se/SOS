@@ -2,7 +2,7 @@
 
 internal static class MappingExtensions
 {
-    public static PagedResultDto<TRecordDto> ToPagedResultDto<TRecord, TRecordDto>(
+    internal static PagedResultDto<TRecordDto> ToPagedResultDto<TRecord, TRecordDto>(
            this PagedResult<TRecord> pagedResult,
            IEnumerable<TRecordDto> records)
     {

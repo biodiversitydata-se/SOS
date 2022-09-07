@@ -1,4 +1,5 @@
-﻿global using Nest;
+﻿global using Microsoft.OpenApi.Models;
+global using Nest;
 global using NLog;
 global using NLog.Web;
 global using SOS.Lib.Cache.Interfaces;
@@ -21,5 +22,6 @@ global using SOS.UserStatistics.Api.Models;
 global using SOS.UserStatistics.Api.Repositories.Interfaces;
 global using SOS.UserStatistics.Extensions;
 global using SOS.UserStatistics.Modules.Interfaces;
+global using System.Reflection;
 
 

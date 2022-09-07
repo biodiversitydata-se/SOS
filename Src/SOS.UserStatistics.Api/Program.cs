@@ -1,5 +1,3 @@
-using SOS.UserStatistics.Api.Extensions;
-
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var logger = NLogBuilder.ConfigureNLog($"NLog.{env}.config").GetCurrentClassLogger();
 logger.Info("Starting application...");
@@ -10,21 +8,26 @@ try
     builder.Logging.SetupLogging();
     builder.Host.UseNLog();
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
 
+    builder.SetupSwagger();
     builder.SetupUserSecrets();
+    builder.SetupAuthentication();
     builder.SetupDependencies();
     builder.RegisterModules();
 
     var app = builder.Build();
+    app.ConfigureExceptionHandler(logger, app.Environment.IsDevelopment());
+    app.MapEndpoints();
     app.UseHttpsRedirection();
 
-    if (app.Environment.IsEnvironment("local"))
+    if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
         app.UseSwaggerUI();
     }
 
+    app.UseAuthentication();
+    //app.UseAuthorization();
     app.Run();
 }
 catch (Exception ex)

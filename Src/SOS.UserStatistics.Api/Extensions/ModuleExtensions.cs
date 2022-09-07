@@ -4,7 +4,7 @@ internal static class ModuleExtensions
 {
     static readonly List<IModule> registeredModules = new();
 
-    public static WebApplicationBuilder RegisterModules(this WebApplicationBuilder builder)
+    internal static WebApplicationBuilder RegisterModules(this WebApplicationBuilder webApplicationBuilder)
     {
         var modules = DiscoverModulesInAssembly();
         foreach (var module in modules)
@@ -12,7 +12,7 @@ internal static class ModuleExtensions
             registeredModules.Add(module);
         }
 
-        return builder;
+        return webApplicationBuilder;
     }
 
     internal static WebApplication MapEndpoints(this WebApplication app)

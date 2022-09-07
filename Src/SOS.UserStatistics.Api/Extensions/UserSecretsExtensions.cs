@@ -1,13 +1,10 @@
-﻿using System.Reflection;
+﻿namespace SOS.UserStatistics.Api.Extensions;
 
-namespace SOS.UserStatistics.Api.Extensions
+internal static class UserSecretsExtensions
 {
-    internal static class UserSecretsExtensions
+    internal static WebApplicationBuilder SetupUserSecrets(this WebApplicationBuilder webApplicationBuilder)
     {
-        public static WebApplicationBuilder SetupUserSecrets(this WebApplicationBuilder builder)
-        {
-            builder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
-            return builder;
-        }
+        webApplicationBuilder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
+        return webApplicationBuilder;
     }
 }

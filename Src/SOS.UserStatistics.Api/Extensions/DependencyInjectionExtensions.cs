@@ -1,16 +1,17 @@
 ﻿using Autofac.Core;
-using Microsoft.Extensions.Configuration;
 using SOS.Lib.Cache;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Database;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Security.Interfaces;
+using SOS.Lib.Security;
 
 namespace SOS.UserStatistics.Extensions;
 
-public static class DependencyInjectionExtensions
+internal static class DependencyInjectionExtensions
 {
-    public static WebApplicationBuilder SetupDependencies(this WebApplicationBuilder webApplicationBuilder)
+    internal static WebApplicationBuilder SetupDependencies(this WebApplicationBuilder webApplicationBuilder)
     {
         var elasticConfiguration = webApplicationBuilder.Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
         webApplicationBuilder.Services.AddSingleton(elasticConfiguration);
@@ -21,6 +22,9 @@ public static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddSingleton<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
         webApplicationBuilder.Services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
+
+        // Add security
+        webApplicationBuilder.Services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
         // Managers
         webApplicationBuilder.Services.AddScoped<IUserStatisticsManager, UserStatisticsManager>();
