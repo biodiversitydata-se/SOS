@@ -8,6 +8,7 @@ This page provides information about how to use the search filter parameters.
   * [OnlyStartDate filter type](#onlystartdate-filter-type)
   * [OnlyEndDate filter type](#onlyenddate-filter-type)
   * [TimeRanges](#timeranges)
+  * [Modified date filter](#modifieddate)
 - [Geographics filter](#geographics-filter)
   * [Search for observations in area](#search-for-observations-in-area)
   * [Search for observations in multiple areas of same type](#search-for-observations-in-multiple-areas-of-same-type)
@@ -160,6 +161,17 @@ This filter will return observations where the hour part of `observation.event.s
 | Afternoon | 18:00-23:00 |
 | Evening | 23:00-04:00 |
 
+### ModifiedDate
+
+This filter will return observations that is modified between `2021-01-01` and `2021-02-31`.
+```json
+{        
+  "modifiedDate": {
+    "from": "2021-01-01",
+    "to": "2021-02-31"
+  }
+}
+```
 
 ## Geographics filter
 
