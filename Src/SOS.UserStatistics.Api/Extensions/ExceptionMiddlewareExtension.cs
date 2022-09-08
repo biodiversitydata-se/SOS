@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
-using System.Net;
-
-namespace SOS.UserStatistics.Api.Extensions;
+﻿namespace SOS.UserStatistics.Api.Extensions;
 
 internal static class ExceptionMiddlewareExtension
 {

@@ -19,10 +19,8 @@ public class UserStatisticsTestFixture : FixtureBase, IDisposable
     }
 
     public InstallationEnvironment InstallationEnvironment { get; private set; }
-    public UserStatisticsModule UserStatisticsModule { get; private set; }
+    public UserStatisticsManager UserStatisticsManager { get; set; }
     public IUserStatisticsProcessedObservationRepository UserStatisticsProcessedObservationRepository { get; set; }
-
-    private IFilterManager _filterManager;
     private IUserManager _userManager;
     public string UserAuthenticationToken { get; set; }
 
@@ -83,6 +81,11 @@ public class UserStatisticsTestFixture : FixtureBase, IDisposable
         var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
         var taxonManager = CreateTaxonManager(processClient, taxonRepository, memoryCache);
         var userStatisticsProcessedObservationRepository = CreateUserStatisticsProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache);
+
+        var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
+        var userStatisticsObservationRepository = new UserStatisticsObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<UserObservationRepository>());
+
+
         var processedTaxonRepository = CreateProcessedTaxonRepository(elasticConfiguration, elasticClientManager, processClient, taxonManager);
 
 
@@ -92,14 +95,14 @@ public class UserStatisticsTestFixture : FixtureBase, IDisposable
         UserStatisticsProcessedObservationRepository = userStatisticsProcessedObservationRepository;
         ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
 
-
         _userManager = new UserManager(userService, new NullLogger<UserManager>());
 
         var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
         var taxa = await taxonRepository.GetAllAsync();
         var taxaById = taxa.ToDictionary(m => m.Id, m => m);
-        var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
-        var userObservationRepository = new UserObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<UserObservationRepository>());
+
+
+        UserStatisticsManager = new UserStatisticsManager(userStatisticsObservationRepository, userStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
     }
 
     private TaxonManager CreateTaxonManager(ProcessClient processClient, TaxonRepository taxonRepository, IMemoryCache memoryCache)
@@ -173,7 +176,6 @@ public class UserStatisticsTestFixture : FixtureBase, IDisposable
         userServiceMock.Setup(userService =>
                 userService.GetUserAuthoritiesAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(authorities);
-        _filterManager.UserService = userServiceMock.Object;
 
         var contextAccessor = new HttpContextAccessor() { HttpContext = new DefaultHttpContext() };
         var claimsIdentity = new ClaimsIdentity();
@@ -187,7 +189,6 @@ public class UserStatisticsTestFixture : FixtureBase, IDisposable
     public void UseUserServiceWithToken(string token)
     {
         var userService = CreateUserService(token);
-        _filterManager.UserService = userService;
         _userManager.UserService = userService;
     }
 }

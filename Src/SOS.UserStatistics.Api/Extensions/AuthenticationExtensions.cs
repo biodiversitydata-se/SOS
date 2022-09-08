@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-
-namespace SOS.UserStatistics.Api.Extensions;
+﻿namespace SOS.UserStatistics.Api.Extensions;
 
 internal static class AuthenticationExtensions
 {

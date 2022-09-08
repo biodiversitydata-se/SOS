@@ -1,13 +1,4 @@
-﻿using Autofac.Core;
-using SOS.Lib.Cache;
-using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Database;
-using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Lib.Repositories.Resource;
-using SOS.Lib.Security.Interfaces;
-using SOS.Lib.Security;
-
-namespace SOS.UserStatistics.Extensions;
+﻿namespace SOS.UserStatistics.Extensions;
 
 internal static class DependencyInjectionExtensions
 {

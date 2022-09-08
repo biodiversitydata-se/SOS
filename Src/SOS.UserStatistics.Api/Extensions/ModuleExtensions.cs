@@ -2,7 +2,7 @@
 
 internal static class ModuleExtensions
 {
-    static readonly List<IModule> registeredModules = new();
+    static readonly List<Modules.Interfaces.IModule> registeredModules = new();
 
     internal static WebApplicationBuilder RegisterModules(this WebApplicationBuilder webApplicationBuilder)
     {
@@ -25,11 +25,11 @@ internal static class ModuleExtensions
         return app;
     }
 
-    private static IEnumerable<IModule> DiscoverModulesInAssembly()
+    private static IEnumerable<Modules.Interfaces.IModule> DiscoverModulesInAssembly()
     {
-        return typeof(IModule).Assembly.GetTypes()
-            .Where(t => t.IsClass && t.IsAssignableTo(typeof(IModule)))
+        return typeof(Modules.Interfaces.IModule).Assembly.GetTypes()
+            .Where(t => t.IsClass && t.IsAssignableTo(typeof(Modules.Interfaces.IModule)))
             .Select(Activator.CreateInstance)
-            .Cast<IModule>();
+            .Cast<Modules.Interfaces.IModule>();
     }
 }

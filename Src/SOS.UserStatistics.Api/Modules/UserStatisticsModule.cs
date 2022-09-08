@@ -1,6 +1,6 @@
 ﻿namespace SOS.UserStatistics.Modules;
 
-public class UserStatisticsModule : IModule
+public class UserStatisticsModule : Modules.Interfaces.IModule
 {
     public void MapEndpoints(WebApplication application)
     {

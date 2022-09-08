@@ -69,10 +69,7 @@ public class UserStatisticsObservationRepository : UserObservationRepository, IU
         int totalCount = Convert.ToInt32(searchResponse.Aggregations.Cardinality("userCount").Value ?? 0);
 
         // Update skip and take
-        if (skip == null)
-        {
-            skip = 0;
-        }
+        skip ??= 0;
         if (skip > totalCount)
         {
             skip = totalCount;
