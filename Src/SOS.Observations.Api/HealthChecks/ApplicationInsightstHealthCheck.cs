@@ -41,7 +41,7 @@ namespace SOS.Observations.Api.HealthChecks
                     var lastHarvestMessage = $"Last ApplicationInsights harvest: {latestHarvestDate.Value.ToShortDateString()}";
                     if ((DateTime.Now - latestHarvestDate.Value).Days > 30)
                     {
-                        return new HealthCheckResult(HealthStatus.Unhealthy, lastHarvestMessage);
+                        return new HealthCheckResult(HealthStatus.Degraded, lastHarvestMessage);
                     }
 
                     if ((DateTime.Now - latestHarvestDate.Value).Days > 25)
@@ -52,11 +52,11 @@ namespace SOS.Observations.Api.HealthChecks
                     return new HealthCheckResult(HealthStatus.Healthy, lastHarvestMessage);
                 }
 
-                return new HealthCheckResult(HealthStatus.Unhealthy, "No ApplicationInsights harvest has been done");
+                return new HealthCheckResult(HealthStatus.Degraded, "No ApplicationInsights harvest has been done");
             }
             catch (Exception e)
             {
-                return new HealthCheckResult(HealthStatus.Unhealthy, "ApplicationInsights health check failed");
+                return new HealthCheckResult(HealthStatus.Degraded, "ApplicationInsights health check failed");
             }
         }
     }
