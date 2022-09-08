@@ -987,6 +987,64 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
 
         [Fact]
         [Trait("Category", "AutomaticIntegrationTest")]
+        public async Task GetObservationsWithMonthsStartDateOrEndDate()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------            
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+               .All()
+                   .HaveValuesFromPredefinedObservations()
+               .TheFirst(15) // Hit - Month 1 is in the query
+                    .With(o => o.StartDate = new DateTime(2000, 1, 1))
+                    .With(o => o.EndDate = new DateTime(2000, 1, 1))
+                .TheNext(15) // Hit - Month 12 is in the query
+                    .With(o => o.StartDate = new DateTime(2000, 12, 1))
+                    .With(o => o.EndDate = new DateTime(2000, 12, 1))
+               .TheNext(15) // Hit - Month 1 is in the query
+                   .With(o => o.StartDate = new DateTime(2000, 1, 25))
+                   .With(o => o.EndDate = new DateTime(2000, 3, 1))
+               .TheNext(15) // Hit - Month 12 is in the query
+                   .With(o => o.StartDate = new DateTime(2000, 11, 12))
+                   .With(o => o.EndDate = new DateTime(2000, 12, 24))
+               .TheNext(20) // No hit - Month 11 or 2 is not in the query
+                    .With(o => o.StartDate = new DateTime(1999, 11, 30))
+                    .With(o => o.EndDate = new DateTime(2000, 2, 1))
+                .TheLast(20) // No hit - Month 3 isn't in the query
+                    .With(o => o.StartDate = new DateTime(2000, 3, 1))
+                    .With(o => o.EndDate = new DateTime(2000, 3, 1))
+               .Build();
+
+            await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+            var searchFilter = new SearchFilterInternalDto
+            {
+                ExtendedFilter = new ExtendedFilterDto
+                {
+                    Months = new[] { 1, 12 },
+                    MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.StartDateOrEndDate
+                }
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.ObservationsBySearchInternal(
+                null,
+                null,
+                searchFilter,
+                0,
+                100);
+            var result = response.GetResult<PagedResultDto<Observation>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            result.Should().NotBeNull();
+            result.TotalCount.Should().Be(60);
+        }
+
+        [Fact]
+        [Trait("Category", "AutomaticIntegrationTest")]
         public async Task GetObservationsWithDontIncludeNotPresent()
         {
             //-----------------------------------------------------------------------------------------------------------

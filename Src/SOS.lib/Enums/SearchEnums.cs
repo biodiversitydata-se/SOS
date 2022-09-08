@@ -107,6 +107,7 @@ namespace SOS.Lib.Enums
     {
         StartDate,
         EndDate,
-        BothStartDateAndEndDate
+        BothStartDateAndEndDate,
+        StartDateOrEndDate
     }
 }

@@ -30,7 +30,8 @@ namespace SOS.Observations.Api.Dtos.Filter
         {
             StartDate,
             EndDate,
-            BothStartDateAndEndDate
+            BothStartDateAndEndDate,
+            StartDateOrEndDate
         }
 
         /// <summary>

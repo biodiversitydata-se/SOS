@@ -26,6 +26,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
@@ -89,7 +90,7 @@ namespace SOS.Observations.Api
         private const string InternalApiName = "InternalSosObservations";
         private const string PublicApiName = "PublicSosObservations";
         private const string InternalApiPrefix = "Internal";
-
+        private IWebHostEnvironment CurrentEnvironment { get; set; }
         private bool _isDevelopment;
         /// <summary>
         ///     Start up
@@ -98,6 +99,7 @@ namespace SOS.Observations.Api
         public Startup(IWebHostEnvironment env)
         {
             var environment = env.EnvironmentName.ToLower();
+            CurrentEnvironment = env;
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -350,7 +352,7 @@ namespace SOS.Observations.Api
             services.AddSingleton(healthCheckConfiguration);
             services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
 
-            services.AddHealthChecks()
+            var healthChecks = services.AddHealthChecks()
                 .AddDiskStorageHealthCheck(
                     x => x.AddDrive("C:\\", (long)(healthCheckConfiguration.MinimumLocalDiskStorage * 1000)),
                     name: $"Primary disk: min {healthCheckConfiguration.MinimumLocalDiskStorage}GB free - warning",
@@ -363,12 +365,16 @@ namespace SOS.Observations.Api
                 .AddCheck<SearchPerformanceHealthCheck>("Search performance", tags: new[] { "database", "elasticsearch", "query", "performance" })
                 .AddCheck<AzureSearchHealthCheck>("Azure search API health check", tags: new[] { "azure", "database", "elasticsearch", "query" })
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
-                .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" })
-                .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
-                .AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" })
-                .AddCheck<WFSHealthCheck>("WFS", tags: new [] { "wfs" })
-                .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" });
-            
+                .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
+                .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" });
+
+            if (CurrentEnvironment.IsEnvironment("prod"))
+            {
+                healthChecks.AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] {"dwca", "export"});
+                healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] {"application insights", "harvest"});
+                healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] {"wfs"}); // add this to ST environment when we have a GeoServer test environment.
+            }
+
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
