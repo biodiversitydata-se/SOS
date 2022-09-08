@@ -46,6 +46,7 @@ namespace SOS.Observations.Api.Managers
                         var searchFilter = new SearchFilterInternal(userId ?? 0, false);
                         searchFilter.PositiveSightings = true;
                         searchFilter.NotPresentFilter = SightingNotPresentFilter.DontIncludeNotPresent;
+                        searchFilter.DeterminationFilter = SightingDeterminationFilter.NotUnsureDetermination;
 
                         _filterManager.PrepareFilterAsync(null, null, searchFilter).Wait();
                         Stopwatch sp = Stopwatch.StartNew();
