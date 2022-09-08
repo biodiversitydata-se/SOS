@@ -1,4 +1,4 @@
-﻿namespace SOS.TestHelpers;
+﻿namespace SOS.UserStatistics.Api.AutomaticIntegrationTests.Helpers;
 
 public enum InstallationEnvironment
 {

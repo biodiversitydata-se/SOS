@@ -1,14 +1,11 @@
-﻿using SOS.Observations.Api.IntegrationTests.Fixtures;
-using SOS.UserStatistics.Api.Tests.Fixtures;
+﻿namespace SOS.UserStatistics.Api.IntegrationTests.Tests;
 
-namespace SOS.UserStatistics.Api.Tests;
-
-[Collection(Collections.ApiTestsCollection)]
+[Collection(Collections.ApiIntegrationTestsCollection)]
 public class UserStatisticsManagerTests
 {
-    private readonly UserStatisticsTestFixture _fixture;
+    private readonly UserStatisticsIntegrationTestFixture _fixture;
 
-    public UserStatisticsManagerTests(UserStatisticsTestFixture fixture)
+    public UserStatisticsManagerTests(UserStatisticsIntegrationTestFixture fixture)
     {
         _fixture = fixture;
     }
@@ -17,7 +14,6 @@ public class UserStatisticsManagerTests
     public async Task Test_PagedSpeciesCountSearchAsync_with_IncludeOtherAreasSpeciesCount()
     {
         // Arrange
-
         var query = new SpeciesCountUserStatisticsQuery
         {
             AreaType = AreaType.Province,
@@ -52,7 +48,7 @@ public class UserStatisticsManagerTests
             query.TaxonId = i;
             await _fixture.UserStatisticsManager.PagedSpeciesCountSearchAsync(query, 0, 30);
         }
-       
+
         // Assert
         initialResult.Records.Count().Should().Be(30, "because the take parameter is 5");
     }

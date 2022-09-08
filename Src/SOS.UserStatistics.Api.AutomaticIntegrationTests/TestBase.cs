@@ -1,4 +1,4 @@
-﻿namespace SOS.Observations.Api.IntegrationTests
+﻿namespace SOS.Observations.Api.AutomaticIntegrationTests
 {
     public class TestBase
     {

@@ -1,8 +1,10 @@
-﻿namespace SOS.UserStatistics.Api.Tests.Fixtures;
+﻿using SOS.UserStatistics.Api.IntegrationTests.Helpers;
 
-public class UserStatisticsTestFixture : FixtureBase, IDisposable
+namespace SOS.UserStatistics.Api.IntegrationTests.Fixtures;
+
+public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
 {
-    public UserStatisticsTestFixture()
+    public UserStatisticsIntegrationTestFixture()
     {
         // MongoDB conventions.
         ConventionRegistry.Register(

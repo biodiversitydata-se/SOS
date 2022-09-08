@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SOS.Observations.Api.IntegrationTests.Fixtures
+﻿namespace SOS.UserStatistics.Api.IntegrationTests.Fixtures
 {
     public static class Collections
     {
-        public const string ApiTestsCollection = "ApiTestsCollection";        
+        public const string ApiIntegrationTestsCollection = "ApiIntegrationTestsCollection";        
     }
 }

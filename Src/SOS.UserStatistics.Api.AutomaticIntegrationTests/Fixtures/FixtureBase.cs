@@ -1,6 +1,7 @@
-﻿using SOS.Observations.Api.IntegrationTests;
+﻿using SOS.Observations.Api.AutomaticIntegrationTests;
+using SOS.UserStatistics.Api.AutomaticIntegrationTests.Helpers;
 
-namespace SOS.UserStatistics.Api.IntegrationTests.Fixtures;
+namespace SOS.UserStatistics.Api.AutomaticIntegrationTests.Fixtures;
 
 public class FixtureBase
 {
