@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -11,9 +10,10 @@ using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Processed;
+using SOS.Observations.Api.Repositories.Interfaces;
 
-namespace SOS.Lib.Repositories.Processed
+namespace SOS.Observations.Api.Repositories
 {
     /// <summary>
     ///     Species data service

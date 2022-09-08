@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
@@ -15,11 +14,11 @@ using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using DateTime = System.DateTime;
+using SOS.Lib.Repositories.Processed;
+using SOS.Observations.Api.Repositories.Interfaces;
 using Result = CSharpFunctionalExtensions.Result;
 
-namespace SOS.Lib.Repositories.Processed
+namespace SOS.Observations.Api.Repositories
 {
     /// <summary>
     ///     Species data service

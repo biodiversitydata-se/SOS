@@ -13,9 +13,9 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Extensions;
+using SOS.Observations.Api.Repositories.Interfaces;
 using ITaxonSearchManager = SOS.Observations.Api.Managers.Interfaces.ITaxonSearchManager;
 
 namespace SOS.Observations.Api.Managers

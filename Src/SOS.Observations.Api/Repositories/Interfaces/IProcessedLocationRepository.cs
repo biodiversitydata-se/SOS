@@ -3,8 +3,9 @@ using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
-namespace SOS.Lib.Repositories.Processed.Interfaces
+namespace SOS.Observations.Api.Repositories.Interfaces
 {
     /// <summary>
     /// </summary>
