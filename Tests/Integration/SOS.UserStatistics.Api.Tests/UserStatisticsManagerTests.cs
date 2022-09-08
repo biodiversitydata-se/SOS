@@ -1,5 +1,9 @@
-﻿namespace SOS.UserStatistics.Api.Tests;
+﻿using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.UserStatistics.Api.Tests.Fixtures;
 
+namespace SOS.UserStatistics.Api.Tests;
+
+[Collection(Collections.ApiTestsCollection)]
 public class UserStatisticsManagerTests
 {
     private readonly UserStatisticsTestFixture _fixture;

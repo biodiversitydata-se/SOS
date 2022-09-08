@@ -1,4 +1,4 @@
-﻿namespace SOS.UserStatistics.Api.Tests;
+﻿namespace SOS.UserStatistics.Api.Tests.Fixtures;
 
 public class UserStatisticsTestFixture : FixtureBase, IDisposable
 {
@@ -96,12 +96,6 @@ public class UserStatisticsTestFixture : FixtureBase, IDisposable
         ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
 
         _userManager = new UserManager(userService, new NullLogger<UserManager>());
-
-        var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
-        var taxa = await taxonRepository.GetAllAsync();
-        var taxaById = taxa.ToDictionary(m => m.Id, m => m);
-
-
         UserStatisticsManager = new UserStatisticsManager(userStatisticsObservationRepository, userStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
     }
 

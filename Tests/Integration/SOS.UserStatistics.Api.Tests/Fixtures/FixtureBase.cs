@@ -1,4 +1,4 @@
-﻿namespace SOS.UserStatistics.Api.Tests;
+﻿namespace SOS.UserStatistics.Api.Tests.Fixtures;
 
 public class FixtureBase
 {
