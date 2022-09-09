@@ -27,6 +27,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> ClearCollectionAsync();
 
         /// <summary>
+        /// Delete all documents
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> DeleteAllDocumentsAsync();
+
+        /// <summary>
         /// Turn of indexing
         /// </summary>
         /// <returns></returns>
