@@ -9,11 +9,31 @@
 
 	<ItemGroup>
 		<None Remove="appsettings.json" />
+		<None Remove="Resources\ArtportalenVerbatimChecklists_1000.json" />
+		<None Remove="Resources\ArtportalenVerbatimObservations_1000.json" />
+		<None Remove="Resources\ArtportalenVerbatimProtectedObservations_1000.json" />
+		<None Remove="Resources\DarwinCoreObservations_1000.json" />
+		<None Remove="Resources\TaxonCollection.zip" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Content Include="appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\ArtportalenVerbatimChecklists_1000.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\ArtportalenVerbatimObservations_1000.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\ArtportalenVerbatimProtectedObservations_1000.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\DarwinCoreObservations_1000.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\TaxonCollection.zip">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
 

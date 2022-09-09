@@ -13,14 +13,11 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
     public IUserStatisticsObservationRepository UserStatisticsObservationRepository { get; set; }
     public ArtportalenVerbatimRepository ArtportalenVerbatimRepository { get; set; }
     private IUserService _userService;
-    private IFilterManager _filterManager;
-    private IUserManager _userManager;
     private VerbatimClient _importClient;
     public List<Taxon> Taxa;
     private Dictionary<int, Taxon> _taxaById;
     private VocabularyRepository _vocabularyRepository;
     private ProcessClient _processClient;
-    private AreaHelper _areaHelper;
     private ProcessTimeManager _processTimeManager;
     private VocabularyValueResolver _vocabularyValueResolver;
     public string UserAuthenticationToken { get; set; }
@@ -66,10 +63,8 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         var areaCache = new AreaCache(areaRepository);
         _userService = CreateUserService();
         var filterManager = new FilterManager(taxonManager, _userService, areaCache, dataProviderCache);
-        _filterManager = filterManager;
         var userStatisticsManager = new UserStatisticsManager(UserStatisticsObservationRepository, UserStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
         TaxonManager = taxonManager;
-        _userManager = new UserManager(_userService, new NullLogger<UserManager>());
         var artportalenDataProvider = new DataProvider { Id = 1 };
         _processTimeManager = new ProcessTimeManager(new ProcessConfiguration());
         ArtportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
@@ -86,8 +81,6 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
             verbatimDbConfiguration.ReadBatchSize,
             verbatimDbConfiguration.WriteBatchSize);
         ArtportalenVerbatimRepository = new ArtportalenVerbatimRepository(_importClient, new NullLogger<ArtportalenVerbatimRepository>());
-
-        _userManager = new UserManager(_userService, new NullLogger<UserManager>());
         UserStatisticsManager = new UserStatisticsManager(UserStatisticsObservationRepository, UserStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
     }
 
