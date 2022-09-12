@@ -22,7 +22,6 @@ using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -54,6 +53,7 @@ using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
+using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Controllers;
 using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
@@ -426,7 +426,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         {
             var protectedLogRepository = new ProtectedLogRepository(processClient, new NullLogger<ProtectedLogRepository>());
             MemoryCacheOptions memoryCacheOptions = new MemoryCacheOptions { SizeLimit = null };
-            var artportalenApiService = new ArtportalenApiService(new Mock<IAuthorizationProvider>().Object,
+            var artportalenApiService = new ArtportalenApiService(
                 new HttpClientService(new NullLogger<HttpClientService>()),
                 new ArtportalenApiServiceConfiguration { BaseAddress = "https://api.artdata.slu.se/observations/v2", AcceptHeaderContentType = "application/json" },
                 new NullLogger<ArtportalenApiService>());
@@ -507,7 +507,6 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 elasticClientManager,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
-                taxonManager,
                 elasticConfiguration,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;

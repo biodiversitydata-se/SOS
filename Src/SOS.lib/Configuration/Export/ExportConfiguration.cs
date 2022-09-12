@@ -1,5 +1,4 @@
 ﻿
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
 
 namespace SOS.Lib.Configuration.Export

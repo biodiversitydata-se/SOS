@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Services.Interfaces;
+using SOS.Observations.Api.Configuration;
 
 namespace SOS.Observations.Api.HealthChecks
 {

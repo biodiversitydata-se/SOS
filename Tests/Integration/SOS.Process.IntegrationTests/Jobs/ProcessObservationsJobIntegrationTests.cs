@@ -85,7 +85,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager, 
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
-                    new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationCoreRepository>());
             }
             else
@@ -223,7 +222,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ProcessedObservationCoreRepository(elasticClientManager, 
                     new ElasticSearchConfiguration(), 
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
-                    new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationCoreRepository>()),
                 new NullLogger<InstanceManager>());
 

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using SOS.Analysis.Api.Configuration;
 using SOS.Analysis.Api.Repositories;
 using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.ActionFilters;
@@ -18,7 +19,6 @@ using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Configuration.Analysis;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.JsonConverters;
@@ -30,6 +30,10 @@ using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using SOS.Analysis.Api.Managers;
+using SOS.Analysis.Api.Managers.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Resource;
 
 namespace SOS.Analysis.Api
 {
@@ -270,14 +274,18 @@ namespace SOS.Analysis.Api
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
             // Add Caches
+            services.AddSingleton<IAreaCache, AreaCache>();
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
 
             // Add managers
+            services.AddScoped<IAnalysisManager, AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
-            services.AddSingleton<ITaxonManager, TaxonManager>();
 
             // Add repositories
+            services.AddScoped<IAreaRepository, AreaRepository>();
+            services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+
         }
 
         /// <summary>

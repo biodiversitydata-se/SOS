@@ -7,11 +7,11 @@ using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
-using NetTopologySuite.Triangulate;
 using NetTopologySuite.Utilities;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Extensions
@@ -257,17 +257,42 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Calculte concave hull for a list of polygons
         /// </summary>
-        /// <param name="polygons">Boundig box as polygon</param>
-        /// <param name="alphaValue"></param>
-        /// <param name="useCenterPoint">Used when concave hull is calculated. Grid corner coordinates used when false</param>
+        /// <param name="points">Points used for calculation</param>
+        /// <param name="edgeLength">The target maximum edge length or the target edge length ratio if useEdgeLengthRatio = true</param>
+        /// <param name="useEdgeLengthRatio">Use edge length ratio instead of edge length. The edge length ratio is a fraction of the length difference between the 
+        /// longest and shortest edges in the Delaunay Triangulation of the input points</param>
+        /// <param name="allowHoles"></param>
         /// <returns></returns>
-        public static Geometry ConcaveHull(this Polygon[] polygons, double alphaValue, bool useCenterPoint)
+        public static Geometry ConcaveHull(this Point[] points, double edgeLength = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
+        {
+            if (!points?.Any() ?? true)
+            {
+                return null;
+            }
+
+            return useEdgeLengthRatio ?
+               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLengthRatio(new MultiPoint(points.ToArray()), edgeLength, allowHoles)
+               :
+               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLength(new MultiPoint(points.ToArray()), edgeLength, allowHoles);
+        }
+
+        /// <summary>
+        /// Calculte concave hull for a list of polygons
+        /// </summary>
+        /// <param name="polygons">Polygons used for calculation</param>
+        /// <param name="useCenterPoint">Use polygon center point amd not polygon envelope edges, less points to use in calculation makes this faster</param>
+        /// <param name="edgeLength">The target maximum edge length or the target edge length ratio if useEdgeLengthRatio = true</param>
+        /// <param name="useEdgeLengthRatio">Use edge length ratio instead of edge length. The edge length ratio is a fraction of the length difference between the 
+        /// longest and shortest edges in the Delaunay Triangulation of the input points</param>
+        /// <param name="allowHoles"></param>
+        /// <returns></returns>
+        public static Geometry ConcaveHull(this Polygon[] polygons, bool useCenterPoint = true, double edgeLength = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
         {
             if (!polygons?.Any() ?? true)
             {
                 return null;
             }
-
+            
             Point[] points;
             if (useCenterPoint)
             {
@@ -292,6 +317,9 @@ namespace SOS.Lib.Extensions
                 }
             }
 
+            return points.ConcaveHull(edgeLength, useEdgeLengthRatio, allowHoles);
+           
+            /*
             //Triangulate all points
             var triangulationBuilder = new ConformingDelaunayTriangulationBuilder();
             triangulationBuilder.SetSites(new MultiPoint(points));
@@ -312,13 +340,13 @@ namespace SOS.Lib.Extensions
                 var radius = 2 * area / p;
                 radius = radius / 1000; //Div radius by 1000 to (commonly) keep alpha values in a range of 1 - 1000
 
-                if (radius < alphaValue)
+                if (radius < edgeLength)
                 {
                     alphaGeometry = alphaGeometry == null ? triangle : alphaGeometry.Union(triangle);
                 }
             }
 
-            return alphaGeometry;
+            return alphaGeometry;*/
         }
 
         /// <summary>
@@ -374,6 +402,30 @@ namespace SOS.Lib.Extensions
             }
 
             return geometry.IsValid;
+        }
+
+        /// <summary>
+        /// Cast XY bounding box to polygon
+        /// </summary>
+        /// <param name="boundinBox"></param>
+        /// <returns></returns>
+        public static Polygon ToPolygon(this XYBoundingBox boundinBox)
+        {
+            if (boundinBox == null)
+            {
+                return null!;
+            }
+
+            return new Polygon(
+                new LinearRing(new[]
+                {
+                    new Coordinate(boundinBox.TopLeft.X, boundinBox.TopLeft.Y),
+                    new Coordinate(boundinBox.BottomRight.X, boundinBox.TopLeft.Y),
+                    new Coordinate(boundinBox.BottomRight.X, boundinBox.BottomRight.Y),
+                    new Coordinate(boundinBox.TopLeft.X, boundinBox.BottomRight.Y),
+                    new Coordinate(boundinBox.TopLeft.X, boundinBox.TopLeft.Y)
+                })
+            );
         }
 
         /// <summary>

@@ -2,8 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Lib.Configuration.ObservationApi;
 
 namespace SOS.Observations.Api.HealthChecks
 {

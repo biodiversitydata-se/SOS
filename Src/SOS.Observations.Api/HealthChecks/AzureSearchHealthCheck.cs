@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SOS.Lib.Configuration.ObservationApi;
+using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Dtos.Filter;
 using System;
 using System.Diagnostics;

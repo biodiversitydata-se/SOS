@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Elasticsearch.Net;
 using Nest;
 using SOS.Lib.Enums;
@@ -89,6 +90,15 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="organismGroup"></param>
         /// <returns></returns>
         Task<DataQualityReport> GetDataQualityReportAsync(string organismGroup);
+
+        /// <summary>
+        /// Get aggregation in metric tiles 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="gridCellSizeInMeters"></param>
+        /// <returns></returns>
+        Task<GeoGridMetricResult> GetMetricGridAggregationAsync(
+            SearchFilter filter, int gridCellSizeInMeters);
 
         /// <summary>
         /// Get index health status

@@ -233,12 +233,17 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision)
+        public async Task<GeoGridTileResult> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision)
         {
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                _logger.LogError(e, "Failed to aggregate to metric tiles. To many buckets");
+                throw;
             }
             catch (Exception e)
             {
@@ -248,13 +253,19 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<Result<GeoGridMetricResult>> GetMetricGridAggregationAsync(int? roleId, string authorizationApplicationIdentifier,
+        public async Task<GeoGridMetricResult> GetMetricGridAggregationAsync(int? roleId, string authorizationApplicationIdentifier,
                 SearchFilter filter, int gridCellSizeInMeters)
         {
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-                return await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellSizeInMeters);
+                var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellSizeInMeters);
+                return result;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                _logger.LogError(e, "Failed to aggregate to metric tiles. To many buckets");
+                throw;
             }
             catch (Exception e)
             {

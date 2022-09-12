@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO.Compression;
 
-namespace SOS.Lib.Configuration.ObservationApi
+namespace SOS.Observations.Api.Configuration
 {
     /// <summary>
     /// Observations API configuration.

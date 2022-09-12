@@ -31,12 +31,10 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NLog.Web;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -69,6 +67,7 @@ using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
+using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -473,7 +472,7 @@ namespace SOS.Observations.Api
             {
                 app.UseResponseCompression();
             }
-            NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
+
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();

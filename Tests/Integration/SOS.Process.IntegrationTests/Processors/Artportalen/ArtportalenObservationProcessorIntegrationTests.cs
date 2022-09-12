@@ -104,7 +104,6 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager,
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
-                    new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationCoreRepository>());
             }
             else

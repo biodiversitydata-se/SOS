@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Nest;
 using NetTopologySuite.Geometries;
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
@@ -20,6 +19,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Swagger;
+using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
@@ -104,7 +104,7 @@ namespace SOS.Observations.Api.Controllers
         /// Get bounding box
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="tryToAutoAdjustBoundingBox"></param>
+        /// <param name="autoAdjustBoundingBox"></param>
         /// <returns></returns>
         private async Task<Envelope> GetBoundingBoxAsync(
             GeographicsFilterDto filter,
@@ -278,7 +278,7 @@ namespace SOS.Observations.Api.Controllers
         {
             _taxonSearchManager = taxonSearchManager ?? throw new ArgumentNullException(nameof(taxonSearchManager));
             _tilesLimit = elasticConfiguration?.MaxNrAggregationBuckets ??
-                          throw new ArgumentNullException(nameof(observationApiConfiguration));
+                          throw new ArgumentNullException(nameof(elasticConfiguration));
 
             _signalSearchTaxonListIds = (observationApiConfiguration?.SignalSearchTaxonListIds?.Any() ?? false) ? observationApiConfiguration.SignalSearchTaxonListIds : Array.Empty<int>();
 
@@ -464,13 +464,12 @@ namespace SOS.Observations.Api.Controllers
                     roleId,
                     authorizationApplicationIdentifier, searchFilter, zoom);
 
-                if (result.IsFailure)
-                {
-                    return BadRequest(result.Error);
-                }
-
-                var dto = result.Value.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
+                var dto = result.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
                 return new OkObjectResult(dto);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return BadRequest(e.Message);
             }
             catch (AuthenticationRequiredException e)
             {
@@ -530,13 +529,12 @@ namespace SOS.Observations.Api.Controllers
                     roleId,
                     authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters);
 
-                if (result.IsFailure)
-                {
-                    return BadRequest(result.Error);
-                }
-
-                var dto = result.Value.ToDto();
+                var dto = result.ToDto();
                 return new OkObjectResult(dto);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return BadRequest(e.Message);
             }
             catch (AuthenticationRequiredException e)
             {
@@ -1052,13 +1050,13 @@ namespace SOS.Observations.Api.Controllers
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
-                if (result.IsFailure)
-                {
-                    return BadRequest(result.Error);
-                }
-
-                GeoGridResultDto dto = result.Value.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
+              
+                GeoGridResultDto dto = result.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
                 return new OkObjectResult(dto);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return BadRequest(e.Message);
             }
             catch (AuthenticationRequiredException e)
             {
@@ -1119,14 +1117,14 @@ namespace SOS.Observations.Api.Controllers
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
-                if (result.IsFailure)
-                {
-                    return BadRequest(result.Error);
-                }
 
-                string strJson = result.Value.GetFeatureCollectionGeoJson();
+                string strJson = result.GetFeatureCollectionGeoJson();
                 var bytes = Encoding.UTF8.GetBytes(strJson);
                 return File(bytes, "application/json", "grid.geojson");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return BadRequest(e.Message);
             }
             catch (AuthenticationRequiredException e)
             {
@@ -1280,13 +1278,12 @@ namespace SOS.Observations.Api.Controllers
                     roleId,
                     authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters);
 
-                if (result.IsFailure)
-                {
-                    return BadRequest(result.Error);
-                }
-
-                var dto = result.Value.ToDto();
+                var dto = result.ToDto();
                 return new OkObjectResult(outputFormat == OutputFormatDto.Json ? dto : dto.ToGeoJson());
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return BadRequest(e.Message);
             }
             catch (AuthenticationRequiredException e)
             {

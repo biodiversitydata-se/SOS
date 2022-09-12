@@ -1,6 +1,4 @@
-﻿using SOS.Lib.Configuration.Shared;
-
-namespace SOS.Lib.Configuration.ObservationApi
+﻿namespace SOS.Lib.Configuration.Shared
 {
     public class ArtportalenApiServiceConfiguration : RestServiceConfiguration
     {

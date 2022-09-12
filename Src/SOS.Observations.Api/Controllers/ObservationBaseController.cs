@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
 

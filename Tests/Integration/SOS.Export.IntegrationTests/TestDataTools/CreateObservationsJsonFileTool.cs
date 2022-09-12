@@ -44,7 +44,6 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 new ElasticClientManager(elasticSearchConfiguration, true),
                 new ElasticSearchConfiguration(),
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
-                new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

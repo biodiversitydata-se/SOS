@@ -70,8 +70,7 @@ namespace SOS.Export.IntegrationTests.Repositories
                 new ProcessedObservationCoreRepository(
                     new ElasticClientManager(elasticConfiguration, true),
                     elasticConfiguration,
-                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
-                    new Mock<ITaxonManager>().Object,                    
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),                   
                     new NullLogger<ProcessedObservationCoreRepository>());
 
             return processedObservationRepository;

@@ -1,4 +1,4 @@
-﻿namespace SOS.Lib.Configuration.ObservationApi
+﻿namespace SOS.Observations.Api.Configuration
 {
     /// <summary>
     /// Configuration for health check

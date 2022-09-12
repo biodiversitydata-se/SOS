@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
@@ -83,7 +82,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="filter"></param>
         /// <param name="precision"></param>
         /// <returns></returns>
-        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision);
+        Task<GeoGridTileResult> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision);
 
         /// <summary>
         /// Get metric tiles aggregation
@@ -93,7 +92,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="filter"></param>
         /// <param name="gridCellSizeInMeters"></param>
         /// <returns></returns>
-        Task<Result<GeoGridMetricResult>> GetMetricGridAggregationAsync(
+        Task<GeoGridMetricResult> GetMetricGridAggregationAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter, int gridCellSizeInMeters);

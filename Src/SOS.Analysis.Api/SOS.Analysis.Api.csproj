@@ -4,8 +4,9 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	<UserSecretsId>92cd2cdb-499c-480d-9f04-feaf7a68f89c</UserSecretsId>
   </PropertyGroup>
-
+	
   <ItemGroup>
     <PackageReference Include="Elastic.Apm.NLog" Version="1.5.3" />
     <PackageReference Include="Elastic.CommonSchema.NLog" Version="1.5.3" />
@@ -21,10 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SOS.lib\SOS.Lib.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\Interfaces\" />
   </ItemGroup>
 
   <ItemGroup>

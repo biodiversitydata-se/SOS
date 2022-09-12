@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
@@ -22,7 +21,6 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Statistics;
 using SOS.Observations.Api.Repositories.Interfaces;
-using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Repositories
 {
@@ -34,9 +32,8 @@ namespace SOS.Observations.Api.Repositories
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             TelemetryClient telemetry,
-            ITaxonManager taxonManager,
             ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, telemetry, taxonManager, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, telemetry, logger)
         {
         }
 
@@ -373,7 +370,7 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(
+        public async Task<GeoGridTileResult> GetGeogridTileAggregationAsync(
                 SearchFilter filter,
                 int zoom)
         {
@@ -424,7 +421,7 @@ namespace SOS.Observations.Api.Repositories
             {
                 if (searchResponse.ServerError?.Error?.CausedBy?.Type == "too_many_buckets_exception")
                 {
-                    return Result.Failure<GeoGridTileResult>($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
+                    throw new ArgumentOutOfRangeException($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
                 }
 
                 throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -433,7 +430,7 @@ namespace SOS.Observations.Api.Repositories
             var nrOfGridCells = (int?)searchResponse.Aggregations?.Filter("geotile_filter")?.GeoTile("geotile_grid")?.Buckets?.Count ?? 0;
             if (nrOfGridCells > MaxNrElasticSearchAggregationBuckets)
             {
-                return Result.Failure<GeoGridTileResult>($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
+                throw new ArgumentOutOfRangeException($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
             }
 
             _telemetry.StopOperation(operation);
@@ -454,97 +451,7 @@ namespace SOS.Observations.Api.Repositories
             };
 
             // When operation is disposed, telemetry item is sent.
-            return Result.Success(gridResult);
-        }
-
-        /// <inheritdoc />
-        public async Task<Result<GeoGridMetricResult>> GetMetricGridAggregationAsync(
-            SearchFilter filter,
-            int gridCellSizeInMeters)
-        {
-            var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
-
-            using var operation =
-                _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_MetricGridAggregation");
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
-
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-                .Aggregations(a => a
-                    .Composite("gridCells", c => c
-                        .Size(MaxNrElasticSearchAggregationBuckets + 1)
-                        .Sources(s => s
-                            .Terms("sweref99tm_x", t => t
-                                .Script(sct => sct
-                                    .Source(
-                                        $"(Math.floor(doc['location.sweref99TmX'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
-                                )
-                            )
-                            .Terms("sweref99tm_y", t => t
-                                .Script(sct => sct
-                                    .Source(
-                                        $"(Math.floor(doc['location.sweref99TmY'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
-                                )
-                            )
-                        )
-                        .Aggregations(a => a
-                            .Cardinality("taxa_count", c => c
-                                .Field("taxon.id")
-                            )
-                        )
-                    )
-                )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
-            );
-
-            if (!searchResponse.IsValid)
-            {
-                if (searchResponse.ServerError?.Error?.CausedBy?.Type == "too_many_buckets_exception")
-                {
-                    return Result.Failure<GeoGridMetricResult>($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
-                }
-
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
-
-            var nrOfGridCells = (int?)searchResponse.Aggregations?.Composite("gridCells")?.Buckets?.Count ?? 0;
-            if (nrOfGridCells > MaxNrElasticSearchAggregationBuckets)
-            {
-                return Result.Failure<GeoGridMetricResult>($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
-            }
-
-            _telemetry.StopOperation(operation);
-
-            var gridResult = new GeoGridMetricResult()
-            {
-                BoundingBox = filter.Location.Geometries.BoundingBox,
-                GridCellSizeInMeters = gridCellSizeInMeters,
-                GridCellCount = nrOfGridCells,
-                GridCells = searchResponse.Aggregations.Composite("gridCells").Buckets.Select(b =>
-                    new GridCell
-                    {
-                        Sweref99TmBoundingBox = new XYBoundingBox
-                        {
-                            BottomRight = new XYCoordinate(double.Parse(b.Key["sweref99tm_x"].ToString()) + gridCellSizeInMeters, double.Parse(b.Key["sweref99tm_y"].ToString())),
-                            TopLeft = new XYCoordinate(double.Parse(b.Key["sweref99tm_x"].ToString()), double.Parse(b.Key["sweref99tm_y"].ToString()) + gridCellSizeInMeters)
-                        },
-                        ObservationsCount = b.DocCount,
-                        TaxaCount = (long?)b.Cardinality("taxa_count").Value
-                    }
-                )
-            };
-
-            // When operation is disposed, telemetry item is sent.
-            return Result.Success(gridResult);
+            return gridResult;
         }
 
         /// <inheritdoc/>

@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Statistics;
@@ -55,16 +54,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="filter"></param>
         /// <param name="zoom"></param>
         /// <returns></returns>
-        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom);
-
-        /// <summary>
-        /// Get aggregation in metric tiles 
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="gridCellSizeInMeters"></param>
-        /// <returns></returns>
-        Task<Result<GeoGridMetricResult>> GetMetricGridAggregationAsync(
-            SearchFilter filter, int gridCellSizeInMeters);
+        Task<GeoGridTileResult> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom);
 
         /// <summary>
         /// Gets a single observation

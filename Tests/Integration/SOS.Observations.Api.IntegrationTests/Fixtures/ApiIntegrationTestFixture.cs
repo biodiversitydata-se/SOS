@@ -12,7 +12,6 @@ using MongoDB.Bson.Serialization.Conventions;
 using Moq;
 using SOS.Harvest.Managers;
 using SOS.Lib.Cache;
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -36,6 +35,7 @@ using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
+using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Controllers;
 using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
@@ -185,7 +185,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var areaManager = CreateAreaManager(processClient);
             var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
             var taxonManager = CreateTaxonManager(processClient, taxonRepository, memoryCache);
-            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
+            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache);
             var processedTaxonRepository = CreateProcessedTaxonRepository(elasticConfiguration, elasticClientManager, processClient, taxonManager);
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);
@@ -224,7 +224,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             TaxonManager = taxonManager;
             ProcessedObservationRepository = processedObservationRepository;
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
-            CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
+            CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache);
             var customObservationManager = CreateObservationManager((ProcessedObservationRepository)CustomProcessedObservationRepository, vocabularyValueResolver, processClient, filterManager);
             CustomObservationsController = new ObservationsController(customObservationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, customElasticConfiguration, new NullLogger<ObservationsController>());
             DwcArchiveFileWriter = dwcArchiveFileWriter;
@@ -289,7 +289,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         {
             var protectedLogRepository = new ProtectedLogRepository(processClient, new NullLogger<ProtectedLogRepository>());
             MemoryCacheOptions memoryCacheOptions = new MemoryCacheOptions { SizeLimit = null};
-            var artportalenApiService = new ArtportalenApiService(new Mock<IAuthorizationProvider>().Object,
+            var artportalenApiService = new ArtportalenApiService(
                 new HttpClientService(new NullLogger<HttpClientService>()),
                 new ArtportalenApiServiceConfiguration { BaseAddress = "https://api.artdata.slu.se/observations/v2", AcceptHeaderContentType = "application/json" },
                 new NullLogger<ArtportalenApiService>());
@@ -361,15 +361,13 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ElasticSearchConfiguration elasticConfiguration,
             IElasticClientManager elasticClientManager,
             IProcessClient processClient,
-            IMemoryCache memoryCache,
-            ITaxonManager taxonManager)
+            IMemoryCache memoryCache)
         {
             var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
             var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClientManager,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
-                taxonManager,
                 elasticConfiguration,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;

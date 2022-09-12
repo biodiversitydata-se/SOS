@@ -17,12 +17,12 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.Repositories.Processed
@@ -962,11 +962,9 @@ namespace SOS.Lib.Repositories.Processed
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             TelemetryClient telemetry,
-            ITaxonManager taxonManager,
             ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
-            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }
 
         /// <summary>
@@ -981,10 +979,9 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ITaxonManager taxonManager,
             ILogger<ProcessedObservationCoreRepository> logger) : base(false, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
-            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
+
         }
 
         /// <inheritdoc />
@@ -1258,6 +1255,96 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             return report;
+        }
+
+        /// <inheritdoc />
+        public async Task<GeoGridMetricResult> GetMetricGridAggregationAsync(
+            SearchFilter filter,
+            int gridCellSizeInMeters)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+
+            using var operation =
+                _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_MetricGridAggregation");
+            operation.Telemetry.Properties["Filter"] = filter.ToString();
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Composite("gridCells", c => c
+                        .Size(MaxNrElasticSearchAggregationBuckets + 1)
+                        .Sources(s => s
+                            .Terms("sweref99tm_x", t => t
+                                .Script(sct => sct
+                                    .Source(
+                                        $"(Math.floor(doc['location.sweref99TmX'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
+                                )
+                            )
+                            .Terms("sweref99tm_y", t => t
+                                .Script(sct => sct
+                                    .Source(
+                                        $"(Math.floor(doc['location.sweref99TmY'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
+                                )
+                            )
+                        )
+                        .Aggregations(a => a
+                            .Cardinality("taxa_count", c => c
+                                .Field("taxon.id")
+                            )
+                        )
+                    )
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+
+            if (!searchResponse.IsValid)
+            {
+                if (searchResponse.ServerError?.Error?.CausedBy?.Type == "too_many_buckets_exception")
+                {
+                    throw new ArgumentOutOfRangeException($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
+                }
+               
+                throw new InvalidOperationException(searchResponse.DebugInformation);
+            }
+
+            var nrOfGridCells = (int?)searchResponse.Aggregations?.Composite("gridCells")?.Buckets?.Count ?? 0;
+            if (nrOfGridCells > MaxNrElasticSearchAggregationBuckets)
+            {
+                throw new ArgumentOutOfRangeException($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
+            }
+
+            _telemetry.StopOperation(operation);
+
+            var gridResult = new GeoGridMetricResult()
+            {
+                BoundingBox = filter.Location?.Geometries?.BoundingBox,
+                GridCellSizeInMeters = gridCellSizeInMeters,
+                GridCellCount = nrOfGridCells,
+                GridCells = searchResponse.Aggregations.Composite("gridCells").Buckets.Select(b =>
+                    new GridCell
+                    {
+                        Sweref99TmBoundingBox = new XYBoundingBox
+                        {
+                            BottomRight = new XYCoordinate(double.Parse(b.Key["sweref99tm_x"].ToString()) + gridCellSizeInMeters, double.Parse(b.Key["sweref99tm_y"].ToString())),
+                            TopLeft = new XYCoordinate(double.Parse(b.Key["sweref99tm_x"].ToString()), double.Parse(b.Key["sweref99tm_y"].ToString()) + gridCellSizeInMeters)
+                        },
+                        ObservationsCount = b.DocCount,
+                        TaxaCount = (long?)b.Cardinality("taxa_count").Value
+                    }
+                )
+            };
+
+            // When operation is disposed, telemetry item is sent.
+            return gridResult;
         }
 
         /// <inheritdoc />
@@ -1852,385 +1939,6 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             return !response.Exists;
-        }
-
-        #region Top Lists (experimental code)
-
-        //public async Task<PagedResult<dynamic>> TopListGetProvinceCrossLeagueAsync(SearchFilter filter, int skip, int take)
-        public async Task<PagedResult<dynamic>> TopListGetProvinceCrossLeagueAsync(SpeciesCountUserStatisticsQuery filter, int skip, int take)
-        {
-            var query = filter.ToQuery<Observation>();
-            //var (query, excludeQuery) = GetCoreQueries(filter);
-
-            var searchResponse = await Client.SearchAsync<Observation>(s => s
-               .Index(new[] { PublicIndexName, ProtectedIndexName })
-               .Query(q => q
-                    .Bool(b => b
-                        //.MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-                .Aggregations(a => a
-                    .Nested("league", n => n
-                        .Path("artportalenInternal.occurrenceRecordedByInternal")
-                        .Aggregations(a => a
-                            .Terms("recordedBy", t => t
-                                .Field("artportalenInternal.occurrenceRecordedByInternal.id")
-                                .Size(skip + take)
-                                .Aggregations(a => a
-                                    .ReverseNested("recorder", rn => rn
-                                        .Aggregations(a => a
-                                            .Terms("province", t => t
-                                                .Field("location.province.name")
-                                                .Size(33)
-                                                .Aggregations(a => a
-                                                    .Cardinality("taxonCount", c => c
-                                                        .Field("taxon.id")
-                                                    )
-                                                )
-                                            )
-                                            .SumBucket("taxonCount", sb => sb
-                                                .BucketsPath("province.taxonCount")
-                                            )
-                                        )
-                                    )
-                                    .BucketSort("leagueSort", bs => bs
-                                        .Sort(s => s
-                                            .Descending("recorder.taxonCount")
-                                        )
-                                    )
-                                )
-                            )
-                            .Cardinality("recordedByCount", c => c
-                                .Field("artportalenInternal.occurrenceRecordedByInternal.id")
-                            )
-                        )
-                    )
-                )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
-            );
-
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
-
-            return new PagedResult<dynamic>
-            {
-                Skip = skip,
-                Take = take,
-                TotalCount = (long)searchResponse.Aggregations.Nested("league").Cardinality("recordedByCount").Value,
-                Records = searchResponse.Aggregations.Nested("league").Terms("recordedBy").Buckets.Skip(skip).Take(take).Select(b =>
-                    new
-                    {
-                        Id = b.Key,
-                        Provinces = b.ReverseNested("recorder").Terms("province").Buckets.Select(b => new
-                        {
-                            Id = b.Key,
-                            TaxonCount = (int)b.Cardinality("taxonCount").Value
-                        })
-                    }
-                )
-            };
-        }
-
-        public async Task<PagedResult<dynamic>> TopListGetLocationLeagueAsync(SearchFilter filter, int skip, int take)
-        {
-            var (query, excludeQuery) = GetCoreQueries(filter);
-
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-               .Index(new[] { PublicIndexName, ProtectedIndexName })
-               .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-                .Aggregations(a => a
-                    .Terms("localities", c => c
-                        .Field("location.locationId")
-                        .Size(skip + take)
-                        .Aggregations(a => a
-                            .Cardinality("taxonCount", c => c
-                                .Field("taxon.id")
-                            )
-                            .BucketSort("sort", bs => bs
-                                .Sort(s => s
-                                    .Descending("taxonCount.value")
-                                )
-                            )
-                        )
-                    )
-                    .Cardinality("localityCount", c => c
-                        .Field("location.locationId")
-                    )
-                )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
-            );
-
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
-
-            return new PagedResult<dynamic>
-            {
-                Skip = skip,
-                Take = take,
-                TotalCount = (long)searchResponse.Aggregations.Cardinality("localityCount").Value,
-                Records = searchResponse.Aggregations.Terms("localities").Buckets.Skip(skip).Take(take).Select(b =>
-                    new
-                    {
-                        Id = b.Key,
-                        TaxonCount = (int)b.Cardinality("taxonCount").Value
-                    }
-                )
-            };
-        }
-
-        /// <inheritdoc/>
-        public async Task<PagedResult<dynamic>> TopListGetMonthCrossLeagueAsync(SearchFilter filter, int skip, int take)
-        {
-            var (query, excludeQuery) = GetCoreQueries(filter);
-
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-               .Index(new[] { PublicIndexName, ProtectedIndexName })
-               .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-                .Aggregations(a => a
-                    .Nested("league", n => n
-                        .Path("artportalenInternal.occurrenceRecordedByInternal")
-                        .Aggregations(a => a
-                            .Terms("recordedBy", t => t
-                                .Field("artportalenInternal.occurrenceRecordedByInternal.id")
-                                .Size(skip + take)
-                                .Aggregations(a => a
-                                    .ReverseNested("recorder", rn => rn
-                                        .Aggregations(a => a
-                                            .Terms("months", t => t
-                                                .Field("event.startMonth")
-                                                .Size(12)
-                                                .Aggregations(a => a
-                                                    .Cardinality("taxonCount", c => c
-                                                        .Field("taxon.id")
-                                                    )
-                                                )
-                                            )
-                                            .SumBucket("taxonCount", sb => sb
-                                                .BucketsPath("months.taxonCount")
-                                            )
-                                        )
-                                    )
-                                    .BucketSort("leagueSort", bs => bs
-                                        .Sort(s => s
-                                            .Descending("recorder.taxonCount")
-                                        )
-                                    )
-                                )
-                            )
-                            .Cardinality("recordedByCount", c => c
-                                .Field("artportalenInternal.occurrenceRecordedByInternal.id")
-                            )
-                        )
-                    )
-                )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
-            );
-
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
-
-            return new PagedResult<dynamic>
-            {
-                Skip = skip,
-                Take = take,
-                Records = searchResponse.Aggregations.Nested("league").Terms("recordedBy").Buckets.Skip(skip).Take(take).Select(b =>
-                    new
-                    {
-                        Id = b.Key,
-                        Provinces = b.ReverseNested("recorder").Terms("months").Buckets.Select(b => new
-                        {
-                            Id = b.Key,
-                            TaxonCount = (int)b.Cardinality("taxonCount").Value
-                        })
-                    }
-                ),
-                TotalCount = (long)searchResponse.Aggregations.Nested("league").Cardinality("recordedByCount").Value
-            };
-        }
-
-        public async Task<PagedResult<dynamic>> TopListGetMunicipalityLeagueAsync(SearchFilter filter, int skip, int take)
-        {
-            var (query, excludeQuery) = GetCoreQueries(filter);
-
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-               .Index(new[] { PublicIndexName, ProtectedIndexName })
-               .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-                .Aggregations(a => a
-                    .Terms("municipalities", c => c
-                        .Field("location.municipality.featureId")
-                        .Size(skip + take)
-                        .Aggregations(a => a
-                            .Cardinality("taxonCount", c => c
-                                .Field("taxon.id")
-                            )
-                            .BucketSort("sort", bs => bs
-                                .Sort(s => s
-                                    .Descending("taxonCount.value")
-                                )
-                            )
-                        )
-                    )
-                    .Cardinality("municipalityCount", c => c
-                        .Field("location.municipality.featureId")
-                    )
-                )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
-            );
-
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
-
-            return new PagedResult<dynamic>
-            {
-                Skip = skip,
-                Take = take,
-                TotalCount = (long)searchResponse.Aggregations.Cardinality("municipalityCount").Value,
-                Records = searchResponse.Aggregations.Terms("municipalities").Buckets.Skip(skip).Take(take).Select(b =>
-                    new
-                    {
-                        Id = b.Key,
-                        TaxonCount = (int)b.Cardinality("taxonCount").Value
-                    }
-                )
-            };
-        }
-
-        /// <inheritdoc/>
-        public async Task<PagedResult<dynamic>> TopListGetProvinceLeagueAsync(SearchFilter filter, int skip, int take)
-        {
-            var (query, excludeQuery) = GetCoreQueries(filter);
-
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-               .Index(new[] { PublicIndexName, ProtectedIndexName })
-               .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-                .Aggregations(a => a
-                    .Terms("provinces", c => c
-                        .Field("location.province.featureId")
-                        .Size(skip + take)
-                        .Aggregations(a => a
-                            .Cardinality("taxonCount", c => c
-                                .Field("taxon.id")
-                            )
-                            .BucketSort("sort", bs => bs
-                                .Sort(s => s
-                                    .Descending("taxonCount.value")
-                                )
-                            )
-                        )
-                    )
-                    .Cardinality("provinceCount", c => c
-                        .Field("location.province.featureId")
-                    )
-                )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
-            );
-
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
-
-            return new PagedResult<dynamic>
-            {
-                Skip = skip,
-                Take = take,
-                TotalCount = (long)searchResponse.Aggregations.Cardinality("provinceCount").Value,
-                Records = searchResponse.Aggregations.Terms("provinces").Buckets.Skip(skip).Take(take).Select(b =>
-                    new
-                    {
-                        Id = b.Key,
-                        TaxonCount = (int)b.Cardinality("taxonCount").Value
-                    }
-                )
-            };
-        }
-
-        /// <inheritdoc/>
-        public async Task<PagedResult<dynamic>> TopListGetReportingVolumeLeagueAsync(SearchFilter filter, int skip, int take)
-        {
-            var (query, excludeQuery) = GetCoreQueries(filter);
-
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-               .Index(new[] { PublicIndexName, ProtectedIndexName })
-               .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-                .Aggregations(a => a
-                    .Terms("reportedBy", c => c
-                        .Field("artportalenInternal.reportedByUserId")
-                        .Size(skip + take)
-                    )
-                    .Cardinality("reportedByCount", c => c
-                        .Field("artportalenInternal.reportedByUserId")
-                    )
-                )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
-            );
-
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
-
-            return new PagedResult<dynamic>
-            {
-                Skip = skip,
-                Take = take,
-                TotalCount = (long)searchResponse.Aggregations.Cardinality("reportedByCount").Value,
-                Records = searchResponse.Aggregations.Terms("reportedBy").Buckets.Skip(skip).Take(take).Select(b =>
-                    new
-                    {
-                        Id = b.Key,
-                        TaxonCount = b.DocCount
-                    }
-                )
-            };
-        }
-
-        #endregion
+        } 
     }
 }

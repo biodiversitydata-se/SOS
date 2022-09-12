@@ -82,6 +82,73 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
+        private async Task<byte[]> GetZippedAreaAsJsonAsync(AreaTypeDto areaType, string featureId)
+        {
+            var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
+            return await GetZippedAreaAsync(area);
+        }
+
+        private async Task<byte[]> GetZippedAreaAsGeoJsonAsync(AreaTypeDto areaType, string featureId)
+        {
+            var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
+            return await GetZippedAreaGeoJsonAsync(area);
+        }
+
+        private async Task<byte[]> GetZippedAreaAsWktAsync(AreaTypeDto areaType, string featureId)
+        {
+            var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
+            return await GetZippedAreaWktAsync(area);
+        }
+
+        private async Task<byte[]> GetZippedAreaGeoJsonAsync(Area area)
+        {
+            try
+            {
+                if (area?.AreaType == AreaType.EconomicZoneOfSweden)
+                {
+                    return null;
+                }
+
+                var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
+
+                var attributesTable = new AttributesTable
+                {
+                    { "AreaType", area.AreaType.ToString() },
+                    { "FeatureId", area.FeatureId },
+                    { "Name", area.Name },
+                    { "BoundingBox", area.BoundingBox }
+                };
+                var areaString = GeoJsonHelper.GetFeatureAsGeoJsonString(geometry, attributesTable);
+                return CreateZipFile($"area{area.Id}.geojson", Encoding.UTF8.GetBytes(areaString));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get area");
+                return null;
+            }
+        }
+
+        private async Task<byte[]> GetZippedAreaWktAsync(Area area)
+        {
+            try
+            {
+                if (area?.AreaType == AreaType.EconomicZoneOfSweden)
+                {
+                    return null;
+                }
+
+                var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
+                var geom = geometry.ToGeometry();
+                var areaString = _wktWriter.Write(geom);
+                return CreateZipFile($"area{area.Id}.wkt", Encoding.UTF8.GetBytes(areaString));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get area");
+                return null;
+            }
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -176,73 +243,6 @@ namespace SOS.Observations.Api.Managers
                 default:
                     throw new ArgumentException(
                         $"{MethodBase.GetCurrentMethod()?.Name}() does not support the value {areaType}", nameof(areaType));
-            }
-        }
-
-        private async Task<byte[]> GetZippedAreaAsJsonAsync(AreaTypeDto areaType, string featureId)
-        {
-            var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
-            return await GetZippedAreaAsync(area);
-        }
-
-        private async Task<byte[]> GetZippedAreaAsGeoJsonAsync(AreaTypeDto areaType, string featureId)
-        {
-            var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
-            return await GetZippedAreaGeoJsonAsync(area);
-        }
-
-        private async Task<byte[]> GetZippedAreaAsWktAsync(AreaTypeDto areaType, string featureId)
-        {
-            var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
-            return await GetZippedAreaWktAsync(area);
-        }
-
-        private async Task<byte[]> GetZippedAreaGeoJsonAsync(Area area)
-        {
-            try
-            {
-                if (area?.AreaType == AreaType.EconomicZoneOfSweden)
-                {
-                    return null;
-                }
-
-                var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
-
-                var attributesTable = new AttributesTable
-                {
-                    { "AreaType", area.AreaType.ToString() },
-                    { "FeatureId", area.FeatureId },
-                    { "Name", area.Name },
-                    { "BoundingBox", area.BoundingBox }
-                };
-                var areaString = GeoJsonHelper.GetFeatureAsGeoJsonString(geometry, attributesTable);
-                return CreateZipFile($"area{area.Id}.geojson", Encoding.UTF8.GetBytes(areaString));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get area");
-                return null;
-            }
-        }
-
-        private async Task<byte[]> GetZippedAreaWktAsync(Area area)
-        {
-            try
-            {
-                if (area?.AreaType == AreaType.EconomicZoneOfSweden)
-                {
-                    return null;
-                }
-
-                var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
-                var geom = geometry.ToGeometry();
-                var areaString = _wktWriter.Write(geom);
-                return CreateZipFile($"area{area.Id}.wkt", Encoding.UTF8.GetBytes(areaString));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get area");
-                return null;
             }
         }
 

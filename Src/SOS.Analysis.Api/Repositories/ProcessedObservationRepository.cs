@@ -14,9 +14,8 @@ namespace SOS.Analysis.Api.Repositories
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             TelemetryClient telemetry,
-            ITaxonManager taxonManager,
             ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, telemetry, taxonManager, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, telemetry, logger)
         {
 
         }
