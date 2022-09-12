@@ -336,7 +336,7 @@ public static class ArtportalenObservationBuilder
             obs.PublicCollection = sourceObservation.PublicCollection;
             obs.Quantity = sourceObservation.Quantity;
             obs.QuantityOfSubstrate = sourceObservation.QuantityOfSubstrate;
-            obs.RegionalSightingStateId = sourceObservation.RegionalSightingStateId;
+            //obs.RegionalSightingStateId = sourceObservation.RegionalSightingStateId;
             obs.ReproductionId = sourceObservation.ReproductionId;
             obs.SightingPublishTypeIds = sourceObservation.SightingPublishTypeIds;
             obs.SightingSpeciesCollectionItemId = sourceObservation.SightingSpeciesCollectionItemId;

@@ -1,6 +1,4 @@
-﻿using SOS.Observations.Api.IntegrationTests;
-
-namespace SOS.UserStatistics.Api.IntegrationTests.Fixtures;
+﻿namespace SOS.UserStatistics.Api.IntegrationTests.Fixtures;
 
 public class FixtureBase
 {
@@ -66,7 +64,7 @@ public class FixtureBase
         var config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .AddEnvironmentVariables()
-            .AddUserSecrets<TestBase>()
+            .AddUserSecrets<FixtureBase>()
             .Build();
 
         return config;

@@ -21,7 +21,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
             t => true);
 
         InstallationEnvironment = GetEnvironmentFromAppSettings();
-        Initialize().Wait();
+        Initialize();
     }
 
     public void Dispose() { }
@@ -50,14 +50,6 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
         return elasticConfiguration;
     }
 
-    protected ElasticSearchConfiguration GetCustomSearchDbConfiguration()
-    {
-        var config = GetAppSettings();
-        var configPrefix = GetConfigPrefix(InstallationEnvironment);
-        var elasticConfiguration = config.GetSection($"{configPrefix}:CustomSearchDbConfiguration").Get<ElasticSearchConfiguration>();
-        return elasticConfiguration;
-    }
-
     protected UserServiceConfiguration GetUserServiceConfiguration()
     {
         var config = GetAppSettings();
@@ -66,7 +58,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
         return userServiceConfiguration;
     }
 
-    private async Task Initialize()
+    private void Initialize()
     {
         UserAuthenticationToken = GetUserAuthenticationToken();
         ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
@@ -78,35 +70,14 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
             mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
 
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
-        var taxonManager = CreateTaxonManager(processClient, taxonRepository, memoryCache);
         var userStatisticsProcessedObservationRepository = CreateUserStatisticsProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache);
 
         var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
         var userStatisticsObservationRepository = new UserStatisticsObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<UserObservationRepository>());
-
-
-        var processedTaxonRepository = CreateProcessedTaxonRepository(elasticConfiguration, elasticClientManager, processClient, taxonManager);
-
-
-        var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
-        var areaCache = new AreaCache(areaRepository);
         var userService = CreateUserService();
         UserStatisticsProcessedObservationRepository = userStatisticsProcessedObservationRepository;
-        ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
-
         _userManager = new UserManager(userService, new NullLogger<UserManager>());
         UserStatisticsManager = new UserStatisticsManager(userStatisticsObservationRepository, userStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
-    }
-
-    private TaxonManager CreateTaxonManager(ProcessClient processClient, TaxonRepository taxonRepository, IMemoryCache memoryCache)
-    {
-        var taxonListRepository = new TaxonListRepository(processClient, new NullLogger<TaxonListRepository>());
-        var taxonManager = new TaxonManager(taxonRepository, taxonListRepository,
-            new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache),
-            new ClassCache<TaxonListSetsById>(memoryCache),
-            new NullLogger<TaxonManager>());
-        return taxonManager;
     }
 
     protected virtual IUserService CreateUserService()
@@ -142,47 +113,5 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
             new NullLogger<ProcessedObservationRepository>());
         return userStatisticsProcessedObservationRepository;
-    }
-
-    private ProcessedTaxonRepository CreateProcessedTaxonRepository(
-        ElasticSearchConfiguration elasticConfiguration,
-        IElasticClientManager elasticClientManager,
-        IProcessClient processClient,
-        ITaxonManager taxonManager)
-    {
-        var processedTaxonRepository = new ProcessedTaxonRepository(
-            elasticClientManager,
-            elasticConfiguration,
-            new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
-            new HttpContextAccessor(),
-            taxonManager,
-            new NullLogger<ProcessedTaxonRepository>());
-        return processedTaxonRepository;
-    }
-
-    public void UseMockUserService(params AuthorityModel[] authorities)
-    {
-        UserModel user = new UserModel();
-        user.Id = 15;
-        var userServiceMock = new Mock<IUserService>();
-        userServiceMock.Setup(userService => userService.GetUserAsync())
-            .ReturnsAsync(user);
-        userServiceMock.Setup(userService =>
-                userService.GetUserAuthoritiesAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
-            .ReturnsAsync(authorities);
-
-        var contextAccessor = new HttpContextAccessor() { HttpContext = new DefaultHttpContext() };
-        var claimsIdentity = new ClaimsIdentity();
-        var claim = new Claim("scope", "SOS.Observations.Protected");
-        claimsIdentity.AddClaim(claim);
-        contextAccessor.HttpContext.User.AddIdentity(claimsIdentity);
-        UserStatisticsProcessedObservationRepository.HttpContextAccessor = contextAccessor;
-    }
-
-
-    public void UseUserServiceWithToken(string token)
-    {
-        var userService = CreateUserService(token);
-        _userManager.UserService = userService;
     }
 }
