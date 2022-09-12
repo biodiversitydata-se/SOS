@@ -46,6 +46,8 @@ namespace SOS.Observations.Api.Managers
                         _logger.LogInformation("Start create taxonSumAggregationCache");
                         var searchFilter = new SearchFilter();
                         searchFilter.PositiveSightings = true;
+                        searchFilter.DeterminationFilter = SightingDeterminationFilter.NotUnsureDetermination;
+
                         _filterManager.PrepareFilterAsync(null, null, searchFilter).Wait();
                         Stopwatch sp = Stopwatch.StartNew();
                         taxonAggregation = await _processedTaxonRepository.GetTaxonSumAggregationAsync(searchFilter);
