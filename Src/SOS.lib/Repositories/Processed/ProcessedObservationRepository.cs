@@ -16,6 +16,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
@@ -966,7 +967,6 @@ namespace SOS.Lib.Repositories.Processed
                     });
         }
 
-        /// <summary>
         /// Constructor used in public mode
         /// </summary>
         /// <param name="elasticClientManager"></param>
@@ -974,6 +974,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="processedConfigurationCache"></param>
         /// <param name="telemetry"></param>
         /// <param name="httpContextAccessor"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClientManager elasticClientManager,
@@ -981,9 +982,11 @@ namespace SOS.Lib.Repositories.Processed
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             TelemetryClient telemetry,
             IHttpContextAccessor httpContextAccessor,
+            ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, httpContextAccessor, elasticConfiguration, logger)
         {
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
+            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             HttpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
@@ -993,13 +996,16 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticClientManager"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
+            ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(false, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
+            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }
 
         /// <inheritdoc />
