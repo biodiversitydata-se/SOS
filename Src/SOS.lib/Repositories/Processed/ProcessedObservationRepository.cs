@@ -42,6 +42,7 @@ namespace SOS.Lib.Repositories.Processed
     {
         private const int ElasticSearchMaxRecords = 10000;
         private readonly TelemetryClient _telemetry;
+        private readonly ITaxonManager _taxonManager;
 
         /// <summary>
         /// Add the collection
