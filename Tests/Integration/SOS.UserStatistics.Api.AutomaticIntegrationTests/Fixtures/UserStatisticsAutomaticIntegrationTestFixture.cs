@@ -197,11 +197,53 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         await _userStatisticsProcessedObservationRepository.DeleteCollectionAsync(protectedIndex);
     }
 
+    public async Task ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+    {
+        var processedObservations = ProcessObservations(verbatimObservations);
+        await AddObservationsToElasticsearchAsync(processedObservations);
+    }
+
     public async Task ProcessAndAddUserObservationToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
     {
         List<Observation> processedObservations = ProcessObservations(verbatimObservations);
         var userObservations = processedObservations.ToUserObservations();
         await AddUserObservationsToElasticsearchAsync(userObservations);
+    }
+
+    public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true)
+    {
+        var publicObservations = new List<Observation>();
+        var protectedObservations = new List<Observation>();
+
+        foreach (var observation in observations)
+        {
+            if (observation.ShallBeProtected())
+            {
+                protectedObservations.Add(observation);
+            }
+            else
+            {
+                publicObservations.Add(observation);
+            }
+        }
+
+        await AddObservationsBatchToElasticsearchAsync(publicObservations, false, clearExistingObservations);
+        await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, clearExistingObservations);
+
+        Thread.Sleep(1000);
+    }
+
+    private async Task AddObservationsBatchToElasticsearchAsync(IEnumerable<Observation> observations,
+           bool protectedIndex,
+           bool clearExistingObservations = true)
+    {
+        if (clearExistingObservations)
+        {
+            await _userStatisticsProcessedObservationRepository.DeleteAllDocumentsAsync(protectedIndex);
+        }
+        await _userStatisticsProcessedObservationRepository.DisableIndexingAsync(protectedIndex);
+        await _userStatisticsProcessedObservationRepository.AddManyAsync(observations, protectedIndex);
+        await _userStatisticsProcessedObservationRepository.EnableIndexingAsync(protectedIndex);
     }
 
     public async Task AddUserObservationsToElasticsearchAsync(IEnumerable<UserObservation> userObservations, bool clearExistingUserObservations = true)
