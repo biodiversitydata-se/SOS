@@ -46,19 +46,17 @@ namespace SOS.Analysis.Api.Managers
                 }
 
                 var gridCellsSweRef99 = result?.GridCells.Select(gc => gc.Sweref99TmBoundingBox.ToPolygon()).ToArray();
-                var eooGeometry = edgeLength == 0 ? gridCellsSweRef99.ConvexHull() : gridCellsSweRef99.ConcaveHull(useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
-
+                //var eooGeometry = edgeLength == 0 ? gridCellsSweRef99.ConvexHull() : gridCellsSweRef99.ConcaveHull(useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
+                var eooGeometry = gridCellsSweRef99.ConcaveHull(useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
                 if (eooGeometry == null)
                 {
                     return null!;
                 }
 
-                var gridCellCount = gridCellsSweRef99.Length;
-                var firstGrid = gridCellsSweRef99.First();
-                var gridCellArea = firstGrid!.Area / 1000000; //Calculate area in km2
-
                 var area = eooGeometry.Area / 1000000; //Calculate area in km2
                 var eoo = Math.Round(area, 0);
+                var gridCellCount = gridCellsSweRef99!.Length;
+                var gridCellArea = gridCellsSweRef99.First()!.Area / 1000000; //Calculate area in km2
                 var aoo = Math.Round((double)gridCellCount * gridCellArea, 0);
 
                 var futureCollection = new FeatureCollection();

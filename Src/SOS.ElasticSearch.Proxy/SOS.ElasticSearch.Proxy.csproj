@@ -27,9 +27,9 @@
 	<ItemGroup>
 		<PackageReference Include="Elastic.Apm.NLog" Version="1.5.3" />
 		<PackageReference Include="Elastic.CommonSchema.NLog" Version="1.5.3" />
-		<PackageReference Include="NLog" Version="5.0.2" />
+		<PackageReference Include="NLog" Version="5.0.4" />
 		<PackageReference Include="NLog.Targets.ElasticSearch" Version="7.7.0" />
-		<PackageReference Include="NLog.Web.AspNetCore" Version="5.1.1" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.1.4" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -7,18 +7,21 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
     public interface IAnalysisController
     {
         /// <summary>
-        /// Calculate AOO and EOO and get map layer representing it
+        /// Calculate AOO and EOO and get geometry showing coverage 
         /// </summary>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
-        /// <param name="filter"></param>
+        /// <param name="searchFilter"></param>
         /// <param name="sensitiveObservations"></param>
-        /// <param name="gridCellSizeInMeters"></param>
-        /// <param name="useCenterPoint"></param>
-        /// <param name="edgeLength"></param>
-        /// <param name="useEdgeLengthRatio"></param>
-        /// <param name="allowHoles"></param>
-        /// <param name="coordinateSystem"></param>
+        /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
+        /// <param name="useCenterPoint">If true, grid cell center point will be used, else grid cell corner points will be used.</param>
+        /// <param name="edgeLength">The target edge length ratio when useEdgeLengthRatio is true, else the target maximum edge length.</param>
+        /// <param name="useEdgeLengthRatio">Change behavior of edgeLength. When true: 
+        /// Computes the concave hull of the vertices in a geometry using the target criterion of edge length ratio. 
+        /// The edge length ratio is a fraction of the length difference between the longest and shortest edges in the Delaunay Triangulation of the input points.
+        /// When false: Computes the concave hull of the vertices in a geometry using the target criterion of edge length, and optionally allowing holes (see below). </param>
+        /// <param name="allowHoles">Gets or sets whether holes are allowed in the concave hull polygon.</param>
+        /// <param name="coordinateSystem">Gemometry coordinate system</param>
         /// <returns></returns>
         Task<IActionResult> CalculateAooAndEooAsync(
             int? roleId,

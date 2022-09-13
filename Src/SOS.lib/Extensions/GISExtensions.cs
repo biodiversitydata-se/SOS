@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using AgileObjects.AgileMapper.Extensions;
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -271,9 +272,9 @@ namespace SOS.Lib.Extensions
             }
 
             return useEdgeLengthRatio ?
-               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLengthRatio(new MultiPoint(points.ToArray()), edgeLength, allowHoles)
+               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLengthRatio(new MultiPoint(points), edgeLength, allowHoles)
                :
-               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLength(new MultiPoint(points.ToArray()), edgeLength, allowHoles);
+               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLength(new MultiPoint(points), edgeLength, allowHoles);
         }
 
         /// <summary>
@@ -292,21 +293,27 @@ namespace SOS.Lib.Extensions
             {
                 return null;
             }
-            
-            Point[] points;
+
+            var points = new HashSet<Point>();
             if (useCenterPoint)
             {
-                //Create a geometry with all grid cell points, this is much faster than using the gridcells because it's less coordinates, the generated geometry will also look better
-                points = (from p in polygons select p.Centroid).ToArray();
+                //Create a geometry with all grid cell points, this is faster than using the gridcells because it's less coordinates
+                polygons.ForEach(p => points.Add(p.Centroid));
             }
             else
             {
-                var polygonCount = polygons.Count();
+                foreach(var polygon in polygons)
+                {
+                    polygon.Coordinates.ForEach(c => points.Add(new Point(c)));
+                }
+
+               /* var polygonCount = polygons.Count();
                 points = new Point[polygonCount * 4];
 
                 for (var i = 0; i < polygonCount; i++)
                 {
                     var polygon = polygons[i];
+                   
                     var boundigBox = polygon.Envelope;
 
                     var startIndex = i * 4;
@@ -314,10 +321,10 @@ namespace SOS.Lib.Extensions
                     points[startIndex + 1] = new Point(new Coordinate(boundigBox.Coordinates[1].X, boundigBox.Coordinates[1].Y));
                     points[startIndex + 2] = new Point(new Coordinate(boundigBox.Coordinates[2].X, boundigBox.Coordinates[2].Y));
                     points[startIndex + 3] = new Point(new Coordinate(boundigBox.Coordinates[3].X, boundigBox.Coordinates[3].Y));
-                }
+                }*/
             }
 
-            return points.ConcaveHull(edgeLength, useEdgeLengthRatio, allowHoles);
+            return points.ToArray().ConcaveHull(edgeLength, useEdgeLengthRatio, allowHoles);
            
             /*
             //Triangulate all points
