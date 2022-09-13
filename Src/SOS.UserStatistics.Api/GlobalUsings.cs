@@ -1,5 +1,4 @@
-﻿global using Autofac.Core;
-global using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.OpenApi.Models;
 global using Nest;
 global using NLog;
@@ -30,7 +29,6 @@ global using SOS.UserStatistics.Api.Managers.Interfaces;
 global using SOS.UserStatistics.Api.Models;
 global using SOS.UserStatistics.Api.Repositories.Interfaces;
 global using SOS.UserStatistics.Extensions;
-global using SOS.UserStatistics.Modules.Interfaces;
 global using System.Reflection;
 global using Microsoft.AspNetCore.Diagnostics;
 global using System.Net;

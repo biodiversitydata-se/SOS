@@ -11,7 +11,7 @@ public class PagedSpeciesCountAggregationTests
     }
 
     [Fact]
-    public async Task Test_PagedSpeciesCountSearchAsync()
+    public async Task Test_PagedSpeciesCountAggregation()
     {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(20)
@@ -54,7 +54,6 @@ public class PagedSpeciesCountAggregationTests
 
         // Act
         var res = await _fixture.UserStatisticsManager.PagedSpeciesCountSearchAsync(query, 0, 5);
-        
 
         // Assert         
         var expected = new List<UserStatisticsItem>

@@ -43,6 +43,7 @@ public class UserStatisticsModule : Modules.Interfaces.IModule
         {
             var res = await userStatisticsManager.ProcessedObservationPagedSpeciesCountSearchAsync(query, skip, take, useCache);
             var dto = res.ToPagedResultDto(res.Records);
+            return Results.Ok(dto);
         })
         .Produces<PagedResult<UserStatisticsItem>>()
         .Produces(StatusCodes.Status400BadRequest)

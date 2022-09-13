@@ -25,7 +25,7 @@ public static class ArtportalenObservationBuilder
             var serializerSettings = new JsonSerializerSettings
             {
                 Converters = new List<JsonConverter> {
-                    new TestHelpers.JsonConverters.ObjectIdConverter(),
+                    new ObjectIdConverter(),
                     new NewtonsoftGeoJsonGeometryConverter()
                 }
             };

@@ -1,5 +1,6 @@
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-var logger = NLogBuilder.ConfigureNLog($"NLog.{env}.config").GetCurrentClassLogger();
+var envLog = env != null ? $"nlog.{env}.config" : "nlog.config";
+var logger = NLogBuilder.ConfigureNLog(envLog).GetCurrentClassLogger();
 logger.Info("Starting application...");
 
 try
@@ -39,3 +40,5 @@ finally
 {
     LogManager.Shutdown();
 }
+
+public partial class Program { }

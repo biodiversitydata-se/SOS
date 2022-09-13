@@ -14,7 +14,6 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
     private IUserStatisticsProcessedObservationRepository _userStatisticsProcessedObservationRepository { get; set; }
     private IUserStatisticsObservationRepository _userStatisticsObservationRepository { get; set; }
     private List<Taxon> _taxa { get; set; }
-
     public UserStatisticsManager UserStatisticsManager { get; set; }
 
     public UserStatisticsAutomaticIntegrationTestFixture()
@@ -34,7 +33,6 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         CreateObservationIntegrationTestIndexAsync(false).Wait();
         CreateObservationIntegrationTestIndexAsync(true).Wait();
         CreateUserObservationIntegrationTestIndexAsync().Wait();
-
     }
 
     private async Task InitializeAsync()
