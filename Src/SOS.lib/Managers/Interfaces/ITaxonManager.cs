@@ -17,6 +17,6 @@ namespace SOS.Lib.Managers.Interfaces
         /// <summary>
         /// Taxon lists taxon ids.
         /// </summary>
-        public Dictionary<int, HashSet<int>> TaxonListSetById { get; }
+        public Dictionary<int, (HashSet<int> Taxa, HashSet<int> WithUnderlyingTaxa)> TaxonListSetById { get; }
     }
 }
