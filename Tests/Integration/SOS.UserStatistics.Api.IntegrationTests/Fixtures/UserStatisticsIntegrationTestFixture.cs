@@ -70,7 +70,9 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
             mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
 
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        var userStatisticsProcessedObservationRepository = CreateUserStatisticsProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache);
+        var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
+        var taxonManager = CreateTaxonManager(processClient, taxonRepository, memoryCache);
+        var userStatisticsProcessedObservationRepository = CreateUserStatisticsProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
 
         var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
         var userStatisticsObservationRepository = new UserStatisticsObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<UserObservationRepository>());
@@ -104,14 +106,26 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
         ElasticSearchConfiguration elasticConfiguration,
         IElasticClientManager elasticClientManager,
         IProcessClient processClient,
-        IMemoryCache memoryCache)
+        IMemoryCache memoryCache,
+        ITaxonManager taxonManager)
     {
         var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
         var userStatisticsProcessedObservationRepository = new UserStatisticsProcessedObservationRepository(
             elasticClientManager,
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+            taxonManager,
             new NullLogger<ProcessedObservationRepository>());
         return userStatisticsProcessedObservationRepository;
+    }
+
+    private TaxonManager CreateTaxonManager(ProcessClient processClient, TaxonRepository taxonRepository, IMemoryCache memoryCache)
+    {
+        var taxonListRepository = new TaxonListRepository(processClient, new NullLogger<TaxonListRepository>());
+        var taxonManager = new TaxonManager(taxonRepository, taxonListRepository,
+            new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache),
+            new ClassCache<TaxonListSetsById>(memoryCache),
+            new NullLogger<TaxonManager>());
+        return taxonManager;
     }
 }

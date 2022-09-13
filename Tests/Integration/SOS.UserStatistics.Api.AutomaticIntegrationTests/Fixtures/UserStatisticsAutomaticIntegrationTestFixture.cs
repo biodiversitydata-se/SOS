@@ -33,6 +33,8 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         InitializeAsync().Wait();
         CreateObservationIntegrationTestIndexAsync(false).Wait();
         CreateObservationIntegrationTestIndexAsync(true).Wait();
+        CreateUserObservationIntegrationTestIndexAsync().Wait();
+
     }
 
     private async Task InitializeAsync()
@@ -169,6 +171,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
             elasticClientManager,
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+            taxonManager,
             new NullLogger<ProcessedObservationRepository>());
         return userStatisticsProcessedObservationRepository;
     }
@@ -195,6 +198,11 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
     private async Task DeleteObservationIntegrationTestIndexAsync(bool protectedIndex)
     {
         await _userStatisticsProcessedObservationRepository.DeleteCollectionAsync(protectedIndex);
+    }
+
+    private async Task CreateUserObservationIntegrationTestIndexAsync()
+    {
+        await _userStatisticsObservationRepository.ClearCollectionAsync();
     }
 
     public async Task ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
