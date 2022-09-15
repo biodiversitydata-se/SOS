@@ -18,10 +18,13 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
         // Managers
+        webApplicationBuilder.Services.AddScoped<ITaxonManager, TaxonManager>();
         webApplicationBuilder.Services.AddScoped<IUserStatisticsManager, UserStatisticsManager>();
 
         // Repositories
         webApplicationBuilder.Services.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
+        webApplicationBuilder.Services.AddScoped<ITaxonRepository, TaxonRepository>();
+        webApplicationBuilder.Services.AddScoped<ITaxonListRepository, TaxonListRepository>();
         webApplicationBuilder.Services.AddScoped<IUserObservationRepository, UserStatisticsObservationRepository>();
         webApplicationBuilder.Services.AddScoped<IProcessedObservationRepository, UserStatisticsProcessedObservationRepository>();
         webApplicationBuilder.Services.AddScoped<IUserStatisticsObservationRepository, UserStatisticsObservationRepository>();
