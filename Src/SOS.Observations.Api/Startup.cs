@@ -107,7 +107,7 @@ namespace SOS.Observations.Api
                 .AddJsonFile($"appsettings.{environment}.json", true)
                 .AddEnvironmentVariables();
 
-            _isDevelopment = environment.Equals("local");
+            _isDevelopment = CurrentEnvironment.IsEnvironment("local") || CurrentEnvironment.IsEnvironment("dev");
             if (_isDevelopment)
             {
                 // If Development mode, add secrets stored on developer machine 
@@ -366,7 +366,8 @@ namespace SOS.Observations.Api
                 .AddCheck<AzureSearchHealthCheck>("Azure search API health check", tags: new[] { "azure", "database", "elasticsearch", "query" })
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
                 .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
-                .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" });
+                .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
+                .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" });
 
             if (CurrentEnvironment.IsEnvironment("prod"))
             {
