@@ -8,6 +8,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
     builder.Logging.SetupLogging();
     builder.Host.UseNLog();
+    builder.Services.AddMemoryCache();
     builder.Services.AddEndpointsApiExplorer();
 
     builder.SetupSwagger();

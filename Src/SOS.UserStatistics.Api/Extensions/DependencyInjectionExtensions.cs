@@ -1,4 +1,9 @@
-﻿namespace SOS.UserStatistics.Extensions;
+﻿using Autofac.Core;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.TaxonTree;
+
+namespace SOS.UserStatistics.Extensions;
 
 internal static class DependencyInjectionExtensions
 {
@@ -12,7 +17,12 @@ internal static class DependencyInjectionExtensions
         var processedSettings = processedDbConfiguration.GetMongoDbSettings();
         webApplicationBuilder.Services.AddSingleton<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
+
+        // Cache
+        webApplicationBuilder.Services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
         webApplicationBuilder.Services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
+        webApplicationBuilder.Services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
+
 
         // Add security
         webApplicationBuilder.Services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
