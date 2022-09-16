@@ -1,6 +1,8 @@
-﻿namespace SOS.UserStatistics.Modules;
+﻿using Microsoft.AspNetCore.Mvc;
 
-public class UserStatisticsModule : Modules.Interfaces.IModule
+namespace SOS.UserStatistics.Modules;
+
+public class UserStatisticsModule : Interfaces.IModule
 {
     public void MapEndpoints(WebApplication application)
     {
@@ -15,7 +17,8 @@ public class UserStatisticsModule : Modules.Interfaces.IModule
         .Produces(StatusCodes.Status500InternalServerError);
 
         application.MapPost("userstatistics/pagedspeciescountaggregation", async (IUserStatisticsManager userStatisticsManager,
-            SpeciesCountUserStatisticsQuery query, int? skip, int? take, bool useCache) =>
+            [FromBody] SpeciesCountUserStatisticsQuery query, 
+            [FromQuery] int? skip, int? take, bool useCache) =>
         {
             var res = await userStatisticsManager.PagedSpeciesCountSearchAsync(query, skip, take, useCache);
             var dto = res.ToPagedResultDto(res.Records);
@@ -27,7 +30,10 @@ public class UserStatisticsModule : Modules.Interfaces.IModule
         .Produces(StatusCodes.Status500InternalServerError);
 
         application.MapPost("userstatistics/speciescountaggregation", async (IUserStatisticsManager userStatisticsManager,
-            SpeciesCountUserStatisticsQuery query, int? skip, int? take, bool useCache) =>
+            [FromBody] SpeciesCountUserStatisticsQuery query, 
+            [FromQuery] int? skip, 
+            [FromQuery] int? take, 
+            [FromQuery] bool useCache) =>
         {
             var res = await userStatisticsManager.SpeciesCountSearchAsync(query, skip, take, useCache);
             PagedResultDto<UserStatisticsItem> dto = res.ToPagedResultDto(res.Records);
@@ -39,7 +45,10 @@ public class UserStatisticsModule : Modules.Interfaces.IModule
         .Produces(StatusCodes.Status500InternalServerError);
 
         application.MapPost("userstatistics/processedobservationpagedspeciescountaggregation", async (IUserStatisticsManager userStatisticsManager,
-            SpeciesCountUserStatisticsQuery query, int? skip, int? take, bool useCache) =>
+            [FromBody] SpeciesCountUserStatisticsQuery query, 
+            [FromQuery] int? skip, 
+            [FromQuery] int? take, 
+            [FromQuery] bool useCache) =>
         {
             var res = await userStatisticsManager.ProcessedObservationPagedSpeciesCountSearchAsync(query, skip, take, useCache);
             var dto = res.ToPagedResultDto(res.Records);
@@ -51,7 +60,9 @@ public class UserStatisticsModule : Modules.Interfaces.IModule
         .Produces(StatusCodes.Status500InternalServerError);
 
         application.MapGet("userstatistics/speciescountbymonthaggregation", async (IUserStatisticsManager userStatisticsManager,
-            int? taxonId, int? year, SpeciesGroup speciesGroup) =>
+            [FromQuery] int? taxonId, 
+            [FromQuery] int? year, 
+            [FromQuery] SpeciesGroup speciesGroup) =>
         {
             await Task.Run(() => throw new NotImplementedException());
         })
@@ -61,7 +72,9 @@ public class UserStatisticsModule : Modules.Interfaces.IModule
         .Produces(StatusCodes.Status500InternalServerError);
 
         application.MapGet("userstatistics/speciescountbyyearandmonthaggregation", async (IUserStatisticsManager userStatisticsManager,
-            int? taxonId, int? year, SpeciesGroup speciesGroup) =>
+            [FromQuery] int? taxonId, 
+            [FromQuery] int? year, 
+            [FromQuery] SpeciesGroup speciesGroup) =>
         {
             await Task.Run(() => throw new NotImplementedException());
         })
@@ -71,7 +84,13 @@ public class UserStatisticsModule : Modules.Interfaces.IModule
         .Produces(StatusCodes.Status500InternalServerError);
 
         application.MapGet("userstatistics/specieslistsummary", async (IUserStatisticsManager userStatisticsManager,
-            int? taxonId, int? year, SpeciesGroup? speciesGroup, AreaType? areaType, string featureId, int? siteId, string sortBy) =>
+            [FromQuery] int? taxonId, 
+            [FromQuery] int? year, 
+            [FromQuery] SpeciesGroup? speciesGroup, 
+            [FromQuery] AreaType? areaType, 
+            [FromQuery] string featureId, 
+            [FromQuery] int? siteId, 
+            [FromQuery] string sortBy) =>
         {
             await Task.Run(() => throw new NotImplementedException());
         })

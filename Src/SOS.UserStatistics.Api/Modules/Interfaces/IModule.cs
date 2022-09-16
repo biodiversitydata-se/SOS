@@ -1,7 +1,6 @@
-﻿namespace SOS.UserStatistics.Modules.Interfaces
+﻿namespace SOS.UserStatistics.Modules.Interfaces;
+
+interface IModule
 {
-    interface IModule
-    {
-        void MapEndpoints(WebApplication application);
-    }
+    void MapEndpoints(WebApplication application);
 }
