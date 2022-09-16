@@ -420,7 +420,7 @@ namespace SOS.Harvest.Processors
             // Translate vocabularies to swedish, default values in db
             vocabularyValueResolver.ResolveVocabularyMappedValues(observations, Cultures.sv_SE, true);
 
-            var preValidationCount = observations.Count;
+            var preValidationCount = observations!.Count;
             observations =
                 await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
             
@@ -429,21 +429,21 @@ namespace SOS.Harvest.Processors
                 return (0, preValidationCount);
             }
          
-            var processedCount = await CommitBatchAsync(dataProvider, protectedObservations, observations, batchId);
+            var processedCount = await CommitBatchAsync(dataProvider, protectedObservations, observations!, batchId);
             
             if (mode == JobRunModes.Full && !protectedObservations && dwcArchiveFileWriterCoordinator.Enabled)
             {
-                await WriteObservationsToDwcaCsvFiles(observations, dataProvider, batchId);
+                await WriteObservationsToDwcaCsvFiles(observations!, dataProvider, batchId);
             }
 
             if (_processConfiguration.ProcessUserObservation && mode == JobRunModes.Full && dataProvider.Id == DataProviderIdentifiers.ArtportalenId && !protectedObservations)
             {
-                Logger.LogDebug($"Add User Observations. BatchId={batchId}, Protected={protectedObservations}, Count={observations.Count}");
+                Logger.LogDebug($"Add User Observations. BatchId={batchId}, Protected={protectedObservations}, Count={observations!.Count}");
                 var userObservations = observations.ToUserObservations();
                 await _userObservationRepository.AddManyAsync(userObservations);
             }
 
-            observations.Clear();
+            observations!.Clear();
 
             return (processedCount, preValidationCount - processedCount);
         }

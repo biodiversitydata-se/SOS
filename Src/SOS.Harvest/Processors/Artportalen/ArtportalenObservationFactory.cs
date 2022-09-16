@@ -230,7 +230,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 // Occurrence
                 obs.Occurrence = new Occurrence();
-                obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages
+                obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages && verbatimObservation.FirstImageId > 0
                     ? $"https://www.artportalen.se/Image/{verbatimObservation.FirstImageId}"
                     : "";
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
