@@ -4,7 +4,7 @@
     {
         public void MapEndpoints(WebApplication application)
         {
-            application.Map("dataproviderstatus", async (ISosClient sosClient) =>
+            application.MapGet("dataproviders/dataproviderstatus", async (ISosClient sosClient) =>
             {
                 var activeProcessInfo = await sosClient.GetProcessInfoAsync(true);
                 var inactiveProcessInfo = await sosClient.GetProcessInfoAsync(false);

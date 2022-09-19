@@ -27,10 +27,10 @@
 
         private static IEnumerable<Modules.Interfaces.IModule> DiscoverModulesInAssembly()
         {
-            return typeof(Modules.Interfaces.IModule).Assembly.GetTypes()
-                .Where(t => t.IsClass && t.IsAssignableTo(typeof(Modules.Interfaces.IModule)))
+            return typeof(IModule).Assembly.GetTypes()
+                .Where(t => t.IsClass && t.IsAssignableTo(typeof(IModule)))
                 .Select(Activator.CreateInstance)
-                .Cast<Modules.Interfaces.IModule>();
+                .Cast<IModule>();
         }
     }
 }

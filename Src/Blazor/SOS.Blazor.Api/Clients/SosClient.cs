@@ -22,7 +22,7 @@ public class SosClient : ISosClient
         var url = $"DataProviders?cultureCode=sv-SE&includeProvidersWithNoObservations=false";
         var res = await _httpClientFactory.CreateClient("SosClient").GetAsync(url);
 
-        return res.IsSuccessStatusCode ? await res.Content.ReadFromJsonAsync<DataProvider[]>() 
+        return res.IsSuccessStatusCode ? await res.Content.ReadFromJsonAsync<DataProvider[]>()
             : throw new Exception("Call to API failed, responseCode:" + res.StatusCode);
     }
 
@@ -31,6 +31,6 @@ public class SosClient : ISosClient
         var url = $"systems/processinformation?active={active}";
         var res = await _httpClientFactory.CreateClient("SosClient").GetAsync(url);
         return res.IsSuccessStatusCode ? await res.Content.ReadFromJsonAsync<ProcessInfo>()
-            : throw new Exception("Call to API failed, responseCode:" + res.StatusCode); 
+            : throw new Exception("Call to API failed, responseCode:" + res.StatusCode);
     }
 }

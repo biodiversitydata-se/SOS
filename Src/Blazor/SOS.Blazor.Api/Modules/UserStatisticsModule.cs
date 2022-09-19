@@ -4,7 +4,7 @@
     {
         public void MapEndpoints(WebApplication application)
         {
-            application.MapPost("pagedspeciescountaggregation", async (ISosUserStatisticsClient sosUserStatisticsClient,
+            application.MapPost("userstatistics/pagedspeciescountaggregation", async (ISosUserStatisticsClient sosUserStatisticsClient,
                 [FromBody] SpeciesCountUserStatisticsQuery query, 
                 [FromQuery] int skip, 
                 [FromQuery] int take, 

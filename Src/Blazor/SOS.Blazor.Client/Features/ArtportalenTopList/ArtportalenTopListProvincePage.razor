@@ -46,7 +46,7 @@
             // Setup user statistics provider
             _userStatisticsProvider = async req =>
             {
-                var url = _navManager.GetUriWithQueryParameters("UserStatistics/PagedSpeciesCountAggregation", new Dictionary<string, object?> {
+                var url = _navManager.GetUriWithQueryParameters("userstatistics/pagedspeciescountaggregation", new Dictionary<string, object?> {
                     { "skip", req.StartIndex },
                     { "take", req.Count },
                     { "useCache", _useCache}

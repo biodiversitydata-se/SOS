@@ -53,7 +53,7 @@
         try
         {
             // Get provinces
-            var provincesResponse = await _httpClient.GetFromJsonAsync<PagedResult<Area>>("Areas?skip=0&take=100&areaType=Province");
+            var provincesResponse = await _httpClient.GetFromJsonAsync<PagedResult<Area>>("areas?skip=0&take=100&areaType=Province");
             _provinces = provincesResponse?.Records.OrderBy(a => Convert.ToInt32(a.FeatureId)).ToList();
 
             // Get user statistics
@@ -69,13 +69,13 @@
 
     private async Task OnSelectProvinceChange(ChangeEventArgs e)
     {
-        _selectedProvinceFeatureId = e.Value.ToString();
+        _selectedProvinceFeatureId = e?.Value?.ToString();
         await GetUserStatistics();
     }
 
     private async Task GetUserStatistics()
     {
-        var url = _navManager.GetUriWithQueryParameters("UserStatistics/PagedSpeciesCountAggregation", new Dictionary<string, object?> {
+        var url = _navManager.GetUriWithQueryParameters("userstatistics/pagedspeciescountaggregation", new Dictionary<string, object?> {
             { "skip", 0 },
             { "take", 100000 },
             { "useCache", _useCache}
@@ -88,6 +88,6 @@
         }
         var response = await _httpClient.PostAsJsonAsync(url, query);
         var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
-        userStatisticsQueryable = pagedResult.Records.AsQueryable();
+        userStatisticsQueryable = pagedResult?.Records.AsQueryable();
     }
 }

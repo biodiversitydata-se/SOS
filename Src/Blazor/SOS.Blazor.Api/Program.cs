@@ -1,38 +1,46 @@
-var builder = WebApplication.CreateBuilder(args);
-builder.SetupLogging();
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+var logger = NLogBuilder.ConfigureNLog($"nlog.{env}.config").GetCurrentClassLogger();
+logger.Info("Starting application...");
 
-// Dependencies (DI)
-builder.SetupDependencies();
-
-// Add modules
-builder.RegisterModules();
-
-// Views
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
-
-var app = builder.Build();
-app.ConfigureExceptionHandler(app.Environment.IsDevelopment());
-app.MapEndpoints();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseWebAssemblyDebugging();
+    var builder = WebApplication.CreateBuilder(args);
+    builder.SetupLogging();
+    builder.SetupDependencies();
+    builder.RegisterModules();
+    builder.Services.AddRazorPages();
+
+    var app = builder.Build();
+    app.ConfigureExceptionHandler(logger, app.Environment.IsDevelopment());
+    app.MapEndpoints();
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseWebAssemblyDebugging();
+    }
+    else
+    {
+        app.UseExceptionHandler("/Error");
+        app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseBlazorFrameworkFiles();
+    app.UseStaticFiles();
+    app.UseRouting();
+
+    app.MapRazorPages();
+    app.MapFallbackToFile("index.html");
+
+    app.Run();
 }
-else
+catch (Exception ex)
 {
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
+    logger.Error(ex, "Failed to start application...");
+    throw;
+}
+finally
+{
+    LogManager.Shutdown();
 }
 
-app.UseHttpsRedirection();
-app.UseBlazorFrameworkFiles();
-app.UseStaticFiles();
-app.UseRouting();
 
-app.MapRazorPages();
-app.MapControllers();
-app.MapFallbackToFile("index.html");
-
-app.Run();

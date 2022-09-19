@@ -54,13 +54,13 @@
         try
         {
             // Get provinces
-            var provincesResponse = await _httpClient.GetFromJsonAsync<PagedResult<Area>>("Areas?skip=0&take=100&areaType=Province");
-            _provinces = provincesResponse.Records.OrderBy(a => Convert.ToInt32(a.FeatureId)).ToList();
+            var provincesResponse = await _httpClient.GetFromJsonAsync<PagedResult<Area>>("areas?skip=0&take=100&areaType=Province");
+            _provinces = provincesResponse?.Records.OrderBy(area => Convert.ToInt32(area.FeatureId)).ToList();
 
             // Setup user statistics provider
             _userStatisticsProvider = async req =>
             {
-                var url = _navManager.GetUriWithQueryParameters("UserStatistics/PagedSpeciesCountAggregation", new Dictionary<string, object?> {
+                var url = _navManager.GetUriWithQueryParameters("userstatistics/pagedspeciescountaggregation", new Dictionary<string, object?> {
                     { "skip", req.StartIndex },
                     { "take", req.Count },
                     { "useCache", _useCache}

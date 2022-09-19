@@ -2,7 +2,7 @@
 
 internal static class ExceptionMiddlewareExtension
 {
-    internal static void ConfigureExceptionHandler(this IApplicationBuilder app, bool isDevelopment)
+    internal static void ConfigureExceptionHandler(this IApplicationBuilder app, Logger logger, bool isDevelopment)
     {
         app.UseExceptionHandler(error =>
         {
@@ -22,6 +22,7 @@ internal static class ExceptionMiddlewareExtension
                     errorAsString = "An error occurred";
                 }
 
+                logger.Error(errorAsString);
                 await context.Response.WriteAsync(isDevelopment ? errorAsString : string.Empty);
             });
         });

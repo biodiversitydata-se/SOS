@@ -23,9 +23,8 @@
         try
         {
             // Get data providers
-            var dataProvidersResponse = await _httpClient.GetFromJsonAsync<IEnumerable<DataProviderStatus>>("DataProviders/DataProviderStatus");
-            dataProvidersQueryable = dataProvidersResponse.AsQueryable();
-
+            var dataProvidersResponse = await _httpClient.GetFromJsonAsync<IEnumerable<DataProviderStatus>>("dataproviders/dataproviderstatus");
+            dataProvidersQueryable = dataProvidersResponse?.AsQueryable();
             await base.OnInitializedAsync();
         }
         catch (Exception ex)
