@@ -5,11 +5,6 @@ namespace SOS.Blazor.Api.Clients;
 public class SosUserStatisticsClient : ISosUserStatisticsClient
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
-    {
-        PropertyNameCaseInsensitive = true,
-        Converters = { new JsonStringEnumConverter() }
-    };
 
     public SosUserStatisticsClient(IHttpClientFactory httpClientFactory)
     {
@@ -20,8 +15,19 @@ public class SosUserStatisticsClient : ISosUserStatisticsClient
     {
         //var response = await _client.PostAsync($"{_apiUrl}UserStatistics/SpeciesCountAggregation?skip={skip}&take={take}&useCache={useCache}", content);
         var url = $"userstatistics/pagedspeciescountaggregation?skip={skip}&take={take}&useCache={useCache}";
-        var response = await _httpClientFactory.CreateClient("SosUserStatisticsClient").PostAsJsonAsync<SpeciesCountUserStatisticsQuery>(url, query);
-        return response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>()
-            : throw new Exception("Call to API failed, responseCode:" + response.StatusCode);
+
+        var getUserStatistics = async () =>
+        {
+            var watch = new Stopwatch();
+            watch.Start();
+            var response = await _httpClientFactory.CreateClient("SosUserStatisticsClient").PostAsJsonAsync<SpeciesCountUserStatisticsQuery>(url, query);
+            var data = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
+            watch.Stop();
+            Debug.WriteLine($"Response time: {watch.Elapsed.TotalMilliseconds}");
+            return (response, data);
+        };
+
+        var res = await getUserStatistics();
+        return res.response.IsSuccessStatusCode? res.data : throw new Exception("Call to API failed, responseCode:" + res.response.StatusCode);
     }
 }
