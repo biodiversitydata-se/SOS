@@ -10,9 +10,7 @@ public class UserStatisticsManager : IUserStatisticsManager
     private static readonly SpeciesCountAggregationCacheManager _speciesCountAggregationCacheManager = new();
     private const int CacheAreaItemsSkipTakeLimit = 100;
 
-    public UserStatisticsManager(
-        IUserStatisticsObservationRepository userStatisticsObservationRepository,
-        IUserStatisticsProcessedObservationRepository userStatisticsProcessedObservationRepository,
+    public UserStatisticsManager(IUserStatisticsObservationRepository userStatisticsObservationRepository, IUserStatisticsProcessedObservationRepository userStatisticsProcessedObservationRepository,
         ILogger<UserStatisticsManager> logger)
     {
         _userStatisticsObservationRepository = userStatisticsObservationRepository ??
@@ -21,7 +19,6 @@ public class UserStatisticsManager : IUserStatisticsManager
                                      throw new ArgumentNullException(nameof(userStatisticsProcessedObservationRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        // Make sure we are working with live data
         _userStatisticsObservationRepository.LiveMode = true;
     }
 
@@ -33,9 +30,7 @@ public class UserStatisticsManager : IUserStatisticsManager
     }
 
     public async Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query,
-            int? skip,
-            int? take,
-            bool useCache = true)
+        int? skip, int? take, bool useCache = true)
     {
         IEnumerable<UserStatisticsItem> selectedRecords = null;
         List<UserStatisticsItem> items = null;
@@ -98,7 +93,7 @@ public class UserStatisticsManager : IUserStatisticsManager
             }
 
             // Get values for records not found in cache
-            Dictionary<int, UserStatisticsItem> areaStatisticsByUserId = foundCachedItemsById;
+            var areaStatisticsByUserId = foundCachedItemsById;
             if (notFoundUserIds.Any())
             {
                 var fetchedItems = await _userStatisticsObservationRepository.AreaSpeciesCountSearchCompositeAsync(query, notFoundUserIds);
@@ -146,9 +141,7 @@ public class UserStatisticsManager : IUserStatisticsManager
     }
 
     public async Task<PagedResult<UserStatisticsItem>> SpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query,
-        int? skip,
-        int? take,
-        bool useCache = true)
+        int? skip, int? take, bool useCache = true)
     {
         List<UserStatisticsItem> records;
         string sortByFeatureId = query.SortByFeatureId; // todo - temporary hack in order to exclude SortByFeatureId in cache key. Sorting is done in memory.
@@ -251,7 +244,7 @@ public class UserStatisticsManager : IUserStatisticsManager
             var userIds = pagedResult.Records.Select(m => m.UserId).ToList();
             var areaRecords = await _processedObservationRepository.AreaSpeciesCountSearchAsync(query, userIds);
             var areaRecordsByUserId = areaRecords.ToDictionary(m => m.UserId, m => m);
-            List<UserStatisticsItem> records = new List<UserStatisticsItem>(pagedResult.Records.Count());
+            var records = new List<UserStatisticsItem>(pagedResult.Records.Count());
             foreach (var item in pagedResult.Records)
             {
                 records.Add(areaRecordsByUserId[item.UserId]);

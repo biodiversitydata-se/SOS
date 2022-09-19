@@ -1,5 +1,4 @@
-﻿using Autofac.Core;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 
@@ -24,7 +23,7 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
 
 
-        // Add security
+        // Security
         webApplicationBuilder.Services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
         // Managers

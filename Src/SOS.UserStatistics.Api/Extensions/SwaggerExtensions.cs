@@ -1,8 +1,8 @@
 ﻿namespace SOS.UserStatistics.Api.Extensions;
 
-internal static class SwaggerExtensions
+public static class SwaggerExtensions
 {
-    internal static WebApplicationBuilder SetupSwagger(this WebApplicationBuilder webApplicationBuilder)
+    public static WebApplicationBuilder SetupSwagger(this WebApplicationBuilder webApplicationBuilder)
     {
         webApplicationBuilder.Services.AddSwaggerGen(
             swagger =>
@@ -32,6 +32,8 @@ internal static class SwaggerExtensions
                     }
                 });
             });
+
+        webApplicationBuilder.Services.AddEndpointsApiExplorer();
         return webApplicationBuilder;
     }
 }

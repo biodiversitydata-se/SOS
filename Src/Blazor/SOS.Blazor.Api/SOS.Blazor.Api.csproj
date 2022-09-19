@@ -16,5 +16,4 @@
     <ProjectReference Include="..\SOS.Blazor.Shared\SOS.Blazor.Shared.csproj" />
   </ItemGroup>
 
-
 </Project>

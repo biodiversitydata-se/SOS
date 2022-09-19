@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace SOS.UserStatistics.Modules;
+﻿namespace SOS.UserStatistics.Modules;
 
 public class UserStatisticsModule : Interfaces.IModule
 {

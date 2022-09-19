@@ -15,7 +15,6 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
 
     public async Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery filter, int? skip, int? take)
     {
-        //var testres1 = await TopListGetProvinceCrossLeagueAsync(filter, skip.GetValueOrDefault(), take.GetValueOrDefault());
         var query = filter.ToProcessedObservationQuery<Observation>();
         var searchResponse = await Client.SearchAsync<Observation>(s => s
             .Index(IndexName)

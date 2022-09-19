@@ -1,10 +1,10 @@
 ﻿namespace SOS.UserStatistics.Api.Extensions;
 
-internal static class ModuleExtensions
+public static class ModuleExtensions
 {
     static readonly List<Modules.Interfaces.IModule> registeredModules = new();
 
-    internal static WebApplicationBuilder RegisterModules(this WebApplicationBuilder webApplicationBuilder)
+    public static WebApplicationBuilder RegisterModules(this WebApplicationBuilder webApplicationBuilder)
     {
         var modules = DiscoverModulesInAssembly();
         foreach (var module in modules)
@@ -15,7 +15,7 @@ internal static class ModuleExtensions
         return webApplicationBuilder;
     }
 
-    internal static WebApplication MapEndpoints(this WebApplication app)
+    public static WebApplication MapEndpoints(this WebApplication app)
     {
         foreach (var module in registeredModules)
         {

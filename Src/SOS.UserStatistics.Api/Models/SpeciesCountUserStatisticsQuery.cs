@@ -9,23 +9,25 @@ public class SpeciesCountUserStatisticsQuery
     public string FeatureId { get; set; }
     public int? SiteId { get; set; }
     public int? ProjectId { get; set; }
-
-    /// <summary>
-    /// Include user species count for all areas in specified AreaType.
-    /// </summary>
     public bool IncludeOtherAreasSpeciesCount { get; set; }
     public string SortByFeatureId { get; set; }
 
-    public string CacheKey => this.ToString();
+    public string CacheKey => ToString();
 
     public override string ToString()
     {
-        return $"{nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}, {nameof(SortByFeatureId)}: {SortByFeatureId}";
+        return $"{nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, " +
+            $"{nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, " +
+            $"{nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}, " +
+            $"{nameof(SortByFeatureId)}: {SortByFeatureId}";
     }
 
     protected bool Equals(SpeciesCountUserStatisticsQuery other)
     {
-        return TaxonId == other.TaxonId && Year == other.Year && SpeciesGroup == other.SpeciesGroup && AreaType == other.AreaType && FeatureId == other.FeatureId && SiteId == other.SiteId && ProjectId == other.ProjectId && IncludeOtherAreasSpeciesCount == other.IncludeOtherAreasSpeciesCount && SortByFeatureId == other.SortByFeatureId;
+        return TaxonId == other.TaxonId && Year == other.Year && SpeciesGroup == other.SpeciesGroup 
+            && AreaType == other.AreaType && FeatureId == other.FeatureId && SiteId == other.SiteId 
+            && ProjectId == other.ProjectId && IncludeOtherAreasSpeciesCount == other.IncludeOtherAreasSpeciesCount 
+            && SortByFeatureId == other.SortByFeatureId;
     }
 
     public override bool Equals(object obj)

@@ -1,36 +1,35 @@
-﻿namespace SOS.Blazor.Api.Extensions
+﻿namespace SOS.Blazor.Api.Extensions;
+
+public static class ModuleExtensions
 {
-    public static class ModuleExtensions
+    static readonly List<IModule> registeredModules = new();
+
+    public static WebApplicationBuilder RegisterModules(this WebApplicationBuilder webApplicationBuilder)
     {
-        static readonly List<IModule> registeredModules = new();
-
-        public static WebApplicationBuilder RegisterModules(this WebApplicationBuilder webApplicationBuilder)
+        var modules = DiscoverModulesInAssembly();
+        foreach (var module in modules)
         {
-            var modules = DiscoverModulesInAssembly();
-            foreach (var module in modules)
-            {
-                registeredModules.Add(module);
-            }
-
-            return webApplicationBuilder;
+            registeredModules.Add(module);
         }
 
-        public static WebApplication MapEndpoints(this WebApplication app)
-        {
-            foreach (var module in registeredModules)
-            {
-                module.MapEndpoints(app);
-            }
+        return webApplicationBuilder;
+    }
 
-            return app;
+    public static WebApplication MapEndpoints(this WebApplication app)
+    {
+        foreach (var module in registeredModules)
+        {
+            module.MapEndpoints(app);
         }
 
-        private static IEnumerable<Modules.Interfaces.IModule> DiscoverModulesInAssembly()
-        {
-            return typeof(IModule).Assembly.GetTypes()
-                .Where(t => t.IsClass && t.IsAssignableTo(typeof(IModule)))
-                .Select(Activator.CreateInstance)
-                .Cast<IModule>();
-        }
+        return app;
+    }
+
+    private static IEnumerable<Modules.Interfaces.IModule> DiscoverModulesInAssembly()
+    {
+        return typeof(IModule).Assembly.GetTypes()
+            .Where(t => t.IsClass && t.IsAssignableTo(typeof(IModule)))
+            .Select(Activator.CreateInstance)
+            .Cast<IModule>();
     }
 }

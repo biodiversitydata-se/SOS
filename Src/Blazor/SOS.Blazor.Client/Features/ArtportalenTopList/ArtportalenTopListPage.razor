@@ -48,6 +48,7 @@
     private static IEnumerable<Area>? _provinces;
     private string? _selectedProvinceFeatureId;
     private bool _useCache = true;
+    private double _totalMilliseconds;
 
     protected override async Task OnInitializedAsync()
     {
@@ -75,7 +76,8 @@
                 var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
                 return GridItemsProviderResult.From(
                     items: pagedResult!.Records.ToList(),
-                    totalItemCount: (int)pagedResult!.TotalCount);
+                    totalItemCount: (int)pagedResult!.TotalCount
+                );
             };
 
             await base.OnInitializedAsync();
@@ -83,13 +85,14 @@
         catch (Exception ex)
         {
             Console.WriteLine($"There was a problem in OnInitializedAsync(): {ex.Message}");
+            throw ex;
         }
     }
 
     private async Task OnSelectProvinceChange(ChangeEventArgs e)
     {
-        _selectedProvinceFeatureId = e.Value.ToString();
-        //await myGrid.RefreshDataAsync();
-        //StateHasChanged();
+        _selectedProvinceFeatureId = e?.Value?.ToString();
+        await myGrid.RefreshDataAsync();
+        StateHasChanged();
     }
 }

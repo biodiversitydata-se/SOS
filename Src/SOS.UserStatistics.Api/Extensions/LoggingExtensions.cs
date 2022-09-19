@@ -1,11 +1,14 @@
-﻿namespace SOS.UserStatistics.Extensions;
+﻿using Microsoft.AspNetCore.Builder;
+
+namespace SOS.UserStatistics.Extensions;
 
 internal static class LoggingExtensions
 {
-    internal static ILoggingBuilder SetupLogging(this ILoggingBuilder loggingBuilder)
+    internal static WebApplicationBuilder SetupLogging(this WebApplicationBuilder webApplicationBuilder)
     {
-        loggingBuilder.ClearProviders();
-        loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-        return loggingBuilder;
+        webApplicationBuilder.Logging.ClearProviders();
+        webApplicationBuilder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+        webApplicationBuilder.Host.UseNLog();
+        return webApplicationBuilder;
     }
 }

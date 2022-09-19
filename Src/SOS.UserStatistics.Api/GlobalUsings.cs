@@ -1,4 +1,7 @@
 ﻿global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.AspNetCore.Diagnostics;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.OpenApi.Models;
 global using Nest;
 global using NLog;
@@ -29,9 +32,9 @@ global using SOS.UserStatistics.Api.Managers.Interfaces;
 global using SOS.UserStatistics.Api.Models;
 global using SOS.UserStatistics.Api.Repositories.Interfaces;
 global using SOS.UserStatistics.Extensions;
-global using System.Reflection;
-global using Microsoft.AspNetCore.Diagnostics;
-global using System.Net;
-global using Microsoft.Extensions.Caching.Memory;
 global using System.Collections.Concurrent;
+global using System.Net;
+global using System.Reflection;
+global using SpeciesCountUserStatisticsQuery = SOS.UserStatistics.Api.Models.SpeciesCountUserStatisticsQuery;
+global using UserStatisticsItem = SOS.UserStatistics.Api.Models.UserStatisticsItem;
 

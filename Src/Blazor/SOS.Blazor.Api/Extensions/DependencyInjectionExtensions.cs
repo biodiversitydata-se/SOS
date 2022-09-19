@@ -6,11 +6,11 @@ public static class DependencyInjectionExtensions
 {
     public static WebApplicationBuilder SetupDependencies(this WebApplicationBuilder webApplicationBuilder)
     {
-        // Sos clients
+        // Sosclients
         webApplicationBuilder.Services.AddScoped<ISosClient, SosClient>();
         webApplicationBuilder.Services.AddScoped<ISosUserStatisticsClient, SosUserStatisticsClient>();
 
-        // Http clients
+        // Httpclients
         webApplicationBuilder.Services.AddHttpClient("SosClient", client =>
         {
             client.BaseAddress = new Uri(webApplicationBuilder.Configuration.GetSection("SosApiUrl").Value);

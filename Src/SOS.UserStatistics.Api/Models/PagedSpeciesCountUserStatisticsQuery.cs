@@ -7,12 +7,18 @@ public class PagedSpeciesCountUserStatisticsQuery : SpeciesCountUserStatisticsQu
 
     public override string ToString()
     {
-        return $"{nameof(Skip)}: {Skip}, {nameof(Take)}: {Take}, {nameof(SortByFeatureId)}: {SortByFeatureId}, {nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}";
+        return $"{nameof(Skip)}: {Skip}, {nameof(Take)}: {Take}, {nameof(SortByFeatureId)}: {SortByFeatureId}, " +
+            $"{nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, " +
+            $"{nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, " +
+            $"{nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}";
     }
 
     protected bool Equals(PagedSpeciesCountUserStatisticsQuery other)
     {
-        return Skip == other.Skip && Take == other.Take && SortByFeatureId == other.SortByFeatureId && TaxonId == other.TaxonId && Year == other.Year && SpeciesGroup == other.SpeciesGroup && AreaType == other.AreaType && FeatureId == other.FeatureId && SiteId == other.SiteId && ProjectId == other.ProjectId && IncludeOtherAreasSpeciesCount == other.IncludeOtherAreasSpeciesCount;
+        return Skip == other.Skip && Take == other.Take 
+            && SortByFeatureId == other.SortByFeatureId && TaxonId == other.TaxonId && Year == other.Year 
+            && SpeciesGroup == other.SpeciesGroup && AreaType == other.AreaType && FeatureId == other.FeatureId 
+            && SiteId == other.SiteId && ProjectId == other.ProjectId && IncludeOtherAreasSpeciesCount == other.IncludeOtherAreasSpeciesCount;
     }
 
     public override bool Equals(object obj)

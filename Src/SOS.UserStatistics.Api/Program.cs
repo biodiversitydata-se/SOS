@@ -5,14 +5,12 @@ logger.Info("Starting application...");
 try
 {
     var builder = WebApplication.CreateBuilder(args);
-    builder.Logging.SetupLogging();
-    builder.Host.UseNLog();
     builder.Services.AddMemoryCache();
-    builder.Services.AddEndpointsApiExplorer();
 
-    builder.SetupSwagger();
     builder.SetupUserSecrets();
     builder.SetupAuthentication();
+    builder.SetupLogging();
+    builder.SetupSwagger();
     builder.SetupDependencies();
     builder.RegisterModules();
 

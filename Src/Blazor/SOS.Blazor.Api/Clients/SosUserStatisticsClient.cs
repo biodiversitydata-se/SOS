@@ -1,4 +1,6 @@
-﻿namespace SOS.Blazor.Api.Clients;
+﻿using System.Diagnostics;
+
+namespace SOS.Blazor.Api.Clients;
 
 public class SosUserStatisticsClient : ISosUserStatisticsClient
 {
@@ -18,9 +20,8 @@ public class SosUserStatisticsClient : ISosUserStatisticsClient
     {
         //var response = await _client.PostAsync($"{_apiUrl}UserStatistics/SpeciesCountAggregation?skip={skip}&take={take}&useCache={useCache}", content);
         var url = $"userstatistics/pagedspeciescountaggregation?skip={skip}&take={take}&useCache={useCache}";
-        var res = await _httpClientFactory.CreateClient("SosUserStatisticsClient").PostAsJsonAsync<SpeciesCountUserStatisticsQuery>(url, query);
-
-        return res.IsSuccessStatusCode ? await res.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>()
-            : throw new Exception("Call to API failed, responseCode:" + res.StatusCode);
+        var response = await _httpClientFactory.CreateClient("SosUserStatisticsClient").PostAsJsonAsync<SpeciesCountUserStatisticsQuery>(url, query);
+        return response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>()
+            : throw new Exception("Call to API failed, responseCode:" + response.StatusCode);
     }
 }

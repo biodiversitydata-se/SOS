@@ -1,6 +1,6 @@
 ﻿namespace SOS.Blazor.Api.Extensions;
 
-internal static class ExceptionMiddlewareExtension
+public static class ExceptionMiddlewareExtension
 {
     internal static void ConfigureExceptionHandler(this IApplicationBuilder app, Logger logger, bool isDevelopment)
     {
