@@ -85,20 +85,23 @@ namespace SOS.Analysis.Api.Controllers
             {
                 CheckAuthorization(sensitiveObservations!.Value);
 
-                var boundingBox = await GetBoundingBoxAsync(searchFilter?.Geographics!);
+                searchFilter = await InitializeSearchFilterAsync(searchFilter);
+               
                 var validationResult = Result.Combine(
                     useEdgeLengthRatio ?? false ? ValidateDouble(edgeLength!.Value, 0.0, 1.0, "Edge length") : Result.Success(),
                     ValidateSearchFilter(searchFilter!),
                     ValidateInt(gridCellSizeInMeters!.Value, minLimit: 100, maxLimit: 100000, "Grid cell size in meters"),
-                    ValidateMetricTilesLimit(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters.Value));
+                    ValidateMetricTilesLimit(searchFilter.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters.Value));
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
+                var filter = searchFilter?.ToSearchFilter(UserId, sensitiveObservations.Value, "sv-SE")!;
+
                 var result = await _analysisManager.CalculateAooAndEooAsync(
-                    searchFilter?.ToSearchFilter(UserId, sensitiveObservations.Value, "sv-SE")!, 
+                    filter, 
                     gridCellSizeInMeters!.Value, 
                     useCenterPoint!.Value, 
                     edgeLength!.Value, 

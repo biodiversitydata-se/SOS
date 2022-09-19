@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Analysis.Api.Dtos.Filter;
 using SOS.Analysis.Api.Dtos.Filter.Enums;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
@@ -22,70 +20,53 @@ namespace SOS.Analysis.Api.Controllers
         private readonly int _tilesLimit;
 
         /// <summary>
-        /// Make envelope as small as possible
+        /// Get bounding box
         /// </summary>
-        /// <param name="geoShape"></param>
-        /// <param name="bboxLeft"></param>
-        /// <param name="bboxTop"></param>
-        /// <param name="bboxRight"></param>
-        /// <param name="bboxBottom"></param>
-        /// <param name="maxDistanceFromPoint"></param>
-        protected void AdjustEnvelopeByShape(
-           IGeoShape geoShape,
-           ref double? bboxLeft,
-           ref double? bboxTop,
-           ref double? bboxRight,
-           ref double? bboxBottom,
-           double? maxDistanceFromPoint)
+        /// <param name="filter"></param>
+        /// <param name="autoAdjustBoundingBox"></param>
+        /// <returns></returns>
+        private async Task<LatLonBoundingBoxDto> GetBoundingBoxAsync(
+            GeographicsFilterDto filter,
+            bool autoAdjustBoundingBox = true)
         {
-            if (geoShape == null)
-            {
-                return;
-            }
+            // Get geometry of sweden economic zone
+            var swedenGeometry = await _areaCache.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1");
 
-            Envelope envelope;
-            if (geoShape.Type.Equals("point", StringComparison.CurrentCultureIgnoreCase))
+            // Get bounding box of swedish economic zone
+            var swedenBoundingBox = swedenGeometry.ToGeometry().EnvelopeInternal;
+            var userBoundingBox = new Envelope(new[]
             {
-                if (maxDistanceFromPoint.HasValue)
+                new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
+                new Coordinate(filter?.BoundingBox?.BottomRight?.Longitude ?? 90, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
+                new Coordinate(filter?.BoundingBox?.BottomRight?.Longitude ?? 90, filter?.BoundingBox?.BottomRight?.Latitude ?? 0),
+                new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.BottomRight?.Latitude ?? 0),
+            });
+            var boundingBox = swedenBoundingBox.Intersection(userBoundingBox);
+
+            if (autoAdjustBoundingBox)
+            {
+                // If areas passed, adjust bounding box to them
+                if (filter?.Areas?.Any() ?? false)
                 {
-                    var geom = geoShape.ToGeometry();
-                    var sweref99TmGeom = geom.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
-                    var bufferedGeomSweref99Tm = sweref99TmGeom.Buffer(maxDistanceFromPoint.Value);
-                    var bufferedGeomWgs84 = bufferedGeomSweref99Tm.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
-                    envelope = bufferedGeomWgs84.EnvelopeInternal;
+                    var areas = await _areaCache.GetAreasAsync(filter.Areas.Select(a => ((AreaType)a.AreaType, a.FeatureId)));
+                    var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
+                    foreach (var areaGeometry in areaGeometries!)
+                    {
+                        boundingBox = boundingBox.AdjustByShape(areaGeometry, filter.MaxDistanceFromPoint);
+                    }
                 }
-                else
+
+                // If geometries passed, adjust bounding box to them
+                if (filter?.Geometries?.Any() ?? false)
                 {
-                    return;
+                    foreach (var areaGeometry in filter.Geometries)
+                    {
+                        boundingBox = boundingBox.AdjustByShape(areaGeometry, filter.MaxDistanceFromPoint);
+                    }
                 }
             }
-            else
-            {
-                envelope = geoShape.ToGeometry().EnvelopeInternal;
-            }
 
-
-            if (envelope.IsNull)
-            {
-                return;
-            }
-
-            if (!bboxLeft.HasValue || envelope.MinX < bboxLeft)
-            {
-                bboxLeft = envelope.MinX;
-            }
-            if (!bboxRight.HasValue || envelope.MaxX > bboxRight)
-            {
-                bboxRight = envelope.MaxX;
-            }
-            if (!bboxBottom.HasValue || envelope.MinY < bboxBottom)
-            {
-                bboxBottom = envelope.MinY;
-            }
-            if (!bboxTop.HasValue || envelope.MaxY > bboxTop)
-            {
-                bboxTop = envelope.MaxY;
-            }
+            return LatLonBoundingBoxDto.Create(boundingBox);
         }
 
         protected void CheckAuthorization(bool sensitiveObservations)
@@ -96,77 +77,12 @@ namespace SOS.Analysis.Api.Controllers
             }
         }
 
-        /// <summary>
-        /// Get bounding box
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="autoAdjustBoundingBox"></param>
-        /// <returns></returns>
-        protected async Task<Envelope> GetBoundingBoxAsync(
-            GeographicsFilterDto filter,
-            bool autoAdjustBoundingBox = true)
-        {
-            var bboxLeft = filter?.BoundingBox?.TopLeft?.Longitude;
-            var bboxTop = filter?.BoundingBox?.TopLeft?.Latitude;
-            var bboxRight = filter?.BoundingBox?.BottomRight?.Longitude;
-            var bboxBottom = filter?.BoundingBox?.BottomRight?.Latitude;
+        protected async Task<SearchFilterDto> InitializeSearchFilterAsync(SearchFilterDto filter) {
 
-            if (autoAdjustBoundingBox)
-            {
-                // If areas passed, adjust bounding box to them
-                if (filter?.Areas?.Any() ?? false)
-                {
-                    var areas = await _areaCache.GetAreasAsync(filter.Areas.Select(a => ((AreaType)a.AreaType, a.FeatureId)));
-                    var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
-                    //await _areaManager.GetGeometriesAsync(filter.Areas.Select(a => ((AreaType) a.AreaType, a.FeatureId)));
-                    foreach (var areaGeometry in areaGeometries)
-                    {
-                        AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom, filter.MaxDistanceFromPoint);
-                    }
-                }
-
-                // If geometries passed, adjust bounding box to them
-                if (filter?.Geometries?.Any() ?? false)
-                {
-                    foreach (var areaGeometry in filter.Geometries)
-                    {
-                        AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom, filter.MaxDistanceFromPoint);
-                    }
-                }
-            }
-
-            // Get geometry of sweden economic zone
-            var swedenGeometry = await _areaCache.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1");
-
-            // Get bounding box of swedish economic zone
-            var swedenBoundingBox = swedenGeometry.ToGeometry().EnvelopeInternal;
-
-            // If bounding box misses one or more values
-            if (!(bboxLeft.HasValue && bboxTop.HasValue && bboxRight.HasValue && bboxBottom.HasValue))
-            {
-                return autoAdjustBoundingBox ? swedenBoundingBox : null!;
-            }
-
-            // Create a bound box using user passed values
-            var boundingBox = Geometry.DefaultFactory.CreatePolygon(new LinearRing(new[]
-            {
-                new Coordinate(bboxLeft.Value, bboxTop.Value),
-                new Coordinate(bboxLeft.Value, bboxBottom.Value),
-                new Coordinate(bboxRight.Value, bboxBottom.Value),
-                new Coordinate(bboxRight.Value, bboxTop.Value),
-                new Coordinate(bboxLeft.Value, bboxTop.Value),
-            })).EnvelopeInternal;
-
-            // Try to intersect sweden and user defined bb
-            boundingBox = swedenBoundingBox.Intersection(boundingBox);
-
-            // If user bb outside of sweden, use sweden
-            if (boundingBox.IsNull)
-            {
-                boundingBox = swedenBoundingBox;
-            }
-
-            return boundingBox;
+            filter ??= new SearchFilterDto();
+            filter.Geographics ??= new GeographicsFilterDto();
+            filter.Geographics.BoundingBox = await GetBoundingBoxAsync(filter.Geographics);
+            return filter;
         }
 
         /// <summary>
@@ -280,7 +196,6 @@ namespace SOS.Analysis.Api.Controllers
             return Result.Success();
         }
 
-
         /// <summary>
         /// Validate serach filter
         /// </summary>
@@ -313,17 +228,17 @@ namespace SOS.Analysis.Api.Controllers
                 errors.Add("Modified from date can't be greater tha to date");
             }
 
-            if (filter.Taxon?.RedListCategories?.Any() ?? false)
+            if (filter?.Taxon?.RedListCategories?.Any() ?? false)
             {
                 errors.AddRange(filter.Taxon.RedListCategories
                     .Where(rc => !new[] { "DD", "EX", "RE", "CR", "EN", "VU", "NT", "LC", "NA", "NE" }.Contains(rc, StringComparer.CurrentCultureIgnoreCase))
                     .Select(rc => $"Red list category doesn't exist ({rc})"));
             }
-            if (filter.Date?.DateFilterType == DateFilterTypeDto.OnlyStartDate && (filter.Date?.StartDate == null || filter.Date?.EndDate == null))
+            if (filter?.Date?.DateFilterType == DateFilterTypeDto.OnlyStartDate && (filter.Date?.StartDate == null || filter.Date?.EndDate == null))
             {
                 errors.Add("When using OnlyStartDate as filter both StartDate and EndDate need to be specified");
             }
-            if (filter.Date?.DateFilterType == DateFilterTypeDto.OnlyEndDate && (filter.Date?.StartDate == null || filter.Date?.EndDate == null))
+            if (filter?.Date?.DateFilterType == DateFilterTypeDto.OnlyEndDate && (filter.Date?.StartDate == null || filter.Date?.EndDate == null))
             {
                 errors.Add("When using OnlyEndDate as filter both StartDate and EndDate need to be specified");
             }

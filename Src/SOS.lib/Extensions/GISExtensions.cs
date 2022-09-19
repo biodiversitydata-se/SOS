@@ -234,6 +234,52 @@ namespace SOS.Lib.Extensions
 
         #region Public
 
+        /// <summary>
+        /// Make envelope as small as possible
+        /// </summary>
+        /// <param name="geoShape"></param>
+        /// <param name="boundingBox"></param>
+        /// <param name="maxDistanceFromPoint"></param>
+        /// <returns></returns>
+        public static Envelope AdjustByShape(
+           this Envelope boundingBox,
+           IGeoShape geoShape,
+           double? maxDistanceFromPoint)
+        {
+            if (geoShape == null)
+            {
+                return boundingBox;
+            }
+
+            Envelope envelope;
+            if (geoShape.Type.Equals("point", StringComparison.CurrentCultureIgnoreCase))
+            {
+                if (maxDistanceFromPoint.HasValue)
+                {
+                    var geom = geoShape.ToGeometry();
+                    var sweref99TmGeom = geom.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
+                    var bufferedGeomSweref99Tm = sweref99TmGeom.Buffer(maxDistanceFromPoint.Value);
+                    var bufferedGeomWgs84 = bufferedGeomSweref99Tm.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+                    envelope = bufferedGeomWgs84.EnvelopeInternal;
+                }
+                else
+                {
+                    return boundingBox;
+                }
+            }
+            else
+            {
+                envelope = geoShape.ToGeometry().EnvelopeInternal;
+            }
+
+            if (envelope.IsNull)
+            {
+                return boundingBox;
+            }
+
+            return boundingBox.Intersection(envelope);
+        }
+
         public static long CalculateNumberOfTiles(this Envelope envelope,
             int zoom)
         {

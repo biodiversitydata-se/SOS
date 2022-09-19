@@ -12,6 +12,7 @@ using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Lib.Cache.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
 {

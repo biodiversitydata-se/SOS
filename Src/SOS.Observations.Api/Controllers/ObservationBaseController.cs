@@ -2,9 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using NetTopologySuite.Geometries;
+using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Observations.Api.Configuration;
+using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
 
@@ -31,6 +36,73 @@ namespace SOS.Observations.Api.Controllers
         {
             ObservationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
+        }
+
+        /// <summary>
+        /// Get bounding box
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="autoAdjustBoundingBox"></param>
+        /// <returns></returns>
+        protected async Task<LatLonBoundingBoxDto> GetBoundingBoxAsync(
+            GeographicsFilterDto filter,
+            bool autoAdjustBoundingBox = true)
+        {
+            // Get geometry of sweden economic zone
+            var swedenGeometry = await AreaManager.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1");
+
+            // Get bounding box of swedish economic zone
+            var swedenBoundingBox = swedenGeometry.ToGeometry().EnvelopeInternal;
+            var userBoundingBox = new Envelope(new[]
+            {
+                new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
+                new Coordinate(filter?.BoundingBox?.BottomRight?.Longitude ?? 90, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
+                new Coordinate(filter?.BoundingBox?.BottomRight?.Longitude ?? 90, filter?.BoundingBox?.BottomRight?.Latitude ?? 0),
+                new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.BottomRight?.Latitude ?? 0),
+            });
+            var boundingBox = swedenBoundingBox.Intersection(userBoundingBox);
+
+            if (autoAdjustBoundingBox)
+            {
+                // If areas passed, adjust bounding box to them
+                if (filter?.Areas?.Any() ?? false)
+                {
+                    var areas = await AreaManager.GetAreasAsync(filter.Areas.Select(a => (a.AreaType, a.FeatureId)));
+                    var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
+                    foreach (var areaGeometry in areaGeometries!)
+                    {
+                        boundingBox = boundingBox.AdjustByShape(areaGeometry, filter.MaxDistanceFromPoint);
+                    }
+                }
+
+                // If geometries passed, adjust bounding box to them
+                if (filter?.Geometries?.Any() ?? false)
+                {
+                    foreach (var areaGeometry in filter.Geometries)
+                    {
+                        boundingBox = boundingBox.AdjustByShape(areaGeometry, filter.MaxDistanceFromPoint);
+                    }
+                }
+            }
+
+            return LatLonBoundingBoxDto.Create(boundingBox);
+        }
+
+        protected async Task<SearchFilterBaseDto> InitializeSearchFilterAsyncx(SearchFilterBaseDto filter)
+        {
+
+            filter ??= new SearchFilterDto();
+            filter.Geographics ??= new GeographicsFilterDto();
+            filter.Geographics.BoundingBox = await GetBoundingBoxAsync(filter.Geographics);
+            return filter;
+        }
+
+        protected async Task<T> InitializeSearchFilterAsync<T>(T filter) where T : SearchFilterBaseDto
+        {
+            filter ??= new SearchFilterBaseDto() as T;
+            filter.Geographics ??= new GeographicsFilterDto();
+            filter.Geographics.BoundingBox = await GetBoundingBoxAsync(filter.Geographics);
+            return filter;
         }
 
         protected string ReplaceDomain(string str, string domain, string path)

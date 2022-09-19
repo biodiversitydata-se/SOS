@@ -834,8 +834,8 @@ namespace SOS.Lib.Repositories.Processed
                     .TrackTotalHits(false)
                 );
 
-                var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-                return epoch.AddMilliseconds(res.Aggregations?.Max("latestModified")?.Value ?? 0).ToUniversalTime();
+                var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                return epoch.AddMilliseconds(res.Aggregations?.Max("latestModified")?.Value ?? 0);
             }
             catch (Exception e)
             {

@@ -249,14 +249,6 @@ namespace SOS.Observations.Api.Extensions
             return filter;
         }
 
-        public static void OverrideBoundingBox(this SearchFilter filter, LatLonBoundingBox boundingbox)
-        {
-            filter ??= new SearchFilter(0, false);
-            filter.Location ??= new LocationFilter();
-            filter.Location.Geometries ??= new GeographicsFilter();
-            filter.Location.Geometries.BoundingBox = boundingbox;
-        }
-
         public static GeoGridTileTaxonPageResultDto ToGeoGridTileTaxonPageResultDto(this GeoGridTileTaxonPageResult pageResult)
         {
             return new GeoGridTileTaxonPageResultDto

@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -41,137 +40,6 @@ namespace SOS.Observations.Api.Controllers
         private readonly int _tilesLimit;
         private readonly IEnumerable<int> _signalSearchTaxonListIds;
         private readonly ILogger<ObservationsController> _logger;
-
-        private void AdjustEnvelopeByShape(
-            IGeoShape geoShape,
-            ref double? bboxLeft,
-            ref double? bboxTop,
-            ref double? bboxRight,
-            ref double? bboxBottom,
-            double? maxDistanceFromPoint)
-        {
-            if (geoShape == null)
-            {
-                return;
-            }
-
-            Envelope envelope;
-            if (geoShape.Type.Equals("point", StringComparison.CurrentCultureIgnoreCase))
-            {
-                if (maxDistanceFromPoint.HasValue)
-                {
-                    var geom = geoShape.ToGeometry();
-                    var sweref99TmGeom = geom.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
-                    var bufferedGeomSweref99Tm = sweref99TmGeom.Buffer(maxDistanceFromPoint.Value);
-                    var bufferedGeomWgs84 = bufferedGeomSweref99Tm.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
-                    envelope = bufferedGeomWgs84.EnvelopeInternal;
-                }
-                else
-                {
-                    return;
-                }
-            }
-            else
-            {
-                envelope = geoShape.ToGeometry().EnvelopeInternal;
-            }
-
-
-            if (envelope.IsNull)
-            {
-                return;
-            }
-
-            if (!bboxLeft.HasValue || envelope.MinX < bboxLeft)
-            {
-                bboxLeft = envelope.MinX;
-            }
-            if (!bboxRight.HasValue || envelope.MaxX > bboxRight)
-            {
-                bboxRight = envelope.MaxX;
-            }
-            if (!bboxBottom.HasValue || envelope.MinY < bboxBottom)
-            {
-                bboxBottom = envelope.MinY;
-            }
-            if (!bboxTop.HasValue || envelope.MaxY > bboxTop)
-            {
-                bboxTop = envelope.MaxY;
-            }
-        }
-
-        /// <summary>
-        /// Get bounding box
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="autoAdjustBoundingBox"></param>
-        /// <returns></returns>
-        private async Task<Envelope> GetBoundingBoxAsync(
-            GeographicsFilterDto filter,
-            bool autoAdjustBoundingBox = true)
-        {
-            var bboxLeft = filter?.BoundingBox?.TopLeft?.Longitude;
-            var bboxTop = filter?.BoundingBox?.TopLeft?.Latitude;
-            var bboxRight = filter?.BoundingBox?.BottomRight?.Longitude;
-            var bboxBottom = filter?.BoundingBox?.BottomRight?.Latitude;
-
-            if (autoAdjustBoundingBox)
-            {
-                // If areas passed, adjust bounding box to them
-                if (filter?.Areas?.Any() ?? false)
-                {
-                    var areas = await AreaManager.GetAreasAsync(filter.Areas.Select(a => (a.AreaType, a.FeatureId)));
-                    var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
-                    //await _areaManager.GetGeometriesAsync(filter.Areas.Select(a => ((AreaType) a.AreaType, a.FeatureId)));
-                    foreach (var areaGeometry in areaGeometries)
-                    {
-                        AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom, filter.MaxDistanceFromPoint);
-                    }
-                }
-
-                // If geometries passed, adjust bounding box to them
-                if (filter?.Geometries?.Any() ?? false)
-                {
-                    foreach (var areaGeometry in filter.Geometries)
-                    {
-                        AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom, filter.MaxDistanceFromPoint);
-                    }
-                }
-            }
-
-            // Get geometry of sweden economic zone
-            var swedenGeometry = await AreaManager.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1");
-
-            // Get bounding box of swedish economic zone
-            var swedenBoundingBox = swedenGeometry.ToGeometry().EnvelopeInternal;
-
-            // If bounding box misses one or more values
-            if (!(bboxLeft.HasValue && bboxTop.HasValue && bboxRight.HasValue && bboxBottom.HasValue))
-            {
-                return autoAdjustBoundingBox ? swedenBoundingBox : null;
-            }
-
-            // Create a bound box using user passed values
-            var boundingBox = Geometry.DefaultFactory.CreatePolygon(new LinearRing(new[]
-            {
-                new Coordinate(bboxLeft.Value, bboxTop.Value),
-                new Coordinate(bboxLeft.Value, bboxBottom.Value),
-                new Coordinate(bboxRight.Value, bboxBottom.Value),
-                new Coordinate(bboxRight.Value, bboxTop.Value),
-                new Coordinate(bboxLeft.Value, bboxTop.Value),
-            })).EnvelopeInternal;
-
-            // Try to intersect sweden and user defined bb
-            boundingBox = swedenBoundingBox.Intersection(boundingBox);
-
-            // If user bb outside of sweden, use sweden
-            if (boundingBox.IsNull)
-            {
-                boundingBox = swedenBoundingBox;
-            }
-
-            return boundingBox;
-        }
 
         /// <summary>
         ///  Validate signal search filter
@@ -364,6 +232,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 CheckAuthorization(sensitiveObservations);
+                filter = await InitializeSearchFilterAsync(filter);
 
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success());
@@ -443,8 +312,9 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 CheckAuthorization(sensitiveObservations);
+                filter = await InitializeSearchFilterAsync(filter);
+                var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
 
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
@@ -458,7 +328,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, translationCultureCode);
-                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(
                     roleId,
@@ -510,8 +379,9 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 CheckAuthorization(sensitiveObservations);
+                filter = await InitializeSearchFilterAsync(filter);
+                var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
 
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
@@ -523,8 +393,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, "en-GB");
-                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
-
                 var result = await ObservationManager.GetMetricGridAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters);
@@ -765,10 +633,10 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 CheckAuthorization(sensitiveObservations);
-
+                filter = await InitializeSearchFilterAsync(filter);
+                var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
-
+                
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
@@ -781,9 +649,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, translationCultureCode);
-
-                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
-
                 var result = await _taxonSearchManager.GetTaxonAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier,
@@ -1031,10 +896,10 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 CheckAuthorization(sensitiveObservations);
-
+                filter = await InitializeSearchFilterAsync(filter);
+                var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
-
+               
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
@@ -1047,7 +912,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(UserId, sensitiveObservations, translationCultureCode);
-                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
               
@@ -1098,9 +962,9 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 CheckAuthorization(sensitiveObservations);
-
+                filter = await InitializeSearchFilterAsync(filter);
+                var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
@@ -1113,9 +977,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, translationCultureCode);
-
-                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
-
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
 
                 string strJson = result.GetFeatureCollectionGeoJson();
@@ -1198,8 +1059,9 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                filter = await InitializeSearchFilterAsync(filter);
+                var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
@@ -1212,9 +1074,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(UserId, false, translationCultureCode);
-
-                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
-
                 var result = await _taxonSearchManager.GetPageGeoTileTaxaAggregationAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(UserId, false, translationCultureCode), zoom, geoTilePage, taxonIdPage);
                 if (result.IsFailure)
                 {
@@ -1259,8 +1118,8 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 CheckAuthorization(sensitiveObservations);
-
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
+                filter = await InitializeSearchFilterAsync(filter);
+                var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
@@ -1272,8 +1131,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, "en-GB");
-                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
-
                 var result = await ObservationManager.GetMetricGridAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters);
@@ -1638,9 +1495,9 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 CheckAuthorization(sensitiveObservations);
-
+                filter = await InitializeSearchFilterAsync(filter);
+                var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
@@ -1653,8 +1510,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(UserId, sensitiveObservations, translationCultureCode);
-                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
-
                 var result = await _taxonSearchManager.GetTaxonAggregationAsync(roleId,
                     authorizationApplicationIdentifier,
                     searchFilter,
