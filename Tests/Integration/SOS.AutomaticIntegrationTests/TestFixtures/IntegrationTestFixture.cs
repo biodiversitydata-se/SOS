@@ -69,7 +69,6 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         public ArtportalenChecklistFactory ArtportalenChecklistFactory { get; set; }
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
-        public UserStatisticsController UserStatisticsController { get; private set; }
         public ChecklistsController ChecklistsController { get; private set; }
         public ExportsController ExportsController { get; private set; }
         public SystemsController SystemsController { get; private set; }
@@ -313,9 +312,6 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(_processClient, new NullLogger<UserExportRepository>());
-            var userStatisticsManager = new UserStatisticsManager(UserObservationRepository, processedObservationRepository, new NullLogger<UserStatisticsManager>());
-            UserStatisticsController = new UserStatisticsController(userStatisticsManager, taxonManager, areaManager,
-                new NullLogger<UserStatisticsController>());
             ObservationsController = new ObservationsController(observationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
             var checklistManager = new ChecklistManager(ProcessedChecklistRepository, processedObservationRepository, filterManager, new NullLogger<ChecklistManager>());
             ChecklistsController = new ChecklistsController(checklistManager, taxonManager, new NullLogger<ChecklistsController>());

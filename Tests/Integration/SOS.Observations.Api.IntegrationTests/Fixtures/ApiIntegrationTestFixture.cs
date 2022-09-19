@@ -54,7 +54,6 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public ObservationsController ObservationsController { get; private set; }
         public ObservationManager ObservationManager { get; private set; }
         public LocationsController LocationsController { get; private set; }
-        public UserStatisticsController UserStatisticsController { get; private set; }
         public ExportsController ExportsController { get; private set; }
         public SystemsController SystemsController { get; private set; }
         public VocabulariesController VocabulariesController { get; private set; }
@@ -248,9 +247,6 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processTimeManager = new ProcessTimeManager(new ProcessConfiguration());
             SersObservationVerbatimRepository = new SersObservationVerbatimRepository(importClient, new NullLogger<SersObservationVerbatimRepository>());
             var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
-            var userObservationRepository = new UserObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<UserObservationRepository>());
-            var userStatisticsManager = new UserStatisticsManager(userObservationRepository, processedObservationRepository, new NullLogger<UserStatisticsManager>());
-            UserStatisticsController = new UserStatisticsController(userStatisticsManager, taxonManager, areaManager, new NullLogger<UserStatisticsController>());
             var processedLocationController = new ProcessedLocationRepository(elasticClientManager,
                 elasticConfiguration, processedConfigurationCache, new HttpContextAccessor(),
                 new NullLogger<ProcessedLocationRepository>());
