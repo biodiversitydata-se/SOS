@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace SOS.Blazor.Api.Clients;
+﻿namespace SOS.Blazor.Api.Clients;
 
 public class SosUserStatisticsClient : ISosUserStatisticsClient
 {
@@ -20,10 +18,11 @@ public class SosUserStatisticsClient : ISosUserStatisticsClient
         {
             var watch = new Stopwatch();
             watch.Start();
-            var response = await _httpClientFactory.CreateClient("SosUserStatisticsClient").PostAsJsonAsync<SpeciesCountUserStatisticsQuery>(url, query);
+            var response = await _httpClientFactory.CreateClient("SosUserStatisticsClient").PostAsJsonAsync(url, query);
             var data = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
             watch.Stop();
-            Debug.WriteLine($"Response time: {watch.Elapsed.TotalMilliseconds}");
+            data.ResponseTime = watch.Elapsed.TotalMilliseconds;
+            Debug.WriteLine($"Response time: {data.ResponseTime}");
             return (response, data);
         };
 

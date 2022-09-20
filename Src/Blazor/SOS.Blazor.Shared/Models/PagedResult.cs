@@ -25,4 +25,7 @@ public class PagedResult<T>
     /// Paged records
     /// </summary>
     public IEnumerable<T> Records { get; set; }
+
+    // Response time
+    public double ResponseTime { get; set; }
 }
