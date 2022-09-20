@@ -2585,7 +2585,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Size(ScrollBatchSize)
                     ) :
                      await Client
-                    .ScrollAsync<Observation>(ScrollTimeout, scrollId);
+                    .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
 
                 if (!queryResponse.IsValid)
                 {
