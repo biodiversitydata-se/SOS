@@ -33,11 +33,14 @@
 </div>
 <Paginator Value="@_pagination"/>
 
+<p>Response time: @_responseTime ms</p>
+
 
 @code {
     GridItemsProvider<ProvinceUserStatisticsItem>? _userStatisticsProvider;
     PaginationState _pagination = new PaginationState { ItemsPerPage = 20 };
     private bool _useCache = true;
+    private double _responseTime;
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,6 +65,7 @@
                 var response = await _httpClient.PostAsJsonAsync(url, query);
                 var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
                 var records = pagedResult!.Records.Select(ProvinceUserStatisticsItem.Create).ToList();
+                _responseTime = pagedResult.ResponseTime;
                 return GridItemsProviderResult.From(
                     items: records,
                     totalItemCount: (int)pagedResult!.TotalCount);
