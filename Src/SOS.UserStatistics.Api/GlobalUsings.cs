@@ -35,6 +35,4 @@ global using SOS.UserStatistics.Extensions;
 global using System.Collections.Concurrent;
 global using System.Net;
 global using System.Reflection;
-global using SpeciesCountUserStatisticsQuery = SOS.UserStatistics.Api.Models.SpeciesCountUserStatisticsQuery;
-global using UserStatisticsItem = SOS.UserStatistics.Api.Models.UserStatisticsItem;
 
