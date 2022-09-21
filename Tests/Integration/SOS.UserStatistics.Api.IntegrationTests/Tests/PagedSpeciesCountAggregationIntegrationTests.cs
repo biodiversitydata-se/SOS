@@ -46,11 +46,11 @@ public class PagedSpeciesCountAggregationIntegrationTests
         {
             query = query.Clone();
             query.TaxonId = i;
-            await _fixture.UserStatisticsManager.PagedSpeciesCountSearchAsync(query, 0, 30);
+            await _fixture.UserStatisticsManager.PagedSpeciesCountSearchAsync(query, 0, 5);
         }
 
         // Assert
-        initialResult.Records.Count().Should().Be(30, "because the take parameter is 5");
+        initialResult.Records.Count().Should().Be(5, "because the take parameter is 5");
     }
 
 }
