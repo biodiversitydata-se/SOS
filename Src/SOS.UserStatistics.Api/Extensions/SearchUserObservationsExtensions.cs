@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Nest;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Statistics;
+﻿using SOS.Lib;
 
 public static class SearchUserObservationsExtensions
 {

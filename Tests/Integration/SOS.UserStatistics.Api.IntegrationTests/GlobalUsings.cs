@@ -7,7 +7,6 @@ global using Microsoft.Extensions.Logging.Abstractions;
 global using MongoDB.Bson.Serialization.Conventions;
 global using Moq;
 global using SOS.Lib.Cache;
-global using SOS.Lib.Configuration.ObservationApi;
 global using SOS.Lib.Configuration.Shared;
 global using SOS.Lib.Database;
 global using SOS.Lib.Database.Interfaces;

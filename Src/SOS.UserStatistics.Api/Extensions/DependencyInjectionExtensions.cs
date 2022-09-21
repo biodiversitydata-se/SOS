@@ -35,7 +35,7 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddScoped<ITaxonRepository, TaxonRepository>();
         webApplicationBuilder.Services.AddScoped<ITaxonListRepository, TaxonListRepository>();
         webApplicationBuilder.Services.AddScoped<IUserObservationRepository, UserStatisticsObservationRepository>();
-        webApplicationBuilder.Services.AddScoped<IProcessedObservationRepository, UserStatisticsProcessedObservationRepository>();
+        webApplicationBuilder.Services.AddScoped<IProcessedObservationCoreRepository, UserStatisticsProcessedObservationRepository>();
         webApplicationBuilder.Services.AddScoped<IUserStatisticsObservationRepository, UserStatisticsObservationRepository>();
         webApplicationBuilder.Services.AddScoped<IUserStatisticsProcessedObservationRepository, UserStatisticsProcessedObservationRepository>();
         return webApplicationBuilder;
