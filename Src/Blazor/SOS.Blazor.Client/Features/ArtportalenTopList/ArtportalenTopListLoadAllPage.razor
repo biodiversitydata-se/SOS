@@ -46,7 +46,7 @@
 @code {
     PaginationState _pagination = new PaginationState { ItemsPerPage = 20 };
     private static IEnumerable<Area> _provinces;
-    private string? _selectedProvinceFeatureId;
+    private string _selectedProvinceFeatureId;
     IQueryable<UserStatisticsItem> userStatisticsQueryable;
     private bool _useCache = true;
     private double _responseTime;
@@ -60,7 +60,7 @@
             _provinces = provincesResponse?.Records.OrderBy(a => Convert.ToInt32(a.FeatureId)).ToList();
 
             // Get user statistics
-            await GetUserStatistics();
+            await GetUserStatisticsAsync();
             await base.OnInitializedAsync();
         }
         catch (Exception ex)
@@ -72,12 +72,12 @@
     private async Task OnSelectProvinceChange(ChangeEventArgs e)
     {
         _selectedProvinceFeatureId = e?.Value?.ToString();
-        await GetUserStatistics();
+        await GetUserStatisticsAsync();
     }
 
-    private async Task GetUserStatistics()
+    private async Task GetUserStatisticsAsync()
     {
-        var url = _navManager.GetUriWithQueryParameters("userstatistics/pagedspeciescountaggregation", new Dictionary<string, object?> {
+        var url = _navManager.GetUriWithQueryParameters("userstatistics/pagedspeciescountaggregation", new Dictionary<string, object> {
             { "skip", 0 },
             { "take", 100000 },
             { "useCache", _useCache}

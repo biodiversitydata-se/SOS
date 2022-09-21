@@ -43,11 +43,11 @@
 <p>Response time: @_responseTime ms</p>
 
 @code {
-    QuickGrid<UserStatisticsItem>? myGrid;
-    GridItemsProvider<UserStatisticsItem>? _userStatisticsProvider;
+    QuickGrid<UserStatisticsItem> myGrid;
+    GridItemsProvider<UserStatisticsItem> _userStatisticsProvider;
     PaginationState _pagination = new PaginationState { ItemsPerPage = 20 };
-    private static IEnumerable<Area>? _provinces;
-    private string? _selectedProvinceFeatureId;
+    private static IEnumerable<Area> _provinces;
+    private string _selectedProvinceFeatureId;
     private bool _useCache = true;
     private double _responseTime;
 
@@ -57,25 +57,7 @@
         _provinces = provincesResponse?.Records.OrderBy(area => Convert.ToInt32(area.FeatureId)).ToList();
         _userStatisticsProvider = async req =>
         {
-            var url = _navManager.GetUriWithQueryParameters("userstatistics/pagedspeciescountaggregation", new Dictionary<string, object?> {
-                { "skip", req.StartIndex },
-                { "take", req.Count },
-                { "useCache", _useCache}
-                });
-            var query = new SpeciesCountUserStatisticsQuery();
-            if (!string.IsNullOrEmpty(_selectedProvinceFeatureId))
-            {
-                query.AreaType = AreaType.Province;
-                query.FeatureId = _selectedProvinceFeatureId;
-            }
-            var response = await _httpClient.PostAsJsonAsync(url, query);
-            var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
-            _responseTime = pagedResult.ResponseTime;
-            StateHasChanged();
-            return GridItemsProviderResult.From(
-                items: pagedResult!.Records.ToList(),
-                totalItemCount: (int)pagedResult!.TotalCount
-            );
+            return await GetUserStatisticsAsync(req);
         };
     }
 
@@ -84,5 +66,28 @@
         _selectedProvinceFeatureId = e?.Value?.ToString();
         await myGrid.RefreshDataAsync();
         StateHasChanged();
+    }
+
+    private async Task<GridItemsProviderResult<UserStatisticsItem>> GetUserStatisticsAsync(GridItemsProviderRequest<UserStatisticsItem> request)
+    {
+        var url = _navManager.GetUriWithQueryParameters("userstatistics/pagedspeciescountaggregation", new Dictionary<string, object> {
+                { "skip", request.StartIndex },
+                { "take", request.Count },
+                { "useCache", _useCache}
+                });
+        var query = new SpeciesCountUserStatisticsQuery();
+        if (!string.IsNullOrEmpty(_selectedProvinceFeatureId))
+        {
+            query.AreaType = AreaType.Province;
+            query.FeatureId = _selectedProvinceFeatureId;
+        }
+        var response = await _httpClient.PostAsJsonAsync(url, query);
+        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
+        _responseTime = pagedResult.ResponseTime;
+        StateHasChanged();
+        return GridItemsProviderResult.From(
+            items: pagedResult!.Records.ToList(),
+            totalItemCount: (int)pagedResult!.TotalCount
+        );
     }
 }
