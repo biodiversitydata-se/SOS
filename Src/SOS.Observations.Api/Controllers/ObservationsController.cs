@@ -488,7 +488,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Search observations and return in Darwin Core format.
         /// </summary>
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Application identifier making the request, used to get proper authorization</param>
@@ -501,6 +501,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="has">Geo,photos</param>
         /// <param name="minEventDate"></param>
         /// <param name="maxEventDate"></param>
+        /// <param name="dataProviderIds">By default only Artportalen observations are returned. If you want other data providers specify them as a comma separated list. E.g. "1,3,8,12"</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <param name="skip">Start index of returned observations.</param>
@@ -525,7 +526,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string has,
             [FromQuery] DateTime? minEventDate,
             [FromQuery] DateTime? maxEventDate,
-            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] string dataProviderIds = null,
+            [FromQuery] string translationCultureCode = "en-GB",
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
@@ -581,6 +583,17 @@ namespace SOS.Observations.Api.Controllers
                         StartDate = minEventDate,
                         EndDate = maxEventDate
                     };
+                }
+
+                if (!string.IsNullOrWhiteSpace(dataProviderIds))
+                {
+                    searchFilter.DatasourceIds = dataProviderIds.Split(",", StringSplitOptions.TrimEntries)
+                        .Select(int.Parse)
+                        .ToList();
+                }
+                else
+                {
+                    searchFilter.DatasourceIds = new List<int> { 1 }; // Artportalen.
                 }
 
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
