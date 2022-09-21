@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Lib.Models.UserService;
-using SOS.Observations.Api.Dtos.Vocabulary;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;

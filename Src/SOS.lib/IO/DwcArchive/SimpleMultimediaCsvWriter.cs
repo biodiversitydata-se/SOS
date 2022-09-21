@@ -33,7 +33,7 @@ namespace SOS.Lib.IO.DwcArchive
         {
             try
             {
-                var scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter);
+                var scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, null);
                 var hasRecords = scrollResult?.Records?.Any() ?? false;
                 if (!hasRecords) return false;
 

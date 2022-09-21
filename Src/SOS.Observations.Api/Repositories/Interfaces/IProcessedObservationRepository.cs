@@ -11,14 +11,6 @@ namespace SOS.Observations.Api.Repositories.Interfaces
     public interface IProcessedObservationRepository : IProcessedObservationCoreRepository
     {
         /// <summary>
-        /// Area species count
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="userIds"></param>
-        /// <returns></returns>
-        Task<List<UserStatisticsItem>> AreaSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery filter, List<int> userIds);
-        
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="filter"></param>
@@ -99,15 +91,6 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="protectedIndex"></param>
         /// <returns></returns>
         Task<bool> HasIndexOccurrenceIdDuplicatesAsync(bool protectedIndex);
-
-        /// <summary>
-        /// Paged species count
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
-        Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query, int? skip, int? take);
 
         /// <summary>
         /// Signal search

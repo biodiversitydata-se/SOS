@@ -1,30 +1,31 @@
-﻿namespace SOS.Blazor.Shared.Models
+﻿namespace SOS.Blazor.Shared.Models;
+
+/// <summary>
+/// Result returned by paged query
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public class PagedResult<T>
 {
     /// <summary>
-    ///     Result returned by paged query
+    /// Ignores the specified number of items and returns a sequence starting at the item after the last skipped item (if any)
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class PagedResult<T>
-    {
-        /// <summary>
-        ///     Ignores the specified number of items and returns a sequence starting at the item after the last skipped item (if
-        ///     any)
-        /// </summary>
-        public int Skip { get; set; }
+    public int Skip { get; set; }
 
-        /// <summary>
-        ///     Returns a sequence containing up to the specified number of items. Anything after the count is ignored
-        /// </summary>
-        public int Take { get; set; }
+    /// <summary>
+    /// Returns a sequence containing up to the specified number of items. Anything after the count is ignored
+    /// </summary>
+    public int Take { get; set; }
 
-        /// <summary>
-        ///     Total number of records matching the query
-        /// </summary>
-        public long TotalCount { get; set; }
+    /// <summary>
+    /// Total number of records matching the query
+    /// </summary>
+    public long TotalCount { get; set; }
 
-        /// <summary>
-        ///     Paged records
-        /// </summary>
-        public IEnumerable<T> Records { get; set; }
-    }
+    /// <summary>
+    /// Paged records
+    /// </summary>
+    public IEnumerable<T> Records { get; set; }
+
+    // Response time
+    public double ResponseTime { get; set; }
 }

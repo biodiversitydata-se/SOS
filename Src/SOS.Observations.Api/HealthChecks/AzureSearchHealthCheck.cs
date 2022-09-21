@@ -92,9 +92,9 @@ namespace SOS.Observations.Api.HealthChecks
                     return new HealthCheckResult(HealthStatus.Unhealthy, $"No observations returned. Duration: {searchResult.Duration.TotalMilliseconds:N0}ms");
                 }
 
-                if (searchResult.Duration.TotalMilliseconds > 5000)
+                if (searchResult.Duration.TotalMilliseconds > 15000)
                 {
-                    return new HealthCheckResult(HealthStatus.Degraded, $"Duration is > 5000ms. Duration: {searchResult.Duration.TotalMilliseconds:N0}ms");
+                    return new HealthCheckResult(HealthStatus.Degraded, $"Duration is > 15000ms. Duration: {searchResult.Duration.TotalMilliseconds:N0}ms");
                 }
 
                 return new HealthCheckResult(HealthStatus.Healthy, $"Duration is {searchResult.Duration.TotalMilliseconds:N0}ms");

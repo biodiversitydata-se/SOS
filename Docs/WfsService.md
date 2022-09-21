@@ -1,11 +1,13 @@
-# OGC Web Feature Service (WFS)
-All public observations that SOS harvests are available in a OGC Web Feature Service (WFS) described on this page.
+# OGC Web Feature Service (WFS) - Technical overview
+All public observations that SOS harvests are available in a OGC Web Feature Service (WFS) described on this page. A [SOS WFS get started guide](WfsServiceGetStarted.md) is available on a separate page.
 - [WFS service overview](#wfs-service-overview)
 - [Service details](#service-details)
 - [HTTP Request examples](#http-request-examples)
 - [QGIS query examples](#qgis-query-examples)
 - [Fields](#fields)
 - [INSPIRE](#inspire)
+- [Known problems](#known-problems)
+- [Support](#support)
 
 ## WFS service overview
 | Name  	| Value 	|
@@ -120,3 +122,9 @@ The INSPIRE layers: SpeciesDistribution and HabitatsDistribution are available u
 | Name  	| Value 	|
 |:---	|:---	|
 | URL | https://sosgeo.artdata.slu.se/geoserver/wfs |
+
+## Known problems
+The WFS is using [GeoServer](https://geoserver.org/) and a plugin to GeoServer that has a [bug](https://github.com/ngageoint/elasticgeo/issues/122) leading to that requests sometimes stop being processed and no observations are returned until the server is restarted. This problem occurs about once a month. Currently we are restarting GeoServer once a day to try avoid that this problem affects users of the WFS.
+
+## Support
+In case of questions or problems, contact support at SLU Artdatabanken: artdatabanken@slu.se

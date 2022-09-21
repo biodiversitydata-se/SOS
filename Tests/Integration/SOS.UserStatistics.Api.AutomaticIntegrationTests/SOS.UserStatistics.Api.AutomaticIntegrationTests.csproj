@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<UserSecretsId>24b45b96-504a-4a16-b6b3-9e989ce27222</UserSecretsId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="appsettings.json" />
+		<None Remove="Resources\ArtportalenVerbatimChecklists_1000.json" />
+		<None Remove="Resources\ArtportalenVerbatimObservations_1000.json" />
+		<None Remove="Resources\ArtportalenVerbatimProtectedObservations_1000.json" />
+		<None Remove="Resources\DarwinCoreObservations_1000.json" />
+		<None Remove="Resources\TaxonCollection.zip" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\ArtportalenVerbatimChecklists_1000.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\ArtportalenVerbatimObservations_1000.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\ArtportalenVerbatimProtectedObservations_1000.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\DarwinCoreObservations_1000.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\TaxonCollection.zip">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Bogus" Version="34.0.2" />
+		<PackageReference Include="FluentAssertions" Version="6.7.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
+		<PackageReference Include="Moq" Version="4.18.2" />
+		<PackageReference Include="NBuilder" Version="6.1.0" />
+		<PackageReference Include="xunit" Version="2.4.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Src\SOS.Harvest\SOS.Harvest.csproj" />
+		<ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
+		<ProjectReference Include="..\..\..\Src\SOS.UserStatistics.Api\SOS.UserStatistics.Api.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -247,13 +247,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <summary>
         /// Scroll observations
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="filter"></param>
         /// <param name="scrollId"></param>
         /// <returns></returns>
-        Task<ScrollResult<dynamic>> ScrollObservationsAsync(
+        Task<ScrollResult<T>> ScrollObservationsAsync<T>(
             SearchFilterBase filter,
-            string scrollId = null);
+            string scrollId);
 
         /// <summary>
         /// Look for duplicates

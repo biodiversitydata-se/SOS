@@ -194,7 +194,7 @@ namespace SOS.Observations.Api.Extensions
                 StartDate = filter.StartDate,
                 EndDate = filter.EndDate,
                 DateFilterType = (DateFilter.DateRangeFilterType)(filter?.DateFilterType).GetValueOrDefault(),
-                TimeRanges = filter.TimeRanges?.Select(tr => (DateFilter.TimeRange)tr)
+                TimeRanges = filter.TimeRanges?.Select(tr => (DateFilter.TimeRange)tr).ToList()
             };
         }
 

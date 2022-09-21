@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1]
+
+ ### `Fixed`
+ - When searching with `TaxonListIds` underlying taxa will be added if `IncludeUnderlyingTaxa=true`.
+ - TimeRange file order bug.
+ - Aggregation by day bug.
+
 ## [1.5]
 
 **Prod**: 2022-05-24 

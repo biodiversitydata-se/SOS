@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Elasticsearch.Net;
@@ -14,6 +15,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
@@ -749,6 +751,18 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
+        /// Cast dynamic to observation
+        /// </summary>
+        /// <param name="dynamicObjects"></param>
+        /// <returns></returns>
+        private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)
+        {
+            if (dynamicObjects == null) return null;
+            return JsonSerializer.Deserialize<List<Observation>>(JsonSerializer.Serialize(dynamicObjects),
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+
+        /// <summary>
         /// Make sure no duplicates of occurrence id's exists in index
         /// </summary>
         /// <param name="protectedIndex"></param>
@@ -850,7 +864,7 @@ namespace SOS.Lib.Repositories.Processed
            string pointInTimeId = null,
            IEnumerable<object> searchAfter = null) where T : class
         {
-            var keepAlive = "10m";
+            var keepAlive = "20m";
             if (string.IsNullOrEmpty(pointInTimeId))
             {
                 var pitResponse = await Client.OpenPointInTimeAsync(searchIndex, pit => pit
@@ -948,7 +962,6 @@ namespace SOS.Lib.Repositories.Processed
                     });
         }
 
-        /// <summary>
         /// Constructor used in public mode
         /// </summary>
         /// <param name="elasticClientManager"></param>
@@ -1803,9 +1816,9 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<ScrollResult<dynamic>> ScrollObservationsAsync(
+        public async Task<ScrollResult<T>> ScrollObservationsAsync<T>(
             SearchFilterBase filter,
-            string scrollId = null)
+            string scrollId)
         {
             // Retry policy by Polly
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
@@ -1831,7 +1844,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Size(ScrollBatchSize)
                     ) :
                      await Client
-                    .ScrollAsync<Observation>(ScrollTimeout, scrollId);
+                    .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
 
                 if (!queryResponse.IsValid)
                 {
@@ -1841,9 +1854,9 @@ namespace SOS.Lib.Repositories.Processed
                 return queryResponse;
             });
 
-            return new ScrollResult<dynamic>
+            return new ScrollResult<T>
             {
-                Records = searchResponse.Documents,
+                Records = (typeof(T) == typeof(Observation) ? CastDynamicsToObservations(searchResponse.Documents) : searchResponse.Documents) as IEnumerable<T>,
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata?.Total?.Value ?? 0
             };

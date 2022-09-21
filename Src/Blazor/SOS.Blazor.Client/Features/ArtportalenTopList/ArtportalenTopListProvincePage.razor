@@ -33,38 +33,23 @@
 </div>
 <Paginator Value="@_pagination"/>
 
+<p>Response time: @_responseTime ms</p>
+
 
 @code {
-    GridItemsProvider<ProvinceUserStatisticsItem>? _userStatisticsProvider;
+    GridItemsProvider<ProvinceUserStatisticsItem> _userStatisticsProvider;
     PaginationState _pagination = new PaginationState { ItemsPerPage = 20 };
     private bool _useCache = true;
+    private double _responseTime;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             // Setup user statistics provider
-            _userStatisticsProvider = async req =>
+            _userStatisticsProvider = async req => 
             {
-                var url = _navManager.GetUriWithQueryParameters("UserStatistics/PagedSpeciesCountAggregation", new Dictionary<string, object?> {
-                    { "skip", req.StartIndex },
-                    { "take", req.Count },
-                    { "useCache", _useCache}
-                });
-                var query = new SpeciesCountUserStatisticsQuery();
-                query.IncludeOtherAreasSpeciesCount = true;
-                query.AreaType = AreaType.Province;
-                string? sortByColumn = req.SortByColumn?.Class;
-                if (!string.IsNullOrEmpty(sortByColumn))
-                {
-                    query.SortByFeatureId = sortByColumn;
-                }
-                var response = await _httpClient.PostAsJsonAsync(url, query);
-                var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
-                var records = pagedResult!.Records.Select(ProvinceUserStatisticsItem.Create).ToList();
-                return GridItemsProviderResult.From(
-                    items: records,
-                    totalItemCount: (int)pagedResult!.TotalCount);
+                return await GetProvinceUserStatisticsAsync(req);
             };
 
             await base.OnInitializedAsync();
@@ -73,5 +58,30 @@
         {
             Console.WriteLine($"There was a problem in OnInitializedAsync(): {ex.Message}");
         }
+    }
+
+    private async Task<GridItemsProviderResult<ProvinceUserStatisticsItem>> GetProvinceUserStatisticsAsync(GridItemsProviderRequest<ProvinceUserStatisticsItem> request)
+    {
+        var url = _navManager.GetUriWithQueryParameters("userstatistics/pagedspeciescountaggregation", new Dictionary<string, object> {
+                    { "skip", request.StartIndex },
+                    { "take", request.Count },
+                    { "useCache", _useCache}
+                });
+        var query = new SpeciesCountUserStatisticsQuery();
+        query.IncludeOtherAreasSpeciesCount = true;
+        query.AreaType = AreaType.Province;
+        string sortByColumn = request.SortByColumn?.Class;
+        if (!string.IsNullOrEmpty(sortByColumn))
+        {
+            query.SortByFeatureId = sortByColumn;
+        }
+        var response = await _httpClient.PostAsJsonAsync(url, query);
+        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
+        var records = pagedResult!.Records.Select(ProvinceUserStatisticsItem.Create).ToList();
+        _responseTime = pagedResult.ResponseTime;
+        StateHasChanged();
+        return GridItemsProviderResult.From(
+            items: records,
+            totalItemCount: (int)pagedResult!.TotalCount);
     }
 }

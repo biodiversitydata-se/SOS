@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
@@ -81,7 +82,7 @@ namespace SOS.Lib.Managers
             }
         }
 
-        public Dictionary<int, HashSet<int>> TaxonListSetById
+        public Dictionary<int, (HashSet<int> Taxa, HashSet<int> WithUnderlyingTaxa)> TaxonListSetById
         {
             get
             {
@@ -94,7 +95,7 @@ namespace SOS.Lib.Managers
                         _taxonListSetsByIdCache.Set(taxonListSetsById);
                     }
                 }
-
+                
                 return taxonListSetsById;
             }
         }
@@ -105,13 +106,12 @@ namespace SOS.Lib.Managers
             var taxonLists = await _taxonListRepository.GetAllAsync();
             foreach (var taxonList in taxonLists)
             {
-                taxonListSetById.Add(taxonList.Id, new HashSet<int>());
-                foreach (var taxon in taxonList.Taxa)
-                {
-                    taxonListSetById[taxonList.Id].Add(taxon.Id);
-                }
+                var tuple = (Taxa: new HashSet<int>(), WithUnderlyingTaxa: new HashSet<int>());
+                tuple.Taxa = taxonList.Taxa.Select(m => m.Id).ToHashSet();
+                tuple.WithUnderlyingTaxa = TaxonTree.GetUnderlyingTaxonIds(tuple.Taxa, true).ToHashSet();
+                taxonListSetById.Add(taxonList.Id, tuple);
             }
-
+            
             return taxonListSetById;
         }
 
