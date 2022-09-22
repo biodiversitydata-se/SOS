@@ -72,7 +72,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
         var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
         var taxonManager = CreateTaxonManager(processClient, taxonRepository, memoryCache);
-        var userStatisticsProcessedObservationRepository = CreateUserStatisticsProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
+        var userStatisticsProcessedObservationRepository = CreateUserStatisticsProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient);
 
         var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
         var userStatisticsObservationRepository = new UserStatisticsObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<UserObservationRepository>());
@@ -105,11 +105,8 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
     private UserStatisticsProcessedObservationRepository CreateUserStatisticsProcessedObservationRepository(
         ElasticSearchConfiguration elasticConfiguration,
         IElasticClientManager elasticClientManager,
-        IProcessClient processClient,
-        IMemoryCache memoryCache,
-        ITaxonManager taxonManager)
+        IProcessClient processClient)
     {
-        var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
         var userStatisticsProcessedObservationRepository = new UserStatisticsProcessedObservationRepository(
             elasticClientManager,
             elasticConfiguration,

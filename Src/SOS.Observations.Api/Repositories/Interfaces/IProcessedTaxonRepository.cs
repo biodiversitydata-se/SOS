@@ -27,16 +27,18 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <summary>
         /// Aggregate observations by taxon. Sort by observation count descending.
         /// </summary>
-        /// <param name="filter"></param>        
+        /// <param name="filter"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <param name="sumUnderlyingTaxa"></param>
+        /// <param name="noOfLatestHits"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,
             int? skip,
             int? take,
-            bool sumUnderlyingTaxa = false);        
+            bool sumUnderlyingTaxa = false,
+            int noOfLatestHits = 1);        
 
         /// <summary>
         /// Get taxon sum aggregation. Including underlying taxa and province count.
