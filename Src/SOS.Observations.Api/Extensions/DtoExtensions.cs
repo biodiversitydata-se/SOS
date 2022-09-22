@@ -664,7 +664,7 @@ namespace SOS.Observations.Api.Extensions
             {
                 dto.Day = observation.Event.StartDay;
                 dto.EndDayOfYear = observation.Event.EndDay;
-                dto.EventDate = observation.Event.PlainStartTime;
+                dto.EventDate = DwcFormatter.CreateDateIntervalString(observation.Event.StartDate, observation.Event.EndDate);
                 dto.EventID = observation.Event.EventId;
                 dto.EventRemarks = observation.Event.EventRemarks;
                 dto.EventTime = observation.Event.PlainStartTime;
@@ -676,7 +676,6 @@ namespace SOS.Observations.Api.Extensions
                 dto.SamplingEffort = observation.Event.SamplingEffort;
                 dto.SamplingProtocol = observation.Event.SamplingProtocol;
                 dto.StartDayOfYear = observation.Event.StartDay;
-
             }
 
             if (observation.Identification != null)
@@ -704,7 +703,6 @@ namespace SOS.Observations.Api.Extensions
                 dto.FootprintSRS = observation.Location.FootprintSRS;
                 dto.FootprintWKT = observation.Location.FootprintWKT;
                 dto.GeodeticDatum = observation.Location.GeodeticDatum;
-                dto.GeologicalContextID = observation.Location.GeodeticDatum;
                 dto.GeoreferencedBy = observation.Location.GeoreferencedBy;
                 dto.GeoreferencedDate = observation.Location.GeoreferencedDate;
                 dto.GeoreferenceProtocol = observation.Location.GeoreferenceProtocol;
@@ -728,6 +726,9 @@ namespace SOS.Observations.Api.Extensions
                 dto.PointRadiusSpatialFit = observation.Location.PointRadiusSpatialFit;
                 dto.StateProvince = observation.Location.Province?.Name;
                 dto.VerbatimLatitude = observation.Location.VerbatimLatitude;
+                dto.VerbatimLongitude = observation.Location.VerbatimLongitude;
+                dto.VerbatimCoordinateSystem = observation.Location.VerbatimCoordinateSystem;
+                dto.VerbatimSRS = observation.Location.VerbatimSRS;
             }
 
             if (observation.MaterialSample != null)
@@ -795,6 +796,9 @@ namespace SOS.Observations.Api.Extensions
                 dto.ScientificNameID = observation.Taxon.ScientificNameId;
                 dto.SpecificEpithet = observation.Taxon.SpecificEpithet;
                 dto.VernacularName = observation.Taxon.VernacularName;
+                dto.TaxonRank = observation.Taxon.TaxonRank;
+                dto.TaxonomicStatus = observation.Taxon.TaxonomicStatus;
+                dto.TaxonRemarks = observation.Taxon.TaxonRemarks;
             }
 
             return dto;

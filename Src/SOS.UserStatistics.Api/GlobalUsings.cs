@@ -35,4 +35,5 @@ global using SOS.UserStatistics.Extensions;
 global using System.Collections.Concurrent;
 global using System.Net;
 global using System.Reflection;
+global using System.IO.Compression;
 

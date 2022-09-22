@@ -15,7 +15,6 @@ global using SOS.Harvest.Managers;
 global using SOS.Harvest.Processors.Artportalen;
 global using SOS.Lib.Cache;
 global using SOS.Lib.Cache.Interfaces;
-global using SOS.Lib.Configuration.ObservationApi;
 global using SOS.Lib.Configuration.Process;
 global using SOS.Lib.Configuration.Shared;
 global using SOS.Lib.Database;

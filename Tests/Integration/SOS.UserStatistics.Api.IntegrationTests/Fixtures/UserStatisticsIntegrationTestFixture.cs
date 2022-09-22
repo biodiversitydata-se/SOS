@@ -114,8 +114,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
             elasticClientManager,
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
-            taxonManager,
-            new NullLogger<ProcessedObservationRepository>());
+            new NullLogger<ProcessedObservationCoreRepository>());
         return userStatisticsProcessedObservationRepository;
     }
 

@@ -40,6 +40,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string has,
             DateTime? minEventDate,
             DateTime? maxEventDate,
+            string dataProviderIds,
             string translationCultureCode,
             bool sensitiveObservations,
             int skip, 

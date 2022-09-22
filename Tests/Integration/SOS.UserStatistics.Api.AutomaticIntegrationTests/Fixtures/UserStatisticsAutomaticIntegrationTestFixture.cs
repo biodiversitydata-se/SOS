@@ -1,4 +1,5 @@
-﻿using Path = System.IO.Path;
+﻿using SOS.UserStatistics.Api.Configuration;
+using Path = System.IO.Path;
 
 namespace SOS.UserStatistics.Api.AutomaticIntegrationTests.Fixtures;
 
@@ -40,7 +41,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
         if (!elasticConfiguration.IndexPrefix.Contains("integrationtests"))
             throw new Exception("Elasticsearch configuration must use integrationtest index");
-        var observationApiConfiguration = GetObservationApiConfiguration();
+        var userStatisticsApiConfiguration = GetUserStatisticsApiConfiguration();
         var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
         var mongoDbConfiguration = GetMongoDbConfiguration();
         var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
@@ -110,11 +111,11 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         return userServiceConfiguration;
     }
 
-    protected ObservationApiConfiguration GetObservationApiConfiguration()
+    protected UserStatisticsApiConfiguration GetUserStatisticsApiConfiguration()
     {
         var config = GetAppSettings();
         var configPrefix = GetConfigPrefix(_installationEnvironment);
-        var observationApiConfiguration = config.GetSection($"{configPrefix}:ObservationApiConfiguration").Get<ObservationApiConfiguration>();
+        var observationApiConfiguration = config.GetSection($"{configPrefix}:UserStatisticsApiConfiguration").Get<UserStatisticsApiConfiguration>();
         return observationApiConfiguration;
     }
 
@@ -169,8 +170,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
             elasticClientManager,
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
-            taxonManager,
-            new NullLogger<ProcessedObservationRepository>());
+            new NullLogger<ProcessedObservationCoreRepository>());
         return userStatisticsProcessedObservationRepository;
     }
 

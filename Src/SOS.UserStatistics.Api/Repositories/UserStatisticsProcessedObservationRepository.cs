@@ -1,14 +1,13 @@
 ﻿namespace SOS.UserStatistics.Api.Repositories.Interfaces;
 
-public class UserStatisticsProcessedObservationRepository : ProcessedObservationRepository, IUserStatisticsProcessedObservationRepository
+public class UserStatisticsProcessedObservationRepository : ProcessedObservationCoreRepository, IUserStatisticsProcessedObservationRepository
 {
     public UserStatisticsProcessedObservationRepository(
         IElasticClientManager elasticClientManager,
         ElasticSearchConfiguration elasticConfiguration,
         ICache<string, ProcessedConfiguration> processedConfigurationCache,
-        ITaxonManager taxonManager,
-        ILogger<ProcessedObservationRepository> logger
-    ) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, logger)
+        ILogger<ProcessedObservationCoreRepository> logger
+    ) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, logger)
     {
 
     }
