@@ -7,7 +7,7 @@ public static class SearchUserObservationsExtensions
     {
         var query = new List<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>>();
 
-        if (filter != null)
+        if (filter == null)
         {
             return query;
         }
@@ -15,7 +15,6 @@ public static class SearchUserObservationsExtensions
         query.TryAddTermCriteria("year", filter.Year);
         query.TryAddTermCriteria("taxonId", filter.TaxonId);
         query.TryAddTermCriteria("speciesGroup", filter.SpeciesGroup);
-        query.AddSightingTypeFilters(SearchFilterBase.SightingTypeFilter.DoNotShowMerged);
         if (filter.AreaType.HasValue)
         {
             switch (filter.AreaType.Value)
@@ -45,9 +44,9 @@ public static class SearchUserObservationsExtensions
             return query;
         }
 
-        query.TryAddTermCriteria("year", filter.Year); // todo
+        query.TryAddTermCriteria("event.startYear", filter.Year); // todo
         query.TryAddTermCriteria("taxon.id", filter.TaxonId);
-        query.TryAddTermCriteria("speciesGroup", filter.SpeciesGroup); // todo
+        query.TryAddTermCriteria("taxon.attributes.speciesGroup", filter.SpeciesGroup); // todo
         query.AddSightingTypeFilters(SearchFilterBase.SightingTypeFilter.DoNotShowMerged);
 
         if (filter.AreaType.HasValue)

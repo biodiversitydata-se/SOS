@@ -169,7 +169,7 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
     //public async Task<PagedResult<dynamic>> TopListGetProvinceCrossLeagueAsync(SearchFilter filter, int skip, int take)
     public async Task<PagedResult<dynamic>> TopListGetProvinceCrossLeagueAsync(SpeciesCountUserStatisticsQuery filter, int skip, int take)
     {
-        var query = filter.ToQuery<Observation>();
+        var query = filter.ToProcessedObservationQuery<Observation>();
         //var (query, excludeQuery) = GetCoreQueries(filter);
 
         var searchResponse = await Client.SearchAsync<Observation>(s => s
