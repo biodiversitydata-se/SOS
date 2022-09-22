@@ -69,6 +69,7 @@ using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
+using SOS.Observations.Api.ApplicationInsights;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
@@ -169,7 +170,7 @@ namespace SOS.Observations.Api
             services.AddApplicationInsightsTelemetry(Configuration);
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<ApplicationInsights>());
+            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
@@ -470,8 +471,8 @@ namespace SOS.Observations.Api
             IApplicationBuilder app, 
             IWebHostEnvironment env, 
             IApiVersionDescriptionProvider apiVersionDescriptionProvider, 
-            TelemetryConfiguration configuration, 
-            ApplicationInsights applicationInsightsConfiguration, 
+            TelemetryConfiguration configuration,
+            Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration, 
             ObservationApiConfiguration observationApiConfiguration,
             IProtectedLogRepository protectedLogRepository)
         {

@@ -59,7 +59,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 null,
                 null,
                 searchFilter, 
-                OutputFieldSet.Minimum, 
+                OutputFieldSet.Minimum,
+                false,
                 PropertyLabelType.Swedish, 
                 "sv-SE");
             var bytes = response.GetFileContentResult();
@@ -98,7 +99,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 null,
                 null,
                 searchFilter, 
-                OutputFieldSet.Minimum, 
+                OutputFieldSet.Minimum,
+                false,
                 PropertyLabelType.Swedish, 
                 "sv-SE");
             var bytes = response.GetFileContentResult();
@@ -142,6 +144,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 null,
                 searchFilter,
                 OutputFieldSet.Minimum,
+                false,
                 PropertyLabelType.Swedish, 
                 "sv-SE",
                 false);

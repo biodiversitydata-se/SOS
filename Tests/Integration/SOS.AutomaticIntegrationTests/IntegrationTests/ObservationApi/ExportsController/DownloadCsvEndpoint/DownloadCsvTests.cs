@@ -58,6 +58,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
                 null,
                 searchFilter,
                 OutputFieldSet.Minimum,
+                false,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 false);
@@ -109,6 +110,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
                 null,
                 searchFilter,
                 OutputFieldSet.Minimum,
+                false,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 false);
@@ -157,6 +159,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
                 null,
                 searchFilter,
                 OutputFieldSet.None,
+                false,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 false);
@@ -167,6 +170,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
                 null,
                 searchFilter,
                 OutputFieldSet.None,
+                false,
                 PropertyLabelType.PropertyPath,
                 "sv-SE",
                 false);
@@ -177,6 +181,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
                 null,
                 searchFilter,
                 OutputFieldSet.None,
+                false,
                 PropertyLabelType.Swedish,
                 "sv-SE",
                 false);
@@ -187,6 +192,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
                 null,
                 searchFilter,
                 OutputFieldSet.None,
+                false,
                 PropertyLabelType.English,
                 "sv-SE",
                 false);
@@ -247,6 +253,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
                 null,
                 searchFilter,
                 OutputFieldSet.Minimum,
+                false,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 false);

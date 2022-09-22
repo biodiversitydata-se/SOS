@@ -113,7 +113,6 @@ namespace SOS.Administration.Gui
             services.AddSingleton<IClassCache<ProcessedConfiguration>, ClassCache<ProcessedConfiguration>>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
             services.Configure<ApiTestConfiguration>(
               Configuration.GetSection(nameof(ApiTestConfiguration)));

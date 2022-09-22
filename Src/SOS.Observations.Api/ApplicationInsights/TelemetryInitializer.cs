@@ -4,8 +4,9 @@ using Microsoft.ApplicationInsights.AspNetCore.TelemetryInitializers;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 
-namespace SOS.Lib.ApplicationInsights
+namespace SOS.Observations.Api.ApplicationInsights
 {
     /// <summary>
     /// 
@@ -61,19 +62,17 @@ namespace SOS.Lib.ApplicationInsights
                 telemetry.Context.User.AccountId = accountId;
             }
 
-            if (platformContext.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystem))
+            if (!telemetry.Context.GlobalProperties.ContainsKey("Requesting-System"))
             {
-                if (!telemetry.Context.GlobalProperties.ContainsKey("Requesting-System"))
+                var requestingSystem = new StringValues();
+                if (!platformContext.Request.Headers.TryGetValue("X-Requesting-System", out requestingSystem))
                 {
-                    telemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
+                    if (!platformContext.Request.Headers.TryGetValue("Requesting-System", out requestingSystem))
+                    {
+                        requestingSystem = new StringValues("N/A");
+                    }
                 }
-            }
-            else if (platformContext.Request.Headers.TryGetValue("Requesting-System", out requestingSystem))
-            {
-                if (!telemetry.Context.GlobalProperties.ContainsKey("Requesting-System"))
-                {
-                    telemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
-                }
+                telemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
             }
         }
 
@@ -82,7 +81,7 @@ namespace SOS.Lib.ApplicationInsights
         /// </summary>
         /// <param name="httpContextAccessor"></param>
         /// <param name="applicationInsightsConfiguration"></param>
-        public TelemetryInitializer(IHttpContextAccessor httpContextAccessor, Configuration.Shared.ApplicationInsights applicationInsightsConfiguration) : base(httpContextAccessor)
+        public TelemetryInitializer(IHttpContextAccessor httpContextAccessor, Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration) : base(httpContextAccessor)
         {
             _loggRequestBody = applicationInsightsConfiguration.EnableRequestBodyLogging;
             _loggSearchResponseCount = applicationInsightsConfiguration.EnableSearchResponseCountLogging;

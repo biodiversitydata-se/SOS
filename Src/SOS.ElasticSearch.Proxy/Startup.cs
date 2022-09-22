@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using SOS.ElasticSearch.Proxy.ApplicationInsights;
 using SOS.ElasticSearch.Proxy.Middleware;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
@@ -7,7 +8,6 @@ using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Middleware;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.TaxonListService;
@@ -79,7 +79,7 @@ namespace SOS.ElasticSearch.Proxy
             services.AddApplicationInsightsTelemetry(Configuration);
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<ApplicationInsights>());
+            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 

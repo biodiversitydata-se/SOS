@@ -848,7 +848,7 @@ namespace SOS.Lib
             }
 
             var sortDescriptor = new SortDescriptor<dynamic>();
-
+            
             // Split sort string 
             var propertyNames = sortBy.Split('.');
             // Create a object of current class
@@ -899,7 +899,7 @@ namespace SOS.Lib
                     }
                 }
             }
-
+            
             sortDescriptor.Field(sortBy,
                 sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending);
 
