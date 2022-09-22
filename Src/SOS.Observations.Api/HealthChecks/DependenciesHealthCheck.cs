@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -43,16 +42,16 @@ namespace SOS.Observations.Api.HealthChecks
                 var hangfireConfiguration = _configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
                 var userServiceConfiguration = _configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>();
 
-                var dependencies = new List<string>
+                var dependencies = new List<(string Title, string Value)>
                 {
-                    $"MongoDb: {processedDbConfiguration.Hosts.First().Name} ({processedDbConfiguration.DatabaseName})",
-                    $"Hangfire: {hangfireConfiguration.Hosts.First().Name} ({hangfireConfiguration.DatabaseName})",
-                    $"Elasticsearch: {elasticConfiguration.Clusters.First().Hosts.First()} ({elasticConfiguration.IndexPrefix})",
-                    $"ArtdataUserService: {userServiceConfiguration.BaseAddress}",
-                    $"IdentityServer: {identityServerConfiguration.Authority}"
+                    ("MongoDb", $"{processedDbConfiguration.Hosts.First().Name} ({processedDbConfiguration.DatabaseName})"),
+                    ("Hangfire", $"{hangfireConfiguration.Hosts.First().Name} ({hangfireConfiguration.DatabaseName})"),
+                    ("Elasticsearch", $"{elasticConfiguration.Clusters.First().Hosts.First()} ({elasticConfiguration.IndexPrefix})"),
+                    ("ArtdataUserService",$"{userServiceConfiguration.BaseAddress}"),
+                    ("IdentityServer", $"{identityServerConfiguration.Authority}")
                 };
 
-                string str = string.Join(", ", dependencies.Select(m => $"[{m}]"));
+                string str = string.Join(", ", dependencies.Select(m => $"**{m.Title}**: [{m.Value}]"));
                 return new HealthCheckResult(HealthStatus.Healthy, str);
             }
             catch (Exception e)
