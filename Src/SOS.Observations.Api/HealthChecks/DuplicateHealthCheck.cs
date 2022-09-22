@@ -47,8 +47,6 @@ namespace SOS.Observations.Api.HealthChecks
 
                 var activePublicIndexDuplicates = healthTasks[0].Result;
                 var activePublicprotectedIndexDuplicates = healthTasks[1].Result;
-                var inActivePublicIndexDuplicates = healthTasks[2].Result;
-                var inActivePublicprotectedIndexDuplicates = healthTasks[3].Result;
                 bool unhealthy = false;
                 bool degraded = false;
 
@@ -65,21 +63,9 @@ namespace SOS.Observations.Api.HealthChecks
                     unhealthy = true;
                 }
 
-                if (inActivePublicIndexDuplicates?.Any() ?? false)
-                {
-                    errors.Append($"Duplicates found in inactive public index: { string.Join(", ", inActivePublicIndexDuplicates) }...");
-                    degraded = true;
-                }
-
-                if (inActivePublicprotectedIndexDuplicates?.Any() ?? false)
-                {
-                    errors.Append($"Duplicates found in inactive protected index: { string.Join(", ", inActivePublicprotectedIndexDuplicates) }...");
-                    degraded = true;
-                }
-
                 if (unhealthy)
                 {
-                    return new HealthCheckResult(HealthStatus.Unhealthy, string.Join(", ", errors));
+                    return new HealthCheckResult(HealthStatus.Degraded, string.Join(", ", errors));
                 }
                 if (degraded)
                 {
@@ -90,7 +76,7 @@ namespace SOS.Observations.Api.HealthChecks
             }
             catch (Exception e)
             {
-                return new HealthCheckResult(HealthStatus.Unhealthy, "Duplicate health check failed");
+                return new HealthCheckResult(HealthStatus.Degraded, "Duplicate health check failed");
             }
         }
     }

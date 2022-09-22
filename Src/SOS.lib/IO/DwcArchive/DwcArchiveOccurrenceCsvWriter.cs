@@ -19,6 +19,8 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Repositories.Processed;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -52,7 +54,7 @@ namespace SOS.Lib.IO.DwcArchive
                 bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
                 elasticRetrievalStopwatch.Start();
                 processedObservationRepository.LiveMode = true;
-                var scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter);
+                var scrollResult = await processedObservationRepository.ScrollObservationsAsync<Observation>(filter, null);
                 elasticRetrievalStopwatch.Stop();
 
                 using var csvFileHelper = new CsvFileHelper();
@@ -67,7 +69,7 @@ namespace SOS.Lib.IO.DwcArchive
 
                     // Fetch observations from ElasticSearch.
                     elasticRetrievalStopwatch.Start();
-                    var processedObservations = scrollResult.Records.ToObservations().ToArray();
+                    var processedObservations = scrollResult.Records.ToArray();
                     elasticRetrievalStopwatch.Stop();
 
                     // Convert observations to DwC format.
@@ -87,7 +89,7 @@ namespace SOS.Lib.IO.DwcArchive
 
                     // Get next batch of observations.
                     elasticRetrievalStopwatch.Start();
-                    scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
+                    scrollResult = await processedObservationRepository.ScrollObservationsAsync<Observation>(filter, scrollResult.ScrollId);
                     elasticRetrievalStopwatch.Stop();
                 }
                 csvFileHelper.FinishWrite();

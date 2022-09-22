@@ -453,6 +453,15 @@ namespace SOS.Harvest.Jobs
                 return false;
             }
 
+            // Fix dates
+            foreach (var obs in verbatims)
+            {
+                if (obs.StartDate.HasValue)
+                    obs.StartDate = DateTime.SpecifyKind(obs.StartDate.Value, DateTimeKind.Local);
+                if (obs.EndDate.HasValue)
+                    obs.EndDate = DateTime.SpecifyKind(obs.EndDate.Value, DateTimeKind.Local);
+            }
+
             return await _processObservationsJob.ProcessArtportalenObservationsAsync(verbatims);
         }
     }

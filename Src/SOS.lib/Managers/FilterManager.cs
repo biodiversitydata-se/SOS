@@ -150,7 +150,7 @@ namespace SOS.Lib.Managers
             var taxaIds = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa, returnBiotaResultAsNull);
             if (listIds != null && listIds.Count() > 0)
             {
-                taxaIds = FilterTaxonByTaxonLists(taxaIds, listIds, listOperator);
+                taxaIds = FilterTaxonByTaxonLists(taxaIds, listIds, listOperator, includeUnderlyingTaxa);
             }
 
             if (taxonCategories?.Any() ?? false)
@@ -172,17 +172,27 @@ namespace SOS.Lib.Managers
             return taxaIds?.Distinct().ToList();
         }
 
-        private List<int> FilterTaxonByTaxonLists(IEnumerable<int> taxaIds, IEnumerable<int> listIds, TaxonFilter.TaxonListOp listOperator)
+        private List<int> FilterTaxonByTaxonLists(IEnumerable<int> taxaIds, 
+            IEnumerable<int> listIds, 
+            TaxonFilter.TaxonListOp listOperator,
+            bool includeUnderlyingTaxa)
         {
             var taxonListIdsSet = new HashSet<int>();
             foreach (var taxonListId in listIds)
             {
                 if (_taxonManager.TaxonListSetById.TryGetValue(taxonListId, out var taxonListSet))
                 {
-                    taxonListIdsSet.UnionWith(taxonListSet);
+                    if (includeUnderlyingTaxa)
+                    {
+                        taxonListIdsSet.UnionWith(taxonListSet.WithUnderlyingTaxa);
+                    }
+                    else
+                    {
+                        taxonListIdsSet.UnionWith(taxonListSet.Taxa);
+                    }
                 }
             }
-
+            
             if (taxonListIdsSet.Count == 0)
             {
                 return taxaIds?.ToList();

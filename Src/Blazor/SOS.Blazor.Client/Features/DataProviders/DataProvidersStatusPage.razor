@@ -17,15 +17,14 @@
 
 
 @code {
-    IQueryable<DataProviderStatus>? dataProvidersQueryable;
+    IQueryable<DataProviderStatus> dataProvidersQueryable;
     protected override async Task OnInitializedAsync()
     {
         try
         {
             // Get data providers
-            var dataProvidersResponse = await _httpClient.GetFromJsonAsync<IEnumerable<DataProviderStatus>>("DataProviders/DataProviderStatus");
+            var dataProvidersResponse = await _httpClient.GetFromJsonAsync<IEnumerable<DataProviderStatus>>("dataproviders/dataproviderstatus");
             dataProvidersQueryable = dataProvidersResponse.AsQueryable();
-
             await base.OnInitializedAsync();
         }
         catch (Exception ex)

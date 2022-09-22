@@ -17,6 +17,7 @@ using SOS.Lib.Models;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
@@ -85,7 +86,7 @@ namespace SOS.Lib.IO.GeoJson
                 jsonWriter.WriteStartArray();
 
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter);
+                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync<dynamic>(filter, null);
 
                 while (scrollResult?.Records?.Any() ?? false)
                 {
@@ -93,7 +94,7 @@ namespace SOS.Lib.IO.GeoJson
 
                     if (flatOut)
                     {
-                        var processedObservations = scrollResult.Records.ToObservations();
+                        var processedObservations = CastDynamicsToObservations(scrollResult.Records);
                         
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
                         
@@ -118,7 +119,7 @@ namespace SOS.Lib.IO.GeoJson
 
                     nrObservations += scrollResult.Records.Count();
                     // Get next batch of observations.
-                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
+                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync<dynamic>(filter, scrollResult.ScrollId);
                 }
                 jsonWriter.WriteEndArray();
                 jsonWriter.WriteEndObject();
@@ -173,6 +174,13 @@ namespace SOS.Lib.IO.GeoJson
             jsonSerializerOptions.Converters.Add(attributesTableConverter);
             jsonSerializerOptions.Converters.Add(geometryConverter);
             return jsonSerializerOptions;
+        }
+
+        private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)
+        {
+            if (dynamicObjects == null) return null;
+            return System.Text.Json.JsonSerializer.Deserialize<List<Observation>>(System.Text.Json.JsonSerializer.Serialize(dynamicObjects),
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
         private async Task WriteFeature(

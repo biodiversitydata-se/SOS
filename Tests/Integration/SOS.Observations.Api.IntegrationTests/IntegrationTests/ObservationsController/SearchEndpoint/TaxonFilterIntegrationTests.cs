@@ -116,6 +116,39 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
+        public async Task Search_for_taxon_list_with_includeUnderlyingTaxa()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            SearchFilterDto searchFilter = new SearchFilterDto
+            {
+                Taxon = new TaxonFilterDto
+                {
+                    TaxonListIds = new List<int> { (int)TaxonListId.SwedishForestAgencyNatureConservationSpecies }, // 18
+                    IncludeUnderlyingTaxa = true,
+                    TaxonListOperator = TaxonListOperatorDto.Merge
+                }
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.ObservationsBySearch(0, null, searchFilter, 0, 2);
+            var resultIncludeUnderlyingTaxa = response.GetResult<PagedResultDto<Observation>>();
+
+            searchFilter.Taxon.IncludeUnderlyingTaxa = false;
+            response = await _fixture.ObservationsController.ObservationsBySearch(0, null, searchFilter, 0, 2);
+            var result = response.GetResult<PagedResultDto<Observation>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            resultIncludeUnderlyingTaxa.TotalCount.Should().BeGreaterThan(result.TotalCount);
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
         public async Task Search_for_all_species()
         {
             //-----------------------------------------------------------------------------------------------------------

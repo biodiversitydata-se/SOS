@@ -42,7 +42,7 @@ namespace SOS.Lib.IO.DwcArchive
         {
             try
             {
-                var scrollResult = await processedObservationRepository.ScrollMeasurementOrFactsAsync(filter);
+                var scrollResult = await processedObservationRepository.ScrollMeasurementOrFactsAsync(filter, null);
                 if (!scrollResult?.Records?.Any() ?? true) return false;
 
                 using var csvFileHelper = new CsvFileHelper();

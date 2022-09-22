@@ -203,7 +203,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             // We start from last harvested sighting 
             var lastModified = await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
-            
+            lastModified = lastModified.AddMinutes(-5); // When we force fetching data from AP (get one observation), we mess up the logic. Back track 5 min to make sure we get all modified obseervations
+
             // Get list of id's to Make sure we don't harvest more than #limit 
             var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(lastModified, _artportalenConfiguration.CatchUpLimit))?.ToArray();
             _logger.LogDebug($"Number of Artportalen Ids to harvest: {idsToHarvest?.Length ?? 0}, lastModifiedQuery={lastModified} ({mode})");
