@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -42,14 +43,17 @@ namespace SOS.Observations.Api.HealthChecks
                 var hangfireConfiguration = _configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
                 var userServiceConfiguration = _configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>();
 
-                var sb = new StringBuilder();
-                sb.AppendLine($"MongoDb: \"{processedDbConfiguration.Hosts.First().Name}\" ({processedDbConfiguration.DatabaseName})");
-                sb.AppendLine($"Hangfire: \"{hangfireConfiguration.Hosts.First().Name}\" ({hangfireConfiguration.DatabaseName})");
-                sb.AppendLine($"Elasticsearch: \"{elasticConfiguration.Clusters.First()}\" ({elasticConfiguration.IndexPrefix})");
-                sb.AppendLine($"ArtdataUserService: \"{userServiceConfiguration.BaseAddress}\"");
-                sb.AppendLine($"IdentityServer: \"{identityServerConfiguration.Authority}\"");
+                var dependencies = new List<string>
+                {
+                    $"MongoDb: {processedDbConfiguration.Hosts.First().Name} ({processedDbConfiguration.DatabaseName})",
+                    $"Hangfire: {hangfireConfiguration.Hosts.First().Name} ({hangfireConfiguration.DatabaseName})",
+                    $"Elasticsearch: {elasticConfiguration.Clusters.First().Hosts.First()} ({elasticConfiguration.IndexPrefix})",
+                    $"ArtdataUserService: {userServiceConfiguration.BaseAddress}",
+                    $"IdentityServer: {identityServerConfiguration.Authority}"
+                };
 
-                return new HealthCheckResult(HealthStatus.Healthy, sb.ToString());
+                string str = string.Join(", ", dependencies.Select(m => $"[{m}]"));
+                return new HealthCheckResult(HealthStatus.Healthy, str);
             }
             catch (Exception e)
             {
