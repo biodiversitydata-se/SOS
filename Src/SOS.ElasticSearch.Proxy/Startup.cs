@@ -7,6 +7,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Middleware;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.TaxonListService;
@@ -16,6 +17,8 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.ElasticSearch.Proxy.Configuration;
+using Microsoft.ApplicationInsights.Extensibility;
+using SOS.Lib.ApplicationInsights;
 
 namespace SOS.ElasticSearch.Proxy
 {
@@ -74,6 +77,11 @@ namespace SOS.ElasticSearch.Proxy
 
             // Add application insights.
             services.AddApplicationInsightsTelemetry(Configuration);
+            // Application insights custom
+            services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
+            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<ApplicationInsights>());
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
             //setup the elastic search configuration
             var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();

@@ -493,7 +493,8 @@ namespace SOS.Observations.Api.Extensions
                 FirstSighting = taxonAggregationItem.FirstSighting,
                 LastSighting = taxonAggregationItem.LastSighting,
                 TaxonId = taxonAggregationItem.TaxonId,
-                ObservationCount = taxonAggregationItem.ObservationCount
+                ObservationCount = taxonAggregationItem.ObservationCount,
+                LatestObservations = taxonAggregationItem.LatestObservations.Select(lo => new TaxonAggregationHitDto { EventStartDate = lo.EventStartDate, OccurrenceId = lo.OccurrenceId })
             };
         }
 

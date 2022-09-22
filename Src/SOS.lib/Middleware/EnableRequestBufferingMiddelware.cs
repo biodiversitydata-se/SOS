@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace SOS.Observations.Api.Middleware
+namespace SOS.Lib.Middleware
 {
     public class EnableRequestBufferingMiddelware
     {

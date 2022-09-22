@@ -285,7 +285,8 @@ namespace SOS.Observations.Api.Managers
             SearchFilter filter,
             int? skip,
             int? take,
-            bool sumUnderlyingTaxa = false)
+            bool sumUnderlyingTaxa = false,
+            int noOfLatestHits = 1)
         {
             try
             {
@@ -293,7 +294,8 @@ namespace SOS.Observations.Api.Managers
                 return await _processedTaxonRepository.GetTaxonAggregationAsync(filter, 
                     skip, 
                     take, 
-                    sumUnderlyingTaxa);
+                    sumUnderlyingTaxa,
+                    noOfLatestHits);
             }
             catch (Exception e)
             {
