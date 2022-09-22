@@ -351,6 +351,7 @@ namespace SOS.Observations.Api
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
             services.AddSingleton(healthCheckConfiguration);
             services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
+            services.AddSingleton(Configuration);
 
             var healthChecks = services.AddHealthChecks()
                 .AddDiskStorageHealthCheck(
@@ -367,7 +368,8 @@ namespace SOS.Observations.Api
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
                 .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
                 .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
-                .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" });
+                .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" })
+                .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" });
 
             if (CurrentEnvironment.IsEnvironment("prod"))
             {
