@@ -1580,12 +1580,12 @@ namespace SOS.Lib.Repositories.Processed
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
-
-            var sortDescriptor = await Client.GetSortDescriptorAsync<Observation>(indexNames, sortBy, sortOrder);
+            
+            var sortDescriptor = await Client.GetSortDescriptorAsync<dynamic>(indexNames, sortBy, sortOrder);
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
-            
+           
             // Retry policy by Polly
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
@@ -1803,7 +1803,6 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
-
 
             return new ScrollResult<SimpleMultimediaRow>
             {

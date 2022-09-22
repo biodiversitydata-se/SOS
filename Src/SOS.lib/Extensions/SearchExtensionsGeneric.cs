@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
@@ -98,7 +99,6 @@ namespace SOS.Lib.Extensions
         /// <typeparam name="TQueryContainer"></typeparam>
         /// <param name="query"></param>
         /// <param name="nestedPath"></param>
-        /// <param name="field"></param>
         public static void AddNestedMustExistsCriteria<TQueryContainer>(
             this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string nestedPath) where TQueryContainer : class
         {
@@ -196,6 +196,105 @@ namespace SOS.Lib.Extensions
                     )
                 )
             );
+        }
+
+        /// <summary>
+        /// Create a sort descriptor
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="client"></param>
+        /// <param name="indexNames"></param>
+        /// <param name="sortBy"></param>
+        /// <param name="sortOrder"></param>
+        /// <returns></returns>
+        public static async Task<SortDescriptor<T>> GetSortDescriptorAsync<T>(this IElasticClient client, string indexNames, string sortBy, SearchSortOrder sortOrder) where T : class
+        {
+            if (string.IsNullOrEmpty(sortBy))
+            {
+                return null;
+            }
+
+            return await GetSortDescriptorAsync<T>(client, indexNames, new[] { (sortBy, sortOrder) });
+        }
+
+        /// <summary>
+        /// Get sort descriptor
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="client"></param>
+        /// <param name="indexNames"></param>
+        /// <param name="sortings"></param>
+        /// <returns></returns>
+        public static async Task<SortDescriptor<T>> GetSortDescriptorAsync<T>(this IElasticClient client, string indexNames, IEnumerable<(string, SearchSortOrder)> sortings) where T : class
+        {
+            if (!sortings?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var sortDescriptor = new SortDescriptor<T>();
+
+            foreach (var sorting in sortings)
+            {
+                var sortBy = sorting.Item1;
+                var sortOrder = sorting.Item2;
+
+                // Split sort string 
+                var propertyNames = sortBy.Split('.');
+                // Create a object of current class
+                var parent = Activator.CreateInstance(typeof(T));
+                var targetProperty = (PropertyInfo)null;
+
+                // Loop throw all levels in passed sort string
+                for (var i = 0; i < propertyNames.Length; i++)
+                {
+                    // Get property info for current property
+                    targetProperty = parent?.GetProperty(propertyNames[i]);
+
+                    // Update property name to make sure it's in the correct case
+                    if (targetProperty != null)
+                    {
+                        propertyNames[i] = targetProperty.Name.ToCamelCase();
+                    }
+
+                    // As long it's not the last property, it must be a sub object. Create a instance of it since it's the new parent
+                    if (i != propertyNames.Length - 1)
+                    {
+                        parent = Activator.CreateInstance(targetProperty.GetPropertyType());
+                    }
+                }
+
+                // Target property found, get it's type
+                var propertyType = targetProperty?.GetPropertyType();
+
+                // If it's a string, add keyword in order to make the sorting work
+                if (propertyType == typeof(string))
+                {
+                    // GetFieldMappingAsync is case sensitive on field names, use updated property names to avoid errors
+                    sortBy = string.Join('.', propertyNames);
+                    var response =
+                        await client.Indices.GetFieldMappingAsync(new GetFieldMappingRequest(indexNames, sortBy));
+
+                    if (response.IsValid)
+                    {
+                        var hasKeyword = response.Indices
+                            .FirstOrDefault().Value.Mappings
+                            .FirstOrDefault().Value?.Mapping?.Values?
+                            .Select(s => s as TextProperty)?
+                            .Where(p => p?.Fields?.ContainsKey("keyword") ?? false)?
+                            .Any() ?? false;
+                        if (hasKeyword)
+                        {
+                            sortBy = $"{sortBy}.keyword";
+                        }
+                    }
+                }
+
+                sortDescriptor = sortDescriptor.Field(sortBy,
+                    sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending);
+            }
+
+            return sortDescriptor;
         }
 
         /// <summary>
