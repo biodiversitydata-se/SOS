@@ -127,6 +127,16 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
+        protected Result ValidateInt(int value, int minLimit, int maxLimit, string paramName)
+        {
+            if (value < minLimit || value > maxLimit)
+            {
+                return Result.Failure($"{paramName} must be between {minLimit} and {maxLimit}");
+            }
+
+            return Result.Success();
+        }
+
         protected override Result ValidateSearchFilter(SearchFilterBaseDto filter, bool bboxMandatory = false)
         {
             var result = base.ValidateSearchFilter(filter, bboxMandatory);

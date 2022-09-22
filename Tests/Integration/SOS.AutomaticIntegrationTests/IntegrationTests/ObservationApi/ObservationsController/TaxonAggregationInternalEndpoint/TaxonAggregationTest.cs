@@ -77,7 +77,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             // Act - Get observation by occurrenceId
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.TaxonAggregationInternal(null, null,
-                searchFilter);
+                searchFilter, 1);
 
             var resultObservation = response.GetResult<PagedResultDto<dynamic>>();
 
