@@ -6,7 +6,7 @@ public class UserStatisticsModule : Interfaces.IModule
     {
         application.MapGet("userstatistics/clearcache", (IUserStatisticsManager userStatisticsManager) =>
         {
-            userStatisticsManager.ClearCache();
+            //userStatisticsManager.ClearCache();
             return Results.Ok();
         })
         .Produces(StatusCodes.Status200OK)
