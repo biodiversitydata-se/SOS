@@ -3,5 +3,4 @@
 [CollectionDefinition(Collections.ApiAutomaticIntegrationTestsCollection)]
 public class ApiAutomaticIntegrationTestCollection : ICollectionFixture<UserStatisticsAutomaticIntegrationTestFixture>
 {
-
 }
