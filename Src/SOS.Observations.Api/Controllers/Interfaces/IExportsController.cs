@@ -36,6 +36,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter</param>
         /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
@@ -46,6 +47,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilterDto filter,
             OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool gzip = true,
@@ -57,12 +59,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter"></param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
         Task<IActionResult> DownloadDwC(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilterDto filter,
+            bool validateSearchFilter = false,
             bool sensitiveObservations = false);
 
         /// <summary>
@@ -72,6 +76,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter</param>
         /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
@@ -82,6 +87,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilterDto filter,
             OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             string cultureCode = "sv-SE",
             bool gzip = true,
@@ -94,6 +100,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The label type to use if flat=false.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
@@ -106,6 +113,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string authorizationApplicationIdentifier, 
             SearchFilterDto filter,
             OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flat = true,
@@ -124,6 +132,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
         /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
@@ -137,6 +146,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             SearchFilterDto filter,
             string description,
             OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             bool sensitiveObservations = false,
             bool sendMailFromZendTo = true,
@@ -154,6 +164,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
         /// <param name="encryptPassword">Password used to encrypt file</param>
@@ -164,6 +175,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilterDto filter, 
             string description,
+            bool validateSearchFilter = false,
             bool sensitiveObservations = false,
             bool sendMailFromZendTo = true,
             string encryptPassword = "",
@@ -180,6 +192,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
         /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
@@ -193,6 +206,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             SearchFilterDto filter, 
             string description,
             OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             bool sensitiveObservations = false,
             bool sendMailFromZendTo = true,
@@ -211,6 +225,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="filter">The search filter.</param>
         /// <param name="description">A description of your download. Will be displayed in the email.</param>
         /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
         /// <param name="encryptPassword">Password used to encrypt file</param>
@@ -227,6 +242,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             SearchFilterDto filter,
             string description,
             OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             bool sensitiveObservations = false,
             bool sendMailFromZendTo = true,

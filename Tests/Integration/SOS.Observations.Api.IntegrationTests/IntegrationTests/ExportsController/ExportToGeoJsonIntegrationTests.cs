@@ -61,6 +61,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 null,
                 searchFilter,
                 OutputFieldSet.Minimum,
+                false,
                 PropertyLabelType.Swedish,
                 "sv-SE",
                 true);
@@ -101,6 +102,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 null,
                 searchFilter,
                 OutputFieldSet.Minimum,
+                false,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 true,
@@ -146,6 +148,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 null,
                 searchFilter,
                 OutputFieldSet.Minimum,
+                false,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 true,
@@ -191,6 +194,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 null,
                 searchFilter,
                 OutputFieldSet.Minimum,
+                false,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 true,
@@ -257,6 +261,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 null, 
                 searchFilter,
                 OutputFieldSet.All,
+                false,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 false,
@@ -272,7 +277,5 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
             await System.IO.File.WriteAllBytesAsync(filePath, bytes);
         }
-
-
     }
 }

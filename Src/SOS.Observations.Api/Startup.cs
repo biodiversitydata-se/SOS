@@ -69,6 +69,7 @@ using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
+using SOS.Observations.Api.ApplicationInsights;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
@@ -169,7 +170,7 @@ namespace SOS.Observations.Api
             services.AddApplicationInsightsTelemetry(Configuration);
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<ApplicationInsights>());
+            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
@@ -352,6 +353,7 @@ namespace SOS.Observations.Api
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
             services.AddSingleton(healthCheckConfiguration);
             services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
+            services.AddSingleton(Configuration);
 
             var healthChecks = services.AddHealthChecks()
                 .AddDiskStorageHealthCheck(
@@ -368,7 +370,8 @@ namespace SOS.Observations.Api
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
                 .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
                 .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
-                .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" });
+                .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" })
+                .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" });
 
             if (CurrentEnvironment.IsEnvironment("prod"))
             {
@@ -470,8 +473,8 @@ namespace SOS.Observations.Api
             IApplicationBuilder app, 
             IWebHostEnvironment env, 
             IApiVersionDescriptionProvider apiVersionDescriptionProvider, 
-            TelemetryConfiguration configuration, 
-            ApplicationInsights applicationInsightsConfiguration, 
+            TelemetryConfiguration configuration,
+            Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration, 
             ObservationApiConfiguration observationApiConfiguration,
             IProtectedLogRepository protectedLogRepository)
         {

@@ -26,7 +26,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
         protected string SightingsFromBasics => @$"
             SearchableSightings s WITH(NOLOCK)
-            INNER JOIN SightingState ss ON s.SightingId = ss.SightingId AND ss.IsActive=1";
+            INNER JOIN SightingState ss ON s.SightingId = ss.SightingId ";
 
         // Todo arguments for protected sightings       
         protected string SightingWhereBasics => @$" 

@@ -124,7 +124,6 @@ namespace SOS.Analysis.Api
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
             services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<ApplicationInsights>());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
             services.AddApiVersioning(o =>
             {

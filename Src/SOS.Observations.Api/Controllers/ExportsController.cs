@@ -86,9 +86,10 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        ///  Validate input for order request
+        /// Validate input for order request
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
         /// <param name="email"></param>
         /// <param name="userExport"></param>
         /// <param name="sensitiveObservations"></param>
@@ -97,7 +98,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="confirmEncryptPassword"></param>
         /// <returns></returns>
         private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(
-            SearchFilterDto filter, 
+            SearchFilterDto filter,
+            bool validateSearchFilter,
             string email, 
             UserExport userExport,
             bool sensitiveObservations,
@@ -106,7 +108,7 @@ namespace SOS.Observations.Api.Controllers
             string confirmEncryptPassword)
         {
             var validationResults = Result.Combine(
-                ValidateSearchFilter(filter),
+                validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                 ValidateEmail(email),
                 ValidateUserExport(userExport),
                 ValidateEncryptPassword(encryptPassword, confirmEncryptPassword, sensitiveObservations),
@@ -138,11 +140,12 @@ namespace SOS.Observations.Api.Controllers
         /// Validate input for download request
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
         /// <param name="sensitiveObservations"></param>
         /// <returns></returns>
-        private async Task<IActionResult> DownloadValidateAsync(SearchFilterDto filter, bool sensitiveObservations)
+        private async Task<IActionResult> DownloadValidateAsync(SearchFilterDto filter, bool validateSearchFilter, bool sensitiveObservations)
         {
-            var validationResults = ValidateSearchFilter(filter);
+            var validationResults = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
 
             if (validationResults.IsFailure)
             {
@@ -315,6 +318,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool gzip = true,
@@ -328,7 +332,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                
-                var validateResult = await DownloadValidateAsync(filter, sensitiveObservations);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, sensitiveObservations);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -379,6 +383,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false)
         {
             FileExportResult fileExportResult = null;
@@ -387,7 +392,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 CheckAuthorization(sensitiveObservations);
 
-                var validateResult = await DownloadValidateAsync(filter, sensitiveObservations);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, sensitiveObservations);
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
@@ -435,6 +440,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool gzip = true,
@@ -449,7 +455,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 
-                var validateResult = await DownloadValidateAsync(filter, sensitiveObservations);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, sensitiveObservations);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -501,6 +507,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flat = true,
@@ -517,7 +524,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 
-                var validateResult = await DownloadValidateAsync(filter, sensitiveObservations);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, sensitiveObservations);
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
@@ -574,6 +581,7 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SearchFilterDto filter,
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool sendMailFromZendTo = true,
@@ -588,7 +596,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -640,6 +648,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter, 
             [FromQuery] string description,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool sendMailFromZendTo = true,
             [FromQuery] string encryptPassword = "",
@@ -650,7 +659,7 @@ namespace SOS.Observations.Api.Controllers
                 CheckAuthorization(sensitiveObservations);
 
                 var userExports = await GetUserExportsAsync();
-                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -702,6 +711,7 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SearchFilterDto filter, 
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool sendMailFromZendTo = true,
@@ -716,7 +726,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -770,6 +780,7 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SearchFilterDto filter, 
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool sendMailFromZendTo = true,
@@ -786,7 +797,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
