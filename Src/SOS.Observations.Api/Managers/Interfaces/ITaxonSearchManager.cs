@@ -63,7 +63,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <param name="sumUnderlyingTaxa"></param>
-        /// <param name="noOfLatestHits"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             int? roleId,
@@ -71,8 +70,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
             SearchFilter filter,
             int? skip,
             int? take,
-            bool sumUnderlyingTaxa = false,
-            int noOfLatestHits = 1);
+            bool sumUnderlyingTaxa = false);
 
         /// <summary>
         /// Aggregates present observations by taxon (absent observations are excluded).

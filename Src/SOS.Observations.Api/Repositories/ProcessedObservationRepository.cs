@@ -19,7 +19,6 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Models.Statistics;
 using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Repositories
