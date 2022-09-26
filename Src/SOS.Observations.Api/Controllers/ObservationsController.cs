@@ -469,8 +469,8 @@ namespace SOS.Observations.Api.Controllers
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-                SearchFilter searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, translationCultureCode);
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
+                SearchFilter searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, translationCultureCode, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
                 PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
@@ -540,7 +540,8 @@ namespace SOS.Observations.Api.Controllers
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var searchFilter = new SearchFilterInternal(UserId, sensitiveObservations)
                 {
-                    FieldTranslationCultureCode = translationCultureCode
+                    FieldTranslationCultureCode = translationCultureCode,
+                    Output = string.IsNullOrEmpty(sortBy) ? null : new OutputFilter { SortOrders = new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } } }
                 };
 
                 if (!string.IsNullOrEmpty(kingdom))
@@ -595,7 +596,7 @@ namespace SOS.Observations.Api.Controllers
                     searchFilter.DatasourceIds = new List<int> { 1 }; // Artportalen.
                 }
 
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
                 
                 var dtos = result?.Records?.ToObservations().Select(o => o.ToDto());
@@ -621,7 +622,6 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
-        /// <param name="noOfLatestHits">Max number of latest observation returned 1-10</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
         /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
@@ -637,7 +637,6 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
-            [FromQuery] int? noOfLatestHits = 1,
             [FromQuery] int? skip = null,
             [FromQuery] int? take = null,
             [FromQuery] bool validateSearchFilter = false,
@@ -655,8 +654,7 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateTaxonAggregationPagingArguments(skip, take),
-                    ValidateTilesLimit(boundingBox, 1),
-                    ValidateInt(noOfLatestHits ?? 0, 1, 10, "noOfLatestHits"));
+                    ValidateTilesLimit(boundingBox, 1));
 
                 if (validationResult.IsFailure)
                 {
@@ -670,8 +668,7 @@ namespace SOS.Observations.Api.Controllers
                     searchFilter,
                     skip,
                     take,
-                    false,
-                    noOfLatestHits ?? 1);
+                    false);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1235,15 +1232,11 @@ namespace SOS.Observations.Api.Controllers
 
                     if (outPutFields?.Any() ?? false)
                     {
-                        if (filter.Output == null)
-                        {
-                            filter.Output = new OutputFilterDto();
-                        }
-
+                        filter.Output ??= new OutputFilterExtendedDto();
                         filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
                     }
                 }
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(UserId, sensitiveObservations, translationCultureCode), skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(UserId, sensitiveObservations, translationCultureCode, sortBy, sortOrder), skip, take);
                 HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 return new OkObjectResult(dto);
@@ -1412,8 +1405,8 @@ namespace SOS.Observations.Api.Controllers
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                SearchFilter searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, translationCultureCode);
-                var result = await ObservationManager.GetObservationsByScrollAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, sortBy, sortOrder, scrollId);
+                SearchFilter searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, translationCultureCode, sortBy, sortOrder);
+                var result = await ObservationManager.GetObservationsByScrollAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, scrollId);
                 if (result.TotalCount > maxTotalCount)
                 {
                     return BadRequest($"Scroll total count limit is maxTotalCount. Your result is {result.TotalCount}. Try use a more specific filter.");
@@ -1485,7 +1478,6 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
-        /// <param name="noOfLatestHits">Max number of latest observation returned 1-10</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
         /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
@@ -1503,7 +1495,6 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
-            [FromQuery] int? noOfLatestHits = 1,
             [FromQuery] int? skip = null,
             [FromQuery] int? take = null,
             [FromQuery] bool validateSearchFilter = false,
@@ -1521,8 +1512,7 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateTaxonAggregationPagingArguments(skip, take),
-                    ValidateTilesLimit(boundingBox, 1),
-                    ValidateInt(noOfLatestHits ?? 0, 1, 10, "noOfLatestHits"));
+                    ValidateTilesLimit(boundingBox, 1));
 
                 if (validationResult.IsFailure)
                 {
@@ -1535,8 +1525,7 @@ namespace SOS.Observations.Api.Controllers
                     searchFilter,
                     skip,
                     take,
-                    sumUnderlyingTaxa,
-                    noOfLatestHits ?? 0);
+                    sumUnderlyingTaxa);
 
                 if (result.IsFailure)
                 {

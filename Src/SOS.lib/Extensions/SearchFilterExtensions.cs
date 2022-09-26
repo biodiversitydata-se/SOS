@@ -17,14 +17,15 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="outputFieldSet"></param>
-        public static void PopulateOutputFields(this SearchFilter filter, OutputFieldSet? outputFieldSet)
+        public static void PopulateFields(this OutputFilter filter, OutputFieldSet? outputFieldSet)
         {
-            if (filter.OutputFields?.Any() == true && outputFieldSet == null) return;
+            if (filter?.Fields?.Any() == true && outputFieldSet == null) return;
+
             const OutputFieldSet defaultFieldSet = OutputFieldSet.Minimum;
             var fieldSet = outputFieldSet ?? defaultFieldSet;
             if (fieldSet == OutputFieldSet.AllWithValues || fieldSet == OutputFieldSet.All)
             {
-                filter.OutputFields = null;
+                filter.Fields = null;
                 return;
             }
 
@@ -32,12 +33,12 @@ namespace SOS.Lib.Extensions
                 ObservationPropertyFieldDescriptionHelper.JsonFormatDependencyByFieldSet[fieldSet];
             List<string> outputFields = propertyFieldsDependencySet.ToList();
 
-            if (filter.OutputFields?.Any() ?? false)
+            if (filter.Fields?.Any() ?? false)
             {
-                outputFields.AddRange(filter.OutputFields.Where(of => !outputFields.Contains(of, StringComparer.CurrentCultureIgnoreCase)));
+                outputFields.AddRange(filter.Fields.Where(of => !outputFields.Contains(of, StringComparer.CurrentCultureIgnoreCase)));
             }
            
-            filter.OutputFields = outputFields;
+            filter.Fields = outputFields;
         }
     }
 }

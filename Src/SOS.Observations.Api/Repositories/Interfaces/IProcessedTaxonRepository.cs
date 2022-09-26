@@ -37,8 +37,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
             SearchFilter filter,
             int? skip,
             int? take,
-            bool sumUnderlyingTaxa = false,
-            int noOfLatestHits = 1);        
+            bool sumUnderlyingTaxa = false);        
 
         /// <summary>
         /// Get taxon sum aggregation. Including underlying taxa and province count.

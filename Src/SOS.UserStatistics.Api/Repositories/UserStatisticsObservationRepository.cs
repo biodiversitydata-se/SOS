@@ -160,26 +160,24 @@ public class UserStatisticsObservationRepository : UserObservationRepository, IU
         CompositeKey nextPageKey = null;
         var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
         var items = new List<UserStatisticsItem>();
+        CompositeBucketAggregate compositeAgg = null;
 
-        do
+        while (compositeAgg == null || compositeAgg.Buckets.Count >= pageTaxaAsyncTake)
         {
             var searchResponse = await SpeciesCountSearchCompositeAggregationAsync(indexName, query, nextPageKey, pageTaxaAsyncTake);
-            var compositeAgg = searchResponse.Aggregations.Composite("taxonComposite");
+            compositeAgg = searchResponse.Aggregations.Composite("taxonComposite");
             foreach (var bucket in compositeAgg.Buckets)
             {
-                var userId = Convert.ToInt32((long)bucket.Key["userId"]);
-                var observationCount = Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0));
-                var speciesCount = Convert.ToInt32(bucket.Cardinality("taxaCount").Value.GetValueOrDefault());
                 items.Add(new UserStatisticsItem()
                 {
-                    UserId = userId,
-                    SpeciesCount = speciesCount,
-                    ObservationCount = observationCount
+                    UserId = Convert.ToInt32((long)bucket.Key["userId"]),
+                    SpeciesCount = Convert.ToInt32(bucket.Cardinality("taxaCount").Value.GetValueOrDefault()),
+                    ObservationCount = Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0))
                 });
             }
 
-            nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
-        } while (nextPageKey != null);
+            nextPageKey = compositeAgg.AfterKey;
+        }
 
         var sortedItems = items
             .OrderByDescending(m => m.SpeciesCount)
@@ -236,11 +234,12 @@ public class UserStatisticsObservationRepository : UserObservationRepository, IU
         CompositeKey nextPageKey = null;
         var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
         var userStatisticsByUserId = new Dictionary<int, UserStatisticsItem>();
+        CompositeBucketAggregate compositeAgg = null;
 
-        do
+        while (compositeAgg == null || compositeAgg.Buckets.Count >= pageTaxaAsyncTake)
         {
             var searchResponse = await AreaSpeciesCountSearchCompositeAggregationAsync(indexName, query, nextPageKey, pageTaxaAsyncTake);
-            var compositeAgg = searchResponse.Aggregations.Composite("taxonComposite");
+            compositeAgg = searchResponse.Aggregations.Composite("taxonComposite");
             foreach (var bucket in compositeAgg.Buckets)
             {
                 var userId = Convert.ToInt32((long)bucket.Key["userId"]);
@@ -251,7 +250,11 @@ public class UserStatisticsObservationRepository : UserObservationRepository, IU
                 UserStatisticsItem item;
                 if (!userStatisticsByUserId.ContainsKey(userId))
                 {
-                    item = new UserStatisticsItem { UserId = userId, SpeciesCountByFeatureId = new Dictionary<string, int>() };
+                    item = new UserStatisticsItem
+                    {
+                        UserId = userId, 
+                        SpeciesCountByFeatureId = new Dictionary<string, int>() 
+                    };
                     userStatisticsByUserId.Add(userId, item);
                 }
                 else
@@ -262,8 +265,8 @@ public class UserStatisticsObservationRepository : UserObservationRepository, IU
                 item.SpeciesCountByFeatureId.Add(provinceId, speciesCount);
             }
 
-            nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
-        } while (nextPageKey != null);
+            nextPageKey = compositeAgg.AfterKey;
+        }
 
         // Calculate sum
         List<UserStatisticsItem> sumItems = await SpeciesCountSearchAsync(filter, userIds);

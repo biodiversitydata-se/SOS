@@ -30,6 +30,16 @@ public class UserStatisticsModule : Interfaces.IModule
         .Produces(StatusCodes.Status401Unauthorized)
         .Produces(StatusCodes.Status500InternalServerError);
 
+        application.MapPost("userstatistics/pagedspecieslistsummary", async (IUserStatisticsManager userStatisticsManager,
+          SpeciesSummaryUserStatisticsQuery query, [FromQuery] int? skip, int? take, bool useCache) =>
+        {
+            var res = await userStatisticsManager.PagedSpeciesSummaryListAsync(query, skip, take, useCache);
+        })
+       .Produces<IEnumerable<UserStatisticsByMonthItem>>()
+       .Produces(StatusCodes.Status400BadRequest)
+       .Produces(StatusCodes.Status401Unauthorized)
+       .Produces(StatusCodes.Status500InternalServerError);
+
         /// <summary>
         /// Aggregates taxon by user.
         /// </summary>
@@ -83,22 +93,6 @@ public class UserStatisticsModule : Interfaces.IModule
             [FromQuery] int? taxonId, 
             [FromQuery] int? year, 
             [FromQuery] SpeciesGroup speciesGroup) =>
-        {
-            await Task.Run(() => throw new NotImplementedException());
-        })
-        .Produces<IEnumerable<UserStatisticsByMonthItem>>()
-        .Produces(StatusCodes.Status400BadRequest)
-        .Produces(StatusCodes.Status401Unauthorized)
-        .Produces(StatusCodes.Status500InternalServerError);
-
-        application.MapGet("userstatistics/specieslistsummary", async (IUserStatisticsManager userStatisticsManager,
-            [FromQuery] int? taxonId, 
-            [FromQuery] int? year, 
-            [FromQuery] SpeciesGroup? speciesGroup, 
-            [FromQuery] AreaType? areaType, 
-            [FromQuery] string featureId, 
-            [FromQuery] int? siteId, 
-            [FromQuery] string sortBy) =>
         {
             await Task.Run(() => throw new NotImplementedException());
         })

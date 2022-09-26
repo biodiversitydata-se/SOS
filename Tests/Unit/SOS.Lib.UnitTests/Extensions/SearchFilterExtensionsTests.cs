@@ -23,12 +23,12 @@ namespace SOS.Lib.UnitTests.Extensions
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            SearchFilterExtensions.PopulateOutputFields(searchFilter, OutputFieldSet.Minimum);
+            searchFilter.Output.PopulateFields(OutputFieldSet.Minimum);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            searchFilter.OutputFields.Should().BeEquivalentTo(
+            searchFilter.Output.Fields.Should().BeEquivalentTo(
                 "Occurrence.OccurrenceId",
                 "Event.StartDate", 
                 "Event.EndDate",
@@ -63,18 +63,22 @@ namespace SOS.Lib.UnitTests.Extensions
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilter(0)
             {
-                OutputFields = new List<string> { "Occurrence.OccurrenceId", "Event.StartDate", "Location.Municipality" }
+                Output = new OutputFilter
+                {
+                    Fields = new[] { "Occurrence.OccurrenceId", "Event.StartDate", "Location.Municipality" }
+                }
             };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            SearchFilterExtensions.PopulateOutputFields(searchFilter, null);
+
+            searchFilter.Output.PopulateFields(null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            searchFilter.OutputFields.Should().BeEquivalentTo(
+            searchFilter.Output.Fields.Should().BeEquivalentTo(
                 "Occurrence.OccurrenceId",
                 "Event.StartDate",
                 "Location.Municipality");
@@ -91,18 +95,21 @@ namespace SOS.Lib.UnitTests.Extensions
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilter(0)
             {
-                OutputFields = new List<string> { "Occurrence.OccurrenceId", "Event.PlainStartTime" }
+                Output = new OutputFilter
+                {
+                    Fields = new[] { "Occurrence.OccurrenceId", "Event.PlainStartTime" }
+                }
             };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            SearchFilterExtensions.PopulateOutputFields(searchFilter, OutputFieldSet.Minimum);
-
+            searchFilter.Output.PopulateFields(OutputFieldSet.Minimum);
+           
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            searchFilter.OutputFields.Should().BeEquivalentTo(
+            searchFilter.Output.Fields.Should().BeEquivalentTo(
                 "Occurrence.OccurrenceId",
                 "Event.StartDate",
                 "Event.EndDate",
@@ -144,12 +151,12 @@ namespace SOS.Lib.UnitTests.Extensions
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            SearchFilterExtensions.PopulateOutputFields(searchFilter, OutputFieldSet.Extended);
-
+            searchFilter.Output.PopulateFields(OutputFieldSet.Extended);
+            
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            searchFilter.OutputFields.Should().BeEquivalentTo(
+            searchFilter.Output.Fields.Should().BeEquivalentTo(
                 "Occurrence.OccurrenceId",
                 "Event.StartDate",
                 "Event.EndDate",
@@ -260,12 +267,12 @@ namespace SOS.Lib.UnitTests.Extensions
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            SearchFilterExtensions.PopulateOutputFields(searchFilter, OutputFieldSet.AllWithValues);
-
+           
+            searchFilter.Output.PopulateFields(OutputFieldSet.AllWithValues);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            searchFilter.OutputFields.Should().BeNull();
+            searchFilter.Output.Fields.Should().BeNull();
         }
     }
 }

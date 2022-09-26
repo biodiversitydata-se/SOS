@@ -181,8 +181,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
             SearchFilter filter,
             int take,
-            string sortBy,
-            SearchSortOrder sortOrder,
             string scrollId);
 
         /// <summary>

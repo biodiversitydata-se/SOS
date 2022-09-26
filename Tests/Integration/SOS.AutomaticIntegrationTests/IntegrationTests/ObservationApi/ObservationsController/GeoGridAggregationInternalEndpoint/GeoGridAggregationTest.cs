@@ -82,12 +82,12 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             // Act - Get observation by occurrenceId
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.GeogridAggregationInternal(null, null, searchFilter);
-            var result = response.GetResult<dynamic>();
+            var result = response.GetResult<Observations.Api.Dtos.GeoGridResultDto>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------            
-            ((IEnumerable<dynamic>)result.GridCells).Sum(gc => gc.ObservationsCount).Should().Be(60);
+            result.GridCells.Sum(gc => gc.ObservationsCount).Should().Be(60);
         }
     }
 }

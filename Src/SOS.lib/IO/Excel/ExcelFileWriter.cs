@@ -69,7 +69,7 @@ namespace SOS.Lib.IO.Excel
                 string excelFilePath = null;
                 int nrObservations = 0;
                 var propertyFields =
-                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.OutputFields);
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
                 {

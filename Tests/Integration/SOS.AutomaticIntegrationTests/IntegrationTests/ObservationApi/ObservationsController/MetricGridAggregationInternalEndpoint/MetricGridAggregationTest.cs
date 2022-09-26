@@ -9,6 +9,7 @@ using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Observations.Api.Dtos;
 
 namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.MetricGridAggregationInternalEndpoint
 {
@@ -81,13 +82,13 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             //-----------------------------------------------------------------------------------------------------------
             // Act - Get observation by occurrenceId
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.MetricGridAggregationInternalAsync(null, null, searchFilter, outputFormat: Observations.Api.Dtos.OutputFormatDto.Json);
-            var result = response.GetResult<dynamic>();
+            var response = await _fixture.ObservationsController.MetricGridAggregationInternalAsync(null, null, searchFilter, outputFormat: OutputFormatDto.Json);
+            var result = response.GetResult<GeoGridMetricResultDto>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------            
-            ((IEnumerable<dynamic>)result.GridCells).Sum(gc => gc.ObservationsCount).Should().Be(60);
+            result.GridCells.Sum(gc => gc.ObservationsCount).Should().Be(60);
         }
     }
 }

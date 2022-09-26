@@ -42,7 +42,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     Months = new List<int> {1,2,4},
                     MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.BothStartDateAndEndDate
                 },
-                Output = new OutputFilterDto{ Fields = new[] { "Event" } } 
+                Output = new OutputFilterExtendedDto{ Fields = new[] { "Event" } } 
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -145,7 +145,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     Months = new List<int> { 1, 2, 4 },
                     MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.StartDate
                 },
-                Output = new OutputFilterDto{ Fields = new[] { "Event" } } 
+                Output = new OutputFilterExtendedDto { Fields = new[] { "Event" } } 
             };
 
             //-----------------------------------------------------------------------------------------------------------

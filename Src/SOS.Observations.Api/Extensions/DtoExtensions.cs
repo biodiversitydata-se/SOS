@@ -86,10 +86,11 @@ namespace SOS.Observations.Api.Extensions
 
             filter.DeterminationFilter = (SightingDeterminationFilter)searchFilterBaseDto.DeterminationFilter;
 
+            filter.Output = new OutputFilter();
             if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
             {
-                filter.OutputFields = searchFilterDto.Output?.Fields?.ToList();
-                filter.PopulateOutputFields(searchFilterDto.Output?.FieldSet);
+                filter.Output.Fields = searchFilterDto.Output?.Fields?.ToArray();
+                filter.Output.PopulateFields(searchFilterDto.Output?.FieldSet);
             }
 
             if (searchFilterBaseDto is SearchFilterInternalBaseDto searchFilterInternalBaseDto)
@@ -100,13 +101,15 @@ namespace SOS.Observations.Api.Extensions
                 if (searchFilterBaseDto is SearchFilterInternalDto searchFilterInternalDto)
                 {
                     filterInternal.IncludeRealCount = searchFilterInternalDto.IncludeRealCount;
-                    filter.OutputFields = searchFilterInternalDto.Output?.Fields?.ToList();
-                    filter.PopulateOutputFields(searchFilterInternalDto.Output?.FieldSet);
+                    filterInternal.Output.Fields = searchFilterInternalDto.Output?.Fields?.ToArray();
+                    filterInternal.Output.PopulateFields(searchFilterInternalDto.Output?.FieldSet);
+                    filterInternal.Output.SortOrders = searchFilterInternalDto.Output?.SortOrders?.Select(so => new SortOrderFilter { SortBy = so.SortBy, SortOrder = so.SortOrder });
                 }
             }
 
             return filter;
         }
+
         private static void PopulateInternalBase(SearchFilterInternalBaseDto searchFilterInternalDto, SearchFilterInternal internalFilter)
         {
             if (searchFilterInternalDto.ExtendedFilter != null)
@@ -493,8 +496,7 @@ namespace SOS.Observations.Api.Extensions
                 FirstSighting = taxonAggregationItem.FirstSighting,
                 LastSighting = taxonAggregationItem.LastSighting,
                 TaxonId = taxonAggregationItem.TaxonId,
-                ObservationCount = taxonAggregationItem.ObservationCount,
-                LatestObservations = taxonAggregationItem.LatestObservations.Select(lo => new TaxonAggregationHitDto { EventStartDate = lo.EventStartDate, OccurrenceId = lo.OccurrenceId })
+                ObservationCount = taxonAggregationItem.ObservationCount
             };
         }
 
@@ -845,9 +847,18 @@ namespace SOS.Observations.Api.Extensions
             return (SearchFilter)PopulateFilter(searchFilterDto, userId, sensitiveObservations, translationCultureCode);
         }
 
-        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, int userId, bool sensitiveObservations, string translationCultureCode)
+        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, int userId, bool sensitiveObservations, string translationCultureCode,
+            string sortBy, SearchSortOrder sortOrder)
         {
-            return (SearchFilter)PopulateFilter(searchFilterDto, userId, sensitiveObservations, translationCultureCode);
+            var searchFilter = (SearchFilter)PopulateFilter(searchFilterDto, userId, sensitiveObservations, translationCultureCode);
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                searchFilter ??= new SearchFilter(userId, sensitiveObservations);
+                searchFilter.Output ??= new OutputFilter();
+                searchFilter.Output.SortOrders = new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } };
+            }
+            return searchFilter;
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalBaseDto searchFilterDto,
@@ -857,8 +868,16 @@ namespace SOS.Observations.Api.Extensions
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalDto searchFilterDto,
-            int userId, bool sensitiveObservations, string translationCultureCode)
+            int userId, bool sensitiveObservations, string translationCultureCode, string sortBy, SearchSortOrder sortOrder)
         {
+            // User sort order passed the old way if not any other sort order is passed 
+            if (!string.IsNullOrEmpty(sortBy) && (!searchFilterDto?.Output?.SortOrders?.Any() ?? true))
+            {
+                searchFilterDto ??= new SearchFilterInternalDto();
+                searchFilterDto.Output ??= new OutputFilterExtendedDto();
+                searchFilterDto.Output.SortOrders = new[] { new SortOrderDto { SortBy = sortBy, SortOrder = sortOrder } };
+            }
+ 
             return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, sensitiveObservations, translationCultureCode);
         }
 
