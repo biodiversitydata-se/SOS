@@ -1,12 +1,19 @@
-﻿namespace SOS.UserStatistics.Api.Cache.Managers;
+﻿using Microsoft.Extensions.Caching.Memory;
 
-public class StatisticsCacheManager : IStatisticsCacheManager
+namespace SOS.UserStatistics.Api.Cache.Managers;
+
+public class UserStatisticsCacheManager : IUserStatisticsCacheManager
 {
-    private readonly static MemoryCache _memoryCache = new MemoryCache(new MemoryCacheOptions());
-    readonly static List<string> _cacheKeys = new();
-    private readonly MemoryCacheEntryOptions _cacheEntryoptions = new MemoryCacheEntryOptions()
+    private readonly IMemoryCache _memoryCache;
+    private readonly static List<string> _cacheKeys = new();
+    private static readonly MemoryCacheEntryOptions _cacheEntryoptions = new MemoryCacheEntryOptions()
         .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
     private const int NumberOfEntriesCleanupLimit = 1000;
+
+    public UserStatisticsCacheManager(IMemoryCache memoryCache)
+    {
+        _memoryCache = memoryCache;
+    }
 
     public Cache<TKey, TValue> GetCache<TKey, TValue>(string cacheKey)
     {

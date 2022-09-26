@@ -2,16 +2,17 @@
 
 public class UserStatisticsManager : IUserStatisticsManager
 {
+    private readonly IUserStatisticsCacheManager _userStatisticsCacheManager;
     private readonly IUserStatisticsObservationRepository _userStatisticsObservationRepository;
     private readonly IUserStatisticsProcessedObservationRepository _processedObservationRepository;
     private readonly ILogger<UserStatisticsManager> _logger;
-    private readonly IStatisticsCacheManager _cacheManager = new StatisticsCacheManager();
 
     private const int CacheAreaItemsSkipTakeLimit = 100;
 
-    public UserStatisticsManager(IUserStatisticsObservationRepository userStatisticsObservationRepository, IUserStatisticsProcessedObservationRepository userStatisticsProcessedObservationRepository,
+    public UserStatisticsManager(IUserStatisticsCacheManager userStatisticsCacheManager, IUserStatisticsObservationRepository userStatisticsObservationRepository, IUserStatisticsProcessedObservationRepository userStatisticsProcessedObservationRepository,
         ILogger<UserStatisticsManager> logger)
     {
+        _userStatisticsCacheManager = userStatisticsCacheManager;
         _userStatisticsObservationRepository = userStatisticsObservationRepository;
         _processedObservationRepository = userStatisticsProcessedObservationRepository;
         _logger = logger;
@@ -20,7 +21,7 @@ public class UserStatisticsManager : IUserStatisticsManager
 
     public void ClearCache()
     {
-        _cacheManager.ClearAllCache();
+        _userStatisticsCacheManager.ClearAllCache();
     }
 
     public async Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query,
@@ -32,7 +33,7 @@ public class UserStatisticsManager : IUserStatisticsManager
         Cache<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>> cache = null;
         if (useCache)
         {
-            cache = _cacheManager.GetCache<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>("SpeciesCountAggregationCache");
+            cache = _userStatisticsCacheManager.GetCache<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>("SpeciesCountAggregationCache");
             itemsFetchedFromCache = cache.TryGetValue(query, out items);
         }
 
@@ -62,7 +63,7 @@ public class UserStatisticsManager : IUserStatisticsManager
             Dictionary<int, UserStatisticsItem> userStatisticsById = new Dictionary<int, UserStatisticsItem>();
             var userStatisticsByIdKey = query.Clone();
             userStatisticsByIdKey.SortByFeatureId = null;
-            var userStatisticsByUserIdManagerCache = _cacheManager.GetCache<SpeciesCountUserStatisticsQuery, Dictionary<int, UserStatisticsItem>>("UserStatisticsByUserIdCache");
+            var userStatisticsByUserIdManagerCache = _userStatisticsCacheManager.GetCache<SpeciesCountUserStatisticsQuery, Dictionary<int, UserStatisticsItem>>("UserStatisticsByUserIdCache");
             if (useCache)
             {
                 if (!userStatisticsByUserIdManagerCache.TryGetValue(userStatisticsByIdKey, out userStatisticsById))
@@ -110,7 +111,7 @@ public class UserStatisticsManager : IUserStatisticsManager
                         _logger.LogDebug($"Added items to userStatisticsById: [{string.Join(", ", itemsToCache.Select(m => m.UserId))}]");
                     }
 
-                    _cacheManager.CheckCleanup<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>("SpeciesCountAggregationCache");
+                    _userStatisticsCacheManager.CheckCleanup<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>("SpeciesCountAggregationCache");
                 }
             }
 
@@ -146,7 +147,7 @@ public class UserStatisticsManager : IUserStatisticsManager
         List<UserStatisticsItem> records;
         string sortByFeatureId = query.SortByFeatureId; // todo - temporary hack in order to exclude SortByFeatureId in cache key. Sorting is done in memory.
         query.SortByFeatureId = null;
-        var cache = _cacheManager.GetCache<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>("UserStatisticsCache");
+        var cache = _userStatisticsCacheManager.GetCache<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>("UserStatisticsCache");
         if (useCache && cache.TryGetValue(query, out var value))
         {
             records = value;
@@ -221,7 +222,7 @@ public class UserStatisticsManager : IUserStatisticsManager
     {
         PagedResult<UserStatisticsItem> result;
         var pagedQuery = PagedSpeciesCountUserStatisticsQuery.Create(query, skip, take);
-        var cache = _cacheManager.GetCache<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>>("ProcessedObservationPagedUserStatisticsCache");
+        var cache = _userStatisticsCacheManager.GetCache<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>>("ProcessedObservationPagedUserStatisticsCache");
         if (useCache && cache.TryGetValue(pagedQuery, out var value))
         {
             _logger.LogInformation("Return result from cache");

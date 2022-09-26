@@ -6,7 +6,7 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddMemoryCache();
-
+    
     builder.SetupUserSecrets();
     builder.SetupAuthentication();
     builder.SetupLogging();
