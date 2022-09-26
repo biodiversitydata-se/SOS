@@ -199,25 +199,6 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Create a sort descriptor
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="client"></param>
-        /// <param name="indexNames"></param>
-        /// <param name="sortBy"></param>
-        /// <param name="sortOrder"></param>
-        /// <returns></returns>
-        public static async Task<SortDescriptor<T>> GetSortDescriptorAsync<T>(this IElasticClient client, string indexNames, string sortBy, SearchSortOrder sortOrder) where T : class
-        {
-            if (string.IsNullOrEmpty(sortBy))
-            {
-                return null;
-            }
-
-            return await GetSortDescriptorAsync<T>(client, indexNames, new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } });
-        }
-
-        /// <summary>
         /// Get sort descriptor
         /// </summary>
         /// <typeparam name="T"></typeparam>
