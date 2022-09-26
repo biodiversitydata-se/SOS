@@ -39,7 +39,12 @@ namespace SOS.Lib.Models.Search.Filters
             FieldTranslationCultureCode = searchFilter.FieldTranslationCultureCode;
             Location = searchFilter.Location;
             NotRecoveredFilter = searchFilter.NotRecoveredFilter;
-            OutputFields = searchFilter.OutputFields;
+            if (searchFilter.Output != null)
+            {
+                Output = new OutputFilter();
+                Output.Fields = searchFilter.Output.Fields;
+                Output.SortOrders = searchFilter.Output.SortOrders;
+            }
             PositiveSightings = searchFilter.PositiveSightings;
             ProjectIds = searchFilter.ProjectIds;
             Taxa = searchFilter.Taxa;

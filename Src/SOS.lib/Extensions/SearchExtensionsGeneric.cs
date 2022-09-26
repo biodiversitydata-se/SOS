@@ -199,25 +199,6 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Create a sort descriptor
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="client"></param>
-        /// <param name="indexNames"></param>
-        /// <param name="sortBy"></param>
-        /// <param name="sortOrder"></param>
-        /// <returns></returns>
-        public static async Task<SortDescriptor<T>> GetSortDescriptorAsync<T>(this IElasticClient client, string indexNames, string sortBy, SearchSortOrder sortOrder) where T : class
-        {
-            if (string.IsNullOrEmpty(sortBy))
-            {
-                return null;
-            }
-
-            return await GetSortDescriptorAsync<T>(client, indexNames, new[] { (sortBy, sortOrder) });
-        }
-
-        /// <summary>
         /// Get sort descriptor
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -225,7 +206,7 @@ namespace SOS.Lib.Extensions
         /// <param name="indexNames"></param>
         /// <param name="sortings"></param>
         /// <returns></returns>
-        public static async Task<SortDescriptor<T>> GetSortDescriptorAsync<T>(this IElasticClient client, string indexNames, IEnumerable<(string, SearchSortOrder)> sortings) where T : class
+        public static async Task<SortDescriptor<T>> GetSortDescriptorAsync<T>(this IElasticClient client, string indexNames, IEnumerable<SortOrderFilter> sortings) where T : class
         {
             if (!sortings?.Any() ?? true)
             {
@@ -236,8 +217,8 @@ namespace SOS.Lib.Extensions
 
             foreach (var sorting in sortings)
             {
-                var sortBy = sorting.Item1;
-                var sortOrder = sorting.Item2;
+                var sortBy = sorting.SortBy;
+                var sortOrder = sorting.SortOrder;
 
                 // Split sort string 
                 var propertyNames = sortBy.Split('.');

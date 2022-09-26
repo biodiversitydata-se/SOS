@@ -80,7 +80,6 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             var records = resultObservation.Records;
             resultObservation.Should().NotBeNull();
             resultObservation.TotalCount.Should().Be(2);
-            records.Sum(r => r.ObservationCount).Should().Be(60);
         }
     }
 }

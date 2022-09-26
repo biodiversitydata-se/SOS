@@ -28,7 +28,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             // Arrange - Create verbatim observations
             //-----------------------------------------------------------------------------------------------------------
             const int SightingId = 123456;
-            const string occurrenceId = $"urn:lsid:artportalen.se:sighting:123456";
+            string occurrenceId = $"urn:lsid:artportalen.se:sighting:{SightingId}";
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All()
                     .HaveValuesFromPredefinedObservations()

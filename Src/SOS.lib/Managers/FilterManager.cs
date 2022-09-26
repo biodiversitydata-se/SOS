@@ -402,11 +402,12 @@ namespace SOS.Lib.Managers
                 // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
                 if (filter is SearchFilter searchFilter)
                 {
-                    if ((searchFilter.OutputFields?.Any() ?? false) &&
-                        !searchFilter.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
-                        !searchFilter.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
+                    if ((searchFilter.Output?.Fields?.Any() ?? false) &&
+                        !searchFilter.Output.Fields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
+                        !searchFilter.Output.Fields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
                     {
-                        searchFilter.OutputFields.Add("occurrence.occurrenceId");
+                        searchFilter.Output ??= new OutputFilter();
+                        searchFilter.Output.Fields.Add("occurrence.occurrenceId");
                     }
                 }
             }

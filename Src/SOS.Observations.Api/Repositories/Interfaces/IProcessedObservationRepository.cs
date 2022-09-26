@@ -1,7 +1,6 @@
 ﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -37,8 +36,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="sortBy"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
-            SearchSortOrder sortOrder);
+        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take);
 
         /// <summary>
         /// Get geo grid tile aggregation

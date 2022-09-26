@@ -12,10 +12,10 @@ namespace SOS.Lib.Helpers
     /// </summary>
     public static class ObservationPropertyFieldDescriptionHelper
     {
-        public static readonly List<PropertyFieldDescription> AllFields;
+        public static readonly IEnumerable<PropertyFieldDescription> AllFields;
         public static readonly Dictionary<string, PropertyFieldDescription> FieldByPropertyPath;
-        public static readonly Dictionary<OutputFieldSet, List<PropertyFieldDescription>> FieldsByFieldSet;
-        public static readonly Dictionary<OutputFieldSet, List<string>> OutputFieldsByFieldSet;
+        public static readonly Dictionary<OutputFieldSet, ICollection<PropertyFieldDescription>> FieldsByFieldSet;
+        public static readonly Dictionary<OutputFieldSet, IEnumerable<string>> OutputFieldsByFieldSet;
         public static readonly Dictionary<OutputFieldSet, HashSet<string>> JsonFormatDependencyByFieldSet;
         private static readonly Dictionary<string, string> ExportFormatFieldByJsonFormatField;
 
@@ -54,7 +54,7 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        private static void InitDataTypeEnum(List<PropertyFieldDescription> fields)
+        private static void InitDataTypeEnum(IEnumerable<PropertyFieldDescription> fields)
         {
             foreach (var field in fields)
             {
@@ -140,10 +140,10 @@ namespace SOS.Lib.Helpers
         }
 
 
-        private static Dictionary<OutputFieldSet, List<PropertyFieldDescription>> CreateFieldSetDictionary(
-            List<PropertyFieldDescription> fields)
+        private static Dictionary<OutputFieldSet, ICollection<PropertyFieldDescription>> CreateFieldSetDictionary(
+            IEnumerable<PropertyFieldDescription> fields)
         {
-            var fieldsByFieldSet = new Dictionary<OutputFieldSet, List<PropertyFieldDescription>>
+            var fieldsByFieldSet = new Dictionary<OutputFieldSet, ICollection<PropertyFieldDescription>>
             {
                 {OutputFieldSet.Minimum, new List<PropertyFieldDescription>()},
                 {OutputFieldSet.Extended, new List<PropertyFieldDescription>()},
@@ -206,7 +206,7 @@ namespace SOS.Lib.Helpers
         }
 
         private static Dictionary<string, string> CreateExportFormatFieldByJsonFormatFieldDictionary(
-            List<PropertyFieldDescription> fields)
+            IEnumerable<PropertyFieldDescription> fields)
         {
             var exportFormatFieldByJsonFormatField = new Dictionary<string, string>();
             foreach (var field in fields)
@@ -227,7 +227,7 @@ namespace SOS.Lib.Helpers
         }
 
         private static Dictionary<OutputFieldSet, HashSet<string>> CreateJsonFormatDependencyDictionary(
-            Dictionary<OutputFieldSet, List<PropertyFieldDescription>> fieldsByFieldSet)
+            Dictionary<OutputFieldSet, ICollection<PropertyFieldDescription>> fieldsByFieldSet)
         {
             var jsonFormatDependencyByFieldSet = new Dictionary<OutputFieldSet, HashSet<string>>
             {
@@ -254,10 +254,10 @@ namespace SOS.Lib.Helpers
             return jsonFormatDependencyByFieldSet;
         }
 
-        private static Dictionary<OutputFieldSet, List<string>> CreateOutputFieldsDictionary(
-            Dictionary<OutputFieldSet, List<PropertyFieldDescription>> fieldsByFieldSet)
+        private static Dictionary<OutputFieldSet, IEnumerable<string>> CreateOutputFieldsDictionary(
+            Dictionary<OutputFieldSet, ICollection<PropertyFieldDescription>> fieldsByFieldSet)
         {
-            var outputfieldsByFieldSet = new Dictionary<OutputFieldSet, List<string>>
+            var outputfieldsByFieldSet = new Dictionary<OutputFieldSet, IEnumerable<string>>
             {
                 {OutputFieldSet.Minimum, new List<string>()},
                 {OutputFieldSet.Extended, new List<string>()},
@@ -284,7 +284,7 @@ namespace SOS.Lib.Helpers
             return outputfieldsByFieldSet;
         }
 
-        private static List<PropertyFieldDescription> LoadFieldDescriptionsFromJson()
+        private static IEnumerable<PropertyFieldDescription> LoadFieldDescriptionsFromJson()
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, @"Resources\ObservationFieldDescriptions.json");
@@ -293,9 +293,9 @@ namespace SOS.Lib.Helpers
             return fields;
         }
 
-        public static List<PropertyFieldDescription> GetExportFieldsFromOutputFields(List<string> outputFields)
+        public static IEnumerable<PropertyFieldDescription> GetExportFieldsFromOutputFields(IEnumerable<string> outputFields)
         {
-            if (outputFields == null || outputFields.Count == 0) return FieldsByFieldSet[OutputFieldSet.AllWithValues];
+            if (!outputFields?.Any() ?? true) return FieldsByFieldSet[OutputFieldSet.AllWithValues];
 
             var fieldsSet = new HashSet<string>();
             foreach (var outputField in outputFields)

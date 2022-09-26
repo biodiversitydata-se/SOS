@@ -133,19 +133,24 @@ namespace SOS.Export.IntegrationTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             var result =
                 await observationManager.ExportAndSendAsync(null, null, 
-                    new SearchFilter(0){ 
-                        DataProviderIds = new List<int>{1}, OutputFields = new List<string>{
-                            "datasetName",
-                            "event.startDate",
-                            "event.endDate",
-                            "identification.verified",
-                            "location.decimalLongitude",
-                            "location.decimalLatitude",
-                            "occurrence.occurrenceId",
-                            "occurrence.reportedBy",
-                            "taxon.id",
-                            "taxon.scientificName",
-                            "taxon.vernacularName"
+                    new SearchFilter(0)
+                    {
+                        DataProviderIds = new List<int> { 1 },
+                        Output = new OutputFilter
+                        {
+                            Fields = new [] {
+                                "datasetName",
+                                "event.startDate",
+                                "event.endDate",
+                                "identification.verified",
+                                "location.decimalLongitude",
+                                "location.decimalLatitude",
+                                "occurrence.occurrenceId",
+                                "occurrence.reportedBy",
+                                "taxon.id",
+                                "taxon.scientificName",
+                                "taxon.vernacularName"
+                            }
                         }
                     }, 
                     "mats.lindgren@slu.se", 
@@ -184,18 +189,22 @@ namespace SOS.Export.IntegrationTests.Managers
                 await observationManager.ExportAndSendAsync(null, null, new SearchFilter(0)
                 {
                     DataProviderIds = new List<int> { 1 },
-                    OutputFields = new List<string> {
-                        "datasetName",
-                        "event.startDate",
-                        "event.endDate",
-                        "identification.verified",
-                        "location.decimalLongitude",
-                        "location.decimalLatitude",
-                        "occurrence.occurrenceId",
-                        "occurrence.reportedBy",
-                        "taxon.id",
-                        "taxon.scientificName",
-                        "taxon.vernacularName"}
+                    Output = new OutputFilter
+                    {
+                        Fields = new[] {
+                            "datasetName",
+                            "event.startDate",
+                            "event.endDate",
+                            "identification.verified",
+                            "location.decimalLongitude",
+                            "location.decimalLatitude",
+                            "occurrence.occurrenceId",
+                            "occurrence.reportedBy",
+                            "taxon.id",
+                            "taxon.scientificName",
+                            "taxon.vernacularName"
+                        }
+                    }
                 }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false,  PropertyLabelType.PropertyPath, false, false,
                     false,
                     null, JobCancellationToken.Null);

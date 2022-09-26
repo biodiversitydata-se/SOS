@@ -35,18 +35,18 @@ namespace SOS.Observations.Api.HealthChecks
                 },
                 VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified,
                 PositiveSightings = true,
-                OutputFields = new List<string>
+                Output = new OutputFilter
                 {
-                    "taxon.id"
+                    Fields = new[] { "taxon.id" }
                 }
             };
 
             // Warm up
-            await _observationManager.GetChunkAsync(0, null, searchFilter, 0, 2, "", SearchSortOrder.Asc);
+            await _observationManager.GetChunkAsync(0, null, searchFilter, 0, 2);
 
             var sw = new Stopwatch();
             sw.Start();
-            var result = await _observationManager.GetChunkAsync(0, null, searchFilter, 0, 2, "", SearchSortOrder.Asc);
+            var result = await _observationManager.GetChunkAsync(0, null, searchFilter, 0, 2);
             sw.Stop();
 
             return (Duration: sw.Elapsed, TotalCount: result.TotalCount);

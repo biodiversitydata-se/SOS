@@ -35,11 +35,8 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="filter"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
-        /// <param name="sortBy"></param>
-        /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take, string sortBy,
-            SearchSortOrder sortOrder);
+        Task<PagedResult<dynamic>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take);
 
         /// <summary>
         /// Get observations by scroll
@@ -48,8 +45,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="take"></param>
-        /// <param name="sortBy"></param>
-        /// <param name="sortOrder"></param>
         /// <param name="scrollId"></param>
         /// <returns></returns>
         Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
@@ -57,8 +52,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int take,
-            string sortBy,
-            SearchSortOrder sortOrder,
             string scrollId);
 
         /// <summary>
@@ -133,7 +126,13 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<dynamic> GetObservationAsync(
             int? userId,
             int? roleId,
-            string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields, bool ensureArtportalenUpdated);
+            string authorizationApplicationIdentifier, 
+            string occurrenceId, 
+            OutputFieldSet outputFieldSet, 
+            string translationCultureCode, 
+            bool protectedObservations, 
+            bool includeInternalFields, 
+            bool ensureArtportalenUpdated);
 
         /// <summary>
         /// Get user year counts
