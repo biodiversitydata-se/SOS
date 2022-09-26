@@ -1554,7 +1554,7 @@ namespace SOS.Lib.Repositories.Processed
 
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchDescriptor<dynamic>()
                 .Index(searchIndex)
-                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                .Source(filter.Output?.Fields?.ToProjection(filter is SearchFilterInternal))
                     .Query(q => q
                         .Bool(b => b
                             .Filter(filter.ToQuery())
@@ -1574,14 +1574,12 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
             SearchFilter filter,
             int take,
-            string sortBy,
-            SearchSortOrder sortOrder,
             string scrollId)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             
-            var sortDescriptor = await Client.GetSortDescriptorAsync<dynamic>(indexNames, sortBy, sortOrder);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<dynamic>(indexNames, filter?.Output?.SortOrders);
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
@@ -1600,7 +1598,7 @@ namespace SOS.Lib.Repositories.Processed
                         )
                         .Sort(sort => sortDescriptor)
                         .Size(take)
-                        .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                        .Source(filter.Output?.Fields?.ToProjection(filter is SearchFilterInternal))
                         .Scroll(ScrollTimeout)
                     ) : await Client
                         .ScrollAsync<dynamic>(ScrollTimeout, scrollId);

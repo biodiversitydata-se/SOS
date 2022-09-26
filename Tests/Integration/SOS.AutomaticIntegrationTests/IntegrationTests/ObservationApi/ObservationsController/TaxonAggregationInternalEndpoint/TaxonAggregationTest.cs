@@ -77,7 +77,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             // Act - Get observation by occurrenceId
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.TaxonAggregationInternal(null, null,
-                searchFilter, 1);
+                searchFilter);
 
             var resultObservation = response.GetResult<PagedResultDto<dynamic>>();
 
@@ -87,7 +87,6 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             var records = resultObservation.Records;
             resultObservation.Should().NotBeNull();
             resultObservation.TotalCount.Should().Be(2);
-            records.Sum(r => r.ObservationCount).Should().Be(60);
         }
     }
 }

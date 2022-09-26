@@ -150,15 +150,13 @@ namespace SOS.Observations.Api.Managers
             string authorizationApplicationIdentifier,
             SearchFilter filter, 
             int skip, 
-            int take, 
-            string sortBy,
-            SearchSortOrder sortOrder)
+            int take)
         {
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
-                    await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder);
+                    await _processedObservationRepository.GetChunkAsync(filter, skip, take);
                 PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
 
                 return processedObservations;
@@ -180,15 +178,13 @@ namespace SOS.Observations.Api.Managers
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int take, 
-            string sortBy,
-            SearchSortOrder sortOrder,
             string scrollId)
         {
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
-                    await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, sortBy, sortOrder, scrollId);
+                    await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, scrollId);
                 PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
                 return processedObservations;
             }
@@ -398,8 +394,8 @@ namespace SOS.Observations.Api.Managers
             }
 
             var filter = includeInternalFields ? new SearchFilterInternal(userId ?? 0, protectedObservations) : new SearchFilter(userId ?? 0, protectedObservations);
-
-            filter.PopulateOutputFields(outputFieldSet);
+            filter.Output = new OutputFilter();
+            filter.Output.PopulateFields(outputFieldSet);
             filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
 
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "Sighting", null, null, null, false);

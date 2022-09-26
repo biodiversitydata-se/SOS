@@ -469,8 +469,8 @@ namespace SOS.Observations.Api.Controllers
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-                SearchFilter searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, translationCultureCode);
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
+                SearchFilter searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, translationCultureCode, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
                 PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
@@ -540,7 +540,8 @@ namespace SOS.Observations.Api.Controllers
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var searchFilter = new SearchFilterInternal(UserId, sensitiveObservations)
                 {
-                    FieldTranslationCultureCode = translationCultureCode
+                    FieldTranslationCultureCode = translationCultureCode,
+                    Output = string.IsNullOrEmpty(sortBy) ? null : new OutputFilter { SortOrders = new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } } }
                 };
 
                 if (!string.IsNullOrEmpty(kingdom))
@@ -595,7 +596,7 @@ namespace SOS.Observations.Api.Controllers
                     searchFilter.DatasourceIds = new List<int> { 1 }; // Artportalen.
                 }
 
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
                 
                 var dtos = result?.Records?.ToObservations().Select(o => o.ToDto());
@@ -1231,15 +1232,11 @@ namespace SOS.Observations.Api.Controllers
 
                     if (outPutFields?.Any() ?? false)
                     {
-                        if (filter.Output == null)
-                        {
-                            filter.Output = new OutputFilterDto();
-                        }
-
+                        filter.Output ??= new OutputFilterExtendedDto();
                         filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
                     }
                 }
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(UserId, sensitiveObservations, translationCultureCode), skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(UserId, sensitiveObservations, translationCultureCode, sortBy, sortOrder), skip, take);
                 HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 return new OkObjectResult(dto);
@@ -1408,8 +1405,8 @@ namespace SOS.Observations.Api.Controllers
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                SearchFilter searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, translationCultureCode);
-                var result = await ObservationManager.GetObservationsByScrollAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, sortBy, sortOrder, scrollId);
+                SearchFilter searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, translationCultureCode, sortBy, sortOrder);
+                var result = await ObservationManager.GetObservationsByScrollAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, scrollId);
                 if (result.TotalCount > maxTotalCount)
                 {
                     return BadRequest($"Scroll total count limit is maxTotalCount. Your result is {result.TotalCount}. Try use a more specific filter.");

@@ -92,7 +92,7 @@ namespace SOS.Observations.Api.Managers
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
                 var propertyFields =
-                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.OutputFields);
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter?.Output?.Fields);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().
                     Where(fd => propertyFields.Select(pf => pf.DwcIdentifier.ToLower()).Contains(fd.DwcIdentifier.ToLower()));
                

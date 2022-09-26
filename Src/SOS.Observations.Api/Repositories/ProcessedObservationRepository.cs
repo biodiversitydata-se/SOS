@@ -61,7 +61,7 @@ namespace SOS.Observations.Api.Repositories
                     )
                 )
                 .Size(0)
-                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                .Source(filter.Output?.Fields?.ToProjection(filter is SearchFilterInternal))
                 .TrackTotalHits(false)
             );
 
@@ -233,20 +233,19 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
-            SearchSortOrder sortOrder)
+        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
-            var sortDescriptor = await Client.GetSortDescriptorAsync<Observation>(indexNames, sortBy, sortOrder);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Observation>(indexNames, filter?.Output?.SortOrders);
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
-                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                .Source(filter.Output?.Fields?.ToProjection(filter is SearchFilterInternal))
                 .From(skip)
                 .Size(take)
                 .Query(q => q
@@ -396,7 +395,6 @@ namespace SOS.Observations.Api.Repositories
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
-
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery)
@@ -404,7 +402,7 @@ namespace SOS.Observations.Api.Repositories
                     )
                 )
                 .Size(1)
-                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                .Source(filter.Output?.Fields?.ToProjection(filter is SearchFilterInternal))
                 .TrackTotalHits(false)
             );
 

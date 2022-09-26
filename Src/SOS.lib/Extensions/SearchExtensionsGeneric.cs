@@ -214,7 +214,7 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
-            return await GetSortDescriptorAsync<T>(client, indexNames, new[] { (sortBy, sortOrder) });
+            return await GetSortDescriptorAsync<T>(client, indexNames, new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } });
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace SOS.Lib.Extensions
         /// <param name="indexNames"></param>
         /// <param name="sortings"></param>
         /// <returns></returns>
-        public static async Task<SortDescriptor<T>> GetSortDescriptorAsync<T>(this IElasticClient client, string indexNames, IEnumerable<(string, SearchSortOrder)> sortings) where T : class
+        public static async Task<SortDescriptor<T>> GetSortDescriptorAsync<T>(this IElasticClient client, string indexNames, IEnumerable<SortOrderFilter> sortings) where T : class
         {
             if (!sortings?.Any() ?? true)
             {
@@ -236,8 +236,8 @@ namespace SOS.Lib.Extensions
 
             foreach (var sorting in sortings)
             {
-                var sortBy = sorting.Item1;
-                var sortOrder = sorting.Item2;
+                var sortBy = sorting.SortBy;
+                var sortOrder = sorting.SortOrder;
 
                 // Split sort string 
                 var propertyNames = sortBy.Split('.');

@@ -69,7 +69,7 @@ namespace SOS.Lib.IO.GeoJson
             {
                 var nrObservations = 0;
                 var propertyFields =
-                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.OutputFields);
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
                 JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))

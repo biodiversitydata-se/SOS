@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SOS.Lib.Models.Search.Filters
+﻿namespace SOS.Lib.Models.Search.Filters
 {
     /// <summary>
     /// 
@@ -14,7 +12,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// <param name="sensitiveObservations"></param>
         public SearchFilter(int userId, bool sensitiveObservations = false) : base(userId, sensitiveObservations)
         {
-
+            Output = new OutputFilter();
         }
 
         /// <summary>
@@ -23,7 +21,7 @@ namespace SOS.Lib.Models.Search.Filters
         ///     your projection is a conditional query where you dictates which fields should be returned by the API.
         ///     Omit this parameter and you will receive the complete collection of fields.
         /// </summary>
-        public List<string> OutputFields { get; set; }
+        public OutputFilter Output { get; set; }
 
         public new SearchFilter Clone()
         {

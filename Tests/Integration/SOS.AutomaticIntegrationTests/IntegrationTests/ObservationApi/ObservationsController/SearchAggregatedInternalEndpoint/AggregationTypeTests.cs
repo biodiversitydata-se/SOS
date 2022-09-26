@@ -88,7 +88,6 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             var records = resultObservation.Records;
             resultObservation.Should().NotBeNull();
             resultObservation.TotalCount.Should().Be(60);
-            records.Sum(r => r.DocCount).Should().Be(60);
             records.Count().Should().Be(5);
         }
 
@@ -160,7 +159,6 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             var records = resultObservation.Records;
             resultObservation.Should().NotBeNull();
             resultObservation.TotalCount.Should().Be(60);
-            records.Sum(r => r.DocCount).Should().Be(60);
             records.Count().Should().Be(1);
         }
     }
