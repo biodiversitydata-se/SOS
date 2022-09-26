@@ -36,4 +36,7 @@ global using System.Collections.Concurrent;
 global using System.Net;
 global using System.Reflection;
 global using System.IO.Compression;
+global using SOS.UserStatistics.Api.Cache.Models;
+global using SOS.UserStatistics.Api.Cache.Managers;
+global using SOS.UserStatistics.Api.Cache.Managers.Interfaces;
 
