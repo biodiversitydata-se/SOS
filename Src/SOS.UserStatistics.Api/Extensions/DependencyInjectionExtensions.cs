@@ -18,6 +18,7 @@ internal static class DependencyInjectionExtensions
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
 
         // Cache
+        webApplicationBuilder.Services.AddSingleton<IUserStatisticsCacheManager, UserStatisticsCacheManager>();
         webApplicationBuilder.Services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
         webApplicationBuilder.Services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         webApplicationBuilder.Services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();

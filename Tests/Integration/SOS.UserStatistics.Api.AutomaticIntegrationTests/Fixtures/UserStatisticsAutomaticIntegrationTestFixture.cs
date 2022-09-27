@@ -1,5 +1,6 @@
-﻿using SOS.UserStatistics.Api.Configuration;
-using Path = System.IO.Path;
+﻿using SOS.UserStatistics.Api.Cache.Managers;
+using SOS.UserStatistics.Api.Cache.Managers.Interfaces;
+using SOS.UserStatistics.Api.Configuration;
 
 namespace SOS.UserStatistics.Api.AutomaticIntegrationTests.Fixtures;
 
@@ -12,6 +13,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
     private VocabularyValueResolver _vocabularyValueResolver;
     private ArtportalenObservationFactory ArtportalenObservationFactory { get; set; }
     private InstallationEnvironment _installationEnvironment { get; set; }
+    private IUserStatisticsCacheManager _userStatisticsCacheManager { get; set; }
     private IUserStatisticsProcessedObservationRepository _userStatisticsProcessedObservationRepository { get; set; }
     private IUserStatisticsObservationRepository _userStatisticsObservationRepository { get; set; }
     private List<Taxon> _taxa { get; set; }
@@ -56,6 +58,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         taxonTreeCache.Set(basicTaxonTree);
         var taxonManager = CreateTaxonManager(_processClient, taxonRepository, memoryCache, taxonTreeCache);
 
+        _userStatisticsCacheManager = new UserStatisticsCacheManager(new MemoryCache(new MemoryCacheOptions()));
         _userStatisticsObservationRepository = CreateUserStatisticsObservationRepository(elasticConfiguration, elasticClientManager, _processClient);
         _userStatisticsProcessedObservationRepository = CreateUserStatisticsProcessedObservationRepository(elasticConfiguration, elasticClientManager, _processClient, memoryCache, taxonManager);
 
@@ -70,7 +73,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
             "https://www.artportalen.se",
             _processTimeManager);
 
-        UserStatisticsManager = new UserStatisticsManager(_userStatisticsObservationRepository, _userStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
+        UserStatisticsManager = new UserStatisticsManager(_userStatisticsCacheManager, _userStatisticsObservationRepository, _userStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
     }
 
     public void Dispose()
@@ -121,8 +124,8 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
 
     private List<Taxon> GetTaxaFromZipFile()
     {
-        var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        var filePath = Path.Combine(assemblyPath, @"Resources\TaxonCollection.zip");
+        var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var filePath = System.IO.Path.Combine(assemblyPath, @"Resources\TaxonCollection.zip");
 
         using (ZipArchive archive = ZipFile.OpenRead(filePath))
         {

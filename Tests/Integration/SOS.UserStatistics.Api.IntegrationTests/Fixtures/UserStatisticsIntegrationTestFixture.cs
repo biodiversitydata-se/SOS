@@ -1,4 +1,6 @@
-﻿namespace SOS.UserStatistics.Api.IntegrationTests.Fixtures;
+﻿using SOS.UserStatistics.Api.Cache.Managers;
+
+namespace SOS.UserStatistics.Api.IntegrationTests.Fixtures;
 
 public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
 {
@@ -79,7 +81,8 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
         var userService = CreateUserService();
         UserStatisticsProcessedObservationRepository = userStatisticsProcessedObservationRepository;
         _userManager = new UserManager(userService, new NullLogger<UserManager>());
-        UserStatisticsManager = new UserStatisticsManager(userStatisticsObservationRepository, userStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
+        var userStatisticsCacheManager = new UserStatisticsCacheManager(new MemoryCache(new MemoryCacheOptions()));
+        UserStatisticsManager = new UserStatisticsManager(userStatisticsCacheManager, userStatisticsObservationRepository, userStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
     }
 
     protected virtual IUserService CreateUserService()
