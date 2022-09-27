@@ -287,18 +287,33 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             try
             {
                 var query = $@"SELECT TOP({limit})   
-	               s.SightingId AS Id
+	                s.SightingId AS Id,
+                    MAX(CASE 
+		                WHEN sc.CreationTime > s.EditDate AND sc.CreationTime > mfc.CreationTime THEN sc.CreationTime
+		                WHEN mfc.CreationTime > s.EditDate AND mfc.CreationTime > sc.CreationTime THEN mfc.CreationTime
+		                ELSE s.EditDate
+	                END) AS SortDate
                 FROM
 	                {SightingsFromBasics}
+                    LEFT JOIN SightingComment sc ON s.SightingId = sc.SightingId
+	                LEFT JOIN MediaFile mf ON s.SightingId = mf.SightingId 
+	                LEFT JOIN MediaFileComment mfc ON mf.Id = mfc.MediaFileId
                 WHERE
 	                {SightingWhereBasics}
                     AND s.EditDate > @modifiedSince
+                    AND (
+		                s.EditDate > @modifiedSince 
+		                OR sc.CreationTime > @modifiedSince 
+		                OR mfc.CreationTime > @modifiedSince
+	                )
+                GROUP BY
+	                s.SightingId
                 ORDER BY
-                    s.EditDate";
+                    SortDate";
 
                 var result = await QueryAsync<int>(query, new { modifiedSince = modifiedSince.ToLocalTime() });                
                 Logger.LogDebug($"GetModifiedIdsAsync({modifiedSince}, {limit}, Live={Live}) returned { (result == null ? "null" : result.Count()) } sightingIds");
-                if ((result?.Count() ?? 0) == 0)
+                if (!result?.Any() ?? true)
                 {                    
                     Logger.LogDebug($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}, Query: {query}");
                 }

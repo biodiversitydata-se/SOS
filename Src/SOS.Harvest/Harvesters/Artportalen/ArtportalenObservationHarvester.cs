@@ -284,7 +284,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _logger.LogDebug($"Start casting entities to verbatim ({batchIndex})");
 
                 // Cast sightings to verbatim observations
-                var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
+                var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(sightings!);
                 _logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
 
                 return verbatimObservations;

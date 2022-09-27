@@ -205,45 +205,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
         #region Media
 
-        private IEnumerable<Media> CastMediaEntityToVerbatims(IEnumerable<MediaEntity> entities)
-        {
-            if (!entities?.Any() ?? true)
-            {
-                return null!;
-            }
-            var mediaFiles = new Dictionary<int, Media>();
-
-            foreach(var entity in entities!)
-            {
-                if (!mediaFiles.TryGetValue(entity.Id, out var media))
-                {
-                    media = new Media
-                    {
-                        Comments = new List<MediaComment>(),
-                        CopyrightText = entity.CopyrightText,
-                        FileType = entity.FileType,
-                        FileUri = entity.FileUri,
-                        Id = entity.Id,
-                        RightsHolder = entity.RightsHolder,
-                        UploadDateTime = entity.UploadDateTime
-                    };
-                    mediaFiles.Add(media.Id, media);
-                }
-
-                if (!string.IsNullOrEmpty(entity.Comment))
-                {
-                    media.Comments.Add(new MediaComment
-                    {
-                        Comment = entity.Comment,
-                        CommentBy = entity.CommentBy,
-                        CommentCreated = entity.CommentCreated
-                    });
-                }
-            }
-
-            return mediaFiles.Values;
-        }
-
         private async Task<IDictionary<int, Media[]>> GetSightingMediaAsync(IEnumerable<int> sightingIds)
         {
             var sightingsMedias = new Dictionary<int, IDictionary<int, Media>>();
@@ -254,7 +215,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
 
             var sightingMediaEntities = await _mediaRepository.GetAsync(sightingIds!);
-
             if (!sightingMediaEntities?.Any() ?? true)
             {
                 return null!;
@@ -552,7 +512,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 Media[]? media = null;
                 sightingsMedias?.TryGetValue(entity.Id, out media);
 
-                var verbatim = CastEntityToVerbatim(entity, site, speciesCollections, personSighting, projects, media);
+                var verbatim = CastEntityToVerbatim(entity, site!, speciesCollections, personSighting, projects, media);
 
                 if (verbatim == null)
                 {
