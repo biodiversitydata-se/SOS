@@ -300,7 +300,6 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                LEFT JOIN MediaFileComment mfc ON mf.Id = mfc.MediaFileId
                 WHERE
 	                {SightingWhereBasics}
-                    AND s.EditDate > @modifiedSince
                     AND (
 		                s.EditDate > @modifiedSince 
 		                OR sc.CreationTime > @modifiedSince 
