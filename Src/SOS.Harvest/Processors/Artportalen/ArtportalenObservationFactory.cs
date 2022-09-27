@@ -347,13 +347,15 @@ namespace SOS.Harvest.Processors.Artportalen
                 var eventMonths = new HashSet<int>();
                 if (startDate.HasValue)
                 {
-                    eventMonths.Add(startDate.Value.Month);
+                    var fromDate = startDate.Value.ToLocalTime();
+                    eventMonths.Add(fromDate.Month);
 
                     if (endDate.HasValue)
                     {
+                        var toDate = endDate.Value.ToLocalTime();
                         // Create a new date the 1 first day in month after start month since we allready have added start month
-                        var currentDate = new DateTime(startDate.Value.Year, startDate.Value.Month, 1).AddMonths(1);
-                        while (currentDate <= endDate.Value)
+                        var currentDate = new DateTime(fromDate.Year, fromDate.Month, 1).AddMonths(1);
+                        while (currentDate <= toDate)
                         {
                             eventMonths.Add(currentDate.Month);
                             currentDate = currentDate.AddMonths(1);
