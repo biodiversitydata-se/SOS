@@ -494,7 +494,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="kingdom">Taxon kingdom. Plantae, arachnida, mollusca, insecta, amphibia, aves, mammalia, reptilia, actinopterygii, animalia, fungi</param>
         /// <param name="identificationVerificationStatus">Identification verification status. Research, casual</param>
         /// <param name="license">none,CC-BY,CC-BY-NC,CC-BY-SA</param>
-        /// <param name="scientificName"></param>
+        /// <param name="scientificName"></param>        
         /// <param name="taxonKey"></param>
         /// <param name="issue"></param>
         /// <param name="has">Geo,photos</param>
