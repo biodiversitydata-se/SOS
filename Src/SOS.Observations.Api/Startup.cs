@@ -580,9 +580,7 @@ namespace SOS.Observations.Api
             var taxonSearchManager = serviceProvider.GetService<ITaxonSearchManager>();
             Task.Run(() => {
                 taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { 0 });                
-            });
-
-            
+            }); 
         }
         
         private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
