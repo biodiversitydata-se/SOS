@@ -1,4 +1,4 @@
-﻿namespace SOS.DataHost.Api.Extensions;
+﻿namespace SOS.DataStewardship.Api.Extensions;
 
 internal static class AuthenticationExtensions
 {

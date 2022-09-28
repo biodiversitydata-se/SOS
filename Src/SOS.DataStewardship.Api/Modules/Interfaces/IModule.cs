@@ -1,4 +1,4 @@
-﻿namespace SOS.DataHost.Api.Modules.Interfaces;
+﻿namespace SOS.DataStewardship.Api.Modules.Interfaces;
 
 interface IModule
 {
