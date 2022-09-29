@@ -92,6 +92,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository = new Mock<IProcessedObservationCoreRepository>().Object;
             }
             IUserObservationRepository userObservationRepository = new Mock<IUserObservationRepository>().Object;
+            IObservationDatasetRepository observationDatasetRepository = new Mock<IObservationDatasetRepository>().Object;
 
             var processInfoRepository =
                 new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
@@ -285,6 +286,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcArchiveFileWriterCoordinator,
                 processConfiguration,
                 userObservationRepository,
+                observationDatasetRepository,
                 new NullLogger<ProcessObservationsJob>());
 
             return processJob;
