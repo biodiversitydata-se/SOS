@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Extensions
@@ -50,11 +51,17 @@ namespace SOS.Lib.Extensions
                 userObservation.UserServiceUserId = userServiceUserId;
                 userObservation.SightingId = observation.ArtportalenInternal.SightingId;
                 userObservation.TaxonId = observation.Taxon.Id;
-                //userObservation.TaxonSpeciesGroupId = // todo
+                userObservation.TaxonSpeciesGroupId = (int)observation.Taxon.Attributes.SpeciesGroup; // todo Check if correct
                 userObservation.ProvinceFeatureId = observation?.Location?.Province?.FeatureId; // int.Parse(observation.Location.Province.FeatureId);
                 userObservation.MunicipalityFeatureId = observation?.Location?.Municipality?.FeatureId; // int.Parse(observation.Location.Municipality.FeatureId);
-                //userObservation.CountryRegionFeatureId = // todo
-                //userObservation.SiteId = observation.Location.LocationId // todo
+                                                                                                        //userObservation.CountryRegionFeatureId = // todo
+                var regex = new Regex(@"\d+$");
+                var match = regex.Match(observation.Location?.LocationId);
+                if (int.TryParse(match.Value, out var siteId))
+                {
+                    userObservation.SiteId = siteId;
+                }
+                   
                 userObservation.StartDate = observation.Event.StartDate.Value;
                 userObservation.ObservationYear = userObservation.StartDate.Year;
                 userObservation.ObservationMonth = userObservation.StartDate.Month;
