@@ -1,10 +1,18 @@
 ﻿using System.Collections.Generic;
 
-
 namespace SOS.Lib.Models.Search.Filters
 {
     public class OutputFilter
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public OutputFilter()
+        {
+            Fields = new List<string>();
+            SortOrders = new SortOrderFilter[0];
+        }
+
         // <summary>
         /// This parameter allows you to decide what fields should be returned, using a projection.
         /// Omit this parameter and you will receive the complete collection of fields.
