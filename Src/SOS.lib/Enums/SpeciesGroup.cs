@@ -38,31 +38,31 @@
         /// <summary>
         /// Invertebrates (Ryggradslösa djur)
         /// </summary>
-        Invertebrates = 6,
+        Invertebrates = 7,
         
         /// <summary>
         /// Birds (fåglar)
         /// </summary>
-        Birds = 7,
+        Birds = 8,
         
         /// <summary>
         /// Amphibians and reptiles (Grod- och kräldjur)
         /// </summary>
-        AmphibiansAndReptiles = 8,
+        AmphibiansAndReptiles = 9,
         
         /// <summary>
         /// Other vertebrates (Andra däggdjur)
         /// </summary>
-        OtherVertebrates = 9,
+        OtherVertebrates = 11,
         
         /// <summary>
         /// Bats (Fladdermöss)
         /// </summary>
-        Bats = 10,
+        Bats = 12,
         
         /// <summary>
         /// Fishes (Fiskar)
         /// </summary>
-        Fishes = 11
+        Fishes = 14
     }
 }
