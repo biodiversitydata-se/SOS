@@ -1,4 +1,5 @@
 using SOS.DataStewardship.Api.Extensions;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var logger = NLogBuilder.ConfigureNLog($"nlog.{env}.config").GetCurrentClassLogger();
@@ -23,8 +24,11 @@ try
 
     if (app.Environment.IsDevelopment())
     {
-        app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwagger();        
+        app.UseSwaggerUI(options =>
+        {            
+            options.DisplayOperationId();            
+        });
     }    
 
     app.UseAuthentication();

@@ -3,6 +3,7 @@ using SOS.DataStewardship.Api.Models;
 using SOS.DataStewardship.Api.Modules.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using Nest;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace SOS.DataStewardship.Api.Modules;
 
@@ -17,7 +18,7 @@ public class DataStewardshipModule : IModule
      * 4. Implement controller actions.
      * 5. Create integration tests         
      */
-
+    
 
     public void MapEndpoints(WebApplication application)
     {
@@ -25,37 +26,54 @@ public class DataStewardshipModule : IModule
             .Produces<Dataset>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError);
-        //.WithName("GetAllBooks")
-        //.WithTags("Getters");
+            .Produces(StatusCodes.Status500InternalServerError)
+            .WithName("GetDatasetById")
+            .WithTags("DataStewardship")
+            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get dataset by id."));
+            
 
         application.MapPost("/datastewardship/datasets", GetDatasetsBySearchAsync)
             .Produces<List<Dataset>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError);
+            .Produces(StatusCodes.Status500InternalServerError)
+            .WithName("GetDatasetsBySearch")
+            .WithTags("DataStewardship")
+            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get datasets by search."));
 
 
-        application.MapGet("/datastewardship/events/{id}", GetEventsByIdAsync)
+        application.MapGet("/datastewardship/events/{id}", GetEventByIdAsync)
             .Produces<EventModel>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError);
+            .Produces(StatusCodes.Status500InternalServerError)
+            .WithName("GetEventById")
+            .WithTags("DataStewardship")
+            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get event by id."));
 
         application.MapPost("/datastewardship/events", GetEventsBySearchAsync)
             .Produces<List<EventModel>>(StatusCodes.Status200OK)            
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError);
+            .Produces(StatusCodes.Status500InternalServerError)
+            .WithName("GetEventsBySearch")
+            .WithTags("DataStewardship")
+            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get events by search."));
 
         application.MapGet("/datastewardship/occurrences/{id}", GetOccurrenceByIdAsync)
             .Produces<OccurrenceModel>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError);
+            .Produces(StatusCodes.Status500InternalServerError)
+            .WithName("GetOccurrenceById")
+            .WithTags("DataStewardship")
+            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get occurrence by id."));
 
         application.MapPost("/datastewardship/occurrences", GetOccurrencesBySearchAsync)
             .Produces<List<OccurrenceModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError);
+            .Produces(StatusCodes.Status500InternalServerError)
+            .WithName("GetOccurrencesBySearch")
+            .WithTags("DataStewardship")
+            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get occurrences by search."));
     }
 
     /// <summary>
@@ -101,7 +119,7 @@ public class DataStewardshipModule : IModule
     /// </summary>
     /// <param name="id">EventId of the event to get.</param>
     /// <returns></returns>
-    internal async Task<IResult> GetEventsByIdAsync([FromRoute][Required] string id)
+    internal async Task<IResult> GetEventByIdAsync([FromRoute][Required] string id)
     {
         try
         {
