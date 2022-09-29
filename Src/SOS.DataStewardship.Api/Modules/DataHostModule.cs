@@ -1,8 +1,8 @@
-﻿using SOS.DataHost.Api.Modules.Interfaces;
+﻿using SOS.DataStewardship.Api.Modules.Interfaces;
 
-namespace SOS.DataHost.Api.Modules;
+namespace SOS.DataStewardship.Api.Modules;
 
-public class DataHostModule : IModule
+public class DataStewardshipModule : IModule
 {
     public void MapEndpoints(WebApplication application)
     {

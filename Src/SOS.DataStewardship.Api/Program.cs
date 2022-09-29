@@ -1,4 +1,4 @@
-using SOS.DataHost.Api.Extensions;
+using SOS.DataStewardship.Api.Extensions;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var logger = NLogBuilder.ConfigureNLog($"nlog.{env}.config").GetCurrentClassLogger();

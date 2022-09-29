@@ -2,7 +2,7 @@
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 
-namespace SOS.DataHost.Api.Extensions;
+namespace SOS.DataStewardship.Api.Extensions;
 
 internal static class DependencyInjectionExtensions
 {

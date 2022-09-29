@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "SOS.DataHost.Api": {
+    "SOS.DataStewardship.Api": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

@@ -1,4 +1,4 @@
-﻿namespace SOS.DataHost.Api.Extensions;
+﻿namespace SOS.DataStewardship.Api.Extensions;
 
 public static class ModuleExtensions
 {

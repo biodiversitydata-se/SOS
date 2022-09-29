@@ -1,9 +1,9 @@
-﻿namespace SOS.DataHost.Api.Configuration
+﻿namespace SOS.DataStewardship.Api.Configuration
 {
     /// <summary>
-    /// DataHost API configuration.
+    /// DataStewardship API configuration.
     /// </summary>
-    public class DataHostApiConfiguration
+    public class DataStewardshipApiConfiguration
     {
         /// <summary>
         /// Protected scope
