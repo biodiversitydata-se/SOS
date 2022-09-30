@@ -2,6 +2,7 @@
 using Hangfire;
 using Hangfire.Server;
 using SOS.Lib.Enums;
+using SOS.Lib.HangfireAttributes;
 using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.Jobs.Export
@@ -30,9 +31,10 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [JobDisplayName("Export observations. Email={2}, Description={3}, ExportFormat={4}")]
+        [JobDisplayName("Export observations. Email={3}, Description={4}, ExportFormat={5}")]
         [AutomaticRetry(Attempts = 2, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
-        [Queue("medium")]
+        [Queue("low")]
+        [OneAtTheTime(MaxAttempts = 0, RetryInSeconds = 60)]
         Task<bool> RunAsync(SearchFilter filter,
             int? roleId,
             string authorizationApplicationIdentifier,
