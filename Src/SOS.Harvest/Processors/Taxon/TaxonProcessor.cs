@@ -73,7 +73,7 @@ namespace SOS.Harvest.Processors.Taxon
                     var enumerations = new Dictionary<string, string>();
                     attributeTypes.Add(attributeType.AttributeTypeId, enumerations);
 
-                    foreach (var enumeration in attributeType.Enumerations)
+                    foreach (var enumeration in attributeType.Enumerations!)
                     {
                         if (string.IsNullOrEmpty(enumeration.Name))
                         {
@@ -210,9 +210,7 @@ namespace SOS.Harvest.Processors.Taxon
                                 taxon.DynamicProperties.SwedishOccurrence = enumValue;
                                 break;
                         }
-                    }
-
-                    
+                    }  
                 }
                 _logger.LogDebug("Finish get taxon attributes batch");
             }

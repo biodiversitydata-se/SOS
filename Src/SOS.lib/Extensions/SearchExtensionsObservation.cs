@@ -691,12 +691,13 @@ namespace SOS.Lib
         }
 
         /// <summary>
-        ///     Create search filter
+        /// Create search filter
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="skipSightingTypeFilters"></param>
         /// <returns></returns>
         public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToQuery(
-            this SearchFilterBase filter)
+            this SearchFilterBase filter, bool skipSightingTypeFilters = false)
         {
             var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
@@ -706,6 +707,11 @@ namespace SOS.Lib
             }
 
             query.AddAuthorizationFilters(filter.ExtendedAuthorization);
+
+            if (!skipSightingTypeFilters)
+            {
+                query.AddSightingTypeFilters(filter.TypeFilter);
+            }
 
             // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
             if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
@@ -718,7 +724,6 @@ namespace SOS.Lib
             query.TryAddLocationFilter(filter.Location);
             query.TryAddModifiedDateFilter(filter.ModifiedDate);
             query.TryAddNotRecoveredFilter(filter);
-            query.AddSightingTypeFilters(filter.TypeFilter);
             query.TryAddValidationStatusFilter(filter);
             query.TryAddTaxonCriteria(filter.Taxa);
 

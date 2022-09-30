@@ -644,7 +644,7 @@ namespace SOS.Harvest.Processors.Artportalen
             }
 
             var res = substrateDescription.Length > 0 ? substrateDescription.ToString().WithMaxLength(255) : null;
-            return res;
+            return res!;
         }
 
         /// <summary>
@@ -662,7 +662,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
             if (taxon.Attributes?.OrganismGroup?.StartsWith("fåg", StringComparison.CurrentCultureIgnoreCase) ?? false)
             {
-                return (verbatimObservation.Activity?.Id ?? 0) == 0 ? 1000000 : verbatimObservation.Activity.Id;
+                return (verbatimObservation.Activity?.Id ?? 0) == 0 ? 1000000 : verbatimObservation.Activity!.Id;
             }
 
             return 0;
