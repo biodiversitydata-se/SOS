@@ -259,7 +259,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 throw new Exception("Elasticsearch configuration must use integrationtest index");
             var blobStorageManagerMock = new Mock<IBlobStorageManager>();
             var observationApiConfiguration = GetObservationApiConfiguration();
-            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration);
             var mongoDbConfiguration = GetMongoDbConfiguration();
             var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
             _processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,

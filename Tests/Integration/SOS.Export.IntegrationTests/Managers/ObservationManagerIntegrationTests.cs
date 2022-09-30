@@ -34,7 +34,7 @@ namespace SOS.Export.IntegrationTests.Managers
         {
             var exportConfiguration = GetExportConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
-            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration);
 
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(

@@ -174,7 +174,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
             var blobStorageManagerMock = new Mock<IBlobStorageManager>();
             var observationApiConfiguration = GetObservationApiConfiguration();
-            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration);
             var mongoDbConfiguration = GetMongoDbConfiguration();
             var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
             var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,

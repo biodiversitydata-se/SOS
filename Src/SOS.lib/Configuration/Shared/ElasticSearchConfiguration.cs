@@ -64,6 +64,11 @@ namespace SOS.Lib.Configuration.Shared
         public string Password { get; set; }
 
         /// <summary>
+        /// Request timeout in seconds
+        /// </summary>
+        public int? RequestTimeout { get; set; }
+
+        /// <summary>
         ///     User name
         /// </summary>
         public string UserName { get; set; }
@@ -96,7 +101,7 @@ namespace SOS.Lib.Configuration.Shared
         /// Get client created with current configuration
         /// </summary>
         /// <returns></returns>
-        public IElasticClient[] GetClients(bool debugMode = false)
+        public IElasticClient[] GetClients()
         {
             var clients = new List<IElasticClient>();
             foreach (var cluster in Clusters)
@@ -107,7 +112,7 @@ namespace SOS.Lib.Configuration.Shared
                 var settings = new ConnectionSettings(connectionPool)
                     .EnableApiVersioningHeader()
                     .EnableHttpCompression(true)
-                    .RequestTimeout(TimeSpan.FromSeconds(300))
+                    .RequestTimeout(TimeSpan.FromSeconds(RequestTimeout ?? 60))
                     .SniffOnStartup(true)
                     .SniffOnConnectionFault(true)
                     .ServerCertificateValidationCallback(CertificateValidations.AllowAll);
@@ -117,7 +122,7 @@ namespace SOS.Lib.Configuration.Shared
                     settings.BasicAuthentication(UserName, Password);
                 }
 
-                if (DebugMode || debugMode)
+                if (DebugMode)
                 {
                     settings.EnableDebugMode();
                 }
