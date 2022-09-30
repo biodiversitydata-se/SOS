@@ -41,10 +41,21 @@ namespace SOS.Lib.HangfireAttributes
             RetryInSeconds = 60;
         }
 
+        /// <summary>
+        /// Max times to retry running job. 0 - infinite
+        /// </summary>
         public int MaxAttempts { get; set; }
 
+        /// <summary>
+        /// Time between retry attempts
+        /// </summary>
         public int RetryInSeconds { get; set; } 
 
+        /// <summary>
+        /// On state election event
+        /// </summary>
+        /// <param name="context"></param>
+        /// <exception cref="NotSupportedException"></exception>
         public void OnStateElection(ElectStateContext context)
         {
             // We are intercepting transitions to the Processed state, that is performed by
@@ -138,8 +149,11 @@ namespace SOS.Lib.HangfireAttributes
 
         }
 
-
-
+        /// <summary>
+        /// On state applited event
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="transaction"></param>
         public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
         {
             if (context.BackgroundJob.Job == null || context.OldStateName != ProcessingState.StateName) {
@@ -154,6 +168,11 @@ namespace SOS.Lib.HangfireAttributes
             }
         }
 
+        /// <summary>
+        /// On state unapplied event
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="transaction"></param>
         public void OnStateUnapplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
         {
 
