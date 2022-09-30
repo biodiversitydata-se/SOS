@@ -1554,7 +1554,7 @@ namespace SOS.Lib.Repositories.Processed
 
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchDescriptor<dynamic>()
                 .Index(searchIndex)
-                .Source(filter.Output?.Fields?.ToProjection(filter is SearchFilterInternal))
+                .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                     .Query(q => q
                         .Bool(b => b
                             .Filter(filter.ToQuery())
@@ -1598,7 +1598,7 @@ namespace SOS.Lib.Repositories.Processed
                         )
                         .Sort(sort => sortDescriptor)
                         .Size(take)
-                        .Source(filter.Output?.Fields?.ToProjection(filter is SearchFilterInternal))
+                        .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                         .Scroll(ScrollTimeout)
                     ) : await Client
                         .ScrollAsync<dynamic>(ScrollTimeout, scrollId);

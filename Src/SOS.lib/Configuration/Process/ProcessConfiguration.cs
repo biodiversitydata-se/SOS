@@ -26,6 +26,11 @@
         public bool ProcessUserObservation { get; set; }
 
         /// <summary>
+        /// True if observation dataset Elasticsearch index should be created.
+        /// </summary>
+        public bool ProcessObservationDataset { get; set; }
+
+        /// <summary>
         ///     No of threads to run in parallel
         /// </summary>
         public int NoOfThreads { get; set; }

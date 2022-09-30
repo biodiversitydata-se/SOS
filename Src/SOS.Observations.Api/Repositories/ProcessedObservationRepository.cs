@@ -61,7 +61,7 @@ namespace SOS.Observations.Api.Repositories
                     )
                 )
                 .Size(0)
-                .Source(filter.Output?.Fields?.ToProjection(filter is SearchFilterInternal))
+                .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .TrackTotalHits(false)
             );
 
@@ -245,7 +245,7 @@ namespace SOS.Observations.Api.Repositories
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
-                .Source(filter.Output?.Fields?.ToProjection(filter is SearchFilterInternal))
+                .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .From(skip)
                 .Size(take)
                 .Query(q => q
@@ -402,7 +402,7 @@ namespace SOS.Observations.Api.Repositories
                     )
                 )
                 .Size(1)
-                .Source(filter.Output?.Fields?.ToProjection(filter is SearchFilterInternal))
+                .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .TrackTotalHits(false)
             );
 

@@ -541,7 +541,7 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = new SearchFilterInternal(UserId, sensitiveObservations)
                 {
                     FieldTranslationCultureCode = translationCultureCode,
-                    Output = string.IsNullOrEmpty(sortBy) ? null : new OutputFilter { SortOrders = new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } } }
+                    Output = string.IsNullOrEmpty(sortBy) ? new OutputFilter() : new OutputFilter { SortOrders = new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } } }
                 };
 
                 if (!string.IsNullOrEmpty(kingdom))

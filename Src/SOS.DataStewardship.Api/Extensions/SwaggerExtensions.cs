@@ -1,13 +1,16 @@
-﻿namespace SOS.DataStewardship.Api.Extensions;
+﻿using Microsoft.Extensions.Options;
+using SOS.DataStewardship.Api.Helpers;
+
+namespace SOS.DataStewardship.Api.Extensions;
 
 public static class SwaggerExtensions
 {
     public static WebApplicationBuilder SetupSwagger(this WebApplicationBuilder webApplicationBuilder)
     {
         webApplicationBuilder.Services.AddSwaggerGen(
-            swagger =>
+            options =>
             {
-                swagger.AddSecurityDefinition("Bearer", //Name the security scheme
+                options.AddSecurityDefinition("Bearer", //Name the security scheme
                     new OpenApiSecurityScheme
                     {
                         Name = "Authorization",
@@ -17,7 +20,7 @@ public static class SwaggerExtensions
                         Scheme = "bearer" //The name of the HTTP Authorization scheme to be used in the Authorization header. In this case "bearer".
                     });
 
-                swagger.AddSecurityRequirement(new OpenApiSecurityRequirement{
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement{
                     {
                         new OpenApiSecurityScheme{
                             Scheme = "bearer",
@@ -31,6 +34,12 @@ public static class SwaggerExtensions
                         new List<string>()
                     }
                 });
+
+                var schemaHelper = new SwashbuckleSchemaHelper();
+                options.CustomSchemaIds(type => schemaHelper.GetSchemaId(type));
+                //options.CustomSchemaIds(type => type.ToString());
+                //options.CustomSchemaIds(type => type.FullName);
+                options.EnableAnnotations();
             });
 
         webApplicationBuilder.Services.AddEndpointsApiExplorer();

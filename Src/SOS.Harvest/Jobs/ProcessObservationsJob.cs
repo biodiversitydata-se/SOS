@@ -35,6 +35,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Models.Processed.Dataset;
 
 namespace SOS.Harvest.Jobs
 {
@@ -52,6 +53,7 @@ namespace SOS.Harvest.Jobs
         private readonly ILogger<ProcessObservationsJob> _logger;
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IUserObservationRepository _userObservationRepository;
+        private readonly IObservationDatasetRepository _observationDatasetRepository;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly Dictionary<DataProviderType, IObservationProcessor> _processorByType;
@@ -139,6 +141,17 @@ namespace SOS.Harvest.Jobs
                     _logger.LogInformation(
                         $"Finish clear ElasticSearch index: {_userObservationRepository.UniqueIndexName}");
                 }
+
+                if (_processConfiguration.ProcessObservationDataset)
+                {
+                    _logger.LogInformation($"_processedObservationRepository.LiveMode={_processedObservationRepository.LiveMode}");
+                    _logger.LogInformation($"_observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");
+                    _observationDatasetRepository.LiveMode = _observationDatasetRepository.LiveMode;
+                    _logger.LogInformation($"Set _observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");
+                    _logger.LogInformation($"Start clear ElasticSearch index: UniqueIndexName={_observationDatasetRepository.UniqueIndexName}, IndexName={_observationDatasetRepository.IndexName}");
+                    await _observationDatasetRepository.ClearCollectionAsync();
+                    _logger.LogInformation($"Finish clear ElasticSearch index: {_observationDatasetRepository.UniqueIndexName}");
+                }
             }
             else
             {
@@ -174,6 +187,13 @@ namespace SOS.Harvest.Jobs
                 await _userObservationRepository.DisableIndexingAsync();
                 _logger.LogInformation($"Finish disable indexing ({_userObservationRepository.UniqueIndexName})");
             }
+
+            if (_processConfiguration.ProcessObservationDataset)
+            {
+                _logger.LogInformation($"Start disable indexing ({_observationDatasetRepository.UniqueIndexName})");
+                await _observationDatasetRepository.DisableIndexingAsync();
+                _logger.LogInformation($"Finish disable indexing ({_observationDatasetRepository.UniqueIndexName})");
+            }
         }
 
         /// <summary>
@@ -195,6 +215,13 @@ namespace SOS.Harvest.Jobs
                 _logger.LogInformation($"Start enable indexing ({_userObservationRepository.UniqueIndexName})");
                 await _userObservationRepository.EnableIndexingAsync();
                 _logger.LogInformation($"Finish enable indexing ({_userObservationRepository.UniqueIndexName})");
+            }
+
+            if (_processConfiguration.ProcessObservationDataset)
+            {
+                _logger.LogInformation($"Start enable indexing ({_observationDatasetRepository.UniqueIndexName})");
+                await _observationDatasetRepository.EnableIndexingAsync();
+                _logger.LogInformation($"Finish enable indexing ({_observationDatasetRepository.UniqueIndexName})");
             }
         }
 
@@ -508,7 +535,12 @@ namespace SOS.Harvest.Jobs
                         _logger.LogInformation(timerMessage);
                     }
                 }
-                
+
+                if (_processConfiguration.ProcessObservationDataset)
+                {
+                    await AddObservationDatasets();
+                }
+
                 //-------------------------------
                 // 8. Return processing result
                 //-------------------------------
@@ -791,6 +823,7 @@ namespace SOS.Harvest.Jobs
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             ProcessConfiguration processConfiguration,
             IUserObservationRepository userObservationRepository,
+            IObservationDatasetRepository observationDatasetRepository,
             ILogger<ProcessObservationsJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -841,6 +874,7 @@ namespace SOS.Harvest.Jobs
             _enableTimeManager = processConfiguration.EnableTimeManager;
             _processConfiguration = processConfiguration;
             _userObservationRepository = userObservationRepository ?? throw new ArgumentNullException(nameof(userObservationRepository));
+            _observationDatasetRepository = observationDatasetRepository ?? throw new ArgumentNullException(nameof(observationDatasetRepository));
         }
 
         /// <inheritdoc />
@@ -900,6 +934,27 @@ namespace SOS.Harvest.Jobs
             var taxa = await GetTaxaAsync(JobRunModes.IncrementalActiveInstance);
             _processedObservationRepository.LiveMode = true;
             return await processor.ProcessObservationsAsync(provider, taxa, verbatims);
+        }
+
+        private async Task AddObservationDatasets()
+        {
+            /*
+             * Workflow - Med nuvarande SOS-struktur
+             * --------------------------------------
+             *  1. Observationer skördas från Artportalen till MongoDB precis som vanligt, men nu ska också en ny property DataStewardshipDatasetId sättas för de observationer som ingår i datavärdskapet. En ny tabell i Artportalen behövs som beskriver datasetet och ytterligare en som pekar på vilka projekt som ingår i datasetet.
+             *  2. Datasetets metadata ska skördas från Artportalen till MongoDB.
+             *  3. Observationerna processas precis som tidigare.
+             *  4. När processningen av alla observationer är klara så processas dataseten, dels utifrån metadatainformationen som finns i MongoDB och dels från de processade observationerna för att få fram vilka EventId:n som ingår i datasetet.
+             *
+             *  Problem
+             *  ----------------------------------
+             *  1. Det finns en del strukturer som inte finns i SOS idag. Exempelvis:
+             *    - WeatherVariable
+             *  Lösning: Antingen får vi lägga till mer properties till nuvarande struktur, eller så får vi skapa ett nytt index för datavärdskapet.
+             */
+
+            List<ObservationDataset> datasets = new List<ObservationDataset>();
+            await _observationDatasetRepository.AddManyAsync(datasets);
         }
     }
 }

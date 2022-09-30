@@ -56,6 +56,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public Event Event { get; set; }
 
         /// <summary>
+        /// Data stewardship dataset id.
+        /// </summary>
+        public string DataStewardshipDatasetId { get; set; }
+
+        /// <summary>
         ///     Geological information, such as stratigraphy, that qualifies a region or place.
         /// </summary>
         public GeologicalContext GeologicalContext { get; set; }
