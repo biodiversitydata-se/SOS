@@ -52,7 +52,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             var processConfiguration = GetProcessConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
 
-            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration);
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
                 processDbConfiguration.GetMongoDbSettings(),

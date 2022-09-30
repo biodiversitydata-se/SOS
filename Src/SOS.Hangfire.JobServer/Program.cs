@@ -181,7 +181,7 @@ namespace SOS.Hangfire.JobServer
                         .Get<UserServiceConfiguration>();
 
                     services.AddSingleton(_searchDbConfiguration);
-                    services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(_searchDbConfiguration, _env.Equals("local")));
+                    services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(_searchDbConfiguration));
                 })
                 .UseServiceProviderFactory(hostContext =>
                     {

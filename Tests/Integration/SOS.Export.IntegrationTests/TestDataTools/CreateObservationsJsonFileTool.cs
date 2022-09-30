@@ -41,7 +41,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var processedObservationRepository = new ProcessedObservationCoreRepository(
-                new ElasticClientManager(elasticSearchConfiguration, true),
+                new ElasticClientManager(elasticSearchConfiguration),
                 new ElasticSearchConfiguration(),
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);

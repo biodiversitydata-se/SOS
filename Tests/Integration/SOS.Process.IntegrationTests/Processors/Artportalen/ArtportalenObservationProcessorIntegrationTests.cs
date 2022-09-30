@@ -77,7 +77,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             var processConfiguration = GetProcessConfiguration();
             var exportConfiguration = GetExportConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
-            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration);
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var verbatimClient = new VerbatimClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),

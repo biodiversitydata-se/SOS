@@ -47,7 +47,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             
             var processConfiguration = GetProcessConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
-            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration);
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var verbatimClient = new VerbatimClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
