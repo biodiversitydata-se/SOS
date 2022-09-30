@@ -9,8 +9,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
 {
     public static class DataStewardshipArtportalenSampleData
     {
-        public static Dataset DatasetBats = new Dataset {
-            Identifier = "ArtportalenDataHost - Project Bats",
+        public static Dataset DatasetBats = new Dataset {            
+            Identifier = "ArtportalenDataHost - Dataset Bats", // Ändra till Id-nummer. Enligt DPS:en ska det vara ett id-nummer från informationsägarens metadatakatalog. Om det är LST som är informationsägare så bör de ha datamängden registrerad i sin metadatakatalog, med ett id där.
             Metadatalanguage = "Swedish",
             Language = "Swedish",
             AccessRights = Dataset.AccessRightsEnum.Publik,
@@ -20,11 +20,13 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 OrganisationID = "2021001975",
                 OrganisationCode = "Naturvårdsverket"
             },
-            Creator = new Organisation
+            // Creator = Utförare av datainsamling.
+            Creator = new Organisation 
             {
                 OrganisationID = "OrganisationId-unknown",
                 OrganisationCode = "SLU Artdatabanken"
             },
+            // Finns inte alltid i AP, behöver skapas/hämtasandra DV informationskällor?
             OwnerinstitutionCode = new Organisation
             {
                 OrganisationID = "OrganisationId-unknown",
@@ -34,23 +36,23 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             {
                 OrganisationID = "OrganisationId-unknown",
                 OrganisationCode = "SLU Artdatabanken"
-            },
-            DataStewardship = "Datavärdskap arter: Fladdermöss",
+            },            
+            DataStewardship = "Datavärdskap Naturdata: Arter", // Artdatabanken har ett datavärdskap, inte ett separat per datamängd.
             StartDate = new DateTime(2011, 1, 1),
-            EndDate = null,
+            EndDate = null,            
             Description = "Inventeringar av fladdermöss som görs inom det gemensamma delprogrammet för fladdermöss, dvs inom regional miljöövervakning, biogeografisk uppföljning och områdesvis uppföljning (uppföljning av skyddade områden).\r\n\r\nDet finns totalt tre projekt på Artportalen för det gemensamma delprogrammet och i detta projekt rapporteras data från den biogeografiska uppföljningen. Syftet med övervakningen är att följa upp hur antal och utbredning av olika arter förändras över tid. Övervakningen ger viktig information till bland annat EU-rapporteringar, rödlistningsarbetet och kan även användas i uppföljning av miljömålen och som underlag i ärendehandläggning. Den biogeografiska uppföljningen omfattar för närvarande några av de mest artrika fladdermuslokalerna i de olika biogeografiska regionerna i Sverige. Dessa inventeras vartannat år. Ett fåartsområde för fransfladdermus i norra Sverige samt några övervintringslokaler ingår också i övervakningen.",
-            Title = "Fladdermöss - gemensamt delprogram (biogeografisk uppföljning)",
+            Title = "Fladdermöss",
             Spatial = "Sverige",
             ProjectID = "Artportalen ProjectId:3606",
-            ProjectCode = "ProjectCode?",
+            ProjectCode = "Fladdermöss - gemensamt delprogram (biogeografisk uppföljning)",
             Methodology = new List<Methodology>
             {
                 new Methodology
                 {
-                    MethodologyDescription = "Methodology description?",
+                    MethodologyDescription = "Methodology description?", // finns sällan i projektbeskrivning i AP, behöver hämtas från andra DV informationskällor
                     MethodologyLink = "https://www.naturvardsverket.se/upload/stod-i-miljoarbetet/vagledning/miljoovervakning/handledning/metoder/undersokningstyper/landskap/fladdermus-artkartering-2017-06-05.pdf",
                     MethodologyName = "Undersökningstyp fladdermöss - artkartering",
-                    SpeciesList = "Species list?"
+                    SpeciesList = "Species list?" // artlistan behöver skapas, alternativt "all species occurring in Sweden"
                 }
             },
             Events = new List<string>
@@ -64,8 +66,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             EventID = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00", // $"{Location.LocationId}#{Event.VerbatimEventDate}"
             Dataset = new EventDataset
             {
-                Identifier = "ArtportalenDataHost - Project Bats",
-                Title = "Fladdermöss - gemensamt delprogram (biogeografisk uppföljning)"
+                Identifier = "ArtportalenDataHost - Dataset Bats",
+                Title = "Fladdermöss"
             },
             EventStartDate = new DateTime(2012, 3, 6, 8, 0, 0),
             EventEndDate = new DateTime(2012, 3, 6, 13, 0, 0),
@@ -89,30 +91,30 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             },
             RecorderCode = new List<string>
             {
-                "Ingemar Ahlén, Jens Rydell" // Är detta korrekt?
+                "Ingemar Ahlén, Jens Rydell" // Observatörer
             },
             RecorderOrganisation = new List<Organisation>
             {
                 new Organisation
                 {
-                    OrganisationID = "urn:lsid:artportalen.se:organisation:232", // Är detta korrekt?
-                    OrganisationCode = "Länsstyrelsen Jönköping" // Är detta korrekt?
+                    OrganisationID = "urn:lsid:artportalen.se:organisation:232", 
+                    OrganisationCode = "Länsstyrelsen Jönköping" // detta heter "inventeringsorganisation" i DPS och avser organisationen som inventeraren representerar dvs Lst Jönk
                 }
             },
-            Weather = null, // Saknas i Artportalen?
-            AssociatedMedia = null, // Saknas i Artportalen?
-            EventRemarks = null, // Saknas i Artportalen?
-            EventType = null, // Saknas i Artportalen?
-            ParentEventID = null, // Saknas i Artportalen?
+            Weather = null, // i AP kan man registrera Fältbesök vilket skulle motsvarar events och där man registrera väder, men jag vet inte om det används av DV projekten
+            AssociatedMedia = null, // i AP kan man registrera Fältbesök vilket skulle motsvarar events, men jag vet inte om man kan lägga upp media för Fältsbesök, och om Fältbsök används av DV projekt
+            EventRemarks = null, // i Fältbesök kan man göra anteckningar men jag vet inte om de används av DV projekt
+            EventType = null, // Saknas i Artportalen
+            ParentEventID = null, // Saknas i Artportalen
         };
 
         public static OccurrenceModel EventBats1Occurrence1 = new OccurrenceModel()
         {
             OccurrenceID = "urn:lsid:artportalen.se:sighting:74542663",
             Event = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",
-            ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), // StartDate och EndDate verkar saknas i OccurrenceModel?
+            ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), // Ej obligatorisk, men kan sättas om StartDate och EndDate har samma värde. EventDate ger tiden för själva besöket (t.ex. från 8:10 på morgonen till 11:36 på förmiddagen. Occ under den tiden gjordes en obs av spillkråka kl 10:54. Det är den tiden (10:54) som är observationstidpunkt.
             BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,
-            IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
+            IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, // Ovaliderad  // för värdelistan väntar vi på vad arbetsgruppen för verifieringsmodulen skulle ha som slutgiltig förslag på kategorier - vi bör fråga de om att få den listan         
             ObservationCertainty = 200m, 
             ObservationPoint = new PointGeometry
             {
@@ -132,7 +134,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             },
             Quantity = 2m,
             QuantityVariable = OccurrenceModel.QuantityVariableEnum.AntalIndivider,
-            Unit = null, // Vad är unit kopplat till för variabel?
+            Unit = null, // Enhet för Quantity
             Taxon = new TaxonModel
             {
                 ScientificName = "Barbastella barbastellus",
@@ -148,10 +150,10 @@ namespace SOS.DataStewardship.Api.Models.SampleData
         public static OccurrenceModel EventBats1Occurrence2 = new OccurrenceModel()
         {
             OccurrenceID = "urn:lsid:artportalen.se:sighting:74542662",
-            Event = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",
-            ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), // StartDate och EndDate verkar saknas i OccurrenceModel?
-            BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,
-            IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, // Ovaliderad
+            Event = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",            
+            ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), 
+            BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,            
+            IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, 
             ObservationCertainty = 200m,
             ObservationPoint = new PointGeometry
             {
@@ -170,8 +172,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 Sex = null
             },
             Quantity = 1m,
-            QuantityVariable = OccurrenceModel.QuantityVariableEnum.AntalIndivider,
-            Unit = null, // Vad är unit kopplat till för variabel?
+            QuantityVariable = OccurrenceModel.QuantityVariableEnum.AntalIndivider,            
+            Unit = null, 
             Taxon = new TaxonModel
             {
                 ScientificName = "Eptesicus nilssonii",
