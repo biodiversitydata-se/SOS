@@ -250,10 +250,7 @@ namespace SOS.Lib.Repositories.Processed
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
+            searchResponse.ThrowIfInvalid();
 
             return searchResponse.Documents?.FirstOrDefault();
         }
@@ -274,10 +271,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Size(take)
             );
 
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
+            searchResponse.ThrowIfInvalid();
 
             return new PagedResult<Checklist>
             {
@@ -308,10 +302,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
             );
-            if (!countResponse.IsValid)
-            {
-                throw new InvalidOperationException(countResponse.DebugInformation);
-            }
+            countResponse.ThrowIfInvalid();
 
             return Convert.ToInt32(countResponse.Count);
         }
@@ -336,10 +327,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
             );
-            if (!countResponse.IsValid)
-            {
-                throw new InvalidOperationException(countResponse.DebugInformation);
-            }
+            countResponse.ThrowIfInvalid();
 
             return Convert.ToInt32(countResponse.Count);
         }               
@@ -364,10 +352,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
             );
-            if (!countResponse.IsValid)
-            {
-                throw new InvalidOperationException(countResponse.DebugInformation);
-            }
+            countResponse.ThrowIfInvalid();
 
             return Convert.ToInt32(countResponse.Count);
         }

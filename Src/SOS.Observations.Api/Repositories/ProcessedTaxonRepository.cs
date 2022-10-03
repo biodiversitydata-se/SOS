@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Interfaces;
@@ -384,10 +385,7 @@ namespace SOS.Observations.Api.Repositories
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
+            searchResponse.ThrowIfInvalid();
 
             return searchResponse;
         }
@@ -442,10 +440,7 @@ namespace SOS.Observations.Api.Repositories
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
+            searchResponse.ThrowIfInvalid();
 
             return searchResponse;
         }
@@ -481,11 +476,8 @@ namespace SOS.Observations.Api.Repositories
                 .Source(s => s.ExcludeAll())
                 .TrackTotalHits(false)
             );
- 
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
+
+            searchResponse.ThrowIfInvalid();
 
             return searchResponse;
         }
@@ -806,7 +798,7 @@ namespace SOS.Observations.Api.Repositories
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            searchResponse.ThrowIfInvalid();
 
             return searchResponse.Aggregations
                 .Terms("taxon_group")

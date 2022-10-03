@@ -169,6 +169,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("{id?}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetObservationById(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
@@ -200,6 +201,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, $"Error getting observation {occurrenceId}");
@@ -220,6 +225,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Count(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
@@ -245,6 +251,10 @@ namespace SOS.Observations.Api.Controllers
             catch (AuthenticationRequiredException e)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
             catch (Exception e)
             {
@@ -298,6 +308,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GeogridAggregation(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
@@ -343,6 +354,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "GeoGridAggregation error.");
@@ -366,6 +381,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(GeoGridMetricResultDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> MetricGridAggregationAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
@@ -407,6 +423,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Metric grid aggregation error.");
@@ -445,6 +465,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> ObservationsBySearch(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
@@ -479,6 +500,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch(TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Search error");
@@ -512,6 +537,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<DarwinCoreOccurrenceDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> ObservationsBySearchDwc(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
@@ -606,6 +632,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Search DwC error");
@@ -632,6 +662,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> TaxonAggregation(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
@@ -681,6 +712,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "TaxonAggregation error.");
@@ -705,6 +740,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("Internal/{id?}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GetObservationByIdInternal(
@@ -739,6 +775,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, $"Error getting observation {occurrenceId}");
@@ -759,6 +799,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> CountInternal(
@@ -785,6 +826,10 @@ namespace SOS.Observations.Api.Controllers
             catch (AuthenticationRequiredException e)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
             catch (Exception e)
             {
@@ -896,6 +941,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GeogridAggregationInternal(
@@ -940,6 +986,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "GeoGridAggregation error.");
@@ -962,6 +1012,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
@@ -1004,6 +1055,10 @@ namespace SOS.Observations.Api.Controllers
             catch (AuthenticationRequiredException e)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
             catch (Exception e)
             {
@@ -1059,6 +1114,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Internal/GeoGridTaxaAggregation")]
         [ProducesResponseType(typeof(GeoGridTileTaxonPageResultDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GeogridTaxaAggregationInternal(
@@ -1097,6 +1153,10 @@ namespace SOS.Observations.Api.Controllers
                 GeoGridTileTaxonPageResultDto dto = result.Value.ToGeoGridTileTaxonPageResultDto();
                 return new OkObjectResult(dto);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "GeoGridAggregation error.");
@@ -1119,6 +1179,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Internal/MetricGridAggregation")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> MetricGridAggregationInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
@@ -1160,6 +1221,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Metric grid aggregation error.");
@@ -1199,6 +1264,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(GeoPagedResultDto<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> ObservationsBySearchInternal(
@@ -1244,6 +1310,10 @@ namespace SOS.Observations.Api.Controllers
             catch (AuthenticationRequiredException e)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
             catch (Exception e)
             {
@@ -1296,6 +1366,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(PagedResultDto<dynamic>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> SearchAggregatedInternal(
@@ -1340,6 +1411,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "SearchAggregatedInternal error");
@@ -1377,6 +1452,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(ScrollResultDto<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> ObservationsScroll(
@@ -1419,6 +1495,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Search error");
@@ -1431,6 +1511,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> SignalSearchInternal(
@@ -1462,6 +1543,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Signal search Internal error");
@@ -1489,6 +1574,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> TaxonAggregationInternal(
@@ -1539,6 +1625,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "TaxonAggregation error.");
@@ -1562,6 +1652,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(PagedResultDto<TaxonSumAggregationItem>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> TaxonSumAggregationInternal(
@@ -1593,6 +1684,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "TaxonSumAggregation error.");
@@ -1615,6 +1710,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> TaxonExistsIndicationInternal(
@@ -1651,6 +1747,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return BadRequest(e.Message);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Get indication if taxon exists Internal error");
@@ -1662,6 +1762,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<YearCountResultDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GetUserYearCountAsync(
@@ -1690,6 +1791,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return BadRequest(e.Message);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get user year count");
@@ -1701,6 +1806,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<YearMonthCountResultDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GetUserYearMonthCountAsync(
@@ -1729,6 +1835,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 return BadRequest(e.Message);
             }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get user year month count");
@@ -1740,6 +1850,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<YearMonthDayCountResultDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GetUserYearMonthDayCountAsync(
@@ -1769,6 +1880,10 @@ namespace SOS.Observations.Api.Controllers
             catch (TaxonValidationException e)
             {
                 return BadRequest(e.Message);
+            }
+            catch (TimeoutException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
             catch (Exception e)
             {

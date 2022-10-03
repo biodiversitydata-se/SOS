@@ -65,8 +65,9 @@ namespace SOS.Observations.Api.Repositories
                 .TrackTotalHits(false)
             );
 
-            var maxResult = (int?)searchResponseCount.Aggregations.Cardinality("species_count").Value ?? 0;
+            searchResponseCount.ThrowIfInvalid();
 
+            var maxResult = (int?)searchResponseCount.Aggregations.Cardinality("species_count").Value ?? 0;
             if (aggregationType == AggregationType.SpeciesSightingsListTaxonCount)
             {
                 return new PagedResult<dynamic>
@@ -128,7 +129,7 @@ namespace SOS.Observations.Api.Repositories
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            searchResponse.ThrowIfInvalid();
 
             _telemetry.StopOperation(operation);
 
@@ -203,8 +204,8 @@ namespace SOS.Observations.Api.Repositories
                 .Source(s => s.ExcludeAll())
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
-
+            searchResponse.ThrowIfInvalid();
+           
             var totalCount = searchResponse.HitsMetadata.Total.Value;
 
             _telemetry.StopOperation(operation);
@@ -257,7 +258,7 @@ namespace SOS.Observations.Api.Repositories
                 .Sort(sort => sortDescriptor)
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            searchResponse.ThrowIfInvalid();
 
             var totalCount = searchResponse.HitsMetadata.Total.Value;
 
@@ -279,7 +280,8 @@ namespace SOS.Observations.Api.Repositories
                         )
                     )
                 );
-                if (!countResponse.IsValid) throw new InvalidOperationException(countResponse.DebugInformation);
+                countResponse.ThrowIfInvalid();
+               
                 totalCount = countResponse.Count;
             }
 
@@ -351,8 +353,7 @@ namespace SOS.Observations.Api.Repositories
                 {
                     throw new ArgumentOutOfRangeException($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
                 }
-
-                throw new InvalidOperationException(searchResponse.DebugInformation);
+                searchResponse.ThrowIfInvalid();
             }
 
             var nrOfGridCells = (int?)searchResponse.Aggregations?.Filter("geotile_filter")?.GeoTile("geotile_grid")?.Buckets?.Count ?? 0;
@@ -405,7 +406,7 @@ namespace SOS.Observations.Api.Repositories
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            searchResponse.ThrowIfInvalid();
 
             // Optional: explicitly send telemetry item:
             _telemetry.StopOperation(operation);
@@ -435,7 +436,7 @@ namespace SOS.Observations.Api.Repositories
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            searchResponse.ThrowIfInvalid();
             int provinceCount = Convert.ToInt32(searchResponse.Aggregations.Cardinality("provinceCount").Value);
             return provinceCount;
         }
@@ -476,10 +477,7 @@ namespace SOS.Observations.Api.Repositories
                     .TrackTotalHits(false)
                 );
 
-                if (!searchResponse.IsValid)
-                {
-                    throw new InvalidOperationException(searchResponse.DebugInformation);
-                }
+                searchResponse.ThrowIfInvalid();
 
                 var result = new HashSet<YearCountResult>();
                 foreach (var bucket in searchResponse.Aggregations.Composite("observationByYear").Buckets)
@@ -547,10 +545,7 @@ namespace SOS.Observations.Api.Repositories
                     .TrackTotalHits(false)
                 );
 
-                if (!searchResponse.IsValid)
-                {
-                    throw new InvalidOperationException(searchResponse.DebugInformation);
-                }
+                searchResponse.ThrowIfInvalid();
 
                 var result = new HashSet<YearMonthCountResult>();
                 foreach (var bucket in searchResponse.Aggregations.Composite("observationByYearMonth").Buckets)
@@ -626,10 +621,7 @@ namespace SOS.Observations.Api.Repositories
                     .TrackTotalHits(false)
                 );
 
-                if (!searchResponse.IsValid)
-                {
-                    throw new InvalidOperationException(searchResponse.DebugInformation);
-                }
+                searchResponse.ThrowIfInvalid();
 
                 var result = new Dictionary<string, YearMonthDayCountResult>();
                 foreach (var bucket in searchResponse.Aggregations.Composite("observationByYearMonth").Buckets.Skip(skip))
@@ -708,10 +700,7 @@ namespace SOS.Observations.Api.Repositories
                         .TrackTotalHits(false)
                     );
 
-                    if (!searchResponseLocality.IsValid)
-                    {
-                        throw new InvalidOperationException(searchResponseLocality.DebugInformation);
-                    }
+                    searchResponse.ThrowIfInvalid();
 
                     // Add locations to result
                     foreach (var bucket in searchResponseLocality.Aggregations.Composite("localityByYearMonth").Buckets)
@@ -758,7 +747,7 @@ namespace SOS.Observations.Api.Repositories
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            searchResponse.ThrowIfInvalid();
 
             return searchResponse.Aggregations
                 .Terms("uniqueOccurrenceIdCount")
@@ -790,10 +779,7 @@ namespace SOS.Observations.Api.Repositories
                 )
             );
 
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
+            searchResponse.ThrowIfInvalid();
 
             return searchResponse.Count > 0;
         }

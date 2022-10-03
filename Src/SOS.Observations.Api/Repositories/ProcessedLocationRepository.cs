@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
@@ -71,10 +72,7 @@ namespace SOS.Observations.Api.Repositories
                .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
+            searchResponse.ThrowIfInvalid();
 
             return searchResponse.Documents?.Select(d => d.Location);
         }
@@ -126,10 +124,7 @@ namespace SOS.Observations.Api.Repositories
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
+            searchResponse.ThrowIfInvalid();
 
             var result = new List<LocationSearchResult>();
             foreach (var bucket in searchResponse.Aggregations.Composite("locations").Buckets?.Skip(skip))

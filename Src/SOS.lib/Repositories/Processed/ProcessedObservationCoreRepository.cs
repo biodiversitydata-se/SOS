@@ -792,10 +792,7 @@ namespace SOS.Lib.Repositories.Processed
                         .TrackTotalHits(false)
                     );
 
-                    if (!searchResponse.IsValid)
-                    {
-                        throw new InvalidOperationException(searchResponse.DebugInformation);
-                    }
+                    searchResponse.ThrowIfInvalid();
                     var observations = searchResponse.Documents.Cast<IDictionary<string, object>>().ToArray();
                     var idsToRemove = new HashSet<string>();
                     var prevOccurrenceId = string.Empty;
@@ -886,10 +883,7 @@ namespace SOS.Lib.Repositories.Processed
                    .TrackTotalHits(false)
                 );
 
-                if (!queryResponse.IsValid)
-                {
-                    throw new InvalidOperationException(queryResponse.DebugInformation);
-                }
+                queryResponse.ThrowIfInvalid();
 
                 return queryResponse;
             });
@@ -1182,7 +1176,7 @@ namespace SOS.Lib.Repositories.Processed
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            searchResponse.ThrowIfInvalid();
 
             var duplicates = searchResponse
                 .Aggregations
@@ -1226,7 +1220,7 @@ namespace SOS.Lib.Repositories.Processed
                         .TrackTotalHits(false)
                     );
 
-                    if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+                    searchResponse.ThrowIfInvalid();
                     var docCount = searchResponse.Documents.Count;
                     if (docCount == 0)
                     {
@@ -1323,8 +1317,8 @@ namespace SOS.Lib.Repositories.Processed
                 {
                     throw new ArgumentOutOfRangeException($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
                 }
-               
-                throw new InvalidOperationException(searchResponse.DebugInformation);
+
+                searchResponse.ThrowIfInvalid();
             }
 
             var nrOfGridCells = (int?)searchResponse.Aggregations?.Composite("gridCells")?.Buckets?.Count ?? 0;
@@ -1413,7 +1407,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
             );
-            if (!countResponse.IsValid) throw new InvalidOperationException(countResponse.DebugInformation);
+            countResponse.ThrowIfInvalid();
 
             return countResponse.Count;
         }
@@ -1437,12 +1431,8 @@ namespace SOS.Lib.Repositories.Processed
                     )
                     .TrackTotalHits(false)
                 );
-
-                if (!searchResponse.IsValid)
-                {
-                    throw new InvalidOperationException(searchResponse.DebugInformation);
-                }
-
+                searchResponse.ThrowIfInvalid();
+                
                 return searchResponse.Documents;
             }
             catch (Exception e)
@@ -1477,7 +1467,7 @@ namespace SOS.Lib.Repositories.Processed
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            searchResponse.ThrowIfInvalid();
 
             return searchResponse.Documents;
         }
@@ -1603,10 +1593,8 @@ namespace SOS.Lib.Repositories.Processed
                     ) : await Client
                         .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
 
-                if (!queryResponse.IsValid) {
-                    throw new InvalidOperationException(queryResponse.DebugInformation);
-                }
-                
+                queryResponse.ThrowIfInvalid();
+   
                 return queryResponse;
             });
 
@@ -1687,12 +1675,8 @@ namespace SOS.Lib.Repositories.Processed
                     )
                     .TrackTotalHits(false)
                 );
-
-                if (!searchResponse.IsValid)
-                {
-                    throw new InvalidOperationException(searchResponse.DebugInformation);
-                }
-
+                searchResponse.ThrowIfInvalid();
+                
                 return searchResponse.Documents;
             }
             catch (Exception e)
@@ -1714,11 +1698,8 @@ namespace SOS.Lib.Repositories.Processed
                     .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
                 );
 
-                if (!countResponse.IsValid)
-                {
-                    throw new InvalidOperationException(countResponse.DebugInformation);
-                }
-
+                countResponse.ThrowIfInvalid();
+                
                 return countResponse.Count;
             }
             catch (Exception e)
@@ -1759,8 +1740,8 @@ namespace SOS.Lib.Repositories.Processed
                     .ScrollAsync<Observation>(ScrollTimeout, scrollId);
             }
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
-
+            searchResponse.ThrowIfInvalid();
+            
             return new ScrollResult<ExtendedMeasurementOrFactRow>
             {
                 Records = searchResponse.Documents?.ToObservations()?.ToExtendedMeasurementOrFactRows(),
@@ -1800,8 +1781,8 @@ namespace SOS.Lib.Repositories.Processed
                     .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
             }
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
-
+            searchResponse.ThrowIfInvalid();
+    
             return new ScrollResult<SimpleMultimediaRow>
             {
                 Records = searchResponse.Documents?.ToObservations()?.ToSimpleMultimediaRows(),
@@ -1840,11 +1821,7 @@ namespace SOS.Lib.Repositories.Processed
                     ) :
                      await Client
                     .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
-
-                if (!queryResponse.IsValid)
-                {
-                    throw new InvalidOperationException(queryResponse.DebugInformation);
-                }
+                queryResponse.ThrowIfInvalid();
 
                 return queryResponse;
             });
@@ -1874,11 +1851,8 @@ namespace SOS.Lib.Repositories.Processed
                 .TrackTotalHits(false)
             );
 
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
-
+            searchResponse.ThrowIfInvalid();
+           
             return searchResponse.Aggregations.Terms("OccurrenceIdDuplicatesExists").Buckets?.Select(b => b.Key);
         }
 
@@ -1919,10 +1893,8 @@ namespace SOS.Lib.Repositories.Processed
                         )
                     ));
 
-                if (!countResponse.IsValid)
-                {
-                    throw new InvalidOperationException(countResponse.DebugInformation);
-                }
+                countResponse.ThrowIfInvalid();
+
                 if (!countResponse.Count.Equals(0))
                 {
                     Logger.LogError($"Failed to validate protection level for Index: {(protectedIndex ? ProtectedIndexName : PublicIndexName)}, count of observations with protection:{protectedIndex} = {countResponse.Count}, should be 0");

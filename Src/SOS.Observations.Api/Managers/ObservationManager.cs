@@ -165,6 +165,11 @@ namespace SOS.Observations.Api.Managers
             {
                 throw;
             }
+            catch(TimeoutException e)
+            {
+                _logger.LogError(e, "Get chunk of observations timeout");
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get chunk of observations");
@@ -190,6 +195,11 @@ namespace SOS.Observations.Api.Managers
             }
             catch (AuthenticationRequiredException e)
             {
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get observations by scroll timeout");
                 throw;
             }
             catch (Exception e)
@@ -221,6 +231,11 @@ namespace SOS.Observations.Api.Managers
             {
                 throw;
             }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get aggregated chunk of observations timeout");
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get aggregated chunk of observations");
@@ -239,6 +254,11 @@ namespace SOS.Observations.Api.Managers
             catch (ArgumentOutOfRangeException e)
             {
                 _logger.LogError(e, "Failed to aggregate to metric tiles. To many buckets");
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get geogrid tile aggregation timeout");
                 throw;
             }
             catch (Exception e)
@@ -261,6 +281,11 @@ namespace SOS.Observations.Api.Managers
             catch (ArgumentOutOfRangeException e)
             {
                 _logger.LogError(e, "Failed to aggregate to metric tiles. To many buckets");
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Aggregate to metric tiles timeout");
                 throw;
             }
             catch (Exception e)
@@ -354,6 +379,11 @@ namespace SOS.Observations.Api.Managers
                 var result = await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
                 return result;
             }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Aggregate to metric tiles timeout");
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Signal search failed");
@@ -441,6 +471,11 @@ namespace SOS.Observations.Api.Managers
                 var result = await _processedObservationRepository.GetUserYearCountAsync(filter);
                 return result?.ToDtos();
             }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get user year count timeout");
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get user year count");
@@ -467,6 +502,11 @@ namespace SOS.Observations.Api.Managers
                 var result = await _processedObservationRepository.GetUserYearMonthCountAsync(filter);
                 return result?.ToDtos();
             }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get user year, month count timeout");
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get user year, month count");
@@ -492,6 +532,11 @@ namespace SOS.Observations.Api.Managers
               
                 var result = await _processedObservationRepository.GetUserYearMonthDayCountAsync(filter, skip, take);
                 return result?.ToDtos();
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get user year, month count timeout");
+                throw;
             }
             catch (Exception e)
             {

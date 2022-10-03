@@ -167,9 +167,14 @@ namespace SOS.Observations.Api.Managers
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedTaxonRepository.GetCompleteGeoTileTaxaAggregationAsync(filter, zoom);
             }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get complete geo tile taxa aggregation timeout");
+                throw;
+            }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to aggregate to geogrids.");
+                _logger.LogError(e, "Failed to get complete geo tile taxa aggregation.");
                 throw;
             }
         }
@@ -188,9 +193,14 @@ namespace SOS.Observations.Api.Managers
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedTaxonRepository.GetPageGeoTileTaxaAggregationAsync(filter, zoom, geoTilePage, taxonIdPage);
             }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get page geo tile taxa aggregation timeout");
+                throw;
+            }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to aggregate to geogrids.");
+                _logger.LogError(e, "Failed to get page geo tile taxa aggregation");
                 throw;
             }
         }
@@ -271,6 +281,11 @@ namespace SOS.Observations.Api.Managers
 
                 return Result.Success(pagedResult);
             }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get taxon aggregation timeout");
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get taxon aggregation");
@@ -294,6 +309,11 @@ namespace SOS.Observations.Api.Managers
                     skip, 
                     take, 
                     sumUnderlyingTaxa);
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get taxon aggregation timeout");
+                throw;
             }
             catch (Exception e)
             {
@@ -319,6 +339,11 @@ namespace SOS.Observations.Api.Managers
 
                 var result = await _processedTaxonRepository.GetTaxonExistsIndicationAsync(filter);
                 return result?.ToTaxonAggregationItemDtos();
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get taxon exists indication timeout");
+                throw;
             }
             catch (Exception e)
             {
