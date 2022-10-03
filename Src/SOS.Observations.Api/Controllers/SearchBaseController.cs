@@ -26,7 +26,7 @@ namespace SOS.Observations.Api.Controllers
         private const int ElasticSearchMaxRecordsInternal = 100000;
         protected readonly IAreaManager AreaManager;
         private ObservationApiConfiguration _observationApiConfiguration;
-        
+
 
         protected string ReplaceDomain(string str, string domain, string path)
         {
@@ -50,7 +50,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Get id of current user
         /// </summary>
-        protected int UserId => int.Parse(User?.Claims?.FirstOrDefault(c => c.Type.Contains("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", StringComparison.CurrentCultureIgnoreCase))?.Value ?? "0");
+        protected int UserId => int.Parse(User?.Claims?.FirstOrDefault(c => c.Type.Contains("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", StringComparison.CurrentCultureIgnoreCase) || c.Type.Contains("client_uaid", StringComparison.CurrentCultureIgnoreCase))?.Value ?? "0");        
 
         /// <summary>
         /// Check if passed areas exists

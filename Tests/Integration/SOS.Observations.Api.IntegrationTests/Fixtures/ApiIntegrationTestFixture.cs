@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -216,6 +217,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
             ObservationsController = new ObservationsController(ObservationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
+            var ctx = new ControllerContext() { HttpContext = new DefaultHttpContext() };
+            ObservationsController.ControllerContext = ctx;
             VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, ObservationManager, new NullLogger<DataProvidersController>());
             ExportsController = new ExportsController(ObservationManager, blobStorageManagerMock.Object, areaManager,
