@@ -65,7 +65,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
         UserAuthenticationToken = GetUserAuthenticationToken();
         ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
 
-        var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+        var elasticClientManager = new ElasticClientManager(elasticConfiguration);
         var mongoDbConfiguration = GetMongoDbConfiguration();
         var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
         var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,

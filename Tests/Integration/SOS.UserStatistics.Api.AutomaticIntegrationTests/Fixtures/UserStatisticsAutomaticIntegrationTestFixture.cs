@@ -44,7 +44,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         if (!elasticConfiguration.IndexPrefix.Contains("integrationtests"))
             throw new Exception("Elasticsearch configuration must use integrationtest index");
         var userStatisticsApiConfiguration = GetUserStatisticsApiConfiguration();
-        var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+        var elasticClientManager = new ElasticClientManager(elasticConfiguration);
         var mongoDbConfiguration = GetMongoDbConfiguration();
         var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
         _processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
