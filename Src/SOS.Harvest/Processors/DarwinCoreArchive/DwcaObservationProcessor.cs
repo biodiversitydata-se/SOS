@@ -43,7 +43,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 taxa,
                 _processedVocabularyRepository,
                 _areaHelper,
-                TimeManager);
+                TimeManager,
+                ProcessConfiguration);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

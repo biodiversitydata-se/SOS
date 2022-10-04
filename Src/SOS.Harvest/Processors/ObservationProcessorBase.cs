@@ -28,8 +28,7 @@ namespace SOS.Harvest.Processors
         where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int>
     {
         private readonly IDiffusionManager _diffusionManager;
-        private readonly bool _logGarbageCharFields;
-        private readonly ProcessConfiguration _processConfiguration;
+        private readonly bool _logGarbageCharFields;        
 
         /// <summary>
         /// Commit batch
@@ -214,7 +213,7 @@ namespace SOS.Harvest.Processors
             IProcessTimeManager processTimeManager,
             IUserObservationRepository userObservationRepository,
             ProcessConfiguration processConfiguration,
-            ILogger<TClass> logger) : base(processManager, processTimeManager, logger)
+            ILogger<TClass> logger) : base(processManager, processTimeManager, processConfiguration, logger)
         {
             ProcessedObservationRepository = processedObservationRepository ??
                                              throw new ArgumentNullException(nameof(processedObservationRepository));
@@ -227,8 +226,7 @@ namespace SOS.Harvest.Processors
 
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
             _logGarbageCharFields = processConfiguration?.LogGarbageCharFields ?? false;
-            _userObservationRepository = userObservationRepository;
-            _processConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
+            _userObservationRepository = userObservationRepository;            
         }
 
         /// <summary>
@@ -436,7 +434,7 @@ namespace SOS.Harvest.Processors
                 await WriteObservationsToDwcaCsvFiles(observations!, dataProvider, batchId);
             }
 
-            if (_processConfiguration.ProcessUserObservation && mode == JobRunModes.Full && dataProvider.Id == DataProviderIdentifiers.ArtportalenId && !protectedObservations)
+            if (ProcessConfiguration.ProcessUserObservation && mode == JobRunModes.Full && dataProvider.Id == DataProviderIdentifiers.ArtportalenId && !protectedObservations)
             {
                 Logger.LogDebug($"Add User Observations. BatchId={batchId}, Protected={protectedObservations}, Count={observations!.Count}");
                 var userObservations = observations.ToUserObservations();

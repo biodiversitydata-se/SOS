@@ -14,6 +14,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -44,7 +45,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager) : base(dataProvider, taxa, processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
         {
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -72,14 +74,15 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration)
         {
             var vocabularies = await processedVocabularyRepository.GetAllAsync();
             var vocabularyById = GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
                 vocabularies.ToArray(),
                 true);
-            return new DwcaObservationFactory(dataProvider, taxa, vocabularyById, areaHelper, processTimeManager);
+            return new DwcaObservationFactory(dataProvider, taxa, vocabularyById, areaHelper, processTimeManager, processConfiguration);
         }
 
         /// <summary>

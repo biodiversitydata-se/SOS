@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
@@ -31,6 +32,7 @@ namespace SOS.Harvest.Managers
         private readonly IAreaHelper _areaHelper;
         private readonly ITaxonRepository _processedTaxonRepository;
         private readonly IProcessTimeManager _processTimeManager;
+        private readonly ProcessConfiguration _processConfiguration;
         private readonly ILogger<DwcaDataValidationReportManager> _logger;
         private Dictionary<int, Taxon> _taxonById;
         private IDictionary<VocabularyId, IDictionary<object, int>> _dwcaVocabularyById;
@@ -43,6 +45,7 @@ namespace SOS.Harvest.Managers
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
             IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration,
             ILogger<DwcaDataValidationReportManager> logger)
         {
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
@@ -52,6 +55,7 @@ namespace SOS.Harvest.Managers
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _processTimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
+            _processConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Task.Run(InitializeAsync).Wait();
@@ -90,7 +94,8 @@ namespace SOS.Harvest.Managers
                 _taxonById,
                 _dwcaVocabularyById,
                 _areaHelper,
-                _processTimeManager);
+                _processTimeManager,
+                _processConfiguration);
 
             var totalNumberOfObservations = archiveReader.GetNumberOfRowsInOccurrenceFile();
             var observationsBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(

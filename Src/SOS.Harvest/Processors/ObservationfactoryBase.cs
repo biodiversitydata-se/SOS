@@ -2,6 +2,7 @@
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Harvest.Managers.Interfaces;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors
 {
@@ -20,7 +21,10 @@ namespace SOS.Harvest.Processors
         /// <param name="taxa"></param>
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        protected ObservationFactoryBase(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IProcessTimeManager processTimeManager) : base(dataProvider, processTimeManager)
+        protected ObservationFactoryBase(DataProvider dataProvider, 
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
+            IProcessTimeManager processTimeManager, 
+            ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
         {
             Taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
 

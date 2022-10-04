@@ -35,13 +35,15 @@ namespace SOS.Process.UnitTests.TestHelpers
 
             var dataProviderDummy = new DataProvider();
             var vocabularyRepository = VocabularyRepositoryStubFactory.Create();
+            var processConfiguration = new ProcessConfiguration();
             var factory = ArtportalenObservationFactory.CreateAsync(
                 dataProviderDummy,
                 new Dictionary<int, Taxon>(), 
                 vocabularyRepository.Object,
                 false,
                 "https://artportalen-st.artdata.slu.se",
-                new ProcessTimeManager(new ProcessConfiguration())).Result;
+                new ProcessTimeManager(processConfiguration),
+                processConfiguration).Result;
             return factory;
         }
     }

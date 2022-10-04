@@ -1,4 +1,5 @@
 ﻿using SOS.Harvest.Managers.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Harvest.Processors
@@ -13,7 +14,7 @@ namespace SOS.Harvest.Processors
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        protected ChecklistFactoryBase(DataProvider dataProvider, IProcessTimeManager processTimeManager) : base(dataProvider, processTimeManager)
+        protected ChecklistFactoryBase(DataProvider dataProvider, IProcessTimeManager processTimeManager, ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
         {
            
         }

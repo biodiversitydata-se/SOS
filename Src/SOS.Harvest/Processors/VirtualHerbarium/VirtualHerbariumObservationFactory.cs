@@ -14,6 +14,7 @@ using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.VirtualHerbarium
 {
@@ -33,7 +34,8 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         public VirtualHerbariumObservationFactory(DataProvider dataProvider, 
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager) : base(dataProvider, taxa, processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
         {
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _communities = new Dictionary<string, (double longitude, double latitude, int precision)>();

@@ -9,6 +9,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Mvm;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.Mvm
 {
@@ -27,7 +28,8 @@ namespace SOS.Harvest.Processors.Mvm
         public MvmObservationFactory(DataProvider dataProvider, 
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager) : base(dataProvider, taxa, processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
         {
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }

@@ -64,14 +64,16 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
 
         _vocabularyRepository = new VocabularyRepository(_processClient, new NullLogger<VocabularyRepository>());
         _vocabularyValueResolver = new VocabularyValueResolver(_vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
-        _processTimeManager = new ProcessTimeManager(new ProcessConfiguration());
+        var processConfiguration = new ProcessConfiguration();
+        _processTimeManager = new ProcessTimeManager(processConfiguration);
         ArtportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
             new DataProvider { Id = 1 },
             _taxaById,
             _vocabularyRepository,
             false,
             "https://www.artportalen.se",
-            _processTimeManager);
+            _processTimeManager,
+            processConfiguration);
 
         UserStatisticsManager = new UserStatisticsManager(_userStatisticsCacheManager, _userStatisticsObservationRepository, _userStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
     }

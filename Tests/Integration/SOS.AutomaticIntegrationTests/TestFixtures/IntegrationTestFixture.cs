@@ -116,7 +116,8 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 _taxaById,
                 _vocabularyRepository,
                 _areaHelper,
-                _processTimeManager);
+                _processTimeManager,
+                _processConfiguration);
 
             return factory;                
         }
@@ -131,6 +132,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         private ProcessClient _processClient;
         private AreaHelper _areaHelper;
         private ProcessTimeManager _processTimeManager;
+        private ProcessConfiguration _processConfiguration;
         private VocabularyValueResolver _vocabularyValueResolver;
         public string UserAuthenticationToken { get; set; }
         public TaxonManager TaxonManager { get; private set; }
@@ -338,17 +340,18 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             _userManager = new UserManager(_userService, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
             var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
-            
 
-            _processTimeManager = new ProcessTimeManager(new ProcessConfiguration());            
+            _processConfiguration = new ProcessConfiguration();
+            _processTimeManager = new ProcessTimeManager(_processConfiguration);            
             ArtportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
                 artportalenDataProvider,
                 _taxaById,
                 _vocabularyRepository,
                 false,
                 "https://www.artportalen.se",
-                _processTimeManager);
-            ArtportalenChecklistFactory = new ArtportalenChecklistFactory(artportalenDataProvider, _processTimeManager);
+                _processTimeManager,
+                _processConfiguration);
+            ArtportalenChecklistFactory = new ArtportalenChecklistFactory(artportalenDataProvider, _processTimeManager, _processConfiguration);
             var verbatimDbConfiguration = GetVerbatimMongoDbConfiguration();
             _importClient = new VerbatimClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),

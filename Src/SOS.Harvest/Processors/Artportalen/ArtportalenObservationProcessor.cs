@@ -80,7 +80,8 @@ namespace SOS.Harvest.Processors.Artportalen
                     _processedVocabularyRepository,
                     mode != JobRunModes.Full, 
                     _artPortalenUrl, 
-                    TimeManager);
+                    TimeManager,
+                    ProcessConfiguration);
             _artportalenVerbatimRepository.Mode = mode;
 
             if (mode != JobRunModes.Full)
@@ -128,7 +129,8 @@ namespace SOS.Harvest.Processors.Artportalen
                     _processedVocabularyRepository,
                     true,
                     _artPortalenUrl,
-                    TimeManager);
+                    TimeManager,
+                    ProcessConfiguration);
 
             var result = await base.ProcessBatchAsync(
                 dataProvider,

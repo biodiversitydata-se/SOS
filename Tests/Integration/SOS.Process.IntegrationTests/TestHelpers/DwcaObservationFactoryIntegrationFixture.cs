@@ -54,13 +54,14 @@ namespace SOS.Process.IntegrationTests.TestHelpers
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var areaHelper =
                 new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
-
+            var processConfiguration = new ProcessConfiguration();
             var dwcaObservationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,
                 taxonByTaxonId,
                 vocabularyRepository,
                 areaHelper,
-                new ProcessTimeManager(new ProcessConfiguration()));
+                new ProcessTimeManager(processConfiguration),
+                processConfiguration);
 
             return dwcaObservationFactory;
         }

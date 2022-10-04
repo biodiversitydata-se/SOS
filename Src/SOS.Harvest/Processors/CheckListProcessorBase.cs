@@ -11,6 +11,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors
 {
@@ -137,7 +138,8 @@ namespace SOS.Harvest.Processors
             IProcessedChecklistRepository processedChecklistRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
-            ILogger<TClass> logger) : base(processManager, processTimeManager, logger)
+            ProcessConfiguration processConfiguration,
+            ILogger<TClass> logger) : base(processManager, processTimeManager, processConfiguration, logger)
         {
             ProcessedChecklistRepository = processedChecklistRepository ??
                                            throw new ArgumentNullException(nameof(processedChecklistRepository));

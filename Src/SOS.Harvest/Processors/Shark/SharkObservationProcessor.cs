@@ -30,7 +30,7 @@ namespace SOS.Harvest.Processors.Shark
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new SharkObservationFactory(dataProvider, taxa, _areaHelper, TimeManager);
+            var observationFactory = new SharkObservationFactory(dataProvider, taxa, _areaHelper, TimeManager, ProcessConfiguration);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,
