@@ -20,7 +20,6 @@ namespace SOS.Export.Jobs
     /// </summary>
     public class ExportAndSendJob : IExportAndSendJob
     {
-        
         private readonly IObservationManager _observationManager;
         private readonly IUserExportRepository _userExportRepository;
         private readonly ILogger<ExportAndSendJob> _logger;
@@ -38,7 +37,6 @@ namespace SOS.Export.Jobs
                 )
             )?.ToList();
         }
-
 
         private async Task UpdateJobInfoStartProcessing(int userId, string jobId)
         {
