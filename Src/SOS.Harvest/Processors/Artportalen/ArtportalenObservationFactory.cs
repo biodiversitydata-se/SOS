@@ -21,6 +21,7 @@ using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 using Nest;
 using System.Linq;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -92,7 +93,8 @@ namespace SOS.Harvest.Processors.Artportalen
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             bool incrementalMode,
             string artPortalenUrl, 
-            IProcessTimeManager processTimeManager) : base(dataProvider, taxa, processTimeManager) 
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration) 
         {
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _incrementalMode = incrementalMode;
@@ -105,11 +107,12 @@ namespace SOS.Harvest.Processors.Artportalen
             IVocabularyRepository processedVocabularyRepository,
             bool incrementalMode,
             string artPortalenUrl,
-            IProcessTimeManager processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration)
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
             var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies?.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode, artPortalenUrl, processTimeManager);
+            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode, artPortalenUrl, processTimeManager, processConfiguration);
         }
 
         /// <summary>
@@ -392,6 +395,11 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 // Populate generic data
                 PopulateGenericData(obs);
+                
+                if (ProcessConfiguration.ProcessObservationDataset)
+                {
+                    obs.DataStewardshipDatasetId = GetDataStewardshipDatasetId(obs);
+                }
 
                 if (obs.ShallBeProtected())
                 {
@@ -750,5 +758,13 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="sightingId"></param>
         /// <returns></returns>
         public static string GetOccurenceId(int sightingId) => $"urn:lsid:artportalen.se:sighting:{sightingId}";
+
+
+        protected string GetDataStewardshipDatasetId(Observation observation)
+        {
+
+
+            return null;
+        }
     }
 }

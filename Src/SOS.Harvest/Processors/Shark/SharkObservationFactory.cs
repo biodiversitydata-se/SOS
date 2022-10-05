@@ -9,6 +9,7 @@ using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Harvest.Constants;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.Shark
 {
@@ -27,7 +28,8 @@ namespace SOS.Harvest.Processors.Shark
         public SharkObservationFactory(DataProvider dataProvider, 
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager) : base(dataProvider, taxa, processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
         {
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }

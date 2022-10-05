@@ -9,6 +9,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors
 {
@@ -17,6 +18,10 @@ namespace SOS.Harvest.Processors
     /// </summary>
     public class FactoryBase
     {
+        protected readonly ProcessConfiguration ProcessConfiguration;
+        protected readonly DataProvider DataProvider;
+        protected readonly IProcessTimeManager TimeManager;
+
         /// <summary>
         /// Get point with disturbance buffer (if any)
         /// </summary>
@@ -79,15 +84,13 @@ namespace SOS.Harvest.Processors
             }
             location.VerbatimLatitude = verbatimLatitude.Value.ToString(CultureInfo.InvariantCulture);
             location.VerbatimLongitude = verbatimLongitude.Value.ToString(CultureInfo.InvariantCulture);
-        }
+        }        
 
-        protected readonly DataProvider DataProvider;
-        protected readonly IProcessTimeManager TimeManager;
-
-        protected FactoryBase(DataProvider dataProvider, IProcessTimeManager processTimeManager)
+        protected FactoryBase(DataProvider dataProvider, IProcessTimeManager processTimeManager, ProcessConfiguration processConfiguration)
         {
             DataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             TimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
+            ProcessConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
         }
        
         /// <summary>

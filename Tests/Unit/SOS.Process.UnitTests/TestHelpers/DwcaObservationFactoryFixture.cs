@@ -46,12 +46,14 @@ namespace SOS.Process.UnitTests.TestHelpers
                 ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
             var vocabularyRepository = VocabularyRepositoryStubFactory.Create();
             var areaHelper = new AreaHelper(processedAreaRepositoryStub.Object);
+            var processConfiguration = new ProcessConfiguration();
             var factory = DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,
                 mammaliaTaxonByTaxonId,
                 vocabularyRepository.Object,
                 areaHelper,
-                new ProcessTimeManager(new ProcessConfiguration())).Result;
+                new ProcessTimeManager(processConfiguration),
+                processConfiguration).Result;
             return factory;
         }
     }

@@ -12,6 +12,7 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -226,7 +227,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             DataProvider dataProvider,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager) : base(dataProvider, processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
         {
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -237,14 +239,15 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             DataProvider dataProvider,
             IVocabularyRepository processedVocabularyRepository,
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration)
         {
             var vocabularies = await processedVocabularyRepository.GetAllAsync();
             var vocabularyById = GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
                 vocabularies.ToArray(),
                 true);
-            return new DwcaChecklistFactory(dataProvider, vocabularyById, areaHelper, processTimeManager);
+            return new DwcaChecklistFactory(dataProvider, vocabularyById, areaHelper, processTimeManager, processConfiguration);
         }
 
         /// <summary>

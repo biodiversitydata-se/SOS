@@ -162,6 +162,7 @@ namespace SOS.Import.IntegrationTests.Managers
             var processedTaxonRepository = new TaxonRepository(
                 processClient,
                 new NullLogger<TaxonRepository>());
+            var processConfiguration = new ProcessConfiguration();
 
             var validationReportManager = new DwcaDataValidationReportManager(
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
@@ -170,7 +171,8 @@ namespace SOS.Import.IntegrationTests.Managers
                 areaHelper,
                 vocabularyValueResolver,
                 processedTaxonRepository,
-                new ProcessTimeManager(new ProcessConfiguration()),
+                new ProcessTimeManager(processConfiguration),
+                processConfiguration,
                 new NullLogger<DwcaDataValidationReportManager>()
             );
 

@@ -30,7 +30,7 @@ namespace SOS.Harvest.Processors.FishData
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new FishDataObservationFactory(dataProvider, taxa, _areaHelper, TimeManager);
+            var observationFactory = new FishDataObservationFactory(dataProvider, taxa, _areaHelper, TimeManager, ProcessConfiguration);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

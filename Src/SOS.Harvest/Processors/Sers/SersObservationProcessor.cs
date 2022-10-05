@@ -30,7 +30,7 @@ namespace SOS.Harvest.Processors.Sers
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new SersObservationFactory(dataProvider, taxa, _areaHelper, TimeManager);
+            var observationFactory = new SersObservationFactory(dataProvider, taxa, _areaHelper, TimeManager, ProcessConfiguration);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

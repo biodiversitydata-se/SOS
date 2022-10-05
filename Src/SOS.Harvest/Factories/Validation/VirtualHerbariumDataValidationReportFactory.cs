@@ -13,6 +13,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.VirtualHerbarium;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Factories.Validation
 {
@@ -31,8 +32,9 @@ namespace SOS.Harvest.Factories.Validation
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
             IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
-            IProcessTimeManager processTimeManager)
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration)
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager, processConfiguration)
         {
             _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository;
         }
@@ -85,7 +87,7 @@ namespace SOS.Harvest.Factories.Validation
         {
             if (_virtualHerbariumObservationFactory == null)
             {
-                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById, _areaHelper, _processTimeManager);
+                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById, _areaHelper, _processTimeManager, ProcessConfiguration);
                 Task.Run(() => _virtualHerbariumObservationFactory.InitializeAsync());
             }
 

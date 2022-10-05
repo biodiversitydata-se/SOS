@@ -11,6 +11,7 @@ using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -34,7 +35,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 _verbatimClient,
                 Logger);
 
-            var checklistFactory = await DwcaChecklistFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager);
+            var checklistFactory = await DwcaChecklistFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager, ProcessConfiguration);
 
             return await base.ProcessChecklistsAsync(
                 dataProvider,
@@ -61,8 +62,9 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             IProcessTimeManager processTimeManager,
             IAreaHelper areaHelper,
             IVocabularyRepository vocabularyRepository,
+            ProcessConfiguration processConfiguration,
             ILogger<DwcaChecklistProcessor> logger) :
-                base(processedChecklistRepository, processManager, processTimeManager, logger)
+                base(processedChecklistRepository, processManager, processTimeManager, processConfiguration, logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));

@@ -21,13 +21,15 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------            
             //Mock<
             var dataProvider = new DataProvider();
+            var processConfiguration = new ProcessConfiguration();
             var factory = new ArtportalenObservationFactory(
                 dataProvider, 
                 new Dictionary<int, Taxon>(),
                 new Dictionary<VocabularyId, IDictionary<object, int>>(),
                 false,
                 "https://artportalen-st.artdata.slu.se",
-                new ProcessTimeManager(new ProcessConfiguration()));
+                new ProcessTimeManager(processConfiguration),
+                processConfiguration);
             ArtportalenObservationVerbatim verbatimObservation = new ArtportalenObservationVerbatim();
             verbatimObservation.Activity = new MetadataWithCategory(1, 1);
             Taxon taxon = new Taxon();

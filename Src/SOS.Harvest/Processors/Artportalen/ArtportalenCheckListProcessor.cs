@@ -7,6 +7,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -31,8 +32,9 @@ namespace SOS.Harvest.Processors.Artportalen
             IProcessedChecklistRepository processedChecklistRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration,
             ILogger<ArtportalenChecklistProcessor> logger) :
-                base(processedChecklistRepository, processManager, processTimeManager, logger)
+                base(processedChecklistRepository, processManager, processTimeManager, processConfiguration, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
@@ -43,7 +45,7 @@ namespace SOS.Harvest.Processors.Artportalen
             DataProvider dataProvider,
             IJobCancellationToken cancellationToken)
         {
-            var checklistFactory = new ArtportalenChecklistFactory(dataProvider, TimeManager);
+            var checklistFactory = new ArtportalenChecklistFactory(dataProvider, TimeManager, ProcessConfiguration);
 
             return await base.ProcessChecklistsAsync(
                 dataProvider,

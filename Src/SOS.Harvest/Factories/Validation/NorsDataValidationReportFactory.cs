@@ -13,6 +13,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Nors;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Factories.Validation
 {
@@ -31,8 +32,9 @@ namespace SOS.Harvest.Factories.Validation
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
             INorsObservationVerbatimRepository norsObservationVerbatimRepository,
-            IProcessTimeManager processTimeManager) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager, processConfiguration)
         {
             _norsObservationVerbatimRepository = norsObservationVerbatimRepository;
         }
@@ -89,7 +91,8 @@ namespace SOS.Harvest.Factories.Validation
                     dataProvider,
                     _taxonById,
                     _areaHelper,
-                    _processTimeManager);
+                    _processTimeManager,
+                    ProcessConfiguration);
             }
 
             return _norsObservationFactory;

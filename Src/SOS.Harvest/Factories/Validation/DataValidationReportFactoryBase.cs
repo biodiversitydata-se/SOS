@@ -17,6 +17,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Factories.Validation
 {
@@ -33,6 +34,7 @@ namespace SOS.Harvest.Factories.Validation
         protected Dictionary<int, Taxon> _taxonById;
         protected IDictionary<VocabularyId, Vocabulary> _vocabularyById;
         protected readonly IProcessTimeManager _processTimeManager;
+        protected readonly ProcessConfiguration ProcessConfiguration;
 
         protected DataValidationReportFactoryBase(
             IVocabularyRepository processedVocabularyRepository,
@@ -40,13 +42,15 @@ namespace SOS.Harvest.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IProcessTimeManager processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration)
         {
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             _processedVocabularyRepository = processedVocabularyRepository ?? throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
+            ProcessConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
             Task.Run(InitializeAsync).Wait();
         }
 

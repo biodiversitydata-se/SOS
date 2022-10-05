@@ -9,6 +9,7 @@ using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
+using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -90,7 +91,8 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="dataProvider"></param>
         public ArtportalenChecklistFactory(
             DataProvider dataProvider,
-            IProcessTimeManager processTimeManager) : base(dataProvider, processTimeManager)
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
         {
         }
 
