@@ -64,24 +64,35 @@ namespace SOS.Observations.Api.Controllers
 
             if (autoAdjustBoundingBox)
             {
+                Geometry geometryUnion = null!; 
+                
                 // If areas passed, adjust bounding box to them
                 if (filter?.Areas?.Any() ?? false)
                 {
                     var areas = await AreaManager.GetAreasAsync(filter.Areas.Select(a => (a.AreaType, a.FeatureId)));
                     var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
-                    foreach (var areaGeometry in areaGeometries!)
+
+                    var areaPolygons = areas?.Select(a => a.BoundingBox.GetPolygon());
+ 
+                    foreach (var areaPolygon in areaPolygons!)
                     {
-                        boundingBox = boundingBox.AdjustByShape(areaGeometry, filter.MaxDistanceFromPoint);
+                        geometryUnion = geometryUnion == null ? areaPolygon : geometryUnion.Union(areaPolygon);
                     }
                 }
 
                 // If geometries passed, adjust bounding box to them
                 if (filter?.Geometries?.Any() ?? false)
                 {
-                    foreach (var areaGeometry in filter.Geometries)
+                    foreach (var geoShape in filter.Geometries)
                     {
-                        boundingBox = boundingBox.AdjustByShape(areaGeometry, filter.MaxDistanceFromPoint);
+                        var geometry = geoShape.ToGeometry();
+                        geometryUnion = geometryUnion == null ? geometry : geometryUnion.Union(geometry);
                     }
+                }
+
+                if (geometryUnion != null)
+                {
+                    boundingBox = boundingBox.AdjustByGeometry(geometryUnion, filter.MaxDistanceFromPoint);
                 }
             }
 

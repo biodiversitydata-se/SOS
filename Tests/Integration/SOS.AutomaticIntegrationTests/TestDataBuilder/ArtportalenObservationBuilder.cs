@@ -62,6 +62,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             return new UserInternal
             {
                 Id = _faker.IndexVariable++,
+                PersonId = _faker.IndexVariable++,
                 UserServiceUserId = _faker.IndexVariable++,
                 UserAlias = _faker.Name.FirstName(),
                 Discover = _faker.Random.Bool(),
@@ -520,7 +521,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             builder.With((obs, index) =>
             {
                 obs.ObserversInternal =
-                    userIds.Select(userId => new UserInternal {Id = userId, UserServiceUserId = userId});
+                    userIds.Select(userId => new UserInternal {Id = userId, PersonId = userId,  UserServiceUserId = userId});
             });
 
             return operable;

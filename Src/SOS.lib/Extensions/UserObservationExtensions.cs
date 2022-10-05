@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Text.RegularExpressions;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Extensions
 {
@@ -31,24 +31,23 @@ namespace SOS.Lib.Extensions
             }
 
             return observation.ArtportalenInternal.OccurrenceRecordedByInternal.Select(m =>
-                ToUserObservation(observation, m.Id, m.UserServiceUserId));
+                ToUserObservation(observation, m));
         }
 
         /// <summary>
         /// Create user observation
         /// </summary>
         /// <param name="observation"></param>
-        /// <param name="userId"></param>
-        /// <param name="userServiceUserId"></param>
+        /// <param name="user"></param>
         /// <returns></returns>
-        public static UserObservation ToUserObservation(this Observation observation, int userId, int? userServiceUserId)
+        public static UserObservation ToUserObservation(this Observation observation, UserInternal user)
         {
             try
             {
                 var userObservation = new UserObservation();
                 userObservation.Id = UserObservation.CreateId();
-                userObservation.UserId = userId;
-                userObservation.UserServiceUserId = userServiceUserId;
+                userObservation.UserId = user.Id;
+                userObservation.UserServiceUserId = user.UserServiceUserId;
                 userObservation.SightingId = observation.ArtportalenInternal.SightingId;
                 userObservation.TaxonId = observation.Taxon.Id;
                 userObservation.TaxonSpeciesGroupId = (int)observation.Taxon.Attributes.SpeciesGroup; // todo Check if correct
@@ -79,7 +78,7 @@ namespace SOS.Lib.Extensions
                 int sightingId = observation?.ArtportalenInternal?.SightingId ?? -1;
                 string provinceId = observation?.Location?.Province?.FeatureId ?? "null";
                 string municipalityId = observation?.Location?.Municipality?.FeatureId ?? "null";
-                throw new Exception($"ToUserObservation exception. userId={userId}, sightingId={sightingId}, provinceId={provinceId}, municipalityId={municipalityId}", e);
+                throw new Exception($"ToUserObservation exception. userId={user.Id}, sightingId={sightingId}, provinceId={provinceId}, municipalityId={municipalityId}", e);
             }
         }
     }

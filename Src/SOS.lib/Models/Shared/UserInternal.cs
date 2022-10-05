@@ -13,6 +13,11 @@
         public int Id { get; set; }
 
         /// <summary>
+        ///     Person Id
+        /// </summary>
+        public int PersonId { get; set; }
+
+        /// <summary>
         /// User Service id
         /// </summary>
         public int? UserServiceUserId { get; set; }

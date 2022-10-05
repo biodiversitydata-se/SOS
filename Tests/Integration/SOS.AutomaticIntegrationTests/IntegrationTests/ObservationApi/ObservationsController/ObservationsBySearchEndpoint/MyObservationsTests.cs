@@ -36,7 +36,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                     .HaveValuesFromPredefinedObservations()
                 .TheFirst(60)
-                    .With(m => m.ObserversInternal = m.ObserversInternal = new[] { new UserInternal() { UserServiceUserId = userId, ViewAccess = true } })
+                    .With(m => m.ObserversInternal = m.ObserversInternal = new[] { new UserInternal() { Id = userId, PersonId = userId, UserServiceUserId = userId, ViewAccess = true } })
                     .With(m => m.Observers = "Tom Volgers")
                     .With(m => m.ReportedByUserServiceUserId = userId)
                     .With(m => m.ReportedBy = "Tom Volgers")
