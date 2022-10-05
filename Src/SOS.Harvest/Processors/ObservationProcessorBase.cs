@@ -21,7 +21,6 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
-using FastDeepCloner;
 
 namespace SOS.Harvest.Processors
 {
@@ -31,7 +30,6 @@ namespace SOS.Harvest.Processors
     {
         private readonly IDiffusionManager _diffusionManager;
         private readonly bool _logGarbageCharFields;
-        private readonly ProcessConfiguration _processConfiguration;
         private readonly IDictionary<int, HashSet<string>> _protectedTaxa;
 
         private struct ProtectedArea
@@ -291,7 +289,6 @@ namespace SOS.Harvest.Processors
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
             _logGarbageCharFields = processConfiguration?.LogGarbageCharFields ?? false;
             _userObservationRepository = userObservationRepository;
-            _processConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
             _protectedTaxa = LoadTaxonProtection();
         }
 
