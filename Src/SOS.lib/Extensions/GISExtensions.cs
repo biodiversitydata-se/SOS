@@ -237,27 +237,26 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Make envelope as small as possible
         /// </summary>
-        /// <param name="geoShape"></param>
+        /// <param name="geometry"></param>
         /// <param name="boundingBox"></param>
         /// <param name="maxDistanceFromPoint"></param>
         /// <returns></returns>
-        public static Envelope AdjustByShape(
+        public static Envelope AdjustByGeometry(
            this Envelope boundingBox,
-           IGeoShape geoShape,
+           Geometry geometry,
            double? maxDistanceFromPoint)
         {
-            if (geoShape == null)
+            if (geometry == null)
             {
                 return boundingBox;
             }
 
             Envelope envelope;
-            if (geoShape.Type.Equals("point", StringComparison.CurrentCultureIgnoreCase))
+            if (geometry is Point point)
             {
                 if (maxDistanceFromPoint.HasValue)
                 {
-                    var geom = geoShape.ToGeometry();
-                    var sweref99TmGeom = geom.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
+                    var sweref99TmGeom = point.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
                     var bufferedGeomSweref99Tm = sweref99TmGeom.Buffer(maxDistanceFromPoint.Value);
                     var bufferedGeomWgs84 = bufferedGeomSweref99Tm.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
                     envelope = bufferedGeomWgs84.EnvelopeInternal;
@@ -269,7 +268,7 @@ namespace SOS.Lib.Extensions
             }
             else
             {
-                envelope = geoShape.ToGeometry().EnvelopeInternal;
+                envelope = geometry.EnvelopeInternal;
             }
 
             if (envelope.IsNull)
