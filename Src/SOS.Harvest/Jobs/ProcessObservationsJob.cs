@@ -958,6 +958,7 @@ namespace SOS.Harvest.Jobs
 
             List<ObservationDataset> datasets = new List<ObservationDataset>();
             var batDataset = GetSampleBatDataset();
+            batDataset.EndDate = DateTime.Now;
 
             // Determine which events that belongs to this dataset. Aggregate unique EventIds with filter: ProjectIds in [3606]
             //var searchFilter = new SearchFilter(0);

@@ -88,6 +88,10 @@ namespace SOS.Lib.Repositories.Processed
                             .Index(false)
                         )
                         .Keyword(kw => kw
+                            .Name(nm => nm.DataStewardshipDatasetId)
+                            .Index(true)
+                        )
+                        .Keyword(kw => kw
                             .Name(nm => nm.DatasetName)
                             .Index(true) // WFS
                             .IgnoreAbove(int.MaxValue)
@@ -1937,7 +1941,7 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Aggregations(a => a
                     .Terms("eventId", t => t
-                        .Size(65536)
+                        .Size(65536)                        
                         .Field("event.eventId")
                     )
                 )
