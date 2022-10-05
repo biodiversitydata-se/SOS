@@ -38,6 +38,7 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Models.Processed.Dataset;
 using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
 using System.Data;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Harvest.Jobs
 {
@@ -959,11 +960,11 @@ namespace SOS.Harvest.Jobs
             var batDataset = GetSampleBatDataset();
 
             // Determine which events that belongs to this dataset. Aggregate unique EventIds with filter: ProjectIds in [3606]
-
-
-            // Update DataStewardshipDatasetId
-
-
+            //var searchFilter = new SearchFilter(0);
+            //searchFilter.DataStewardshipDatasetId = batDataset.Identifier;
+            //var eventIds = await _processedObservationRepository.GetEventIdsAsync(searchFilter);
+            List<string> eventIds = new List<string>() { "TestId1", "TestId2"};
+            batDataset.EventIds = eventIds;
             datasets.Add(batDataset);
             await _observationDatasetRepository.AddManyAsync(datasets);
         }
