@@ -1,0 +1,705 @@
+[
+    {
+        "taxonId": 245,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "6"
+            },
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "23"
+            }
+        ]
+    },
+    {
+        "taxonId": 695,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "17"
+            }
+        ]
+    },
+    {
+        "taxonId": 698,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "6"
+            },
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "17"
+            }
+        ]
+    },
+    {
+        "taxonId": 886,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "9"
+            }
+        ]
+    },
+    {
+        "taxonId": 1294,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "12"
+            }
+        ]
+    },
+    {
+        "taxonId": 1477,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "13"
+            }
+        ]
+    },
+    {
+        "taxonId": 1547,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "3"
+            },
+            {
+                "areaType": 21,
+                "featureId": "4"
+            },
+            {
+                "areaType": 21,
+                "featureId": "10"
+            },
+            {
+                "areaType": 21,
+                "featureId": "12"
+            },
+            {
+                "areaType": 21,
+                "featureId": "13"
+            },
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "18"
+            },
+            {
+                "areaType": 21,
+                "featureId": "21"
+            }
+        ]
+    },
+    {
+        "taxonId": 1713,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 1898,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "22"
+            }
+        ]
+    },
+    {
+        "taxonId": 2094,
+        "areas": [
+            {
+                "areaType": 19,
+                "featureId": "172"
+            }
+        ]
+    },
+    {
+        "taxonId": 101198,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "3"
+            },
+            {
+                "areaType": 21,
+                "featureId": "19"
+            }
+        ]
+    },
+    {
+        "taxonId": 219677,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "1"
+            },
+            {
+                "areaType": 21,
+                "featureId": "4"
+            },
+            {
+                "areaType": 21,
+                "featureId": "6"
+            },
+            {
+                "areaType": 21,
+                "featureId": "7"
+            },
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 219755,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "10"
+            }
+        ]
+    },
+    {
+        "taxonId": 219763,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "12"
+            }
+        ]
+    },
+    {
+        "taxonId": 219836,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "22"
+            }
+        ]
+    },
+    {
+        "taxonId": 219878,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "17"
+            }
+        ]
+    },
+    {
+        "taxonId": 219880,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "13"
+            }
+        ]
+    },
+    {
+        "taxonId": 220250,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "10"
+            }
+        ]
+    },
+    {
+        "taxonId": 220294,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 220320,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 220482,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "9"
+            },
+            {
+                "areaType": 21,
+                "featureId": "10"
+            }
+        ]
+    },
+    {
+        "taxonId": 220686,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "10"
+            }
+        ]
+    },
+    {
+        "taxonId": 221092,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "18"
+            }
+        ]
+    },
+    {
+        "taxonId": 221137,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "19"
+            }
+        ]
+    },
+    {
+        "taxonId": 221143,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 221411,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 221447,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "6"
+            },
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "17"
+            }
+        ]
+    },
+    {
+        "taxonId": 221449,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 221514,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 221733,
+        "areas": [
+            {
+                "areaType": 19,
+                "featureId": "2215"
+            },
+            {
+                "areaType": 19,
+                "featureId": "2232"
+            },
+            {
+                "areaType": 19,
+                "featureId": "2264"
+            }
+        ]
+    },
+    {
+        "taxonId": 221760,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "19"
+            }
+        ]
+    },
+    {
+        "taxonId": 222412,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "4"
+            },
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "17"
+            },
+            {
+                "areaType": 21,
+                "featureId": "18"
+            }
+        ]
+    },
+    {
+        "taxonId": 222592,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "10"
+            }
+        ]
+    },
+    {
+        "taxonId": 222593,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "6"
+            },
+            {
+                "areaType": 21,
+                "featureId": "7"
+            },
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "21"
+            }
+        ]
+    },
+    {
+        "taxonId": 222783,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "4"
+            },
+            {
+                "areaType": 21,
+                "featureId": "10"
+            },
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "22"
+            },
+            {
+                "areaType": 21,
+                "featureId": "23"
+            }
+        ]
+    },
+    {
+        "taxonId": 222784,
+        "areas": [
+            {
+                "areaType": 16,
+                "featureId": "4"
+            }
+        ]
+    },
+    {
+        "taxonId": 222812,
+        "areas": [
+            {
+                "areaType": 16,
+                "featureId": "4"
+            },
+            {
+                "areaType": 21,
+                "featureId": "1"
+            },
+            {
+                "areaType": 21,
+                "featureId": "4"
+            },
+            {
+                "areaType": 21,
+                "featureId": "7"
+            }
+        ]
+    },
+    {
+        "taxonId": 222884,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "3"
+            },
+            {
+                "areaType": 21,
+                "featureId": "4"
+            },
+            {
+                "areaType": 21,
+                "featureId": "12"
+            },
+            {
+                "areaType": 21,
+                "featureId": "13"
+            }
+        ]
+    },
+    {
+        "taxonId": 222931,
+        "areas": [
+            {
+                "areaType": 16,
+                "featureId": "4"
+            },
+            {
+                "areaType": 21,
+                "featureId": "4"
+            },
+            {
+                "areaType": 21,
+                "featureId": "6"
+            },
+            {
+                "areaType": 21,
+                "featureId": "7"
+            },
+            {
+                "areaType": 21,
+                "featureId": "10"
+            },
+            {
+                "areaType": 21,
+                "featureId": "12"
+            },
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "17"
+            },
+            {
+                "areaType": 21,
+                "featureId": "18"
+            },
+            {
+                "areaType": 21,
+                "featureId": "19"
+            }
+        ]
+    },
+    {
+        "taxonId": 223324,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "18"
+            }
+        ]
+    },
+    {
+        "taxonId": 223359,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 223380,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "22"
+            }
+        ]
+    },
+    {
+        "taxonId": 223718,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "9"
+            }
+        ]
+    },
+    {
+        "taxonId": 224146,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 224191,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 224192,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 224204,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "17"
+            }
+        ]
+    },
+    {
+        "taxonId": 224205,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "17"
+            }
+        ]
+    },
+    {
+        "taxonId": 224206,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "17"
+            }
+        ]
+    },
+    {
+        "taxonId": 224207,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            }
+        ]
+    },
+    {
+        "taxonId": 224210,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "6"
+            },
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "17"
+            }
+        ]
+    },
+    {
+        "taxonId": 232917,
+        "areas": [
+            {
+                "areaType": 19,
+                "featureId": "172"
+            }
+        ]
+    },
+    {
+        "taxonId": 264673,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "12"
+            }
+        ]
+    },
+    {
+        "taxonId": 264683,
+        "areas": [
+            {
+                "areaType": 21,
+                "featureId": "14"
+            },
+            {
+                "areaType": 21,
+                "featureId": "17"
+            }
+        ]
+    }
+]
+

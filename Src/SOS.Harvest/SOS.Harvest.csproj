@@ -39,6 +39,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="Resources\TaxonProtection.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Resources\CountyNameMapper.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
