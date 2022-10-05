@@ -23,7 +23,7 @@ namespace SOS.Harvest.Containers.Interfaces
         ConcurrentDictionary<int, Metadata> DiscoveryMethods { get; }
         ConcurrentDictionary<int, Metadata> Genders { get; }
         ConcurrentDictionary<int, Metadata> Organizations { get; }
-        ConcurrentDictionary<int, Person> PersonByUserId { get; }
+        ConcurrentDictionary<int, Person> PersonsByUserId { get; }
         ConcurrentDictionary<int, Project> Projects { get; }
         ConcurrentDictionary<int, Metadata> Stages { get; }
         ConcurrentDictionary<int, Metadata> Substrates { get; }

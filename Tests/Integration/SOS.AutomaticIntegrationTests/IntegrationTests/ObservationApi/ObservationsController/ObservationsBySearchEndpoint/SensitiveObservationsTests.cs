@@ -172,7 +172,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                     .HaveValuesFromPredefinedObservations()
                     .HaveTaxonSensitivityCategory(3)
                 .TheFirst(60)
-                    .With(m => m.ObserversInternal = new[] { new UserInternal() { UserServiceUserId = userId, ViewAccess = true } })
+                    .With(m => m.ObserversInternal = new[] { new UserInternal() { Id = userId, PersonId = userId, UserServiceUserId = userId, ViewAccess = true } })
                 .Build();
 
             var authorityBuilder = new UserAuthorizationTestBuilder();

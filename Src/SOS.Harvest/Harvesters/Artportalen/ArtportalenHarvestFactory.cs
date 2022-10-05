@@ -129,9 +129,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.Projects = projects;
                 observation.SightingTypeId = entity.SightingTypeId;
                 observation.SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId;
-                observation.DeterminedBy = entity.DeterminerUserId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(entity.DeterminerUserId.Value) ? _artportalenMetadataContainer.PersonByUserId[entity.DeterminerUserId.Value].FullName : null;
+                observation.DeterminedBy = entity.DeterminerUserId.HasValue && _artportalenMetadataContainer.PersonsByUserId.ContainsKey(entity.DeterminerUserId.Value) ? _artportalenMetadataContainer.PersonsByUserId[entity.DeterminerUserId.Value].FullName : null;
                 observation.DeterminationYear = entity.DeterminationYear;
-                observation.ConfirmedBy = entity.ConfirmatorUserId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(entity.ConfirmatorUserId.Value) ? _artportalenMetadataContainer.PersonByUserId[entity.ConfirmatorUserId.Value].FullName : null;
+                observation.ConfirmedBy = entity.ConfirmatorUserId.HasValue && _artportalenMetadataContainer.PersonsByUserId.ContainsKey(entity.ConfirmatorUserId.Value) ? _artportalenMetadataContainer.PersonsByUserId[entity.ConfirmatorUserId.Value].FullName : null;
                 observation.ConfirmationYear = entity.ConfirmationYear;
 
                 observation.RegionalSightingStateId = entity.RegionalSightingStateId;
@@ -148,8 +148,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     observation.PublicCollection = speciesCollectionItemEntity.OrganizationId.HasValue && _artportalenMetadataContainer.Organizations.ContainsKey(speciesCollectionItemEntity.OrganizationId.Value)
                         ? _artportalenMetadataContainer.Organizations[speciesCollectionItemEntity.OrganizationId.Value]
                         : null;
-                    observation.PrivateCollection = speciesCollectionItemEntity.CollectorId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(speciesCollectionItemEntity.CollectorId.Value)
-                        ? _artportalenMetadataContainer.PersonByUserId[speciesCollectionItemEntity.CollectorId.Value].FullName
+                    observation.PrivateCollection = speciesCollectionItemEntity.CollectorId.HasValue && _artportalenMetadataContainer.PersonsByUserId.ContainsKey(speciesCollectionItemEntity.CollectorId.Value)
+                        ? _artportalenMetadataContainer.PersonsByUserId[speciesCollectionItemEntity.CollectorId.Value].FullName
                         : null;
                 }
                 
@@ -491,7 +491,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             var personSightings = PersonSightingFactory.CreatePersonSightingDictionary(
                 sightingIds,
-                _artportalenMetadataContainer.PersonByUserId,
+                _artportalenMetadataContainer.PersonsByUserId,
                 _artportalenMetadataContainer.Organizations,
                 speciesCollectionsBySightingId,
                 sightingRelations);

@@ -197,7 +197,7 @@ namespace SOS.Harvest.Containers
         public ConcurrentDictionary<int, Metadata> DiscoveryMethods { get; private set; }
         public ConcurrentDictionary<int, Metadata> Genders { get; private set; }
         public ConcurrentDictionary<int, Metadata> Organizations { get; private set; }
-        public ConcurrentDictionary<int, Person> PersonByUserId { get; private set; }
+        public ConcurrentDictionary<int, Person> PersonsByUserId { get; private set; }
         public ConcurrentDictionary<int, Project> Projects { get; private set; }        
         public ConcurrentDictionary<int, Metadata> Stages { get; private set; }
         public ConcurrentDictionary<int, Metadata> Substrates { get; private set; }
@@ -237,11 +237,11 @@ namespace SOS.Harvest.Containers
 
         /// <inheritdoc />
         public void InitializeDynamic(
-            IEnumerable<PersonEntity> personByUserId,
+            IEnumerable<PersonEntity> persons,
             IEnumerable<ProjectEntity> projectEntities
         )
         {
-            PersonByUserId = CastPersonEntitiesToVerbatims(personByUserId)?.ToConcurrentDictionary(p => p.UserId, p => p) ?? new ConcurrentDictionary<int, Person>();
+            PersonsByUserId = CastPersonEntitiesToVerbatims(persons)?.ToConcurrentDictionary(p => p.UserId, p => p) ?? new ConcurrentDictionary<int, Person>();
             Projects = CastProjectEntitiesToVerbatim(projectEntities).ToConcurrentDictionary(p => p.Id, p => p) ?? new ConcurrentDictionary<int, Project>();
         }
     }
