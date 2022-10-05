@@ -760,11 +760,62 @@ namespace SOS.Harvest.Processors.Artportalen
         public static string GetOccurenceId(int sightingId) => $"urn:lsid:artportalen.se:sighting:{sightingId}";
 
 
-        protected string GetDataStewardshipDatasetId(Observation observation)
+        protected string? GetDataStewardshipDatasetId(Observation observation)
         {
+            if (observation.Projects == null || observation.Projects.Count() == 0) return null;
 
+            DataStewardshipMapping? dataStewardshipMapping = null;
+            foreach (var project in observation.Projects)
+            {
+                if (DataStewardshipByProjectId.TryGetValue(project.Id, out dataStewardshipMapping))
+                {
+                    break;
+                }
+            }
+            if (dataStewardshipMapping == null) return null;
+            return dataStewardshipMapping.DatasetId;
+        }        
 
-            return null;
+        private List<DataStewardshipMapping> dataStewardshipMappings = new List<DataStewardshipMapping>()
+        {
+            new DataStewardshipMapping
+            {
+                DatasetId = "ArtportalenDataHost - Dataset Bats",
+                ProjectIdsSet = new HashSet<int>() { 3606 }
+            }
+        };
+
+        private Dictionary<int, DataStewardshipMapping> _dataStewardshipByProjectId;
+        private object _dataStewardshipByProjectIdLock = new object();
+        private Dictionary<int, DataStewardshipMapping> DataStewardshipByProjectId
+        {
+            get
+            {
+                if (_dataStewardshipByProjectId == null)
+                {
+                    lock (_dataStewardshipByProjectIdLock)
+                    {
+                        var dictionary = new Dictionary<int, DataStewardshipMapping>();                        
+                        foreach (var mapping in dataStewardshipMappings)
+                        {
+                            foreach (var projectId in mapping.ProjectIdsSet)
+                            {
+                                dictionary.TryAdd(projectId, mapping);
+                            }
+                        }
+
+                        _dataStewardshipByProjectId = dictionary;
+                    }
+                }
+
+                return _dataStewardshipByProjectId;
+            }
+        }
+
+        private class DataStewardshipMapping
+        {
+            public string DatasetId { get; set; }
+            public HashSet<int> ProjectIdsSet { get; set; }
         }
     }
 }

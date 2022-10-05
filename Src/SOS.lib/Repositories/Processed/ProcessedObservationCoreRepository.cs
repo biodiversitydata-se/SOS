@@ -1919,6 +1919,132 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             return !response.Exists;
-        } 
+        }
+
+        public async Task<IEnumerable<EventIdAggregationItem>> GetEventIdsAsync(
+            SearchFilter filter)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Terms("eventId", t => t
+                        .Size(65536)
+                        .Field("event.eventId")
+                    )
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            IEnumerable<EventIdAggregationItem> result = searchResponse.Aggregations
+                .Terms("eventId")
+                .Buckets
+                .Select(b => new EventIdAggregationItem { EventId = b.Key, ObservationCount = (int)(b.DocCount ?? 0) });
+
+            return result;
+        }
+
+
+        public async Task<List<EventIdAggregationItem>> GetAllEventIdsAsync(SearchFilter filter)
+        {
+            var indexName = GetCurrentIndex(filter);
+            var(query, excludeQuery) = GetCoreQueries(filter);
+            var eventIdItems = new List<EventIdAggregationItem>();
+            CompositeKey nextPageKey = null;
+            var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
+            do
+            {
+                var searchResponse = await PageEventIdsAsync(indexName, query, excludeQuery, nextPageKey, pageTaxaAsyncTake);
+                var compositeAgg = searchResponse.Aggregations.Composite("eventComposite");
+                foreach (var bucket in compositeAgg.Buckets)
+                {                    
+                    eventIdItems.Add(new EventIdAggregationItem
+                    {
+                        EventId = bucket.Key["eventId"].ToString(),
+                        ObservationCount = Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0))
+                    });                    
+                }
+
+                nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
+            } while (nextPageKey != null);
+
+            return eventIdItems;
+        }
+
+        private async Task<ISearchResponse<dynamic>> PageEventIdsAsync(
+            string indexName,
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            CompositeKey nextPage,
+            int take)
+        {
+            ISearchResponse<dynamic> searchResponse;
+
+            searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Composite("eventComposite", g => g
+                        .After(nextPage ?? null)
+                        //.After(nextPage ?? new CompositeKey(new Dictionary<string, object>() { { "eventId", 0 } }))
+                        .Size(take)
+                        .Sources(src => src
+                            .Terms("eventId", tt => tt
+                                .Field("event.eventId")
+                            )
+                        )
+                    )
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            return searchResponse;
+
+        //    var searchResponse = await Client.SearchAsync<UserObservation>(s => s
+        //    .Index(indexName)
+        //    .Query(q => q
+        //        .Bool(b => b
+        //            .Filter(query)
+        //        )
+        //    )
+        //    .Aggregations(a => a.Composite("taxonComposite", g => g
+        //        .Size(take)
+        //        .After(nextPage ?? null)
+        //        .Sources(src => src
+        //            .Terms("userId", tt => tt
+        //                .Field("userId"))
+        //            )
+        //        .Aggregations(aa => aa
+        //            .Cardinality("taxaCount", c => c
+        //                .Field("taxonId"))
+        //            )
+        //        )
+        //    )
+        //    .Size(0)
+        //    .Source(s => s.ExcludeAll())
+        //    .TrackTotalHits(false)
+        //);
+        }
     }
 }

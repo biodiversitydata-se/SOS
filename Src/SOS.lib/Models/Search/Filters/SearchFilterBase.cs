@@ -133,6 +133,8 @@ namespace SOS.Lib.Models.Search.Filters
         /// </summary>
         public int? BirdNestActivityLimit { get; set; }
 
+        public string DataStewardshipDatasetId { get; set; }
+
         ///// <summary>
         /////     Observation start date specified in the ISO 8601 standard.
         ///// </summary>
