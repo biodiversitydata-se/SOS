@@ -112,7 +112,9 @@ namespace SOS.Lib.IO.Excel
                                 WriteHeader(sheet, propertyFields, propertyLabelType);
 
                                 // Save to file
+                                _logger.LogDebug($"Begin save Excel export. {package.File.FullName}");
                                 await package.SaveAsync();
+                                _logger.LogDebug($"Finish save Excel export. {package.File.FullName}");
                                 sheet.Dispose();
                                 package.Dispose();
                             }
