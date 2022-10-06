@@ -20,6 +20,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
+using System.Diagnostics;
 
 namespace SOS.Lib.IO.Excel
 {
@@ -75,9 +76,13 @@ namespace SOS.Lib.IO.Excel
                 {
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
-
+                
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
+                var stopwatch = Stopwatch.StartNew();
+                _logger.LogDebug($"Excel export. Begin ES Scroll call for file: {fileName}");
                 var scrollResult = await _processedObservationRepository.ScrollObservationsAsync<Observation>(filter, null);
+                stopwatch.Stop();
+                _logger.LogDebug($"Excel export. End ES Scroll call for file: {fileName}. Elapsed: {stopwatch.ElapsedMilliseconds/1000}s");
                 var fileCount = 0;
                 var rowIndex = 0;
                 ExcelPackage package = null;
@@ -141,7 +146,11 @@ namespace SOS.Lib.IO.Excel
 
                     nrObservations += processedObservations.Length;
                     // Get next batch of observations.
+                    stopwatch.Restart();
+                    _logger.LogDebug($"Excel export. Begin ES Scroll call for file: {fileName}");
                     scrollResult = await _processedObservationRepository.ScrollObservationsAsync<Observation>(filter, scrollResult.ScrollId);
+                    stopwatch.Stop();
+                    _logger.LogDebug($"Excel export. End ES Scroll call for file: {fileName}. Elapsed: {stopwatch.ElapsedMilliseconds / 1000}s");
                 }
 
                 // If less tha 99% of expected observations where fetched, something is wrong
