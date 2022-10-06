@@ -309,6 +309,10 @@ namespace SOS.Lib.Extensions
                     .Index(false)
                 )
                 .Keyword(kw => kw
+                    .Name(nm => nm.Locality)
+                    .Normalizer("lowercase")
+                )
+                .Keyword(kw => kw
                     .Name(nm => nm.LocationRemarks)
                     .Index(false)
                 )
@@ -466,9 +470,6 @@ namespace SOS.Lib.Extensions
                             .Name(nm => nm.Name)
                         )
                     )
-                )
-                .Wildcard(wc => wc
-                    .Name(nm => nm.Locality)
                 );
         }
 
