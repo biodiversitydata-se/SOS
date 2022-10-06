@@ -523,7 +523,7 @@ namespace SOS.Harvest.Jobs
                 // Add data stewardardship datasets
                 if (_processConfiguration.ProcessObservationDataset)
                 {
-                    await AddObservationDatasets();
+                    await AddObservationDatasetsAsync();
                 }
 
                 _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessOverall, processOverallTimerSessionId);
@@ -940,35 +940,42 @@ namespace SOS.Harvest.Jobs
             return await processor.ProcessObservationsAsync(provider, taxa, verbatims);
         }
 
-        private async Task AddObservationDatasets()
+        private async Task AddObservationDatasetsAsync()
         {
-            /*
-             * Workflow - Med nuvarande SOS-struktur
-             * --------------------------------------
-             *  1. Observationer skördas från Artportalen till MongoDB precis som vanligt, men nu ska också en ny property DataStewardshipDatasetId sättas för de observationer som ingår i datavärdskapet. En ny tabell i Artportalen behövs som beskriver datasetet och ytterligare en som pekar på vilka projekt som ingår i datasetet.
-             *  2. Datasetets metadata ska skördas från Artportalen till MongoDB.
-             *  3. Observationerna processas precis som tidigare.
-             *  4. När processningen av alla observationer är klara så processas dataseten, dels utifrån metadatainformationen som finns i MongoDB och dels från de processade observationerna för att få fram vilka EventId:n som ingår i datasetet.
-             *
-             *  Problem
-             *  ----------------------------------
-             *  1. Det finns en del strukturer som inte finns i SOS idag. Exempelvis:
-             *    - WeatherVariable
-             *  Lösning: Antingen får vi lägga till mer properties till nuvarande struktur, eller så får vi skapa ett nytt index för datavärdskapet.
-             */
+            try
+            {
+                /*
+                 * Workflow - Med nuvarande SOS-struktur
+                 * --------------------------------------
+                 *  1. Observationer skördas från Artportalen till MongoDB precis som vanligt, men nu ska också en ny property DataStewardshipDatasetId sättas för de observationer som ingår i datavärdskapet. En ny tabell i Artportalen behövs som beskriver datasetet och ytterligare en som pekar på vilka projekt som ingår i datasetet.
+                 *  2. Datasetets metadata ska skördas från Artportalen till MongoDB.
+                 *  3. Observationerna processas precis som tidigare.
+                 *  4. När processningen av alla observationer är klara så processas dataseten, dels utifrån metadatainformationen som finns i MongoDB och dels från de processade observationerna för att få fram vilka EventId:n som ingår i datasetet.
+                 *
+                 *  Problem
+                 *  ----------------------------------
+                 *  1. Det finns en del strukturer som inte finns i SOS idag. Exempelvis:
+                 *    - WeatherVariable
+                 *  Lösning: Antingen får vi lägga till mer properties till nuvarande struktur, eller så får vi skapa ett nytt index för datavärdskapet.
+                 */
 
-            List<ObservationDataset> datasets = new List<ObservationDataset>();
-            var batDataset = GetSampleBatDataset();
-            batDataset.EndDate = DateTime.Now;
+                List<ObservationDataset> datasets = new List<ObservationDataset>();
+                var batDataset = GetSampleBatDataset();
+                batDataset.EndDate = DateTime.Now;
 
-            // Determine which events that belongs to this dataset. Aggregate unique EventIds with filter: ProjectIds in [3606]
-            //var searchFilter = new SearchFilter(0);
-            //searchFilter.DataStewardshipDatasetId = batDataset.Identifier;
-            //var eventIds = await _processedObservationRepository.GetEventIdsAsync(searchFilter);
-            List<string> eventIds = new List<string>() { "TestId1", "TestId2"};
-            batDataset.EventIds = eventIds;
-            datasets.Add(batDataset);
-            await _observationDatasetRepository.AddManyAsync(datasets);
+                // Determine which events that belongs to this dataset. Aggregate unique EventIds with filter: ProjectIds in [3606]
+                //var searchFilter = new SearchFilter(0);
+                //searchFilter.DataStewardshipDatasetId = batDataset.Identifier;
+                //var eventIds = await _processedObservationRepository.GetEventIdsAsync(searchFilter);
+                List<string> eventIds = new List<string>() { "TestId1", "TestId2" };
+                batDataset.EventIds = eventIds;
+                datasets.Add(batDataset);
+                await _observationDatasetRepository.AddManyAsync(datasets);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Add data stewardship datasets failed.");
+            }
         }
 
 
