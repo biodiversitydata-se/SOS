@@ -40,15 +40,18 @@ namespace SOS.Lib.Repositories.Processed
                 .Map<ObservationDataset>(m => m
                     .AutoMap<ObservationDataset>()
                     .Properties(p => p
-                        //.Keyword(kw => kw
-                        //    .Name(nm => nm.ProvinceFeatureId)    
-                        //)
-                        //.Keyword(kw => kw
-                        //    .Name(nm => nm.MunicipalityFeatureId)
-                        //)
-                        //.Keyword(kw => kw
-                        //    .Name(nm => nm.CountryRegionFeatureId)
-                        //)
+                        .Nested<string>(n => n
+                            .AutoMap()
+                            .Name(nm => nm.EventIds)
+                    //.Keyword(kw => kw
+                    //    .Name(nm => nm.ProvinceFeatureId)    
+                    //)
+                    //.Keyword(kw => kw
+                    //    .Name(nm => nm.MunicipalityFeatureId)
+                    //)
+                    //.Keyword(kw => kw
+                    //    .Name(nm => nm.CountryRegionFeatureId)
+                    //)
                     )
                 )
             );
