@@ -520,6 +520,12 @@ namespace SOS.Harvest.Jobs
 
                 _logger.LogInformation($"Processing done: {success} {mode}");
 
+                // Add data stewardardship datasets
+                if (_processConfiguration.ProcessObservationDataset)
+                {
+                    await AddObservationDatasets();
+                }
+
                 _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessOverall, processOverallTimerSessionId);
 
                 if (_enableTimeManager)
@@ -537,12 +543,7 @@ namespace SOS.Harvest.Jobs
 
                         _logger.LogInformation(timerMessage);
                     }
-                }
-
-                if (_processConfiguration.ProcessObservationDataset)
-                {
-                    await AddObservationDatasets();
-                }
+                }                
 
                 //-------------------------------
                 // 8. Return processing result
