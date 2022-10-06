@@ -38,5 +38,28 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             //-----------------------------------------------------------------------------------------------------------
             eventIds.Should().NotBeNull();
         }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Get_allEventIds_for_datastewardship_dataset()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            SearchFilter searchFilter = new SearchFilter(0)
+            {
+                DataStewardshipDatasetId = "ArtportalenDataHost - Dataset Bats"
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var eventIds = await _fixture.ProcessedObservationRepository.GetAllEventIdsAsync(searchFilter);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            eventIds.Should().NotBeNull();
+        }
     }
 }
