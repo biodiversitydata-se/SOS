@@ -453,14 +453,20 @@ namespace SOS.Harvest.Jobs
                             Thread.Sleep(TimeSpan.FromSeconds(6)); // Wait for Elasticsearch indexing to finish.
                             docCount = await _processedObservationRepository.IndexCountAsync(false);
                         }
-                       
+
+                        // Add data stewardardship datasets
+                        if (_processConfiguration.ProcessObservationDataset)
+                        {
+                            await AddObservationDatasetsAsync();
+                        }
+
                         if (_runIncrementalAfterFull)
                         {
                             // Enqueue incremental harvest/process job to Hangfire in order to get latest sightings
                             var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunIncrementalInactiveAsync(cancellationToken));
 
                             _logger.LogInformation($"Incremental harvest/process job with Id={jobId} was enqueued");
-                        }
+                        }                        
 
                         //----------------------------------------------------------------------------
                         // 7. End create DwC CSV files and merge the files into multiple DwC-A files.
@@ -479,14 +485,14 @@ namespace SOS.Harvest.Jobs
 
                                 _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
                             }
-                        }
+                        }                        
                     }
 
                     if (!await _processedObservationRepository.EnsureNoDuplicatesAsync())
                     {
                         _logger.LogError($"Failed to delete duplicates");
-                    }
-             
+                    }                    
+
                     // When we do a incremental harvest to live index, there is no meaning to do validation since the data is already live
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull ||
                         mode == JobRunModes.IncrementalInactiveInstance)
@@ -518,13 +524,7 @@ namespace SOS.Harvest.Jobs
                     }
                 }
 
-                _logger.LogInformation($"Processing done: {success} {mode}");
-
-                // Add data stewardardship datasets
-                if (_processConfiguration.ProcessObservationDataset)
-                {
-                    await AddObservationDatasetsAsync();
-                }
+                _logger.LogInformation($"Processing done: {success} {mode}");                
 
                 _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessOverall, processOverallTimerSessionId);
 
