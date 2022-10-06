@@ -53,7 +53,7 @@ namespace SOS.Lib.Repositories.Processed
                     //    .Name(nm => nm.CountryRegionFeatureId)
                     //)
                     )
-                )
+                ))
             );
             
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationDataset index. Error: {createIndexResponse.DebugInformation}");
