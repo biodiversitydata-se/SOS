@@ -108,6 +108,7 @@ namespace SOS.Lib.IO.Excel
                             // If we have a package, save it
                             if (package != null)
                             {
+                                _logger.LogDebug($"Begin write Excel header for file: {fileName}");
                                 WriteHeader(sheet, propertyFields, propertyLabelType);
 
                                 // Save to file
@@ -220,7 +221,7 @@ namespace SOS.Lib.IO.Excel
                 sheet.Cells[1, columnIndex].Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));
                 sheet.Cells[1, columnIndex].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 sheet.Cells[1, columnIndex].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
-                sheet.Column(columnIndex).AutoFit(10, 70);
+                //sheet.Column(columnIndex).AutoFit(10, 70);
                 columnIndex++;
             }
         }
