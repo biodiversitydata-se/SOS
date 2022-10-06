@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
@@ -1774,7 +1773,9 @@ namespace SOS.Lib.Repositories.Processed
                             .Filter(filter.ToMultimediaQuery())
                         )
                     )
-                    .Sort(s => s.Ascending(new Field("_doc")))
+                    .Sort(s => s
+                        .Ascending(new Field("_doc"))
+                    )
                     .Scroll(ScrollTimeout)
                     .Size(ScrollBatchSize)
                 );
