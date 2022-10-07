@@ -92,7 +92,7 @@ namespace SOS.Export.Services
                     continue;
                 }
             }
-            return null!;
+            return new ZendToResponse();
         }
 
         private string GetMessage(string template, DateTime fileCreationDate)
