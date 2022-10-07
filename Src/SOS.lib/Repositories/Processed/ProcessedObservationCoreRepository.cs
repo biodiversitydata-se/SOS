@@ -1796,7 +1796,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<ScrollResult<T>> ScrollObservationsAsync<T>(
             SearchFilterBase filter,
             string scrollId)
-        {
+        {            
             // Retry policy by Polly
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {

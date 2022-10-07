@@ -4,6 +4,7 @@ using SOS.DataStewardship.Api.Modules.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using Nest;
 using Swashbuckle.AspNetCore.Annotations;
+using SOS.DataStewardship.Api.Managers.Interfaces;
 
 namespace SOS.DataStewardship.Api.Modules;
 
@@ -81,12 +82,16 @@ public class DataStewardshipModule : IModule
     /// </summary>
     /// <param name="id">The dataset id.</param>
     /// <returns></returns>
-    internal async Task<IResult> GetDatasetByIdAsync([FromRoute][Required] string id)
+    internal async Task<IResult> GetDatasetByIdAsync([FromRoute][Required] string id, IDataStewardshipManager dataStewardshipManager)
     {
         try
         {
-            var datasetExample = DataStewardshipArtportalenSampleData.DatasetBats;
-            return Results.Ok(datasetExample);
+            var dataset = await dataStewardshipManager.GetDatasetByIdAsync(id);
+            if (dataset == null) return Results.NotFound();
+            return Results.Ok(dataset);
+
+            //var datasetExample = DataStewardshipArtportalenSampleData.DatasetBats;
+            //return Results.Ok(datasetExample);
         }
         catch (Exception ex)
         {

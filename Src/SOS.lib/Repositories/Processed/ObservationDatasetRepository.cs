@@ -12,6 +12,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Dataset;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -39,10 +40,7 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Map<ObservationDataset>(m => m
                     .AutoMap<ObservationDataset>()
-                    .Properties(p => p
-                        .Nested<string>(n => n
-                            .AutoMap()
-                            .Name(nm => nm.EventIds)
+                    .Properties(p => p                        
                     //.Keyword(kw => kw
                     //    .Name(nm => nm.ProvinceFeatureId)    
                     //)
@@ -53,10 +51,30 @@ namespace SOS.Lib.Repositories.Processed
                     //    .Name(nm => nm.CountryRegionFeatureId)
                     //)
                     )
-                ))
+                )
             );
             
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationDataset index. Error: {createIndexResponse.DebugInformation}");
+        }
+
+        public async Task<ObservationDataset> GetDatasetById(string id)
+        {
+            var query = new List<Func<QueryContainerDescriptor<ObservationDataset>, QueryContainer>>();
+            query.TryAddTermsCriteria("identifier", id);            
+            var searchResponse = await Client.SearchAsync<ObservationDataset>(s => s
+                .Index(IndexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .Filter(query)
+                    )
+                )
+                .Size(1)                
+                .TrackTotalHits(false)
+            );
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            var dataset = searchResponse.Documents.SingleOrDefault();            
+            return dataset;
         }
 
         /// <summary>
