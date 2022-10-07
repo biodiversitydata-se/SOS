@@ -1920,10 +1920,9 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             return !response.Exists;
-        }
+        }        
 
-        public async Task<IEnumerable<EventIdAggregationItem>> GetEventIdsAsync(
-            SearchFilter filter)
+        public async Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, string aggregationField)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -1937,9 +1936,9 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .Aggregations(a => a
-                    .Terms("eventId", t => t
-                        .Size(65536)                        
-                        .Field("event.eventId")
+                    .Terms("termAggregation", t => t
+                        .Size(65536)
+                        .Field(aggregationField)
                     )
                 )
                 .Size(0)
@@ -1948,34 +1947,32 @@ namespace SOS.Lib.Repositories.Processed
             );
 
             searchResponse.ThrowIfInvalid();
-
-            IEnumerable<EventIdAggregationItem> result = searchResponse.Aggregations
-                .Terms("eventId")
+            IEnumerable<AggregationItem> result = searchResponse.Aggregations
+                .Terms("termAggregation")
                 .Buckets
-                .Select(b => new EventIdAggregationItem { EventId = b.Key, ObservationCount = (int)(b.DocCount ?? 0) });
+                .Select(b => new AggregationItem { AggregationKey = b.Key, DocCount = (int)(b.DocCount ?? 0) });
 
             return result;
         }
 
-
-        public async Task<List<EventIdAggregationItem>> GetAllEventIdsAsync(SearchFilter filter)
+        public async Task<List<AggregationItem>> GetAllAggregationItemsAsync(SearchFilter filter, string aggregationField)
         {
             var indexName = GetCurrentIndex(filter);
-            var(query, excludeQuery) = GetCoreQueries(filter);
-            var eventIdItems = new List<EventIdAggregationItem>();
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            var eventIdItems = new List<AggregationItem>();
             CompositeKey nextPageKey = null;
             var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
             do
             {
-                var searchResponse = await PageEventIdsAsync(indexName, query, excludeQuery, nextPageKey, pageTaxaAsyncTake);
-                var compositeAgg = searchResponse.Aggregations.Composite("eventComposite");
+                var searchResponse = await PageAggregationItemAsync(indexName, aggregationField, query, excludeQuery, nextPageKey, pageTaxaAsyncTake);
+                var compositeAgg = searchResponse.Aggregations.Composite("compositeAggregation");
                 foreach (var bucket in compositeAgg.Buckets)
-                {                    
-                    eventIdItems.Add(new EventIdAggregationItem
+                {
+                    eventIdItems.Add(new AggregationItem
                     {
-                        EventId = bucket.Key["eventId"].ToString(),
-                        ObservationCount = Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0))
-                    });                    
+                        AggregationKey = bucket.Key["termAggregation"].ToString(),
+                        DocCount = Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0))
+                    });
                 }
 
                 nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
@@ -1984,8 +1981,9 @@ namespace SOS.Lib.Repositories.Processed
             return eventIdItems;
         }
 
-        private async Task<ISearchResponse<dynamic>> PageEventIdsAsync(
+        private async Task<ISearchResponse<dynamic>> PageAggregationItemAsync(
             string indexName,
+            string aggregationField,
             ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
             ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
             CompositeKey nextPage,
@@ -2002,13 +2000,12 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .Aggregations(a => a
-                    .Composite("eventComposite", g => g
+                    .Composite("compositeAggregation", g => g
                         .After(nextPage ?? null)
-                        //.After(nextPage ?? new CompositeKey(new Dictionary<string, object>() { { "eventId", 0 } }))
                         .Size(take)
                         .Sources(src => src
-                            .Terms("eventId", tt => tt
-                                .Field("event.eventId")
+                            .Terms("termAggregation", tt => tt
+                                .Field(aggregationField)
                             )
                         )
                     )
@@ -2021,31 +2018,76 @@ namespace SOS.Lib.Repositories.Processed
             searchResponse.ThrowIfInvalid();
 
             return searchResponse;
+        }
 
-        //    var searchResponse = await Client.SearchAsync<UserObservation>(s => s
-        //    .Index(indexName)
-        //    .Query(q => q
-        //        .Bool(b => b
-        //            .Filter(query)
-        //        )
-        //    )
-        //    .Aggregations(a => a.Composite("taxonComposite", g => g
-        //        .Size(take)
-        //        .After(nextPage ?? null)
-        //        .Sources(src => src
-        //            .Terms("userId", tt => tt
-        //                .Field("userId"))
-        //            )
-        //        .Aggregations(aa => aa
-        //            .Cardinality("taxaCount", c => c
-        //                .Field("taxonId"))
-        //            )
-        //        )
-        //    )
-        //    .Size(0)
-        //    .Source(s => s.ExcludeAll())
-        //    .TrackTotalHits(false)
-        //);
+
+        public async Task<List<EventOccurrenceAggregationItem>> GetEventOccurrenceItemsAsync(SearchFilter filter)
+        {
+            var indexName = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);            
+            var occurrencesByEventId = new Dictionary<string, List<string>>();
+            CompositeKey nextPageKey = null;
+            var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
+            do
+            {
+                var searchResponse = await PageEventOccurrenceItemAsync(indexName, query, excludeQuery, nextPageKey, pageTaxaAsyncTake);
+                var compositeAgg = searchResponse.Aggregations.Composite("compositeAggregation");
+                foreach (var bucket in compositeAgg.Buckets)
+                {
+                    string eventId = bucket.Key["eventId"].ToString();
+                    string occurrenceId = bucket.Key["occurrenceId"].ToString();
+                    if (!occurrencesByEventId.ContainsKey(eventId))
+                        occurrencesByEventId[eventId] = new List<string>();
+                    occurrencesByEventId[eventId].Add(occurrenceId);
+                }
+
+                nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
+            } while (nextPageKey != null);
+
+
+            var eventIdItems = occurrencesByEventId.Select(m => new EventOccurrenceAggregationItem { EventId = m.Key, OccurrenceIds = m.Value }).ToList();
+            return eventIdItems;
+        }
+
+        private async Task<ISearchResponse<dynamic>> PageEventOccurrenceItemAsync(
+            string indexName,            
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            CompositeKey nextPage,
+            int take)
+        {
+            ISearchResponse<dynamic> searchResponse;
+
+            searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Composite("compositeAggregation", g => g
+                        .After(nextPage ?? null)
+                        .Size(take)
+                        .Sources(src => src
+                            .Terms("eventId", tt => tt
+                                .Field("event.eventId")
+                            )
+                            .Terms("occurrenceId", tt => tt
+                                .Field("occurrence.occurrenceId")
+                            )
+                        )
+                    )
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            return searchResponse;
         }
     }
 }

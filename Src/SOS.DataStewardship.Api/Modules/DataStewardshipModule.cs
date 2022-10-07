@@ -8,6 +8,7 @@ using SOS.DataStewardship.Api.Managers.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System;
+using SOS.DataStewardship.Api.Managers;
 
 namespace SOS.DataStewardship.Api.Modules;
 
@@ -120,10 +121,12 @@ public class DataStewardshipModule : IModule
     /// <param name="skip">Start index.</param>
     /// <param name="take">Number of items to return. 1000 items is the max to return in one call.</param>
     /// <returns></returns>
-    internal async Task<IResult> GetDatasetsBySearchAsync([FromBody] DatasetFilter body, [FromQuery] int? skip, [FromQuery] int? take)
+    internal async Task<IResult> GetDatasetsBySearchAsync(IDataStewardshipManager dataStewardshipManager, [FromBody] DatasetFilter body, [FromQuery] int? skip, [FromQuery] int? take)
     {
         try
         {
+            //var datasets = await dataStewardshipManager.GetDatasetsBySearchAsync(body, skip.GetValueOrDefault(), take.GetValueOrDefault(20));
+
             var datasetExample = DataStewardshipArtportalenSampleData.DatasetBats;
             return Results.Ok(new List<Dataset> { datasetExample });
         }
@@ -138,12 +141,18 @@ public class DataStewardshipModule : IModule
     /// </summary>
     /// <param name="id">EventId of the event to get.</param>
     /// <returns></returns>
-    internal async Task<IResult> GetEventByIdAsync([FromRoute][Required] string id)
+    internal async Task<IResult> GetEventByIdAsync(IDataStewardshipManager dataStewardshipManager, [FromRoute][Required] string id)
     {
         try
         {
-            var eventExample = DataStewardshipArtportalenSampleData.EventBats1;
-            return Results.Ok(eventExample);
+            var eventModel = await dataStewardshipManager.GetEventByIdAsync(id);
+            if (eventModel == null) return Results.NotFound();
+            //return Results.Ok(dataset);
+
+            // The Json setup in Progam.cs doesn't seem to work. Why?            
+            return Results.Json(eventModel, _jsonSerializerOptions);
+            //var eventExample = DataStewardshipArtportalenSampleData.EventBats1;
+            //return Results.Ok(eventExample);
         }
         catch (Exception ex)
         {
