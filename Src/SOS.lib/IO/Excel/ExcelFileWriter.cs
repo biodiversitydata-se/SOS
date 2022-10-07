@@ -102,14 +102,12 @@ namespace SOS.Lib.IO.Excel
                     foreach (var observation in processedObservations)
                     {
                         var flatObservation = new FlatObservation(observation);
-                        // Max 500000 rows in a file
-                        if (rowIndex % 500000 == 0)
+                        // Max 100000 observations rows in a file
+                        if (rowIndex % 100002 == 0)
                         {
                             // If we have a package, save it
                             if (package != null)
                             {
-                                WriteHeader(sheet, propertyFields, propertyLabelType);
-
                                 // Save to file
                                 await package.SaveAsync();
                                 sheet.Dispose();
@@ -122,7 +120,8 @@ namespace SOS.Lib.IO.Excel
                             var file = new FileInfo(excelFilePath);
                             package = new ExcelPackage(file);
                             sheet = package.Workbook.Worksheets.Add("Observations");
-                            rowIndex = 1;
+                            WriteHeader(sheet, propertyFields, propertyLabelType);
+                            rowIndex = 2;
                         }
 
                         int columnIndex = 1;
@@ -136,13 +135,13 @@ namespace SOS.Lib.IO.Excel
                                 _ => value
                             };
 
-                            sheet.Cells[rowIndex + 1, columnIndex].Value = val;
+                            sheet.Cells[rowIndex, columnIndex].Value = val;
                             columnIndex++;
                         }
 
                         rowIndex++;
                     }
-
+                    
                     nrObservations += processedObservations.Length;
                     // Get next batch of observations.
                     stopwatch.Restart();
@@ -161,7 +160,6 @@ namespace SOS.Lib.IO.Excel
                 // If we have a package, save it
                 if (package != null)
                 {
-                    WriteHeader(sheet, propertyFields, propertyLabelType);
 
                     // Save to file
                     await package.SaveAsync();

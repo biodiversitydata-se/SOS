@@ -1149,10 +1149,6 @@ namespace SOS.Lib.Repositories.Processed
             return tasks.All(t => t.Result);
         }
 
-        
-
-        
-
         /// <inheritdoc />
         public async Task<DataQualityReport> GetDataQualityReportAsync(string organismGroup)
         {
