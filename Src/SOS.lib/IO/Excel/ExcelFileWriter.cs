@@ -34,6 +34,25 @@ namespace SOS.Lib.IO.Excel
         private readonly ILogger<ExcelFileWriter> _logger;
 
         /// <summary>
+        /// Try to save Excel packagec# async method not 
+        /// </summary>
+        /// <param name="package"></param>
+        /// <returns></returns>
+        private async Task TrySavePackageAync(ExcelPackage package)
+        {
+            if (package == null)
+            {
+                return;
+            }
+
+            // Save to file
+            _logger.LogDebug($"Begin save Excel export. {package.File.FullName}");
+            await package.SaveAsync();
+            _logger.LogDebug($"Finish save Excel export. {package.File.FullName}");
+            package.Dispose();
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="processedObservationRepository"></param>
@@ -87,6 +106,7 @@ namespace SOS.Lib.IO.Excel
                 ExcelPackage package = null;
                 ExcelWorksheet sheet = null;
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                var packageSaveTasks = new List<Task>();
 
                 while (scrollResult?.Records?.Any() ?? false)
                 {
@@ -105,16 +125,7 @@ namespace SOS.Lib.IO.Excel
                         // Max 100000 observations rows in a file
                         if (rowIndex % 100002 == 0)
                         {
-                            // If we have a package, save it
-                            if (package != null)
-                            { 
-                                // Save to file
-                                _logger.LogDebug($"Begin save Excel export. {package.File.FullName}");
-                                await package.SaveAsync();
-                                _logger.LogDebug($"Finish save Excel export. {package.File.FullName}");
-                                sheet.Dispose();
-                                package.Dispose();
-                            }
+                            packageSaveTasks.Add(TrySavePackageAync(package));
 
                             // Create new file
                             fileCount++;
@@ -159,14 +170,9 @@ namespace SOS.Lib.IO.Excel
                     throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
                 }
 
-                // If we have a package, save it
-                if (package != null)
-                {
-                    // Save to file
-                    await package.SaveAsync();
-                    sheet.Dispose();
-                    package.Dispose();
-                }
+                packageSaveTasks.Add(TrySavePackageAync(package));
+
+                await Task.WhenAll(packageSaveTasks);
 
                 if (gzip)
                 {
@@ -206,7 +212,7 @@ namespace SOS.Lib.IO.Excel
             {
                 return;
             }
-
+            _logger.LogDebug($"Start write Excel header");
             int columnIndex = 1;
             foreach (var propertyField in propertyFields)
             {
@@ -217,9 +223,10 @@ namespace SOS.Lib.IO.Excel
                 sheet.Cells[1, columnIndex].Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));
                 sheet.Cells[1, columnIndex].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 sheet.Cells[1, columnIndex].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
-                //sheet.Column(columnIndex).AutoFit(10, 70);
+                sheet.Column(columnIndex).AutoFit(10, 70);
                 columnIndex++;
             }
+            _logger.LogDebug($"Finish write Excel header");
         }
         
         private void FormatColumns(ExcelWorksheet worksheet, List<PropertyFieldDescription> propertyFields)

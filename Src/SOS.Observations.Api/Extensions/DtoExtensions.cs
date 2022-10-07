@@ -225,7 +225,7 @@ namespace SOS.Observations.Api.Extensions
                 MaxAccuracy = filter.MaxAccuracy
             };
         }
-
+        
         private static TaxonFilter PopulateTaxa(TaxonFilterBaseDto filterDto)
         {
             if (filterDto == null)

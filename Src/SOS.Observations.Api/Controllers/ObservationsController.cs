@@ -23,6 +23,7 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Observation;
 using SOS.Observations.Api.Extensions;
+using SOS.Observations.Api.Helpers;
 using SOS.Observations.Api.Managers.Interfaces;
 using Result = CSharpFunctionalExtensions.Result;
 
@@ -567,7 +568,13 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = new SearchFilterInternal(UserId, sensitiveObservations)
                 {
                     FieldTranslationCultureCode = translationCultureCode,
-                    Output = string.IsNullOrEmpty(sortBy) ? new OutputFilter() : new OutputFilter { SortOrders = new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } } }
+                    Output = string.IsNullOrEmpty(sortBy) ? new OutputFilter() : new OutputFilter { 
+                        SortOrders = new[] { 
+                            new SortOrderFilter { 
+                                SortBy = DwAMappingHelper.MapToObservationField(sortBy), SortOrder = sortOrder 
+                            } 
+                        } 
+                    }
                 };
 
                 if (!string.IsNullOrEmpty(kingdom))
