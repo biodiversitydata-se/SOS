@@ -117,7 +117,7 @@ namespace SOS.Lib.IO.Excel
                         }
                         csvFileHelper.WriteRow(fields);
                     }
-
+                 
                     nrObservations += processedObservations.Length;
                     
                     // Get next batch of observations.
