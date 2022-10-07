@@ -1,4 +1,6 @@
-﻿using SOS.Lib.Models.Interfaces;
+﻿using SOS.DataStewardship.Api.Managers;
+using SOS.DataStewardship.Api.Managers.Interfaces;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 
@@ -28,11 +30,14 @@ internal static class DependencyInjectionExtensions
 
         // Managers
         webApplicationBuilder.Services.AddScoped<ITaxonManager, TaxonManager>();
+        webApplicationBuilder.Services.AddScoped<IDataStewardshipManager, DataStewardshipManager>();
 
         // Repositories
         webApplicationBuilder.Services.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
         webApplicationBuilder.Services.AddScoped<ITaxonRepository, TaxonRepository>();
         webApplicationBuilder.Services.AddScoped<ITaxonListRepository, TaxonListRepository>();
+        webApplicationBuilder.Services.AddScoped<IObservationDatasetRepository, ObservationDatasetRepository>();
+
         return webApplicationBuilder;
     }
 }
