@@ -1,4 +1,5 @@
-﻿using SOS.DataStewardship.Api.Managers.Interfaces;
+﻿using SOS.DataStewardship.Api.Extensions;
+using SOS.DataStewardship.Api.Managers.Interfaces;
 using SOS.DataStewardship.Api.Models;
 
 namespace SOS.DataStewardship.Api.Managers;
@@ -19,11 +20,7 @@ public class DataStewardshipManager : IDataStewardshipManager
     {
         var observationDataset = await _observationDatasetRepository.GetDatasetById(id);
         if (observationDataset == null) return null;
-
-        var dataset = new Dataset();
-        dataset.Identifier = observationDataset.Identifier;
-        dataset.StartDate = observationDataset.StartDate;
-
+        var dataset = observationDataset.ToDataset();        
         return dataset;
     }
 }

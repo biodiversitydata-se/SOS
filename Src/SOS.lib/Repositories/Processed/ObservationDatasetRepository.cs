@@ -60,7 +60,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<ObservationDataset> GetDatasetById(string id)
         {
             var query = new List<Func<QueryContainerDescriptor<ObservationDataset>, QueryContainer>>();
-            query.TryAddTermsCriteria("identifier", id);            
+            query.TryAddTermCriteria("identifier.keyword", id);            
             var searchResponse = await Client.SearchAsync<ObservationDataset>(s => s
                 .Index(IndexName)
                 .Query(q => q

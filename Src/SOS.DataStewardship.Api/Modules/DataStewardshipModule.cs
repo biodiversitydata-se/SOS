@@ -5,6 +5,9 @@ using System.ComponentModel.DataAnnotations;
 using Nest;
 using Swashbuckle.AspNetCore.Annotations;
 using SOS.DataStewardship.Api.Managers.Interfaces;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System;
 
 namespace SOS.DataStewardship.Api.Modules;
 
@@ -19,10 +22,18 @@ public class DataStewardshipModule : IModule
      * 4. Implement controller actions.
      * 5. Create integration tests         
      */
-    
+
+    private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+    {
+        Converters =
+        {
+            new JsonStringEnumConverter()
+        }
+    };
+                   
 
     public void MapEndpoints(WebApplication application)
-    {
+    {        
         application.MapGet("/datastewardship/datasets/{id}", GetDatasetByIdAsync)
             .Produces<Dataset>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
@@ -88,7 +99,10 @@ public class DataStewardshipModule : IModule
         {
             var dataset = await dataStewardshipManager.GetDatasetByIdAsync(id);
             if (dataset == null) return Results.NotFound();
-            return Results.Ok(dataset);
+            //return Results.Ok(dataset);
+            
+            // The Json setup in Progam.cs doesn't seem to work. Why?            
+            return Results.Json(dataset, _jsonSerializerOptions);
 
             //var datasetExample = DataStewardshipArtportalenSampleData.DatasetBats;
             //return Results.Ok(datasetExample);
