@@ -79,19 +79,23 @@ namespace SOS.Export.Services
             using var client = new HttpClient();
             using var response = await client.PostAsync("https://zendto.slu.se/dropoff.php", form);
             response.Headers.TryGetValues("X-ZendTo-Response", out var responseStrings);
-
-            foreach(var responseString in responseStrings)
+            
+            if (response.IsSuccessStatusCode)
             {
-                try
+                foreach (var responseString in responseStrings)
                 {
-                    return JsonSerializer.Deserialize<ZendToResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                }
-                catch(Exception e)
-                {
-                    _logger.LogDebug($"Failed to deserialize ZendTo response: {responseString}", e);
-                    continue;
+                    try
+                    {
+                        return JsonSerializer.Deserialize<ZendToResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogDebug($"Failed to deserialize ZendTo response: {responseString}", e);
+                        continue;
+                    }
                 }
             }
+            _logger.LogDebug($"Failed to send file using ZendT: {response.ReasonPhrase}");
             return new ZendToResponse();
         }
 
