@@ -286,14 +286,13 @@ namespace SOS.Export.Managers
         {
             try
             {
-                bool gzip = true;
                 var fileExportResult = await _excelWriter.CreateFileAync(
                     filter,
                     _exportPath,
                     fileName,
                     culture,
                     propertyLabelType,
-                    gzip,
+                    gzip: true,
                     cancellationToken);
 
                 return fileExportResult;

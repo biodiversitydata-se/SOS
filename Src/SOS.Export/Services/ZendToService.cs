@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -19,7 +19,7 @@ namespace SOS.Export.Services
     public class ZendToService : IZendToService
     {
         private readonly ZendToConfiguration _configuration;
-
+        private readonly ILogger<ZendToService> _logger;
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -39,7 +39,7 @@ namespace SOS.Export.Services
             string message = GetMessage(_configuration.Message, fileCreationDate);
             if (string.IsNullOrWhiteSpace(description))
             {
-                description = "DwC-A file";
+                description = "Observations data file";
             }
 
             var formData = new[]
@@ -80,7 +80,19 @@ namespace SOS.Export.Services
             using var response = await client.PostAsync("https://zendto.slu.se/dropoff.php", form);
             response.Headers.TryGetValues("X-ZendTo-Response", out var responseStrings);
 
-            return JsonSerializer.Deserialize<ZendToResponse>(responseStrings?.FirstOrDefault(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            foreach(var responseString in responseStrings)
+            {
+                try
+                {
+                    return JsonSerializer.Deserialize<ZendToResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                }
+                catch(Exception e)
+                {
+                    _logger.LogDebug($"Failed to deserialize ZendTo response: {responseString}", e);
+                    continue;
+                }
+            }
+            return null!;
         }
 
         private string GetMessage(string template, DateTime fileCreationDate)
