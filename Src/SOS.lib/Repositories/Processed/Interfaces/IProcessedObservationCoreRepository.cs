@@ -283,8 +283,9 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="protectedIndex"></param>
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync(bool protectedIndex);
-
-        Task<IEnumerable<EventIdAggregationItem>> GetEventIdsAsync(SearchFilter filter);
-        Task<List<EventIdAggregationItem>> GetAllEventIdsAsync(SearchFilter filter);
+        
+        Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, string aggregationField);
+        Task<List<AggregationItem>> GetAllAggregationItemsAsync(SearchFilter filter, string aggregationField);
+        Task<List<EventOccurrenceAggregationItem>> GetEventOccurrenceItemsAsync(SearchFilter filter);
     }
 }

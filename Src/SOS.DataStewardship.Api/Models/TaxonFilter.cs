@@ -17,6 +17,6 @@ namespace SOS.DataStewardship.Api.Models
         /// </summary>
 
         [DataMember(Name="ids")]
-        public List<int?> Ids { get; set; }
+        public List<int> Ids { get; set; }
     }
 }

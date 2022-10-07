@@ -730,6 +730,7 @@ namespace SOS.Lib
             query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermCriteria("dataStewardshipDatasetId", filter.DataStewardshipDatasetId);
+            query.TryAddTermsCriteria("event.eventId", filter.EventIds);
 
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);                        
             query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds); 

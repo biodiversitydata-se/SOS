@@ -1,5 +1,9 @@
+using Autofac.Core;
 using SOS.DataStewardship.Api.Extensions;
+using SOS.Lib.JsonConverters;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var logger = NLogBuilder.ConfigureNLog($"nlog.{env}.config").GetCurrentClassLogger();
@@ -16,6 +20,11 @@ try
     builder.SetupSwagger();
     builder.SetupDependencies();
     builder.RegisterModules();
+    builder.Services.Configure<JsonOptions>(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
     var app = builder.Build();
     app.ConfigureExceptionHandler(logger, app.Environment.IsDevelopment());

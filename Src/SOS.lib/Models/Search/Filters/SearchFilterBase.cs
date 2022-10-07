@@ -135,6 +135,8 @@ namespace SOS.Lib.Models.Search.Filters
 
         public string DataStewardshipDatasetId { get; set; }
 
+        public List<string> EventIds { get; set; }
+
         ///// <summary>
         /////     Observation start date specified in the ISO 8601 standard.
         ///// </summary>
