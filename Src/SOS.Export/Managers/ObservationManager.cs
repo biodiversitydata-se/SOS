@@ -130,7 +130,7 @@ namespace SOS.Export.Managers
                     exportFormat, 
                     sendMailFromZendTo, 
                     !sensitiveObservations,// Can't include pass code if sensitive observations is selcted
-                    sensitiveObservations, // Encrypt file if sensitive observations is selcted
+                    sensitiveObservations || !string.IsNullOrEmpty(encryptPassword), // Encrypt file if sensitive observations is selcted or password is passed
                     encryptPassword);
             }
             catch (Exception e)
