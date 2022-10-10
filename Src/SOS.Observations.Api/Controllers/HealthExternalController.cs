@@ -8,7 +8,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.Linq;
 using SOS.Observations.Api.Controllers.Interfaces;
-using SOS.Observations.Api.Dtos.Health;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -48,59 +47,72 @@ namespace SOS.Observations.Api.Controllers
 
         /// <inheritdoc />
         [HttpGet()]
-        [ProducesResponseType(typeof(IEnumerable<HealthEntryDto>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> HealthCheck()
         {
             try
             {
+                var start = DateTime.Now;
                 var healthCheck = await _healthCheckService.CheckHealthAsync(new System.Threading.CancellationToken());
-
-                var checks = new List<HealthEntryDto>();
+                var entries = new Dictionary<string, HealthReportEntry>();
+              
                 var azureApiCheck = healthCheck.Entries?.Where(e => e.Key.Equals("Azure search API health check"))?.Select(d => d.Value)?.FirstOrDefault();
-                checks.Add(new HealthEntryDto
-                {
-                    Name = "SOS API",
-                    Description = azureApiCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Not running" : "Running",
-                    Status = azureApiCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Unhealthy" : "Healthy"
-                });
+                entries.Add("SOS API", new HealthReportEntry(
+                    azureApiCheck.Value.Status, 
+                    azureApiCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Not running" : "Running",
+                    azureApiCheck.Value.Duration,
+                    null,
+                    null
+                    )
+                );
                 var dataprovidersCheck = healthCheck.Entries?.Where(e => e.Key.Equals("Search data providers"))?.Select(d => d.Value)?.FirstOrDefault();
-                checks.Add(new HealthEntryDto
-                {
-                    Name = "Data providers",
-                    Description = $"{dataprovidersCheck.Value.Data.Where(d => d.Key.Equals("SuccessfulProviders")).Select(d => d.Value).FirstOrDefault()} data providers",
-                    Status = dataprovidersCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Unhealthy" : "Healthy"
-                });
+                entries.Add("Data providers", new HealthReportEntry(
+                    dataprovidersCheck.Value.Status,
+                    $"{dataprovidersCheck.Value.Data.Where(d => d.Key.Equals("SuccessfulProviders")).Select(d => d.Value).FirstOrDefault()} data providers",
+                    dataprovidersCheck.Value.Duration,
+                    null,
+                    null
+                    )
+                );
                 var dataAmountCheck = healthCheck.Entries?.Where(e => e.Key.Equals("Data amount"))?.Select(d => d.Value)?.FirstOrDefault();
-                checks.Add(new HealthEntryDto
-                {
-                    Name = "Observations",
-                    Description = $"{dataAmountCheck.Value.Data.Where(d => d.Key.Equals("Public observations")).Select(d => d.Value).FirstOrDefault()} public observations, {dataAmountCheck.Value.Data.Where(d => d.Key.Equals("Protected observations")).Select(d => d.Value).FirstOrDefault()} protected observations",
-                    Status = dataAmountCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Unhealthy" : "Healthy"
-                });
-                var wfsCheckStatus = healthCheck.Entries?.Where(e => e.Key.Equals("WFS"))?.Select(e => e.Value)?.FirstOrDefault().Status;
-                checks.Add(new HealthEntryDto
-                {
-                    Name = "WFS",
-                    Description = wfsCheckStatus.Equals(HealthStatus.Unhealthy) ? "Not running" : "Running",
-                    Status = wfsCheckStatus.Equals(HealthStatus.Unhealthy) ? "Unhealthy" : "Healthy"
-                });
+                entries.Add("Observations", new HealthReportEntry(
+                    dataAmountCheck.Value.Status,
+                    $"{dataAmountCheck.Value.Data.Where(d => d.Key.Equals("Public observations")).Select(d => d.Value).FirstOrDefault()} public observations, {dataAmountCheck.Value.Data.Where(d => d.Key.Equals("Protected observations")).Select(d => d.Value).FirstOrDefault()} protected observations",
+                    dataAmountCheck.Value.Duration,
+                    null,
+                    null
+                    )
+                );
+                var wfsCheck = healthCheck.Entries?.Where(e => e.Key.Equals("WFS"))?.Select(e => e.Value)?.FirstOrDefault();
+                entries.Add("WFS", new HealthReportEntry(
+                    wfsCheck.Value.Status,
+                    wfsCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Unhealthy" : "Healthy",
+                    wfsCheck.Value.Duration,
+                    null,
+                    null
+                    )
+                );
                 var processInfo = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
-                checks.Add(new HealthEntryDto
-                {
-                    Name = "Latest Full harvest",
-                    Description = processInfo?.End.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss"),
-                    Status = (processInfo?.End ?? DateTime.MinValue).ToLocalTime() > DateTime.Now.AddDays(-1) ? "Healthy" : "Unhealthy"
-                });
+                entries.Add("Latest Full harvest", new HealthReportEntry(
+                    (processInfo?.End ?? DateTime.MinValue).ToLocalTime() > DateTime.Now.AddDays(-1) ? HealthStatus.Healthy : HealthStatus.Unhealthy,
+                    processInfo?.End.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss"),
+                    TimeSpan.FromTicks(0),
+                    null,
+                    null
+                    )
+                );
                 var apProvider = processInfo?.ProvidersInfo.Where(p => p.DataProviderId.Equals(1)).FirstOrDefault();
-                checks.Add(new HealthEntryDto
-                {
-                    Name = "Latest Artportalen incremental harvest",
-                    Description = apProvider?.LatestIncrementalEnd.HasValue ?? false ? apProvider.LatestIncrementalEnd.Value.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss") : "",
-                    Status = (apProvider?.LatestIncrementalEnd.HasValue ?? false) && apProvider?.LatestIncrementalEnd.Value.ToLocalTime() > DateTime.Now.AddMinutes(-10)  ? "Healthy" : "Unhealthy"
-                });
+                entries.Add("Latest Artportalen incremental harvest", new HealthReportEntry(
+                    (apProvider?.LatestIncrementalEnd.HasValue ?? false) && apProvider?.LatestIncrementalEnd.Value.ToLocalTime() > DateTime.Now.AddMinutes(-10) ? HealthStatus.Healthy : HealthStatus.Unhealthy,
+                    apProvider?.LatestIncrementalEnd.HasValue ?? false ? apProvider.LatestIncrementalEnd.Value.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss") : "",
+                    TimeSpan.FromTicks(0),
+                    null,
+                    null
+                    )
+                );
 
-                return new OkObjectResult(checks);
+                return new OkObjectResult(new HealthReport(entries, DateTime.Now - start));
             }
             catch (Exception e)
             {
