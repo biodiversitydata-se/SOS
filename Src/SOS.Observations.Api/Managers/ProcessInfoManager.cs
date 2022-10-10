@@ -51,6 +51,7 @@ namespace SOS.Observations.Api.Managers
                 PublicProcessCount = providerInfo.PublicProcessCount,
                 ProtectedProcessCount = providerInfo.ProtectedProcessCount,
                 ProcessEnd = providerInfo.ProcessEnd,
+                ProcessFailCount = providerInfo.ProcessFailCount,
                 ProcessStart = providerInfo.ProcessStart,
                 ProcessStatus = providerInfo.ProcessStatus?.ToString()
             };

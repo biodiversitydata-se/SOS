@@ -14,20 +14,26 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="cultureCode"></param>
         /// <param name="includeProvidersWithNoObservations">If false, data providers with no observations are excluded from the result.</param>
         /// <returns>List of data providers.</returns>
-        Task<IActionResult> GetDataProviders(string cultureCode = "en-GB", bool includeProvidersWithNoObservations = false);
+        Task<IActionResult> GetDataProvidersAsync(string cultureCode = "en-GB", bool includeProvidersWithNoObservations = false);
 
         /// <summary>
         /// Get latest modified date for a data provider.
         /// </summary>
         /// <param name="providerId"></param>
         /// <returns></returns>
-        Task<IActionResult> GetLastModifiedDateById(int providerId);
+        Task<IActionResult> GetLastModifiedDateByIdAsync(int providerId);
 
         /// <summary>
         /// Get provider EML file
         /// </summary>
         /// <param name="providerId"></param>
         /// <returns></returns>
-        Task<IActionResult> GetEML([FromRoute] int providerId);
+        Task<IActionResult> GetEMLAsync(int providerId);
+
+        /// <summary>
+        /// Make dataproviders health check
+        /// </summary>
+        /// <returns></returns>
+        Task<IActionResult> HealthCheckAsync();
     }
 }
