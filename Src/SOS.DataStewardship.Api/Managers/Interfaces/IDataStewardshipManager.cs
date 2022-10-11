@@ -8,4 +8,5 @@ public interface IDataStewardshipManager
 
     Task<List<Dataset>> GetDatasetsBySearchAsync(DatasetFilter datasetFilter, int skip, int take);
     Task<EventModel> GetEventByIdAsync(string id);
+    Task<OccurrenceModel> GetOccurrenceByIdAsync(string id);
 }

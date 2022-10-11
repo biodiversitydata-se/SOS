@@ -188,10 +188,15 @@ public class DataStewardshipModule : IModule
     /// </summary>
     /// <param name="id">OccurrenceId of the occurrence to get.</param>
     /// <returns></returns>
-    internal async Task<IResult> GetOccurrenceByIdAsync([FromRoute][Required] string id)
+    internal async Task<IResult> GetOccurrenceByIdAsync(IDataStewardshipManager dataStewardshipManager, [FromRoute][Required] string id)
     {
         try
         {
+            var occurrenceModel = await dataStewardshipManager.GetOccurrenceByIdAsync(id);
+            if (occurrenceModel == null) return Results.NotFound();
+            // The Json setup in Progam.cs doesn't seem to work. Why?            
+            return Results.Json(occurrenceModel, _jsonSerializerOptions);
+
             var occurrenceExample = DataStewardshipArtportalenSampleData.EventBats1Occurrence1;
             return Results.Ok(occurrenceExample);
         }
