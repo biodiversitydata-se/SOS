@@ -22,7 +22,7 @@ namespace SOS.Observations.Api.Controllers
     public class SearchBaseController : ControllerBase
     {
         private const int MaxBatchSize = 1000;
-        private const int ElasticSearchMaxRecords = 10000;
+        private const int ElasticSearchMaxRecords = 25000;
         private const int ElasticSearchMaxRecordsInternal = 100000;
         protected readonly IAreaManager AreaManager;
         private ObservationApiConfiguration _observationApiConfiguration;
