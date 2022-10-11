@@ -29,6 +29,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         if (observationDataset == null) return null;
         var dataset = observationDataset.ToDataset();        
         return dataset;
+        //return DataStewardshipArtportalenSampleData.DatasetBats;
     }
 
     public async Task<List<Dataset>> GetDatasetsBySearchAsync(DatasetFilter datasetFilter, int skip, int take)
@@ -39,7 +40,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         DatumFilterType? dateFilterType = datasetFilter?.Datum?.DatumFilterType;
         // datasetFilter.Area.
 
-        return null;
+        return new List<Dataset> { DataStewardshipArtportalenSampleData.DatasetBats };
     }
 
     public async Task<EventModel> GetEventByIdAsync(string id)
@@ -52,9 +53,16 @@ public class DataStewardshipManager : IDataStewardshipManager
         var occurrenceIds = await _processedObservationCoreRepository.GetAllAggregationItemsAsync(filter, "occurrence.occurrenceId");
         var ev = obs.ToEventModel(occurrenceIds.Select(m => m.AggregationKey));
         return ev;
-        
-        // Skapa upp nytt Event-index i ES?
-        return DataStewardshipArtportalenSampleData.EventBats1;
+        //return DataStewardshipArtportalenSampleData.EventBats1;
+    }
+
+    public async Task<List<EventModel>> GetEventsBySearchAsync(EventsFilter filter, int skip, int take)
+    {
+        return new List<EventModel>
+        {
+            DataStewardshipArtportalenSampleData.EventBats1,
+            DataStewardshipArtportalenSampleData.EventBats2
+        };
     }
 
     public async Task<OccurrenceModel> GetOccurrenceByIdAsync(string id)
@@ -65,6 +73,18 @@ public class DataStewardshipManager : IDataStewardshipManager
         Observation obs = CastDynamicToObservation(observation);
         var occurrence = obs.ToOccurrenceModel();
         return occurrence;
+        //return DataStewardshipArtportalenSampleData.EventBats1Occurrence1;
+    }
+
+    public async Task<List<OccurrenceModel>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take)
+    {
+        return new List<OccurrenceModel> {
+            DataStewardshipArtportalenSampleData.EventBats1Occurrence1,
+            DataStewardshipArtportalenSampleData.EventBats1Occurrence2,
+            DataStewardshipArtportalenSampleData.EventBats1Occurrence3,
+            DataStewardshipArtportalenSampleData.EventBats2Occurrence1,
+            DataStewardshipArtportalenSampleData.EventBats2Occurrence2,
+        };
     }
 
     private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)

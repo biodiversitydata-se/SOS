@@ -1,14 +1,10 @@
-﻿using SOS.DataStewardship.Api.Models.SampleData;
-using SOS.DataStewardship.Api.Models;
+﻿using SOS.DataStewardship.Api.Models;
 using SOS.DataStewardship.Api.Modules.Interfaces;
 using System.ComponentModel.DataAnnotations;
-using Nest;
 using Swashbuckle.AspNetCore.Annotations;
 using SOS.DataStewardship.Api.Managers.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System;
-using SOS.DataStewardship.Api.Managers;
 
 namespace SOS.DataStewardship.Api.Modules;
 
@@ -94,19 +90,15 @@ public class DataStewardshipModule : IModule
     /// </summary>
     /// <param name="id">The dataset id.</param>
     /// <returns></returns>
-    internal async Task<IResult> GetDatasetByIdAsync([FromRoute][Required] string id, IDataStewardshipManager dataStewardshipManager)
+    internal async Task<IResult> GetDatasetByIdAsync(IDataStewardshipManager dataStewardshipManager, 
+        [FromRoute][Required] string id)
     {
         try
         {
             var dataset = await dataStewardshipManager.GetDatasetByIdAsync(id);
             if (dataset == null) return Results.NotFound();
-            //return Results.Ok(dataset);
-            
-            // The Json setup in Progam.cs doesn't seem to work. Why?            
             return Results.Json(dataset, _jsonSerializerOptions);
-
-            //var datasetExample = DataStewardshipArtportalenSampleData.DatasetBats;
-            //return Results.Ok(datasetExample);
+            //return Results.Ok(dataset); // The Json setup in Progam.cs doesn't seem to work. Why?
         }
         catch (Exception ex)
         {
@@ -117,18 +109,20 @@ public class DataStewardshipModule : IModule
     /// <summary>
     /// Get datasets by search
     /// </summary>
-    /// <param name="body">Filter used to limit the search.</param>
+    /// <param name="filter">Filter used to limit the search.</param>
     /// <param name="skip">Start index.</param>
     /// <param name="take">Number of items to return. 1000 items is the max to return in one call.</param>
     /// <returns></returns>
-    internal async Task<IResult> GetDatasetsBySearchAsync(IDataStewardshipManager dataStewardshipManager, [FromBody] DatasetFilter body, [FromQuery] int? skip, [FromQuery] int? take)
+    internal async Task<IResult> GetDatasetsBySearchAsync(IDataStewardshipManager dataStewardshipManager, 
+        [FromBody] DatasetFilter filter, 
+        [FromQuery] int? skip, 
+        [FromQuery] int? take)
     {
         try
         {
-            //var datasets = await dataStewardshipManager.GetDatasetsBySearchAsync(body, skip.GetValueOrDefault(), take.GetValueOrDefault(20));
-
-            var datasetExample = DataStewardshipArtportalenSampleData.DatasetBats;
-            return Results.Ok(new List<Dataset> { datasetExample });
+            var datasets = await dataStewardshipManager.GetDatasetsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));
+            return Results.Json(datasets, _jsonSerializerOptions);
+            //return Results.Ok(datasets); // The Json setup in Progam.cs doesn't seem to work. Why?
         }
         catch (Exception ex)
         {
@@ -141,18 +135,15 @@ public class DataStewardshipModule : IModule
     /// </summary>
     /// <param name="id">EventId of the event to get.</param>
     /// <returns></returns>
-    internal async Task<IResult> GetEventByIdAsync(IDataStewardshipManager dataStewardshipManager, [FromRoute][Required] string id)
+    internal async Task<IResult> GetEventByIdAsync(IDataStewardshipManager dataStewardshipManager, 
+        [FromRoute][Required] string id)
     {
         try
         {
             var eventModel = await dataStewardshipManager.GetEventByIdAsync(id);
             if (eventModel == null) return Results.NotFound();
-            //return Results.Ok(dataset);
-
-            // The Json setup in Progam.cs doesn't seem to work. Why?            
             return Results.Json(eventModel, _jsonSerializerOptions);
-            //var eventExample = DataStewardshipArtportalenSampleData.EventBats1;
-            //return Results.Ok(eventExample);
+            //return Results.Ok(dataset); // The Json setup in Progam.cs doesn't seem to work. Why?
         }
         catch (Exception ex)
         {
@@ -163,19 +154,20 @@ public class DataStewardshipModule : IModule
     /// <summary>
     /// Get events by search.
     /// </summary>
-    /// <param name="body">Filter used to limit the search.</param>
+    /// <param name="filter">Filter used to limit the search.</param>
     /// <param name="skip">Start index.</param>
     /// <param name="take">Number of items to return. 1000 items is the max to return in one call.</param>
     /// <returns></returns>
-    internal async Task<IResult> GetEventsBySearchAsync([FromBody] EventsFilter body, [FromQuery] int? skip, [FromQuery] int? take)
+    internal async Task<IResult> GetEventsBySearchAsync(IDataStewardshipManager dataStewardshipManager, 
+        [FromBody] EventsFilter filter,
+        [FromQuery] int? skip, 
+        [FromQuery] int? take)
     {
         try
         {
-            return Results.Ok(new List<EventModel>
-            {
-                DataStewardshipArtportalenSampleData.EventBats1,
-                DataStewardshipArtportalenSampleData.EventBats2
-            });
+            var eventModels = await dataStewardshipManager.GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));
+            return Results.Json(eventModels, _jsonSerializerOptions);
+            //return Results.Ok(eventModels); // The Json setup in Progam.cs doesn't seem to work. Why?
         }
         catch (Exception ex)
         {
@@ -188,17 +180,15 @@ public class DataStewardshipModule : IModule
     /// </summary>
     /// <param name="id">OccurrenceId of the occurrence to get.</param>
     /// <returns></returns>
-    internal async Task<IResult> GetOccurrenceByIdAsync(IDataStewardshipManager dataStewardshipManager, [FromRoute][Required] string id)
+    internal async Task<IResult> GetOccurrenceByIdAsync(IDataStewardshipManager dataStewardshipManager, 
+        [FromRoute][Required] string id)
     {
         try
         {
             var occurrenceModel = await dataStewardshipManager.GetOccurrenceByIdAsync(id);
-            if (occurrenceModel == null) return Results.NotFound();
-            // The Json setup in Progam.cs doesn't seem to work. Why?            
+            if (occurrenceModel == null) return Results.NotFound();            
             return Results.Json(occurrenceModel, _jsonSerializerOptions);
-
-            var occurrenceExample = DataStewardshipArtportalenSampleData.EventBats1Occurrence1;
-            return Results.Ok(occurrenceExample);
+            //return Results.Ok(occurrenceModel); // The Json setup in Progam.cs doesn't seem to work. Why?
         }
         catch (Exception ex)
         {
@@ -209,22 +199,22 @@ public class DataStewardshipModule : IModule
     /// <summary>
     /// Get occurrences by search.
     /// </summary>
-    /// <param name="body">Filter used to limit the search.</param>
+    /// <param name="filter">Filter used to limit the search.</param>
     /// <param name="skip">Start index.</param>
     /// <param name="take">Number of items to return. 1000 items is the max to return in one call.</param>
     /// <returns></returns>
-    internal async Task<IResult> GetOccurrencesBySearchAsync([FromBody] EventsFilter body, [FromQuery] int? skip, [FromQuery] int? take)
+    internal async Task<IResult> GetOccurrencesBySearchAsync(IDataStewardshipManager dataStewardshipManager, 
+        [FromBody] OccurrenceFilter filter, 
+        [FromQuery] int? skip, 
+        [FromQuery] int? take)
     {
         try
-        {            
-            return Results.Ok(new List<OccurrenceModel>
-            {
-                DataStewardshipArtportalenSampleData.EventBats1Occurrence1,
-                DataStewardshipArtportalenSampleData.EventBats1Occurrence2,
-                DataStewardshipArtportalenSampleData.EventBats1Occurrence3,
-                DataStewardshipArtportalenSampleData.EventBats2Occurrence1,
-                DataStewardshipArtportalenSampleData.EventBats2Occurrence2,
-            });
+        {
+            var occurrences = await dataStewardshipManager.GetOccurrencesBySearchAsync(filter, 
+                skip.GetValueOrDefault(0), 
+                take.GetValueOrDefault(20));
+
+            return Results.Ok(occurrences);            
         }
         catch (Exception ex)
         {
