@@ -1,5 +1,8 @@
-﻿using SOS.DataStewardship.Api.Managers;
+﻿using Microsoft.ApplicationInsights.Extensibility;
+using SOS.DataStewardship.Api.ApplicationInsights;
+using SOS.DataStewardship.Api.Managers;
 using SOS.DataStewardship.Api.Managers.Interfaces;
+using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
@@ -37,6 +40,16 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddScoped<ITaxonRepository, TaxonRepository>();
         webApplicationBuilder.Services.AddScoped<ITaxonListRepository, TaxonListRepository>();
         webApplicationBuilder.Services.AddScoped<IObservationDatasetRepository, ObservationDatasetRepository>();
+        webApplicationBuilder.Services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
+
+        // Add application insights.
+        webApplicationBuilder.Services.AddApplicationInsightsTelemetry(webApplicationBuilder.Configuration);
+        // Application insights custom
+        webApplicationBuilder.Services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
+        webApplicationBuilder.Services.AddSingleton(webApplicationBuilder.Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>());
+        webApplicationBuilder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        webApplicationBuilder.Services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
+
 
         return webApplicationBuilder;
     }

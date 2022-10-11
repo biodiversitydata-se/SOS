@@ -234,72 +234,6 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
-        {
-            var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
-
-            var sortDescriptor = await Client.GetSortDescriptorAsync<Observation>(indexNames, filter?.Output?.SortOrders);
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
-
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
-
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
-                .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
-                .From(skip)
-                .Size(take)
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-                .Sort(sort => sortDescriptor)
-            );
-
-            searchResponse.ThrowIfInvalid();
-
-            var totalCount = searchResponse.HitsMetadata.Total.Value;
-
-            var includeRealCount = totalCount >= ElasticSearchMaxRecords;
-
-            if (filter is SearchFilterInternal internalFilter)
-            {
-                includeRealCount = internalFilter.IncludeRealCount;
-            }
-
-            if (includeRealCount)
-            {
-                var countResponse = await Client.CountAsync<dynamic>(s => s
-                    .Index(indexNames)
-                    .Query(q => q
-                        .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
-                        )
-                    )
-                );
-                countResponse.ThrowIfInvalid();
-               
-                totalCount = countResponse.Count;
-            }
-
-            operation.Telemetry.Metrics["SpeciesObservationCount"] = searchResponse.Documents.Count;
-
-            // Optional: explicitly send telemetry item:
-            _telemetry.StopOperation(operation);
-
-            return new PagedResult<dynamic>
-            {
-                Records = searchResponse.Documents,
-                Skip = skip,
-                Take = take,
-                TotalCount = totalCount
-            };
-        }
-
-        /// <inheritdoc />
         public async Task<GeoGridTileResult> GetGeogridTileAggregationAsync(
                 SearchFilter filter,
                 int zoom)
@@ -381,39 +315,7 @@ namespace SOS.Observations.Api.Repositories
 
             // When operation is disposed, telemetry item is sent.
             return gridResult;
-        }
-
-        /// <inheritdoc/>
-        public async Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter)
-        {
-            var indexNames = GetCurrentIndex(filter);
-            var query = filter.ToQuery(true);
-            query.TryAddTermCriteria("occurrence.occurrenceId", occurrenceId);
-
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");
-            operation.Telemetry.Properties["OccurrenceId"] = occurrenceId;
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
-
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
-                .Query(q => q
-                    .Bool(b => b
-                        .Filter(query)
-                    )
-                )
-                .Size(1)
-                .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
-                .TrackTotalHits(false)
-            );
-
-            searchResponse.ThrowIfInvalid();
-
-            // Optional: explicitly send telemetry item:
-            _telemetry.StopOperation(operation);
-
-            return searchResponse.Documents;
-
-        }
+        }        
 
         /// <inheritdoc />
         public async Task<int> GetProvinceCountAsync(SearchFilterBase filter)

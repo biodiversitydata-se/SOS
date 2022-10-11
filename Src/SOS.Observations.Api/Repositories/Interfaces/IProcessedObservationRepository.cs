@@ -25,18 +25,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="filter"></param>
         /// <param name="aggregationType"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetAggregatedHistogramChunkAsync(SearchFilter filter, AggregationType aggregationType);
-
-        /// <summary>
-        ///     Get chunk of objects from repository
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="sortBy"></param>
-        /// <param name="sortOrder"></param>
-        /// <returns></returns>
-        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take);
+        Task<PagedResult<dynamic>> GetAggregatedHistogramChunkAsync(SearchFilter filter, AggregationType aggregationType);        
 
         /// <summary>
         /// Get geo grid tile aggregation
@@ -44,14 +33,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="filter"></param>
         /// <param name="zoom"></param>
         /// <returns></returns>
-        Task<GeoGridTileResult> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom);
-
-        /// <summary>
-        /// Gets a single observation
-        /// </summary>
-        /// <param name="occurrenceId"></param>
-        /// <returns></returns>
-        Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter);
+        Task<GeoGridTileResult> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom);        
 
         /// <summary>
         /// Get number of provinces matching the provided filter.
@@ -98,6 +80,6 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <returns></returns>
         Task<bool> SignalSearchInternalAsync(
             SearchFilter filter,
-            bool onlyAboveMyClearance);
+            bool onlyAboveMyClearance);        
     }
 }

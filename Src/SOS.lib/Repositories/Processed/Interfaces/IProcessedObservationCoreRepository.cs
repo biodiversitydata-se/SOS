@@ -287,5 +287,21 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, string aggregationField);
         Task<List<AggregationItem>> GetAllAggregationItemsAsync(SearchFilter filter, string aggregationField);
         Task<List<EventOccurrenceAggregationItem>> GetEventOccurrenceItemsAsync(SearchFilter filter);
+
+        /// <summary>
+        ///     Get chunk of objects from repository
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>        
+        /// <returns></returns>
+        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take);
+
+        /// <summary>
+        /// Gets a single observation
+        /// </summary>
+        /// <param name="occurrenceId"></param>
+        /// <returns></returns>
+        Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter);
     }
 }
