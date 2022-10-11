@@ -46,22 +46,11 @@ namespace SOS.Lib.Repositories.Processed
                         .Date(d => d
                             .Name(nm => nm.RegisterDate)
                         )
-                        .Keyword(k => k
-                            .Name(nm => nm.Id)
-                        )
-                        .Keyword(k => k
-                            .Name(nm => nm.Name)
-                        )
-                        .Keyword(k => k
-                            .Name(nm => nm.OccurrenceIds)
-                        )
-                        .Keyword(k => k
-                            .Name(nm => nm.RecordedBy)
-                        )
-                        .Keyword(k => k
-                            .Name(nm => nm.SamplingEffortTime)
-                            .Index(false)
-                        )
+                        .KeyWordLowerCase(kwlc => kwlc.Id)
+                        .KeyWordLowerCase(kwlc => kwlc.Name)
+                        .KeyWordLowerCase(kwlc => kwlc.OccurrenceIds)
+                        .KeyWordLowerCase(kwlc => kwlc.RecordedBy)
+                        .KeyWordLowerCase(kwlc => kwlc.SamplingEffortTime, false)
                         .Number(no => no
                             .Name(nm => nm.DataProviderId)
                             .Type(NumberType.Integer)

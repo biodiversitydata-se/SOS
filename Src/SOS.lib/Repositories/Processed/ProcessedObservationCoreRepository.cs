@@ -54,186 +54,55 @@ namespace SOS.Lib.Repositories.Processed
                 .Map<Observation>(m => m
                     .AutoMap<Observation>()
                     .Properties(ps => ps
-                        .Keyword(kw => kw
-                            .Name(nm => nm.Id)
-                            .Index(true) // todo - index=false?
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.DynamicProperties)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.InformationWithheld)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.BibliographicCitation)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.CollectionId)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.CollectionCode)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.DataGeneralizations)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.DatasetId)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.DataStewardshipDatasetId)
-                            .Index(true)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.DatasetName)
-                            .Index(true) // WFS
-                            .IgnoreAbove(int.MaxValue)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.InstitutionId)
-                            .Index(true)
-                            .IgnoreAbove(int.MaxValue)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.Language)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.License)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.OwnerInstitutionCode)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.PrivateCollection)
-                            .Index(true)
-                            .IgnoreAbove(int.MaxValue)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.PublicCollection)
-                            .Index(true)
-                            .IgnoreAbove(int.MaxValue)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.References)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.RightsHolder)
-                            .Index(false)
-                        )
-                        .Keyword(kw => kw
-                            .Name(nm => nm.SpeciesCollectionLabel)
-                            .Index(true)
-                            .IgnoreAbove(int.MaxValue)
-                        )
+                        .KeyWordLowerCase(kwlc => kwlc.Id, false)
+                        .KeyWordLowerCase(kwlc => kwlc.DynamicProperties, false)
+                        .KeyWordLowerCase(kwlc => kwlc.InformationWithheld, false)
+                        .KeyWordLowerCase(kwlc => kwlc.BibliographicCitation, false)
+                        .KeyWordLowerCase(kwlc => kwlc.CollectionId, false)
+                        .KeyWordLowerCase(kwlc => kwlc.CollectionCode, false)
+                        .KeyWordLowerCase(kwlc => kwlc.DataGeneralizations, false)
+                        .KeyWordLowerCase(kwlc => kwlc.DatasetId, false)
+                        .KeyWordLowerCase(kwlc => kwlc.DataStewardshipDatasetId)
+                        .KeyWordLowerCase(kwlc => kwlc.DatasetName) // WFS
+                        .KeyWordLowerCase(kwlc => kwlc.InstitutionId)
+                        .KeyWordLowerCase(kwlc => kwlc.Language, false)
+                        .KeyWordLowerCase(kwlc => kwlc.License, false)
+                        .KeyWordLowerCase(kwlc => kwlc.OwnerInstitutionCode, false)
+                        .KeyWordLowerCase(kwlc => kwlc.PrivateCollection)
+                        .KeyWordLowerCase(kwlc => kwlc.PublicCollection)
+                        .KeyWordLowerCase(kwlc => kwlc.References, false)
+                        .KeyWordLowerCase(kwlc => kwlc.RightsHolder, false)
+                        .KeyWordLowerCase(kwlc => kwlc.SpeciesCollectionLabel)
                         .Nested<ExtendedMeasurementOrFact>(n => n
                             .Name(nm => nm.MeasurementOrFacts)
                             .Properties(ps => ps
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementAccuracy)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementDeterminedBy)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementDeterminedDate)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementID)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementMethod)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementRemarks)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementType)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementTypeID)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementUnit)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementUnitID)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementValue)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MeasurementValueID)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.OccurrenceID)
-                                    .Index(false)
-                                )
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementAccuracy, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementDeterminedBy, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementDeterminedDate, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementID, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementMethod, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementRemarks, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementType, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementTypeID, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementUnit, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementUnitID, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementValue, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementValueID, false)
+                                .KeyWordLowerCase(kwlc => kwlc.OccurrenceID, false)
                             )
                         )
                         .Object<ProjectsSummary>(t => t
                             .AutoMap()
                             .Name(nm => nm.ProjectsSummary)
                             .Properties(ps => ps
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Project1Name)
-                                    .Index(true) // WFS
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Project1Category)
-                                    .Index(true) // WFS
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Project1Url)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Project1Values)
-                                    .Index(true)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Project2Name)
-                                    .Index(true) // WFS
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Project2Category)
-                                    .Index(true) // WFS
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Project2Url)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Project2Values)
-                                    .Index(true)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
+                                .KeyWordLowerCase(kwlc => kwlc.Project1Name) // WFS
+                                .KeyWordLowerCase(kwlc => kwlc.Project1Category) // WFS
+                                .KeyWordLowerCase(kwlc => kwlc.Project1Url, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Project1Values) // WFS
+                                .KeyWordLowerCase(kwlc => kwlc.Project2Name) // WFS
+                                .KeyWordLowerCase(kwlc => kwlc.Project2Category) // WFS
+                                .KeyWordLowerCase(kwlc => kwlc.Project2Url, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Project2Values)
                             )
                         )
                         .Nested<Project>(n => n
@@ -249,48 +118,26 @@ namespace SOS.Lib.Repositories.Processed
                             .AutoMap()
                             .Name(nm => nm.ArtportalenInternal)
                             .Properties(ps => ps
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.LocationExternalId)
-                                    .Index(true)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.LocationPresentationNameParishRegion)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.ParentLocality)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.ReportedByUserAlias)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.SightingBarcodeURL)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
+                                .KeyWordLowerCase(kwlc => kwlc.LocationExternalId)
+                                .KeyWordLowerCase(kwlc => kwlc.LocationPresentationNameParishRegion, false)
+                                .KeyWordLowerCase(kwlc => kwlc.ParentLocality)
+                                .KeyWordLowerCase(kwlc => kwlc.ReportedByUserAlias)
+                                .KeyWordLowerCase(kwlc => kwlc.SightingBarcodeURL)
                                 .Nested<UserInternal>(n => n
                                     .AutoMap()
                                     .Name(nm => nm.OccurrenceRecordedByInternal)
                                     .Properties(ps => ps
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.UserAlias)
-                                        )
+                                        .KeyWordLowerCase(kwlc => kwlc.UserAlias)
                                     )
                                 )
                                 .Nested<UserInternal>(n => n
                                     .AutoMap()
                                     .Name(nm => nm.OccurrenceVerifiedByInternal)
                                     .Properties(ps => ps
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.UserAlias)
-                                            .IgnoreAbove(int.MaxValue)
-                                        )
+                                        .KeyWordLowerCase(kwlc => kwlc.UserAlias)
                                     )
                                 )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.BirdValidationAreaIds)
-                                )
+                                .KeyWordLowerCase(kwlc => kwlc.BirdValidationAreaIds)
                             )
                         )
                         .Object<VocabularyValue>(c => c
@@ -301,23 +148,15 @@ namespace SOS.Lib.Repositories.Processed
                             .AutoMap()
                             .Name(nm => nm.DataQuality)
                             .Properties(ps => ps
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.UniqueKey)
-                                )
+                                .KeyWordLowerCase(kwlc => kwlc.UniqueKey, false)
                             )
                         )
                         .Object<IDictionary<string, string>>(c => c
                             .AutoMap()
                             .Name(nm => nm.Defects)
                             .Properties(ps => ps
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Keys)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Values)
-                                    .Index(false)
-                                )
+                                .KeyWordLowerCase(kwlc => kwlc.Keys, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Values, false)
                             )
                         )
                         .Object<Event>(t => t
@@ -328,131 +167,42 @@ namespace SOS.Lib.Repositories.Processed
                         .Object<GeologicalContext>(c => c
                             .Name(nm => nm.GeologicalContext)
                             .Properties(ps => ps
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Bed)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.EarliestAgeOrLowestStage)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.EarliestEonOrLowestEonothem)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.EarliestEpochOrLowestSeries)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.EarliestEraOrLowestErathem)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.EarliestGeochronologicalEra)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.EarliestPeriodOrLowestSystem)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Formation)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.GeologicalContextId)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Group)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.HighestBiostratigraphicZone)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.LatestAgeOrHighestStage)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.LatestEonOrHighestEonothem)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.LatestEpochOrHighestSeries)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.LatestEraOrHighestErathem)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.LatestGeochronologicalEra)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.LatestPeriodOrHighestSystem)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.LithostratigraphicTerms)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.LowestBiostratigraphicZone)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Member)
-                                    .Index(false)
-                                )
+                                .KeyWordLowerCase(kwlc => kwlc.Bed, false)
+                                .KeyWordLowerCase(kwlc => kwlc.EarliestAgeOrLowestStage, false)
+                                .KeyWordLowerCase(kwlc => kwlc.EarliestEonOrLowestEonothem, false)
+                                .KeyWordLowerCase(kwlc => kwlc.EarliestEpochOrLowestSeries, false)
+                                .KeyWordLowerCase(kwlc => kwlc.EarliestEraOrLowestErathem, false)
+                                .KeyWordLowerCase(kwlc => kwlc.EarliestGeochronologicalEra, false)
+                                .KeyWordLowerCase(kwlc => kwlc.EarliestPeriodOrLowestSystem, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Formation, false)
+                                .KeyWordLowerCase(kwlc => kwlc.GeologicalContextId, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Group, false)
+                                .KeyWordLowerCase(kwlc => kwlc.HighestBiostratigraphicZone, false)
+                                .KeyWordLowerCase(kwlc => kwlc.LatestAgeOrHighestStage, false)
+                                .KeyWordLowerCase(kwlc => kwlc.LatestEonOrHighestEonothem, false)
+                                .KeyWordLowerCase(kwlc => kwlc.LatestEpochOrHighestSeries, false)
+                                .KeyWordLowerCase(kwlc => kwlc.LatestEraOrHighestErathem, false)
+                                .KeyWordLowerCase(kwlc => kwlc.LatestGeochronologicalEra, false)
+                                .KeyWordLowerCase(kwlc => kwlc.LatestPeriodOrHighestSystem, false)
+                                .KeyWordLowerCase(kwlc => kwlc.LithostratigraphicTerms, false)
+                                .KeyWordLowerCase(kwlc => kwlc.LowestBiostratigraphicZone, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Member, false)
                             )
                         )
                         .Object<Identification>(c => c
                             .AutoMap()
                             .Name(nm => nm.Identification)
                             .Properties(ps => ps
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.IdentificationRemarks)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.ConfirmedBy)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.ConfirmedDate)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.DateIdentified)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.IdentificationId)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.IdentificationQualifier)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.IdentificationReferences)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.IdentifiedBy)
-                                    .Index(false)
-                                )
-                                 .Keyword(kw => kw
-                                    .Name(nm => nm.TypeStatus)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.VerifiedBy)
-                                )
+                                .KeyWordLowerCase(kwlc => kwlc.IdentificationRemarks, false)
+                                .KeyWordLowerCase(kwlc => kwlc.ConfirmedBy, false)
+                                .KeyWordLowerCase(kwlc => kwlc.ConfirmedDate, false)
+                                .KeyWordLowerCase(kwlc => kwlc.DateIdentified, false)
+                                .KeyWordLowerCase(kwlc => kwlc.IdentificationId, false)
+                                .KeyWordLowerCase(kwlc => kwlc.IdentificationQualifier, false)
+                                .KeyWordLowerCase(kwlc => kwlc.IdentificationReferences, false)
+                                .KeyWordLowerCase(kwlc => kwlc.IdentifiedBy, false)
+                                .KeyWordLowerCase(kwlc => kwlc.TypeStatus, false)
+                                .KeyWordLowerCase(kwlc => kwlc.VerifiedBy)
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.DeterminationMethod)
                                     .Properties(ps => ps.GetMapping())
@@ -492,150 +242,44 @@ namespace SOS.Lib.Repositories.Processed
                                 .Date(d => d
                                     .Name(nm => nm.ReportedDate)
                                 )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.AssociatedMedia)
-                                    .Index(true)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Text(t => t
-                                    .Name(nm => nm.OccurrenceRemarks)
-                                    .IndexOptions(IndexOptions.Docs)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.AssociatedOccurrences)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.AssociatedReferences)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.AssociatedSequences)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.AssociatedTaxa)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.BiotopeDescription)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.IndividualId)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.RecordedBy)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.CatalogNumber)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Disposition)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.IndividualCount)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.OccurrenceId)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.OccurrenceStatus)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.OrganismQuantity)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.OtherCatalogNumbers)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Preparations)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.RecordNumber)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.ReportedBy)
-                                    .IgnoreAbove(int.MaxValue)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.Url)
-                                    .Index(false)
-                                )
+                                .KeyWordLowerCase(kwlc => kwlc.AssociatedMedia)
+                                .KeyWordLowerCase(kwlc => kwlc.AssociatedOccurrences, false)
+                                .KeyWordLowerCase(kwlc => kwlc.AssociatedReferences, false)
+                                .KeyWordLowerCase(kwlc => kwlc.AssociatedSequences, false)
+                                .KeyWordLowerCase(kwlc => kwlc.AssociatedTaxa, false)
+                                .KeyWordLowerCase(kwlc => kwlc.BiotopeDescription, false)
+                                .KeyWordLowerCase(kwlc => kwlc.IndividualId, false)
+                                .KeyWordLowerCase(kwlc => kwlc.RecordedBy)
+                                .KeyWordLowerCase(kwlc => kwlc.CatalogNumber)
+                                .KeyWordLowerCase(kwlc => kwlc.Disposition, false)
+                                .KeyWordLowerCase(kwlc => kwlc.IndividualCount, false)
+                                .KeyWordLowerCase(kwlc => kwlc.OccurrenceId)
+                                .KeyWordLowerCase(kwlc => kwlc.OccurrenceStatus)
+                                .KeyWordLowerCase(kwlc => kwlc.OrganismQuantity)
+                                .KeyWordLowerCase(kwlc => kwlc.OtherCatalogNumbers, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Preparations, false)
+                                .KeyWordLowerCase(kwlc => kwlc.RecordNumber)
+                                .KeyWordLowerCase(kwlc => kwlc.ReportedBy)
+                                .KeyWordLowerCase(kwlc => kwlc.Url, false)
                                 .Nested<Multimedia>(n => n
                                     .AutoMap()
                                     .Name(nm => nm.Media)
                                     .Properties(ps => ps
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Description)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Audience)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Contributor)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Created)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Creator)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.DatasetID)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Format)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Identifier)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.License)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Publisher)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.References)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.RightsHolder)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Source)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Title)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Type)
-                                            .Index(false)
-                                        )
+                                        .KeyWordLowerCase(kwlc => kwlc.Description, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.Audience, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.Contributor, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.Created, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.Creator, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.DatasetID, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.Format, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.Identifier, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.License, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.Publisher, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.References, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.RightsHolder, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.Source, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.Title, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.Type, false)
                                     )
                                 )
                                 .Object<VocabularyValue>(c => c
@@ -678,31 +322,20 @@ namespace SOS.Lib.Repositories.Processed
                                     .AutoMap()
                                     .Name(nm => nm.Substrate)
                                     .Properties(ps => ps
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.SpeciesScientificName)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.Description)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.SpeciesDescription)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.SubstrateDescription)
-                                            .Index(false)
-                                        )
-                                        .Keyword(kw => kw
-                                            .Name(nm => nm.SpeciesVernacularName)
-                                            .Index(false)
-                                        )
+                                        .KeyWordLowerCase(kwlc => kwlc.SpeciesScientificName, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.Description, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.SpeciesDescription, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.SubstrateDescription, false)
+                                        .KeyWordLowerCase(kwlc => kwlc.SpeciesVernacularName, false)
                                         .Object<VocabularyValue>(c => c
                                             .Name(nm => nm.Name)
                                             .Properties(ps => ps.GetMapping())
                                         )
                                     )
+                                )
+                                .Text(t => t
+                                    .Name(nm => nm.OccurrenceRemarks)
+                                    .IndexOptions(IndexOptions.Docs)
                                 )
                             )
                         )
@@ -710,30 +343,12 @@ namespace SOS.Lib.Repositories.Processed
                             .AutoMap()
                             .Name(nm => nm.Organism)
                             .Properties(ps => ps
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.AssociatedOrganisms)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.OrganismId)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.OrganismName)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.OrganismRemarks)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.OrganismScope)
-                                    .Index(false)
-                                )
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.PreviousIdentifications)
-                                    .Index(false)
-                                )
+                                .KeyWordLowerCase(kwlc => kwlc.AssociatedOrganisms, false)
+                                .KeyWordLowerCase(kwlc => kwlc.OrganismId, false)
+                                .KeyWordLowerCase(kwlc => kwlc.OrganismName, false)
+                                .KeyWordLowerCase(kwlc => kwlc.OrganismRemarks, false)
+                                .KeyWordLowerCase(kwlc => kwlc.OrganismScope, false)
+                                .KeyWordLowerCase(kwlc => kwlc.PreviousIdentifications, false)
                             )
                         )
                         .Object<Taxon>(t => t
