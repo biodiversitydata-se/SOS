@@ -220,7 +220,11 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var ctx = new ControllerContext() { HttpContext = new DefaultHttpContext() };
             ObservationsController.ControllerContext = ctx;
             VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());
-            DataProvidersController = new DataProvidersController(dataproviderManager, ObservationManager, new NullLogger<DataProvidersController>());
+            DataProvidersController = new DataProvidersController(dataproviderManager, 
+                ObservationManager,
+                processInfoManager,
+                processedObservationRepository,
+                new NullLogger<DataProvidersController>());
             ExportsController = new ExportsController(ObservationManager, blobStorageManagerMock.Object, areaManager,
                 taxonManager, exportManager, fileService, userExportRepository, observationApiConfiguration,
                 new NullLogger<ExportsController>());

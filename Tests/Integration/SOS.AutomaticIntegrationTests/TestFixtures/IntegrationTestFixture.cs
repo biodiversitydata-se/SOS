@@ -320,7 +320,11 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var checklistManager = new ChecklistManager(ProcessedChecklistRepository, processedObservationRepository, filterManager, new NullLogger<ChecklistManager>());
             ChecklistsController = new ChecklistsController(checklistManager, taxonManager, new NullLogger<ChecklistsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());
-            DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
+            DataProvidersController = new DataProvidersController(dataproviderManager, 
+                observationManager,
+                processInfoManager,
+                processedObservationRepository,
+                new NullLogger<DataProvidersController>());
             TaxonManager = taxonManager;
             ProcessedObservationRepository = processedObservationRepository;
             ExportsController = new ExportsController(observationManager, blobStorageManagerMock.Object, areaManager,
