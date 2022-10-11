@@ -40,7 +40,7 @@ namespace SOS.Observations.Api
                LogManager.Shutdown();
             }
         }
-
+        
         /// <summary>
         ///     Create a host builder
         /// </summary>

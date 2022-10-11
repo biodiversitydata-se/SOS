@@ -1,362 +1,459 @@
 ﻿[
-  {
-    "Id": 1,
-    "TaxonListServiceId": 34,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Protected by law species"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Fridlysta arter"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 2,
-    "TaxonListServiceId": 33,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Signal species"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Signalarter"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 3,
-    "TaxonListServiceId": 35,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Invasive species"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Främmande arter"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 4,
-    "ParentId": 3,
-    "TaxonListServiceId": 36,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Invasive species in Sweden"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Främmande arter i Sverige"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 5,
-    "ParentId": 3,
-    "TaxonListServiceId": 37,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "EU regulation 1143/2014"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "EU-förordning 1143/2014"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 6,
-    "ParentId": 3,
-    "TaxonListServiceId": 38,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Risk assessment"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Risklista"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 7,
-    "TaxonListServiceId": 227,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Redlisted species"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Rödlistade arter"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 8,
-    "TaxonListServiceId": 8,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Habitats directive species"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Habitatdirektivet"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 9,
-    "ParentId": 8,
-    "TaxonListServiceId": 9,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Habitats directive Annex 2"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Habitatdirektivets bilaga 2"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 10,
-    "ParentId": 8,
-    "TaxonListServiceId": 10,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Habitats directive Annex 2, priority species"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Habitatdirektivets bilaga 2 (prioriterad art)"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 11,
-    "ParentId": 8,
-    "TaxonListServiceId": 11,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Habitats directive Annex 4"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Habitatdirektivets bilaga 4"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 12,
-    "ParentId": 8,
-    "TaxonListServiceId": 12,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Habitats directive Annex 5"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Habitatdirektivets bilaga 5"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 13,
-    "TaxonListServiceId": 44,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Birds Directive"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Fågeldirektivet"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 14,
-    "ParentId": 13,
-    "TaxonListServiceId": 45,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Priority birds"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Prioriterade fåglar"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 15,
-    "ParentId": 13,
-    "TaxonListServiceId": 46,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Birds directive - Annex 1"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Fågeldirektivet - bilaga 1"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 16,
-    "ParentId": 13,
-    "TaxonListServiceId": 47,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Birds directive - Annex 2"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Fågeldirektivet - bilaga 2"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 17,
-    "TaxonListServiceId": 13,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Action plan"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Åtgärdsprogram"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 18,
-    "TaxonListServiceId": 235,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Swedish forest agency nature conservation species"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Skogsstyrelsens naturvårdsarter"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 19,
-    "ParentId": 6,
-    "TaxonListServiceId": 39,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Risk assessment - Severe impact"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Risklista - Mycket hög risk (SE)"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 20,
-    "ParentId": 6,
-    "TaxonListServiceId": 40,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Risk assessment - High impact"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Risklista - Hög risk (HI)"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 21,
-    "ParentId": 6,
-    "TaxonListServiceId": 41,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Risk assessment - Potentially high impact"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Risklista - Potentiellt hög risk (PH)"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 22,
-    "ParentId": 6,
-    "TaxonListServiceId": 42,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Risk assessment - Low impact"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Risklista - Låg risk (LO)"
-      }
-    ],
-    "TaxonIds": []
-  },
-  {
-    "Id": 23,
-    "ParentId": 6,
-    "TaxonListServiceId": 43,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Risk assessment - No known impact"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Risklista - Ingen känd risk (NK)"
-      }
-    ],
-    "TaxonIds": []
-  }
+    {
+        "Id": 1,
+        "TaxonListServiceId": 34,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Protected by law species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Fridlysta arter"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 2,
+        "TaxonListServiceId": 33,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Signal species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Signalarter"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 3,
+        "TaxonListServiceId": 35,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Invasive species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Främmande arter"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 4,
+        "ParentId": 3,
+        "TaxonListServiceId": 36,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Invasive species in Sweden"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Främmande arter i Sverige"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 5,
+        "ParentId": 3,
+        "TaxonListServiceId": 37,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "EU regulation 1143/2014"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "EU-förordning 1143/2014"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 6,
+        "ParentId": 3,
+        "TaxonListServiceId": 38,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Risk assessment"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Risklista"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 7,
+        "TaxonListServiceId": 227,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Redlisted species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Rödlistade arter"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 8,
+        "TaxonListServiceId": 8,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Habitats directive species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Habitatdirektivet"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 9,
+        "ParentId": 8,
+        "TaxonListServiceId": 9,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Habitats directive Annex 2"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Habitatdirektivets bilaga 2"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 10,
+        "ParentId": 8,
+        "TaxonListServiceId": 10,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Habitats directive Annex 2, priority species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Habitatdirektivets bilaga 2 (prioriterad art)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 11,
+        "ParentId": 8,
+        "TaxonListServiceId": 11,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Habitats directive Annex 4"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Habitatdirektivets bilaga 4"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 12,
+        "ParentId": 8,
+        "TaxonListServiceId": 12,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Habitats directive Annex 5"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Habitatdirektivets bilaga 5"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 13,
+        "TaxonListServiceId": 44,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Birds Directive"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Fågeldirektivet"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 14,
+        "ParentId": 13,
+        "TaxonListServiceId": 45,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Priority birds"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Prioriterade fåglar"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 15,
+        "ParentId": 13,
+        "TaxonListServiceId": 46,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Birds directive - Annex 1"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Fågeldirektivet - bilaga 1"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 16,
+        "ParentId": 13,
+        "TaxonListServiceId": 47,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Birds directive - Annex 2"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Fågeldirektivet - bilaga 2"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 17,
+        "TaxonListServiceId": 13,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Action plan"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Åtgärdsprogram"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 18,
+        "TaxonListServiceId": 235,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Swedish forest agency nature conservation species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Skogsstyrelsens naturvårdsarter"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 19,
+        "ParentId": 6,
+        "TaxonListServiceId": 39,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Risk assessment - Severe impact"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Risklista - Mycket hög risk (SE)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 20,
+        "ParentId": 6,
+        "TaxonListServiceId": 40,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Risk assessment - High impact"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Risklista - Hög risk (HI)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 21,
+        "ParentId": 6,
+        "TaxonListServiceId": 41,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Risk assessment - Potentially high impact"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Risklista - Potentiellt hög risk (PH)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 22,
+        "ParentId": 6,
+        "TaxonListServiceId": 42,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Risk assessment - Low impact"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Risklista - Låg risk (LO)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 23,
+        "ParentId": 6,
+        "TaxonListServiceId": 43,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Risk assessment - No known impact"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Risklista - Ingen känd risk (NK)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 24,
+        "ParentId": 7,
+        "TaxonListServiceId": 233,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Near Threatened (NT)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Nära hotad (NT)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 25,
+        "ParentId": 7,
+        "TaxonListServiceId": 232,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Vulnerable (VU)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Sårbar (VU)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 26,
+        "ParentId": 7,
+        "TaxonListServiceId": 231,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Endangered (EN)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Starkt hotad (EN)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 27,
+        "ParentId": 7,
+        "TaxonListServiceId": 230,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Critically Endangered (CR)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Akut hotad (CR)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 28,
+        "ParentId": 7,
+        "TaxonListServiceId": 229,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Regionally Extinct (RE)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Nationellt utdöd (RE)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 29,
+        "ParentId": 7,
+        "TaxonListServiceId": 228,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Data Deficient (DD)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Kunskapsbrist (DD)"
+            }
+        ],
+        "TaxonIds": []
+    }
+
 ]

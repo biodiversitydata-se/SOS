@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 namespace SOS.Observations.Api.Dtos
 {
@@ -72,6 +73,12 @@ namespace SOS.Observations.Api.Dtos
         ///     Process end date and time
         /// </summary>
         public DateTime? ProcessEnd { get; set; }
+
+        /// <summary>
+        ///     No of failed observations
+        /// </summary>
+        [JsonIgnore]
+        public int? ProcessFailCount { get; set; }
 
         /// <summary>
         ///     Process start date and time

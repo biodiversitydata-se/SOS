@@ -10,9 +10,11 @@ using Microsoft.Extensions.Logging;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Repositories.Interfaces;
 using Newtonsoft.Json;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -25,6 +27,8 @@ namespace SOS.Observations.Api.Controllers
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly IObservationManager _observationManager;
+        private readonly IProcessInfoManager _processInfoManager;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly ILogger<DataProvidersController> _logger;
 
         /// <summary>
@@ -32,14 +36,22 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="dataProviderManager"></param>
         /// <param name="observationManager"></param>
+        /// <param name="processInfoManager"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DataProvidersController(
             IDataProviderManager dataProviderManager,
             IObservationManager observationManager,
+            IProcessInfoManager processInfoManager,
+            IProcessedObservationRepository processedObservationRepository,
             ILogger<DataProvidersController> logger)
         {
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
+            _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
+            _processedObservationRepository = processedObservationRepository ??
+                                              throw new ArgumentNullException(nameof(processedObservationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -48,7 +60,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(List<DataProviderDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDataProviders([FromQuery] string cultureCode = "sv-SE", [FromQuery] bool includeProvidersWithNoObservations = false)
+        public async Task<IActionResult> GetDataProvidersAsync([FromQuery] string cultureCode = "sv-SE", [FromQuery] bool includeProvidersWithNoObservations = false)
         {
             try
             {
@@ -73,7 +85,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<DateTime>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetLastModifiedDateById([FromRoute] int providerId)
+        public async Task<IActionResult> GetLastModifiedDateByIdAsync([FromRoute] int providerId)
         {
             try
             {
@@ -96,7 +108,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetEML([FromRoute] int providerId)
+        public async Task<IActionResult> GetEMLAsync([FromRoute] int providerId)
         {
             try
             {
@@ -134,11 +146,52 @@ namespace SOS.Observations.Api.Controllers
                     Content = json,
                     StatusCode = 200
                 };
-                
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"Error getting EML date for provider {providerId}");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet("Health")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> HealthCheckAsync()
+        {
+            try
+            {
+                var start = DateTime.Now;
+                var entries = new Dictionary<string, HealthReportEntry>();
+
+                var processInfo = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
+                foreach(var provider in processInfo.ProvidersInfo)
+                {
+                    entries.Add(provider.DataProviderIdentifier, new HealthReportEntry(
+                       provider.ProcessStatus.Equals("Success", StringComparison.CurrentCultureIgnoreCase) ? HealthStatus.Healthy : HealthStatus.Unhealthy,
+                       $"Public: {provider.PublicProcessCount}, Protected: {provider.ProtectedProcessCount}",
+                       (provider.HarvestEnd ?? DateTime.MinValue) - (provider.HarvestStart ?? DateTime.MinValue),
+                       null,
+                       new Dictionary<string, object>()
+                       {
+                           { "PublicCount", provider.PublicProcessCount },
+                           { "ProtectedCount", provider.ProtectedProcessCount },
+                           { "InvalidCount", provider.ProcessFailCount },
+                           { "HarvestDate", provider.HarvestStart.HasValue ? provider.HarvestStart.Value.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss") : "N/A" },
+                           { "IncrementalHarvestDate", provider.LatestIncrementalStart.HasValue ? provider.LatestIncrementalStart.Value.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss") : "N/A" },
+                           { "IncrementalHarvestPublicCount", provider.LatestIncrementalPublicCount },
+                           { "IncrementalHarvestProtetcedCount", provider.LatestIncrementalProtectedCount }
+                       },
+                       new[] { "dataprovider" }
+                       )
+                    );
+                }
+
+                return new OkObjectResult(new HealthReport(entries, DateTime.Now - start));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error making data provider health check");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
