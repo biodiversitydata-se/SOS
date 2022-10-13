@@ -282,6 +282,11 @@ namespace SOS.Observations.Api.Dtos.Observation
         public string CountryCode { get; set; }
 
         /// <summary>
+        /// Name of country region
+        /// </summary>
+        public string CountryRegion { get; set; }
+
+        /// <summary>
         /// The name of the next smaller administrative region than country (state, province, canton, department, region, etc.) in which the Location occurs.
         /// </summary>
         public string StateProvince { get; set; }

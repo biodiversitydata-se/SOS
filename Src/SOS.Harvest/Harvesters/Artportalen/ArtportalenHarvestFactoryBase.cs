@@ -151,8 +151,10 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var site = new Site
             {
                 Accuracy = accuracy,
+                DiffusionFactor = entity.DiffusionFactor,
                 ExternalId = entity.ExternalId,
                 Id = entity.Id,
+                IsPrivate = entity.IsPrivate,
                 PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),
                 PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : wgs84Point.ToCircle(accuracy))?.ToGeoJson(),
@@ -162,8 +164,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 ProjectId = entity.ProjectId,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
-                VerbatimCoordinateSystem = CoordinateSys.WebMercator,
-
+                VerbatimCoordinateSystem = CoordinateSys.WebMercator
             };
 
             if (!areas?.Any() ?? true)
@@ -171,12 +172,15 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 return site;
             }
 
-            foreach (var area in areas)
+            foreach (var area in areas!)
             {
                 switch ((AreaType)area.AreaDatasetId)
                 {
                     case AreaType.BirdValidationArea:
                         (site.BirdValidationAreaIds ??= new List<string>()).Add(area.FeatureId);
+                        break;
+                    case AreaType.CountryRegion:
+                        site.CountryRegion = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
                         break;
                     case AreaType.County:
                         site.County = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
@@ -273,7 +277,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var missingSiteIds = new HashSet<int>();
 
             // Try to get sites from cache
-            foreach (var siteId in siteIds)
+            foreach (var siteId in siteIds!)
             {
                 if (_cachedSites.TryGetValue(siteId, out var site))
                 {

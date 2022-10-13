@@ -26,6 +26,11 @@
         public int Id { get; set; }
 
         /// <summary>
+        /// Bird sites are public
+        /// </summary>
+        public bool IsPrivate { get; set; }
+
+        /// <summary>
         /// Id of parent site
         /// </summary>
         public int? ParentSiteId { get; set; }

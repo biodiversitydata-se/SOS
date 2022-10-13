@@ -21,6 +21,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public ICollection<string> BirdValidationAreaIds { get; set; }
 
         /// <summary>
+        ///     Country Region
+        /// </summary>
+        public GeographicalArea CountryRegion { get; set; }
+
+        /// <summary>
         ///     County of site
         /// </summary>
         public GeographicalArea County { get; set; }
@@ -29,11 +34,6 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// 
         /// </summary>
         public string CountyPartIdByCoordinate { get; set; }
-
-        /// <summary>
-        ///     Country Region
-        /// </summary>
-        public GeographicalArea CountryRegion { get; set; }
 
         /// <summary>
         ///     Diffused Point (WGS84)
@@ -59,6 +59,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         ///     Id of site
         /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Bird sites are public
+        /// </summary>
+        public bool IsPrivate { get; set; }
 
         /// <summary>
         ///     Name of site

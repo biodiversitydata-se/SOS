@@ -316,6 +316,9 @@ namespace SOS.Lib.Managers
 
                 switch (areaFilter.AreaType)
                 {
+                    case AreaType.CountryRegion:
+                        (geographicFilter.CountryRegionIds ??= new List<string>()).Add(areaFilter.FeatureId);
+                        break;
                     case AreaType.County:
                         (geographicFilter.CountyIds ??= new List<string>()).Add(areaFilter.FeatureId);
                         break;

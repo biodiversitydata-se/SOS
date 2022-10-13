@@ -423,7 +423,9 @@ namespace SOS.Observations.Api.Managers
                 }
             }
 
-            var filter = includeInternalFields ? new SearchFilterInternal(userId ?? 0, protectedObservations) : new SearchFilter(userId ?? 0, protectedObservations);
+            var filter = includeInternalFields ? 
+                new SearchFilterInternal(userId ?? 0, protectedObservations) { NotPresentFilter = SightingNotPresentFilter.IncludeNotPresent } : 
+                new SearchFilter(userId ?? 0, protectedObservations);
             filter.Output = new OutputFilter();
             filter.Output.PopulateFields(outputFieldSet);
             filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;

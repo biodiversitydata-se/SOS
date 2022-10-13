@@ -13,6 +13,11 @@ namespace SOS.Lib.Models.Search.Filters
         public List<string> BirdValidationAreaIds { get; set; }
 
         /// <summary>
+        /// Country region id's
+        /// </summary>
+        public List<string> CountryRegionIds { get; set; }
+
+        /// <summary>
         /// County id's where user has extended authorization
         /// </summary>
         public List<string> CountyIds { get; set; }

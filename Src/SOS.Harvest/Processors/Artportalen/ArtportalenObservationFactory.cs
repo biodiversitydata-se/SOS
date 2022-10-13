@@ -19,8 +19,6 @@ using Location = SOS.Lib.Models.Processed.Observation.Location;
 using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
 using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
-using Nest;
-using System.Linq;
 using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.Artportalen
@@ -47,7 +45,7 @@ namespace SOS.Harvest.Processors.Artportalen
         {
             if (area == null)
             {
-                return null;
+                return null!;
             }
 
             return new Area
@@ -86,6 +84,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="incrementalMode"></param>
         /// <param name="artPortalenUrl"></param>
         /// <param name="processTimeManager"></param>
+        /// <param name="processConfiguration"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ArtportalenObservationFactory(
             DataProvider dataProvider,
@@ -124,7 +123,9 @@ namespace SOS.Harvest.Processors.Artportalen
         {
             try
             {
-                var diffuseFactor = verbatimObservation?.Site?.DiffusionFactor ?? 0;
+
+
+                var diffuseFactor = verbatimObservation.Site?.DiffusionFactor ?? 0;
                 var diffuse = diffuseIfSupported && diffuseFactor > 0;
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
                                   (verbatimObservation.Site?.YCoord ?? 0) > 0;
@@ -176,7 +177,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Event = new Event(startDate, endDate);
                 var eventId = $"{verbatimObservation.Site?.Id ?? 0}:{obs.Event.VerbatimEventDate}:{(obs.Projects?.Any() ?? false ? string.Join(',', obs.Projects.Select(p => p.Id)) : "N/A")}".ToHash();
                 obs.Event.EventId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}:event:{eventId}";
-                obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, VocabularyId.DiscoveryMethod);
+                obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation.DiscoveryMethod, VocabularyId.DiscoveryMethod);
                 obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation);
                 
                 // Identification
@@ -194,9 +195,11 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Location = new Location();
                 obs.Location.Attributes.CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate;
                 obs.Location.Attributes.ExternalId = verbatimObservation.Site?.ExternalId;
+                obs.Location.Attributes.IsBirdLocation = !(verbatimObservation.Site?.IsPrivate ?? true); // Public sites are bird sites
                 obs.Location.Attributes.ProjectId = verbatimObservation.Site?.ProjectId;
                 obs.Location.Attributes.ProvincePartIdByCoordinate = verbatimObservation.Site?.ProvincePartIdByCoordinate;
-                obs.Location.County = CastToArea(verbatimObservation.Site?.County);
+                obs.Location.CountryRegion = CastToArea(verbatimObservation.Site?.CountryRegion!);
+                obs.Location.County = CastToArea(verbatimObservation.Site?.County!);
                 obs.Location.IsInEconomicZoneOfSweden = hasPosition;
                 obs.Location.Locality = verbatimObservation.Site?.Name.Trim().Clean();
                 obs.Location.LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}";
@@ -204,9 +207,9 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
                 obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;
                 obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;
-                obs.Location.Municipality = CastToArea(verbatimObservation.Site?.Municipality);
-                obs.Location.Parish = CastToArea(verbatimObservation.Site?.Parish);
-                obs.Location.Province = CastToArea(verbatimObservation.Site?.Province);
+                obs.Location.Municipality = CastToArea(verbatimObservation.Site?.Municipality!);
+                obs.Location.Parish = CastToArea(verbatimObservation.Site?.Parish!);
+                obs.Location.Province = CastToArea(verbatimObservation.Site?.Province!);
                 obs.Location.VerbatimLocality = obs.Location.Locality;
                 if (diffuse)
                 {
@@ -214,8 +217,8 @@ namespace SOS.Harvest.Processors.Artportalen
                         verbatimObservation.Site?.XCoord,
                         verbatimObservation.Site?.YCoord,
                         CoordinateSys.WebMercator,
-                        (Point)verbatimObservation.Site?.DiffusedPoint?.ToGeometry(),
-                        verbatimObservation.Site?.DiffusedPointWithBuffer,
+                        (Point)verbatimObservation.Site?.DiffusedPoint?.ToGeometry()!,
+                        verbatimObservation.Site?.DiffusedPointWithBuffer!,
                         verbatimObservation.Site?.Accuracy,
                         taxon?.Attributes?.DisturbanceRadius);
                 }
@@ -225,8 +228,8 @@ namespace SOS.Harvest.Processors.Artportalen
                         verbatimObservation.Site?.XCoord,
                         verbatimObservation.Site?.YCoord,
                         CoordinateSys.WebMercator,
-                        (Point)verbatimObservation.Site?.Point?.ToGeometry(),
-                        verbatimObservation.Site?.PointWithBuffer,
+                        (Point)verbatimObservation.Site?.Point?.ToGeometry()!,
+                        verbatimObservation.Site?.PointWithBuffer!,
                         verbatimObservation.Site?.Accuracy,
                         taxon?.Attributes?.DisturbanceRadius);
                 }
@@ -237,9 +240,9 @@ namespace SOS.Harvest.Processors.Artportalen
                     ? $"https://www.artportalen.se/Image/{verbatimObservation.FirstImageId}"
                     : "";
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
-                obs.Occurrence.Biotope = GetSosIdFromMetadata(verbatimObservation?.Biotope, VocabularyId.Biotope);
+                obs.Occurrence.Biotope = GetSosIdFromMetadata(verbatimObservation.Biotope!, VocabularyId.Biotope);
                 obs.Occurrence.BiotopeDescription = verbatimObservation.BiotopeDescription?.Clean();
-                obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon);
+                obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(verbatimObservation!, taxon!);
                 obs.Occurrence.CatalogNumber = verbatimObservation.SightingId.ToString();
                 obs.Occurrence.CatalogId = verbatimObservation.SightingId;
                 obs.Occurrence.OccurrenceId = GetOccurenceId(verbatimObservation.SightingId);
@@ -269,9 +272,9 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 obs.Occurrence.Substrate = new Substrate
                 {
-                    Description = GetSubstrateDescription(verbatimObservation, substrateTaxon)?.Clean(),
-                    Id = verbatimObservation?.Substrate?.Id,
-                    Name = GetSosIdFromMetadata(verbatimObservation?.Substrate, VocabularyId.Substrate),
+                    Description = GetSubstrateDescription(verbatimObservation, substrateTaxon!)?.Clean(),
+                    Id = verbatimObservation.Substrate?.Id,
+                    Name = GetSosIdFromMetadata(verbatimObservation.Substrate!, VocabularyId.Substrate),
                     Quantity = verbatimObservation.QuantityOfSubstrate,
                     SpeciesDescription = verbatimObservation.SubstrateSpeciesDescription.Clean(),
                     SpeciesId = verbatimObservation.SubstrateSpeciesId,
@@ -374,23 +377,23 @@ namespace SOS.Harvest.Processors.Artportalen
                     : obs.Occurrence.BiotopeDescription).WithMaxLength(255))?.Clean();
 
                 // Get vocabulary mapped values
-                obs.Occurrence.Sex = GetSosIdFromMetadata(verbatimObservation?.Gender, VocabularyId.Sex);
-                obs.Occurrence.Activity = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.Activity);
+                obs.Occurrence.Sex = GetSosIdFromMetadata(verbatimObservation.Gender!, VocabularyId.Sex);
+                obs.Occurrence.Activity = GetSosIdFromMetadata(verbatimObservation.Activity!, VocabularyId.Activity);
                 
-                obs.Identification.ValidationStatus = GetSosIdFromMetadata(verbatimObservation?.ValidationStatus, VocabularyId.VerificationStatus);
-                obs.Identification.VerificationStatus = GetSosIdFromMetadata(verbatimObservation?.ValidationStatus, VocabularyId.VerificationStatus);
-                obs.Occurrence.LifeStage = GetSosIdFromMetadata(verbatimObservation?.Stage, VocabularyId.LifeStage);
-                obs.Occurrence.ReproductiveCondition = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.ReproductiveCondition, null, true);
-                obs.Occurrence.Behavior = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.Behavior, null, true);
-                obs.InstitutionCode = GetSosIdFromMetadata(verbatimObservation?.OwnerOrganization, VocabularyId.Institution);
-                obs.InstitutionId = verbatimObservation?.OwnerOrganization == null
+                obs.Identification.ValidationStatus = GetSosIdFromMetadata(verbatimObservation.ValidationStatus!, VocabularyId.VerificationStatus);
+                obs.Identification.VerificationStatus = GetSosIdFromMetadata(verbatimObservation.ValidationStatus!, VocabularyId.VerificationStatus);
+                obs.Occurrence.LifeStage = GetSosIdFromMetadata(verbatimObservation.Stage!, VocabularyId.LifeStage);
+                obs.Occurrence.ReproductiveCondition = GetSosIdFromMetadata(verbatimObservation.Activity!, VocabularyId.ReproductiveCondition, null, true);
+                obs.Occurrence.Behavior = GetSosIdFromMetadata(verbatimObservation.Activity!, VocabularyId.Behavior, null, true);
+                obs.InstitutionCode = GetSosIdFromMetadata(verbatimObservation.OwnerOrganization!, VocabularyId.Institution);
+                obs.InstitutionId = verbatimObservation.OwnerOrganization == null
                     ? null
                     : $"urn:lsid:artdata.slu.se:organization:{verbatimObservation.OwnerOrganization.Id}";
                 obs.Occurrence.OrganismQuantityUnit = GetSosIdFromMetadata(
-                    verbatimObservation?.Unit, 
+                    verbatimObservation.Unit, 
                     VocabularyId.Unit,
                     (int) UnitId.Individuals);
-                obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, VocabularyId.DeterminationMethod);
+                obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation.DeterminationMethod!, VocabularyId.DeterminationMethod);
                 obs.MeasurementOrFacts = CreateMeasurementOrFacts(obs.Occurrence.OccurrenceId, verbatimObservation);
 
                 // Populate generic data
@@ -685,35 +688,35 @@ namespace SOS.Harvest.Processors.Artportalen
         {
             if (!verbatimObservation?.MigrateSightingObsId.HasValue ?? true)
             {
-                return null;
+                return null!;
             }
 
-            string associatedReferences = null;
-            switch (verbatimObservation.MigrateSightingPortalId ?? 0)
+            string associatedReferences = null!;
+            switch (verbatimObservation!.MigrateSightingPortalId ?? 0)
             {
                 case 1:
                     associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:Bird.{verbatimObservation.MigrateSightingObsId.Value}";
+                        $"urn:lsid:artportalen.se:Sighting:Bird.{verbatimObservation!.MigrateSightingObsId}";
                     break;
                 case 2:
                     associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:PlantAndMushroom.{verbatimObservation.MigrateSightingObsId.Value}";
+                        $"urn:lsid:artportalen.se:Sighting:PlantAndMushroom.{verbatimObservation!.MigrateSightingObsId}";
                     break;
                 case 6:
                     associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:Vertebrate.{verbatimObservation.MigrateSightingObsId.Value}";
+                        $"urn:lsid:artportalen.se:Sighting:Vertebrate.{verbatimObservation!.MigrateSightingObsId}";
                     break;
                 case 7:
                     associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:Bugs.{verbatimObservation.MigrateSightingObsId.Value}";
+                        $"urn:lsid:artportalen.se:Sighting:Bugs.{verbatimObservation!.MigrateSightingObsId}";
                     break;
                 case 8:
                     associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:Fish.{verbatimObservation.MigrateSightingObsId.Value}";
+                        $"urn:lsid:artportalen.se:Sighting:Fish.{verbatimObservation!.MigrateSightingObsId}";
                     break;
                 case 9:
                     associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:MarineInvertebrates.{verbatimObservation.MigrateSightingObsId.Value}";
+                        $"urn:lsid:artportalen.se:Sighting:MarineInvertebrates.{verbatimObservation!.MigrateSightingObsId}";
                     break;
             }
 

@@ -30,33 +30,6 @@ namespace SOS.Harvest.Processors
     {
         private readonly IDiffusionManager _diffusionManager;
         private readonly bool _logGarbageCharFields;
-        private readonly IDictionary<int, HashSet<string>> _protectedTaxa;
-
-        private struct ProtectedArea
-        {
-            /// <summary>
-            /// Type of area
-            /// </summary>
-            public AreaType AreaType { get; set; }
-            
-            /// <summary>
-            /// Id of area
-            /// </summary>
-            public string? FeatureId { get; set; }
-        }
-
-        private struct ProtectedTaxon
-        {
-            /// <summary>
-            /// Areas taxon is protected in
-            /// </summary>
-            public IEnumerable<ProtectedArea>? Areas { get; set; }
-            
-            /// <summary>
-            /// Id of protected taxon
-            /// </summary>
-            public int TaxonId { get; set; }
-        }
 
         /// <summary>
         /// Commit batch
@@ -182,40 +155,6 @@ namespace SOS.Harvest.Processors
             }
         }
 
-        private string GetAreaKey(AreaType areatype, string? featureId) => $"{areatype}-{featureId}";
-
-        private IDictionary<int, HashSet<string>> LoadTaxonProtection()
-        {
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath!, @"Resources\TaxonProtection.json");
-            using (var fs = FileSystemHelper.WaitForFile(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                var taxonProtection = JsonSerializer.DeserializeAsync<IEnumerable<ProtectedTaxon>>(fs, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Result;
-                return taxonProtection?.ToDictionary(tp => tp.TaxonId, tp => tp.Areas?.Select(a => GetAreaKey(a.AreaType, a.FeatureId)).ToHashSet() ?? new HashSet<string>()) ?? new Dictionary<int, HashSet<string>>();
-            }
-        }
-
-        private void PopulateProtectedByLaw(Observation observation)
-        {
-            if (observation?.Taxon?.Attributes?.ProtectedByLaw ?? false && observation.Location != null)
-            {
-                if (_protectedTaxa.TryGetValue(observation.Taxon.Id, out var areas))
-                {
-                    if (!(
-                        areas.Contains(GetAreaKey(AreaType.County, observation.Location.County?.FeatureId)) ||
-                        areas.Contains(GetAreaKey(AreaType.Province, observation.Location.Province?.FeatureId)) ||
-                        areas.Contains(GetAreaKey(AreaType.Municipality, observation.Location.Municipality?.FeatureId)) ||
-                        areas.Contains(GetAreaKey(AreaType.Parish, observation.Location.Parish?.FeatureId))         
-                        )
-                    )
-                    {
-                        observation.Taxon = observation.Taxon.Clone();
-                        observation.Taxon.Attributes.ProtectedByLaw = false;
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Resolve vocabulary mapped values and then write the observations to DwC-A CSV files.
         /// </summary>
@@ -289,7 +228,6 @@ namespace SOS.Harvest.Processors
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
             _logGarbageCharFields = processConfiguration?.LogGarbageCharFields ?? false;
             _userObservationRepository = userObservationRepository;
-            _protectedTaxa = LoadTaxonProtection();
         }
 
         /// <summary>
@@ -366,7 +304,6 @@ namespace SOS.Harvest.Processors
                 {
                     var processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
                     var observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
-                    PopulateProtectedByLaw(observation);
                     TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
 
                     if (observation == null)
@@ -402,7 +339,6 @@ namespace SOS.Harvest.Processors
                         // Recreate observation, diffused if provider supports diffusing 
                         processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
                         observation = observationFactory.CreateProcessedObservation(verbatimObservation, true);
-                        PopulateProtectedByLaw(observation);
 
                         TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
 

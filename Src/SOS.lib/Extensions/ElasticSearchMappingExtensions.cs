@@ -193,6 +193,14 @@ namespace SOS.Lib.Extensions
                 )
                 .Object<Area>(c => c
                     .AutoMap()
+                    .Name(nm => nm.CountryRegion)
+                    .Properties(ps => ps
+                        .KeyWordLowerCase(kwlc => kwlc.FeatureId)
+                        .KeyWordLowerCase(kwlc => kwlc.Name)
+                    )
+                )
+                .Object<Area>(c => c
+                    .AutoMap()
                     .Name(nm => nm.County)
                     .Properties(ps => ps
                         .KeyWordLowerCase(kwlc => kwlc.FeatureId)

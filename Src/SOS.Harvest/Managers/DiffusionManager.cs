@@ -42,6 +42,7 @@ namespace SOS.Harvest.Managers
             // Make sure all location data are erased
             location.DecimalLatitude = null;
             location.DecimalLongitude = null;
+            location.CountryRegion = null;
             location.County = null;
             location.Locality = null;
             location.Municipality = null;

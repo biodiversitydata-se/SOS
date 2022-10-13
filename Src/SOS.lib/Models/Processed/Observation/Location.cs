@@ -70,6 +70,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string CountryCode { get; set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public Area CountryRegion { get; set; }
+
+        /// <summary>
         ///     The full, unabbreviated name of the next smaller
         ///     administrative region than stateProvince(county, shire,
         ///     department, etc.) in which the Location occurs

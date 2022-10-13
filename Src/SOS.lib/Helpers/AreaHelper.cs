@@ -22,6 +22,7 @@ namespace SOS.Lib.Helpers
     public class AreaHelper : IAreaHelper
     {
         private readonly AreaType[] _areaTypesInStrTree = {
+            AreaType.CountryRegion,
             AreaType.County, 
             AreaType.Province, 
             AreaType.Municipality, 
@@ -59,6 +60,7 @@ namespace SOS.Lib.Helpers
 
             var positionLocation = GetPositionLocation(processedLocation.DecimalLongitude.Value,
                 processedLocation.DecimalLatitude.Value);
+            processedLocation.CountryRegion = positionLocation?.CountryRegion;
             processedLocation.County = positionLocation?.County;
             processedLocation.Municipality = positionLocation?.Municipality;
             processedLocation.Parish = positionLocation?.Parish;
@@ -223,6 +225,9 @@ namespace SOS.Lib.Helpers
                                 };
                                 switch ((AreaType)areaType)
                                 {
+                                    case AreaType.CountryRegion:
+                                        positionLocation.CountryRegion = area;
+                                        break;
                                     case AreaType.County:
                                         positionLocation.County = area;
                                         break;

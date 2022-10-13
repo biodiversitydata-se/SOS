@@ -111,6 +111,7 @@ namespace SOS.Lib
                 return;
             }
 
+            query.TryAddTermsCriteria("location.countryRegion.featureId", geographicAreasFilter.CountryRegionIds);
             query.TryAddTermsCriteria("location.county.featureId", geographicAreasFilter.CountyIds);
             query.TryAddTermsCriteria("location.municipality.featureId", geographicAreasFilter.MunicipalityIds);
             query.TryAddTermsCriteria("location.parish.featureId", geographicAreasFilter.ParishIds);

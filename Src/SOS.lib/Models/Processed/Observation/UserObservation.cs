@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Processed.Observation
@@ -26,6 +23,14 @@ namespace SOS.Lib.Models.Processed.Observation
         public List<int> ProjectIds { get; set; }
         public bool ProtectedBySystem { get; set; }
         public bool ProtectedByUser { get; set; }
+        public bool IsBirdsite { get; set; }
+        public int ReporterId { get; set; }
+
+        public string UserAlias { get; set; }
+        public string ReporterName { get; set; }
+        public string TaxonScientificName { get; set; }
+        public string TaxonVernacularName { get; set; }
+
 
         public static long CreateId()
         {

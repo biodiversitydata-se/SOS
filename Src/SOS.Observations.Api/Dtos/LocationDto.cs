@@ -44,6 +44,11 @@ namespace SOS.Observations.Api.Dtos
         public IdValueDto<int> Country { get; set; }
 
         /// <summary>
+        /// The name of the country region
+        /// </summary>
+        public IdValueDto<string> CountryRegion { get; set; }
+
+        /// <summary>
         ///     The standard code for the country in which the
         ///     Location occurs.
         ///     Recommended best practice is to use ISO 3166-1-alpha-2

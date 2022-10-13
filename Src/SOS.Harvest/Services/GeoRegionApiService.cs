@@ -29,6 +29,7 @@ namespace SOS.Harvest.Services
         public async Task<FeatureCollection> GetFeatureCollectionFromZipAsync(IEnumerable<int> areaDatasetIds, int srid = 4326)
         {
             using var client = new HttpClient();
+            client.Timeout = TimeSpan.FromMinutes(5);
             var jsonBody = new StringContent(JsonConvert.SerializeObject(areaDatasetIds), Encoding.UTF8,
                 "application/json");
             using var response = await client.PostAsync($"{_apiUrl}Areas/GeoJsonZip?srid={srid}", jsonBody);

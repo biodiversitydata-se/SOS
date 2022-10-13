@@ -114,6 +114,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? LocationCountryId => _observation?.Location?.Country?.Id;
         public string LocationCountryValue => _observation?.Location?.Country?.Value;
         public string LocationCountryCode => _observation?.Location?.CountryCode;
+        public string LocationCountryRegion => _observation?.Location?.CountryRegion?.ToString();
+        public string LocationCountryRegionFeatureId => _observation?.Location?.CountryRegion?.FeatureId;
+        public string LocationCountryRegionName => _observation?.Location?.CountryRegion?.Name;
         public string LocationCounty => _observation?.Location?.County?.ToString();
         public string LocationCountyFeatureId => _observation?.Location?.County?.FeatureId;
         public string LocationCountyName => _observation?.Location?.County?.Name;

@@ -63,17 +63,18 @@ namespace SOS.Harvest.Processors.Artportalen
                 return location;
             }
 
-            var point = (Point)verbatim.Site?.Point?.ToGeometry();
+            var point = (Point)verbatim.Site?.Point?.ToGeometry()!;
 
             var site = verbatim.Site;
             location.Attributes.CountyPartIdByCoordinate = site.CountyPartIdByCoordinate;
             location.Attributes.ProvincePartIdByCoordinate = site.ProvincePartIdByCoordinate;
-            location.County = CastToArea(site?.County);
+            location.CountryRegion = CastToArea(site?.CountryRegion!);
+            location.County = CastToArea(site?.County!);
             location.Locality = site.Name.Trim();
             location.LocationId = $"urn:lsid:artportalen.se:site:{site?.Id}";
-            location.Municipality = CastToArea(site?.Municipality);
-            location.Parish = CastToArea(site?.Parish);
-            location.Province = CastToArea(site?.Province);
+            location.Municipality = CastToArea(site?.Municipality!);
+            location.Parish = CastToArea(site?.Parish!);
+            location.Province = CastToArea(site?.Province!);
             AddPositionData(location, site.XCoord,
                 site.YCoord,
                 CoordinateSys.WebMercator,

@@ -3,6 +3,10 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
+using System.Reflection;
+using System.Text.Json;
 
 namespace SOS.Harvest.Processors
 {
@@ -11,6 +15,47 @@ namespace SOS.Harvest.Processors
     /// </summary>
     public class ObservationFactoryBase : FactoryBase
     {
+        private struct ProtectedArea
+        {
+            /// <summary>
+            /// Type of area
+            /// </summary>
+            public AreaType AreaType { get; set; }
+
+            /// <summary>
+            /// Id of area
+            /// </summary>
+            public string? FeatureId { get; set; }
+        }
+
+        private struct ProtectedTaxon
+        {
+            /// <summary>
+            /// Areas taxon is protected in
+            /// </summary>
+            public IEnumerable<ProtectedArea>? Areas { get; set; }
+
+            /// <summary>
+            /// Id of protected taxon
+            /// </summary>
+            public int TaxonId { get; set; }
+        }
+
+        private readonly IDictionary<int, HashSet<string>> _protectedTaxa;
+
+        private string GetAreaKey(AreaType areatype, string? featureId) => $"{areatype}-{featureId}";
+
+        private IDictionary<int, HashSet<string>> LoadTaxonProtection()
+        {
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var filePath = Path.Combine(assemblyPath!, @"Resources\TaxonProtection.json");
+            using (var fs = FileSystemHelper.WaitForFile(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                var taxonProtection = JsonSerializer.DeserializeAsync<IEnumerable<ProtectedTaxon>>(fs, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Result;
+                return taxonProtection?.ToDictionary(tp => tp.TaxonId, tp => tp.Areas?.Select(a => GetAreaKey(a.AreaType, a.FeatureId)).ToHashSet() ?? new HashSet<string>()) ?? new Dictionary<int, HashSet<string>>();
+            }
+        }
+
         protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }
         protected IDictionary<string, Lib.Models.Processed.Observation.Taxon> TaxaByName { get; }
 
@@ -37,6 +82,8 @@ namespace SOS.Harvest.Processors
                     TaxaByName.Add(taxonName, taxon);
                 }
             }
+
+            _protectedTaxa = LoadTaxonProtection();
         }
         
         /// <summary>
@@ -82,6 +129,25 @@ namespace SOS.Harvest.Processors
             {
                 UniqueKey = source.ToHash()
             };
+
+            if (observation?.Taxon?.Attributes?.ProtectedByLaw ?? false && observation.Location != null)
+            {
+                if (_protectedTaxa.TryGetValue(observation.Taxon.Id, out var areas))
+                {
+                    if (!(
+                        areas.Contains(GetAreaKey(AreaType.CountryRegion, observation.Location.CountryRegion?.FeatureId)) ||
+                        areas.Contains(GetAreaKey(AreaType.County, observation.Location.County?.FeatureId)) ||
+                        areas.Contains(GetAreaKey(AreaType.Province, observation.Location.Province?.FeatureId)) ||
+                        areas.Contains(GetAreaKey(AreaType.Municipality, observation.Location.Municipality?.FeatureId)) ||
+                        areas.Contains(GetAreaKey(AreaType.Parish, observation.Location.Parish?.FeatureId))
+                        )
+                    )
+                    {
+                        observation.Taxon = observation.Taxon.Clone();
+                        observation.Taxon.Attributes.ProtectedByLaw = false;
+                    }
+                }
+            }
         }
     }
 }

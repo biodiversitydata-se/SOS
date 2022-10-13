@@ -16,6 +16,11 @@
         public string ExternalId { get; set; }
 
         /// <summary>
+        /// Tru if it's a bird location
+        /// </summary>
+        public bool IsBirdLocation { get; set; }
+
+        /// <summary>
         /// Id of project
         /// </summary>
         public int? ProjectId { get; set; }

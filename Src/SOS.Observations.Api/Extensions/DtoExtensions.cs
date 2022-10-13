@@ -697,6 +697,7 @@ namespace SOS.Observations.Api.Extensions
                 dto.CoordinatePrecision = observation.Location.CoordinatePrecision;
                 dto.CoordinateUncertaintyInMeters = observation.Location.CoordinateUncertaintyInMeters;
                 dto.Country = observation.Location.Country?.Value;
+                dto.CountryRegion = observation.Location.CountryRegion?.Name;
                 dto.CountryCode = observation.Location.CountryCode;
                 dto.County = observation.Location.County?.Name;
                 dto.DecimalLatitude = observation.Location.DecimalLatitude;
@@ -1119,6 +1120,9 @@ namespace SOS.Observations.Api.Extensions
                     ? null
                     : new IdValueDto<int> { Id = location.Country.Id, Value = location.Country.Value },
                 CountryCode = location.CountryCode,
+                CountryRegion = location.CountryRegion == null
+                    ? null
+                    : new IdValueDto<string> { Id = location.CountryRegion.FeatureId, Value = location.CountryRegion.Name },
                 County = location.County == null
                     ? null
                     : new IdValueDto<string> { Id = location.County.FeatureId, Value = location.County.Name },
