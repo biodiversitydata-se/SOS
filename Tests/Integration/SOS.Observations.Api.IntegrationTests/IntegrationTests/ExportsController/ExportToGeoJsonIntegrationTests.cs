@@ -56,7 +56,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(
+            var response = await _fixture.ExportsController.DownloadGeoJsonAsync(
                 null,
                 null,
                 searchFilter,
@@ -97,7 +97,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(
+            var response = await _fixture.ExportsController.DownloadGeoJsonAsync(
                 null,
                 null,
                 searchFilter,
@@ -143,7 +143,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(
+            var response = await _fixture.ExportsController.DownloadGeoJsonAsync(
                 null,
                 null,
                 searchFilter,
@@ -189,7 +189,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(
+            var response = await _fixture.ExportsController.DownloadGeoJsonAsync(
                 null,
                 null,
                 searchFilter,
@@ -257,7 +257,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson( null, 
+            var response = await _fixture.ExportsController.DownloadGeoJsonAsync( null, 
                 null, 
                 searchFilter,
                 OutputFieldSet.All,

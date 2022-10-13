@@ -67,7 +67,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var geoJsonFileResult = await _fixture.ExportsController.DownloadGeoJson(
+            var geoJsonFileResult = await _fixture.ExportsController.DownloadGeoJsonAsync(
                 null,
                 null,
                 searchFilter,

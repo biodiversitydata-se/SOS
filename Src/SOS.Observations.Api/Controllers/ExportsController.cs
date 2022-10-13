@@ -19,6 +19,7 @@ using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Export;
@@ -65,11 +66,26 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <summary>
-        /// Get user export info
-        /// </summary>
-        /// <returns></returns>
-        private async Task<UserExport> GetUserExportsAsync()
+        private void HandleOutputFieldSet(SearchFilterInternalDto filter,
+              OutputFieldSet outputFieldSet)
+        {
+            if (outputFieldSet != OutputFieldSet.None)
+            {
+                filter = filter ?? new SearchFilterInternalDto();
+                filter.Output = filter?.Output ?? new OutputFilterExtendedDto();
+
+                if ((filter.Output.FieldSet ?? OutputFieldSet.None) == OutputFieldSet.None)
+                {
+                    filter.Output.FieldSet = outputFieldSet;
+                }
+            }
+        }
+
+            /// <summary>
+            /// Get user export info
+            /// </summary>
+            /// <returns></returns>
+            private async Task<UserExport> GetUserExportsAsync()
         {
             var userExport = await _userExportRepository.GetAsync(UserId);
             return userExport ?? new UserExport { Id = UserId, Limit = _defaultUserExportLimit };
@@ -98,7 +114,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="confirmEncryptPassword"></param>
         /// <returns></returns>
         private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(
-            SearchFilterDto filter,
+            SearchFilterBaseDto filter,
             bool validateSearchFilter,
             string email, 
             UserExport userExport,
@@ -143,7 +159,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter"></param>
         /// <param name="sensitiveObservations"></param>
         /// <returns></returns>
-        private async Task<IActionResult> DownloadValidateAsync(SearchFilterDto filter, bool validateSearchFilter, bool sensitiveObservations)
+        private async Task<IActionResult> DownloadValidateAsync(SearchFilterBaseDto filter, bool validateSearchFilter, bool sensitiveObservations)
         {
             var validationResults = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
 
@@ -236,7 +252,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<Lib.Models.Misc.File>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDatasetsList()
+        public async Task<IActionResult> GetDatasetsListAsync()
         {
             try
             {
@@ -262,7 +278,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<ExportJobInfoDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetMyExports()
+        public async Task<IActionResult> GetMyExportsAsync()
         {
             try
             {
@@ -288,7 +304,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(ExportJobInfoDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetMyExport([FromRoute] string id)
+        public async Task<IActionResult> GetMyExportAsync([FromRoute] string id)
         {
             try
             {
@@ -313,7 +329,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/Csv")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> DownloadCsv(
+        public async Task<IActionResult> DownloadCsvAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
@@ -379,7 +395,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/DwC")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> DownloadDwC(
+        public async Task<IActionResult> DownloadDwCAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
@@ -435,7 +451,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/Excel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> DownloadExcel(
+        public async Task<IActionResult> DownloadExcelAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
@@ -502,7 +518,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/GeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> DownloadGeoJson(
+        public async Task<IActionResult> DownloadGeoJsonAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
@@ -575,7 +591,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        public async Task<IActionResult> OrderCsv(
+        public async Task<IActionResult> OrderCsvAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
@@ -643,7 +659,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        public async Task<IActionResult> OrderDwC(
+        public async Task<IActionResult> OrderDwCAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter, 
@@ -705,7 +721,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        public async Task<IActionResult> OrderExcel(
+        public async Task<IActionResult> OrderExcelAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter, 
@@ -774,7 +790,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        public async Task<IActionResult> OrderGeoJson(
+        public async Task<IActionResult> OrderGeoJsonAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter, 
@@ -835,5 +851,542 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        #region Internal
+        /// <inheritdoc />
+        [HttpPost("Internal/Download/Csv")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> DownloadCsvInternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            [FromQuery] string cultureCode = "sv-SE",
+            [FromQuery] bool gzip = true,
+            [FromQuery] bool sensitiveObservations = false)
+        {
+            FileExportResult fileExportResult = null;
+            try
+            {
+                CheckAuthorization(sensitiveObservations);
+
+                HandleOutputFieldSet(filter, outputFieldSet);
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, sensitiveObservations);
+
+                if (validateResult is not OkObjectResult okResult)
+                {
+                    return validateResult;
+                }
+
+                var exportFilter = (SearchFilter)okResult.Value;
+
+                fileExportResult =
+                    await _exportManager.CreateExportFileAsync(
+                        roleId,
+                        authorizationApplicationIdentifier,
+                        exportFilter,
+                        ExportFormat.Csv,
+                        _exportPath, cultureCode,
+                        false,
+                        propertyLabelType,
+                        false,
+                        gzip,
+                        JobCancellationToken.Null);
+
+                HttpContext.LogObservationCount(fileExportResult.NrObservations);
+                if (gzip)
+                    return GetFile(fileExportResult.FilePath, "Observations_Csv.zip", "application/zip");
+                else
+                    return GetFile(fileExportResult.FilePath, "Observations.csv", "text/tab-separated-values"); // or "text/csv"?                
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error exporting Csv file");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Internal/Download/DwC")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> DownloadDwCInternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] bool sensitiveObservations = false)
+        {
+            FileExportResult fileExportResult = null;
+
+            try
+            {
+                CheckAuthorization(sensitiveObservations);
+
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, sensitiveObservations);
+                if (validateResult is not OkObjectResult okResult)
+                {
+                    return validateResult;
+                }
+
+                var exportFilter = (SearchFilter)okResult.Value;
+                fileExportResult =
+                    await _exportManager.CreateExportFileAsync(
+                        roleId,
+                        authorizationApplicationIdentifier,
+                        exportFilter,
+                        ExportFormat.DwC,
+                        _exportPath,
+                        Cultures.en_GB,
+                        false,
+                        PropertyLabelType.PropertyPath,
+                        false,
+                        true,
+                        JobCancellationToken.Null);
+
+                HttpContext.LogObservationCount(fileExportResult.NrObservations);
+                return GetFile(fileExportResult.FilePath, "Observations_DwC.zip", "application/zip");
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error exporting DwC file");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Internal/Download/Excel")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> DownloadExcelInternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            [FromQuery] string cultureCode = "sv-SE",
+            [FromQuery] bool gzip = true,
+            [FromQuery] bool sensitiveObservations = false)
+        {
+            FileExportResult fileExportResult = null;
+
+            try
+            {
+                CheckAuthorization(sensitiveObservations);
+
+                HandleOutputFieldSet(filter, outputFieldSet);
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, sensitiveObservations);
+
+                if (validateResult is not OkObjectResult okResult)
+                {
+                    return validateResult;
+                }
+
+                var exportFilter = (SearchFilter)okResult.Value;
+                fileExportResult =
+                    await _exportManager.CreateExportFileAsync(
+                        roleId,
+                        authorizationApplicationIdentifier,
+                        exportFilter,
+                        ExportFormat.Excel,
+                        _exportPath,
+                        cultureCode,
+                        false,
+                        propertyLabelType,
+                        false,
+                        gzip,
+                        JobCancellationToken.Null);
+
+                HttpContext.LogObservationCount(fileExportResult.NrObservations);
+                if (gzip)
+                    return GetFile(fileExportResult.FilePath, "Observations_Excel.zip", "application/zip");
+                else
+                    return GetFile(fileExportResult.FilePath, "Observations.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error exporting Excel file");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Internal/Download/GeoJson")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> DownloadGeoJsonInternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            [FromQuery] string cultureCode = "sv-SE",
+            [FromQuery] bool flat = true,
+            [FromQuery] bool excludeNullValues = true,
+            [FromQuery] bool gzip = true,
+            [FromQuery] bool sensitiveObservations = false)
+        {
+            FileExportResult fileExportResult = null;
+
+            try
+            {
+                CheckAuthorization(sensitiveObservations);
+
+                HandleOutputFieldSet(filter, outputFieldSet);
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, sensitiveObservations);
+                if (validateResult is not OkObjectResult okResult)
+                {
+                    return validateResult;
+                }
+
+                var exportFilter = (SearchFilter)okResult.Value;
+
+                fileExportResult =
+                    await _exportManager.CreateExportFileAsync(
+                        roleId,
+                        authorizationApplicationIdentifier,
+                        exportFilter,
+                        ExportFormat.GeoJson,
+                        _exportPath,
+                        cultureCode,
+                        flat,
+                        propertyLabelType,
+                        excludeNullValues,
+                        gzip,
+                        JobCancellationToken.Null);
+
+                HttpContext.LogObservationCount(fileExportResult?.NrObservations ?? 0);
+                if (gzip)
+                    return GetFile(fileExportResult.FilePath, "Observations_GeoJson.zip", "application/zip");
+                else
+                    return GetFile(fileExportResult.FilePath, "Observations.geojson", "application/geo+json");
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error exporting GeoJson file");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Internal/Order/Csv")]
+        [Authorize/*(Roles = "Privat")*/]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [InternalApi]
+        public async Task<IActionResult> OrderCsvInternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] string description,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool sendMailFromZendTo = true,
+            [FromQuery] string encryptPassword = "",
+            [FromQuery] string confirmEncryptPassword = "",
+            [FromQuery] string cultureCode = "sv-SE")
+        {
+            try
+            {
+                CheckAuthorization(sensitiveObservations);
+
+                HandleOutputFieldSet(filter, outputFieldSet);
+                var userExports = await GetUserExportsAsync();
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+
+                if (validateResult.Result is not OkObjectResult okResult)
+                {
+                    return validateResult.Result;
+                }
+
+                var exportFilter = (SearchFilter)okResult.Value;
+                var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Csv, cultureCode, false,
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+
+                var exportJobInfo = new ExportJobInfo
+                {
+                    Id = jobId,
+                    Status = ExportJobStatus.Queued,
+                    CreatedDate = DateTime.UtcNow,
+                    NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                    Format = ExportFormat.Csv,
+                    Description = description,
+                    OutputFieldSet = filter?.Output?.FieldSet
+                };
+
+                userExports.Jobs.Add(exportJobInfo);
+                await UpdateUserExportsAsync(userExports);
+
+                return new OkObjectResult(jobId);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running export failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Internal/Order/DwC")]
+        [Authorize/*(Roles = "Privat")*/]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [InternalApi]
+        public async Task<IActionResult> OrderDwCInternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] string description,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool sendMailFromZendTo = true,
+            [FromQuery] string encryptPassword = "",
+            [FromQuery] string confirmEncryptPassword = "")
+        {
+            try
+            {
+                CheckAuthorization(sensitiveObservations);
+
+                var userExports = await GetUserExportsAsync();
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+
+                if (validateResult.Result is not OkObjectResult okResult)
+                {
+                    return validateResult.Result;
+                }
+
+                var exportFilter = (SearchFilter)okResult.Value;
+                var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.DwC, "en-GB", false,
+                        PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+
+                var exportJobInfo = new ExportJobInfo
+                {
+                    Id = jobId,
+                    Status = ExportJobStatus.Queued,
+                    CreatedDate = DateTime.UtcNow,
+                    NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                    Format = ExportFormat.DwC,
+                    Description = description
+                };
+
+                userExports.Jobs.Add(exportJobInfo);
+                await UpdateUserExportsAsync(userExports);
+
+                return new OkObjectResult(jobId);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running export failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Internal/Order/Excel")]
+        [Authorize/*(Roles = "Privat")*/]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [InternalApi]
+        public async Task<IActionResult> OrderExcelInternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] string description,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool sendMailFromZendTo = true,
+            [FromQuery] string encryptPassword = "",
+            [FromQuery] string confirmEncryptPassword = "",
+            [FromQuery] string cultureCode = "sv-SE")
+        {
+            try
+            {
+                CheckAuthorization(sensitiveObservations);
+
+                HandleOutputFieldSet(filter, outputFieldSet);
+                var userExports = await GetUserExportsAsync();
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+
+                if (validateResult.Result is not OkObjectResult okResult)
+                {
+                    return validateResult.Result;
+                }
+
+                var exportFilter = (SearchFilter)okResult.Value;
+
+                var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Excel, cultureCode, false,
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+
+                var exportJobInfo = new ExportJobInfo
+                {
+                    Id = jobId,
+                    Status = ExportJobStatus.Queued,
+                    CreatedDate = DateTime.UtcNow,
+                    NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                    Format = ExportFormat.Excel,
+                    Description = description,
+                    OutputFieldSet = filter?.Output?.FieldSet
+                };
+
+                userExports.Jobs.Add(exportJobInfo);
+                await UpdateUserExportsAsync(userExports);
+
+                return new OkObjectResult(jobId);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running export failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Internal/Order/GeoJson")]
+        [Authorize/*(Roles = "Privat")*/]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [InternalApi]
+        public async Task<IActionResult> OrderGeoJsonInternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] string description,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool sendMailFromZendTo = true,
+            [FromQuery] string encryptPassword = "",
+            [FromQuery] string confirmEncryptPassword = "",
+            [FromQuery] bool flat = true,
+            [FromQuery] bool excludeNullValues = true,
+            [FromQuery] string cultureCode = "sv-SE")
+        {
+            try
+            {
+                CheckAuthorization(sensitiveObservations);
+
+                HandleOutputFieldSet(filter, outputFieldSet);
+                var userExports = await GetUserExportsAsync();
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+
+                if (validateResult.Result is not OkObjectResult okResult)
+                {
+                    return validateResult.Result;
+                }
+
+                var exportFilter = (SearchFilter)okResult.Value;
+                var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.GeoJson, cultureCode,
+                        flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+
+                var exportJobInfo = new ExportJobInfo
+                {
+                    Id = jobId,
+                    Status = ExportJobStatus.Queued,
+                    CreatedDate = DateTime.UtcNow,
+                    NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                    Format = ExportFormat.GeoJson,
+                    Description = description,
+                    OutputFieldSet = filter?.Output?.FieldSet
+                };
+
+                userExports.Jobs.Add(exportJobInfo);
+                await UpdateUserExportsAsync(userExports);
+
+                return new OkObjectResult(jobId);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running export failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion Internal
     }
 }

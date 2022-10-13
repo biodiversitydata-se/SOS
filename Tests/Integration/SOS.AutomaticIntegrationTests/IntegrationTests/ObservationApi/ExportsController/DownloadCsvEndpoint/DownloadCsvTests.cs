@@ -53,7 +53,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var csvFileResult = await _fixture.ExportsController.DownloadCsv(
+            var csvFileResult = await _fixture.ExportsController.DownloadCsvAsync(
                 null, 
                 null,
                 searchFilter,
@@ -105,7 +105,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var csvFileResult = await _fixture.ExportsController.DownloadCsv(
+            var csvFileResult = await _fixture.ExportsController.DownloadCsvAsync(
                 null,
                 null,
                 searchFilter,
@@ -154,7 +154,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var propertyNameFileResult = await _fixture.ExportsController.DownloadCsv(
+            var propertyNameFileResult = await _fixture.ExportsController.DownloadCsvAsync(
                 null,
                 null,
                 searchFilter,
@@ -165,7 +165,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
                 false);
             var propertyNameFile = (FileContentResult)propertyNameFileResult;
 
-            var propertyPathFileResult = await _fixture.ExportsController.DownloadCsv(
+            var propertyPathFileResult = await _fixture.ExportsController.DownloadCsvAsync(
                 null,
                 null,
                 searchFilter,
@@ -176,7 +176,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
                 false);
             var propertyPathFile = (FileContentResult)propertyPathFileResult;
 
-            var swedishFileResult = await _fixture.ExportsController.DownloadCsv(
+            var swedishFileResult = await _fixture.ExportsController.DownloadCsvAsync(
                 null,
                 null,
                 searchFilter,
@@ -187,7 +187,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
                 false);
             var swedishFile = (FileContentResult)swedishFileResult;
 
-            var englishFileResult = await _fixture.ExportsController.DownloadCsv(
+            var englishFileResult = await _fixture.ExportsController.DownloadCsvAsync(
                 null,
                 null,
                 searchFilter,
@@ -248,7 +248,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var csvFileResult = await _fixture.ExportsController.DownloadCsv(
+            var csvFileResult = await _fixture.ExportsController.DownloadCsvAsync(
                 null,
                 null,
                 searchFilter,

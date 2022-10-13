@@ -55,7 +55,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadCsv(
+            var response = await _fixture.ExportsController.DownloadCsvAsync(
                 null,
                 null,
                 searchFilter, 
@@ -95,7 +95,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadCsv(
+            var response = await _fixture.ExportsController.DownloadCsvAsync(
                 null,
                 null,
                 searchFilter, 
@@ -139,7 +139,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadCsv(
+            var response = await _fixture.ExportsController.DownloadCsvAsync(
                 null,
                 null,
                 searchFilter,

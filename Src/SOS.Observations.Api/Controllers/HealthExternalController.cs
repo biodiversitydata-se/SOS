@@ -58,57 +58,83 @@ namespace SOS.Observations.Api.Controllers
                 var entries = new Dictionary<string, HealthReportEntry>();
               
                 var azureApiCheck = healthCheck.Entries?.Where(e => e.Key.Equals("Azure search API health check"))?.Select(d => d.Value)?.FirstOrDefault();
+                var azureStatus = azureApiCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Not running" : "Running";
                 entries.Add("SOS API", new HealthReportEntry(
-                    azureApiCheck.Value.Status, 
-                    azureApiCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Not running" : "Running",
+                    azureApiCheck.Value.Status,
+                    azureStatus,
                     azureApiCheck.Value.Duration,
                     null,
-                    null
+                    new Dictionary<string, object>()
+                       {
+                           { "Status", azureStatus }
+                       }
                     )
                 );
                 var dataprovidersCheck = healthCheck.Entries?.Where(e => e.Key.Equals("Search data providers"))?.Select(d => d.Value)?.FirstOrDefault();
+                var successfullProviders = dataprovidersCheck.Value.Data.Where(d => d.Key.Equals("SuccessfulProviders")).Select(d => d.Value).FirstOrDefault();
                 entries.Add("Data providers", new HealthReportEntry(
                     dataprovidersCheck.Value.Status,
-                    $"{dataprovidersCheck.Value.Data.Where(d => d.Key.Equals("SuccessfulProviders")).Select(d => d.Value).FirstOrDefault()} data providers",
+                    $"{successfullProviders} data providers",
                     dataprovidersCheck.Value.Duration,
                     null,
-                    null
+                    new Dictionary<string, object>()
+                       {
+                           { "ProviderCount", successfullProviders }
+                       }
                     )
                 );
                 var dataAmountCheck = healthCheck.Entries?.Where(e => e.Key.Equals("Data amount"))?.Select(d => d.Value)?.FirstOrDefault();
+                var publicCount = dataAmountCheck.Value.Data.Where(d => d.Key.Equals("Public observations")).Select(d => d.Value).FirstOrDefault();
+                var protectedCount = dataAmountCheck.Value.Data.Where(d => d.Key.Equals("Protected observations")).Select(d => d.Value).FirstOrDefault();
                 entries.Add("Observations", new HealthReportEntry(
                     dataAmountCheck.Value.Status,
-                    $"{dataAmountCheck.Value.Data.Where(d => d.Key.Equals("Public observations")).Select(d => d.Value).FirstOrDefault()} public observations, {dataAmountCheck.Value.Data.Where(d => d.Key.Equals("Protected observations")).Select(d => d.Value).FirstOrDefault()} protected observations",
+                    $"{publicCount} public observations, {protectedCount} protected observations",
                     dataAmountCheck.Value.Duration,
                     null,
-                    null
+                    new Dictionary<string, object>()
+                       {
+                           { "PublicCount", publicCount },
+                           { "ProtectedCount", protectedCount }
+                       }
                     )
                 );
                 var wfsCheck = healthCheck.Entries?.Where(e => e.Key.Equals("WFS"))?.Select(e => e.Value)?.FirstOrDefault();
+                var wfsStatus = wfsCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Not running" : "Running";
                 entries.Add("WFS", new HealthReportEntry(
                     wfsCheck.Value.Status,
-                    wfsCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Unhealthy" : "Healthy",
+                    wfsStatus,
                     wfsCheck.Value.Duration,
                     null,
-                    null
+                    new Dictionary<string, object>()
+                       {
+                           { "Status", wfsStatus }
+                       }
                     )
                 );
                 var processInfo = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
+                var processingEnd = processInfo?.End.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss");
                 entries.Add("Latest Full harvest", new HealthReportEntry(
                     (processInfo?.End ?? DateTime.MinValue).ToLocalTime() > DateTime.Now.AddDays(-1) ? HealthStatus.Healthy : HealthStatus.Unhealthy,
-                    processInfo?.End.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss"),
+                    processingEnd,
                     TimeSpan.FromTicks(0),
                     null,
-                    null
+                    new Dictionary<string, object>()
+                       {
+                           { "ProcessingEnd", processingEnd }
+                       }
                     )
                 );
                 var apProvider = processInfo?.ProvidersInfo.Where(p => p.DataProviderId.Equals(1)).FirstOrDefault();
+                var apIncrementalEnd = apProvider?.LatestIncrementalEnd.HasValue ?? false ? apProvider?.LatestIncrementalEnd.Value.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss") : "";
                 entries.Add("Latest Artportalen incremental harvest", new HealthReportEntry(
                     (apProvider?.LatestIncrementalEnd.HasValue ?? false) && apProvider?.LatestIncrementalEnd.Value.ToLocalTime() > DateTime.Now.AddMinutes(-10) ? HealthStatus.Healthy : HealthStatus.Unhealthy,
-                    apProvider?.LatestIncrementalEnd.HasValue ?? false ? apProvider.LatestIncrementalEnd.Value.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss") : "",
+                    apIncrementalEnd,
                     TimeSpan.FromTicks(0),
                     null,
-                    null
+                    new Dictionary<string, object>()
+                       {
+                           { "IncrementalEnd", apIncrementalEnd }
+                       }
                     )
                 );
 
