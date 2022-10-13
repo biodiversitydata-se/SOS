@@ -12,12 +12,17 @@ public class DataStewardshipModule : IModule
 {
     /*
      * Todo
-     * ====
-     * 1. Create sample request-response for Artportalen data
-     * 2. Create sample request-response for other data provider
-     * 3. Harvest additional Artportalen metadata
-     * 4. Implement controller actions.
-     * 5. Create integration tests         
+     * ====     
+     * 1. Add proper geometry handling in models and endpoints.
+     * 2. Implement filter search     
+     * 3. Create event index in ES or store all event data in observations?
+     * 4. Create integration tests 
+     * 5. Update models with latest specification (https://github.com/Lund-University-Biodiversity-data/datahost-api/blob/main/api/openapi.yaml)
+     * 6. Create sample request-response for other data providers
+     * 7. Implement Artportalen dataset database tables
+     * 8. Implement harvest Artportalen dataset database tables
+     * 9. Implement harvest Artportalen data stewardship harvesting.
+     * 10. Implement sample event DwC-A data stewardship harvesting.
      */
 
     private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
@@ -27,7 +32,6 @@ public class DataStewardshipModule : IModule
             new JsonStringEnumConverter()
         }
     };
-                   
 
     public void MapEndpoints(WebApplication application)
     {        
