@@ -176,7 +176,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             if (obs.ShallBeProtected())
             {
                 obs.Sensitive = true;
-                obs.Protected = true;
             }
 
             // Populate generic data
@@ -312,9 +311,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedIdentification.IdentificationQualifier = verbatim.IdentificationQualifier;
             processedIdentification.IdentificationReferences = verbatim.IdentificationReferences;
             processedIdentification.IdentificationRemarks = verbatim.IdentificationRemarks?.Clean();
-            processedIdentification.ValidationStatus = GetSosId(verbatim.IdentificationVerificationStatus, _vocabularyById[VocabularyId.VerificationStatus]);
             processedIdentification.VerificationStatus = GetSosId(verbatim.IdentificationVerificationStatus, _vocabularyById[VocabularyId.VerificationStatus]);
-            processedIdentification.Validated = GetIsValidated(processedIdentification.ValidationStatus);
             processedIdentification.Verified = GetIsValidated(processedIdentification.ValidationStatus);
             processedIdentification.IdentifiedBy = verbatim.IdentifiedBy?.Clean();
             processedIdentification.TypeStatus = verbatim.TypeStatus;

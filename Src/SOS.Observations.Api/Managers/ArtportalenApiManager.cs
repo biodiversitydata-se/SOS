@@ -273,6 +273,7 @@ namespace SOS.Observations.Api.Managers
 
             // Location
             obs.Location = new Location();
+            obs.Location.Attributes.ExternalId = sighting.Site.ExternalId;
             obs.Location.MaximumDepthInMeters = sighting.MaxDepth;
             obs.Location.MinimumDepthInMeters = sighting.MinDepth;
             obs.Location.MaximumElevationInMeters = sighting.MaxHeight;
@@ -335,7 +336,6 @@ namespace SOS.Observations.Api.Managers
 
             // ArtportalenInternal
             obs.ArtportalenInternal = new ArtportalenInternal();
-            obs.ArtportalenInternal.HasTriggeredValidationRules = sighting.RuleValidationMessages != null && sighting.RuleValidationMessages.Count > 0;
             obs.ArtportalenInternal.HasTriggeredVerificationRules = sighting.RuleValidationMessages != null && sighting.RuleValidationMessages.Count > 0;
             obs.ArtportalenInternal.LocationExternalId = sighting.Site.ExternalId;
             obs.ArtportalenInternal.HasUserComments = !string.IsNullOrEmpty(sighting.PublicComment);

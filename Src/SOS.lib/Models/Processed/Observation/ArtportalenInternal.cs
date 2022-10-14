@@ -49,7 +49,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Has Triggered Validation Rules
         /// </summary>
         [Obsolete("Replaced by HasTriggeredVerificationRules")]
-        public bool HasTriggeredValidationRules { get; set; }
+        public bool HasTriggeredValidationRules => HasTriggeredVerificationRules;
 
         /// <summary>
         ///     Has Triggered Verification Rules
@@ -60,7 +60,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Has any Triggered Validation Rule with Warning
         /// </summary>
         [Obsolete("Replaced by HasAnyTriggeredVerificationRuleWithWarning")]
-        public bool HasAnyTriggeredValidationRuleWithWarning { get; set; }
+        public bool HasAnyTriggeredValidationRuleWithWarning => HasAnyTriggeredVerificationRuleWithWarning;
 
         /// <summary>
         ///     Has any Triggered Verification Rule with Warning

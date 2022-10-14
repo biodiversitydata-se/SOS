@@ -325,7 +325,6 @@ namespace SOS.Harvest.Processors
                     // If  observation is protected
                     if (observation.ShallBeProtected())
                     {
-                        observation.Protected = true;
                         observation.Sensitive = true;
                         protectedObservations.TryAdd(observation.Occurrence.OccurrenceId, observation);
 

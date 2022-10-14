@@ -87,14 +87,17 @@ namespace SOS.Lib.Models.Processed.Observation
         public string IdentificationIdentificationQualifier => _observation?.Identification?.IdentificationQualifier;
         public string IdentificationIdentificationReferences => _observation?.Identification?.IdentificationReferences;
         public string IdentificationIdentificationRemarks => _observation?.Identification?.IdentificationRemarks;
-        public bool? IdentificationValidated => _observation?.Identification?.Validated;
         public bool? IdentificationVerified => _observation?.Identification?.Verified;
+
         [Obsolete]
-        public string IdentificationValidationStatus => _observation?.Identification?.ValidationStatus?.ToString();
+        public bool? IdentificationValidated => IdentificationVerified;
         [Obsolete]
-        public int? IdentificationValidationStatusId => _observation?.Identification?.ValidationStatus?.Id;
+        public string IdentificationValidationStatus => IdentificationVerificationStatus;
         [Obsolete]
-        public string IdentificationValidationStatusValue => _observation?.Identification?.ValidationStatus?.Value;
+        public int? IdentificationValidationStatusId => IdentificationVerificationStatusId;
+        [Obsolete]
+        public string IdentificationValidationStatusValue => IdentificationVerificationStatusValue;
+
         public string IdentificationVerificationStatus => _observation?.Identification?.VerificationStatus?.ToString();
         public int? IdentificationVerificationStatusId => _observation?.Identification?.VerificationStatus?.Id;
         public string IdentificationVerificationStatusValue => _observation?.Identification?.VerificationStatus?.Value;
@@ -212,8 +215,10 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? OccurrenceOrganismQuantityUnitId => _observation?.Occurrence?.OrganismQuantityUnit?.Id;
         public string OccurrenceOrganismQuantityUnitValue => _observation?.Occurrence?.OrganismQuantityUnit?.Value;
         public string OccurrencePreparations => _observation?.Occurrence?.Preparations;
+       
         [Obsolete]
-        public int? OccurrenceProtectionLevel => _observation?.Occurrence?.ProtectionLevel;
+        public int? OccurrenceProtectionLevel => OccurrenceSensitivityCategory;
+       
         public int? OccurrenceSensitivityCategory => _observation?.Occurrence?.SensitivityCategory;
         public string OccurrenceRecordedBy => _observation?.Occurrence?.RecordedBy;
         public string OccurrenceRecordNumber => _observation?.Occurrence?.RecordNumber;
@@ -265,15 +270,17 @@ namespace SOS.Lib.Models.Processed.Observation
         public string TaxonAttributesOrganismGroup => _observation?.Taxon?.Attributes?.OrganismGroup;
         public int? TaxonAttributesParentDyntaxaTaxonId => _observation?.Taxon?.Attributes?.ParentDyntaxaTaxonId;
         public bool? TaxonAttributesProtectedByLaw => _observation?.Taxon?.Attributes?.ProtectedByLaw;
+       
         [Obsolete]
-        public string TaxonAttributesProtectionLevel => _observation?.Taxon?.Attributes?.ProtectionLevel?.ToString();
+        public string TaxonAttributesProtectionLevel => TaxonAttributesSensitivityCategory;
         [Obsolete]
-        public int? TaxonAttributesProtectionLevelId => _observation?.Taxon?.Attributes?.ProtectionLevel?.Id;
+        public int? TaxonAttributesProtectionLevelId => TaxonAttributesSensitivityCategoryId;
         [Obsolete]
-        public string TaxonAttributesProtectionLevelValue => _observation?.Taxon?.Attributes?.ProtectionLevel?.Value;
-        public string TaxonAttributesSensitivityCategory => _observation?.Taxon?.Attributes?.ProtectionLevel?.ToString();
-        public int? TaxonAttributesSensitivityCategoryId => _observation?.Taxon?.Attributes?.ProtectionLevel?.Id;
-        public string TaxonAttributesSensitivityCategoryValue => _observation?.Taxon?.Attributes?.ProtectionLevel?.Value;
+        public string TaxonAttributesProtectionLevelValue => TaxonAttributesSensitivityCategoryValue;
+        
+        public string TaxonAttributesSensitivityCategory => _observation?.Taxon?.Attributes?.SensitivityCategory?.ToString();
+        public int? TaxonAttributesSensitivityCategoryId => _observation?.Taxon?.Attributes?.SensitivityCategory?.Id;
+        public string TaxonAttributesSensitivityCategoryValue => _observation?.Taxon?.Attributes?.SensitivityCategory?.Value;
         public string TaxonAttributesTaxonCategory => _observation?.Taxon?.Attributes?.TaxonCategory?.ToString();
         public int? TaxonAttributesTaxonCategoryId => _observation?.Taxon?.Attributes?.TaxonCategory?.Id;
         public string TaxonAttributesTaxonCategoryValue => _observation?.Taxon?.Attributes?.TaxonCategory?.Value;
@@ -356,8 +363,10 @@ namespace SOS.Lib.Models.Processed.Observation
         }
         public string OwnerInstitutionCode => _observation?.OwnerInstitutionCode;
         public string PrivateCollection => _observation?.PrivateCollection;
+
         [Obsolete]
-        public bool? Protected => _observation?.Protected;
+        public bool? Protected => Sensitive;
+
         public bool? Sensitive => _observation?.Sensitive;
         public string PublicCollection => _observation?.PublicCollection;
         public string References => _observation?.References;
