@@ -162,9 +162,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
-                    Validated = false,
                     Verified = false,
-                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 Location = new Location

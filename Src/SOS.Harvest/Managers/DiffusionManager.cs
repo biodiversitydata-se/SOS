@@ -55,6 +55,7 @@ namespace SOS.Harvest.Managers
             location.VerbatimLatitude = null;
             location.VerbatimLongitude = null;
             location.VerbatimLocality = null;
+            location.Attributes.ExternalId = null;
             location.Attributes.VerbatimMunicipality = null;
             location.Attributes.VerbatimProvince = null;
 
@@ -140,7 +141,6 @@ namespace SOS.Harvest.Managers
             observation.DataGeneralizations += " All data related to the exact location of the observation has been diffused or removed. Native data is available with extended privileges.";
 
             // Diffused observations is not protected
-            observation.Protected = false;
             observation.Sensitive = false;
             observation.Occurrence.ReportedBy = string.Empty;
             

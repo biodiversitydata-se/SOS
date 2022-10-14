@@ -67,9 +67,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
-                    Validated = false,
                     Verified = false,
-                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 InstitutionId = verbatim.SCI_code,

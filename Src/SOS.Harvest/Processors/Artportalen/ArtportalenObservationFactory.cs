@@ -187,10 +187,10 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Identification.DateIdentified = verbatimObservation.DeterminationYear.ToString();
                 obs.Identification.IdentifiedBy = verbatimObservation.DeterminedBy;
                 obs.Identification.VerifiedBy = verbatimObservation.VerifiedBy?.Clean();
-                obs.Identification.Verified = obs.Identification.Validated = _validationStatusIdIds.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);                
+                obs.Identification.Verified = _validationStatusIdIds.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);                
                 obs.Identification.UncertainIdentification = verbatimObservation.UnsureDetermination;
                 obs.Identification.IdentificationRemarks = verbatimObservation.UnsureDetermination ? "Uncertain determination" : string.Empty;
-               
+              
                 // Location
                 obs.Location = new Location();
                 obs.Location.Attributes.CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate;
@@ -318,9 +318,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ArtportalenInternal.DatasourceId = verbatimObservation.DatasourceId;
                 obs.ArtportalenInternal.DeterminationYear = verbatimObservation.DeterminationYear;
                 obs.ArtportalenInternal.FieldDiaryGroupId = verbatimObservation.FieldDiaryGroupId;
-                obs.ArtportalenInternal.HasTriggeredValidationRules = verbatimObservation.HasTriggeredValidationRules;
                 obs.ArtportalenInternal.HasTriggeredVerificationRules = verbatimObservation.HasTriggeredValidationRules;
-                obs.ArtportalenInternal.HasAnyTriggeredValidationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;
                 obs.ArtportalenInternal.HasAnyTriggeredVerificationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;
                 obs.ArtportalenInternal.SightingSpeciesCollectionItemId = verbatimObservation.SightingSpeciesCollectionItemId;
                 obs.ArtportalenInternal.SpeciesFactsIds = verbatimObservation.SpeciesFactsIds;
@@ -379,8 +377,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 // Get vocabulary mapped values
                 obs.Occurrence.Sex = GetSosIdFromMetadata(verbatimObservation.Gender!, VocabularyId.Sex);
                 obs.Occurrence.Activity = GetSosIdFromMetadata(verbatimObservation.Activity!, VocabularyId.Activity);
-                
-                obs.Identification.ValidationStatus = GetSosIdFromMetadata(verbatimObservation.ValidationStatus!, VocabularyId.VerificationStatus);
+               
                 obs.Identification.VerificationStatus = GetSosIdFromMetadata(verbatimObservation.ValidationStatus!, VocabularyId.VerificationStatus);
                 obs.Occurrence.LifeStage = GetSosIdFromMetadata(verbatimObservation.Stage!, VocabularyId.LifeStage);
                 obs.Occurrence.ReproductiveCondition = GetSosIdFromMetadata(verbatimObservation.Activity!, VocabularyId.ReproductiveCondition, null, true);
@@ -407,7 +404,6 @@ namespace SOS.Harvest.Processors.Artportalen
                 if (obs.ShallBeProtected())
                 {
                     obs.Sensitive = true;
-                    obs.Protected = true;
                 }
 
                 return obs;
