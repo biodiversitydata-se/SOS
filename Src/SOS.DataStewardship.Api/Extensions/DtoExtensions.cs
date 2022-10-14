@@ -21,7 +21,7 @@ namespace SOS.DataStewardship.Api.Extensions
             {
                 AccessRights = dataset.AccessRights.ToDatasetAccessRightsEnum(),
                 Assigner = dataset.Assigner.ToOrganisation(),
-                Creator = dataset.Creator.ToOrganisation(),
+                Creator = new List<Organisation> { dataset.Creator.ToOrganisation() }, // todo - support list of creators in ES index.
                 DataStewardship = dataset.DataStewardship,
                 Description = dataset.Description,
                 EndDate = dataset.EndDate,

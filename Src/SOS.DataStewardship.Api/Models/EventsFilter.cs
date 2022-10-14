@@ -9,7 +9,19 @@ namespace SOS.DataStewardship.Api.Models
     /// </summary>
     [DataContract]
     public class EventsFilter
-    { 
+    {
+        /// <summary>
+        /// Gets or Sets ExportMode
+        /// </summary>
+        [DataMember(Name = "exportMode")]
+        public ExportMode ExportMode { get; set; }
+
+        /// <summary>
+        /// Gets or Sets DatasetList
+        /// </summary>        
+        [DataMember(Name = "datasetList")]
+        public List<string> DatasetList { get; set; }
+
         /// <summary>
         /// Datum
         /// </summary>

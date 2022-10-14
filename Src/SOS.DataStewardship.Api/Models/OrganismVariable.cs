@@ -410,7 +410,12 @@ namespace SOS.DataStewardship.Api.Models
             ///  LdreGnagspr for äldre gnagspår
             /// </summary>
             [EnumMember(Value = "äldre gnagspår")]
-            ÄldreGnagspår = 38
+            ÄldreGnagspår = 38,
+            /// <summary>
+            /// bobygge
+            /// </summary>
+            [EnumMember(Value = "exkrementsäck")]
+            Exkrementsäck = 39,
         }
 
         /// <summary>

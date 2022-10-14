@@ -4,9 +4,9 @@ using System.Runtime.Serialization;
 using System.Text;
 
 namespace SOS.DataStewardship.Api.Models
-{ 
+{
     /// <summary>
-    /// 
+    /// Weather variable reported as a measurement and a unit.
     /// </summary>
     [DataContract]
     public class WeatherMeasuring

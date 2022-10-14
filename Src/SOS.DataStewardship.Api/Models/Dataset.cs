@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using System.Security.AccessControl;
 
 namespace SOS.DataStewardship.Api.Models
 { 
@@ -17,6 +18,14 @@ namespace SOS.DataStewardship.Api.Models
         [Required]
         [DataMember(Name="identifier")]
         public string Identifier { get; set; }
+
+        /// <summary>
+        /// States which Creative Commons license that is applied to the dataset.  Note that any attachments included in the dataset have their own separate licenses.
+        /// </summary>
+        /// <value>States which Creative Commons license that is applied to the dataset.  Note that any attachments included in the dataset have their own separate licenses.</value>
+        [Required]
+        [DataMember(Name = "license")]
+        public string License { get; set; }
 
         /// <summary>
         /// Name of the dataset. Can sometimes be the same as the name of the project.
@@ -38,28 +47,29 @@ namespace SOS.DataStewardship.Api.Models
         public string ProjectCode { get; set; }
 
         /// <summary>
-        /// Assigner
+        /// The organisation that orders the data collection.
         /// </summary>
         [Required]
         [DataMember(Name="assigner")]
         public Organisation Assigner { get; set; }
 
         /// <summary>
-        /// Creator
+        /// The organisation responsible for the data collection. More than  one organisation can be given here.
         /// </summary>
+        /// <value>The organisation responsible for the data collection. More than  one organisation can be given here.</value>
         [Required]
-        [DataMember(Name="creator")]
-        public Organisation Creator { get; set; }
+        [DataMember(Name = "creator")]
+        public List<Organisation> Creator { get; set; }
 
         /// <summary>
-        /// OwnerinstitutionCode
+        /// The organisation that is responsible for the information in the dataset.
         /// </summary>
         [Required]
         [DataMember(Name="ownerinstitutionCode")]
         public Organisation OwnerinstitutionCode { get; set; }
 
         /// <summary>
-        /// Publisher
+        /// The organisation that receives the dataset from the data provider. Responsible for making the dataset accessible. (Also corresponding to: data host)
         /// </summary>
         [Required]
         [DataMember(Name="publisher")]

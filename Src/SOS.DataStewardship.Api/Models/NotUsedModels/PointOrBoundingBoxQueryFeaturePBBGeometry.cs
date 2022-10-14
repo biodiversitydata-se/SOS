@@ -4,35 +4,35 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace SOS.DataStewardship.Api.Models
-{ 
+namespace SOS.DataStewardship.Api.Models.NotUsedModels
+{
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
-    public class LineOrPolygonQueryFeatureLPGeometry
-    { 
+    public class PointOrBoundingBoxQueryFeaturePBBGeometry
+    {
         /// <summary>
         /// Type enum
         /// </summary>
         public enum TypeEnum
         {
             /// <summary>
-            /// Polygon
+            /// Point
             /// </summary>
-            [EnumMember(Value = "Polygon")]
-            Polygon = 0,
+            [EnumMember(Value = "Point")]
+            PointEnum = 0,
             /// <summary>
-            /// LineString
+            /// BoundingBox
             /// </summary>
-            [EnumMember(Value = "LineString")]
-            LineString = 1
+            [EnumMember(Value = "BoundingBox")]
+            BoundingBoxEnum = 1
         }
 
         /// <summary>
         /// Type
         /// </summary>
-        [DataMember(Name="type")]
+        [DataMember(Name = "type")]
         public TypeEnum? Type { get; set; }
     }
 }

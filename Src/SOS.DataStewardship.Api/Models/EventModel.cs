@@ -7,13 +7,13 @@ using System.Runtime.Serialization;
 namespace SOS.DataStewardship.Api.Models
 {
     /// <summary>
-    /// Event
+    /// A specified event when organisms were surveyed according to a specified methodology at a specific place.
     /// </summary>
     [DataContract]
     public class EventModel
     { 
         /// <summary>
-        /// A unique id for the survey event within a specific dataset hosted by the respective datahosts. A survey event is usually a visit to a survey area/site. A survey event can also be a visit to a smaller defined part of a survey area/site or one of several samples from the same place. The term survey event can also represent a specific period or season. What eventID is representing is given in the attribute type.
+        /// A unique id for the survey event within a specific dataset hosted by the respective datahosts. A survey event is usually a visit to a survey area/site. A survey event can also be a visit to a smaller defined part of a survey area/site or one of several samples from the same place. The term survey event can also represent a specific period or season. What eventID is representing is given in the attribute eventType.
         /// </summary>
         [Required]
         [DataMember(Name="eventID")]
@@ -58,7 +58,7 @@ namespace SOS.DataStewardship.Api.Models
         /// </summary>
         [Required]
         [DataMember(Name="surveyLocation")]
-        public Object SurveyLocation { get; set; }
+        public Location SurveyLocation { get; set; }        
 
         /// <summary>
         /// Name or code for the person conducting the survey. Several names or codes can be given.
@@ -79,7 +79,7 @@ namespace SOS.DataStewardship.Api.Models
         public string SamplingProtocol { get; set; }
 
         /// <summary>
-        /// Weather
+        /// Information about the weather conditions during the survey event.
         /// </summary>
         [DataMember(Name="weather")]
         public WeatherVariable Weather { get; set; }

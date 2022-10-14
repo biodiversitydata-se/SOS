@@ -21,10 +21,13 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 OrganisationCode = "Naturvårdsverket"
             },
             // Creator = Utförare av datainsamling.
-            Creator = new Organisation 
-            {
-                OrganisationID = "OrganisationId-unknown",
-                OrganisationCode = "SLU Artdatabanken"
+            Creator = new List<Organisation> 
+            { 
+                new Organisation
+                {
+                    OrganisationID = "OrganisationId-unknown",
+                    OrganisationCode = "SLU Artdatabanken"
+                }
             },
             // Finns inte alltid i AP, behöver skapas/hämtasandra DV informationskällor?
             OwnerinstitutionCode = new Organisation
@@ -72,7 +75,20 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             EventStartDate = new DateTime(2012, 3, 6, 8, 0, 0),
             EventEndDate = new DateTime(2012, 3, 6, 13, 0, 0),
             LocationProtected = false,
-            SurveyLocation = "Karlsborgs fästning, Vg", // Location.Locality
+            //SurveyLocation = "Karlsborgs fästning, Vg", // Location.Locality
+            SurveyLocation = new Location
+            {
+                Locality = "Karlsborgs fästning, Vg",
+                County = County.VästraGötalandsLän,
+                Municipality = Municipality.Karlsborg,
+                LocationType = Location.LocationTypeEnum.Punkt,
+                Emplacement = new PointGeoShape(new GeoCoordinate(58.01221, 14.96721)),
+                EmplacementTest = new GeometryObject
+                {
+                    Type = "point",
+                    Coordinates = new double[] { 58.01221, 14.96721 }
+                }
+            },
             SamplingProtocol = "Undersökningstyp fladdermöss - artkartering",
             NoObservations = EventModel.NoObservationsEnum.Falskt,
             Occurrences = new List<string>
@@ -115,15 +131,13 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), // Ej obligatorisk, men kan sättas om StartDate och EndDate har samma värde. EventDate ger tiden för själva besöket (t.ex. från 8:10 på morgonen till 11:36 på förmiddagen. Occ under den tiden gjordes en obs av spillkråka kl 10:54. Det är den tiden (10:54) som är observationstidpunkt.
             BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,
             IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, // Ovaliderad  // för värdelistan väntar vi på vad arbetsgruppen för verifieringsmodulen skulle ha som slutgiltig förslag på kategorier - vi bör fråga de om att få den listan         
-            ObservationCertainty = 200m, 
-            ObservationPoint = new PointGeometry
+            ObservationCertainty = 200m,
+            ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
+            ObservationPointTest = new GeometryObject
             {
                 Type = "point",
-                Geometry = new PointGeometryGeometry
-                {
-                    Coordinates = new List<decimal?> { 14.52667m, 58.52845m }
-                }
-            },
+                Coordinates = new double[] { 58.52845, 14.52667 }
+            },            
             OccurrenceRemarks = "Östra utfallsgången",
             OccurrenceStatus = OccurrenceModel.OccurrenceStatusEnum.Observerad,
             Organism = new OrganismVariable
@@ -155,14 +169,12 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,            
             IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, 
             ObservationCertainty = 200m,
-            ObservationPoint = new PointGeometry
+            ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
+            ObservationPointTest = new GeometryObject
             {
                 Type = "point",
-                Geometry = new PointGeometryGeometry
-                {
-                    Coordinates = new List<decimal?> { 14.52667m, 58.52845m }
-                }
-            },
+                Coordinates = new double[] { 58.52845, 14.52667 }
+            },            
             OccurrenceRemarks = "Östra utfallsgången",
             OccurrenceStatus = OccurrenceModel.OccurrenceStatusEnum.Observerad,
             Organism = new OrganismVariable
@@ -194,13 +206,11 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,
             IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
             ObservationCertainty = 200m,
-            ObservationPoint = new PointGeometry
+            ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
+            ObservationPointTest = new GeometryObject
             {
                 Type = "point",
-                Geometry = new PointGeometryGeometry
-                {
-                    Coordinates = new List<decimal?> { 14.52667m, 58.52845m }
-                }
+                Coordinates = new double[] { 58.52845, 14.52667 }
             },
             OccurrenceRemarks = "Västra blindgången",
             OccurrenceStatus = OccurrenceModel.OccurrenceStatusEnum.Observerad,
@@ -236,7 +246,20 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             EventStartDate = new DateTime(2016, 7, 14),
             EventEndDate = new DateTime(2016, 7, 15),
             LocationProtected = false,
-            SurveyLocation = "Allarps bjär, Sk", // Location.Locality
+            //SurveyLocation = "Allarps bjär, Sk", // Location.Locality
+            SurveyLocation = new Location
+            {
+                Locality = "Karlsborgs fästning, Vg",
+                County = County.VästraGötalandsLän,
+                Municipality = Municipality.Karlsborg,
+                LocationType = Location.LocationTypeEnum.Punkt,
+                Emplacement = new PointGeoShape(new GeoCoordinate(58.01221, 14.96721)),
+                EmplacementTest = new GeometryObject
+                {
+                    Type = "point",
+                    Coordinates = new double[] { 58.01221, 14.96721 }
+                }
+            },
             SamplingProtocol = "Undersökningstyp fladdermöss - artkartering",
             NoObservations = EventModel.NoObservationsEnum.Falskt,
             Occurrences = new List<string>
@@ -274,13 +297,11 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,
             IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
             ObservationCertainty = 5m,
-            ObservationPoint = new PointGeometry
+            ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
+            ObservationPointTest = new GeometryObject
             {
                 Type = "point",
-                Geometry = new PointGeometryGeometry
-                {
-                    Coordinates = new List<decimal?> { 13.42109m, 55.99346m }
-                }
+                Coordinates = new double[] { 58.52845, 14.52667 }
             },
             OccurrenceRemarks = null,
             OccurrenceStatus = OccurrenceModel.OccurrenceStatusEnum.Observerad,
@@ -313,14 +334,11 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,
             IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
             ObservationCertainty = 5m,
-            ObservationPoint = new PointGeometry
+            ObservationPointTest = new GeometryObject
             {
                 Type = "point",
-                Geometry = new PointGeometryGeometry
-                {
-                    Coordinates = new List<decimal?> { 13.42109m, 55.99346m }
-                }
-            },
+                Coordinates = new double[] { 58.52845, 14.52667 }
+            },            
             OccurrenceRemarks = null,
             OccurrenceStatus = OccurrenceModel.OccurrenceStatusEnum.Observerad,
             Organism = new OrganismVariable
