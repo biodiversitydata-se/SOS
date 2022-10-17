@@ -132,7 +132,7 @@ namespace SOS.Lib.Extensions
                 .GeoShape(gs => gs
                     .Name(nn => nn.PointWithDisturbanceBuffer)
                 )
-                .KeyWordLowerCase(kwlc => kwlc.CountryCode, false)
+                .KeyWordLowerCase(kwlc => kwlc.CountryCode)
                 .KeyWordLowerCase(kwlc => kwlc.FootprintSRS, false)
                 .KeyWordLowerCase(kwlc => kwlc.GeodeticDatum, false)
                 .KeyWordLowerCase(kwlc => kwlc.GeoreferencedBy, false)
@@ -147,7 +147,7 @@ namespace SOS.Lib.Extensions
                 .KeyWordLowerCase(kwlc => kwlc.Locality)
                 .KeyWordLowerCase(kwlc => kwlc.LocationRemarks, false)
                 .KeyWordLowerCase(kwlc => kwlc.LocationAccordingTo, false)
-                .KeyWordLowerCase(kwlc => kwlc.LocationId, false)
+                .KeyWordLowerCase(kwlc => kwlc.LocationId)
                 .KeyWordLowerCase(kwlc => kwlc.FootprintSpatialFit, false)
                 .KeyWordLowerCase(kwlc => kwlc.FootprintWKT, false)
                 .KeyWordLowerCase(kwlc => kwlc.GeoreferenceRemarks, false)
@@ -157,7 +157,7 @@ namespace SOS.Lib.Extensions
                 .KeyWordLowerCase(kwlc => kwlc.VerbatimDepth, false)
                 .KeyWordLowerCase(kwlc => kwlc.VerbatimElevation, false)
                 .KeyWordLowerCase(kwlc => kwlc.VerbatimLatitude, false)  
-                .KeyWordLowerCase(kwlc => kwlc.VerbatimLocality, true) // WFS
+                .KeyWordLowerCase(kwlc => kwlc.VerbatimLocality) // WFS
                 .KeyWordLowerCase(kwlc => kwlc.VerbatimLongitude, false)
                 .KeyWordLowerCase(kwlc => kwlc.VerbatimSRS, false)
                 .KeyWordLowerCase(kwlc => kwlc.WaterBody, false)
