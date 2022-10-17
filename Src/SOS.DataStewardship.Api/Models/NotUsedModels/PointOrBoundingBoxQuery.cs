@@ -2,18 +2,18 @@ using System;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace SOS.DataStewardship.Api.Models
-{ 
+namespace SOS.DataStewardship.Api.Models.NotUsedModels
+{
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
     public class PointOrBoundingBoxQuery
-    { 
+    {
         /// <summary>
         /// FeaturePBB
         /// </summary>
-        [DataMember(Name="featurePBB")]
+        [DataMember(Name = "featurePBB")]
         public PointOrBoundingBoxQueryFeaturePBB FeaturePBB { get; set; }
     }
 }

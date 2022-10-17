@@ -23,11 +23,14 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                     OrganisationID = "2021001975",
                     OrganisationCode = "Naturvårdsverket"
                 },
-                Creator = new Organisation
+                Creator = new List<Organisation>
                 {
-                    OrganisationID = "OrganisationId",
-                    OrganisationCode = "OrganisationCode"
-                },
+                    new Organisation
+                    {
+                        OrganisationID = "OrganisationId",
+                        OrganisationCode = "OrganisationCode"
+                    }
+                },                
                 OwnerinstitutionCode = new Organisation
                 {
                     OrganisationID = "OrganisationId",
@@ -109,7 +112,20 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 }
             },
             SamplingProtocol = "SamplingProtocol",
-            SurveyLocation = "SurveyLocation",
+            //SurveyLocation = "SurveyLocation",
+            SurveyLocation = new Location
+            {
+                Locality = "Karlsborgs fästning, Vg",
+                County = County.VästraGötalandsLän,
+                Municipality = Municipality.Karlsborg,
+                LocationType = Location.LocationTypeEnum.Punkt,
+                Emplacement = new PointGeoShape(new GeoCoordinate(58.01221, 14.96721)),
+                EmplacementTest = new GeometryObject
+                {
+                    Type = "point",
+                    Coordinates = new double[] { 58.01221, 14.96721 }
+                }
+            },
             Weather = new WeatherVariable()
             {
                 AirTemperature  = new WeatherMeasuring

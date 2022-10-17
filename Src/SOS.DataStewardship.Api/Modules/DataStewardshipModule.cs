@@ -36,7 +36,8 @@ public class DataStewardshipModule : IModule
     public void MapEndpoints(WebApplication application)
     {        
         application.MapGet("/datastewardship/datasets/{id}", GetDatasetByIdAsync)
-            .Produces<Dataset>(StatusCodes.Status200OK)
+            .Produces<Dataset>(StatusCodes.Status200OK, "application/json")
+            .Produces<Dataset>(StatusCodes.Status200OK, "text/csv")
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)

@@ -1,13 +1,15 @@
+using QuikGraph.Algorithms.Observers;
 using SOS.DataStewardship.Api.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.Runtime.Serialization;
 
 namespace SOS.DataStewardship.Api.Models
 {
     /// <summary>
-    /// 
+    /// A specific observation of an organism or a uniform group of organisms made at an event.
     /// </summary>
     [DataContract]
     public class OccurrenceModel
@@ -63,10 +65,14 @@ namespace SOS.DataStewardship.Api.Models
         /// The specific place where an organism was located when it was observed.
         /// </summary>
         [DataMember(Name="observationPoint")]
-        public Object ObservationPoint { get; set; }
+        public IGeoShape ObservationPoint { get; set; }
+
+        // Decide if to observationPoint should use IGeoShape or GeometryObject data type.
+        [DataMember(Name = "observationPointTest")]
+        public GeometryObject ObservationPointTest { get; set; }
 
         /// <summary>
-        /// Taxon
+        /// Taxonomic information about the observation. States which species (or subspecies, species aggregation, genus, family etc) was observed and identified.
         /// </summary>
         [Required]
         [DataMember(Name="taxon")]

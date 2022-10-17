@@ -1,42 +1,38 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace SOS.DataStewardship.Api.Models
-{ 
+namespace SOS.DataStewardship.Api.Models.NotUsedModels
+{
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
-    public class LineGeometryGeometry
-    { 
+    public class LineOrPolygonQueryFeatureLPGeometry
+    {
         /// <summary>
         /// Type enum
         /// </summary>
         public enum TypeEnum
         {
             /// <summary>
+            /// Polygon
+            /// </summary>
+            [EnumMember(Value = "Polygon")]
+            Polygon = 0,
+            /// <summary>
             /// LineString
             /// </summary>
             [EnumMember(Value = "LineString")]
-            LineString = 0
+            LineString = 1
         }
 
         /// <summary>
         /// Type
         /// </summary>
-        [Required]
-        [DataMember(Name="type")]
+        [DataMember(Name = "type")]
         public TypeEnum? Type { get; set; }
-
-        /// <summary>
-        /// Coordinates
-        /// </summary>
-        [Required]
-        [DataMember(Name="coordinates")]
-        public List<List<decimal?>> Coordinates { get; set; }
     }
 }

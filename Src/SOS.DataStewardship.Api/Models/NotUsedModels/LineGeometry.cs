@@ -3,33 +3,33 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace SOS.DataStewardship.Api.Models
-{ 
+namespace SOS.DataStewardship.Api.Models.NotUsedModels
+{
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
-    public class PolygonGeometry
-    { 
+    public class LineGeometry
+    {
         /// <summary>
         /// Type
         /// </summary>
         [Required]
-        [DataMember(Name="type")]
+        [DataMember(Name = "type")]
         public string Type { get; set; }
 
         /// <summary>
         /// Geometry
         /// </summary>
         [Required]
-        [DataMember(Name="geometry")]
-        public PolygonGeometryGeometry Geometry { get; set; }
+        [DataMember(Name = "geometry")]
+        public LineGeometryGeometry Geometry { get; set; }
 
         /// <summary>
         /// Properties
         /// </summary>
         [Required]
-        [DataMember(Name="properties")]
+        [DataMember(Name = "properties")]
         public PointGeometryProperties Properties { get; set; }
     }
 }

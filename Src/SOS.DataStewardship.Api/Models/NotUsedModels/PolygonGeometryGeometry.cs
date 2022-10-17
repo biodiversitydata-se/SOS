@@ -5,38 +5,38 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace SOS.DataStewardship.Api.Models
-{ 
+namespace SOS.DataStewardship.Api.Models.NotUsedModels
+{
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
-    public class PointGeometryGeometry
-    { 
+    public class PolygonGeometryGeometry
+    {
         /// <summary>
-        /// Type enum
+        /// Type
         /// </summary>
         public enum TypeEnum
         {
             /// <summary>
-            /// Point
+            /// Polygon
             /// </summary>
-            [EnumMember(Value = "Point")]
-            Point = 0
+            [EnumMember(Value = "Polygon")]
+            PolygonEnum = 0
         }
 
         /// <summary>
         /// Type
         /// </summary>
         [Required]
-        [DataMember(Name="type")]
+        [DataMember(Name = "type")]
         public TypeEnum? Type { get; set; }
 
         /// <summary>
         /// Coordinates
         /// </summary>
         [Required]
-        [DataMember(Name="coordinates")]
-        public List<decimal?> Coordinates { get; set; }
+        [DataMember(Name = "coordinates")]
+        public List<List<List<decimal?>>> Coordinates { get; set; }
     }
 }

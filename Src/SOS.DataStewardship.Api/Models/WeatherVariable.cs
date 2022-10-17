@@ -39,13 +39,13 @@ namespace SOS.DataStewardship.Api.Models
         public SnowCoverEnum? SnowCover { get; set; }
 
         /// <summary>
-        /// Sunshine
+        /// States the amount of sunshine during the survey event.
         /// </summary>
         [DataMember(Name="sunshine")]
         public WeatherMeasuring Sunshine { get; set; }
 
         /// <summary>
-        /// AirTemperature
+        /// States the air temperature during the survey event.
         /// </summary>
         [DataMember(Name="airTemperature")]
         public WeatherMeasuring AirTemperature { get; set; }
@@ -104,7 +104,7 @@ namespace SOS.DataStewardship.Api.Models
         public WindDirectionCompassEnum? WindDirectionCompass { get; set; }
 
         /// <summary>
-        /// WindDirectionDegrees
+        /// States the wind direction during the survey event as a number of degrees.
         /// </summary>
         [DataMember(Name="windDirectionDegrees")]
         public WeatherMeasuring WindDirectionDegrees { get; set; }
