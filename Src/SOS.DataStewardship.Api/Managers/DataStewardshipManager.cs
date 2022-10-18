@@ -45,9 +45,9 @@ public class DataStewardshipManager : IDataStewardshipManager
 
     public async Task<EventModel> GetEventByIdAsync(string id)
     {
-        var filter = new SearchFilter(0);
+        var filter = new SearchFilter(0);        
         filter.EventIds = new List<string> { id };
-        var processedObservations = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 1);
+        var processedObservations = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 1, true);
         var observation = processedObservations.Records.FirstOrDefault();
         Observation obs = CastDynamicToObservation(observation);
         var occurrenceIds = await _processedObservationCoreRepository.GetAllAggregationItemsAsync(filter, "occurrence.occurrenceId");
@@ -68,7 +68,7 @@ public class DataStewardshipManager : IDataStewardshipManager
     public async Task<OccurrenceModel> GetOccurrenceByIdAsync(string id)
     {
         var filter = new SearchFilter(0);                
-        IEnumerable<dynamic> observations = await _processedObservationCoreRepository.GetObservationAsync(id, filter);
+        IEnumerable<dynamic> observations = await _processedObservationCoreRepository.GetObservationAsync(id, filter, true);
         var observation = observations.FirstOrDefault();
         Observation obs = CastDynamicToObservation(observation);
         var occurrence = obs.ToOccurrenceModel();
@@ -96,10 +96,8 @@ public class DataStewardshipManager : IDataStewardshipManager
 
     private Observation CastDynamicToObservation(dynamic dynamicObject)
     {
-        if (dynamicObject == null) return null;        
-        return JsonSerializer.Deserialize<Observation>(JsonSerializer.Serialize(dynamicObject),
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        //return JsonSerializer.Deserialize<Observation>(JsonSerializer.Serialize(dynamicObject, _jsonSerializerOptions), _jsonSerializerOptions);
+        if (dynamicObject == null) return null;                
+        return JsonSerializer.Deserialize<Observation>(JsonSerializer.Serialize(dynamicObject, _jsonSerializerOptions), _jsonSerializerOptions);
     }
 
     private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)

@@ -5,6 +5,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using SOS.DataStewardship.Api.Managers.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using SOS.Lib.JsonConverters;
 
 namespace SOS.DataStewardship.Api.Modules;
 
@@ -28,8 +29,10 @@ public class DataStewardshipModule : IModule
     private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
     {
         Converters =
-        {
-            new JsonStringEnumConverter()
+        {            
+            new JsonStringEnumConverter(),
+            new GeoShapeConverter(),
+            new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
         }
     };
 

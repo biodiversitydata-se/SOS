@@ -790,7 +790,7 @@ namespace SOS.Lib
         /// Build a projection string
         /// </summary>
         /// <param name="properties"></param>
-        /// <param name="isInternal"></param>
+        /// <param name="isInternal"></param>        
         /// <returns></returns>
         public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> properties,
             bool isInternal)
