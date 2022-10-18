@@ -43,7 +43,7 @@ public class DataStewardshipModule : IModule
             .Produces(StatusCodes.Status500InternalServerError)
             .WithName("GetDatasetById")
             .WithTags("DataStewardship")
-            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get dataset by id."));
+            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get dataset by id. Example: ArtportalenDataHost - Dataset Bats"));
             
 
         application.MapPost("/datastewardship/datasets", GetDatasetsBySearchAsync)
@@ -62,7 +62,7 @@ public class DataStewardshipModule : IModule
             .Produces(StatusCodes.Status500InternalServerError)
             .WithName("GetEventById")
             .WithTags("DataStewardship")
-            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get event by id."));
+            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get event by id. Example: urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10002293427000658739"));
 
         application.MapPost("/datastewardship/events", GetEventsBySearchAsync)
             .Produces<List<EventModel>>(StatusCodes.Status200OK)            
@@ -79,7 +79,7 @@ public class DataStewardshipModule : IModule
             .Produces(StatusCodes.Status500InternalServerError)
             .WithName("GetOccurrenceById")
             .WithTags("DataStewardship")
-            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get occurrence by id."));
+            .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get occurrence by id. Example: urn:lsid:artportalen.se:sighting:98571689"));
 
         application.MapPost("/datastewardship/occurrences", GetOccurrencesBySearchAsync)
             .Produces<List<OccurrenceModel>>(StatusCodes.Status200OK)
