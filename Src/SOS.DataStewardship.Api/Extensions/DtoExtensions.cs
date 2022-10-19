@@ -98,7 +98,7 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.EventStartDate = observation.Event.StartDate;
             ev.EventEndDate = observation.Event.EndDate;
             ev.SamplingProtocol = observation.Event.SamplingProtocol;
-            //ev.SurveyLocation = ? // location data
+            ev.SurveyLocation = observation.ToLocation();
             //ev.LocationProtected = ?
             //ev.EventType = ?
             //ev.Weather = ?
@@ -130,6 +130,32 @@ namespace SOS.DataStewardship.Api.Extensions
 
             return ev;
         }
+
+        public static Models.Location ToLocation(this Observation observation)
+        {
+            County? county = observation?.Location?.County?.FeatureId?.GetCounty();
+
+            var location = new Models.Location()
+            {
+                County = county.Value,
+                //Province = 
+                //Municipality =
+                //Parish =
+                Locality = observation?.Location?.Locality,
+                LocationID = observation?.Location?.LocationId,
+                LocationRemarks = observation?.Location.LocationRemarks,
+                //LocationType = // ? todo - add location type to models.
+                Emplacement = observation?.Location?.Point, // todo - decide if to use Point or PointWithBuffer
+                EmplacementTest = new GeometryObject
+                {
+                    Type = "point",
+                    Coordinates = new double[] { observation.Location.Point.Coordinates.Longitude, observation.Location.Point.Coordinates.Latitude }
+                }
+            };
+
+            return location;
+        }
+
         public static List<AssociatedMedia> ToAssociatedMedias(this IEnumerable<Multimedia> multimedias)
         {
             if (multimedias == null || !multimedias.Any()) return null;
@@ -177,7 +203,12 @@ namespace SOS.DataStewardship.Api.Extensions
             occurrence.Event = observation.Event.EventId;
             occurrence.IdentificationVerificationStatus = Models.OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas; // todo - implement when the value list is defined
             occurrence.ObservationCertainty = Convert.ToDecimal(observation.Location.CoordinateUncertaintyInMeters);
-            //occurrence.ObservationPoint = ? // todo - definte geometry type in a proper way            
+            occurrence.ObservationPoint = observation.Location.Point;
+            occurrence.ObservationPointTest = new GeometryObject
+            {
+                Type = "point",
+                Coordinates = new double[] { observation.Location.Point.Coordinates.Longitude, observation.Location.Point.Coordinates.Latitude }
+            };
             occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;
             occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
             occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
@@ -296,6 +327,5 @@ namespace SOS.DataStewardship.Api.Extensions
                     return null;
             }
         }
-
     }
 }

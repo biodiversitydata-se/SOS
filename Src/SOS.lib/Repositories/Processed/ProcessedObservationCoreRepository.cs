@@ -1705,9 +1705,9 @@ namespace SOS.Lib.Repositories.Processed
 
             return searchResponse;
         }
-
+        
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
+        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, bool getAllFields = false)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -1718,8 +1718,8 @@ namespace SOS.Lib.Repositories.Processed
             operation.Telemetry.Properties["Filter"] = filter.ToString();
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
-                .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+                .Index(indexNames)                
+                .Source(getAllFields ? p => new SourceFilterDescriptor<dynamic>() : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .From(skip)
                 .Size(take)
                 .Query(q => q
@@ -1773,7 +1773,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc/>
-        public async Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter)
+        public async Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter, bool getAllFields = false)
         {
             var indexNames = GetCurrentIndex(filter);
             var query = filter.ToQuery(true);
@@ -1791,7 +1791,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .Size(1)
-                .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+                .Source(getAllFields ? p => new SourceFilterDescriptor<dynamic>() : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))                
                 .TrackTotalHits(false)
             );
 

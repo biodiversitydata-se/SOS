@@ -293,15 +293,18 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="skip"></param>
-        /// <param name="take"></param>        
+        /// <param name="take"></param>
+        /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take);
+        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, bool getAllFields = false);
 
         /// <summary>
         /// Gets a single observation
         /// </summary>
         /// <param name="occurrenceId"></param>
+        /// <param name="filter"></param>
+        /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
         /// <returns></returns>
-        Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter);
+        Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter, bool getAllFields = false);
     }
 }
