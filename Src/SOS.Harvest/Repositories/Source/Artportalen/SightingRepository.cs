@@ -215,7 +215,12 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             WHERE 
 	            st.StartDate > '{from.ToLocalTime().ToString("yyyy-MM-dd hh:mm")}'
 	            AND st.SightingStateTypeId = 50
-	            AND st.isactive = 1";
+	            AND st.isactive = 1
+            UNION
+			SELECT 
+				TemporaryRemovedSightingId
+			FROM 
+				TemporaryRemovedSightingIds";
 
             return await QueryAsync<int>(query, null!);
         }
