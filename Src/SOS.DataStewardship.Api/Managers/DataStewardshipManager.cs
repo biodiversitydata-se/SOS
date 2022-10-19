@@ -1,4 +1,5 @@
-﻿using SOS.DataStewardship.Api.Extensions;
+﻿using Nest;
+using SOS.DataStewardship.Api.Extensions;
 using SOS.DataStewardship.Api.Managers.Interfaces;
 using SOS.DataStewardship.Api.Models;
 using SOS.DataStewardship.Api.Models.SampleData;
@@ -47,8 +48,8 @@ public class DataStewardshipManager : IDataStewardshipManager
     {
         var filter = new SearchFilter(0);        
         filter.EventIds = new List<string> { id };
-        var processedObservations = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 1, true);
-        var observation = processedObservations.Records.FirstOrDefault();
+        var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 1, true);
+        var observation = pageResult.Records.FirstOrDefault();
         Observation obs = CastDynamicToObservation(observation);
         var occurrenceIds = await _processedObservationCoreRepository.GetAllAggregationItemsAsync(filter, "occurrence.occurrenceId");
         var ev = obs.ToEventModel(occurrenceIds.Select(m => m.AggregationKey));
@@ -78,20 +79,24 @@ public class DataStewardshipManager : IDataStewardshipManager
 
     public async Task<List<OccurrenceModel>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take)
     {
-        return new List<OccurrenceModel> {
-            DataStewardshipArtportalenSampleData.EventBats1Occurrence1,
-            DataStewardshipArtportalenSampleData.EventBats1Occurrence2,
-            DataStewardshipArtportalenSampleData.EventBats1Occurrence3,
-            DataStewardshipArtportalenSampleData.EventBats2Occurrence1,
-            DataStewardshipArtportalenSampleData.EventBats2Occurrence2,
-        };
+        var filter = occurrenceFilter.ToSearchFilter();
+        var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, skip, take, true);
+        var observations = CastDynamicsToObservations(pageResult.Records);
+        var occurrences = observations.Select(x => x.ToOccurrenceModel()).ToList();
+        return occurrences;
+        //return new List<OccurrenceModel> {
+        //    DataStewardshipArtportalenSampleData.EventBats1Occurrence1,
+        //    DataStewardshipArtportalenSampleData.EventBats1Occurrence2,
+        //    DataStewardshipArtportalenSampleData.EventBats1Occurrence3,
+        //    DataStewardshipArtportalenSampleData.EventBats2Occurrence1,
+        //    DataStewardshipArtportalenSampleData.EventBats2Occurrence2,
+        //};
     }
 
     private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)
     {
-        if (dynamicObjects == null) return null;
-        return JsonSerializer.Deserialize<List<Observation>>(JsonSerializer.Serialize(dynamicObjects),
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        if (dynamicObjects == null) return null;        
+        return JsonSerializer.Deserialize<List<Observation>>(JsonSerializer.Serialize(dynamicObjects, _jsonSerializerOptions), _jsonSerializerOptions);
     }
 
     private Observation CastDynamicToObservation(dynamic dynamicObject)

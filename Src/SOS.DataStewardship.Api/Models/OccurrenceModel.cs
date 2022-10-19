@@ -62,6 +62,27 @@ namespace SOS.DataStewardship.Api.Models
         public DateTime? ObservationTime { get; set; }
 
         /// <summary>
+        /// Date and Time for when the survey started (local time).
+        /// </summary>
+        /// <remarks>
+        /// Newly added property
+        /// </remarks>
+        /// <value>Date and Time for when the survey started (local time).</value>
+        [Required]
+        [DataMember(Name = "eventStartDate")]
+        public DateTime? EventStartDate { get; set; }
+
+        /// <summary>
+        /// Date and Time for when the survey ended (local time).
+        /// </summary>
+        /// <remarks>
+        /// Newly added property
+        /// </remarks>
+        [Required]
+        [DataMember(Name = "eventEndDate")]
+        public DateTime? EventEndDate { get; set; }
+
+        /// <summary>
         /// The specific place where an organism was located when it was observed.
         /// </summary>
         [DataMember(Name="observationPoint")]
@@ -266,5 +287,13 @@ namespace SOS.DataStewardship.Api.Models
         /// </summary>
         [DataMember(Name="event")]
         public string Event { get; set; }
+
+        /// <summary>
+        /// Data stewardship dataset identifier.
+        /// </summary>
+        /// <remarks>
+        /// Newly added property
+        /// </remarks>
+        public string DatasetIdentifier { get; set; }
     }
 }

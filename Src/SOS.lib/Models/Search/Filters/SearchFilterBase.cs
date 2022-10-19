@@ -133,7 +133,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// </summary>
         public int? BirdNestActivityLimit { get; set; }
 
-        public string DataStewardshipDatasetId { get; set; }
+        public List<string> DataStewardshipDatasetIds { get; set; }
 
         public List<string> EventIds { get; set; }
 

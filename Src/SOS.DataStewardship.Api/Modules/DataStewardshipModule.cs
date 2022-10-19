@@ -12,29 +12,23 @@ namespace SOS.DataStewardship.Api.Modules;
 public class DataStewardshipModule : IModule
 {
     /*
+     * API specification
+     * =================
+     * Complete: https://github.com/Lund-University-Biodiversity-data/datahost-api/blob/main/api/openapi.yaml
+     * Template: https://github.com/Lund-University-Biodiversity-data/datahost-api/blob/main/api/templateOpenapi.yaml
+     * 
      * Todo
-     * ====     
-     * 1. Add proper geometry handling in models and endpoints.
-     * 2. Implement filter search     
-     * 3. Create event index in ES or store all event data in observations?
-     * 4. Create integration tests 
-     * 5. Update models with latest specification (https://github.com/Lund-University-Biodiversity-data/datahost-api/blob/main/api/openapi.yaml)
-     * 6. Create sample request-response for other data providers
-     * 7. Implement Artportalen dataset database tables
-     * 8. Implement harvest Artportalen dataset database tables
-     * 9. Implement harvest Artportalen data stewardship harvesting.
-     * 10. Implement sample event DwC-A data stewardship harvesting.
-     */
-
-    private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
-    {
-        Converters =
-        {            
-            new JsonStringEnumConverter(),
-            new GeoShapeConverter(),
-            new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
-        }
-    };
+     * ====          
+     * 1. Implement filter search     
+     * 2. Create event index in ES or store all event data in observations?
+     * 3. Create integration tests
+     * 4. Implement Artportalen dataset database tables
+     * 5. Implement harvest Artportalen dataset database tables
+     * 6. Implement harvest Artportalen data stewardship harvesting.
+     * 7. Implement sample event DwC-A data stewardship harvesting.
+     * 8. Optimize ES search projection. Now every fields are retrieved just for convenience during development. SearchExtensionsObservation.ToProjection().
+     * 9. Implement logging
+     */    
 
     public void MapEndpoints(WebApplication application)
     {        
@@ -104,9 +98,8 @@ public class DataStewardshipModule : IModule
         try
         {
             var dataset = await dataStewardshipManager.GetDatasetByIdAsync(id);
-            if (dataset == null) return Results.NotFound();
-            return Results.Json(dataset, _jsonSerializerOptions);
-            //return Results.Ok(dataset); // The Json setup in Progam.cs doesn't seem to work. Why?
+            if (dataset == null) return Results.NotFound();            
+            return Results.Ok(dataset);
         }
         catch (Exception ex)
         {
@@ -128,9 +121,8 @@ public class DataStewardshipModule : IModule
     {
         try
         {
-            var datasets = await dataStewardshipManager.GetDatasetsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));
-            return Results.Json(datasets, _jsonSerializerOptions);
-            //return Results.Ok(datasets); // The Json setup in Progam.cs doesn't seem to work. Why?
+            var datasets = await dataStewardshipManager.GetDatasetsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));            
+            return Results.Ok(datasets);
         }
         catch (Exception ex)
         {
@@ -149,9 +141,8 @@ public class DataStewardshipModule : IModule
         try
         {
             var eventModel = await dataStewardshipManager.GetEventByIdAsync(id);
-            if (eventModel == null) return Results.NotFound();
-            return Results.Json(eventModel, _jsonSerializerOptions);
-            //return Results.Ok(dataset); // The Json setup in Progam.cs doesn't seem to work. Why?
+            if (eventModel == null) return Results.NotFound();            
+            return Results.Ok(eventModel);
         }
         catch (Exception ex)
         {
@@ -173,9 +164,8 @@ public class DataStewardshipModule : IModule
     {
         try
         {
-            var eventModels = await dataStewardshipManager.GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));
-            return Results.Json(eventModels, _jsonSerializerOptions);
-            //return Results.Ok(eventModels); // The Json setup in Progam.cs doesn't seem to work. Why?
+            var eventModels = await dataStewardshipManager.GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));            
+            return Results.Ok(eventModels);
         }
         catch (Exception ex)
         {
@@ -194,9 +184,8 @@ public class DataStewardshipModule : IModule
         try
         {
             var occurrenceModel = await dataStewardshipManager.GetOccurrenceByIdAsync(id);
-            if (occurrenceModel == null) return Results.NotFound();            
-            return Results.Json(occurrenceModel, _jsonSerializerOptions);
-            //return Results.Ok(occurrenceModel); // The Json setup in Progam.cs doesn't seem to work. Why?
+            if (occurrenceModel == null) return Results.NotFound();                        
+            return Results.Ok(occurrenceModel);
         }
         catch (Exception ex)
         {
@@ -220,9 +209,8 @@ public class DataStewardshipModule : IModule
         {
             var occurrences = await dataStewardshipManager.GetOccurrencesBySearchAsync(filter, 
                 skip.GetValueOrDefault(0), 
-                take.GetValueOrDefault(20));
-
-            return Results.Ok(occurrences);            
+                take.GetValueOrDefault(20));            
+            return Results.Ok(occurrences);
         }
         catch (Exception ex)
         {

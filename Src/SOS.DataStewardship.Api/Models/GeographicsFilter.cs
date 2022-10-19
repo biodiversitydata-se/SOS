@@ -13,15 +13,15 @@ namespace SOS.DataStewardship.Api.Models
     public class GeographicsFilter
     {
         [DataMember(Name = "county")]
-        public County County { get; set; }
+        public County? County { get; set; }
 
         [DataMember(Name = "municipality")]
-        public County Municipality { get; set; }
+        public Municipality? Municipality { get; set; }
 
         [DataMember(Name = "area")]
         public GeographicsFilterArea Area { get; set; }
 
         [DataMember(Name = "responseCoordinateSystem")]
-        public CoordinateSystem ResponseCoordinateSystem { get; set; }
+        public CoordinateSystem ResponseCoordinateSystem { get; set; } // todo - this is not really a filter
     }
 }
