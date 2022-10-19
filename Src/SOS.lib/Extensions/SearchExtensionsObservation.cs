@@ -731,6 +731,10 @@ namespace SOS.Lib
             query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermsCriteria("dataStewardshipDatasetId", filter.DataStewardshipDatasetIds);
+            if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
+            {                
+                query.AddExistsCriteria("dataStewardshipDatasetId");
+            }            
             query.TryAddTermsCriteria("event.eventId", filter.EventIds);
 
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);                        

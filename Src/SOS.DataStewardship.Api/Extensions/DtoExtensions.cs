@@ -339,6 +339,7 @@ namespace SOS.DataStewardship.Api.Extensions
             var filter = new SearchFilter(0);
             filter.EventIds = occurrenceFilter.EventIds;
             filter.DataStewardshipDatasetIds = occurrenceFilter.DatasetList;
+            filter.IsPartOfDataStewardshipDataset = true;
             if (occurrenceFilter.Taxon?.Ids != null && occurrenceFilter.Taxon.Ids.Any())
             {
                 filter.Taxa = new Lib.Models.Search.Filters.TaxonFilter
