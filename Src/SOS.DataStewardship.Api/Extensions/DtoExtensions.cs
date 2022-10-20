@@ -332,6 +332,37 @@ namespace SOS.DataStewardship.Api.Extensions
             }
         }
 
+        public static SearchFilter ToSearchFilter(this DatasetFilter datasetFilter)
+        {
+            if (datasetFilter == null) return null;
+
+            var filter = new SearchFilter(0);
+            filter.DataStewardshipDatasetIds = datasetFilter.DatasetList;
+            filter.IsPartOfDataStewardshipDataset = true;
+            if (datasetFilter.Taxon?.Ids != null && datasetFilter.Taxon.Ids.Any())
+            {
+                filter.Taxa = new Lib.Models.Search.Filters.TaxonFilter
+                {
+                    Ids = datasetFilter.Taxon.Ids,
+                    IncludeUnderlyingTaxa = false
+                };
+            }
+
+            if (datasetFilter.Datum != null)
+            {
+                filter.Date = new DateFilter
+                {
+                    StartDate = datasetFilter.Datum.StartDate,
+                    EndDate = datasetFilter.Datum.EndDate,
+                    DateFilterType = datasetFilter.Datum.DatumFilterType.ToDateRangeFilterType()
+                };
+            }
+
+            filter.Location = datasetFilter.Area?.ToLocationFilter();
+
+            return filter;
+        }
+
         public static SearchFilter ToSearchFilter(this EventsFilter eventsFilter)
         {
             if (eventsFilter == null) return null;

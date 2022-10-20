@@ -38,12 +38,23 @@ public class DataStewardshipManager : IDataStewardshipManager
     }
 
     public async Task<List<Dataset>> GetDatasetsBySearchAsync(DatasetFilter datasetFilter, int skip, int take)
-    {
-        List<int> taxonIds = datasetFilter?.Taxon?.Ids;
-        DateTime? startDate = datasetFilter?.Datum?.StartDate;
-        DateTime? endDate = datasetFilter?.Datum?.EndDate;
-        DatumFilterType? dateFilterType = datasetFilter?.Datum?.DatumFilterType;
-        // datasetFilter.Area.
+    {        
+        var filter = datasetFilter.ToSearchFilter();
+        await _filterManager.PrepareFilterAsync(null, null, filter);
+        var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 10000, true); // todo - when there are more than 10000 observations this solutions is no good.        
+        var observations = CastDynamicsToObservations(pageResult.Records);
+        var datasetIds = observations.Select(m => m.DataStewardshipDatasetId).Distinct();
+        List<Dataset> datasets = new List<Dataset>();
+        foreach (var datasetId in datasetIds)
+        {
+            var observationDataset = await _observationDatasetRepository.GetDatasetById(datasetId);
+            datasets.Add(observationDataset.ToDataset());
+        }
+
+        return datasets
+            .Skip(skip)
+            .Take(take)
+            .ToList();
 
         return new List<Dataset> { DataStewardshipArtportalenSampleData.DatasetBats };
     }
@@ -104,6 +115,7 @@ public class DataStewardshipManager : IDataStewardshipManager
     public async Task<List<OccurrenceModel>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take)
     {
         var filter = occurrenceFilter.ToSearchFilter();
+        await _filterManager.PrepareFilterAsync(null, null, filter);
         var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, skip, take, true);
         var observations = CastDynamicsToObservations(pageResult.Records);
         var occurrences = observations.Select(x => x.ToOccurrenceModel()).ToList();
