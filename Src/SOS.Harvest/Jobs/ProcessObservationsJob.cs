@@ -34,7 +34,6 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Models.Processed.Dataset;
 using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
 using System.Data;

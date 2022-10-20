@@ -590,7 +590,7 @@ namespace SOS.Observations.Api.Repositories
                                         .Order(SortOrder.Descending)
                                     )
                                       .Terms("locality", t => t
-                                        .Field("location.locality")
+                                        .Field("location.locality.raw")
                                         .Order(SortOrder.Descending)
                                     )
                                 )
