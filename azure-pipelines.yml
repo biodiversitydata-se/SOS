@@ -10,10 +10,15 @@ pool:
   name: default
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: Npm@1
+  displayName: 'install newman'
+  inputs:
+    command: 'custom'
+    customCommand: 'install newman -g'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: Npm@1
+  displayName: 'install newman-reporter-htmlextra'
+  inputs:
+    command: 'custom'
+    customCommand: 'install newman-reporter-htmlextra -g'
+
