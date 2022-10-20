@@ -43,7 +43,7 @@ namespace SOS.Lib.Repositories.Processed
                     .AutoMap<ObservationDataset>()
                     .Properties(ps => ps
                         .KeyWordLowerCase(kwlc => kwlc.Id)
-                        .KeyWordLowerCase(kwlc => kwlc.Identifier)
+                        .KeyWordLowerCase(kwlc => kwlc.Identifier)                        
                         .KeyWordLowerCase(kwlc => kwlc.DataStewardship)
                         .KeyWordLowerCase(kwlc => kwlc.Title, false)
                         .KeyWordLowerCase(kwlc => kwlc.ProjectId)
@@ -94,7 +94,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<ObservationDataset> GetDatasetById(string id)
         {
             var query = new List<Func<QueryContainerDescriptor<ObservationDataset>, QueryContainer>>();
-            query.TryAddTermCriteria("identifier.keyword", id);            
+            query.TryAddTermCriteria("identifier", id);            
             var searchResponse = await Client.SearchAsync<ObservationDataset>(s => s
                 .Index(IndexName)
                 .Query(q => q
@@ -187,7 +187,7 @@ namespace SOS.Lib.Repositories.Processed
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ILogger<ObservationDatasetRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
-            LiveMode = false;
+            LiveMode = true;
             _id = nameof(Observation); // The active instance should be the same as the ProcessedObservationRepository which uses the Observation type.
         }
 
