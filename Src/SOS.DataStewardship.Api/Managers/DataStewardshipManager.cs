@@ -4,6 +4,7 @@ using SOS.DataStewardship.Api.Managers.Interfaces;
 using SOS.DataStewardship.Api.Models;
 using SOS.DataStewardship.Api.Models.SampleData;
 using SOS.Lib.JsonConverters;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -13,14 +14,17 @@ public class DataStewardshipManager : IDataStewardshipManager
 {    
     private readonly IObservationDatasetRepository _observationDatasetRepository;
     private readonly IProcessedObservationCoreRepository _processedObservationCoreRepository;
+    private readonly IFilterManager _filterManager;
     private readonly ILogger<DataStewardshipManager> _logger;
 
     public DataStewardshipManager(IObservationDatasetRepository observationDatasetRepository,
         IProcessedObservationCoreRepository processedObservationCoreRepository,
+        IFilterManager filterManager,
         ILogger<DataStewardshipManager> logger)
     {
         _observationDatasetRepository = observationDatasetRepository;
         _processedObservationCoreRepository = processedObservationCoreRepository;
+        _filterManager = filterManager;
         _logger = logger;
     }
 
@@ -57,8 +61,28 @@ public class DataStewardshipManager : IDataStewardshipManager
         //return DataStewardshipArtportalenSampleData.EventBats1;
     }
 
-    public async Task<List<EventModel>> GetEventsBySearchAsync(EventsFilter filter, int skip, int take)
+    public async Task<List<EventModel>> GetEventsBySearchAsync(EventsFilter eventsFilter, int skip, int take)
     {
+        var filter = eventsFilter.ToSearchFilter();
+        await _filterManager.PrepareFilterAsync(null, null, filter);
+        var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 10000, true); // todo - when there are more than 10000 observations this solutions is no good.        
+        var observations = CastDynamicsToObservations(pageResult.Records);
+        var observationsByEventId = observations
+            .GroupBy(m => m.Event.EventId)
+            .ToDictionary(m => m.Key, m => m.ToList());
+
+        var events = new List<EventModel>();
+        foreach (var pair in observationsByEventId)
+        {
+            var eventModel = pair.Value.First().ToEventModel(pair.Value.Select(m => m.Occurrence.OccurrenceId));
+            events.Add(eventModel);
+        }
+
+        return events
+            .Skip(skip)
+            .Take(take)
+            .ToList();
+
         return new List<EventModel>
         {
             DataStewardshipArtportalenSampleData.EventBats1,
