@@ -16,6 +16,7 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -40,16 +41,49 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Map<ObservationDataset>(m => m
                     .AutoMap<ObservationDataset>()
-                    .Properties(p => p                        
-                    //.Keyword(kw => kw
-                    //    .Name(nm => nm.ProvinceFeatureId)    
-                    //)
-                    //.Keyword(kw => kw
-                    //    .Name(nm => nm.MunicipalityFeatureId)
-                    //)
-                    //.Keyword(kw => kw
-                    //    .Name(nm => nm.CountryRegionFeatureId)
-                    //)
+                    .Properties(ps => ps
+                        .KeyWordLowerCase(kwlc => kwlc.Id)
+                        .KeyWordLowerCase(kwlc => kwlc.Identifier)
+                        .KeyWordLowerCase(kwlc => kwlc.DataStewardship)
+                        .KeyWordLowerCase(kwlc => kwlc.Title, false)
+                        .KeyWordLowerCase(kwlc => kwlc.ProjectId)
+                        .KeyWordLowerCase(kwlc => kwlc.ProjectCode, false)
+                        .KeyWordLowerCase(kwlc => kwlc.Description, false)
+                        .KeyWordLowerCase(kwlc => kwlc.Spatial, false)
+                        .KeyWordLowerCase(kwlc => kwlc.Language, false)
+                        .KeyWordLowerCase(kwlc => kwlc.Metadatalanguage, false)
+                        .Object<Organisation>(t => t
+                            .AutoMap()
+                            .Name(nm => nm.Assigner)
+                            .Properties(ps => ps
+                                .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, false)
+                                .KeyWordLowerCase(kwlc => kwlc.OrganisationID, false)
+                            )
+                        )
+                        .Object<Organisation>(t => t
+                            .AutoMap()
+                            .Name(nm => nm.Creator)
+                            .Properties(ps => ps
+                                .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, false)
+                                .KeyWordLowerCase(kwlc => kwlc.OrganisationID, false)
+                            )
+                        )
+                        .Object<Organisation>(t => t
+                            .AutoMap()
+                            .Name(nm => nm.OwnerinstitutionCode)
+                            .Properties(ps => ps
+                                .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, false)
+                                .KeyWordLowerCase(kwlc => kwlc.OrganisationID, false)
+                            )
+                        )
+                        .Object<Organisation>(t => t
+                            .AutoMap()
+                            .Name(nm => nm.Publisher)
+                            .Properties(ps => ps
+                                .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, false)
+                                .KeyWordLowerCase(kwlc => kwlc.OrganisationID, false)
+                            )
+                        )
                     )
                 )
             );

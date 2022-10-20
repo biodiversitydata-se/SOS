@@ -41,22 +41,20 @@ public class DataStewardshipManager : IDataStewardshipManager
     {        
         var filter = datasetFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);
-        var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 10000, true); // todo - when there are more than 10000 observations this solutions is no good.        
-        var observations = CastDynamicsToObservations(pageResult.Records);
-        var datasetIds = observations.Select(m => m.DataStewardshipDatasetId).Distinct();
+        var datasetIdAggregationItems = await _processedObservationCoreRepository.GetAllAggregationItemsAsync(filter, "dataStewardshipDatasetId");        
         List<Dataset> datasets = new List<Dataset>();
-        foreach (var datasetId in datasetIds)
+        var datasetIds = datasetIdAggregationItems
+            .Skip(skip)
+            .Take(take);
+
+        foreach (var item in datasetIds)
         {
-            var observationDataset = await _observationDatasetRepository.GetDatasetById(datasetId);
+            var observationDataset = await _observationDatasetRepository.GetDatasetById(item.AggregationKey);
             datasets.Add(observationDataset.ToDataset());
         }
 
-        return datasets
-            .Skip(skip)
-            .Take(take)
-            .ToList();
-
-        return new List<Dataset> { DataStewardshipArtportalenSampleData.DatasetBats };
+        return datasets;
+        //return new List<Dataset> { DataStewardshipArtportalenSampleData.DatasetBats };
     }
 
     public async Task<EventModel> GetEventByIdAsync(string id)
