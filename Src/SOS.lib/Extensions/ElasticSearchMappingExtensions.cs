@@ -144,7 +144,15 @@ namespace SOS.Lib.Extensions
                 .KeyWordLowerCase(kwlc => kwlc.HigherGeographyId, false)
                 .KeyWordLowerCase(kwlc => kwlc.Island, false)
                 .KeyWordLowerCase(kwlc => kwlc.IslandGroup, false)
-                .KeyWordLowerCase(kwlc => kwlc.Locality)
+                .Keyword(kw => kw
+                    .Name(nm => nm.Locality)
+                    .Normalizer("lowercase")
+                    .Fields(f => f
+                        .Keyword(kw => kw
+                            .Name("raw")
+                        )
+                    ) 
+                )
                 .KeyWordLowerCase(kwlc => kwlc.LocationRemarks, false)
                 .KeyWordLowerCase(kwlc => kwlc.LocationAccordingTo, false)
                 .KeyWordLowerCase(kwlc => kwlc.LocationId)

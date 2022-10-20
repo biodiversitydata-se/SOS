@@ -88,9 +88,9 @@ namespace SOS.Analysis.Api.Controllers
             }
         }
 
-        protected async Task<SearchFilterDto> InitializeSearchFilterAsync(SearchFilterDto filter) {
+        protected async Task<SearchFilterInternalDto> InitializeSearchFilterAsync(SearchFilterInternalDto filter) {
 
-            filter ??= new SearchFilterDto();
+            filter ??= new SearchFilterInternalDto();
             filter.Geographics ??= new GeographicsFilterDto();
             filter.Geographics.BoundingBox = await GetBoundingBoxAsync(filter.Geographics);
             return filter;
