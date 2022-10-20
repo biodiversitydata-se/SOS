@@ -10,6 +10,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Swagger;
 using System.Net;
 using Result = CSharpFunctionalExtensions.Result;
 
@@ -64,15 +65,16 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="allowHoles">Gets or sets whether holes are allowed in the concave hull polygon.</param>
         /// <param name="coordinateSystem">Gemometry coordinate system</param>
         /// <returns></returns>
-        [HttpPost("AOO_EOO")]
+        [HttpPost("/internal/aoo_eoo")]
         [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CalculateAooAndEooAsync(
+        [InternalApi]
+        public async Task<IActionResult> CalculateAooAndEooInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
-            [FromBody] SearchFilterDto searchFilter,
+            [FromBody] SearchFilterInternalDto searchFilter,
             [FromQuery] bool? sensitiveObservations = false,
             [FromQuery] int? gridCellSizeInMeters = 2000,
             [FromQuery] bool? useCenterPoint = true,

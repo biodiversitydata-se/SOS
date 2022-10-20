@@ -58,10 +58,11 @@ namespace SOS.Analysis.Api.Managers
                 var gridCellCount = gridCellsSweRef99!.Length;
                 var gridCellArea = gridCellsSweRef99.First()!.Area / 1000000; //Calculate area in km2
                 var aoo = Math.Round((double)gridCellCount * gridCellArea, 0);
+                var transformedGeometry = eooGeometry.Transform(CoordinateSys.SWEREF99_TM, coordinateSystem);
 
-                var futureCollection = new FeatureCollection();
+                var futureCollection = new FeatureCollection() { BoundingBox = transformedGeometry?.Envelope.ToEnvelope() };
                 futureCollection.Add(new Feature(
-                    eooGeometry.Transform(CoordinateSys.SWEREF99_TM, coordinateSystem),
+                    transformedGeometry,
                     new AttributesTable(new KeyValuePair<string, object>[] {
                             new KeyValuePair<string, object>("aoo", (int)aoo),
                             new KeyValuePair<string, object>("eoo", (int)eoo),

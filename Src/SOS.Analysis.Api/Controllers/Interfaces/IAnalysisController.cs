@@ -23,10 +23,10 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="allowHoles">Gets or sets whether holes are allowed in the concave hull polygon.</param>
         /// <param name="coordinateSystem">Gemometry coordinate system</param>
         /// <returns></returns>
-        Task<IActionResult> CalculateAooAndEooAsync(
+        Task<IActionResult> CalculateAooAndEooInternalAsync(
             int? roleId,
             string? authorizationApplicationIdentifier,
-            SearchFilterDto searchFilter,
+            SearchFilterInternalDto searchFilter,
             bool? sensitiveObservations = false,
             int? gridCellSizeInMeters = 2000,
             bool? useCenterPoint = true, 

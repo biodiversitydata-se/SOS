@@ -611,6 +611,18 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Cast envelope to geoemtry
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <param name="attributes"></param>
+        /// <returns></returns>
+        public static Envelope ToEnvelope(this Geometry geometry)
+        {
+            return (geometry?.Coordinates?.Any() ?? false) ? new Envelope(geometry.Coordinates) : null;
+        }
+
+
+        /// <summary>
         ///     Cast geometry to geo json
         /// </summary>
         /// <param name="geometry"></param>
