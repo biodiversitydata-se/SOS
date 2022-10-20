@@ -1,0 +1,24 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  name: default
+
+steps:
+- task: Npm@1
+  displayName: 'install newman'
+  inputs:
+    command: 'custom'
+    customCommand: 'install newman -g'
+
+- task: Npm@1
+  displayName: 'install newman-reporter-htmlextra'
+  inputs:
+    command: 'custom'
+    customCommand: 'install newman-reporter-htmlextra -g'
+
