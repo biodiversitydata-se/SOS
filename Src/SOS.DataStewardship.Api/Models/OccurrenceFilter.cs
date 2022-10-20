@@ -9,16 +9,22 @@ namespace SOS.DataStewardship.Api.Models
     public class OccurrenceFilter
     {
         /// <summary>
-        /// Gets or Sets ExportMode
+        /// ExportMode. Todo - this property should not be in a filter?
         /// </summary>
         [DataMember(Name = "exportMode")]
         public ExportMode ExportMode { get; set; }
 
         /// <summary>
-        /// Gets or Sets DatasetList
+        /// DatasetList
         /// </summary>
         [DataMember(Name = "datasetList")]
         public List<string> DatasetList { get; set; }
+
+        /// <summary>
+        /// EventIds
+        /// </summary>
+        [DataMember(Name = "eventIds")]
+        public List<string> EventIds { get; set; }
 
         /// <summary>
         /// Datum

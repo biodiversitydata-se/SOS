@@ -1,4 +1,5 @@
-﻿using SOS.DataStewardship.Api.Models;
+﻿using Microsoft.Extensions.Azure;
+using SOS.DataStewardship.Api.Models;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Dataset;
 using System.Data;
@@ -201,6 +202,7 @@ namespace SOS.DataStewardship.Api.Extensions
             }
 
             occurrence.Event = observation.Event.EventId;
+            occurrence.DatasetIdentifier = observation.DataStewardshipDatasetId;
             occurrence.IdentificationVerificationStatus = Models.OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas; // todo - implement when the value list is defined
             occurrence.ObservationCertainty = Convert.ToDecimal(observation.Location.CoordinateUncertaintyInMeters);
             occurrence.ObservationPoint = observation.Location.Point;
@@ -209,7 +211,9 @@ namespace SOS.DataStewardship.Api.Extensions
                 Type = "point",
                 Coordinates = new double[] { observation.Location.Point.Coordinates.Longitude, observation.Location.Point.Coordinates.Latitude }
             };
-            occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;
+            occurrence.EventStartDate = observation.Event.StartDate;
+            occurrence.EventEndDate = observation.Event.EndDate;
+            occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;            
             occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
             occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
             occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? Models.OccurrenceModel.OccurrenceStatusEnum.Observerad : Models.OccurrenceModel.OccurrenceStatusEnum.InteObserverad;
@@ -325,6 +329,92 @@ namespace SOS.DataStewardship.Api.Extensions
                 // todo - add mappings
                 default:
                     return null;
+            }
+        }
+
+        public static SearchFilter ToSearchFilter(this OccurrenceFilter occurrenceFilter)
+        {
+            if (occurrenceFilter == null) return null;
+
+            var filter = new SearchFilter(0);
+            filter.EventIds = occurrenceFilter.EventIds;
+            filter.DataStewardshipDatasetIds = occurrenceFilter.DatasetList;
+            filter.IsPartOfDataStewardshipDataset = true;
+            if (occurrenceFilter.Taxon?.Ids != null && occurrenceFilter.Taxon.Ids.Any())
+            {
+                filter.Taxa = new Lib.Models.Search.Filters.TaxonFilter
+                {
+                    Ids = occurrenceFilter.Taxon.Ids,
+                    IncludeUnderlyingTaxa = false
+                };
+            }
+            
+            if (occurrenceFilter.Datum != null)
+            {
+                filter.Date = new DateFilter
+                {
+                    StartDate = occurrenceFilter.Datum.StartDate,
+                    EndDate = occurrenceFilter.Datum.EndDate,
+                    DateFilterType = occurrenceFilter.Datum.DatumFilterType.ToDateRangeFilterType()
+                };                
+            }
+            
+            filter.Location = occurrenceFilter.Area?.ToLocationFilter();
+
+            return filter;
+        }
+
+        public static LocationFilter ToLocationFilter(this SOS.DataStewardship.Api.Models.GeographicsFilter geographicsFilter)
+        {
+            if (geographicsFilter == null) return null;
+            var locationFilter = new LocationFilter();
+            var areaFilter = new List<AreaFilter>();
+
+            // County
+            if (geographicsFilter.County != null)
+            {
+                areaFilter.Add(new AreaFilter {
+                    AreaType = AreaType.County,
+                    FeatureId = geographicsFilter.County.Value.GetCountyFeatureId()
+                });                                        
+            }
+
+            // Municipality - todo
+
+
+            locationFilter.Geometries = geographicsFilter.Area?.ToGeographicsFilter();
+            locationFilter.Areas = areaFilter;
+            return locationFilter;
+        }
+
+        public static SOS.Lib.Models.Search.Filters.GeographicsFilter ToGeographicsFilter(this SOS.DataStewardship.Api.Models.GeographicsFilterArea geographicsFilterArea)
+        {
+            if (geographicsFilterArea == null) return null;
+            var geographicsFilter = new SOS.Lib.Models.Search.Filters.GeographicsFilter();
+            geographicsFilter.MaxDistanceFromPoint = geographicsFilterArea.MaxDistanceFromGeometries;
+            if (geographicsFilterArea.GeographicArea != null)
+            {
+                geographicsFilter.Geometries = new List<IGeoShape> { geographicsFilterArea.GeographicArea }; // todo - change filter type to List<IGeoShape>?
+            }
+
+            return geographicsFilter;
+        }
+
+
+        public static DateFilter.DateRangeFilterType ToDateRangeFilterType(this DatumFilterType datumFilterType)
+        {
+            switch (datumFilterType)
+            {
+                case DatumFilterType.OnlyStartDate:
+                    return DateFilter.DateRangeFilterType.OnlyStartDate;
+                case DatumFilterType.OnlyEndDate:
+                    return DateFilter.DateRangeFilterType.OnlyEndDate;
+                case DatumFilterType.OverlappingStartDateAndEndDate:
+                    return DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate;
+                case DatumFilterType.BetweenStartDateAndEndDate:
+                    return DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate;
+                default:
+                    return DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate;
             }
         }
     }

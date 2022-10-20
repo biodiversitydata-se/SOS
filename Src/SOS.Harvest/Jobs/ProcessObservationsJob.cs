@@ -964,7 +964,7 @@ namespace SOS.Harvest.Jobs
 
                 // Determine which events that belongs to this dataset. Aggregate unique EventIds with filter: ProjectIds in [3606]
                 var searchFilter = new SearchFilter(0);
-                searchFilter.DataStewardshipDatasetId = batDataset.Identifier;
+                searchFilter.DataStewardshipDatasetIds = new List<string> { batDataset.Identifier };
                 var eventIds = await _processedObservationRepository.GetAllAggregationItemsAsync(searchFilter, "event.eventId");
                 batDataset.EventIds = eventIds.Select(m => m.AggregationKey).ToList();
                 datasets.Add(batDataset);

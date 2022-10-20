@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             //-----------------------------------------------------------------------------------------------------------
             SearchFilter searchFilter = new SearchFilter(0)
             {
-                DataStewardshipDatasetId = "ArtportalenDataHost - Dataset Bats"
+                DataStewardshipDatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats" }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             //-----------------------------------------------------------------------------------------------------------
             SearchFilter searchFilter = new SearchFilter(0)
             {
-                DataStewardshipDatasetId = "ArtportalenDataHost - Dataset Bats"
+                DataStewardshipDatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats" }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             //-----------------------------------------------------------------------------------------------------------
             SearchFilter searchFilter = new SearchFilter(0)
             {
-                DataStewardshipDatasetId = "ArtportalenDataHost - Dataset Bats"
+                DataStewardshipDatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats" }
             };
 
             //-----------------------------------------------------------------------------------------------------------

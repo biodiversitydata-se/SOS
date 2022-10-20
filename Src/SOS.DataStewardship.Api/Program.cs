@@ -21,12 +21,16 @@ try
     builder.SetupLogging();
     builder.SetupSwagger();
     builder.SetupDependencies();
-    builder.RegisterModules();
-    builder.Services.Configure<JsonOptions>(options =>
+    builder.RegisterModules();    
+    builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
     {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.SerializerOptions.Converters.Add(new GeoShapeConverter());
+        options.SerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+        options.SerializerOptions.PropertyNameCaseInsensitive = true;
     });
+
 #if DEBUG
     builder.Services.Configure<TelemetryConfiguration>(x => x.DisableTelemetry = true);
 #endif

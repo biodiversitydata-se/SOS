@@ -605,6 +605,16 @@ namespace SOS.Lib.Extensions
             }
         }
 
+        public static void AddExistsCriteria<TQueryContainer>(
+            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field) where TQueryContainer : class        
+        {
+            query.Add(q => q
+                .Exists(e => e
+                    .Field(field)
+                )
+            );
+        }         
+
         /// <summary>
         /// Try to add query criteria
         /// </summary>
