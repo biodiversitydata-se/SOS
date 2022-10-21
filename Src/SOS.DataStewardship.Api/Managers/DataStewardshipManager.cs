@@ -30,10 +30,12 @@ public class DataStewardshipManager : IDataStewardshipManager
 
     public async Task<Dataset> GetDatasetByIdAsync(string id)
     {
-        var observationDataset = await _observationDatasetRepository.GetDatasetById(id);
+        if (string.IsNullOrEmpty(id)) return null;
+        var observationDataset = await _observationDatasetRepository.GetDatasetsByIds(new string[] { id });
         if (observationDataset == null) return null;
-        var dataset = observationDataset.ToDataset();        
+        var dataset = observationDataset.FirstOrDefault()?.ToDataset();
         return dataset;
+
         //return DataStewardshipArtportalenSampleData.DatasetBats;
     }
 
@@ -41,19 +43,15 @@ public class DataStewardshipManager : IDataStewardshipManager
     {        
         var filter = datasetFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);
-        var datasetIdAggregationItems = await _processedObservationCoreRepository.GetAllAggregationItemsAsync(filter, "dataStewardshipDatasetId");        
-        List<Dataset> datasets = new List<Dataset>();
-        var datasetIds = datasetIdAggregationItems
+        var datasetIdAggregationItems = await _processedObservationCoreRepository.GetAllAggregationItemsAsync(filter, "dataStewardshipDatasetId");                
+        var datasetIdItems = datasetIdAggregationItems
             .Skip(skip)
             .Take(take);
-
-        foreach (var item in datasetIds)
-        {
-            var observationDataset = await _observationDatasetRepository.GetDatasetById(item.AggregationKey);
-            datasets.Add(observationDataset.ToDataset());
-        }
-
+        if (!datasetIdItems.Any()) return new List<Dataset>();
+        var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(datasetIdItems.Select(m => m.AggregationKey));
+        var datasets = observationDatasets.Select(m => m.ToDataset()).ToList();
         return datasets;
+        
         //return new List<Dataset> { DataStewardshipArtportalenSampleData.DatasetBats };
     }
 

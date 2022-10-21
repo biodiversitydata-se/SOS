@@ -91,10 +91,12 @@ namespace SOS.Lib.Repositories.Processed
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationDataset index. Error: {createIndexResponse.DebugInformation}");
         }
 
-        public async Task<ObservationDataset> GetDatasetById(string id)
+        public async Task<List<ObservationDataset>> GetDatasetsByIds(IEnumerable<string> ids)
         {
+            if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
+
             var query = new List<Func<QueryContainerDescriptor<ObservationDataset>, QueryContainer>>();
-            query.TryAddTermCriteria("identifier", id);            
+            query.TryAddTermsCriteria("identifier", ids);
             var searchResponse = await Client.SearchAsync<ObservationDataset>(s => s
                 .Index(IndexName)
                 .Query(q => q
@@ -107,8 +109,8 @@ namespace SOS.Lib.Repositories.Processed
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
-            var dataset = searchResponse.Documents.SingleOrDefault();            
-            return dataset;
+            var datasets = searchResponse.Documents.ToList();
+            return datasets;
         }
 
         /// <summary>
