@@ -10,15 +10,21 @@ pool:
   name: default
 
 steps:
+- checkout: self
 - task: Npm@1
-  displayName: 'install newman'
+  displayName: Install newman
   inputs:
     command: 'custom'
-    customCommand: 'install newman -g'
+    customCommand: 'install -g newman'
+    verbose: false
+- task: CmdLine@2
+  displayName: Run tests
+  inputs:
+      script: newman run $(Build.SourcesDirectory)\Testing.postman_collection.json -x -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\JunitResults.xml
 
-- task: Npm@1
-  displayName: 'install newman-reporter-htmlextra'
+- task: PublishTestResults@2
+  displayName: Publish Test Results
   inputs:
-    command: 'custom'
-    customCommand: 'install newman-reporter-htmlextra -g'
+    testResultsFiles: '**\*.xml'
+    searchFolder: $(build.artifactstagingdirectory)
 
