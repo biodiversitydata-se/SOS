@@ -15,16 +15,20 @@ steps:
   displayName: Install newman
   inputs:
     command: 'custom'
+    workingDir: Tests/Postman
     customCommand: 'install -g newman'
     verbose: false
 - task: CmdLine@2
   displayName: Run tests
   inputs:
-      script: newman run $(Build.SourcesDirectory)\Testing.postman_collection.json -x -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\JunitResults.xml
+    workingDirectory: Tests/Postman
+    script: newman run Prod.postman_collection.json -x -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\JunitResults.xml
 
 - task: PublishTestResults@2
   displayName: Publish Test Results
   inputs:
     testResultsFiles: '**\*.xml'
-    searchFolder: $(build.artifactstagingdirectory)
+    searchFolder: Tests/Postman
+
+#$(build.artifactstagingdirectory)
 
