@@ -18,12 +18,21 @@ steps:
     workingDir: Tests/Postman
     customCommand: 'install newman'
     verbose: false
+
+- task: Npm@1
+  displayName: Install newman-reporter-htmlextra
+  inputs:
+    command: 'custom'
+    workingDir: Tests/Postman
+    customCommand: 'install newman-reporter-htmlextra'
+    verbose: false    
+    
 - task: CmdLine@2
   displayName: Run tests
   inputs:
     workingDirectory: Tests/Postman
-    script: ./node_modules/.bin/newman run Prod.postman_collection.json -x -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\JunitResults.xml
-
+    script: ./node_modules/.bin/newman run Prod.postman_collection.json -x -r htmlextra --reporter-htmlextra-export $(build.artifactstagingdirectory)\Results\report.html
+#script: ./node_modules/.bin/newman run Prod.postman_collection.json -x -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\JunitResults.xml
 - task: PublishTestResults@2
   displayName: Publish Test Results
   inputs:
