@@ -66,36 +66,62 @@ public class DataStewardshipManager : IDataStewardshipManager
         var ev = obs.ToEventModel(occurrenceIds.Select(m => m.AggregationKey));
         return ev;
         //return DataStewardshipArtportalenSampleData.EventBats1;
-    }
+    }    
 
     public async Task<List<EventModel>> GetEventsBySearchAsync(EventsFilter eventsFilter, int skip, int take)
     {
         var filter = eventsFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);
-        var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 10000, true); // todo - when there are more than 10000 observations this solutions is no good.        
-        var observations = CastDynamicsToObservations(pageResult.Records);
-        var observationsByEventId = observations
-            .GroupBy(m => m.Event.EventId)
-            .ToDictionary(m => m.Key, m => m.ToList());
-
-        var events = new List<EventModel>();
-        foreach (var pair in observationsByEventId)
-        {
-            var eventModel = pair.Value.First().ToEventModel(pair.Value.Select(m => m.Occurrence.OccurrenceId));
-            events.Add(eventModel);
-        }
-
-        return events
+        var eventOccurrenceIds = await _processedObservationCoreRepository.GetEventOccurrenceItemsAsync(filter);
+        var occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
+        var eventIds = occurrenceIdsByEventId
+            .OrderBy(m => m.Key) // todo - support sorting by other properties?
             .Skip(skip)
             .Take(take)
             .ToList();
 
-        return new List<EventModel>
+        var firstOccurrenceIdInEvents = eventIds.Select(m => m.Value.First());        
+        var observations = await _processedObservationCoreRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
+        var events = new List<EventModel>();
+        foreach (var observation in observations)
         {
-            DataStewardshipArtportalenSampleData.EventBats1,
-            DataStewardshipArtportalenSampleData.EventBats2
-        };
+            var occurrenceIds = occurrenceIdsByEventId[observation.Event.EventId.ToLower()];
+            var eventModel = observation.ToEventModel(occurrenceIds);            
+            events.Add(eventModel);
+        }
+
+        return events;
+
+        // old implementation
+        //var filter = eventsFilter.ToSearchFilter();
+        //await _filterManager.PrepareFilterAsync(null, null, filter);
+        //var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 10000, true); // todo - when there are more than 10000 observations this solutions is no good.        
+        //var observations = CastDynamicsToObservations(pageResult.Records);
+        //var observationsByEventId = observations
+        //    .GroupBy(m => m.Event.EventId)
+        //    .ToDictionary(m => m.Key, m => m.ToList());
+
+        //var events = new List<EventModel>();
+        //foreach (var pair in observationsByEventId)
+        //{
+        //    var eventModel = pair.Value.First().ToEventModel(pair.Value.Select(m => m.Occurrence.OccurrenceId));
+        //    events.Add(eventModel);
+        //}
+
+        //return events
+        //    .Skip(skip)
+        //    .Take(take)
+        //    .ToList();
     }
+
+    private readonly List<string> _observationEventOutputFields = new List<string>()
+        {
+            "occurrence",
+            "location",
+            "event",
+            "dataStewardshipDatasetId",
+            "institutionCode",
+        };
 
     public async Task<OccurrenceModel> GetOccurrenceByIdAsync(string id)
     {
