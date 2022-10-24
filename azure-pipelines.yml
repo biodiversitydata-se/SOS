@@ -23,10 +23,8 @@ parameters:
 variables:
   ${{ if eq(parameters.environment, 'dev') }}:
     postmanCollection: Prod.postman_collection.json
-  ${{ elseif eq(parameters.environment, 'st' }}:
+  ${{ elseif eq(parameters.environment, 'st') }}:
     postmanCollection: St.postman_collection.json
-  ${{ elseif eq(parameters.environment, 'at' }}:
-    postmanCollection: At.postman_collection.json
   ${{ else }}:
     postmanCollection: Prod.postman_collection.json
 
