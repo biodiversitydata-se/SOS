@@ -36,7 +36,7 @@ steps:
 - task: PublishTestResults@2
   displayName: Publish Test Results
   inputs:
-    testResultsFiles: '**\*.xml'
+    testResultsFiles: '**\*.html'
     searchFolder: $(build.artifactstagingdirectory)\Results
 
 #$(build.artifactstagingdirectory)
