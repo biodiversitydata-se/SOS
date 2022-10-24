@@ -87,6 +87,7 @@ namespace SOS.Lib.Extensions
                 userObservation.ReporterName = observation?.Occurrence?.ReportedBy;
                 userObservation.TaxonScientificName = observation?.Taxon?.ScientificName;
                 userObservation.TaxonVernacularName = observation?.Taxon?.VernacularName;
+                userObservation.TaxonSortOrder = observation.Taxon.Attributes.SortOrder;
 
                 return userObservation;
             }
