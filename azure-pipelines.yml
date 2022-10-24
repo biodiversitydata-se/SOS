@@ -10,7 +10,7 @@ pool:
   name: default
 
 parameters:
-- name: environmet
+- name: environment
   displayName: State environment
   type: string
   default: st
@@ -21,11 +21,11 @@ parameters:
   - prod
 
 variables:
-  ${{ if eq(parameters.environmet, 'dev') }}:
+  ${{ if eq(parameters.environment, 'dev') }}:
     postmanCollection: Prod.postman_collection.json
-  ${{ elseif eq(parameters.environmet, 'st' }}:
+  ${{ elseif eq(parameters.environment, 'st' }}:
     postmanCollection: St.postman_collection.json
-  ${{ elseif eq(parameters.environmet, 'at' }}:
+  ${{ elseif eq(parameters.environment, 'at' }}:
     postmanCollection: At.postman_collection.json
   ${{ else }}:
     postmanCollection: Prod.postman_collection.json
