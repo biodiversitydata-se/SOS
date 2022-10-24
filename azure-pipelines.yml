@@ -9,8 +9,26 @@ trigger:
 pool:
   name: default
 
+parameters:
+- name: environmet
+  displayName: State environment
+  type: string
+  default: st
+  values:
+  - dev
+  - st
+  - at
+  - prod
+
 variables:
-  postmanCollection: Prod.postman_collection.json
+  ${{ if eq(parameters.environmet, 'dev') }}:
+    postmanCollection: Prod.postman_collection.json
+  ${{ elseif eq(parameters.environmet, 'st' }}:
+    postmanCollection: St.postman_collection.json
+  ${{ elseif eq(parameters.environmet, 'at' }}:
+    postmanCollection: At.postman_collection.json
+  ${{ else }}:
+    postmanCollection: Prod.postman_collection.json
 
 steps:
 - checkout: self
