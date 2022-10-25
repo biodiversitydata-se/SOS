@@ -23,13 +23,13 @@ parameters:
 variables:
   - name: postmanCollection
     ${{ if eq(parameters.environment, 'dev') }}:
-      value: SOS Health Check - DEV.postman_collection.json
+      value: 'SOS Health Check - DEV.postman_collection.json'
     ${{ if eq(parameters.environment, 'st') }}:
-      value: SOS Health Check - ST.postman_collection.json
+      value: 'SOS Health Check - ST.postman_collection.json'
     ${{ if eq(parameters.environment, 'at') }}:
-      value: SOS Health Check - AT.postman_collection.json
+      value: 'SOS Health Check - AT.postman_collection.json'
     ${{ if eq(parameters.environment, 'prod') }}:
-      value: SOS Health Check - PROD.postman_collection.json
+      value: 'SOS Health Check - PROD.postman_collection.json'
 
 steps:
 - checkout: self
