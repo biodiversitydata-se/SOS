@@ -15,6 +15,7 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.UserService;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Export;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Location;
@@ -1225,7 +1226,32 @@ namespace SOS.Observations.Api.Extensions
                 Id = userRole.Id,
                 Name = userRole.Name,
                 ShortName = userRole.ShortName,
-                Description = userRole.Description
+                Description = userRole.Description,
+                Authorities = userRole.Authorities?.Select(a => a.ToUserAuthorityDto()).ToList()
+            };
+        }
+
+        public static UserAuthorityDto ToUserAuthorityDto(this UserAuthority userAuthority)
+        {
+            if (userAuthority == null) return null;
+
+            return new UserAuthorityDto
+            {
+                Id = userAuthority.Id,
+                Name = userAuthority.Name,
+                Areas = userAuthority.Areas?.Select(a => a.ToUserAreaDto()).ToList()
+            };
+        }
+
+        public static UserAreaDto ToUserAreaDto(this UserArea userArea)
+        {
+            if (userArea == null) return null;
+
+            return new UserAreaDto
+            {
+                AreaType = (AreaTypeDto)userArea.AreaType,
+                FeatureId = userArea.FeatureId,
+                Name = userArea.Name
             };
         }
 
