@@ -21,17 +21,21 @@ parameters:
   - prod
 
 variables:
-  ${{ if eq(parameters.environment, 'dev') }}:
-    postmanCollection: Prod.postman_collection.json
-  ${{ if eq(parameters.environment, 'st') }}:
-    postmanCollection: St.postman_collection.json
-  ${{ if eq(parameters.environment, 'at') }}:
-    postmanCollection: At.postman_collection.json
-    ${{ else }}:
-      postmanCollection: Prod.postman_collection.json
-  
+  - name: postmanCollection
+    ${{ if eq(parameters.environment, 'dev') }}:
+      value: Dev.postman_collection.json
+      ${{ if eq(parameters.environment, 'st') }}:
+        value: St.postman_collection.json
+        ${{ if eq(parameters.environment, 'at') }}:
+          value: At.postman_collection.json
+          ${{ else }}:
+            value: Prod.postman_collection.json
 
 steps:
+- script: | 
+    echo '$(postmanCollection)'
+    echo '$(variables.postmanCollection)'
+
 - checkout: self
 - task: Npm@1
   displayName: Install newman
