@@ -21,15 +21,15 @@ parameters:
   - prod
 
 variables:
-  ${{ if eq(parameters.environment, 'dev') }}:
-    postmanCollection: Prod.postman_collection.json
-  ${{ if eq(parameters.environment, 'st') }}:
-    postmanCollection: St.postman_collection.json
-  ${{ if eq(parameters.environment, 'at') }}:
-    postmanCollection: At.postman_collection.json
-    ${{ else }}:
-      postmanCollection: Prod.postman_collection.json
-  
+  - name: postmanCollection
+    ${{ if eq(parameters.environment, 'dev') }}:
+      value: SOS_Health_Check-DEV.postman_collection.json
+    ${{ if eq(parameters.environment, 'st') }}:
+      value: SOS_Health_Check-ST.postman_collection.json
+    ${{ if eq(parameters.environment, 'at') }}:
+      value: SOS_Health_Check-AT.postman_collection.json
+    ${{ if eq(parameters.environment, 'prod') }}:
+      value: SOS_Health_Check-PROD.postman_collection.json
 
 steps:
 - checkout: self

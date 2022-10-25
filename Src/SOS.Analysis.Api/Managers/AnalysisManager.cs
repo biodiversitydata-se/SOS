@@ -1,4 +1,5 @@
 ﻿using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
 using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.Enums;
@@ -64,9 +65,28 @@ namespace SOS.Analysis.Api.Managers
                 futureCollection.Add(new Feature(
                     transformedGeometry,
                     new AttributesTable(new KeyValuePair<string, object>[] {
+                            new KeyValuePair<string, object>("name", "eoo"),
                             new KeyValuePair<string, object>("aoo", (int)aoo),
                             new KeyValuePair<string, object>("eoo", (int)eoo),
-                            new KeyValuePair<string, object>("gridCellArea", gridCellArea)
+                            new KeyValuePair<string, object>("gridCellArea", gridCellArea),
+                            new KeyValuePair<string, object>("gridCellAreaUnit", "km2"),
+                        }
+                    )
+                ));
+
+                futureCollection.Add(new Feature(
+                    new MultiPolygon(
+                            coordinateSystem.Equals(CoordinateSys.SWEREF99_TM) ? 
+                                gridCellsSweRef99 
+                                : 
+                                gridCellsSweRef99.Select(gc => gc.Transform(CoordinateSys.SWEREF99_TM, coordinateSystem) as Polygon).ToArray()
+                    ),
+                    new AttributesTable(new KeyValuePair<string, object>[] {
+                            new KeyValuePair<string, object>("name", "gridcells"),
+                            new KeyValuePair<string, object>("gridCellArea", gridCellArea),
+                            new KeyValuePair<string, object>("gridCellAreaUnit", "km2"),
+                            new KeyValuePair<string, object>("gridCellSide", gridCellsInMeters),
+                            new KeyValuePair<string, object>("gridCellSideUnit", "m")
                         }
                     )
                 ));
