@@ -24,12 +24,12 @@ variables:
   - name: postmanCollection
     ${{ if eq(parameters.environment, 'dev') }}:
       value: Dev.postman_collection.json
-      ${{ if eq(parameters.environment, 'st') }}:
-        value: St.postman_collection.json
-        ${{ if eq(parameters.environment, 'at') }}:
-          value: At.postman_collection.json
-          ${{ else }}:
-            value: Prod.postman_collection.json
+    ${{ if eq(parameters.environment, 'st') }}:
+      value: St.postman_collection.json
+    ${{ if eq(parameters.environment, 'at') }}:
+      value: At.postman_collection.json
+      ${{ else }}:
+        value: Prod.postman_collection.json
 
 steps:
 - script: | 
