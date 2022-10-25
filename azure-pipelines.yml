@@ -1,0 +1,64 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  name: default
+
+parameters:
+- name: environment
+  displayName: State environment
+  type: string
+  default: st
+  values:
+  - dev
+  - st
+  - at
+  - prod
+
+variables:
+  - name: postmanCollection
+    ${{ if eq(parameters.environment, 'dev') }}:
+      value: SOS_Health_Check-DEV.postman_collection.json
+    ${{ if eq(parameters.environment, 'st') }}:
+      value: SOS_Health_Check-ST.postman_collection.json
+    ${{ if eq(parameters.environment, 'at') }}:
+      value: SOS_Health_Check-AT.postman_collection.json
+    ${{ if eq(parameters.environment, 'prod') }}:
+      value: SOS_Health_Check-PROD.postman_collection.json
+
+steps:
+- checkout: self
+- task: Npm@1
+  displayName: Install newman
+  inputs:
+    command: 'custom'
+    workingDir: Tests/Postman
+    customCommand: 'install newman'
+    verbose: false
+
+- task: Npm@1
+  displayName: Install newman-reporter-htmlextra
+  inputs:
+    command: 'custom'
+    workingDir: Tests/Postman
+    customCommand: 'install newman-reporter-htmlextra'
+    verbose: false    
+- task: CmdLine@2
+  displayName: Run tests
+  inputs:
+    workingDirectory: Tests/Postman
+    script: ./node_modules/.bin/newman run $(postmanCollection) -x -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\JunitResults.xml
+#script: ./node_modules/.bin/newman run Prod.postman_collection.json -x -r htmlextra --reporter-htmlextra-export $(build.artifactstagingdirectory)\Results\report.html
+- task: PublishTestResults@2
+  displayName: Publish Test Results
+  inputs:
+    testResultsFiles: '**\*.xml'
+    searchFolder: $(build.artifactstagingdirectory)\Results
+
+#$(build.artifactstagingdirectory)
+

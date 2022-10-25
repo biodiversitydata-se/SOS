@@ -55,6 +55,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync();
 
-        Task<ObservationDataset> GetDatasetById(string id);
+        Task<List<ObservationDataset>> GetDatasetsByIds(IEnumerable<string> ids);
     }
 }

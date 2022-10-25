@@ -30,6 +30,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string ReporterName { get; set; }
         public string TaxonScientificName { get; set; }
         public string TaxonVernacularName { get; set; }
+        public int TaxonSortOrder { get; set; }
 
 
         public static long CreateId()

@@ -4,6 +4,7 @@ using SOS.DataStewardship.Api.Managers.Interfaces;
 using SOS.DataStewardship.Api.Models;
 using SOS.DataStewardship.Api.Models.SampleData;
 using SOS.Lib.JsonConverters;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -13,35 +14,45 @@ public class DataStewardshipManager : IDataStewardshipManager
 {    
     private readonly IObservationDatasetRepository _observationDatasetRepository;
     private readonly IProcessedObservationCoreRepository _processedObservationCoreRepository;
+    private readonly IFilterManager _filterManager;
     private readonly ILogger<DataStewardshipManager> _logger;
 
     public DataStewardshipManager(IObservationDatasetRepository observationDatasetRepository,
         IProcessedObservationCoreRepository processedObservationCoreRepository,
+        IFilterManager filterManager,
         ILogger<DataStewardshipManager> logger)
     {
         _observationDatasetRepository = observationDatasetRepository;
         _processedObservationCoreRepository = processedObservationCoreRepository;
+        _filterManager = filterManager;
         _logger = logger;
     }
 
     public async Task<Dataset> GetDatasetByIdAsync(string id)
     {
-        var observationDataset = await _observationDatasetRepository.GetDatasetById(id);
+        if (string.IsNullOrEmpty(id)) return null;
+        var observationDataset = await _observationDatasetRepository.GetDatasetsByIds(new string[] { id });
         if (observationDataset == null) return null;
-        var dataset = observationDataset.ToDataset();        
+        var dataset = observationDataset.FirstOrDefault()?.ToDataset();
         return dataset;
+
         //return DataStewardshipArtportalenSampleData.DatasetBats;
     }
 
     public async Task<List<Dataset>> GetDatasetsBySearchAsync(DatasetFilter datasetFilter, int skip, int take)
-    {
-        List<int> taxonIds = datasetFilter?.Taxon?.Ids;
-        DateTime? startDate = datasetFilter?.Datum?.StartDate;
-        DateTime? endDate = datasetFilter?.Datum?.EndDate;
-        DatumFilterType? dateFilterType = datasetFilter?.Datum?.DatumFilterType;
-        // datasetFilter.Area.
-
-        return new List<Dataset> { DataStewardshipArtportalenSampleData.DatasetBats };
+    {        
+        var filter = datasetFilter.ToSearchFilter();
+        await _filterManager.PrepareFilterAsync(null, null, filter);
+        var datasetIdAggregationItems = await _processedObservationCoreRepository.GetAllAggregationItemsAsync(filter, "dataStewardshipDatasetId");                
+        var datasetIdItems = datasetIdAggregationItems
+            .Skip(skip)
+            .Take(take);
+        if (!datasetIdItems.Any()) return new List<Dataset>();
+        var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(datasetIdItems.Select(m => m.AggregationKey));
+        var datasets = observationDatasets.Select(m => m.ToDataset()).ToList();
+        return datasets;
+        
+        //return new List<Dataset> { DataStewardshipArtportalenSampleData.DatasetBats };
     }
 
     public async Task<EventModel> GetEventByIdAsync(string id)
@@ -55,16 +66,62 @@ public class DataStewardshipManager : IDataStewardshipManager
         var ev = obs.ToEventModel(occurrenceIds.Select(m => m.AggregationKey));
         return ev;
         //return DataStewardshipArtportalenSampleData.EventBats1;
+    }    
+
+    public async Task<List<EventModel>> GetEventsBySearchAsync(EventsFilter eventsFilter, int skip, int take)
+    {
+        var filter = eventsFilter.ToSearchFilter();
+        await _filterManager.PrepareFilterAsync(null, null, filter);
+        var eventOccurrenceIds = await _processedObservationCoreRepository.GetEventOccurrenceItemsAsync(filter);
+        var occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
+        var eventIds = occurrenceIdsByEventId
+            .OrderBy(m => m.Key) // todo - support sorting by other properties?
+            .Skip(skip)
+            .Take(take)
+            .ToList();
+
+        var firstOccurrenceIdInEvents = eventIds.Select(m => m.Value.First());        
+        var observations = await _processedObservationCoreRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
+        var events = new List<EventModel>();
+        foreach (var observation in observations)
+        {
+            var occurrenceIds = occurrenceIdsByEventId[observation.Event.EventId.ToLower()];
+            var eventModel = observation.ToEventModel(occurrenceIds);            
+            events.Add(eventModel);
+        }
+
+        return events;
+
+        // old implementation
+        //var filter = eventsFilter.ToSearchFilter();
+        //await _filterManager.PrepareFilterAsync(null, null, filter);
+        //var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 10000, true); // todo - when there are more than 10000 observations this solutions is no good.        
+        //var observations = CastDynamicsToObservations(pageResult.Records);
+        //var observationsByEventId = observations
+        //    .GroupBy(m => m.Event.EventId)
+        //    .ToDictionary(m => m.Key, m => m.ToList());
+
+        //var events = new List<EventModel>();
+        //foreach (var pair in observationsByEventId)
+        //{
+        //    var eventModel = pair.Value.First().ToEventModel(pair.Value.Select(m => m.Occurrence.OccurrenceId));
+        //    events.Add(eventModel);
+        //}
+
+        //return events
+        //    .Skip(skip)
+        //    .Take(take)
+        //    .ToList();
     }
 
-    public async Task<List<EventModel>> GetEventsBySearchAsync(EventsFilter filter, int skip, int take)
-    {
-        return new List<EventModel>
+    private readonly List<string> _observationEventOutputFields = new List<string>()
         {
-            DataStewardshipArtportalenSampleData.EventBats1,
-            DataStewardshipArtportalenSampleData.EventBats2
+            "occurrence",
+            "location",
+            "event",
+            "dataStewardshipDatasetId",
+            "institutionCode",
         };
-    }
 
     public async Task<OccurrenceModel> GetOccurrenceByIdAsync(string id)
     {
@@ -80,6 +137,7 @@ public class DataStewardshipManager : IDataStewardshipManager
     public async Task<List<OccurrenceModel>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take)
     {
         var filter = occurrenceFilter.ToSearchFilter();
+        await _filterManager.PrepareFilterAsync(null, null, filter);
         var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, skip, take, true);
         var observations = CastDynamicsToObservations(pageResult.Records);
         var occurrences = observations.Select(x => x.ToOccurrenceModel()).ToList();

@@ -20,13 +20,8 @@ The Web API uses the OAuth 2 and OpenID Connect standards during authorization.
 As the first step towards authorization, you will need to receive your unique client ID and client secret key from SLU Swedish Species Information Centre to use in the authorization flows. You will also need to specify the return URL where the token should be delivered on login. Contact support to exchange authorization details.
 
 ### Supported Authorization Flows
-#### Implicit Grant flow
-Implicit grant flow is implemented when clients are regarded as “insecure”, ie web clients, mobile apps etc.
+- Authorization Code Grant Flow with PKCE ([RFC-7636](https://datatracker.ietf.org/doc/html/rfc7636))
 
-#### Authorization Code Grant Flow with PKCE
-This method is suitable for long-running applications which the user logs into once. It provides an access token that can be refreshed. Since the token exchange involves sending your secret key, this should happen on a secure location, like a backend service, not from a client like a browser or mobile app.
-
-These flows are described in [RFC-6749](https://tools.ietf.org/html/rfc6749) and [RFC-7636](https://datatracker.ietf.org/doc/html/rfc7636).
 ## URL:s
 
 | Name 	| Value 	|
