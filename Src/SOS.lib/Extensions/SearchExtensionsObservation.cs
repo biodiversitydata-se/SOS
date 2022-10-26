@@ -38,6 +38,8 @@ namespace SOS.Lib
 
             if (filter.ProtectionFilter.Equals(ProtectionFilter.Public))
             {
+                // Just to be sure since we can query both public and protected index... Only public observations
+                query.TryAddTermCriteria("sensitive", false);
                 return;
             }
 
