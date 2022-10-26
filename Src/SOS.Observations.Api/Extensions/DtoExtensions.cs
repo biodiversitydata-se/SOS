@@ -45,7 +45,7 @@ namespace SOS.Observations.Api.Extensions
         {
             if (searchFilterBaseDto == null) return default;
 
-            var filter = searchFilterBaseDto is SearchFilterInternalBaseDto ? new SearchFilterInternal(userId, sensitiveObservations) : new SearchFilter(userId, sensitiveObservations);
+            var filter = searchFilterBaseDto is SearchFilterInternalBaseDto ? new SearchFilterInternal(userId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public) : new SearchFilter(userId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public);
             filter.Taxa = searchFilterBaseDto.Taxon?.ToTaxonFilter();
             filter.Date = PopulateDateFilter(searchFilterBaseDto.Date);
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
@@ -62,7 +62,6 @@ namespace SOS.Observations.Api.Extensions
                     From = searchFilterBaseDto.ModifiedDate.From,
                     To = searchFilterBaseDto.ModifiedDate.To
                 };
-            filter.ExtendedAuthorization.ProtectedObservations = sensitiveObservations;
             filter.ExtendedAuthorization.ObservedByMe = searchFilterBaseDto.ObservedByMe;
             filter.ExtendedAuthorization.ReportedByMe = searchFilterBaseDto.ReportedByMe;
 
@@ -855,7 +854,7 @@ namespace SOS.Observations.Api.Extensions
 
             if (!string.IsNullOrEmpty(sortBy))
             {
-                searchFilter ??= new SearchFilter(userId, sensitiveObservations);
+                searchFilter ??= new SearchFilter(userId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public);
                 searchFilter.Output ??= new OutputFilter();
                 searchFilter.Output.SortOrders = new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } };
             }
@@ -941,7 +940,7 @@ namespace SOS.Observations.Api.Extensions
                 return null;
             }
 
-            var searchFilter = new SearchFilterInternal(userId, sensitiveObservations)
+            var searchFilter = new SearchFilterInternal(userId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public)
             {
                 BirdNestActivityLimit = searchFilterDto.BirdNestActivityLimit,
                 DataProviderIds = searchFilterDto.DataProvider?.Ids,

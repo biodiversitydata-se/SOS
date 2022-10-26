@@ -35,14 +35,29 @@ namespace SOS.Lib
                     { "viewAccess", true }
                 });
             }
-            
-            if (!filter.ProtectedObservations)
+
+            if (filter.ProtectionFilter.Equals(ProtectionFilter.Public))
             {
                 return;
             }
 
+            // A observation can exists in both public (as diffused) and in protected (as not diffused) index.
+            // If we only get non diffused observations, we make sure we don't get a observation twice when searching both indexes
+            query.TryAddTermCriteria("diffusionStatus", 0);
+
+            // At least on of the sub queries in authorized querys must match
             var authorizeQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
+            // Match all public observations
+            var publicQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            publicQuery.TryAddTermCriteria("sensitive", false);
+            authorizeQuerys.Add(q => q
+                .Bool(b => b
+                    .Filter(publicQuery)
+                )
+            );
+
+            // Match user specific areas and taxa
             if (filter.ExtendedAreas?.Any() ?? false)
             {
                 foreach (var extendedAuthorization in filter.ExtendedAreas)
@@ -61,6 +76,7 @@ namespace SOS.Lib
                 }
             }
 
+            // Match observations sighted or reported by requesting user
             if (filter.UserId != 0)
             {
                 // Add autorization to a users 'own' observations 
@@ -87,18 +103,11 @@ namespace SOS.Lib
                 );
             }
 
-            if (authorizeQuerys.Any())
-            {
-                query.Add(q => q
-                    .Bool(b => b
-                        .Should(authorizeQuerys)
-                    )
-                );
-                return;
-            }
-
-            // No extended authorization. Make sure only public data match
-            query.TryAddNumericRangeCriteria("occurrence.sensitivityCategory", 2, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
+            query.Add(q => q
+                .Bool(b => b
+                    .Should(authorizeQuerys)
+                )
+            );  
         }
 
         /// <summary>

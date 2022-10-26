@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.Enums;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Search.Filters
 {
@@ -18,9 +19,9 @@ namespace SOS.Lib.Models.Search.Filters
         public bool ObservedByMe { get; set; }
 
         /// <summary>
-        /// Only include ProtectedObservations
+        /// Observation protection filter
         /// </summary>
-        public bool ProtectedObservations { get; set; }
+        public ProtectionFilter ProtectionFilter { get; set; }
 
         /// <summary>
         /// Only get observations reported by me

@@ -80,9 +80,9 @@ namespace SOS.Analysis.Api.Controllers
             return LatLonBoundingBoxDto.Create(boundingBox);
         }
 
-        protected void CheckAuthorization(bool sensitiveObservations)
+        protected void CheckAuthorization(ProtectionFilterDto protectionFilter)
         {
-            if (sensitiveObservations && (!User?.HasAccessToScope(_protectedScope) ?? true))
+            if (!protectionFilter.Equals(ProtectionFilterDto.Public) && (!User?.HasAccessToScope(_protectedScope) ?? true))
             {
                 throw new AuthenticationRequiredException("Not authorized");
             }

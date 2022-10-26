@@ -110,4 +110,22 @@ namespace SOS.Lib.Enums
         BothStartDateAndEndDate,
         StartDateEndDateMonthRange
     }
+
+    public enum ProtectionFilter
+    {
+        /// <summary>
+        /// Public observations
+        /// </summary>
+        Public = 0,
+
+        /// <summary>
+        /// Sensitive observations
+        /// </summary>
+        Sensitive,
+
+        /// <summary>
+        /// Both public and sensitive observations
+        /// </summary>
+        BothPublicAndSensitive
+    }
 }

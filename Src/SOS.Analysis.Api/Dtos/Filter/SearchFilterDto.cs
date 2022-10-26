@@ -17,6 +17,11 @@ namespace SOS.Analysis.Api.Dtos.Filter
         public int? BirdNestActivityLimit { get; set; }
 
         /// <summary>
+        /// Observation protection filter
+        /// </summary>
+        public ProtectionFilterDto ProtectionFilter { get; set; }
+
+        /// <summary>
         ///     Only get data from these providers.
         /// </summary>
         public DataProviderFilterDto? DataProvider { get; set; }

@@ -398,7 +398,7 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task PrepareFilterAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
-            if (filter.ExtendedAuthorization.ProtectedObservations)
+            if (!filter.ExtendedAuthorization.ProtectionFilter.Equals(ProtectionFilter.Public))
             {
                 filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(filter.ExtendedAuthorization.UserId, roleId ?? 0, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
 

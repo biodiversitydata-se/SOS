@@ -32,7 +32,7 @@ namespace SOS.Observations.Api.HealthChecks
 
             foreach (var provider in providers)
             {
-                var searchFilter = new SearchFilter(0, false)
+                var searchFilter = new SearchFilter(0, ProtectionFilter.Public)
                 {
                     DataProviderIds = new List<int>{ provider.Id },
                     Output = new OutputFilter

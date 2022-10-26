@@ -12,7 +12,6 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
-        /// <param name="sensitiveObservations"></param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="useCenterPoint">If true, grid cell center point will be used, else grid cell corner points will be used.</param>
         /// <param name="edgeLength">The target edge length ratio when useEdgeLengthRatio is true, else the target maximum edge length.</param>
@@ -27,11 +26,10 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             int? roleId,
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto searchFilter,
-            bool? sensitiveObservations = false,
             int? gridCellSizeInMeters = 2000,
             bool? useCenterPoint = true, 
-            double? edgeLength = 1000, 
-            bool? useEdgeLengthRatio = false, 
+            double? edgeLength = 0.5, 
+            bool? useEdgeLengthRatio = true, 
             bool? allowHoles = false,
             CoordinateSys? coordinateSystem = CoordinateSys.ETRS89);
     }

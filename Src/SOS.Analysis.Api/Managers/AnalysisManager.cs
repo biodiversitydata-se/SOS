@@ -47,8 +47,9 @@ namespace SOS.Analysis.Api.Managers
                 }
 
                 var gridCellsSweRef99 = result?.GridCells.Select(gc => gc.Sweref99TmBoundingBox.ToPolygon()).ToArray();
-                //var eooGeometry = edgeLength == 0 ? gridCellsSweRef99.ConvexHull() : gridCellsSweRef99.ConcaveHull(useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
+                //var eooGeometry = edgeLength == 0 && !useEdgeLengthRatio ? gridCellsSweRef99.ConvexHull() : gridCellsSweRef99.ConcaveHull(useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
                 var eooGeometry = gridCellsSweRef99.ConcaveHull(useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
+
                 if (eooGeometry == null)
                 {
                     return null!;

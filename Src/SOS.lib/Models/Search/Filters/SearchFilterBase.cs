@@ -15,13 +15,13 @@ namespace SOS.Lib.Models.Search.Filters
         /// Constructor
         /// </summary>
         /// <param name="userId"></param>
-        /// <param name="sensitiveObservations"></param>
-        public SearchFilterBase(int userId, bool sensitiveObservations = false)
+        /// <param name="protectionFilter"></param>
+        public SearchFilterBase(int userId, ProtectionFilter protectionFilter = ProtectionFilter.Public)
         {
             ExtendedAuthorization = new ExtendedAuthorizationFilter
             {
                 UserId = userId,
-                ProtectedObservations = sensitiveObservations
+                ProtectionFilter = protectionFilter
             };
             Location = new LocationFilter();
         }

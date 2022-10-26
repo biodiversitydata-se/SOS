@@ -351,54 +351,9 @@ namespace SOS.Lib.Extensions
                 {
                     polygon.Coordinates.ForEach(c => points.Add(new Point(c)));
                 }
-
-               /* var polygonCount = polygons.Count();
-                points = new Point[polygonCount * 4];
-
-                for (var i = 0; i < polygonCount; i++)
-                {
-                    var polygon = polygons[i];
-                   
-                    var boundigBox = polygon.Envelope;
-
-                    var startIndex = i * 4;
-                    points[startIndex] = new Point(new Coordinate(boundigBox.Coordinates[0].X, boundigBox.Coordinates[0].Y));
-                    points[startIndex + 1] = new Point(new Coordinate(boundigBox.Coordinates[1].X, boundigBox.Coordinates[1].Y));
-                    points[startIndex + 2] = new Point(new Coordinate(boundigBox.Coordinates[2].X, boundigBox.Coordinates[2].Y));
-                    points[startIndex + 3] = new Point(new Coordinate(boundigBox.Coordinates[3].X, boundigBox.Coordinates[3].Y));
-                }*/
             }
 
             return points.ToArray().ConcaveHull(edgeLength, useEdgeLengthRatio, allowHoles);
-           
-            /*
-            //Triangulate all points
-            var triangulationBuilder = new ConformingDelaunayTriangulationBuilder();
-            triangulationBuilder.SetSites(new MultiPoint(points));
-
-            var geometryFactory = new GeometryFactory();
-            var triangles = triangulationBuilder.GetTriangles(geometryFactory);
-
-            Geometry alphaGeometry = null;
-            for (var i = 0; i < triangles.Count; i++)
-            {
-                var triangle = triangles[i];
-
-                var a = triangle.Coordinates[0].Distance(triangle.Coordinates[1]); // Length side a
-                var b = triangle.Coordinates[1].Distance(triangle.Coordinates[2]); // Length side b
-                var c = triangle.Coordinates[2].Distance(triangle.Coordinates[3]); // Length side c
-                var p = a + b + c; // Perimeter 
-                var area = 0.25 * Math.Sqrt((a + b + c) * (-a + b + c) * (a - b + c) * (a + b - c));
-                var radius = 2 * area / p;
-                radius = radius / 1000; //Div radius by 1000 to (commonly) keep alpha values in a range of 1 - 1000
-
-                if (radius < edgeLength)
-                {
-                    alphaGeometry = alphaGeometry == null ? triangle : alphaGeometry.Union(triangle);
-                }
-            }
-
-            return alphaGeometry;*/
         }
 
         /// <summary>

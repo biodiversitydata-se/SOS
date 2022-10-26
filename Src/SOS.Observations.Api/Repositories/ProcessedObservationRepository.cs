@@ -666,7 +666,7 @@ namespace SOS.Observations.Api.Repositories
             // Authorization is handled different in signal search, reset some values before we get core queries
             filter.ExtendedAuthorization.ExtendedAreas = null;
             filter.ExtendedAuthorization.UserId = 0;
-            filter.ExtendedAuthorization.ProtectedObservations = false;
+            filter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Public;
 
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddSignalSearchCriteria(extendedAuthorizations, onlyAboveMyClearance);
