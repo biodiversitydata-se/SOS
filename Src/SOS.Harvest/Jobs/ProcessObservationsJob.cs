@@ -38,6 +38,8 @@ using SOS.Lib.Models.Processed.Dataset;
 using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
 using System.Data;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Processed.Event;
+using SOS.Lib.Extensions;
 
 namespace SOS.Harvest.Jobs
 {
@@ -56,6 +58,7 @@ namespace SOS.Harvest.Jobs
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IUserObservationRepository _userObservationRepository;
         private readonly IObservationDatasetRepository _observationDatasetRepository;
+        private readonly IObservationEventRepository _observationEventRepository;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly Dictionary<DataProviderType, IObservationProcessor> _processorByType;
@@ -147,12 +150,22 @@ namespace SOS.Harvest.Jobs
                 if (_processConfiguration.ProcessObservationDataset)
                 {
                     _logger.LogInformation($"_processedObservationRepository.LiveMode={_processedObservationRepository.LiveMode}");
+
+                    // Dataset
                     _logger.LogInformation($"_observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");
                     _observationDatasetRepository.LiveMode = _observationDatasetRepository.LiveMode;
                     _logger.LogInformation($"Set _observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");
                     _logger.LogInformation($"Start clear ElasticSearch index: UniqueIndexName={_observationDatasetRepository.UniqueIndexName}, IndexName={_observationDatasetRepository.IndexName}");
                     await _observationDatasetRepository.ClearCollectionAsync();
                     _logger.LogInformation($"Finish clear ElasticSearch index: {_observationDatasetRepository.UniqueIndexName}");
+
+                    // Event                    
+                    _logger.LogInformation($"_observationEventRepository.LiveMode={_observationEventRepository.LiveMode}");
+                    _observationEventRepository.LiveMode = _observationEventRepository.LiveMode;
+                    _logger.LogInformation($"Set _observationEventRepository.LiveMode={_observationEventRepository.LiveMode}");
+                    _logger.LogInformation($"Start clear ElasticSearch index: UniqueIndexName={_observationEventRepository.UniqueIndexName}, IndexName={_observationEventRepository.IndexName}");
+                    await _observationEventRepository.ClearCollectionAsync();
+                    _logger.LogInformation($"Finish clear ElasticSearch index: {_observationEventRepository.UniqueIndexName}");
                 }
             }
             else
@@ -192,9 +205,15 @@ namespace SOS.Harvest.Jobs
 
             if (_processConfiguration.ProcessObservationDataset)
             {
+                // Dataset
                 _logger.LogInformation($"Start disable indexing ({_observationDatasetRepository.UniqueIndexName})");
                 await _observationDatasetRepository.DisableIndexingAsync();
                 _logger.LogInformation($"Finish disable indexing ({_observationDatasetRepository.UniqueIndexName})");
+
+                // Event
+                _logger.LogInformation($"Start disable indexing ({_observationEventRepository.UniqueIndexName})");
+                await _observationEventRepository.DisableIndexingAsync();
+                _logger.LogInformation($"Finish disable indexing ({_observationEventRepository.UniqueIndexName})");
             }
         }
 
@@ -221,9 +240,15 @@ namespace SOS.Harvest.Jobs
 
             if (_processConfiguration.ProcessObservationDataset)
             {
+                // Dataset
                 _logger.LogInformation($"Start enable indexing ({_observationDatasetRepository.UniqueIndexName})");
                 await _observationDatasetRepository.EnableIndexingAsync();
                 _logger.LogInformation($"Finish enable indexing ({_observationDatasetRepository.UniqueIndexName})");
+
+                // Event
+                _logger.LogInformation($"Start enable indexing ({_observationEventRepository.UniqueIndexName})");
+                await _observationEventRepository.EnableIndexingAsync();
+                _logger.LogInformation($"Finish enable indexing ({_observationEventRepository.UniqueIndexName})");
             }
         }
 
@@ -457,6 +482,7 @@ namespace SOS.Harvest.Jobs
                         if (_processConfiguration.ProcessObservationDataset)
                         {
                             await AddObservationDatasetsAsync();
+                            await AddObservationEventsAsync();
                         }
 
                         if (_runIncrementalAfterFull)
@@ -825,8 +851,9 @@ namespace SOS.Harvest.Jobs
             IAreaHelper areaHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             ProcessConfiguration processConfiguration,
-            IUserObservationRepository userObservationRepository,
+            IUserObservationRepository userObservationRepository,            
             IObservationDatasetRepository observationDatasetRepository,
+            IObservationEventRepository observationEventRepository,
             ILogger<ProcessObservationsJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -878,6 +905,7 @@ namespace SOS.Harvest.Jobs
             _processConfiguration = processConfiguration;
             _userObservationRepository = userObservationRepository ?? throw new ArgumentNullException(nameof(userObservationRepository));
             _observationDatasetRepository = observationDatasetRepository ?? throw new ArgumentNullException(nameof(observationDatasetRepository));
+            _observationEventRepository = observationEventRepository ?? throw new ArgumentNullException(nameof(observationEventRepository));
         }
 
         /// <inheritdoc />
@@ -973,6 +1001,49 @@ namespace SOS.Harvest.Jobs
             catch (Exception e)
             {
                 _logger.LogError(e, "Add data stewardship datasets failed.");
+            }
+        }
+
+        private readonly List<string> _observationEventOutputFields = new List<string>()
+        {
+            "occurrence",
+            "location",
+            "event",
+            "dataStewardshipDatasetId",
+            "institutionCode",
+        };
+
+        private async Task AddObservationEventsAsync()
+        {
+            try
+            {                
+                int batchSize = 5000;
+                var filter = new SearchFilter(0);
+                filter.IsPartOfDataStewardshipDataset = true;
+                var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
+                Dictionary<string, List<string>> totalOccurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
+                var chunks = totalOccurrenceIdsByEventId.Chunk(batchSize);
+
+                foreach (var chunk in chunks) // todo - do this step in parallel
+                {
+                    var occurrenceIdsByEventId = chunk.ToDictionary(m => m.Key, m => m.Value);
+                    var firstOccurrenceIdInEvents = occurrenceIdsByEventId.Select(m => m.Value.First());
+                    var observations = await _processedObservationRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
+                    var events = new List<ObservationEvent>();
+                    foreach (var observation in observations)
+                    {
+                        var occurrenceIds = occurrenceIdsByEventId[observation.Event.EventId.ToLower()];
+                        var eventModel = observation.ToObservationEvent(occurrenceIds);
+                        events.Add(eventModel);
+                    }
+
+                    // write to ES
+                    await _observationEventRepository.AddManyAsync(events);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Add data stewardship events failed.");
             }
         }
 

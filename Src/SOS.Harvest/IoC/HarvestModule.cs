@@ -289,6 +289,8 @@ namespace SOS.Harvest.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<ObservationDatasetRepository>().As<IObservationDatasetRepository>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<ObservationEventRepository>().As<IObservationEventRepository>()
+                            .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedChecklistRepository>().As<IProcessedChecklistRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedObservationCoreRepository>().As<IProcessedObservationCoreRepository>()
