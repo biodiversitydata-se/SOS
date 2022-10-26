@@ -7,13 +7,13 @@ using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Analysis.Api.Extensions.Dto
 {
-    public static class FilterExtensionscs
+    public static class FilterExtensions
     {
-        private static SearchFilterBase PopulateFilter(SearchFilterDto searchFilterDto, int userId, bool sensitiveObservations, string translationCultureCode)
+        private static SearchFilterBase PopulateFilter(SearchFilterDto searchFilterDto, int userId, string translationCultureCode)
         {
             if (searchFilterDto == null) return default!;
 
-            var filter = new SearchFilterInternal(userId, sensitiveObservations);
+            var filter = new SearchFilterInternal(userId, (ProtectionFilter)searchFilterDto.ProtectionFilter);
             filter.Taxa = searchFilterDto.Taxon?.ToTaxonFilter();
             filter.Date = ToDateFilter(searchFilterDto.Date!);
             filter.DataProviderIds = searchFilterDto.DataProvider?.Ids?.ToList();
@@ -30,7 +30,6 @@ namespace SOS.Analysis.Api.Extensions.Dto
                     From = searchFilterDto.ModifiedDate.From,
                     To = searchFilterDto.ModifiedDate.To
                 };
-            filter.ExtendedAuthorization.ProtectedObservations = sensitiveObservations;
             filter.ExtendedAuthorization.ObservedByMe = searchFilterDto.ObservedByMe ?? false;
             filter.ExtendedAuthorization.ReportedByMe = searchFilterDto.ReportedByMe ?? false;
 
@@ -214,9 +213,9 @@ namespace SOS.Analysis.Api.Extensions.Dto
             };
         }
 
-        public static SearchFilterInternal ToSearchFilter(this SearchFilterInternalDto searchFilterDto, int userId, bool sensitiveObservations, string translationCultureCode)
+        public static SearchFilterInternal ToSearchFilter(this SearchFilterInternalDto searchFilterDto, int userId, string translationCultureCode)
         {
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, sensitiveObservations, translationCultureCode);
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, translationCultureCode);
         }
     }
 }

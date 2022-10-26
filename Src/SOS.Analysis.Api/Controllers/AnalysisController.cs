@@ -54,10 +54,9 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
-        /// <param name="sensitiveObservations"></param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="useCenterPoint">If true, grid cell center point will be used, else grid cell corner points will be used.</param>
-        /// <param name="edgeLength">The target edge length ratio when useEdgeLengthRatio is true, else the target maximum edge length.</param>
+        /// <param name="edgeLength">The target edge length ratio when useEdgeLengthRatio is true, else the target maximum edge length. Calculate convex hull when 0 else concave hull</param>
         /// <param name="useEdgeLengthRatio">Change behavior of edgeLength. When true: 
         /// Computes the concave hull of the vertices in a geometry using the target criterion of edge length ratio. 
         /// The edge length ratio is a fraction of the length difference between the longest and shortest edges in the Delaunay Triangulation of the input points.
@@ -75,17 +74,16 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
-            [FromQuery] bool? sensitiveObservations = false,
             [FromQuery] int? gridCellSizeInMeters = 2000,
             [FromQuery] bool? useCenterPoint = true,
-            [FromQuery] double? edgeLength = 1000,
-            [FromQuery] bool? useEdgeLengthRatio = false,
+            [FromQuery] double? edgeLength = 0.5,
+            [FromQuery] bool? useEdgeLengthRatio = true,
             [FromQuery] bool? allowHoles = false,
             CoordinateSys? coordinateSystem = CoordinateSys.ETRS89)
         {
             try
             {
-                CheckAuthorization(sensitiveObservations!.Value);
+                CheckAuthorization(searchFilter.ProtectionFilter);
 
                 searchFilter = await InitializeSearchFilterAsync(searchFilter);
                
@@ -100,7 +98,7 @@ namespace SOS.Analysis.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var filter = searchFilter?.ToSearchFilter(UserId, sensitiveObservations.Value, "sv-SE")!;
+                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
 
                 var result = await _analysisManager.CalculateAooAndEooAsync(
                     filter, 

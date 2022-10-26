@@ -44,7 +44,7 @@ namespace SOS.Observations.Api.Managers
         private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
         private readonly ILogger<ObservationManager> _logger;        
 
-        private void PostProcessObservations(bool protectedObservations, IEnumerable<dynamic> processedObservations, string cultureCode)
+        private void PostProcessObservations(ProtectionFilter protectionFilter, IEnumerable<dynamic> processedObservations, string cultureCode)
         {
             if (!processedObservations?.Any() ?? true)
             {
@@ -62,10 +62,12 @@ namespace SOS.Observations.Api.Managers
                
                 foreach (var obs in observations)
                 {
-                    if (protectedObservations && obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
-                        out var occurrenceObject))
+                    if (!protectionFilter.Equals(ProtectionFilter.Public) &&
+                        obs.TryGetValue(nameof(Observation.Sensitive).ToLower(), out var sensitive) &&
+                        obs.TryGetValue(nameof(Observation.Occurrence).ToLower(), out var occurrenceObject)
+                    )
                     {
-                        if (occurrenceObject is IDictionary<string, object> occurrenceDictionary && occurrenceDictionary.TryGetValue("occurrenceId", out var occurenceId))
+                        if (((bool)sensitive) && occurrenceObject is IDictionary<string, object> occurrenceDictionary && occurrenceDictionary.TryGetValue("occurrenceId", out var occurenceId))
                         {
                             occurenceIds.Add(occurenceId as string);
                         }
@@ -73,7 +75,7 @@ namespace SOS.Observations.Api.Managers
                 }
 
                 // Log protected observations
-                if (protectedObservations)
+                if (!protectionFilter.Equals(ProtectionFilter.Public))
                 {
                     var user =  _httpContextAccessor.HttpContext?.User;
 
@@ -157,7 +159,7 @@ namespace SOS.Observations.Api.Managers
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetChunkAsync(filter, skip, take);
-                PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
+                PostProcessObservations(filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
 
                 return processedObservations;
             }
@@ -190,7 +192,7 @@ namespace SOS.Observations.Api.Managers
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, scrollId);
-                PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
+                PostProcessObservations(filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
                 return processedObservations;
             }
             catch (AuthenticationRequiredException e)
@@ -423,18 +425,18 @@ namespace SOS.Observations.Api.Managers
                 }
             }
 
+            var protectionFilter = protectedObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public;
             var filter = includeInternalFields ? 
-                new SearchFilterInternal(userId ?? 0, protectedObservations) { NotPresentFilter = SightingNotPresentFilter.IncludeNotPresent } : 
-                new SearchFilter(userId ?? 0, protectedObservations);
+                new SearchFilterInternal(userId ?? 0, protectionFilter) { NotPresentFilter = SightingNotPresentFilter.IncludeNotPresent } : 
+                new SearchFilter(userId ?? 0, protectionFilter);
             filter.Output = new OutputFilter();
             filter.Output.PopulateFields(outputFieldSet);
-            filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
-
+            
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "Sighting", null, null, null, false);
 
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
 
-            PostProcessObservations(protectedObservations, processedObservation, translationCultureCode);
+            PostProcessObservations(protectionFilter, processedObservation, translationCultureCode);
 
             return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
         }
@@ -450,7 +452,7 @@ namespace SOS.Observations.Api.Managers
             var sighting = await _artportalenApiManager.GetObservationAsync(occurrenceId);
             processedObservation = sighting.ToDynamic();
             processedObservation = new List<dynamic>() { processedObservation };           
-            PostProcessObservations(protectedObservations, processedObservation, translationCultureCode);
+            PostProcessObservations(protectedObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public, processedObservation, translationCultureCode);
             return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
         }
 
@@ -461,7 +463,7 @@ namespace SOS.Observations.Api.Managers
             {
                 // Make sure mandatory properties is set
                 filter.ExtendedAuthorization.ObservedByMe = true;
-                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
+                filter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Public; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
                 filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
                 await _filterManager.PrepareFilterAsync(null, null, filter);
 
@@ -492,7 +494,7 @@ namespace SOS.Observations.Api.Managers
             {
                 // Make sure mandatory properties is set
                 filter.ExtendedAuthorization.ObservedByMe = true;
-                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
+                filter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Public; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
                 filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
                 await _filterManager.PrepareFilterAsync(null, null, filter);
 
@@ -523,7 +525,7 @@ namespace SOS.Observations.Api.Managers
             {
                 // Make sure mandatory properties is set
                 filter.ExtendedAuthorization.ObservedByMe = true;
-                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
+                filter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Public; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
                 filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
                 await _filterManager.PrepareFilterAsync(null, null, filter);
 

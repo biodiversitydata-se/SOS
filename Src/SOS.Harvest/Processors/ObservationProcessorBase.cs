@@ -322,15 +322,15 @@ namespace SOS.Harvest.Processors
                         }
                     }
                     
-                    // If  observation is protected
+                    // If observation is protected
                     if (observation.ShallBeProtected())
                     {
                         observation.Sensitive = true;
-                        protectedObservations.TryAdd(observation.Occurrence.OccurrenceId, observation);
+                        protectedObservations.TryAdd(observation.Occurrence!.OccurrenceId, observation);
 
                         //If it is a protected sighting, public users should not be possible to find it in the current month 
                         if (!EnableDiffusion || (observation.Occurrence.SensitivityCategory > 2 && (observation.Event?.StartDate?.Year ?? 0) == DateTime.Now.Year || (observation?.Event?.EndDate?.Year ?? 0) == DateTime.Now.Year) &&
-                            ((observation.Event?.StartDate?.Month ?? 0) == DateTime.Now.Month || (observation?.Event?.EndDate?.Month ?? 0) == DateTime.Now.Month))
+                            ((observation!.Event?.StartDate?.Month ?? 0) == DateTime.Now.Month || (observation?.Event?.EndDate?.Month ?? 0) == DateTime.Now.Month))
                         {
                             continue;
                         }
@@ -354,7 +354,7 @@ namespace SOS.Harvest.Processors
                     }
 
                     // Add public observation
-                    publicObservations.TryAdd(observation.Occurrence.OccurrenceId, observation);
+                    publicObservations.TryAdd(observation.Occurrence!.OccurrenceId, observation);
                 }
                 verbatimObservationsBatch = null!;
 

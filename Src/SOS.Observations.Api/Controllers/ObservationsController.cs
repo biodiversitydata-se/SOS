@@ -565,7 +565,7 @@ namespace SOS.Observations.Api.Controllers
                 CheckAuthorization(sensitiveObservations);
 
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                var searchFilter = new SearchFilterInternal(UserId, sensitiveObservations)
+                var searchFilter = new SearchFilterInternal(UserId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public)
                 {
                     FieldTranslationCultureCode = translationCultureCode,
                     Output = string.IsNullOrEmpty(sortBy) ? new OutputFilter() : new OutputFilter { 

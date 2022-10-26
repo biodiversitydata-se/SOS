@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
@@ -38,23 +39,24 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         protected string GetCurrentIndex(SearchFilterBase filter)
         {
-            if (((filter?.ExtendedAuthorization.ObservedByMe ?? false) || (filter?.ExtendedAuthorization.ReportedByMe ?? false) || (filter?.ExtendedAuthorization.ProtectedObservations ?? false)) &&
-                (filter?.ExtendedAuthorization.UserId ?? 0) == 0)
+            if (
+                (
+                    (filter.ExtendedAuthorization.ObservedByMe) || 
+                    (filter.ExtendedAuthorization.ReportedByMe) || 
+                    (!filter.ExtendedAuthorization.ProtectionFilter.Equals(ProtectionFilter.Public))
+                ) &&
+                (filter?.ExtendedAuthorization.UserId ?? 0) == 0
+            )
             {
                 throw new AuthenticationRequiredException("Not authenticated");
             }
 
-            if (!filter?.ExtendedAuthorization.ProtectedObservations ?? true)
+            return filter.ExtendedAuthorization.ProtectionFilter switch
             {
-                return PublicIndexName;
-            }
-
-           /* if (!((filter?.ExtendedAuthorization?.ReportedByMe ?? false) || (filter?.ExtendedAuthorization?.ObservedByMe ?? false)) && (!filter?.ExtendedAuthorization?.ExtendedAreas?.Any() ?? true))
-            {
-                throw new AuthenticationRequiredException("Not authorized");
-            }*/
-
-            return ProtectedIndexName;
+                ProtectionFilter.BothPublicAndSensitive => $"{PublicIndexName}, {ProtectedIndexName}",
+                ProtectionFilter.Sensitive => ProtectedIndexName,
+                _ => PublicIndexName
+            };
         }
 
         /// <summary>

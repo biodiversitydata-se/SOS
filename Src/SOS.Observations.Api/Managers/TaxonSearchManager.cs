@@ -43,7 +43,7 @@ namespace SOS.Observations.Api.Managers
                     if (taxonAggregation == null)
                     {
                         _logger.LogInformation("Start create taxonSumAggregationCache");
-                        var searchFilter = new SearchFilterInternal(userId ?? 0, false);
+                        var searchFilter = new SearchFilterInternal(userId ?? 0, ProtectionFilter.Public);
                         searchFilter.PositiveSightings = true;
                         searchFilter.NotPresentFilter = SightingNotPresentFilter.DontIncludeNotPresent;
                         searchFilter.DeterminationFilter = SightingDeterminationFilter.NotUnsureDetermination;

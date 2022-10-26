@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Models.Search.Filters
+﻿using SOS.Lib.Enums;
+
+namespace SOS.Lib.Models.Search.Filters
 {
     /// <summary>
     /// 
@@ -9,8 +11,8 @@
         /// Constructor
         /// </summary>
         /// <param name="userId"></param>
-        /// <param name="sensitiveObservations"></param>
-        public SearchFilter(int userId, bool sensitiveObservations = false) : base(userId, sensitiveObservations)
+        /// <param name="protectionFilter"></param>
+        public SearchFilter(int userId, ProtectionFilter protectionFilter = ProtectionFilter.Public) : base(userId, protectionFilter)
         {
             Output = new OutputFilter();
         }
