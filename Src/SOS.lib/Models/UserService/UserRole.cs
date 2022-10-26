@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Models.UserService
+﻿using System.Collections.Generic;
+
+namespace SOS.Lib.Models.UserService
 {
     /// <summary>
     /// User role.
@@ -25,5 +27,8 @@
         /// </summary>
         public string Description { get; set; }
         //public ICollection<int> AuthorityIds { get; set; }
+
+        public List<UserAuthority> Authorities { get; set; }
+        public List<UserArea> Areas { get; set; }
     }
 }

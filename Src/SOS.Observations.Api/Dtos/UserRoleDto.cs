@@ -1,4 +1,7 @@
-﻿namespace SOS.Observations.Api.Dtos
+﻿using SOS.Lib.Enums;
+using System.Collections.Generic;
+
+namespace SOS.Observations.Api.Dtos
 {
     /// <summary>
     /// User role.
@@ -24,5 +27,7 @@
         /// Role description.
         /// </summary>
         public string Description { get; set; }
+
+        public List<UserAuthorityDto> Authorities { get; set; }
     }
 }
