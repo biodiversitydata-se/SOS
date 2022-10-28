@@ -194,15 +194,6 @@ namespace SOS.Harvest.Processors.Taxon
                             case NonPeriodizeFactorEnum.OrganismGroup:
                                 taxon.DynamicProperties.OrganismGroup = enumValue;
                                 break;
-                            case NonPeriodizeFactorEnum.ProtectedByLawRegulation1:
-                                taxon.DynamicProperties.ProtectedByLaw = true;
-                                break;
-                            case NonPeriodizeFactorEnum.ProtectedByLawRegulation2:
-                                taxon.DynamicProperties.ProtectedByLaw = true;
-                                break;
-                            case NonPeriodizeFactorEnum.ProtectedByLawRegulation3:
-                                taxon.DynamicProperties.ProtectedByLaw = true;
-                                break;
                             case NonPeriodizeFactorEnum.ProtectedByLawSpeciesProtection:
                                 taxon.DynamicProperties.ProtectedByLaw = true;
                                 break;
