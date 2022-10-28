@@ -17,16 +17,16 @@
 
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="6.4.0" />
-		<PackageReference Include="CSharpFunctionalExtensions" Version="2.34.3" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="2.35.1" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Hangfire.Core" Version="1.7.31" />
 		<PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-		<PackageReference Include="MongoDB.Driver" Version="2.17.1" />
-		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.17.1" />
+		<PackageReference Include="MongoDB.Driver" Version="2.18.0" />
+		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.18.0" />
 		<PackageReference Include="NetTopologySuite" Version="2.5.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.4" />
 		<PackageReference Include="System.ServiceModel.Duplex" Version="4.10.0" />
 		<PackageReference Include="System.ServiceModel.Http" Version="4.10.0" />
 		<PackageReference Include="System.ServiceModel.NetTcp" Version="4.10.0" />
