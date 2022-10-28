@@ -5,6 +5,7 @@ using SOS.DataStewardship.Api.Models;
 using SOS.DataStewardship.Api.Models.SampleData;
 using SOS.Lib.JsonConverters;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -13,17 +14,20 @@ namespace SOS.DataStewardship.Api.Managers;
 public class DataStewardshipManager : IDataStewardshipManager
 {    
     private readonly IObservationDatasetRepository _observationDatasetRepository;
+    private readonly IObservationEventRepository _observationEventRepository;
     private readonly IProcessedObservationCoreRepository _processedObservationCoreRepository;
     private readonly IFilterManager _filterManager;
     private readonly ILogger<DataStewardshipManager> _logger;
 
     public DataStewardshipManager(IObservationDatasetRepository observationDatasetRepository,
         IProcessedObservationCoreRepository processedObservationCoreRepository,
+        IObservationEventRepository observationEventRepository,
         IFilterManager filterManager,
         ILogger<DataStewardshipManager> logger)
     {
         _observationDatasetRepository = observationDatasetRepository;
         _processedObservationCoreRepository = processedObservationCoreRepository;
+        _observationEventRepository = observationEventRepository;
         _filterManager = filterManager;
         _logger = logger;
     }
@@ -57,7 +61,15 @@ public class DataStewardshipManager : IDataStewardshipManager
 
     public async Task<EventModel> GetEventByIdAsync(string id)
     {
-        var filter = new SearchFilter(0);        
+        // todo - decide if the observation or event index should be used.
+        var resFromObs = await GetEventByIdFromObservationIndexAsync(id);
+        var resFromEvent = await GetEventByIdFromEventIndexAsync(id);
+        return resFromEvent;
+    }
+
+    private async Task<EventModel> GetEventByIdFromObservationIndexAsync(string id)
+    {
+        var filter = new SearchFilter(0);
         filter.EventIds = new List<string> { id };
         var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 1, true);
         var observation = pageResult.Records.FirstOrDefault();
@@ -65,10 +77,28 @@ public class DataStewardshipManager : IDataStewardshipManager
         var occurrenceIds = await _processedObservationCoreRepository.GetAllAggregationItemsAsync(filter, "occurrence.occurrenceId");
         var ev = obs.ToEventModel(occurrenceIds.Select(m => m.AggregationKey));
         return ev;
-        //return DataStewardshipArtportalenSampleData.EventBats1;
-    }    
+    }
+
+    private async Task<EventModel> GetEventByIdFromEventIndexAsync(string id)
+    {
+        var observationEvents = await _observationEventRepository.GetEventsByIds(new List<string> { id });
+        var ev = observationEvents.First().ToEventModel();        
+        return ev;
+    }
 
     public async Task<List<EventModel>> GetEventsBySearchAsync(EventsFilter eventsFilter, int skip, int take)
+    {
+        // todo - decide if the observation or event index should be used.
+        var resFromObs = await GetEventsBySearchFromObservationIndexAsync(eventsFilter, skip, take);
+        var resFromEvent = await GetEventsBySearchFromEventIndexAsync(eventsFilter, skip, take);
+
+        return resFromEvent;        
+    }
+
+    /// <remarks>
+    /// This search uses the Observation index.
+    /// </remarks>
+    private async Task<List<EventModel>> GetEventsBySearchFromObservationIndexAsync(EventsFilter eventsFilter, int skip, int take)
     {
         var filter = eventsFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);
@@ -80,38 +110,30 @@ public class DataStewardshipManager : IDataStewardshipManager
             .Take(take)
             .ToList();
 
-        var firstOccurrenceIdInEvents = eventIds.Select(m => m.Value.First());        
+        var firstOccurrenceIdInEvents = eventIds.Select(m => m.Value.First());
         var observations = await _processedObservationCoreRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
         var events = new List<EventModel>();
         foreach (var observation in observations)
         {
             var occurrenceIds = occurrenceIdsByEventId[observation.Event.EventId.ToLower()];
-            var eventModel = observation.ToEventModel(occurrenceIds);            
+            var eventModel = observation.ToEventModel(occurrenceIds);
             events.Add(eventModel);
         }
 
         return events;
+    }
 
-        // old implementation
-        //var filter = eventsFilter.ToSearchFilter();
-        //await _filterManager.PrepareFilterAsync(null, null, filter);
-        //var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 10000, true); // todo - when there are more than 10000 observations this solutions is no good.        
-        //var observations = CastDynamicsToObservations(pageResult.Records);
-        //var observationsByEventId = observations
-        //    .GroupBy(m => m.Event.EventId)
-        //    .ToDictionary(m => m.Key, m => m.ToList());
-
-        //var events = new List<EventModel>();
-        //foreach (var pair in observationsByEventId)
-        //{
-        //    var eventModel = pair.Value.First().ToEventModel(pair.Value.Select(m => m.Occurrence.OccurrenceId));
-        //    events.Add(eventModel);
-        //}
-
-        //return events
-        //    .Skip(skip)
-        //    .Take(take)
-        //    .ToList();
+    /// <remarks>
+    /// This search uses the Event index.
+    /// </remarks>
+    private async Task<List<EventModel>> GetEventsBySearchFromEventIndexAsync(EventsFilter eventsFilter, int skip, int take)
+    {
+        var filter = eventsFilter.ToSearchFilter();
+        await _filterManager.PrepareFilterAsync(null, null, filter);        
+        var eventIds = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "event.eventId", "event.startDate", skip, take);
+        var observationEvents = await _observationEventRepository.GetEventsByIds(eventIds.Select(m => m.AggregationKey));
+        var events = observationEvents.Select(m => m.ToEventModel()).ToList();
+        return events;
     }
 
     private readonly List<string> _observationEventOutputFields = new List<string>()

@@ -104,7 +104,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Filter(query)
                     )
                 )
-                .Size(1)                
+                .Size(ids?.Count() ?? 0)                
                 .TrackTotalHits(false)
             );
 

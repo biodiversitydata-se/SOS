@@ -285,6 +285,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> VerifyCollectionAsync(bool protectedIndex);
         
         Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, string aggregationField);
+        Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
+            string aggregationField,
+            string numericSortField,
+            int skip,
+            int take);
+
         Task<List<AggregationItem>> GetAllAggregationItemsAsync(SearchFilter filter, string aggregationField);
         Task<List<EventOccurrenceAggregationItem>> GetEventOccurrenceItemsAsync(SearchFilter filter);
 
