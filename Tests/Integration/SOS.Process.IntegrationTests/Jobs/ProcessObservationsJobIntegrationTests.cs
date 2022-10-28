@@ -93,6 +93,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             }
             IUserObservationRepository userObservationRepository = new Mock<IUserObservationRepository>().Object;
             IObservationDatasetRepository observationDatasetRepository = new Mock<IObservationDatasetRepository>().Object;
+            IObservationEventRepository observationEventRepository = new Mock<IObservationEventRepository>().Object;
 
             var processInfoRepository =
                 new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
@@ -287,6 +288,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration,
                 userObservationRepository,
                 observationDatasetRepository,
+                observationEventRepository,
                 new NullLogger<ProcessObservationsJob>());
 
             return processJob;

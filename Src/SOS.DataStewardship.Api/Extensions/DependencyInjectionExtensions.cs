@@ -48,6 +48,7 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddScoped<ITaxonRepository, TaxonRepository>();
         webApplicationBuilder.Services.AddScoped<ITaxonListRepository, TaxonListRepository>();
         webApplicationBuilder.Services.AddScoped<IObservationDatasetRepository, ObservationDatasetRepository>();
+        webApplicationBuilder.Services.AddScoped<IObservationEventRepository, ObservationEventRepository>();
         webApplicationBuilder.Services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
         webApplicationBuilder.Services.AddSingleton<IAreaRepository, AreaRepository>();
         webApplicationBuilder.Services.AddSingleton<IDataProviderRepository, DataProviderRepository>();

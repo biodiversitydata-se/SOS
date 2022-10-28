@@ -10,21 +10,19 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Processed.Dataset;
+using SOS.Lib.Models.Processed.Event;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
+using static SOS.Lib.Models.Processed.Event.ObservationEvent;
 
 namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
-    ///     Dataset observation repository.
+    ///     Observation event repository.
     /// </summary>
-    public class ObservationDatasetRepository : ProcessRepositoryBase<ObservationDataset, string>,
-        IObservationDatasetRepository
+    public class ObservationEventRepository : ProcessRepositoryBase<ObservationEvent, string>,
+        IObservationEventRepository
     {
         /// <summary>
         /// Add the collection
@@ -39,78 +37,124 @@ namespace SOS.Lib.Repositories.Processed
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
                 )
-                .Map<ObservationDataset>(m => m
-                    .AutoMap<ObservationDataset>()
+                .Map<ObservationEvent>(m => m
+                    .AutoMap<ObservationEvent>()
                     .Properties(ps => ps
                         .KeyWordLowerCase(kwlc => kwlc.Id)
-                        .KeyWordLowerCase(kwlc => kwlc.Identifier)                        
-                        .KeyWordLowerCase(kwlc => kwlc.DataStewardship)
-                        .KeyWordLowerCase(kwlc => kwlc.Title, false)
-                        .KeyWordLowerCase(kwlc => kwlc.ProjectId)
-                        .KeyWordLowerCase(kwlc => kwlc.ProjectCode, false)
-                        .KeyWordLowerCase(kwlc => kwlc.Description, false)
-                        .KeyWordLowerCase(kwlc => kwlc.Spatial, false)
-                        .KeyWordLowerCase(kwlc => kwlc.Language, false)
-                        .KeyWordLowerCase(kwlc => kwlc.Metadatalanguage, false)
+                        .KeyWordLowerCase(kwlc => kwlc.EventId)
+                        .KeyWordLowerCase(kwlc => kwlc.ParentEventId, false)
+                        .KeyWordLowerCase(kwlc => kwlc.EventType, false)
+                        .KeyWordLowerCase(kwlc => kwlc.SamplingProtocol, false)
+                        .KeyWordLowerCase(kwlc => kwlc.SamplingEffort, false)
+                        .KeyWordLowerCase(kwlc => kwlc.SampleSizeValue, false)
+                        .KeyWordLowerCase(kwlc => kwlc.SampleSizeUnit, false)
+                        .KeyWordLowerCase(kwlc => kwlc.Habitat, false)
+                        .Text(t => t
+                            .Name(nm => nm.EventRemarks)
+                            .IndexOptions(IndexOptions.Docs)
+                        )
+                        .Object<Location>(l => l
+                            .AutoMap()
+                            .Name(nm => nm.Location)
+                            .Properties(ps => ps.GetMapping())
+                        )
+                        .Object<EventDataset>(l => l
+                            .AutoMap()
+                            .Name(nm => nm.Dataset)
+                            .Properties(ps => ps
+                                .KeyWordLowerCase(kwlc => kwlc.Identifier)
+                                .KeyWordLowerCase(kwlc => kwlc.Title)
+                            )
+                        )
+                        .Object<VocabularyValue>(t => t
+                            .Name(nm => nm.DiscoveryMethod)
+                            .Properties(ps => ps
+                                .KeyWordLowerCase(kwlc => kwlc.Value)
+                                .Number(nr => nr
+                                    .Name(nm => nm.Id)
+                                    .Type(NumberType.Integer)
+                                )
+                            )
+                        )
+                        .Nested<ExtendedMeasurementOrFact>(n => n
+                            .AutoMap()
+                            .Name(nm => nm.MeasurementOrFacts)
+                            .Properties(ps => ps
+                                .KeyWordLowerCase(kwlc => kwlc.OccurrenceID)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementRemarks, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementAccuracy, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementDeterminedBy, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementDeterminedDate, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementID, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementMethod, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementType, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementTypeID, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementUnit, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementUnitID, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementValue, false)
+                                .KeyWordLowerCase(kwlc => kwlc.MeasurementValueID, false)
+                            )
+                        )
+                        .Nested<Multimedia>(n => n
+                            .AutoMap()
+                            .Name(nm => nm.Media)
+                            .Properties(ps => ps
+                                .KeyWordLowerCase(kwlc => kwlc.Description, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Audience, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Contributor, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Created, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Creator, false)
+                                .KeyWordLowerCase(kwlc => kwlc.DatasetID, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Format, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Identifier, false)
+                                .KeyWordLowerCase(kwlc => kwlc.License, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Publisher, false)
+                                .KeyWordLowerCase(kwlc => kwlc.References, false)
+                                .KeyWordLowerCase(kwlc => kwlc.RightsHolder, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Source, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Title, false)
+                                .KeyWordLowerCase(kwlc => kwlc.Type, false)
+                            )
+                        )
                         .Object<Organisation>(t => t
                             .AutoMap()
-                            .Name(nm => nm.Assigner)
+                            .Name(nm => nm.RecorderOrganisation)
                             .Properties(ps => ps
                                 .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, false)
                                 .KeyWordLowerCase(kwlc => kwlc.OrganisationID, false)
                             )
                         )
-                        .Object<Organisation>(t => t
+                        .Object<WeatherVariable>(t => t
                             .AutoMap()
-                            .Name(nm => nm.Creator)
-                            .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, false)
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationID, false)
-                            )
-                        )
-                        .Object<Organisation>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.OwnerinstitutionCode)
-                            .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, false)
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationID, false)
-                            )
-                        )
-                        .Object<Organisation>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.Publisher)
-                            .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, false)
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationID, false)
-                            )
-                        )
+                            .Name(nm => nm.Weather)
+                        )                        
                     )
                 )
             );
             
-            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationDataset index. Error: {createIndexResponse.DebugInformation}");
+            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationEvent index. Error: {createIndexResponse.DebugInformation}");
         }
 
-        public async Task<List<ObservationDataset>> GetDatasetsByIds(IEnumerable<string> ids)
+        public async Task<List<ObservationEvent>> GetEventsByIds(IEnumerable<string> ids)
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
 
-            var query = new List<Func<QueryContainerDescriptor<ObservationDataset>, QueryContainer>>();
-            query.TryAddTermsCriteria("identifier", ids);
-            var searchResponse = await Client.SearchAsync<ObservationDataset>(s => s
+            var query = new List<Func<QueryContainerDescriptor<ObservationEvent>, QueryContainer>>();
+            query.TryAddTermsCriteria("eventId", ids);
+            var searchResponse = await Client.SearchAsync<ObservationEvent>(s => s
                 .Index(IndexName)
                 .Query(q => q
                     .Bool(b => b
                         .Filter(query)
                     )
                 )
-                .Size(ids?.Count() ?? 0)                
+                .Size(ids?.Count() ?? 0)
                 .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
-            var datasets = searchResponse.Documents.ToList();
-            return datasets;
+            var events = searchResponse.Documents.ToList();
+            return events;
         }
 
         /// <summary>
@@ -128,7 +172,7 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        private BulkAllObserver WriteToElastic(IEnumerable<ObservationDataset> items)
+        private BulkAllObserver WriteToElastic(IEnumerable<ObservationEvent> items)
         {
             if (!items.Any())
             {
@@ -169,11 +213,11 @@ namespace SOS.Lib.Repositories.Processed
                     .Size(WriteBatchSize)
                     .DroppedDocumentCallback((r, o) =>
                     {
-                        Logger.LogError($"Dataset id: {o?.Id}, Error: {r?.Error?.Reason}");
+                        Logger.LogError($"EventId: {o?.Id}, Error: {r?.Error?.Reason}");
                     })
                 )
                 .Wait(TimeSpan.FromDays(1),
-                    next => { Logger.LogDebug($"Indexing datasets for search:{count += next.Items.Count}"); });
+                    next => { Logger.LogDebug($"Indexing events for search:{count += next.Items.Count}"); });
         }
 
         /// <summary>
@@ -183,23 +227,23 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="logger"></param>
-        public ObservationDatasetRepository(
+        public ObservationEventRepository(
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ILogger<ObservationDatasetRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
+            ILogger<ObservationEventRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             LiveMode = true;
             _id = nameof(Observation); // The active instance should be the same as the ProcessedObservationRepository which uses the Observation type.
         }
 
         /// <inheritdoc />
-        public async Task<int> AddManyAsync(IEnumerable<ObservationDataset> items)
+        public async Task<int> AddManyAsync(IEnumerable<ObservationEvent> items)
         {
             // Save valid processed data
-            Logger.LogDebug($"Start indexing ObservationDataset batch for searching with {items.Count()} items");
+            Logger.LogDebug($"Start indexing ObservationEvent batch for searching with {items.Count()} items");
             var indexResult = WriteToElastic(items);
-            Logger.LogDebug("Finished indexing ObservationDataset batch for searching");
+            Logger.LogDebug("Finished indexing ObservationEvent batch for searching");
             if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
             return items.Count();
         }
@@ -208,7 +252,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                var res = await Client.DeleteByQueryAsync<ObservationDataset>(q => q
+                var res = await Client.DeleteByQueryAsync<ObservationEvent>(q => q
                     .Index(IndexName)
                     .Query(q => q.MatchAll())
                 );
@@ -247,7 +291,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public string UniqueIndexName => IndexHelper.GetIndexName<ObservationDataset>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
+        public string UniqueIndexName => IndexHelper.GetIndexName<ObservationEvent>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
 
         /// <inheritdoc />
         public async Task<bool> VerifyCollectionAsync()

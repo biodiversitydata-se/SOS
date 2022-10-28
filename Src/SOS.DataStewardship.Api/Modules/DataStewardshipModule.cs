@@ -18,17 +18,16 @@ public class DataStewardshipModule : IModule
      * Template: https://github.com/Lund-University-Biodiversity-data/datahost-api/blob/main/api/templateOpenapi.yaml
      * 
      * Todo
-     * ====          
-     * 1. Implement filter search     
-     * 2. Create event index in ES or store all event data in observations?
-     * 3. Create integration tests
-     * 4. Implement Artportalen dataset database tables
-     * 5. Implement harvest Artportalen dataset database tables
-     * 6. Implement harvest Artportalen data stewardship harvesting.
-     * 7. Implement sample event DwC-A data stewardship harvesting.
-     * 8. Optimize ES search projection. Now every fields are retrieved just for convenience during development. SearchExtensionsObservation.ToProjection().
-     * 9. Implement logging
-     */    
+     * ====               
+     * 1. Create integration tests
+     * 2. Implement Artportalen dataset database tables
+     * 3. Implement harvest Artportalen dataset database tables
+     * 4. Implement harvest Artportalen data stewardship harvesting.
+     * 5. Implement sample event DwC-A data stewardship harvesting.
+     * 6. Optimize ES search projection. Now every fields are retrieved just for convenience during development. SearchExtensionsObservation.ToProjection().
+     * 7. Implement logging
+     * 8. Move SOS.Lib.Models.Processed.Dataset.ObservationDataset.Organisation to SOS.Lib.Models.Processed.Dataset.Organisation?
+     */
 
     public void MapEndpoints(WebApplication application)
     {        

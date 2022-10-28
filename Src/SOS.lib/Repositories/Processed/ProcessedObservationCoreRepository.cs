@@ -1571,6 +1571,57 @@ namespace SOS.Lib.Repositories.Processed
             return result;
         }
 
+        public async Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
+            string aggregationField,
+            string numericSortField,
+            int skip, 
+            int take)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            int size = Math.Min(skip + take, 100000);
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Terms("termAggregation", t => t
+                        .Size(size)
+                        .Field(aggregationField)
+                        .Aggregations(aa => aa
+                            .Max("sort_agg", mi => mi
+                                .Field(numericSortField)
+                            )
+                            .BucketSort("bucketsort", bs => bs
+                                .Sort(s => s
+                                    .Descending("sort_agg")
+                                )
+                                .From(skip)
+                                .Size(take)
+                            )
+                        )
+                    )                    
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+
+            searchResponse.ThrowIfInvalid();
+            IEnumerable<AggregationItem> result = searchResponse.Aggregations
+                .Terms("termAggregation")
+                .Buckets
+                .Select(b => new AggregationItem { AggregationKey = b.Key, DocCount = (int)(b.DocCount ?? 0) });
+
+            return result;
+        }
+
+
         public async Task<List<AggregationItem>> GetAllAggregationItemsAsync(SearchFilter filter, string aggregationField)
         {
             var indexName = GetCurrentIndex(filter);
@@ -1689,6 +1740,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Sources(src => src
                             .Terms("eventId", tt => tt
                                 .Field("event.eventId")
+                                .Order(SortOrder.Ascending)
                             )
                             .Terms("occurrenceId", tt => tt
                                 .Field("occurrence.occurrenceId")

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Azure;
-using SOS.DataStewardship.Api.Models;
+﻿using SOS.DataStewardship.Api.Models;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Dataset;
 using System.Data;
@@ -82,6 +81,43 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
+        public static EventModel ToEventModel(this Lib.Models.Processed.Event.ObservationEvent observationEvent)
+        {
+            if (observationEvent == null) return null;
+
+            var ev = new EventModel();
+            ev.EventID = observationEvent.EventId;
+            ev.ParentEventID = observationEvent.ParentEventId;
+            ev.EventRemarks = observationEvent.EventRemarks;
+            ev.AssociatedMedia = observationEvent.Media.ToAssociatedMedias();            
+            ev.Dataset = new EventDataset
+            {
+                Identifier = observationEvent.Dataset.Identifier,
+                //Title = // need to lookup this from observationEvent.ataset index or store this information in observationEvent.Event
+            };
+            ev.EventStartDate = observationEvent.StartDate;
+            ev.EventEndDate = observationEvent.EndDate;
+            ev.SamplingProtocol = observationEvent.SamplingProtocol;
+            ev.SurveyLocation = observationEvent.Location.ToLocation();
+            //ev.LocationProtected = ?
+            //ev.EventType = ?
+            //ev.Weather = ?
+            ev.RecorderCode = observationEvent.RecorderCode;
+            ev.RecorderOrganisation = observationEvent?.RecorderOrganisation?.Select(m => m.ToOrganisation()).ToList();
+
+            ev.Occurrences = observationEvent.OccurrenceIds;
+            if (ev.Occurrences.Any())
+            {
+                ev.NoObservations = EventModel.NoObservationsEnum.Falskt;
+            }
+            else
+            {
+                ev.NoObservations = EventModel.NoObservationsEnum.Sant;
+            }
+
+            return ev;
+        }       
+
         public static EventModel ToEventModel(this Observation observation, IEnumerable<string> occurrenceIds)
         {
             if (observation == null) return null;            
@@ -99,7 +135,7 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.EventStartDate = observation.Event.StartDate;
             ev.EventEndDate = observation.Event.EndDate;
             ev.SamplingProtocol = observation.Event.SamplingProtocol;
-            ev.SurveyLocation = observation.ToLocation();
+            ev.SurveyLocation = observation.Location.ToLocation();
             //ev.LocationProtected = ?
             //ev.EventType = ?
             //ev.Weather = ?
@@ -132,29 +168,27 @@ namespace SOS.DataStewardship.Api.Extensions
             return ev;
         }
 
-        public static Models.Location ToLocation(this Observation observation)
+        public static Models.Location ToLocation(this Lib.Models.Processed.Observation.Location location)
         {
-            County? county = observation?.Location?.County?.FeatureId?.GetCounty();
+            County? county = location?.County?.FeatureId?.GetCounty();
 
-            var location = new Models.Location()
+            return new Models.Location()
             {
                 County = county.Value,
                 //Province = 
                 //Municipality =
                 //Parish =
-                Locality = observation?.Location?.Locality,
-                LocationID = observation?.Location?.LocationId,
-                LocationRemarks = observation?.Location.LocationRemarks,
+                Locality = location?.Locality,
+                LocationID = location?.LocationId,
+                LocationRemarks = location.LocationRemarks,
                 //LocationType = // ? todo - add location type to models.
-                Emplacement = observation?.Location?.Point, // todo - decide if to use Point or PointWithBuffer
+                Emplacement = location?.Point, // todo - decide if to use Point or PointWithBuffer
                 EmplacementTest = new GeometryObject
                 {
                     Type = "point",
-                    Coordinates = new double[] { observation.Location.Point.Coordinates.Longitude, observation.Location.Point.Coordinates.Latitude }
+                    Coordinates = new double[] { location.Point.Coordinates.Longitude, location.Point.Coordinates.Latitude }
                 }
             };
-
-            return location;
         }
 
         public static List<AssociatedMedia> ToAssociatedMedias(this IEnumerable<Multimedia> multimedias)

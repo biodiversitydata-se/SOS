@@ -4,6 +4,8 @@ using System.Linq;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
+using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
+using static SOS.Lib.Models.Processed.Event.ObservationEvent;
 
 namespace SOS.Lib.Extensions
 {
@@ -282,6 +284,6 @@ namespace SOS.Lib.Extensions
                 .Select(observation => observation.ToDarwinCore());
         }
 
-        #endregion Sighting
+        #endregion Sighting        
     }
 }

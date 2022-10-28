@@ -25,7 +25,7 @@ namespace SOS.Lib.Models.Processed.Checklist
         /// <summary>
         /// Check list end date 
         /// </summary>
-        public Event Event { get; set; }
+        public Observation.Event Event { get; set; }
 
         /// <summary>
         /// Id of checklist
