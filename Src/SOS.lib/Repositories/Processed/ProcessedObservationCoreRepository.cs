@@ -1828,7 +1828,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter, bool getAllFields = false)
         {
             var indexNames = GetCurrentIndex(filter);
-            var query = filter.ToQuery(true);
+            var query = filter.ToQuery(skipSightingTypeFilters: true);
             query.TryAddTermCriteria("occurrence.occurrenceId", occurrenceId);
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");

@@ -703,13 +703,14 @@ namespace SOS.Lib
         }
 
         /// <summary>
-        /// Create search filter
+        ///  Create search filter
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="skipSightingTypeFilters"></param>
+        /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
         public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToQuery(
-            this SearchFilterBase filter, bool skipSightingTypeFilters = false)
+            this SearchFilterBase filter, bool skipSightingTypeFilters = false, bool skipAuthorizationFilters = false)
         {
             var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
@@ -718,7 +719,10 @@ namespace SOS.Lib
                 return query;
             }
 
-            query.AddAuthorizationFilters(filter.ExtendedAuthorization);
+            if (!skipAuthorizationFilters)
+            {
+                query.AddAuthorizationFilters(filter.ExtendedAuthorization);
+            }  
 
             if (!skipSightingTypeFilters)
             {

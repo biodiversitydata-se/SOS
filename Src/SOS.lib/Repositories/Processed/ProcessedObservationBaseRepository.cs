@@ -23,10 +23,12 @@ namespace SOS.Lib.Repositories.Processed
         /// Get core queries
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
-        protected (ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>) GetCoreQueries(SearchFilterBase filter)
+        protected (ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>) 
+            GetCoreQueries(SearchFilterBase filter, bool skipAuthorizationFilters = false)
         {
-            var query = filter.ToQuery();
+            var query = filter.ToQuery(skipAuthorizationFilters: skipAuthorizationFilters);
             var excludeQuery = filter.ToExcludeQuery();
 
             return (query, excludeQuery);
