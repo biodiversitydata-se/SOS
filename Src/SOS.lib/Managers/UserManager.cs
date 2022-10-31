@@ -48,9 +48,7 @@ namespace SOS.Lib.Managers
         {            
             var user = await UserService.GetUserAsync();            
             if (user == null) throw new AuthenticationRequiredException("User is null, probably due to missing authentication header.");
-            var userRoles = await UserService.GetUserRolesAsync(user.Id, applicationIdentifier, cultureCode);
-            var authorities = await UserService.GetUserAuthoritiesAsync(user.Id, applicationIdentifier, cultureCode) ??
-                              new List<AuthorityModel>();
+            var userRoles = await UserService.GetUserRolesAsync(user.Id, applicationIdentifier, cultureCode);            
             
             var userInformation = new UserInformation
             {
@@ -77,28 +75,22 @@ namespace SOS.Lib.Managers
                     Description = role.Description
                     //AuthorityIds = role.Authorities != null ? role.Authorities.Select(m => m.Id).ToArray() : null
                 };
-                userRole.Authorities = await GetUserAuthoritiesAsync(role.Authorities);                
+                userRole.Authorities = await GetUserAuthoritiesAsync(role.Authorities);
                 userInformation.Roles.Add(userRole);
-            }
 
-            //userInformation.Authorities = new List<UserAuthority>();
-            foreach (var authority in authorities)
-            {
-                //var userAuthority = new UserAuthority();
-                //userAuthority.Id = authority.Id;
-                //userAuthority.Name = authority.Name;
-                //userAuthority.AuthorityIdentity = authority.AuthorityIdentity;
-
-                if (authority.AuthorityIdentity == "Sighting" && authority.MaxProtectionLevel >= 3)
-                {                    
-                    userInformation.HasSensitiveSpeciesAuthority = true;
-                }
-                if (authority.AuthorityIdentity == "SightingIndication")
+                foreach (var authority in userRole.Authorities)
                 {
-                    userInformation.HasSightingIndicationAuthority = true;
+                    if (authority.AuthorityIdentity == "Sighting" && authority.MaxProtectionLevel >= 3)
+                    {
+                        userRole.HasSensitiveSpeciesAuthority = true;
+                        userInformation.HasSensitiveSpeciesAuthority = true;
+                    }
+                    if (authority.AuthorityIdentity == "SightingIndication")
+                    {
+                        userRole.HasSightingIndicationAuthority = true;
+                        userInformation.HasSightingIndicationAuthority = true;
+                    }
                 }
-
-                //userInformation.Authorities.Add(userAuthority);
             }
 
             return userInformation;
@@ -124,6 +116,8 @@ namespace SOS.Lib.Managers
             userAuthority.Id = authorityModel.Id;
             userAuthority.Name = authorityModel.Name;
             userAuthority.Areas = await GetUserAreasAsync(authorityModel.Areas);
+            userAuthority.AuthorityIdentity = authorityModel.AuthorityIdentity;
+            userAuthority.MaxProtectionLevel = authorityModel.MaxProtectionLevel;
             return userAuthority;
         }
 

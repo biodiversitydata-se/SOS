@@ -1226,6 +1226,8 @@ namespace SOS.Observations.Api.Extensions
                 Name = userRole.Name,
                 ShortName = userRole.ShortName,
                 Description = userRole.Description,
+                HasSensitiveSpeciesAuthority = userRole.HasSensitiveSpeciesAuthority,
+                HasSightingIndicationAuthority = userRole.HasSightingIndicationAuthority,                
                 Authorities = userRole.Authorities?.Select(a => a.ToUserAuthorityDto()).ToList()
             };
         }

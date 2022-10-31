@@ -28,6 +28,16 @@ namespace SOS.Observations.Api.Dtos
         /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        /// Indicates whether this role has sensitive species observation authority.
+        /// </summary>
+        public bool HasSensitiveSpeciesAuthority { get; set; }
+
+        /// <summary>
+        /// Indicates whether this role has sighting indication authority.
+        /// </summary>
+        public bool HasSightingIndicationAuthority { get; set; }
+
         public List<UserAuthorityDto> Authorities { get; set; }
     }
 }
