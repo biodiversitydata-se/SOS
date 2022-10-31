@@ -105,7 +105,10 @@ namespace SOS.Harvest.Processors.Taxon
         /// <param name="taxonIds"></param>
         /// <param name="currentRedlistPeriodId"></param>
         /// <returns></returns>
-        private async Task PopulateDynamicProperties(IDictionary<int, DarwinCoreTaxon> taxaDictonary, IDictionary<int, IDictionary<string, string>> attributeTypes, IEnumerable<int> taxonIds, int? currentRedlistPeriodId = null)
+        private async Task PopulateDynamicProperties(IDictionary<int, DarwinCoreTaxon> taxaDictonary, 
+            IDictionary<int, IDictionary<string, string>> attributeTypes, 
+            IEnumerable<int> taxonIds, 
+            int? currentRedlistPeriodId = null)
         {
             try
             {
@@ -131,8 +134,9 @@ namespace SOS.Harvest.Processors.Taxon
                 {
                     return;
                 }
+                
 
-                foreach(var taxonAttribute in response.TaxonAttributes) {
+                foreach (var taxonAttribute in response.TaxonAttributes) {
                     var mainField = taxonAttribute.Values?.FirstOrDefault(a => a.AttributeInfo?.IsMainField ?? false);
 
                     if (!taxaDictonary.TryGetValue(taxonAttribute.TaxonId, out var taxon) || mainField == null)
@@ -191,10 +195,10 @@ namespace SOS.Harvest.Processors.Taxon
                                 taxon.DynamicProperties.OrganismGroup = enumValue;
                                 break;
                             case NonPeriodizeFactorEnum.ProtectedByLawSpeciesProtection:
-                                taxon.DynamicProperties.ProtectedByLawSpeciesProtection = true;
+                                taxon.DynamicProperties.ProtectedByLaw = true;
                                 break;
                             case NonPeriodizeFactorEnum.ProtectedByLawBirds:
-                                taxon.DynamicProperties.ProtectedByLawBirds = mainField.Value == "1";
+                                taxon.DynamicProperties.ProtectedByLaw = true;
                                 break;
                             case NonPeriodizeFactorEnum.ProtectionLevel:
                                 taxon.DynamicProperties.ProtectionLevel = enumValue;

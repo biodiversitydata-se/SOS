@@ -31,7 +31,7 @@ namespace SOS.Harvest.Services.Taxon
 
                 if (attempt > 2)
                 {
-                    return null;
+                    return null!;
                 }
 
                 Thread.Sleep(attempt * 500);

@@ -3,6 +3,11 @@
     public class Attribute
     {
         /// <summary>
+        /// Attribute id
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
         ///     Attribute group id
         /// </summary>
         public int AttributeGroupId { get; set; }
