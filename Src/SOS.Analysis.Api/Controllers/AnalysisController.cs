@@ -3,6 +3,7 @@ using NetTopologySuite.Features;
 using SOS.Analysis.Api.Configuration;
 using SOS.Analysis.Api.Controllers.Interfaces;
 using SOS.Analysis.Api.Dtos.Filter;
+using SOS.Analysis.Api.Dtos.Search;
 using SOS.Analysis.Api.Extensions.Dto;
 using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Lib.Cache.Interfaces;
@@ -47,6 +48,57 @@ namespace SOS.Analysis.Api.Controllers
             _analysisManager = analysisManager ?? throw new ArgumentNullException(nameof(analysisManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+       
+        [HttpPost("/internal/aggregation")]
+        [ProducesResponseType(typeof(IEnumerable<UserAggregationResponseDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> AggregateAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto searchFilter,
+            [FromQuery] string aggregationField,
+            [FromQuery] string? afterKey,
+            [FromQuery] int? take = 10)
+        {
+            try
+            {
+                CheckAuthorization(searchFilter.ProtectionFilter);
+                searchFilter = await InitializeSearchFilterAsync(searchFilter);
+
+                var validationResult = Result.Combine(ValidateSearchFilter(searchFilter!), ValidateFields(new[] { aggregationField }));
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
+
+                var result = await _analysisManager.AggregateByUserFieldAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    filter,
+                    aggregationField,
+                    afterKey,
+                    take
+                );
+
+                return new OkObjectResult(result!);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Aggregate by user field error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
 
         /// <summary>
         /// Calculate AOO and EOO and get geometry showing coverage 
@@ -84,7 +136,6 @@ namespace SOS.Analysis.Api.Controllers
             try
             {
                 CheckAuthorization(searchFilter.ProtectionFilter);
-
                 searchFilter = await InitializeSearchFilterAsync(searchFilter);
                
                 var validationResult = Result.Combine(
@@ -101,6 +152,8 @@ namespace SOS.Analysis.Api.Controllers
                 var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
 
                 var result = await _analysisManager.CalculateAooAndEooAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
                     filter, 
                     gridCellSizeInMeters!.Value, 
                     useCenterPoint!.Value, 

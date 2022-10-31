@@ -34,6 +34,11 @@ using SOS.Analysis.Api.Managers;
 using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Services;
+using SOS.Lib.Services.Interfaces;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.TaxonTree;
+using SOS.Lib.Models.TaxonListService;
 
 namespace SOS.Analysis.Api
 {
@@ -273,16 +278,27 @@ namespace SOS.Analysis.Api
 
             // Add Caches
             services.AddSingleton<IAreaCache, AreaCache>();
+            services.AddSingleton<IDataProviderCache, DataProviderCache>();
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
+            services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
+            services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
 
             // Add managers
             services.AddScoped<IAnalysisManager, AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
-
+            services.AddScoped<ITaxonManager, TaxonManager>();
+           
             // Add repositories
             services.AddScoped<IAreaRepository, AreaRepository>();
+            services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddScoped<ITaxonRepository, TaxonRepository>();
+            services.AddScoped<ITaxonListRepository, TaxonListRepository>();
+
+            // Add services
+            services.AddSingleton<IHttpClientService, HttpClientService>();
+            services.AddScoped<IUserService, UserService>();
 
         }
 

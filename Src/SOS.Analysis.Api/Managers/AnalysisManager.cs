@@ -1,9 +1,12 @@
 ﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using SOS.Analysis.Api.Dtos.Search;
 using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Analysis.Api.Managers
@@ -11,35 +14,65 @@ namespace SOS.Analysis.Api.Managers
     public class AnalysisManager : IAnalysisManager
     {
         private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IFilterManager _filterManager;
         private readonly ILogger<AnalysisManager> _logger;
 
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
+        /// <param name="filterManager"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public AnalysisManager(
+            IFilterManager filterManager,
             IProcessedObservationRepository processedObservationRepository,
             ILogger<AnalysisManager> logger)
         {
+            _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc/>
-        public async Task<FeatureCollection> CalculateAooAndEooAsync(
-             SearchFilter filter,
-             int gridCellsInMeters,
-             bool useCenterPoint,
-             double edgeLength,
-             bool useEdgeLengthRatio,
-             bool allowHoles,
-             CoordinateSys coordinateSystem)
+        public async Task<PagedAggregationResultDto<UserAggregationResponseDto>> AggregateByUserFieldAsync(
+            int? roleId,
+            string? authorizationApplicationIdentifier,
+            SearchFilter filter, 
+            string aggregationField,
+            string? afterKey,
+            int? take)
         {
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, afterKey, take);
 
+            return new PagedAggregationResultDto<UserAggregationResponseDto>
+            {
+                AfterKey = result.SearchAfter,
+                Records = result?.Records?.Select(r => new UserAggregationResponseDto
+                {
+                    AggregationField = r.AggregationField,
+                    Count = (int)r.DocCount,
+                    UniqueTaxon = (int)r.UniqueTaxon
+                })!
+            };
+        }
+
+        /// <inheritdoc/>
+        public async Task<FeatureCollection> CalculateAooAndEooAsync(
+            int? roleId,
+            string? authorizationApplicationIdentifier,
+            SearchFilter filter,
+            int gridCellsInMeters,
+            bool useCenterPoint,
+            double edgeLength,
+            bool useEdgeLengthRatio,
+            bool allowHoles,
+            CoordinateSys coordinateSystem)
+        {
             try
             {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters);
                 if (!result?.GridCells?.Any() ?? true)
                 {

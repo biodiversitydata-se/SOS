@@ -7,6 +7,24 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
     public interface IAnalysisController
     {
         /// <summary>
+        ///  Aggregate by user passed filed
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="searchFilter"></param>
+        /// <param name="aggregationField"></param>
+        /// <param name="afterKey"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<IActionResult> AggregateAsync(
+            int? roleId,
+            string? authorizationApplicationIdentifier,
+            SearchFilterInternalDto searchFilter,
+            string aggregationField,
+            string? afterKey,
+            int? take);
+
+        /// <summary>
         /// Calculate AOO and EOO and get geometry showing coverage 
         /// </summary>
         /// <param name="roleId"></param>

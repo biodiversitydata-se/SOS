@@ -6,6 +6,8 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Filters;
 using Result = CSharpFunctionalExtensions.Result;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -158,6 +160,21 @@ namespace SOS.Analysis.Api.Controllers
 
             return Result.Success();
         }
+
+        protected Result ValidateFields(IEnumerable<string> fields)
+        {
+            var errors = new List<string>();
+
+            if (fields?.Any() ?? false)
+            {
+                errors.AddRange(fields
+                    .Where(f => !typeof(Observation).HasProperty(f))
+                    .Select(f => $"Field doesn't exist ({f})"));
+            }
+
+            return errors.Any() ? Result.Failure(string.Join(". ", errors)) : Result.Success();
+        }
+       
 
         protected Result ValidateInt(int value, int minLimit, int maxLimit, string paramName)
         {
