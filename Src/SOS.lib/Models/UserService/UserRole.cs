@@ -30,5 +30,15 @@ namespace SOS.Lib.Models.UserService
 
         public List<UserAuthority> Authorities { get; set; }
         public List<UserArea> Areas { get; set; }
+
+        /// <summary>
+        /// Indicates whether this role has sensitive species observation authority.
+        /// </summary>
+        public bool HasSensitiveSpeciesAuthority { get; set; }
+
+        /// <summary>
+        /// Indicates whether this role has sighting indication authority.
+        /// </summary>
+        public bool HasSightingIndicationAuthority { get; set; }
     }
 }
