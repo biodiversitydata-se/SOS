@@ -50,7 +50,7 @@ namespace SOS.Analysis.Api.Controllers
         }
        
         [HttpPost("/internal/aggregation")]
-        [ProducesResponseType(typeof(IEnumerable<UserAggregationResponseDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedAggregationResultDto<UserAggregationResponseDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
