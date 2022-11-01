@@ -436,6 +436,25 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Create a new feature
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <param name="attributes"></param>
+        /// <returns></returns>
+        public static Feature ToFeature(this Geometry geometry, IEnumerable<KeyValuePair<string, object>> attributes)
+        {
+            if (geometry == null)
+            {
+                return null!;
+            }
+
+            return new Feature(
+                geometry,
+                new AttributesTable(attributes)
+            );
+        }
+
+        /// <summary>
         ///     Make polygon valid
         /// </summary>
         /// <param name="geometry"></param>
