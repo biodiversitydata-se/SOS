@@ -1,14 +1,12 @@
 ﻿using FizzWare.NBuilder;
 using FluentAssertions;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
-using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 
 namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.CountInternalEndpoint

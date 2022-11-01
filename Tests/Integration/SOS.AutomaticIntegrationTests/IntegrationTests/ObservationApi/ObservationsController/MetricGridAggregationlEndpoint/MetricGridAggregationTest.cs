@@ -1,7 +1,6 @@
 ﻿using FizzWare.NBuilder;
 using FluentAssertions;
 using Xunit;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SOS.AutomaticIntegrationTests.TestFixtures;
