@@ -7,7 +7,7 @@ All public observations that SOS harvests are available in a OGC Web Feature Ser
 
 
 ## Get started
-Using a GIS application as ArcGIS or QGIS connect to SOS geoServer by selecting _Add layer_: 
+Using a GIS application as ArcGIS or QGIS connect to SOS GeoServer by selecting _Add layer_: 
 
 ![addLayer1](Images/wfs_addLayer1.jpg)
 
@@ -18,6 +18,8 @@ Then add a new connection:
 Select _Connect_:
 
 ![addLayer3](Images/wfs_addLayer3.jpg)
+
+There is no need for authentication in order to connect to SOS GeoServer. 
 
 Now select _Swedish species observations_ and select _Add_:
 
