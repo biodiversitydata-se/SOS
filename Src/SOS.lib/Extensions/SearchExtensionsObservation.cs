@@ -620,6 +620,7 @@ namespace SOS.Lib
                 {
                     AggregationType.QuantityPerWeek => 7,
                     AggregationType.SightingsPerWeek => 7,
+                    AggregationType.SightingsPerWeek48 => 7,
                     AggregationType.QuantityPerYear => 365,
                     AggregationType.SightingsPerYear => 365,
                     _ => 365
@@ -826,6 +827,8 @@ namespace SOS.Lib
             {
                 projection.Excludes(e => e
                     .Field("defects")
+                    .Field("event.endHistogramWeek")
+                    .Field("event.startHistogramWeek")
                     .Field("artportalenInternal.sightingTypeSearchGroupId")
                     .Field("location.point")
                     .Field("location.pointLocation")
@@ -837,6 +840,8 @@ namespace SOS.Lib
             {
                 projection.Excludes(e => e
                     .Field("defects")
+                    .Field("event.endHistogramWeek")
+                    .Field("event.startHistogramWeek")
                     /*.Field("artportalenInternal.reportedByUserAlias")
                     .Field("artportalenInternal.identifiedByInternal")*/
                     .Field("artportalenInternal")

@@ -227,6 +227,9 @@ namespace SOS.Observations.Api.Managers
                 if(aggregationType.IsSpeciesSightingsList())
                     return await _processedObservationRepository.GetAggregatedChunkAsync(filter, aggregationType, skip, take);
 
+                if (aggregationType == AggregationType.SightingsPerWeek48)
+                    return await _processedObservationRepository.GetAggregated48WeekHistogramAsync(filter);
+
                 return null;
             }
             catch (AuthenticationRequiredException e)

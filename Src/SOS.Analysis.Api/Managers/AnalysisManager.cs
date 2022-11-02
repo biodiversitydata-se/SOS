@@ -128,8 +128,7 @@ namespace SOS.Analysis.Api.Managers
                     
                     futureCollection.Add(gridCellFeatureSweRef99);
                 }
-        
-
+ 
                 return futureCollection;
             }
             catch (ArgumentOutOfRangeException e)

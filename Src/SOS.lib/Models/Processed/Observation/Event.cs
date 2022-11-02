@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using SOS.Lib.Helpers;
 
 namespace SOS.Lib.Models.Processed.Observation
@@ -9,6 +10,21 @@ namespace SOS.Lib.Models.Processed.Observation
     /// </summary>
     public class Event
     {
+        /// <summary>
+        /// Divide year in 48 weeks
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        private int? CalculateHistogramWeek(DateTime? date)
+        {
+            if (!date.HasValue)
+            {
+                return null!;
+            }
+            
+            var cal = new GregorianCalendar();
+            return ((date.Value.Month - 1) * 4) + (int)Math.Ceiling(date.Value.Day / Math.Round((double)cal.GetDaysInMonth(date.Value.Year, date.Value.Month) / 4));
+        }
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -74,6 +90,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime? StartDate { get; set; }
 
         /// <summary>
+        /// Divide year in 48 "weeks"
+        /// </summary>
+        public int? StartHistogramWeek => CalculateHistogramWeek(StartDate);
+
+        /// <summary>
         /// Start year of the event, Swedish localization
         /// </summary>
         public int? StartYear { get; set; }
@@ -92,6 +113,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     End date/time of the event in W. Europe Standard Time.
         /// </summary>
         public DateTime? EndDate { get; set; }
+
+        /// <summary>
+        /// Divide year in 48 weeks 
+        /// </summary>
+        public int? EndHistogramWeek => CalculateHistogramWeek(EndDate);
 
         /// <summary>
         /// End year of the event, Swedish localization

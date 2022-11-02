@@ -25,7 +25,14 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="filter"></param>
         /// <param name="aggregationType"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetAggregatedHistogramChunkAsync(SearchFilter filter, AggregationType aggregationType);        
+        Task<PagedResult<dynamic>> GetAggregatedHistogramChunkAsync(SearchFilter filter, AggregationType aggregationType);
+
+        /// <summary>
+        /// Get histogram based on 48 weeks a year
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<PagedResult<dynamic>> GetAggregated48WeekHistogramAsync(SearchFilter filter);
 
         /// <summary>
         /// Get geo grid tile aggregation

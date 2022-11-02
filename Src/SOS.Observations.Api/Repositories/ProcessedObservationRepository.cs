@@ -180,6 +180,7 @@ namespace SOS.Observations.Api.Repositories
                     )
                 )
                 .Aggregations(a => a
+                    
                     .DateHistogram("aggregation", dh => dh
                         .Field("event.startDate")
                         .CalendarInterval(aggregationType switch
@@ -228,6 +229,108 @@ namespace SOS.Observations.Api.Repositories
                 Skip = 0,
                 Take = result?.Count ?? 0,
                 TotalCount = totalCount
+            };
+
+            // When operation is disposed, telemetry item is sent.
+        }
+
+        /// <inheritdoc />
+        public async Task<PagedResult<dynamic>> GetAggregated48WeekHistogramAsync(SearchFilter filter)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            query.AddAggregationFilter(AggregationType.SightingsPerWeek48);
+
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_Aggregated_HistogramWeek48");
+
+            operation.Telemetry.Properties["Filter"] = filter.ToString();
+            var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .RuntimeFields(rf => rf
+                    .RuntimeField("yearWeek", FieldType.Keyword, s => s
+                        .Script("emit(doc['event.startYear'].value + '-' + doc['event.startHistogramWeek'].value);")
+                    )
+                )
+                .Aggregations(a => a
+                    .Terms("yearWeekAggregation", t => t
+                        .Field("yearWeek")
+                        .Size(1000)
+                        .Order(o => o
+                            .Ascending("_key")
+                        )
+                        .Aggregations(a => a
+                            .Sum("quantity", sum => sum
+                                .Field("occurrence.organismQuantityInt")
+                            )
+                        )
+                    )
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            _telemetry.StopOperation(operation);
+
+            var yearWeekAggregations = searchResponse
+                .Aggregations
+                .Terms("yearWeekAggregation")
+                .Buckets?
+                .Select(b =>
+                    new
+                    {
+                        Year = int.Parse(b.Key.Substring(0, 4)),
+                        Week = int.Parse(b.Key.Substring(5)),
+                        DocCount = b.DocCount,
+                        Quantity = b.Sum("quantity").Value
+                    }).ToDictionary(b => $"{b.Year}-{b.Week}", b => b);
+
+            //Fill in gaps in returned result
+            var yearWeeks = new List<dynamic>();
+            if (yearWeekAggregations?.Any() ?? false)
+            {
+                var currentYear = yearWeekAggregations.First().Value.Year;
+                var currentWeek = yearWeekAggregations.First().Value.Week;
+                var lastYear = yearWeekAggregations.Last().Value.Year;
+                var lastWeek = yearWeekAggregations.Last().Value.Week;
+                
+                while(currentYear < lastYear || (currentYear == lastYear && currentWeek <= lastWeek))
+                {
+                    if (!yearWeekAggregations.TryGetValue($"{currentYear}-{currentWeek}", out var yearWeekAggregation))
+                    {
+                        yearWeekAggregation = new
+                        {
+                            Year = currentYear,
+                            Week = currentWeek,
+                            DocCount = (long?)0,
+                            Quantity = (double?)0.0
+                        };
+                    }
+                    yearWeeks.Add(yearWeekAggregation);
+
+                    if (currentWeek == 48)
+                    {
+                        currentYear++;
+                        currentWeek = 0;
+                    }
+                    currentWeek++;
+                }
+            }
+
+            return new PagedResult<dynamic>
+            {
+                Records = yearWeeks,
+                Skip = 0,
+                Take = yearWeeks.Count(),
+                TotalCount = yearWeeks.Count()
             };
 
             // When operation is disposed, telemetry item is sent.
