@@ -356,6 +356,11 @@ namespace SOS.Lib.Extensions
             return points.ToArray().ConcaveHull(edgeLength, useEdgeLengthRatio, allowHoles);
         }
 
+        public static Geometry ConcaveHull(this MultiPolygon multiPolygon, bool useCenterPoint = true, double edgeLength = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
+        {
+            return ConcaveHull(multiPolygon?.Geometries.Select(g => g as Polygon)?.ToArray(), useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
+        }
+
         /// <summary>
         /// Get the convex hull for a list of polygons
         /// </summary>

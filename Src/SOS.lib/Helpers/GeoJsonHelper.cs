@@ -140,8 +140,8 @@ namespace SOS.Lib.Helpers
             var noOfZeros = gridSizesInM.Length - gridSizesInM.TrimEnd('0').Length;
             string lowLeftX = left.ToString();
             string lowLeftY = bottom.ToString();
-            var strLowerLeftY = lowLeftX.Remove(lowLeftX.ToString().Length - noOfZeros, noOfZeros);
-            var strLowerLeftX = lowLeftY.Remove(lowLeftY.ToString().Length - noOfZeros, noOfZeros);
+            var strLowerLeftY = lowLeftY.Remove(lowLeftY.ToString().Length - noOfZeros, noOfZeros);
+            var strLowerLeftX = lowLeftX.Remove(lowLeftX.ToString().Length - noOfZeros, noOfZeros); 
             string id;
             if (gridCellSizeInMeters < 1000)
                 id = $"{gridCellSizeInMeters}mN{strLowerLeftY}E{strLowerLeftX}";

@@ -114,6 +114,7 @@ namespace SOS.Analysis.Api.Controllers
         /// The edge length ratio is a fraction of the length difference between the longest and shortest edges in the Delaunay Triangulation of the input points.
         /// When false: Computes the concave hull of the vertices in a geometry using the target criterion of edge length, and optionally allowing holes (see below). </param>
         /// <param name="allowHoles">Gets or sets whether holes are allowed in the concave hull polygon.</param>
+        /// <param name="includeEmptyCells">Include grid cells with no observations</param>
         /// <param name="coordinateSystem">Gemometry coordinate system</param>
         /// <returns></returns>
         [HttpPost("/internal/aoo_eoo")]
@@ -131,6 +132,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromQuery] double? edgeLength = 0.5,
             [FromQuery] bool? useEdgeLengthRatio = true,
             [FromQuery] bool? allowHoles = false,
+            [FromQuery] bool? includeEmptyCells = false,
             CoordinateSys? coordinateSystem = CoordinateSys.ETRS89)
         {
             try
@@ -160,6 +162,7 @@ namespace SOS.Analysis.Api.Controllers
                     edgeLength!.Value, 
                     useEdgeLengthRatio!.Value, 
                     allowHoles!.Value, 
+                    includeEmptyCells!.Value,
                     coordinateSystem!.Value
                 );
                 return new OkObjectResult(result!);
