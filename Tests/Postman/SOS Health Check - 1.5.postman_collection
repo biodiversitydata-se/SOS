@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "10950802-427c-4ea3-95c7-72d84856a34d",
+		"_postman_id": "363193ce-b4fc-4503-b963-c44dd1d5d0a1",
 		"name": "SOS Health Check - Prod 1.5",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "5495698"
+		"_exporter_id": "8524282"
 	},
 	"item": [
 		{
@@ -27,13 +27,16 @@
 									"    pm.expect(result.records.length).to.eql(2);",
 									"});",
 									"",
-									"pm.test(\"total count > 5000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(3000);",
+									"const otterCount = parseInt(pm.environment.get(\"observations.search.otterCount\"));",
+									"pm.test(\"total count > \" + otterCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(otterCount);",
 									"});",
 									"",
 									"pm.test(\"TaxonId is 100077\", function () {    ",
 									"    pm.expect(observation.taxon.id).to.eql(100077);",
-									"});"
+									"});",
+									"",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -56,13 +59,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false        \n    },    \n    \"occurrenceStatus\":\"present\"\n}\n"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=2",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -100,8 +99,9 @@
 									"    pm.expect(result.records.length).to.eql(2);",
 									"});",
 									"",
-									"pm.test(\"total count > 5000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(5000);",
+									"const redListedCount = parseInt(pm.environment.get(\"observations.search.redListedCount\"));",
+									"pm.test(\"total count >= \" + redListedCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(redListedCount);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -125,13 +125,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-01\",\n\t    \"endDate\":\"2019-12-31\"\n    },\n    \"taxon\" : {\n        \"redListCategories\": [ \"CR\", \"EN\", \"VU\" ]\n    },\n    \"occurrenceStatus\":\"present\",\n    \"output\": {\n        \"fieldSet\":\"all\"\n    }\n}\n"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/Internal/search?skip=0&take=2",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/Internal/search?skip=0&take=2",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -170,8 +166,9 @@
 									"    pm.expect(result.records.length).to.eql(2);",
 									"});",
 									"",
-									"pm.test(\"total count > 5000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(3000);",
+									"const otterCount = parseInt(pm.environment.get(\"observations.search.otterCount\"));",
+									"pm.test(\"total count > \" + otterCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(otterCount);",
 									"});",
 									"",
 									"pm.test(\"TaxonId is 100077\", function () {    ",
@@ -199,13 +196,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false\n    },    \n    \"occurrenceStatus\":\"present\",\n    \"output\":{\n        \"fieldSet\": \"minimum\",\n        \"fields\": [\"taxon.attributes.vernacularNames\"]\n    }\n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=2",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -260,13 +253,9 @@
 							"raw": "{    \n     \"extendedFilter\": {    \n        \"reportedByUserServiceUserId\": 1278    \n     },\n     \"output\":{\n         \"fieldSet\":\"minimum\",\n         \"fields\": [\"taxon.attributes.redlistCategory\"]\n     }     \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/Internal/Search?skip=0&take=10",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/Internal/Search?skip=0&take=10",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -321,13 +310,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false        \n    },    \n    \"occurrenceStatus\":\"present\"    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/Internal/search?skip=0&take=2&outputFormat=geojsonflat",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/Internal/search?skip=0&take=2&outputFormat=geojsonflat",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -395,13 +380,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\",\n        \"dateFilterType\": \"OverlappingStartDateAndEndDate\"\n    },\n    \"taxon\" : {\n        \"ids\" : [100077]        \n    },\n    \"geographics\": {\n        \"areas\" : [\n            {\n                \"areaType\": \"Municipality\",\n                \"featureId\": \"687\"\n            },\n            {\n                \"areaType\": \"County\",\n                \"featureId\": \"6\"\n            }        \n        ]\n    },    \n    \"occurrenceStatus\":\"present\"    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=2",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -464,13 +445,9 @@
 							"raw": "{\n    \"dataprovider\": {\n        \"ids\": [16]\n    },\n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\",\n        \"dateFilterType\": \"OverlappingStartDateAndEndDate\"\n    },\n    \"geographics\": {\n        \"areas\" : [\n            {\n                \"areaType\": \"Municipality\",\n                \"featureId\": \"687\"\n            }\n        ]\n    },    \n    \"occurrenceStatus\":\"absent\"\n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=2",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -524,13 +501,9 @@
 							"raw": "{\n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\",\n        \"dateFilterType\": \"OverlappingStartDateAndEndDate\"\n    },\n    \"geographics\": {\n        \"areas\" : [\n            {\n                \"areaType\": \"Municipality\",\n                \"featureId\": \"2029\"\n            }   \n        ]\n    },\n    \"occurrenceStatus\":\"present\"\n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/count",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/count",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -579,13 +552,9 @@
 							"raw": "{\n    \"taxon\": {\n        \"ids\": [\n            100077\n        ]\n    },\n    \"geographics\": {        \n        \"geometries\": [\n            {\"type\":\"polygon\", \"coordinates\":[[[15.07063, 57.92573],[15.0051, 58.16108],[14.58003, 58.10148],[14.64143, 57.93294],[15.07063, 57.92573]]]}\n        ],        \n        \"considerObservationAccuracy\": true\n    }    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=2",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -648,13 +617,9 @@
 							"raw": "{\n    \"taxon\": {\n        \"ids\": [\n            100077\n        ]\n    },\n    \"geographics\": {        \n        \"geometries\": [\n            {\"type\":\"point\", \"coordinates\": [14.99047, 58.01563]}\n        ], \n        \"maxDistanceFromPoint\": 5000\n    }    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=2",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -712,13 +677,9 @@
 							"raw": "{\n    \"fieldTranslationCultureCode\":\"sv-SE\",\n    \"occurrenceStatus\": \"present\",\n    \"output\" : {\n        \"fields\" :  [\"taxon.id\", \"taxon.vernacularName\", \"taxon.protectionLevel\", \"accessRights\", \"protectionLevel\"]\n    },\n    \"taxon\" : {\n        \"ids\":[100024],\n        \"includeUnderlyingTaxa\" : true        \n    }    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=10",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=10",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -776,13 +737,9 @@
 							"raw": "{\n    \"fieldTranslationCultureCode\":\"sv-SE\",\n    \"occurrenceStatus\": \"present\",    \n    \"taxon\" : {\n        \"ids\":[100055, 267302, 267303, 267320, 100024, 100093],\n        \"includeUnderlyingTaxa\" : true        \n    },\n    \"output\" :{\n        \"fields\":[\"occurrence.protectionLevel\", \"protected\", \"taxon.attributes.protectionLevel\"]\n    }    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=1000",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=1000",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -816,8 +773,9 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"total count > 70 000 000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(20000000);",
+									"const observationCount = parseInt(pm.environment.get(\"observations.search.observationCount\"));",
+									"pm.test(\"total count > \" + observationCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(observationCount);",
 									"});",
 									"",
 									"pm.test(\"Occurrence status has value 'present'\", function () {    ",
@@ -845,13 +803,9 @@
 							"raw": "{        \n    \"occurrenceStatus\": \"present\",\n    \"output\" : {\n        \"fields\" :  [\"rightsHolder\", \"datasetName\", \"occurrence.recordedBy\", \"occurrence.catalogNumber\", \"occurrence.occurrenceStatus\", \"taxon.id\", \"taxon.vernacularName\", \"taxon.redlistCategory\"]\n    }\n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=1",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=1",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -885,8 +839,9 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"total count > 400 000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(100000);",
+									"const absentObservationCount = parseInt(pm.environment.get(\"observations.search.absentObservationCount\"));",
+									"pm.test(\"total count > \" + absentObservationCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(absentObservationCount);",
 									"});",
 									"",
 									"pm.test(\"Occurrence status has value 'present'\", function () {    ",
@@ -916,13 +871,9 @@
 							"raw": "{   \n    \"dataprovider\": {\n        \"ids\": [1]\n    },    \n    \"occurrenceStatus\":\"absent\",\n    \"output\" : {\n        \"fieldSet\" : \"Extended\"\n    }\n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=1&translationCultureCode=sv-SE",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=1&translationCultureCode=sv-SE",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -985,13 +936,9 @@
 							"raw": "{\n    \"projectIds\": [2976],\n    \"date\": {\n        \"startDate\":\"2016-09-01\",\n\t    \"endDate\":\"2016-09-30\"\n    },\n    \"output\": {\n        \"fieldSet\":\"all\"        \n    }\n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=2",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1029,8 +976,9 @@
 									"    pm.expect(result.records.length).to.eql(2);",
 									"});",
 									"",
-									"pm.test(\"total count > 5000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(3000);",
+									"const secondHandInfoCount = parseInt(pm.environment.get(\"observations.search.secondHandInfoCount\"));",
+									"pm.test(\"total count > \" + secondHandInfoCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(secondHandInfoCount);",
 									"});",
 									""
 								],
@@ -1055,13 +1003,9 @@
 							"raw": "{  \n  \"extendedFilter\": {   \n    \"onlySecondHandInformation\": true  \n  },\n  \"output\": {\n      \"fieldSet\":\"all\"\n  }\n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/Internal/search?skip=0&take=2",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/Internal/search?skip=0&take=2",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1116,13 +1060,9 @@
 							"raw": "{\n    \"taxon\" : {\n        \"taxonListIds\":[18],\n        \"includeUnderlyingTaxa\" : false\n    }\n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/count",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/count",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1175,13 +1115,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false        \n    },    \n    \"occurrenceStatus\":\"present\"\n}\n"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/Search/DwC?kingdom=Plantae&translationCultureCode=en-GB&skip=0&take=2",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/Search/DwC?kingdom=Plantae&translationCultureCode=en-GB&skip=0&take=2",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1234,12 +1170,14 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"grid cell count > 1000\", function () {    ",
-									"    pm.expect(result.gridCellCount).to.greaterThan(1000);",
+									"const mammalCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalCellCount\"));",
+									"pm.test(\"grid cell count > \" + mammalCellCount, function () {    ",
+									"    pm.expect(result.gridCellCount).to.greaterThan(mammalCellCount);",
 									"});",
 									"",
-									"pm.test(\"Observation count > 1000 for the grid cell with most observations\", function () {    ",
-									"    pm.expect(gridCell.observationsCount).to.greaterThan(1000);    ",
+									"const mammalCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalCountCell\"));",
+									"pm.test(\"Observation count > \" + mammalCountCell + \" for the grid cell with most observations\", function () {    ",
+									"    pm.expect(gridCell.observationsCount).to.greaterThan(mammalCountCell);    ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1263,13 +1201,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[4000107],\n        \"includeUnderlyingTaxa\" : true\n    },        \n    \"occurrenceStatus\":\"present\"    \n}\n"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/geogridaggregation?zoom=10",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/geogridaggregation?zoom=10",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1299,12 +1233,14 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"grid cell count > 1000\", function () {    ",
-									"    pm.expect(result.gridCellCount).to.greaterThan(1000);",
+									"const invalidTaxaCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.invalidTaxaCellCount\"));",
+									"pm.test(\"grid cell count > \" + invalidTaxaCellCount, function () {    ",
+									"    pm.expect(result.gridCellCount).to.greaterThan(invalidTaxaCellCount);",
 									"});",
 									"",
-									"pm.test(\"Observation count > 1000 for the grid cell with most observations\", function () {    ",
-									"    pm.expect(gridCell.observationsCount).to.greaterThan(1000);    ",
+									"const invalidTaxaCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.invalidTaxaCountCell\"));",
+									"pm.test(\"Observation count > \" + invalidTaxaCountCell + \" for the grid cell with most observations\", function () {    ",
+									"    pm.expect(gridCell.observationsCount).to.greaterThan(invalidTaxaCountCell);    ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1328,13 +1264,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[4000107],\n        \"includeUnderlyingTaxa\" : true\n    },        \n    \"occurrenceStatus\":\"present\"    \n}\n"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/geogridaggregation?zoom=10",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/geogridaggregation?zoom=10",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1364,12 +1296,14 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"grid cell count > 100\", function () {    ",
-									"    pm.expect(result.gridCellCount).to.greaterThan(100);",
+									"const mammalBboxCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalBboxCellCount\"));",
+									"pm.test(\"grid cell count > \" + mammalBboxCellCount, function () {    ",
+									"    pm.expect(result.gridCellCount).to.greaterThan(mammalBboxCellCount);",
 									"});",
 									"",
-									"pm.test(\"Observation count > 100 for the grid cell with most observations\", function () {    ",
-									"    pm.expect(gridCell.observationsCount).to.greaterThan(100);    ",
+									"const mammalBboxCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalBboxCountCell\"));",
+									"pm.test(\"Observation count > \" + mammalBboxCellCount + \" for the grid cell with most observations\", function () {    ",
+									"    pm.expect(gridCell.observationsCount).to.greaterThan(mammalBboxCountCell);    ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1393,13 +1327,9 @@
 							"raw": "{\n    \"date\": {\n        \"startDate\": \"1990-01-31T07:59:46.862Z\",\n        \"endDate\": \"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\": {\n        \"ids\": [\n            4000107\n        ],\n        \"includeUnderlyingTaxa\": true\n    },\n    \"geographics\": {\n        \"boundingBox\": {\n            \"bottomRight\": {\n                \"latitude\": 59.17592824927137,\n                \"longitude\": 18.28125\n            },\n            \"topLeft\": {\n                \"latitude\": 59.355596110016315,\n                \"longitude\": 17.9296875\n            }\n        }\n    },    \n    \"occurrenceStatus\": \"present\"    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/geogridaggregation?zoom=15",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/geogridaggregation?zoom=15",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1487,12 +1417,14 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"grid cell count > 30\", function () {    ",
-									"    pm.expect(result.gridCellCount).to.greaterThan(30);",
+									"const circleCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.circleCellCount\"));",
+									"pm.test(\"grid cell count > \" + circleCellCount, function () {    ",
+									"    pm.expect(result.gridCellCount).to.greaterThan(circleCellCount);",
 									"});",
 									"",
-									"pm.test(\"Observation count > 10 for the grid cell with most observations\", function () {    ",
-									"    pm.expect(gridCell.observationsCount).to.greaterThan(10);    ",
+									"const circleCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.circleCountCell\"));",
+									"pm.test(\"Observation count > \" + circleCountCell + \" for the grid cell with most observations\", function () {    ",
+									"    pm.expect(gridCell.observationsCount).to.greaterThan(circleCountCell);    ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1516,13 +1448,9 @@
 							"raw": "{\n    \"date\": {\n        \"startDate\": \"1990-01-31T07:59:46.862Z\",\n        \"endDate\": \"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\": {\n        \"ids\": [\n            4000107\n        ],\n        \"includeUnderlyingTaxa\": true\n    },\n    \"geographics\": {\n          \"geometries\": [\n            {\n                \"type\": \"point\",\n                \"coordinates\": [\n                    14.99047,\n                    58.01563\n                ]\n            }\n        ],\n        \"maxDistanceFromPoint\": 5000\n    },    \n    \"occurrenceStatus\": \"present\"    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/geogridaggregation?zoom=15",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/geogridaggregation?zoom=15",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1557,12 +1485,14 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"total count > 30000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(30000);",
+									"const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
+									"pm.test(\"total count > \" + taxaCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(taxaCount);",
 									"});",
 									"",
-									"pm.test(\"The taxon with most observations has more than 100 000\", function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(100000);    ",
+									"const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1586,13 +1516,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },        \n    \"occurrenceStatus\":\"present\"    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/TaxonAggregation?skip=0&take=100",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/TaxonAggregation?skip=0&take=100",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1626,12 +1552,14 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"total count > 25000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(25000);",
+									"const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
+									"pm.test(\"total count > \" + taxaCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(taxaCount);",
 									"});",
 									"",
-									"pm.test(\"The taxon with most observations has more than 100 000\", function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(100000);    ",
+									"const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1655,13 +1583,9 @@
 							"raw": "{\n    \"taxon\": {\n        \"includeUnderlyingTaxa\":true\n    },\n    \"occurrenceStatus\":\"present\"    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1700,12 +1624,14 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"total count > 30000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(30000);",
+									"const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
+									"pm.test(\"total count > \" + taxaCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(taxaCount);",
 									"});",
 									"",
-									"pm.test(\"The taxon with most observations has more than 100 000\", function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(100000);    ",
+									"const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1729,13 +1655,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },        \n    \"occurrenceStatus\":\"present\"    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/Internal/TaxonAggregation?skip=0&take=100",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/Internal/TaxonAggregation?skip=0&take=100",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1770,12 +1692,14 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"total count > 8000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(8000);",
+									"const bBoxtaxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.bBoxtaxaCount\"));",
+									"pm.test(\"total count > \" + bBoxtaxaCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(bBoxtaxaCount);",
 									"});",
 									"",
-									"pm.test(\"The taxon with most observations has more than 2500\", function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(2500);    ",
+									"const bBoxmostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.bBoxmostCommonCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + bBoxmostCommonCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(bBoxmostCommonCount);    ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1799,13 +1723,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },    \n    \"geographics\": {\n        \"boundingBox\": {\n            \"bottomRight\": {\n                \"latitude\": 59.17592824927137,\n                \"longitude\": 18.28125\n            },\n            \"topLeft\": {\n                \"latitude\": 59.355596110016315,\n                \"longitude\": 17.9296875\n            }\n        }\n    },        \n    \"occurrenceStatus\":\"present\"    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/TaxonAggregation?skip=0&take=500",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/TaxonAggregation?skip=0&take=500",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1839,8 +1759,9 @@
 									"const result = pm.response.json();",
 									"const taxonRecord = result.records[0];",
 									"",
-									"pm.test(\"total count > 10\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(10);",
+									"const circleCount = parseInt(pm.environment.get(\"observations.taxonAggregation.circleCount\"));",
+									"pm.test(\"total count > \" + circleCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(circleCount);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1869,13 +1790,9 @@
 							"raw": "{\n    \"geographics\": {\n        \"geometries\": [\n            {\n                \"type\": \"point\",\n                \"coordinates\": [\n                    14.99047,\n                    58.01563\n                ]\n            }\n        ],\n        \"maxDistanceFromPoint\": 5000\n    }    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/TaxonAggregation?skip=0&take=100",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/TaxonAggregation?skip=0&take=100",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1909,8 +1826,9 @@
 									"const result = pm.response.json();",
 									"const taxonRecord = result.records[0];",
 									"",
-									"pm.test(\"total count > 10\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(10);",
+									"const circleCumulativeCount = parseInt(pm.environment.get(\"observations.taxonAggregation.circleCumulativeCount\"));",
+									"pm.test(\"total count > \" + circleCumulativeCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(circleCumulativeCount);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1939,13 +1857,9 @@
 							"raw": "{\n    \"geographics\": {\n        \"geometries\": [\n            {\n                \"type\": \"point\",\n                \"coordinates\": [\n                    14.99047,\n                    58.01563\n                ]\n            }\n        ],\n        \"maxDistanceFromPoint\": 5000\n    }    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -1984,12 +1898,14 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"total count > 25000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(25000);",
+									"const internalCumulativeTotCount = parseInt(pm.environment.get(\"observations.taxonAggregation.internalCumulativeTotCount\"));",
+									"pm.test(\"total count > \" + internalCumulativeTotCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(internalCumulativeTotCount);",
 									"});",
 									"",
-									"pm.test(\"The taxon with most observations has more than 100 000\", function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(100000);    ",
+									"const internalCumulativeObsCount = parseInt(pm.environment.get(\"observations.taxonAggregation.internalCumulativeObsCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + internalCumulativeObsCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(internalCumulativeObsCount);    ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2013,13 +1929,9 @@
 							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\": {\n        \"includeUnderlyingTaxa\": true\n    },\n    \"occurrenceStatus\":\"present\"    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -2058,12 +1970,14 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    ",
 									"",
-									"pm.test(\"total count > 25000\", function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(25000);",
+									"const speciesTotCount = parseInt(pm.environment.get(\"observations.taxonAggregation.speciesTotCount\"));",
+									"pm.test(\"total count > \" + speciesTotCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(speciesTotCount);",
 									"});",
 									"",
-									"pm.test(\"The taxon with most observations has more than 100 000\", function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(100000);    ",
+									"const speciesObsCount = parseInt(pm.environment.get(\"observations.taxonAggregation.speciesObsCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + speciesObsCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(speciesObsCount);    ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2087,13 +2001,9 @@
 							"raw": "{\n    \"taxon\": {\n        \"includeUnderlyingTaxa\":true,\n        \"taxonCategories\": [17]\n    },\n    \"occurrenceStatus\":\"present\"    \n}"
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Observations",
@@ -2143,8 +2053,9 @@
 									"    pm.expect(dataProviders.every(d => d.id !== undefined && d.identifier !== undefined)).to.be.true;",
 									"});",
 									"",
-									"pm.test(\"Artportalen observations is more than 10 millions\", function () {",
-									"    pm.expect(artportalenDataProvider.publicObservations).to.be.greaterThan(10000000);",
+									"const observationCount = parseInt(pm.environment.get(\"observations.dataProviders.observationCount\"));",
+									"pm.test(\"Artportalen observations is more than \" + observationCount, function () {",
+									"    pm.expect(artportalenDataProvider.publicObservations).to.be.greaterThan(observationCount);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2155,13 +2066,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/DataProviders",
-							"protocol": "https",
+							"raw": "{{testUrl}}/DataProviders",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"DataProviders"
@@ -2203,13 +2110,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Systems/ProcessInformation?active=true",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Systems/ProcessInformation?active=true",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Systems",
@@ -2273,13 +2176,9 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Vocabularies/lifeStage",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Vocabularies/lifeStage",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Vocabularies",
@@ -2331,13 +2230,9 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Vocabularies/validationStatus",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Vocabularies/validationStatus",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Vocabularies",
@@ -2389,13 +2284,9 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/Vocabularies/verificationStatus",
-							"protocol": "https",
+							"raw": "{{testUrl}}/Vocabularies/verificationStatus",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"Vocabularies",
@@ -2423,8 +2314,9 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
 									"});    \r",
 									"\r",
+									"const checklistId = pm.environment.get(\"observations.checklists.checklistId\");\r",
 									"pm.test(\"Checklist is returned\", function () {\r",
-									"    pm.expect(checklist.event.eventId).to.eql('urn:lsid:artportalen.se:Checklist:4455');    \r",
+									"    pm.expect(checklist.event.eventId).to.eql(checklistId);    \r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2435,13 +2327,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://sos-search.artdata.slu.se/CheckLists?id=urn:lsid:artportalen.se:Checklist:4455",
-							"protocol": "https",
+							"raw": "{{testUrl}}/CheckLists?id=urn:lsid:artportalen.se:Checklist:4455",
 							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
+								"{{testUrl}}"
 							],
 							"path": [
 								"CheckLists"
@@ -2469,12 +2357,14 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
 									"});    \r",
 									"\r",
-									"pm.test(\"Trend is larger than 0.4\", function () {\r",
-									"    pm.expect(trend.quotient).to.gte(0.4);\r",
+									"const calculatedTrend = parseFloat(pm.environment.get(\"observations.checklists.trend\"));\r",
+									"pm.test(\"Trend is larger than \" + calculatedTrend, function () {\r",
+									"    pm.expect(trend.quotient).to.gte(calculatedTrend);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Number of checklists is larger than 13000\", function () {\r",
-									"    pm.expect(trend.nrChecklists).to.gte(13000);\r",
+									"const checkListCount = parseInt(pm.environment.get(\"observations.checklists.checkListCount\"));\r",
+									"pm.test(\"Number of checklists is larger than \" + checkListCount, function () {\r",
+									"    pm.expect(trend.nrChecklists).to.gte(checkListCount);\r",
 									"});"
 								],
 								"type": "text/javascript"
