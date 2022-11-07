@@ -1,4 +1,4 @@
-﻿namespace SOS.Lib.Models.Processed.Dataset
+﻿namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
 {
     /// <summary>
     /// The methodology that is used for the data collection, e.g. as described by one or more monitoring manuals.

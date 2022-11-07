@@ -10,14 +10,14 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Processed.Dataset;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
+using static SOS.Lib.Models.Processed.DataStewardship.Dataset.ObservationDataset;
 
 namespace SOS.Lib.Repositories.Processed
 {

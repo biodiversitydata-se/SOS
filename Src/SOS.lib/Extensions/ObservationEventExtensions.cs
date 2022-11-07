@@ -1,6 +1,5 @@
 ﻿using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
-using SOS.Lib.Models.Processed.Event;
 using SOS.Lib.Models.Processed.Observation;
 using System.Collections.Generic;
 using System.Linq;

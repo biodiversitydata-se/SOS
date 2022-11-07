@@ -1,20 +1,20 @@
 ﻿using SOS.DataStewardship.Api.Models;
 using SOS.DataStewardship.Api.Models.Enums;
 using SOS.Lib.Enums.VocabularyValues;
-using SOS.Lib.Models.Processed.Dataset;
 using System.Data;
+using ProcessedDataStewardship = SOS.Lib.Models.Processed.DataStewardship;
 
 namespace SOS.DataStewardship.Api.Extensions
 {
     public static class DtoExtensions
     {
-        public static List<Dataset> ToDatasets(this IEnumerable<ObservationDataset> datasets)
+        public static List<Dataset> ToDatasets(this IEnumerable<ProcessedDataStewardship.Dataset.ObservationDataset> datasets)
         {
             if (datasets == null || !datasets.Any()) return null;             
             return datasets.Select(m => m.ToDataset()).ToList();
         }
 
-        public static Dataset ToDataset(this ObservationDataset dataset)
+        public static Dataset ToDataset(this ProcessedDataStewardship.Dataset.ObservationDataset dataset)
         {
             if (dataset == null) return null;
                             
@@ -42,19 +42,19 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static Purpose? ToDatasetPurposeEnum(this ObservationDataset.PurposeEnum? purposeEnum)
+        public static Purpose? ToDatasetPurposeEnum(this ProcessedDataStewardship.Enums.Purpose? purposeEnum)
         {
             if (purposeEnum == null) return null;
             return (Purpose)purposeEnum;
         }
 
-        public static AccessRights? ToDatasetAccessRightsEnum(this ObservationDataset.AccessRightsEnum? accessRightsEnum)
+        public static AccessRights? ToDatasetAccessRightsEnum(this ProcessedDataStewardship.Enums.AccessRights? accessRightsEnum)
         {
             if (accessRightsEnum == null) return null;
             return (AccessRights)accessRightsEnum;
         }
 
-        public static Organisation ToOrganisation(this ObservationDataset.Organisation organisation)
+        public static Organisation ToOrganisation(this ProcessedDataStewardship.Common.Organisation organisation)
         {
             if (organisation == null) return null;
             return new Organisation
@@ -64,13 +64,13 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static List<Methodology> ToMethodologies(this IEnumerable<ObservationDataset.MethodologyModel> methodologies)
+        public static List<Methodology> ToMethodologies(this IEnumerable<ProcessedDataStewardship.Dataset.Methodology> methodologies)
         {
             if (methodologies == null || !methodologies.Any()) return null;
             return methodologies.Select(m => m.ToMethodology()).ToList();
         }
 
-        public static Methodology ToMethodology(this ObservationDataset.MethodologyModel methodology)
+        public static Methodology ToMethodology(this ProcessedDataStewardship.Dataset.Methodology methodology)
         {
             if (methodology == null) return null;
             return new Methodology
@@ -82,7 +82,7 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static EventModel ToEventModel(this Lib.Models.Processed.Event.ObservationEvent observationEvent)
+        public static EventModel ToEventModel(this ProcessedDataStewardship.Event.ObservationEvent observationEvent)
         {
             if (observationEvent == null) return null;
 

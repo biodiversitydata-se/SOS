@@ -10,7 +10,7 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Enums;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 
-namespace SOS.Lib.Models.Processed.Dataset
+namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
 {
     public class ObservationDataset : IEntity<string>
     {

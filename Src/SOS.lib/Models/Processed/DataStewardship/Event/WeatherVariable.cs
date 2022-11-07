@@ -1,7 +1,7 @@
 ﻿using SOS.Lib.Models.Processed.DataStewardship.Enums;
 using System.Runtime.Serialization;
 
-namespace SOS.Lib.Models.Processed.Event
+namespace SOS.Lib.Models.Processed.DataStewardship.Event
 {
     /// <summary>
     /// 

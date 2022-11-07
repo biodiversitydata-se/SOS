@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace SOS.Lib.Models.Processed.Event
+namespace SOS.Lib.Models.Processed.DataStewardship.Event
 {
     /// <summary>
     /// Weather variable reported as a measurement and a unit.

@@ -34,13 +34,13 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Lib.Models.Processed.Dataset;
 using System.Data;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Processed.Event;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.DataStewardship.Enums;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
 
 namespace SOS.Harvest.Jobs
 {
