@@ -1,4 +1,4 @@
-﻿using SOS.DataStewardship.Api.Models;
+﻿using SOS.DataStewardship.Api.Models.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 
 namespace SOS.DataStewardship.Api.Extensions

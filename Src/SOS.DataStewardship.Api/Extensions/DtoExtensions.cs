@@ -1,4 +1,5 @@
 ﻿using SOS.DataStewardship.Api.Models;
+using SOS.DataStewardship.Api.Models.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Dataset;
 using System.Data;
@@ -41,16 +42,16 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static Dataset.PurposeEnum? ToDatasetPurposeEnum(this ObservationDataset.PurposeEnum? purposeEnum)
+        public static Purpose? ToDatasetPurposeEnum(this ObservationDataset.PurposeEnum? purposeEnum)
         {
             if (purposeEnum == null) return null;
-            return (Dataset.PurposeEnum)purposeEnum;
+            return (Purpose)purposeEnum;
         }
 
-        public static Dataset.AccessRightsEnum? ToDatasetAccessRightsEnum(this ObservationDataset.AccessRightsEnum? accessRightsEnum)
+        public static AccessRights? ToDatasetAccessRightsEnum(this ObservationDataset.AccessRightsEnum? accessRightsEnum)
         {
             if (accessRightsEnum == null) return null;
-            return (Dataset.AccessRightsEnum)accessRightsEnum;
+            return (AccessRights)accessRightsEnum;
         }
 
         public static Organisation ToOrganisation(this ObservationDataset.Organisation organisation)
@@ -108,11 +109,11 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.Occurrences = observationEvent.OccurrenceIds;
             if (ev.Occurrences.Any())
             {
-                ev.NoObservations = EventModel.NoObservationsEnum.Falskt;
+                ev.NoObservations = NoObservations.Falskt;
             }
             else
             {
-                ev.NoObservations = EventModel.NoObservationsEnum.Sant;
+                ev.NoObservations = NoObservations.Sant;
             }
 
             return ev;
@@ -158,11 +159,11 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.Occurrences = occurrenceIds.ToList();
             if (ev.Occurrences.Any())
             {
-                ev.NoObservations = EventModel.NoObservationsEnum.Falskt;
+                ev.NoObservations = NoObservations.Falskt;
             }
             else
             {
-                ev.NoObservations = EventModel.NoObservationsEnum.Sant;
+                ev.NoObservations = NoObservations.Sant;
             }
 
             return ev;
@@ -210,20 +211,20 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static AssociatedMedia.AssociatedMediaTypeEnum GetAssociatedMediaTypeEnum(string format)
+        public static AssociatedMediaType GetAssociatedMediaTypeEnum(string format)
         {
-            if (string.IsNullOrEmpty(format)) return AssociatedMedia.AssociatedMediaTypeEnum.Bild; // default
+            if (string.IsNullOrEmpty(format)) return AssociatedMediaType.Bild; // default
             string formatLower = format.ToLower();
             if (formatLower.StartsWith("image"))
-                return AssociatedMedia.AssociatedMediaTypeEnum.Bild;
+                return AssociatedMediaType.Bild;
             if (formatLower.StartsWith("pdf"))
-                return AssociatedMedia.AssociatedMediaTypeEnum.Pdf;
+                return AssociatedMediaType.Pdf;
             if (formatLower.StartsWith("audio"))
-                return AssociatedMedia.AssociatedMediaTypeEnum.Ljud;
+                return AssociatedMediaType.Ljud;
             if (formatLower.StartsWith("video"))
-                return AssociatedMedia.AssociatedMediaTypeEnum.Film;
+                return AssociatedMediaType.Film;
 
-            return AssociatedMedia.AssociatedMediaTypeEnum.Bild; // default
+            return AssociatedMediaType.Bild; // default
         }
 
         public static OccurrenceModel ToOccurrenceModel(this Observation observation)
@@ -237,7 +238,7 @@ namespace SOS.DataStewardship.Api.Extensions
 
             occurrence.Event = observation.Event.EventId;
             occurrence.DatasetIdentifier = observation.DataStewardshipDatasetId;
-            occurrence.IdentificationVerificationStatus = Models.OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas; // todo - implement when the value list is defined
+            occurrence.IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas; // todo - implement when the value list is defined
             occurrence.ObservationCertainty = Convert.ToDecimal(observation.Location.CoordinateUncertaintyInMeters);
             occurrence.ObservationPoint = observation.Location.Point;
             occurrence.ObservationPointTest = new GeometryObject
@@ -250,7 +251,7 @@ namespace SOS.DataStewardship.Api.Extensions
             occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;            
             occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
             occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
-            occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? Models.OccurrenceModel.OccurrenceStatusEnum.Observerad : Models.OccurrenceModel.OccurrenceStatusEnum.InteObserverad;
+            occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? OccurrenceStatus.Observerad : OccurrenceStatus.InteObserverad;
             occurrence.Quantity = Convert.ToDecimal(observation.Occurrence.OrganismQuantityInt);
             if (observation?.Occurrence?.OrganismQuantityUnit?.Id != null)
             {
@@ -268,37 +269,37 @@ namespace SOS.DataStewardship.Api.Extensions
             return occurrence;            
         }
 
-        public static OccurrenceModel.BasisOfRecordEnum GetBasisOfRecordEnum(BasisOfRecordId? basisOfRecordId)
+        public static BasisOfRecord GetBasisOfRecordEnum(BasisOfRecordId? basisOfRecordId)
         {
             switch(basisOfRecordId)
             {                
                 case BasisOfRecordId.HumanObservation:
-                    return OccurrenceModel.BasisOfRecordEnum.MänskligObservation;
+                    return BasisOfRecord.MänskligObservation;
                 case BasisOfRecordId.MachineObservation:
-                    return OccurrenceModel.BasisOfRecordEnum.MaskinellObservation;
+                    return BasisOfRecord.MaskinellObservation;
                 case BasisOfRecordId.MaterialSample:
-                    return OccurrenceModel.BasisOfRecordEnum.FysisktProv;
+                    return BasisOfRecord.FysisktProv;
                 default:
-                    return OccurrenceModel.BasisOfRecordEnum.Okänt;
+                    return BasisOfRecord.Okänt;
             }
         }
 
-        public static OccurrenceModel.QuantityVariableEnum? GetQuantityVariableEnum(UnitId unitId)
+        public static QuantityVariable? GetQuantityVariableEnum(UnitId unitId)
         {
             switch(unitId)
             {
                 case UnitId.Individuals:
-                    return OccurrenceModel.QuantityVariableEnum.AntalIndivider;
+                    return QuantityVariable.AntalIndivider;
                 case UnitId.Fruitbodies:
-                    return OccurrenceModel.QuantityVariableEnum.AntalFruktkroppar;
+                    return QuantityVariable.AntalFruktkroppar;
                 case UnitId.Capsules:
-                    return OccurrenceModel.QuantityVariableEnum.AntalKapslar;
+                    return QuantityVariable.AntalKapslar;
                 case UnitId.Plants:
-                    return OccurrenceModel.QuantityVariableEnum.AntalPlantorTuvor;
+                    return QuantityVariable.AntalPlantorTuvor;
                 case UnitId.Stems:
-                    return OccurrenceModel.QuantityVariableEnum.AntalStjälkarStrånSkott;
+                    return QuantityVariable.AntalStjälkarStrånSkott;
                 case UnitId.EggClusters:
-                    return OccurrenceModel.QuantityVariableEnum.AntalÄggklumpar;
+                    return QuantityVariable.AntalÄggklumpar;
                 //case UnitId.: // todo - add Täckningsgrad unit to SOS
                 //    return OccurrenceModel.QuantityVariableEnum.Täckningsgrad;
                 //case UnitId.: // todo - add Yttäckning unit to SOS
@@ -321,45 +322,45 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static OrganismVariable.SexEnum? GetSexEnum(SexId? sexId)
+        public static Sex? GetSexEnum(SexId? sexId)
         {
             if (sexId == null) return null;
 
             switch(sexId.Value)
             {
                 case SexId.Male:
-                    return OrganismVariable.SexEnum.Hane;
+                    return Sex.Hane;
                 case SexId.Female:
-                    return OrganismVariable.SexEnum.Hona;
+                    return Sex.Hona;
                 case SexId.InPair:
-                    return OrganismVariable.SexEnum.IPar;
+                    return Sex.IPar;
                 default:
                     return null;
             }
         }
 
-        public static OrganismVariable.ActivityEnum? GetActivityEnum(ActivityId? activityId)
+        public static Activity? GetActivityEnum(ActivityId? activityId)
         {
             if (activityId == null) return null;
 
             switch (activityId.Value)
             {
                 case ActivityId.FoundDead:
-                    return OrganismVariable.ActivityEnum.Död;
+                    return Activity.Död;
                 // todo - add mappings
                 default:
                     return null;
             }
         }
 
-        public static OrganismVariable.LifeStageEnum? GetLifeStageEnum(LifeStageId? lifeStageId)
+        public static LifeStage? GetLifeStageEnum(LifeStageId? lifeStageId)
         {
             if (lifeStageId == null) return null;
 
             switch (lifeStageId.Value)
             {
                 case LifeStageId.Adult:
-                    return OrganismVariable.LifeStageEnum.Adult;
+                    return LifeStage.Adult;
                 // todo - add mappings
                 default:
                     return null;

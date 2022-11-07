@@ -1,9 +1,10 @@
 using System;
 using System.Runtime.Serialization;
 using System.Text;
+using SOS.DataStewardship.Api.Models.Enums;
 
 namespace SOS.DataStewardship.Api.Models
-{ 
+{
     /// <summary>
     /// Search filter.
     /// </summary>

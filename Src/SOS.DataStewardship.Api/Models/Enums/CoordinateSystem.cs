@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace SOS.DataStewardship.Api.Models
+namespace SOS.DataStewardship.Api.Models.Enums
 {
     /// <summary>
     /// Coordinate system for the (X, Y) coordinates of the geometry.

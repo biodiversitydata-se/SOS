@@ -1,4 +1,4 @@
-﻿using SOS.DataStewardship.Api.Models;
+﻿using SOS.DataStewardship.Api.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +16,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 Identifier = "identifier",
                 Metadatalanguage = "English",
                 Language = "Swedish",
-                AccessRights = Dataset.AccessRightsEnum.Publik,
-                Purpose = Dataset.PurposeEnum.NationellMiljöövervakning,
+                AccessRights = AccessRights.Publik,
+                Purpose = Purpose.NationellMiljöövervakning,
                 Assigner = new Organisation
                 {
                     OrganisationID = "2021001975",
@@ -77,7 +77,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 {
                     AssociatedMediaLink = "AssociatedMediaLink",
                     AssociatedMediaName = "AssociatedMediaName",
-                    AssociatedMediaType = AssociatedMedia.AssociatedMediaTypeEnum.Bild,
+                    AssociatedMediaType = AssociatedMediaType.Bild,
                     License = "License",
                     RightsHolder = "RightsHolder"
                 }
@@ -93,7 +93,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             EventRemarks = "EventRemarks",
             EventType = "EventType",
             LocationProtected = false,
-            NoObservations = EventModel.NoObservationsEnum.Falskt,
+            NoObservations = NoObservations.Falskt,
             Occurrences = new List<string>()
             {
                 "Occurrence-1", "Occurrence-2"
@@ -131,7 +131,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 AirTemperature  = new WeatherMeasuring
                 {
                     WeatherMeasure = 25.4m,
-                    Unit = WeatherMeasuring.UnitEnum.GraderCelsius
+                    Unit = Unit.GraderCelsius
                 }
             }
         };
@@ -145,29 +145,29 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 {
                     AssociatedMediaLink = "AssociatedMediaLink",
                     AssociatedMediaName = "AssociatedMediaName",
-                    AssociatedMediaType = AssociatedMedia.AssociatedMediaTypeEnum.Bild,
+                    AssociatedMediaType = AssociatedMediaType.Bild,
                     License = "License",
                     RightsHolder = "RightsHolder"
                 }
             },
-            BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,
+            BasisOfRecord = BasisOfRecord.MänskligObservation,
             Event = "EventId-1",
-            IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, 
+            IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, 
             ObservationCertainty = 25m, 
             ObservationPoint = null,
             ObservationTime = new DateTime(2013,10,22),
             OccurrenceID = "OccurrenceId-1",
             OccurrenceRemarks = "OccurrenceRemarks",
-            OccurrenceStatus = OccurrenceModel.OccurrenceStatusEnum.Observerad,
+            OccurrenceStatus = OccurrenceStatus.Observerad,
             Organism = new OrganismVariable()
             {
-                Activity = OrganismVariable.ActivityEnum.Födosökande,
-                LifeStage = OrganismVariable.LifeStageEnum.ImagoAdult,
-                Sex = OrganismVariable.SexEnum.Hane
+                Activity = Activity.Födosökande,
+                LifeStage = LifeStage.ImagoAdult,
+                Sex = Sex.Hane
             },
             Quantity = 1m,
-            QuantityVariable = OccurrenceModel.QuantityVariableEnum.AntalIndivider,
-            Unit = OccurrenceModel.UnitEnum.Styck,
+            QuantityVariable = QuantityVariable.AntalIndivider,
+            Unit = Unit.Styck,
             Taxon = new TaxonModel()
             {
                 ScientificName = "ScientificName",

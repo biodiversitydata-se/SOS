@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using SOS.DataStewardship.Api.Models.Enums;
 
 namespace SOS.DataStewardship.Api.Models
 {
