@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -78,7 +80,13 @@ namespace SOS.Lib.IO.GeoJson
                 }
                 var observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "Observations.geojson");
                 await using var fileStream = File.Create(observationsFilePath, 1048576);
-                await using var jsonWriter = new Utf8JsonWriter(fileStream);
+                var jsonWriterOptions = new JsonWriterOptions()
+                {
+                    //To be able to display å,ä,ö e.t.c. properly we need to add the range Latin1Supplement to the list of characters which should not be displayed as UTF8 encoded values (\uxxxx).
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement)
+                };
+
+                await using var jsonWriter = new Utf8JsonWriter(fileStream, jsonWriterOptions);
                 jsonWriter.WriteStartObject();
                 jsonWriter.WriteString("type", "FeatureCollection");
                 jsonWriter.WriteString("crs", "EPSG:4326");
