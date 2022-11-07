@@ -107,6 +107,12 @@ namespace SOS.Observations.Api.Extensions
                 }
             }
 
+            if (searchFilterBaseDto.ExcludeFilter != null)
+            {
+                filter.ExcludeFilter = new ExcludeFilter();
+                filter.ExcludeFilter.OccurrenceIds = searchFilterBaseDto.ExcludeFilter.OccurrenceIds;
+            }
+
             return filter;
         }
 
