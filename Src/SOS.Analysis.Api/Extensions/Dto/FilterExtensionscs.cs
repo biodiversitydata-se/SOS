@@ -51,6 +51,12 @@ namespace SOS.Analysis.Api.Extensions.Dto
                 PopulateInternalBase(searchFilterInternalDto, filter);
             }
 
+            if (searchFilterDto.ExcludeFilter != null)
+            {
+                filter.ExcludeFilter = new ExcludeFilter();
+                filter.ExcludeFilter.OccurrenceIds = searchFilterDto.ExcludeFilter.OccurrenceIds;
+            }
+
             return filter;
         }
 

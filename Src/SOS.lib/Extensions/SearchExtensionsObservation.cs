@@ -777,6 +777,11 @@ namespace SOS.Lib
         /// <returns></returns>
         public static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToExcludeQuery(this SearchFilterBase filter)
         {
+            if (filter == null)
+            {
+                return null;
+            }
+
             var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
             if (filter.Location?.AreaGeographic?.GeometryFilter?.IsValid ?? false)
@@ -797,6 +802,8 @@ namespace SOS.Lib
                     }
                 }
             }
+            
+            query.TryAddTermsCriteria("occurrence.occurrenceId", filter.ExcludeFilter?.OccurrenceIds);
 
             if (filter is SearchFilterInternal)
             {

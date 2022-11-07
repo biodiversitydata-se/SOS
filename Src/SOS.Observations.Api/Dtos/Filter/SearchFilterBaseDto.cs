@@ -68,6 +68,11 @@ namespace SOS.Observations.Api.Dtos.Filter
         public IEnumerable<DiffusionStatusDto> DiffusionStatuses { get; set; }
 
         /// <summary>
+        /// Exclude filter
+        /// </summary>
+        public ExcludeFilterDto ExcludeFilter { get; set; }
+
+        /// <summary>
         /// Geographics filter 
         /// </summary>
         public GeographicsFilterDto Geographics { get; set; }

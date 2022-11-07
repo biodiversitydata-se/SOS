@@ -58,6 +58,11 @@ namespace SOS.Lib.Models.Search.Filters
         public List<DiffusionStatus> DiffusionStatuses { get; set; }
 
         /// <summary>
+        /// Exclude filter
+        /// </summary>
+        public ExcludeFilter ExcludeFilter { get; set; }
+
+        /// <summary>
         /// Filter used to give user extended authorization
         /// </summary>
         public ExtendedAuthorizationFilter ExtendedAuthorization { get; set; }
