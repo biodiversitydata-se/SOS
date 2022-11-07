@@ -35,11 +35,12 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Models.Processed.Dataset;
-using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
 using System.Data;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Processed.Event;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Processed.DataStewardship.Enums;
+using SOS.Lib.Models.Processed.DataStewardship.Common;
 
 namespace SOS.Harvest.Jobs
 {
@@ -1055,8 +1056,8 @@ namespace SOS.Harvest.Jobs
                 Identifier = "ArtportalenDataHost - Dataset Bats", // Ändra till Id-nummer. Enligt DPS:en ska det vara ett id-nummer från informationsägarens metadatakatalog. Om det är LST som är informationsägare så bör de ha datamängden registrerad i sin metadatakatalog, med ett id där.
                 Metadatalanguage = "Swedish",
                 Language = "Swedish",
-                AccessRights = AccessRightsEnum.Publik,
-                Purpose = PurposeEnum.NationellMiljöövervakning,                
+                AccessRights = AccessRights.Publik,
+                Purpose = Purpose.NationellMiljöövervakning,                
                 Assigner = new Organisation
                 {
                     OrganisationID = "2021001975",
@@ -1087,9 +1088,9 @@ namespace SOS.Harvest.Jobs
                 Spatial = "Sverige",                
                 ProjectId = "Artportalen ProjectId:3606",
                 ProjectCode = "Fladdermöss - gemensamt delprogram (biogeografisk uppföljning)",
-                Methodology = new List<MethodologyModel>
+                Methodology = new List<Methodology>
                 {
-                    new MethodologyModel
+                    new Methodology
                     {
                         MethodologyDescription = "Methodology description?", // finns sällan i projektbeskrivning i AP, behöver hämtas från andra DV informationskällor
                         MethodologyLink = "https://www.naturvardsverket.se/upload/stod-i-miljoarbetet/vagledning/miljoovervakning/handledning/metoder/undersokningstyper/landskap/fladdermus-artkartering-2017-06-05.pdf",

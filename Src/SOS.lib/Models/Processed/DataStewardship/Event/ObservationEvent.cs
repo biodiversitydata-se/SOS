@@ -9,6 +9,8 @@ using SOS.Lib.Models.Interfaces;
 using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Processed.DataStewardship.Common;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
 
 namespace SOS.Lib.Models.Processed.Event
 {
@@ -149,18 +151,5 @@ namespace SOS.Lib.Models.Processed.Event
         /// A list of unique identities of the occurances made during an event
         /// </summary>
         public List<string> OccurrenceIds { get; set; }
-
-        public class EventDataset
-        {
-            /// <summary>
-            /// Identifier
-            /// </summary>
-            public string Identifier { get; set; }
-
-            /// <summary>
-            /// Title
-            /// </summary>
-            public string Title { get; set; }
-        }
     }
 }
