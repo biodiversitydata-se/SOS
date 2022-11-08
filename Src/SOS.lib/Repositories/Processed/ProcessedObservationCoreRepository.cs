@@ -916,7 +916,7 @@ namespace SOS.Lib.Repositories.Processed
                         )
                         .Aggregations(a => a
                             .Cardinality("taxa_count", c => c
-                                .Field("taxon.id")
+                                .Field("taxon.id")                                
                             )
                         )
                     )
@@ -1570,8 +1570,8 @@ namespace SOS.Lib.Repositories.Processed
 
             return result;
         }
-
-        public async Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
+        
+        public async Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
             string aggregationField,
             string numericSortField,
             int skip, 
@@ -1605,18 +1605,30 @@ namespace SOS.Lib.Repositories.Processed
                                 .Size(take)
                             )
                         )
-                    )                    
-                )
+                    )
+                    .Cardinality("cardinalityAggregation", t => t
+                        .Field(aggregationField)
+                        .PrecisionThreshold(40000)
+                    )
+                )                
                 .Size(0)
                 .Source(s => s.ExcludeAll())
                 .TrackTotalHits(false)
             );
 
             searchResponse.ThrowIfInvalid();
-            IEnumerable<AggregationItem> result = searchResponse.Aggregations
+            IEnumerable<AggregationItem> records = searchResponse.Aggregations
                 .Terms("termAggregation")
                 .Buckets
                 .Select(b => new AggregationItem { AggregationKey = b.Key, DocCount = (int)(b.DocCount ?? 0) });
+            var totalCount = Convert.ToInt32(searchResponse.Aggregations.Cardinality("cardinalityAggregation").Value);
+            var result = new PagedResult<AggregationItem>()
+            {
+                Records = records,
+                Skip = skip,
+                Take = take,
+                TotalCount = totalCount
+            };
 
             return result;
         }

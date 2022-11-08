@@ -43,7 +43,7 @@ public class DataStewardshipModule : IModule
             
 
         application.MapPost("/datastewardship/datasets", GetDatasetsBySearchAsync)
-            .Produces<List<Dataset>>(StatusCodes.Status200OK)
+            .Produces<Models.PagedResult<Dataset>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
             .WithName("GetDatasetsBySearch")
@@ -61,7 +61,7 @@ public class DataStewardshipModule : IModule
             .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get event by id. Example: urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10002293427000658739"));
 
         application.MapPost("/datastewardship/events", GetEventsBySearchAsync)
-            .Produces<List<EventModel>>(StatusCodes.Status200OK)            
+            .Produces<Models.PagedResult<EventModel>>(StatusCodes.Status200OK)            
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
             .WithName("GetEventsBySearch")
@@ -78,7 +78,7 @@ public class DataStewardshipModule : IModule
             .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get occurrence by id. Example: urn:lsid:artportalen.se:sighting:98571689"));
 
         application.MapPost("/datastewardship/occurrences", GetOccurrencesBySearchAsync)
-            .Produces<List<OccurrenceModel>>(StatusCodes.Status200OK)
+            .Produces<Models.PagedResult<OccurrenceModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
             .WithName("GetOccurrencesBySearch")
