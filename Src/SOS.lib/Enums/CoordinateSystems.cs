@@ -41,4 +41,17 @@
         /// </summary>
         ETRS89 = 3035
     }
+
+    public enum MetricCoordinateSys
+    {
+        /// <summary>
+        ///     SWEREF 99 TM
+        /// </summary>
+        SWEREF99_TM = 3006,
+
+        /// <summary>
+        ///     ETRS-LAEA
+        /// </summary>
+        ETRS89 = 3035
+    }
 }

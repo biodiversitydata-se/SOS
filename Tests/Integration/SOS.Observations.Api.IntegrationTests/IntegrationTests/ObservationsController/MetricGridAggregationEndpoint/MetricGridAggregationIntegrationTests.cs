@@ -69,6 +69,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 10000, 
                 false, 
                 false, 
+                Lib.Enums.MetricCoordinateSys.SWEREF99_TM,
                 OutputFormatDto.GeoJson);
             var result = response.GetResultObject<FeatureCollection>();            
 

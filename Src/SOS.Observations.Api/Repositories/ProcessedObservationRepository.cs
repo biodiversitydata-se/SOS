@@ -25,8 +25,6 @@ namespace SOS.Observations.Api.Repositories
 {
     public class ProcessedObservationRepository : ProcessedObservationCoreRepository, IProcessedObservationRepository
     {
-        private const int ElasticSearchMaxRecords = 10000;
-
         public ProcessedObservationRepository(
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,

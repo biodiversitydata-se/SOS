@@ -76,18 +76,18 @@ namespace SOS.Analysis.Api.Managers
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-                var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters);
+                var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, MetricCoordinateSys.SWEREF99_TM);
                 if (!result?.GridCells?.Any() ?? true)
                 {
                     return null!;
                 }
 
                 // We need features to return later so we create them now 
-                var gridCellFeaturesSweRef99 = result!.GridCells.Select(gc => gc.Sweref99TmBoundingBox
+                var gridCellFeaturesSweRef99 = result!.GridCells.Select(gc => gc.MetricBoundingBox
                     .ToPolygon()
                     .ToFeature(new Dictionary<string, object>()
                     {
-                        {  "id", GeoJsonHelper.GetGridCellId(gridCellsInMeters, (int)gc.Sweref99TmBoundingBox.TopLeft.X, (int)gc.Sweref99TmBoundingBox.BottomRight.Y) },
+                        {  "id", GeoJsonHelper.GetGridCellId(gridCellsInMeters, (int)gc.MetricBoundingBox.TopLeft.X, (int)gc.MetricBoundingBox.BottomRight.Y) },
                         {  "observationsCount", gc.ObservationsCount! },
                         {  "taxaCount", gc.TaxaCount! }
                     })

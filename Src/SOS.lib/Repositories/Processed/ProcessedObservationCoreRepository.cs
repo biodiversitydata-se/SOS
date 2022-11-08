@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
@@ -880,7 +881,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<GeoGridMetricResult> GetMetricGridAggregationAsync(
             SearchFilter filter,
-            int gridCellSizeInMeters)
+            int gridCellSizeInMeters,
+            MetricCoordinateSys metricCoordinateSys)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -901,16 +903,16 @@ namespace SOS.Lib.Repositories.Processed
                     .Composite("gridCells", c => c
                         .Size(MaxNrElasticSearchAggregationBuckets + 1)
                         .Sources(s => s
-                            .Terms("sweref99tm_x", t => t
+                            .Terms("metric_x", t => t
                                 .Script(sct => sct
                                     .Source(
-                                        $"(Math.floor(doc['location.sweref99TmX'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
+                                        $"(Math.floor(doc['location.{( metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89 ) ? "etrs89X" : "sweref99TmX")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
                                 )
                             )
-                            .Terms("sweref99tm_y", t => t
+                            .Terms("metric_y", t => t
                                 .Script(sct => sct
                                     .Source(
-                                        $"(Math.floor(doc['location.sweref99TmY'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
+                                        $"(Math.floor(doc['location.{(metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) ? "etrs89Y" : "sweref99TmY")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
                                 )
                             )
                         )
@@ -952,10 +954,10 @@ namespace SOS.Lib.Repositories.Processed
                 GridCells = searchResponse.Aggregations.Composite("gridCells").Buckets.Select(b =>
                     new GridCell
                     {
-                        Sweref99TmBoundingBox = new XYBoundingBox
+                        MetricBoundingBox = new XYBoundingBox
                         {
-                            BottomRight = new XYCoordinate(double.Parse(b.Key["sweref99tm_x"].ToString()) + gridCellSizeInMeters, double.Parse(b.Key["sweref99tm_y"].ToString())),
-                            TopLeft = new XYCoordinate(double.Parse(b.Key["sweref99tm_x"].ToString()), double.Parse(b.Key["sweref99tm_y"].ToString()) + gridCellSizeInMeters)
+                            BottomRight = new XYCoordinate(double.Parse(b.Key["metric_x"].ToString()) + gridCellSizeInMeters, double.Parse(b.Key["metric_y"].ToString())),
+                            TopLeft = new XYCoordinate(double.Parse(b.Key["metric_x"].ToString()), double.Parse(b.Key["metric_y"].ToString()) + gridCellSizeInMeters)
                         },
                         ObservationsCount = b.DocCount,
                         TaxaCount = (long?)b.Cardinality("taxa_count").Value

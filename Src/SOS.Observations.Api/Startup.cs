@@ -414,7 +414,6 @@ namespace SOS.Observations.Api
             services.AddSingleton<ITaxonManager, TaxonManager>();
             services.AddScoped<ITaxonSearchManager, TaxonSearchManager>();
             services.AddScoped<IVocabularyManager, VocabularyManager>();
-            services.AddScoped<IArtportalenApiManager, ArtportalenApiManager>();
 
             // Add repositories
             services.AddScoped<IApiUsageStatisticsRepository, ApiUsageStatisticsRepository>();

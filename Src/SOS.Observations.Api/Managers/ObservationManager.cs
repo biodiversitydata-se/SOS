@@ -40,9 +40,14 @@ namespace SOS.Observations.Api.Managers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ITaxonObservationCountCache _taxonObservationCountCache;
-        private readonly IArtportalenApiManager _artportalenApiManager;
         private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
-        private readonly ILogger<ObservationManager> _logger;        
+        private readonly ILogger<ObservationManager> _logger;
+
+        private async Task<long> GetProvinceCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
+        {
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            return await _processedObservationRepository.GetProvinceCountAsync(filter);
+        }
 
         private void PostProcessObservations(ProtectionFilter protectionFilter, IEnumerable<dynamic> processedObservations, string cultureCode)
         {
@@ -113,7 +118,6 @@ namespace SOS.Observations.Api.Managers
         /// <param name="filterManager"></param>
         /// <param name="httpContextAccessor"></param>
         /// <param name="taxonObservationCountCache"></param>
-        /// <param name="artportalenApiManager"></param>
         /// <param name="taxonSumAggregationCache"></param>
         /// <param name="logger"></param>
         public ObservationManager(
@@ -123,7 +127,6 @@ namespace SOS.Observations.Api.Managers
             IFilterManager filterManager,
             IHttpContextAccessor httpContextAccessor,
             ITaxonObservationCountCache taxonObservationCountCache,
-            IArtportalenApiManager artportalenApiManager,
             IClassCache<Dictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
             ILogger<ObservationManager> logger)
         {
@@ -275,12 +278,13 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<GeoGridMetricResult> GetMetricGridAggregationAsync(int? roleId, string authorizationApplicationIdentifier,
-                SearchFilter filter, int gridCellSizeInMeters)
+                SearchFilter filter, int gridCellSizeInMeters, MetricCoordinateSys metricCoordinateSys)
         {
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-                var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellSizeInMeters);
+                var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellSizeInMeters, metricCoordinateSys);
+
                 return result;
             }
             catch (ArgumentOutOfRangeException e)
@@ -306,19 +310,11 @@ namespace SOS.Observations.Api.Managers
             return await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(providerId);
         }
 
-        
-
         /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             return await _processedObservationRepository.GetMatchCountAsync(filter);
-        }
-
-        private async Task<long> GetProvinceCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
-        {
-            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            return await _processedObservationRepository.GetProvinceCountAsync(filter);
         }
 
         public async Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(SearchFilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch)
@@ -441,21 +437,6 @@ namespace SOS.Observations.Api.Managers
 
             PostProcessObservations(protectionFilter, processedObservation, translationCultureCode);
 
-            return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
-        }
-
-        public async Task<dynamic> GetObservationFromArtportalenApiAsync(
-            string occurrenceId,
-            OutputFieldSet outputFieldSet,
-            string translationCultureCode,
-            bool protectedObservations,
-            bool includeInternalFields)
-        {
-            dynamic processedObservation;            
-            var sighting = await _artportalenApiManager.GetObservationAsync(occurrenceId);
-            processedObservation = sighting.ToDynamic();
-            processedObservation = new List<dynamic>() { processedObservation };           
-            PostProcessObservations(protectedObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public, processedObservation, translationCultureCode);
             return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
         }
 

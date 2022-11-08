@@ -310,7 +310,7 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        public static FeatureCollection ToGeoJson(this GeoGridMetricResultDto geoGridMetricResult)
+        public static FeatureCollection ToGeoJson(this GeoGridMetricResultDto geoGridMetricResult, MetricCoordinateSys metricCoordinateSys)
         {
             var featureCollection = new FeatureCollection
             {
@@ -325,13 +325,14 @@ namespace SOS.Observations.Api.Extensions
             {                
                 var polygon = new Polygon(new LinearRing(new[]
                     {
-                        new Coordinate(gridCell.Sweref99TmBoundingBox.TopLeft.X, gridCell.Sweref99TmBoundingBox.BottomRight.Y),
-                        new Coordinate(gridCell.Sweref99TmBoundingBox.BottomRight.X, gridCell.Sweref99TmBoundingBox.BottomRight.Y),
-                        new Coordinate(gridCell.Sweref99TmBoundingBox.BottomRight.X, gridCell.Sweref99TmBoundingBox.TopLeft.Y),
-                        new Coordinate(gridCell.Sweref99TmBoundingBox.TopLeft.X, gridCell.Sweref99TmBoundingBox.TopLeft.Y),
-                        new Coordinate(gridCell.Sweref99TmBoundingBox.TopLeft.X, gridCell.Sweref99TmBoundingBox.BottomRight.Y)
+                        new Coordinate(gridCell.MetricBoundingBox.TopLeft.X, gridCell.MetricBoundingBox.BottomRight.Y),
+                        new Coordinate(gridCell.MetricBoundingBox.BottomRight.X, gridCell.MetricBoundingBox.BottomRight.Y),
+                        new Coordinate(gridCell.MetricBoundingBox.BottomRight.X, gridCell.MetricBoundingBox.TopLeft.Y),
+                        new Coordinate(gridCell.MetricBoundingBox.TopLeft.X, gridCell.MetricBoundingBox.TopLeft.Y),
+                        new Coordinate(gridCell.MetricBoundingBox.TopLeft.X, gridCell.MetricBoundingBox.BottomRight.Y)
                     }));
-                var wgs84Polygon = polygon.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+
+                var wgs84Polygon = polygon.Transform((CoordinateSys)metricCoordinateSys, CoordinateSys.WGS84);
                 
                 var feature = new Feature
                 {                    
@@ -341,10 +342,11 @@ namespace SOS.Observations.Api.Extensions
                         new KeyValuePair<string, object>("cellSizeInMeters", geoGridMetricResult.GridCellSizeInMeters),
                         new KeyValuePair<string, object>("observationsCount", gridCell.ObservationsCount),
                         new KeyValuePair<string, object>("taxaCount", gridCell.TaxaCount),
-                        new KeyValuePair<string, object>("sweref99TmLeft", Convert.ToInt32(gridCell.Sweref99TmBoundingBox.TopLeft.X)),
-                        new KeyValuePair<string, object>("sweref99TmTop", Convert.ToInt32(gridCell.Sweref99TmBoundingBox.TopLeft.Y)),
-                        new KeyValuePair<string, object>("sweref99TmRight", Convert.ToInt32(gridCell.Sweref99TmBoundingBox.BottomRight.X)),
-                        new KeyValuePair<string, object>("sweref99TmBottom", Convert.ToInt32(gridCell.Sweref99TmBoundingBox.BottomRight.Y))
+                        new KeyValuePair<string, object>("metricCRS", metricCoordinateSys.ToString()),
+                        new KeyValuePair<string, object>("metricLeft", Convert.ToInt32(gridCell.MetricBoundingBox.TopLeft.X)),
+                        new KeyValuePair<string, object>("metricTop", Convert.ToInt32(gridCell.MetricBoundingBox.TopLeft.Y)),
+                        new KeyValuePair<string, object>("metricRight", Convert.ToInt32(gridCell.MetricBoundingBox.BottomRight.X)),
+                        new KeyValuePair<string, object>("metricBottom", Convert.ToInt32(gridCell.MetricBoundingBox.BottomRight.Y))
                     }),                    
                     Geometry = wgs84Polygon,
                     BoundingBox = wgs84Polygon.EnvelopeInternal
@@ -482,10 +484,10 @@ namespace SOS.Observations.Api.Extensions
         {
             return new GridCellDto
             {
-                Id = GeoJsonHelper.GetGridCellId(gridCellSizeInMeters, Convert.ToInt32(gridCell.Sweref99TmBoundingBox.TopLeft.X), Convert.ToInt32(gridCell.Sweref99TmBoundingBox.BottomRight.Y)),
-                BoundingBox = gridCell.Sweref99TmBoundingBox.ToLatLonBoundingBoxDto(),
+                Id = GeoJsonHelper.GetGridCellId(gridCellSizeInMeters, Convert.ToInt32(gridCell.MetricBoundingBox.TopLeft.X), Convert.ToInt32(gridCell.MetricBoundingBox.BottomRight.Y)),
+                BoundingBox = gridCell.MetricBoundingBox.ToLatLonBoundingBoxDto(),
                 ObservationsCount = gridCell.ObservationsCount,
-                Sweref99TmBoundingBox = gridCell.Sweref99TmBoundingBox.ToXYBoundingBoxDto(),
+                MetricBoundingBox = gridCell.MetricBoundingBox.ToXYBoundingBoxDto(),
                 TaxaCount = gridCell.TaxaCount
             };
         }

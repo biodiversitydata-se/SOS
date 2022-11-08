@@ -129,7 +129,7 @@ namespace SOS.Observations.Api.Controllers
         /// Constructor
         /// </summary>
         /// <param name="observationManager"></param>
-        /// <param name="taxonManager"></param>
+        /// <param name="taxonSearchManager"></param>
         /// <param name="areaManager"></param>
         /// <param name="observationApiConfiguration"></param>
         /// <param name="elasticConfiguration"></param>
@@ -411,7 +411,7 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, "en-GB");
                 var result = await ObservationManager.GetMetricGridAggregationAsync(
                     roleId,
-                    authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters);
+                    authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters, MetricCoordinateSys.SWEREF99_TM);
 
                 var dto = result.ToDto();
                 return new OkObjectResult(dto);
@@ -1182,6 +1182,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="gridCellSizeInMeters">Size of grid cell in meters</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="metricCoordinateSys">Metric coordinate system used to calculate grid cells</param>
+        /// <param name="outputFormat">Returned format</param>
         /// <returns></returns>
         [HttpPost("Internal/MetricGridAggregation")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
@@ -1195,6 +1197,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int gridCellSizeInMeters = 10000,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] MetricCoordinateSys metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
             [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
             try
@@ -1215,10 +1218,13 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilter(UserId, sensitiveObservations, "en-GB");
                 var result = await ObservationManager.GetMetricGridAggregationAsync(
                     roleId,
-                    authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters);
+                    authorizationApplicationIdentifier, 
+                    searchFilter, 
+                    gridCellSizeInMeters,
+                    metricCoordinateSys);
 
                 var dto = result.ToDto();
-                return new OkObjectResult(outputFormat == OutputFormatDto.Json ? dto : dto.ToGeoJson());
+                return new OkObjectResult(outputFormat == OutputFormatDto.Json ? dto : dto.ToGeoJson(metricCoordinateSys));
             }
             catch (ArgumentOutOfRangeException e)
             {

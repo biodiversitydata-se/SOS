@@ -18,6 +18,6 @@
         /// <summary>
         /// Cell coordinates
         /// </summary>
-        public XYBoundingBox Sweref99TmBoundingBox { get; set; }
+        public XYBoundingBox MetricBoundingBox { get; set; }
     }
 }

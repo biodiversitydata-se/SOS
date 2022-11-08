@@ -122,6 +122,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public double? DecimalLongitude { get; set; }
 
         /// <summary>
+        /// X coordinate in ETRS89.
+        /// </summary>
+        public double? Etrs89X { get; set; }
+
+        /// <summary>
+        /// Y coordinate in ETRS89.
+        /// </summary>
+        public double? Etrs89Y { get; set; }
+
+        /// <summary>
         ///     The ratio of the area of the footprint (footprintWKT)
         ///     to the area of the true (original, or most specific)
         ///     spatial representation of the Location. Legal values are

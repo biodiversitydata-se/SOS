@@ -70,11 +70,15 @@ namespace SOS.Harvest.Processors
             location.PointWithBuffer = pointWithBuffer;
             location.PointWithDisturbanceBuffer = pointWithDisturbanceBuffer;
 
-            var sweref99TimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.Sweref99Conversion);
+            var coordinateConversionTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.CoordinateConversion);
             var sweRef99TmPoint = point.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
             location.Sweref99TmX = sweRef99TmPoint.Coordinate.X;
             location.Sweref99TmY = sweRef99TmPoint.Coordinate.Y;
-            TimeManager.Stop(ProcessTimeManager.TimerTypes.Sweref99Conversion, sweref99TimerSessionId);
+           
+            var etrs89Point = point.Transform(CoordinateSys.WGS84, CoordinateSys.ETRS89);
+            location.Etrs89X = etrs89Point.Coordinate.X;
+            location.Etrs89Y = etrs89Point.Coordinate.Y;
+            TimeManager.Stop(ProcessTimeManager.TimerTypes.CoordinateConversion, coordinateConversionTimerSessionId);
 
             location.VerbatimSRS = verbatimCoordinateSystem.EpsgCode();
 

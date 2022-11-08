@@ -134,6 +134,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public string LocationProvinceName => _observation?.Location?.Province?.Name;
         public double? LocationDecimalLatitude => _observation?.Location?.DecimalLatitude;
         public double? LocationDecimalLongitude => _observation?.Location?.DecimalLongitude;
+        public double? LocationEtrs89X => _observation?.Location?.Etrs89X;
+        public double? LocationEtrs89Y => _observation?.Location?.Etrs89Y;
         public double? LocationSweref99TmX => _observation?.Location?.Sweref99TmX;
         public double? LocationSweref99TmY => _observation?.Location?.Sweref99TmY;
         public string LocationFootprintSpatialFit => _observation?.Location?.FootprintSpatialFit;
