@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Helpers;
 using Xunit;
 
@@ -9,10 +7,10 @@ namespace SOS.Lib.UnitTests.Helpers
     public class GeoJsonHelperTests
     {
         [Theory]
-        [InlineData(10000, 620000, 6870000, "10kmN62E687")]
-        [InlineData(15000, 625000, 6870000, "15kmN625E6870")]
-        [InlineData(1720, 621700, 6870000, "1.72kmN62170E687000")]
-        [InlineData(500, 620500, 6870000, "500mN6205E68700")]
+        [InlineData(10000, 620000, 6870000, "10kmN687E62")]
+        [InlineData(15000, 625000, 6870000, "15kmN6870E625")]
+        [InlineData(1720, 621700, 6870000, "1.72kmN687000E62170")]
+        [InlineData(500, 620500, 6870000, "500mN68700E6205")]
         public void Test_GetGridCellId(
             int gridCellSizeInMeters,
             int lowerLeftX,
