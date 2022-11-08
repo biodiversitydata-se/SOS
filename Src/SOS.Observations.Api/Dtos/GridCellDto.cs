@@ -23,7 +23,7 @@
         /// <summary>
         /// Cell coordinates in SWEREF99 TM
         /// </summary>
-        public XYBoundingBoxDto Sweref99TmBoundingBox { get; set; }
+        public XYBoundingBoxDto MetricBoundingBox { get; set; }
 
         /// <summary>
         /// Count of different taxa

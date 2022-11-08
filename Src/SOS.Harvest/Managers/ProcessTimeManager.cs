@@ -54,17 +54,17 @@ namespace SOS.Harvest.Managers
 
         public enum TimerTypes
         {
+            Diffuse,
+            CoordinateConversion,
+            CsvWrite,
+            DwCCreation,
             ElasticsearchDelete,
             ElasticSearchRead,
             ElasticSearchWrite,
-            CsvWrite,
-            Diffuse,
-            DwCCreation,
             MongoDbRead,
             MongoDbWrite,
             ProcessObservation,
             ProcessOverall,
-            Sweref99Conversion,
             ValidateObservations,
             ValidateIndex
         }

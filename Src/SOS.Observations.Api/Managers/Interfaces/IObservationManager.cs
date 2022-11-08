@@ -84,11 +84,14 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="gridCellSizeInMeters"></param>
+        /// <param name="metricCoordinateSys"></param>
         /// <returns></returns>
         Task<GeoGridMetricResult> GetMetricGridAggregationAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
-            SearchFilter filter, int gridCellSizeInMeters);
+            SearchFilter filter, 
+            int gridCellSizeInMeters,
+            MetricCoordinateSys metricCoordinateSys);
 
         /// <summary>
         /// Get latest data modified date for passed provider 

@@ -121,6 +121,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int gridCellSizeInMeters = 10000,
             bool validateSearchFilter = false,
             bool sensitiveObservations = false,
+            MetricCoordinateSys metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
             OutputFormatDto outputFormat = OutputFormatDto.Json);
 
         Task<IActionResult> TaxonAggregation(

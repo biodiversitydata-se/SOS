@@ -432,16 +432,13 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 new HttpClientService(new NullLogger<HttpClientService>()),
                 new ArtportalenApiServiceConfiguration { BaseAddress = "https://api.artdata.slu.se/observations/v2", AcceptHeaderContentType = "application/json" },
                 new NullLogger<ArtportalenApiService>());
-            var artportalenApiManager = new ArtportalenApiManager(artportalenApiService, new NullLogger<ArtportalenApiManager>());
-
-
+         
             var observationsManager = new ObservationManager(processedObservationRepository,
                 protectedLogRepository,
                 vocabularyValueResolver,
                 filterManager,
                 new HttpContextAccessor(),
                 new TaxonObservationCountCache(),
-                artportalenApiManager,
                 new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions())) { CacheDuration = TimeSpan.FromHours(4) },
                 new NullLogger<ObservationManager>());
 
