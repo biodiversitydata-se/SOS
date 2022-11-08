@@ -1,12 +1,8 @@
-﻿using SOS.Lib.Models.Processed.Event;
+﻿using SOS.Lib.Models.Processed.DataStewardship.Common;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
-using static SOS.Lib.Models.Processed.Event.ObservationEvent;
 
 namespace SOS.Lib.Extensions
 {

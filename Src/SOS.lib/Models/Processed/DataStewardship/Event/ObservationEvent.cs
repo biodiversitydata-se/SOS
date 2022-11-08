@@ -6,11 +6,12 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Interfaces;
-using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
+using static SOS.Lib.Models.Processed.DataStewardship.Dataset.ObservationDataset;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Processed.DataStewardship.Common;
 
-namespace SOS.Lib.Models.Processed.Event
+namespace SOS.Lib.Models.Processed.DataStewardship.Event
 {
     public class ObservationEvent : IEntity<string>
     {
@@ -47,7 +48,7 @@ namespace SOS.Lib.Models.Processed.Event
         /// </summary>
         /// <value>Date and Time for when the survey started (local time).</value>        
         public DateTime? StartDate { get; set; }
-        
+
         /// <summary>
         /// Date and Time for when the survey ended (local time).
         /// </summary>        
@@ -124,7 +125,7 @@ namespace SOS.Lib.Models.Processed.Event
         /// Comment (freetext) about the survey event.
         /// </summary>
         public string EventRemarks { get; set; }
-        
+
         /// <summary>
         /// States whether any of the sought after organisms were observed during the survey event or not. \&quot;Sant\&quot; (i.e. True) means that none of the sought after organisms were observed at all.
         /// </summary>
@@ -149,18 +150,5 @@ namespace SOS.Lib.Models.Processed.Event
         /// A list of unique identities of the occurances made during an event
         /// </summary>
         public List<string> OccurrenceIds { get; set; }
-
-        public class EventDataset
-        {
-            /// <summary>
-            /// Identifier
-            /// </summary>
-            public string Identifier { get; set; }
-
-            /// <summary>
-            /// Title
-            /// </summary>
-            public string Title { get; set; }
-        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SOS.DataStewardship.Api.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,8 +14,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             Identifier = "ArtportalenDataHost - Dataset Bats", // Ändra till Id-nummer. Enligt DPS:en ska det vara ett id-nummer från informationsägarens metadatakatalog. Om det är LST som är informationsägare så bör de ha datamängden registrerad i sin metadatakatalog, med ett id där.
             Metadatalanguage = "Swedish",
             Language = "Swedish",
-            AccessRights = Dataset.AccessRightsEnum.Publik,
-            Purpose = Dataset.PurposeEnum.NationellMiljöövervakning,
+            AccessRights = AccessRights.Publik,
+            Purpose = Purpose.NationellMiljöövervakning,
             Assigner = new Organisation
             {
                 OrganisationID = "2021001975",
@@ -90,7 +91,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 }
             },
             SamplingProtocol = "Undersökningstyp fladdermöss - artkartering",
-            NoObservations = EventModel.NoObservationsEnum.Falskt,
+            NoObservations = NoObservations.Falskt,
             Occurrences = new List<string>
             {
                 "urn:lsid:artportalen.se:sighting:74542663",
@@ -129,8 +130,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             OccurrenceID = "urn:lsid:artportalen.se:sighting:74542663",
             Event = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",
             ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), // Ej obligatorisk, men kan sättas om StartDate och EndDate har samma värde. EventDate ger tiden för själva besöket (t.ex. från 8:10 på morgonen till 11:36 på förmiddagen. Occ under den tiden gjordes en obs av spillkråka kl 10:54. Det är den tiden (10:54) som är observationstidpunkt.
-            BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,
-            IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, // Ovaliderad  // för värdelistan väntar vi på vad arbetsgruppen för verifieringsmodulen skulle ha som slutgiltig förslag på kategorier - vi bör fråga de om att få den listan         
+            BasisOfRecord = BasisOfRecord.MänskligObservation,
+            IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Ovaliderad  // för värdelistan väntar vi på vad arbetsgruppen för verifieringsmodulen skulle ha som slutgiltig förslag på kategorier - vi bör fråga de om att få den listan         
             ObservationCertainty = 200m,
             ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
             ObservationPointTest = new GeometryObject
@@ -139,15 +140,15 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 Coordinates = new double[] { 58.52845, 14.52667 }
             },            
             OccurrenceRemarks = "Östra utfallsgången",
-            OccurrenceStatus = OccurrenceModel.OccurrenceStatusEnum.Observerad,
+            OccurrenceStatus = OccurrenceStatus.Observerad,
             Organism = new OrganismVariable
             {
-                Activity = OrganismVariable.ActivityEnum.PåÖvervintringsplats,
+                Activity = Activity.PåÖvervintringsplats,
                 LifeStage = null,
                 Sex = null
             },
             Quantity = 2m,
-            QuantityVariable = OccurrenceModel.QuantityVariableEnum.AntalIndivider,
+            QuantityVariable = QuantityVariable.AntalIndivider,
             Unit = null, // Enhet för Quantity
             Taxon = new TaxonModel
             {
@@ -166,8 +167,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             OccurrenceID = "urn:lsid:artportalen.se:sighting:74542662",
             Event = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",            
             ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), 
-            BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,            
-            IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, 
+            BasisOfRecord = BasisOfRecord.MänskligObservation,            
+            IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, 
             ObservationCertainty = 200m,
             ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
             ObservationPointTest = new GeometryObject
@@ -176,15 +177,15 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 Coordinates = new double[] { 58.52845, 14.52667 }
             },            
             OccurrenceRemarks = "Östra utfallsgången",
-            OccurrenceStatus = OccurrenceModel.OccurrenceStatusEnum.Observerad,
+            OccurrenceStatus = OccurrenceStatus.Observerad,
             Organism = new OrganismVariable
             {
-                Activity = OrganismVariable.ActivityEnum.PåÖvervintringsplats,
+                Activity = Activity.PåÖvervintringsplats,
                 LifeStage = null,
                 Sex = null
             },
             Quantity = 1m,
-            QuantityVariable = OccurrenceModel.QuantityVariableEnum.AntalIndivider,            
+            QuantityVariable = QuantityVariable.AntalIndivider,            
             Unit = null, 
             Taxon = new TaxonModel
             {
@@ -203,8 +204,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             OccurrenceID = "urn:lsid:artportalen.se:sighting:74542657",
             Event = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",
             ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), // StartDate och EndDate verkar saknas i OccurrenceModel?
-            BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,
-            IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
+            BasisOfRecord = BasisOfRecord.MänskligObservation,
+            IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
             ObservationCertainty = 200m,
             ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
             ObservationPointTest = new GeometryObject
@@ -213,15 +214,15 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 Coordinates = new double[] { 58.52845, 14.52667 }
             },
             OccurrenceRemarks = "Västra blindgången",
-            OccurrenceStatus = OccurrenceModel.OccurrenceStatusEnum.Observerad,
+            OccurrenceStatus = OccurrenceStatus.Observerad,
             Organism = new OrganismVariable
             {
-                Activity = OrganismVariable.ActivityEnum.PåÖvervintringsplats,
+                Activity = Activity.PåÖvervintringsplats,
                 LifeStage = null,
                 Sex = null
             },
             Quantity = 5m,
-            QuantityVariable = OccurrenceModel.QuantityVariableEnum.AntalIndivider,
+            QuantityVariable = QuantityVariable.AntalIndivider,
             Unit = null, // Vad är unit kopplat till för variabel?
             Taxon = new TaxonModel
             {
@@ -261,7 +262,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 }
             },
             SamplingProtocol = "Undersökningstyp fladdermöss - artkartering",
-            NoObservations = EventModel.NoObservationsEnum.Falskt,
+            NoObservations = NoObservations.Falskt,
             Occurrences = new List<string>
             {
                 "urn:lsid:artportalen.se:sighting:85188138",
@@ -294,8 +295,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             OccurrenceID = "urn:lsid:artportalen.se:sighting:85188138",
             Event = "urn:lsid:artportalen.se:site:5084342#2016-07-14T22:00:00+02:00/2016-07-15T05:00:00+02:00",
             ObservationTime = new DateTime(2016, 7, 14), // StartDate och EndDate verkar saknas i OccurrenceModel?
-            BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,
-            IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
+            BasisOfRecord = BasisOfRecord.MänskligObservation,
+            IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
             ObservationCertainty = 5m,
             ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
             ObservationPointTest = new GeometryObject
@@ -304,7 +305,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 Coordinates = new double[] { 58.52845, 14.52667 }
             },
             OccurrenceRemarks = null,
-            OccurrenceStatus = OccurrenceModel.OccurrenceStatusEnum.Observerad,
+            OccurrenceStatus = OccurrenceStatus.Observerad,
             Organism = new OrganismVariable
             {
                 Activity = null,
@@ -312,7 +313,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 Sex = null
             },
             Quantity = 4m,
-            QuantityVariable = OccurrenceModel.QuantityVariableEnum.AntalIndivider,
+            QuantityVariable = QuantityVariable.AntalIndivider,
             Unit = null, // Vad är unit kopplat till för variabel?
             Taxon = new TaxonModel
             {
@@ -331,8 +332,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             OccurrenceID = "urn:lsid:artportalen.se:sighting:85188141",
             Event = "urn:lsid:artportalen.se:site:5084342#2016-07-14T22:00:00+02:00/2016-07-15T05:00:00+02:00",
             ObservationTime = new DateTime(2016, 7, 14), // StartDate och EndDate verkar saknas i OccurrenceModel?
-            BasisOfRecord = OccurrenceModel.BasisOfRecordEnum.MänskligObservation,
-            IdentificationVerificationStatus = OccurrenceModel.IdentificationVerificationStatusEnum.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
+            BasisOfRecord = BasisOfRecord.MänskligObservation,
+            IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
             ObservationCertainty = 5m,
             ObservationPointTest = new GeometryObject
             {
@@ -340,7 +341,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 Coordinates = new double[] { 58.52845, 14.52667 }
             },            
             OccurrenceRemarks = null,
-            OccurrenceStatus = OccurrenceModel.OccurrenceStatusEnum.Observerad,
+            OccurrenceStatus = OccurrenceStatus.Observerad,
             Organism = new OrganismVariable
             {
                 Activity = null,
@@ -348,7 +349,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 Sex = null
             },
             Quantity = 1m,
-            QuantityVariable = OccurrenceModel.QuantityVariableEnum.AntalIndivider,
+            QuantityVariable = QuantityVariable.AntalIndivider,
             Unit = null, // Vad är unit kopplat till för variabel?
             Taxon = new TaxonModel
             {

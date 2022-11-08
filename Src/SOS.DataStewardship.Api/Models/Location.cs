@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using SOS.DataStewardship.Api.Models.Enums;
 
 namespace SOS.DataStewardship.Api.Models
 {

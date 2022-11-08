@@ -1,3 +1,4 @@
+using SOS.DataStewardship.Api.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -85,31 +86,9 @@ namespace SOS.DataStewardship.Api.Models
         /// <summary>
         /// The purpose of the data collection (e.g. national or regional environmental monitoring).
         /// </summary>
-        public enum PurposeEnum
-        {
-            /// <summary>
-            /// Nationell miljöövervakning
-            /// </summary>
-            [EnumMember(Value = "nationell miljöövervakning")]
-            NationellMiljöövervakning = 0,
-            /// <summary>
-            /// Regional miljöövervakning
-            /// </summary>
-            [EnumMember(Value = "regional miljöövervakning")]
-            RegionalMiljöövervakning = 1,
-            /// <summary>
-            /// Biogeografisk uppföljning
-            /// </summary>
-            [EnumMember(Value = "biogeografisk uppföljning")]
-            biogeografiskUppföljning = 2
-        }
-
-        /// <summary>
-        /// The purpose of the data collection (e.g. national or regional environmental monitoring).
-        /// </summary>
         [Required]
         [DataMember(Name="purpose")]
-        public PurposeEnum? Purpose { get; set; }
+        public Purpose? Purpose { get; set; }
 
         /// <summary>
         /// Short description of the dataset or the context for collection of the data included in the dataset. The structure and content of the description is governed by the requirements from the respective metadata catalogues.
@@ -148,31 +127,9 @@ namespace SOS.DataStewardship.Api.Models
         /// <summary>
         /// Information about whether the whole, parts of, or nothing in the dataset is publically available.
         /// </summary>
-        public enum AccessRightsEnum
-        {
-            /// <summary>
-            /// publik
-            /// </summary>
-            [EnumMember(Value = "publik")]
-            Publik = 0,
-            /// <summary>
-            /// begränsad
-            /// </summary>
-            [EnumMember(Value = "begränsad")]
-            Begränsad = 1,
-            /// <summary>
-            /// ej offentlig
-            /// </summary>
-            [EnumMember(Value = "ej offentlig")]
-            EjOffentlig = 2
-        }
-
-        /// <summary>
-        /// Information about whether the whole, parts of, or nothing in the dataset is publically available.
-        /// </summary>
         [Required]
         [DataMember(Name="accessRights")]
-        public AccessRightsEnum? AccessRights { get; set; }
+        public AccessRights? AccessRights { get; set; }
 
         /// <summary>
         /// The language that is used when writing metadata about the dataset.

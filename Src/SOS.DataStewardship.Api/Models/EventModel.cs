@@ -1,4 +1,5 @@
 using SOS.DataStewardship.Api.Models;
+using SOS.DataStewardship.Api.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -91,27 +92,10 @@ namespace SOS.DataStewardship.Api.Models
         public string EventRemarks { get; set; }
 
         /// <summary>
-        /// States whether any of the sought after organisms were observed during the survey event or not. \"Sant\" (i.e. True) means that none of the sought after organisms were observed at all.
-        /// </summary>
-        public enum NoObservationsEnum
-        {
-            /// <summary>
-            /// falskt
-            /// </summary>
-            [EnumMember(Value = "falskt")]
-            Falskt = 0,
-            /// <summary>
-            /// sant
-            /// </summary>
-            [EnumMember(Value = "sant")]
-            Sant = 1
-        }
-
-        /// <summary>
         /// States whether any of the sought after organisms were observed during the survey event or not. \&quot;Sant\&quot; (i.e. True) means that none of the sought after organisms were observed at all.
         /// </summary>
         [DataMember(Name="noObservations")]
-        public NoObservationsEnum? NoObservations { get; set; }
+        public NoObservations? NoObservations { get; set; }
 
         /// <summary>
         /// Attached information about the survey event, e.g. media files like images, sound recordings, maps etc.

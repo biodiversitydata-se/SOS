@@ -10,11 +10,12 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Processed.Event;
+using SOS.Lib.Models.Processed.DataStewardship.Common;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using static SOS.Lib.Models.Processed.Dataset.ObservationDataset;
-using static SOS.Lib.Models.Processed.Event.ObservationEvent;
+using static SOS.Lib.Models.Processed.DataStewardship.Dataset.ObservationDataset;
+using static SOS.Lib.Models.Processed.DataStewardship.Event.ObservationEvent;
 
 namespace SOS.Lib.Repositories.Processed
 {

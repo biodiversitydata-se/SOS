@@ -1,7 +1,7 @@
 using System.Runtime.Serialization;
 
-namespace SOS.DataStewardship.Api.Models
-{ 
+namespace SOS.DataStewardship.Api.Models.Enums
+{
     /// <summary>
     /// Date filter type.
     /// </summary>

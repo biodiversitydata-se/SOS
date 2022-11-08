@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace SOS.DataStewardship.Api.Models
+namespace SOS.DataStewardship.Api.Models.Enums
 {
     /// <summary>
     /// json or csv
@@ -12,11 +12,11 @@ namespace SOS.DataStewardship.Api.Models
         /// Enum JsonEnum for json
         /// </summary>
         [EnumMember(Value = "json")]
-        JsonEnum = 0,
+        Json = 0,
         /// <summary>
         /// Enum CsvEnum for csv
         /// </summary>
         [EnumMember(Value = "csv")]
-        CsvEnum = 1        
+        Csv = 1
     }
 }

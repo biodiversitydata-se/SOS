@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Checklist;
-using SOS.Lib.Models.Processed.Dataset;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
