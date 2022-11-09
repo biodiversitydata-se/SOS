@@ -166,9 +166,9 @@ namespace SOS.Harvest.Jobs
         {
             if (!_processConfiguration.ProcessObservationDataset) return;
             _logger.LogInformation($"ProcessedConfiguration.ActiveIndex is {_processedObservationRepository.ActiveInstance}");
-            _logger.LogInformation($"_observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");
-            _observationDatasetRepository.LiveMode = _observationDatasetRepository.LiveMode;
-            _logger.LogInformation($"Set _observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");
+            _logger.LogInformation($"_observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");            
+            _observationDatasetRepository.LiveMode = _processedObservationRepository.LiveMode;
+            _logger.LogInformation($"Set _observationDatasetRepository.LiveMode={_processedObservationRepository.LiveMode}");
             _logger.LogInformation($"Start clear ElasticSearch index: UniqueIndexName={_observationDatasetRepository.UniqueIndexName}, IndexName={_observationDatasetRepository.IndexName}");
             await _observationDatasetRepository.ClearCollectionAsync();
             _logger.LogInformation($"Finish clear ElasticSearch index: {_observationDatasetRepository.UniqueIndexName}");
@@ -179,8 +179,8 @@ namespace SOS.Harvest.Jobs
             if (!_processConfiguration.ProcessObservationDataset) return;
             _logger.LogInformation($"ProcessedConfiguration.ActiveIndex is {_processedObservationRepository.ActiveInstance}");
             _logger.LogInformation($"_observationEventRepository.LiveMode={_observationEventRepository.LiveMode}");
-            _observationEventRepository.LiveMode = _observationEventRepository.LiveMode;
-            _logger.LogInformation($"Set _observationEventRepository.LiveMode={_observationEventRepository.LiveMode}");
+            _observationEventRepository.LiveMode = _processedObservationRepository.LiveMode;
+            _logger.LogInformation($"Set _observationEventRepository.LiveMode={_processedObservationRepository.LiveMode}");
             _logger.LogInformation($"Start clear ElasticSearch index: UniqueIndexName={_observationEventRepository.UniqueIndexName}, IndexName={_observationEventRepository.IndexName}");
             await _observationEventRepository.ClearCollectionAsync();
             _logger.LogInformation($"Finish clear ElasticSearch index: {_observationEventRepository.UniqueIndexName}");
