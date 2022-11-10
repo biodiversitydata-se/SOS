@@ -1,5 +1,4 @@
 ﻿using AgileObjects.AgileMapper.Extensions;
-using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Analysis.Api.Dtos.Search;
@@ -71,12 +70,13 @@ namespace SOS.Analysis.Api.Managers
             bool useEdgeLengthRatio,
             bool allowHoles,
             bool includeEmptyCells,
+            MetricCoordinateSys metricCoordinateSys,
             CoordinateSys coordinateSystem)
         {
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-                var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, MetricCoordinateSys.SWEREF99_TM);
+                var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys);
                 if (!result?.GridCells?.Any() ?? true)
                 {
                     return null!;

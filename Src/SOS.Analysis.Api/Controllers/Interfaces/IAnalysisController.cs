@@ -39,6 +39,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// When false: Computes the concave hull of the vertices in a geometry using the target criterion of edge length, and optionally allowing holes (see below). </param>
         /// <param name="allowHoles">Gets or sets whether holes are allowed in the concave hull polygon.</param>
         /// <param name="includeEmptyCells">Include grid cells with no observations</param>
+        /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
         /// <param name="coordinateSystem">Gemometry coordinate system</param>
         /// <returns></returns>
         Task<IActionResult> CalculateAooAndEooInternalAsync(
@@ -51,6 +52,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             bool? useEdgeLengthRatio = true, 
             bool? allowHoles = false,
             bool? includeEmptyCells = false,
+            MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.ETRS89,
             CoordinateSys? coordinateSystem = CoordinateSys.ETRS89);
     }
 }

@@ -36,8 +36,9 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="edgeLength"></param>
         /// <param name="useEdgeLengthRatio"></param>
         /// <param name="allowHoles"></param>
-        /// <param name="coordinateSystem"></param>
         /// <param name="includeEmptyCells"></param>
+        /// <param name="metricCoordinateSys"></param>
+        /// <param name="coordinateSystem"></param>
         /// <returns></returns>
         Task<FeatureCollection> CalculateAooAndEooAsync(
             int? roleId,
@@ -49,6 +50,7 @@ namespace SOS.Analysis.Api.Managers.Interfaces
             bool useEdgeLengthRatio,
             bool allowHoles,
             bool includeEmptyCells,
+            MetricCoordinateSys metricCoordinateSys,
             CoordinateSys coordinateSystem);
     }
 }
