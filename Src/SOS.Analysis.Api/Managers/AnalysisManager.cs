@@ -83,7 +83,7 @@ namespace SOS.Analysis.Api.Managers
                 }
 
                 // We need features to return later so we create them now 
-                var gridCellFeaturesSweRef99 = result!.GridCells.Select(gc => gc.MetricBoundingBox
+                var gridCellFeaturesMetric = result!.GridCells.Select(gc => gc.MetricBoundingBox
                     .ToPolygon()
                     .ToFeature(new Dictionary<string, object>()
                     {
@@ -93,7 +93,7 @@ namespace SOS.Analysis.Api.Managers
                     })
                 ).ToDictionary(f => (string)f.Attributes["id"], f => f);
 
-                var eooGeometry = gridCellFeaturesSweRef99.Select(f => f.Value.Geometry as Polygon).ToArray().ConcaveHull(useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
+                var eooGeometry = gridCellFeaturesMetric.Select(f => f.Value.Geometry as Polygon).ToArray().ConcaveHull(useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
 
                 if (eooGeometry == null)
                 {
@@ -104,12 +104,12 @@ namespace SOS.Analysis.Api.Managers
                 if (includeEmptyCells)
                 {
                     GeoJsonHelper.FillInBlanks(
-                        gridCellFeaturesSweRef99,
+                        gridCellFeaturesMetric,
                         new Envelope(
-                            gridCellFeaturesSweRef99.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.X)),
-                            gridCellFeaturesSweRef99.Max(gc => gc.Value.Geometry.Coordinates.Max(c => c.X)),
-                            gridCellFeaturesSweRef99.Max(gc => gc.Value.Geometry.Coordinates.Max(c => c.Y)),
-                            gridCellFeaturesSweRef99.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.Y))
+                            gridCellFeaturesMetric.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.X)),
+                            gridCellFeaturesMetric.Max(gc => gc.Value.Geometry.Coordinates.Max(c => c.X)),
+                            gridCellFeaturesMetric.Max(gc => gc.Value.Geometry.Coordinates.Max(c => c.Y)),
+                            gridCellFeaturesMetric.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.Y))
                         ),
                         gridCellsInMeters, new[] {
                             new KeyValuePair<string, object>("observationsCount", 0),
@@ -123,7 +123,7 @@ namespace SOS.Analysis.Api.Managers
                 var gridCellCount = result.GridCells.Count();
                 var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
                 var aoo = Math.Round((double)gridCellCount * gridCellArea, 0);
-                var transformedEooGeometry = eooGeometry.Transform(CoordinateSys.SWEREF99_TM, coordinateSystem);
+                var transformedEooGeometry = eooGeometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
 
                 var futureCollection = new FeatureCollection() { BoundingBox = transformedEooGeometry?.Envelope.ToEnvelope() };
                 futureCollection.Add(new Feature(
@@ -139,14 +139,14 @@ namespace SOS.Analysis.Api.Managers
                 ));
 
                 // Add all grid cells features
-                foreach(var gridCellFeatureSweRef99 in gridCellFeaturesSweRef99.OrderBy(gc => gc.Key))
+                foreach(var gridCellFeatureMetric in gridCellFeaturesMetric.OrderBy(gc => gc.Key))
                 {
-                    if (coordinateSystem != CoordinateSys.SWEREF99_TM)
+                    if (coordinateSystem != (CoordinateSys)metricCoordinateSys)
                     {
-                        gridCellFeatureSweRef99.Value.Geometry = gridCellFeatureSweRef99.Value.Geometry.Transform(CoordinateSys.SWEREF99_TM, coordinateSystem);
+                        gridCellFeatureMetric.Value.Geometry = gridCellFeatureMetric.Value.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
                     }
                     
-                    futureCollection.Add(gridCellFeatureSweRef99.Value);
+                    futureCollection.Add(gridCellFeatureMetric.Value);
                 }
  
                 return futureCollection;
