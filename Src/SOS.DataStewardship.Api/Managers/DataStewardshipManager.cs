@@ -1,11 +1,7 @@
-﻿using Nest;
-using SOS.DataStewardship.Api.Extensions;
+﻿using SOS.DataStewardship.Api.Extensions;
 using SOS.DataStewardship.Api.Managers.Interfaces;
 using SOS.DataStewardship.Api.Models;
-using SOS.DataStewardship.Api.Models.SampleData;
 using SOS.Lib.JsonConverters;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -39,11 +35,9 @@ public class DataStewardshipManager : IDataStewardshipManager
         if (observationDataset == null) return null;
         var dataset = observationDataset.FirstOrDefault()?.ToDataset();
         return dataset;
-
-        //return DataStewardshipArtportalenSampleData.DatasetBats;
     }
 
-    public async Task<List<Dataset>> GetDatasetsBySearchAsync(DatasetFilter datasetFilter, int skip, int take)
+    public async Task<Models.PagedResult<Dataset>> GetDatasetsBySearchAsync(DatasetFilter datasetFilter, int skip, int take)
     {        
         var filter = datasetFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);
@@ -51,12 +45,24 @@ public class DataStewardshipManager : IDataStewardshipManager
         var datasetIdItems = datasetIdAggregationItems
             .Skip(skip)
             .Take(take);
-        if (!datasetIdItems.Any()) return new List<Dataset>();
-        var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(datasetIdItems.Select(m => m.AggregationKey));
-        var datasets = observationDatasets.Select(m => m.ToDataset()).ToList();
-        return datasets;
+
+        int count = datasetIdItems.Count();
+        int totalCount = datasetIdAggregationItems.Count();
+        var records = Enumerable.Empty<Dataset>();
+        if (datasetIdItems.Any())
+        {
+            var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(datasetIdItems.Select(m => m.AggregationKey));
+            records = observationDatasets.Select(m => m.ToDataset()).ToList();
+        }
         
-        //return new List<Dataset> { DataStewardshipArtportalenSampleData.DatasetBats };
+        return new Models.PagedResult<Dataset>()
+        {
+            Skip = skip,
+            Take = take,
+            Count = count,
+            TotalCount = datasetIdAggregationItems.Count(),
+            Records = records
+        };
     }
 
     public async Task<EventModel> GetEventByIdAsync(string id)
@@ -86,19 +92,19 @@ public class DataStewardshipManager : IDataStewardshipManager
         return ev;
     }
 
-    public async Task<List<EventModel>> GetEventsBySearchAsync(EventsFilter eventsFilter, int skip, int take)
+    public async Task<Models.PagedResult<EventModel>> GetEventsBySearchAsync(EventsFilter eventsFilter, int skip, int take)
     {
         // todo - decide if the observation or event index should be used.
         var resFromObs = await GetEventsBySearchFromObservationIndexAsync(eventsFilter, skip, take);
         var resFromEvent = await GetEventsBySearchFromEventIndexAsync(eventsFilter, skip, take);
 
-        return resFromEvent;        
+        return resFromEvent;
     }
 
     /// <remarks>
     /// This search uses the Observation index.
     /// </remarks>
-    private async Task<List<EventModel>> GetEventsBySearchFromObservationIndexAsync(EventsFilter eventsFilter, int skip, int take)
+    private async Task<Models.PagedResult<EventModel>> GetEventsBySearchFromObservationIndexAsync(EventsFilter eventsFilter, int skip, int take)
     {
         var filter = eventsFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);
@@ -120,20 +126,46 @@ public class DataStewardshipManager : IDataStewardshipManager
             events.Add(eventModel);
         }
 
-        return events;
+        int count = events.Count();
+        int totalCount = eventOccurrenceIds.Count;
+        var records = events;
+
+        return new Models.PagedResult<EventModel>()
+        {
+            Skip = skip,
+            Take = take,
+            Count = count,
+            TotalCount = totalCount,
+            Records = records
+        };
     }
 
     /// <remarks>
     /// This search uses the Event index.
     /// </remarks>
-    private async Task<List<EventModel>> GetEventsBySearchFromEventIndexAsync(EventsFilter eventsFilter, int skip, int take)
+    private async Task<Models.PagedResult<EventModel>> GetEventsBySearchFromEventIndexAsync(EventsFilter eventsFilter, int skip, int take)
     {
         var filter = eventsFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);        
-        var eventIds = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "event.eventId", "event.startDate", skip, take);
-        var observationEvents = await _observationEventRepository.GetEventsByIds(eventIds.Select(m => m.AggregationKey));
-        var events = observationEvents.Select(m => m.ToEventModel()).ToList();
-        return events;
+        var eventIdPageResult = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "event.eventId", "event.startDate", skip, take);
+        int count = eventIdPageResult.Records.Count();
+        int totalCount = Convert.ToInt32(eventIdPageResult.TotalCount);
+        var records = Enumerable.Empty<EventModel>();
+        if (eventIdPageResult.Records.Any())
+        {
+            var observationEvents = await _observationEventRepository.GetEventsByIds(eventIdPageResult.Records.Select(m => m.AggregationKey));
+            var events = observationEvents.Select(m => m.ToEventModel()).ToList();
+            records = events;
+        }
+        
+        return new Models.PagedResult<EventModel>()
+        {
+            Skip = skip,
+            Take = take,
+            Count = count,
+            TotalCount = totalCount,
+            Records = records
+        };
     }
 
     private readonly List<string> _observationEventOutputFields = new List<string>()
@@ -153,24 +185,24 @@ public class DataStewardshipManager : IDataStewardshipManager
         Observation obs = CastDynamicToObservation(observation);
         var occurrence = obs.ToOccurrenceModel();
         return occurrence;
-        //return DataStewardshipArtportalenSampleData.EventBats1Occurrence1;
     }
 
-    public async Task<List<OccurrenceModel>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take)
+    public async Task<Models.PagedResult<OccurrenceModel>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take)
     {
         var filter = occurrenceFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);
         var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, skip, take, true);
         var observations = CastDynamicsToObservations(pageResult.Records);
         var occurrences = observations.Select(x => x.ToOccurrenceModel()).ToList();
-        return occurrences;
-        //return new List<OccurrenceModel> {
-        //    DataStewardshipArtportalenSampleData.EventBats1Occurrence1,
-        //    DataStewardshipArtportalenSampleData.EventBats1Occurrence2,
-        //    DataStewardshipArtportalenSampleData.EventBats1Occurrence3,
-        //    DataStewardshipArtportalenSampleData.EventBats2Occurrence1,
-        //    DataStewardshipArtportalenSampleData.EventBats2Occurrence2,
-        //};
+
+        return new Models.PagedResult<OccurrenceModel>()
+        {
+            Skip = skip,
+            Take = take,
+            Count = occurrences.Count,
+            TotalCount = Convert.ToInt32(pageResult.TotalCount),
+            Records = occurrences
+        };
     }
 
     private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)

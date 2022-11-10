@@ -113,7 +113,7 @@ namespace SOS.Harvest.Jobs
             _logger.LogDebug("Start initialize area cache");
             await _areaHelper.InitializeAsync();
             _logger.LogDebug("Finish initialize area cache");
-        }
+        }        
 
         private async Task InitializeElasticSearchAsync(JobRunModes mode)
         {
@@ -146,28 +146,7 @@ namespace SOS.Harvest.Jobs
 
                     _logger.LogInformation(
                         $"Finish clear ElasticSearch index: {_userObservationRepository.UniqueIndexName}");
-                }
-
-                if (_processConfiguration.ProcessObservationDataset)
-                {
-                    _logger.LogInformation($"_processedObservationRepository.LiveMode={_processedObservationRepository.LiveMode}");
-
-                    // Dataset
-                    _logger.LogInformation($"_observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");
-                    _observationDatasetRepository.LiveMode = _observationDatasetRepository.LiveMode;
-                    _logger.LogInformation($"Set _observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");
-                    _logger.LogInformation($"Start clear ElasticSearch index: UniqueIndexName={_observationDatasetRepository.UniqueIndexName}, IndexName={_observationDatasetRepository.IndexName}");
-                    await _observationDatasetRepository.ClearCollectionAsync();
-                    _logger.LogInformation($"Finish clear ElasticSearch index: {_observationDatasetRepository.UniqueIndexName}");
-
-                    // Event                    
-                    _logger.LogInformation($"_observationEventRepository.LiveMode={_observationEventRepository.LiveMode}");
-                    _observationEventRepository.LiveMode = _observationEventRepository.LiveMode;
-                    _logger.LogInformation($"Set _observationEventRepository.LiveMode={_observationEventRepository.LiveMode}");
-                    _logger.LogInformation($"Start clear ElasticSearch index: UniqueIndexName={_observationEventRepository.UniqueIndexName}, IndexName={_observationEventRepository.IndexName}");
-                    await _observationEventRepository.ClearCollectionAsync();
-                    _logger.LogInformation($"Finish clear ElasticSearch index: {_observationEventRepository.UniqueIndexName}");
-                }
+                }                
             }
             else
             {
@@ -182,6 +161,30 @@ namespace SOS.Harvest.Jobs
                 _logger.LogInformation($"Finish ensure collection exists ({_processedObservationRepository.ProtectedIndexName})");
             }
         }
+
+        private async Task InitializeElasticSearchDatasetAsync()
+        {
+            if (!_processConfiguration.ProcessObservationDataset) return;
+            _logger.LogInformation($"ProcessedConfiguration.ActiveIndex is {_processedObservationRepository.ActiveInstance}");
+            _logger.LogInformation($"_observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");            
+            _observationDatasetRepository.LiveMode = _processedObservationRepository.LiveMode;
+            _logger.LogInformation($"Set _observationDatasetRepository.LiveMode={_processedObservationRepository.LiveMode}");
+            _logger.LogInformation($"Start clear ElasticSearch index: UniqueIndexName={_observationDatasetRepository.UniqueIndexName}, IndexName={_observationDatasetRepository.IndexName}");
+            await _observationDatasetRepository.ClearCollectionAsync();
+            _logger.LogInformation($"Finish clear ElasticSearch index: {_observationDatasetRepository.UniqueIndexName}");
+        }
+
+        private async Task InitializeElasticSearchEventAsync()
+        {
+            if (!_processConfiguration.ProcessObservationDataset) return;
+            _logger.LogInformation($"ProcessedConfiguration.ActiveIndex is {_processedObservationRepository.ActiveInstance}");
+            _logger.LogInformation($"_observationEventRepository.LiveMode={_observationEventRepository.LiveMode}");
+            _observationEventRepository.LiveMode = _processedObservationRepository.LiveMode;
+            _logger.LogInformation($"Set _observationEventRepository.LiveMode={_processedObservationRepository.LiveMode}");
+            _logger.LogInformation($"Start clear ElasticSearch index: UniqueIndexName={_observationEventRepository.UniqueIndexName}, IndexName={_observationEventRepository.IndexName}");
+            await _observationEventRepository.ClearCollectionAsync();
+            _logger.LogInformation($"Finish clear ElasticSearch index: {_observationEventRepository.UniqueIndexName}");
+        }        
 
         /// <summary>
         /// Disable Elasticsearch indexing
@@ -203,19 +206,22 @@ namespace SOS.Harvest.Jobs
                 await _userObservationRepository.DisableIndexingAsync();
                 _logger.LogInformation($"Finish disable indexing ({_userObservationRepository.UniqueIndexName})");
             }
+        }
 
-            if (_processConfiguration.ProcessObservationDataset)
-            {
-                // Dataset
-                _logger.LogInformation($"Start disable indexing ({_observationDatasetRepository.UniqueIndexName})");
-                await _observationDatasetRepository.DisableIndexingAsync();
-                _logger.LogInformation($"Finish disable indexing ({_observationDatasetRepository.UniqueIndexName})");
+        private async Task DisableEsDatasetIndexingAsync()
+        {
+            if (!_processConfiguration.ProcessObservationDataset) return;
+            _logger.LogInformation($"Start disable indexing ({_observationDatasetRepository.UniqueIndexName})");
+            await _observationDatasetRepository.DisableIndexingAsync();
+            _logger.LogInformation($"Finish disable indexing ({_observationDatasetRepository.UniqueIndexName})");
+        }
 
-                // Event
-                _logger.LogInformation($"Start disable indexing ({_observationEventRepository.UniqueIndexName})");
-                await _observationEventRepository.DisableIndexingAsync();
-                _logger.LogInformation($"Finish disable indexing ({_observationEventRepository.UniqueIndexName})");
-            }
+        private async Task DisableEsEventIndexingAsync()
+        {
+            if (!_processConfiguration.ProcessObservationDataset) return;
+            _logger.LogInformation($"Start disable indexing ({_observationEventRepository.UniqueIndexName})");
+            await _observationEventRepository.DisableIndexingAsync();
+            _logger.LogInformation($"Finish disable indexing ({_observationEventRepository.UniqueIndexName})");
         }
 
         /// <summary>
@@ -238,19 +244,22 @@ namespace SOS.Harvest.Jobs
                 await _userObservationRepository.EnableIndexingAsync();
                 _logger.LogInformation($"Finish enable indexing ({_userObservationRepository.UniqueIndexName})");
             }
+        }
 
-            if (_processConfiguration.ProcessObservationDataset)
-            {
-                // Dataset
-                _logger.LogInformation($"Start enable indexing ({_observationDatasetRepository.UniqueIndexName})");
-                await _observationDatasetRepository.EnableIndexingAsync();
-                _logger.LogInformation($"Finish enable indexing ({_observationDatasetRepository.UniqueIndexName})");
+        private async Task EnableEsDatasetIndexingAsync()
+        {
+            if (!_processConfiguration.ProcessObservationDataset) return;
+            _logger.LogInformation($"Start enable indexing ({_observationDatasetRepository.UniqueIndexName})");
+            await _observationDatasetRepository.EnableIndexingAsync();
+            _logger.LogInformation($"Finish enable indexing ({_observationDatasetRepository.UniqueIndexName})");
+        }
 
-                // Event
-                _logger.LogInformation($"Start enable indexing ({_observationEventRepository.UniqueIndexName})");
-                await _observationEventRepository.EnableIndexingAsync();
-                _logger.LogInformation($"Finish enable indexing ({_observationEventRepository.UniqueIndexName})");
-            }
+        private async Task EnableEsEventIndexingAsync()
+        {
+            if (!_processConfiguration.ProcessObservationDataset) return;
+            _logger.LogInformation($"Start enable indexing ({_observationEventRepository.UniqueIndexName})");
+            await _observationEventRepository.EnableIndexingAsync();
+            _logger.LogInformation($"Finish enable indexing ({_observationEventRepository.UniqueIndexName})");
         }
 
         /// <summary>
@@ -479,13 +488,6 @@ namespace SOS.Harvest.Jobs
                             docCount = await _processedObservationRepository.IndexCountAsync(false);
                         }
 
-                        // Add data stewardardship datasets
-                        if (_processConfiguration.ProcessObservationDataset)
-                        {
-                            await AddObservationDatasetsAsync();
-                            await AddObservationEventsAsync();
-                        }
-
                         if (_runIncrementalAfterFull)
                         {
                             // Enqueue incremental harvest/process job to Hangfire in order to get latest sightings
@@ -529,6 +531,14 @@ namespace SOS.Harvest.Jobs
                         {
                             throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
                         }
+
+                        // Add data stewardardship datasets
+                        if (_processConfiguration.ProcessObservationDataset)
+                        {
+                            await AddObservationDatasetsAsync();
+                            await AddObservationEventsAsync();
+                        }
+
                         _logger.LogInformation($"Finish validate indexes");
                         _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateIndex, validateIndexTimerSessionId);
 
@@ -986,18 +996,23 @@ namespace SOS.Harvest.Jobs
                  *    - WeatherVariable
                  *  Lösning: Antingen får vi lägga till mer properties till nuvarande struktur, eller så får vi skapa ett nytt index för datavärdskapet.
                  */
-
+                _logger.LogInformation("Start AddObservationDatasetsAsync()");
+                await InitializeElasticSearchDatasetAsync();
+                await DisableEsDatasetIndexingAsync();
                 List<ObservationDataset> datasets = new List<ObservationDataset>();
                 var batDataset = GetSampleBatDataset();
                 batDataset.EndDate = DateTime.Now;
 
                 // Determine which events that belongs to this dataset. Aggregate unique EventIds with filter: ProjectIds in [3606]
+                _logger.LogInformation($"AddObservationDatasetsAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
                 var searchFilter = new SearchFilter(0);
                 searchFilter.DataStewardshipDatasetIds = new List<string> { batDataset.Identifier };
                 var eventIds = await _processedObservationRepository.GetAllAggregationItemsAsync(searchFilter, "event.eventId");
                 batDataset.EventIds = eventIds.Select(m => m.AggregationKey).ToList();
                 datasets.Add(batDataset);
                 await _observationDatasetRepository.AddManyAsync(datasets);
+                await EnableEsDatasetIndexingAsync();
+                _logger.LogInformation("End AddObservationDatasetsAsync()");
             }
             catch (Exception e)
             {
@@ -1017,10 +1032,14 @@ namespace SOS.Harvest.Jobs
         private async Task AddObservationEventsAsync()
         {
             try
-            {                
+            {
+                _logger.LogInformation("Start AddObservationEventsAsync()");
+                await InitializeElasticSearchEventAsync();
+                await DisableEsEventIndexingAsync();
                 int batchSize = 5000;
                 var filter = new SearchFilter(0);
                 filter.IsPartOfDataStewardshipDataset = true;
+                _logger.LogInformation($"AddObservationEventsAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
                 var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
                 Dictionary<string, List<string>> totalOccurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
                 var chunks = totalOccurrenceIdsByEventId.Chunk(batchSize);
@@ -1041,13 +1060,14 @@ namespace SOS.Harvest.Jobs
                     // write to ES
                     await _observationEventRepository.AddManyAsync(events);
                 }
+                await EnableEsEventIndexingAsync();
+                _logger.LogInformation("End AddObservationEventsAsync()");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Add data stewardship events failed.");
             }
         }
-
 
         private ObservationDataset GetSampleBatDataset()
         {
