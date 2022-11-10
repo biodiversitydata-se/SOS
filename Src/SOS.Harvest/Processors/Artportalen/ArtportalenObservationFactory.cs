@@ -20,6 +20,7 @@ using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
 using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 using SOS.Lib.Configuration.Process;
+using System.Diagnostics;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -123,8 +124,6 @@ namespace SOS.Harvest.Processors.Artportalen
         {
             try
             {
-
-
                 var diffuseFactor = verbatimObservation.Site?.DiffusionFactor ?? 0;
                 var diffuse = diffuseIfSupported && diffuseFactor > 0;
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
@@ -195,7 +194,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Location = new Location();
                 obs.Location.Attributes.CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate;
                 obs.Location.Attributes.ExternalId = verbatimObservation.Site?.ExternalId;
-                obs.Location.Attributes.IsBirdLocation = !(verbatimObservation.Site?.IsPrivate ?? true); // Public sites are bird sites
+                obs.Location.Attributes.IsPrivate = verbatimObservation.Site?.IsPrivate ?? false;
                 obs.Location.Attributes.ProjectId = verbatimObservation.Site?.ProjectId;
                 obs.Location.Attributes.ProvincePartIdByCoordinate = verbatimObservation.Site?.ProvincePartIdByCoordinate;
                 obs.Location.CountryRegion = CastToArea(verbatimObservation.Site?.CountryRegion!);
@@ -312,6 +311,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 // ArtportalenInternal
                 obs.ArtportalenInternal = new ArtportalenInternal();
+                obs.ArtportalenInternal.ActivityCategoryId = verbatimObservation.Activity?.Category?.Id;
                 obs.ArtportalenInternal.BirdValidationAreaIds = verbatimObservation.Site?.BirdValidationAreaIds;
                 obs.ArtportalenInternal.ChecklistId = verbatimObservation.ChecklistId;
                 obs.ArtportalenInternal.ConfirmationYear = verbatimObservation.ConfirmationYear;
@@ -345,8 +345,9 @@ namespace SOS.Harvest.Processors.Artportalen
                     (obs.Occurrence.RecordedBy?.StartsWith("Via", StringComparison.CurrentCultureIgnoreCase) ?? false) &&
                     ((verbatimObservation.ObserversInternal == null || verbatimObservation.ObserversInternal.Count() == 0) ||
                     (verbatimObservation.ObserversInternal?.Any(oi => oi.Id == verbatimObservation.ReportedByUserId) ?? false));
-                obs.ArtportalenInternal.TriggeredObservationRuleFrequencyId = verbatimObservation.FrequencyId;
-                obs.ArtportalenInternal.TriggeredObservationRuleReproductionId = verbatimObservation.ReproductionId;
+                obs.ArtportalenInternal.TriggeredObservationRuleFrequencyId = verbatimObservation.TriggeredObservationRuleFrequencyId;
+                obs.ArtportalenInternal.TriggeredObservationRuleReproductionId = verbatimObservation.TriggeredObservationRuleReproductionId;
+                obs.ArtportalenInternal.TriggeredObservationRuleUnspontaneous = verbatimObservation.TriggeredObservationRuleUnspontaneous;
 
                 var eventMonths = new HashSet<int>();
                 if (startDate.HasValue)

@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Models.Processed.Observation
+﻿using SOS.Lib.Swagger;
+
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// Location attributes.
@@ -16,9 +18,10 @@
         public string ExternalId { get; set; }
 
         /// <summary>
-        /// Tru if it's a bird location
+        /// True if it's a private location
         /// </summary>
-        public bool IsBirdLocation { get; set; }
+        [SwaggerExclude]
+        public bool IsPrivate { get; set; }
 
         /// <summary>
         /// Id of project

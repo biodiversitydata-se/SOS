@@ -72,7 +72,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.EndDate = entity.EndDate;
                 observation.EndTime = entity.EndTime;
                 observation.FieldDiaryGroupId = entity.FieldDiaryGroupId;
-                observation.FrequencyId = entity.FrequencyId;
                 observation.Gender = entity.GenderId.HasValue && _artportalenMetadataContainer.Genders.ContainsKey(entity.GenderId.Value)
                     ? _artportalenMetadataContainer.Genders[entity.GenderId.Value]
                     : null;
@@ -100,7 +99,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.Quantity = entity.Quantity;
                 observation.QuantityOfSubstrate = entity.QuantityOfSubstrate;
                 observation.ReportedDate = entity.RegisterDate;
-                observation.ReproductionId = entity.ReproductionId;
                 observation.RightsHolder = entity.RightsHolder;
                 observation.Site = site;
                 observation.SpeciesGroupId = speciesGroupId;
@@ -116,6 +114,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.SubstrateSpeciesDescription = entity.SubstrateSpeciesDescription;
                 observation.SubstrateSpeciesId = entity.SubstrateSpeciesId;
                 observation.TaxonId = entity.TaxonId;
+                observation.TriggeredObservationRuleFrequencyId = entity.TriggeredObservationRuleFrequencyId;
+                observation.TriggeredObservationRuleReproductionId = entity.TriggeredObservationRuleReproductionId;
+                observation.TriggeredObservationRuleUnspontaneous = entity.TriggeredObservationRuleUnspontaneous;
                 observation.Unit = entity.UnitId.HasValue && _artportalenMetadataContainer.Units.ContainsKey(entity.UnitId.Value)
                     ? _artportalenMetadataContainer.Units[entity.UnitId.Value]
                     : null;

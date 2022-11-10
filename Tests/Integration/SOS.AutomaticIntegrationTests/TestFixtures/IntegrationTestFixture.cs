@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson.Serialization.Conventions;
 using Moq;
+using SOS.Harvest.Extensions;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;

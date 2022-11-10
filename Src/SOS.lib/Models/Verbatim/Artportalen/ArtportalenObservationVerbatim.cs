@@ -74,12 +74,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// Field diary group id
         /// </summary>
         public int? FieldDiaryGroupId { get; set; }
-
-        /// <summary>
-        /// Triggered observation rule frequency id
-        /// </summary>
-        public int? FrequencyId { get; set; }
-
+    
         /// <summary>
         ///     Taxon gender id
         /// </summary>
@@ -199,7 +194,17 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         /// Triggered observation rule reproduction id
         /// </summary>
-        public int? ReproductionId { get; set; }
+        public int? TriggeredObservationRuleFrequencyId { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule frequency id
+        /// </summary>
+        public int? TriggeredObservationRuleReproductionId { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule unspontaneous
+        /// </summary>
+        public bool? TriggeredObservationRuleUnspontaneous { get; set; }
 
         /// <summary>
         ///     Date sighting was added

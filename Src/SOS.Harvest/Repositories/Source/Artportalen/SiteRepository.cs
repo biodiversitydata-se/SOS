@@ -25,10 +25,11 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 				    s.ExternalId,
 				    s.ParentId AS ParentSiteId,
 				    s.PresentationNameParishRegion,
-                    ISNULL(ps.PresentationName, ps.Name) AS ParentSiteName,
                     s.ProjectId,
-                    d.Factor AS DiffusionFactor,
-                    s.IsPrivate
+                    s.IsPrivate,
+                    s.IncludedBySiteId,
+                    ISNULL(ps.PresentationName, ps.Name) AS ParentSiteName,
+                    d.Factor AS DiffusionFactor
                 FROM 
 	                Site s 
                     LEFT JOIN Site ps ON s.ParentId = ps.Id

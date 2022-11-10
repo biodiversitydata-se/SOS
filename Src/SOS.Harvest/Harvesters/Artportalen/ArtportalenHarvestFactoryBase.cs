@@ -154,6 +154,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 DiffusionFactor = entity.DiffusionFactor,
                 ExternalId = entity.ExternalId,
                 Id = entity.Id,
+                IncludedBySiteId = entity.IncludedBySiteId,
                 IsPrivate = entity.IsPrivate,
                 PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),

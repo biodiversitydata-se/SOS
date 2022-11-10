@@ -1,7 +1,7 @@
-﻿using SOS.Lib.Enums.VocabularyValues;
+﻿using System.Collections.Generic;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Processed.Observation;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

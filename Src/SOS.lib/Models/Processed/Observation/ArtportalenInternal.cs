@@ -11,6 +11,12 @@ namespace SOS.Lib.Models.Processed.Observation
     public class ArtportalenInternal
     {
         /// <summary>
+        /// Activity category id
+        /// </summary>
+        [SwaggerExclude]
+        public int? ActivityCategoryId { get; set; }
+
+        /// <summary>
         /// Bird validation areas.
         /// </summary>
         public IEnumerable<string> BirdValidationAreaIds { get; set; }
@@ -153,6 +159,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public string ParentLocality { get; set; }
 
         /// <summary>
+        /// AP site.includedbysiteid
+        /// </summary>
+        [SwaggerExclude]
+        public int? IncludedByLocationId { get; set; }
+
+        /// <summary>
         ///     User id of the person that reported the species observation.
         /// </summary>
         public int? ReportedByUserId { get; set; }
@@ -193,5 +205,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Triggered observation rule reproduction id
         /// </summary>
         public int? TriggeredObservationRuleReproductionId { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule unspontaneous
+        /// </summary>
+        [SwaggerExclude]
+        public bool? TriggeredObservationRuleUnspontaneous { get; set; }
     }
 }

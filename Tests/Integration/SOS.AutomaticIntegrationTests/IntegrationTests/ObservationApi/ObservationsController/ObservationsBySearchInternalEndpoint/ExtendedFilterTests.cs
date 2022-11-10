@@ -1499,13 +1499,13 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                .All()
                    .HaveValuesFromPredefinedObservations()
                .TheFirst(30)
-                    .With(o => o.FrequencyId = 1)
+                    .With(o => o.TriggeredObservationRuleFrequencyId = 1)
                 .TheNext(30)
-                     .With(o => o.FrequencyId = 2)
+                     .With(o => o.TriggeredObservationRuleFrequencyId = 2)
                 .TheNext(20)
-                     .With(o => o.FrequencyId = 3)
+                     .With(o => o.TriggeredObservationRuleFrequencyId = 3)
                 .TheNext(20)
-                     .With(o => o.FrequencyId = null)
+                     .With(o => o.TriggeredObservationRuleFrequencyId = null)
                .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -1546,13 +1546,13 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                .All()
                    .HaveValuesFromPredefinedObservations()
                .TheFirst(30)
-                    .With(o => o.ReproductionId = 1)
+                    .With(o => o.TriggeredObservationRuleReproductionId = 1)
                 .TheNext(30)
-                     .With(o => o.ReproductionId = 2)
+                     .With(o => o.TriggeredObservationRuleReproductionId = 2)
                 .TheNext(20)
-                     .With(o => o.ReproductionId = 3)
+                     .With(o => o.TriggeredObservationRuleReproductionId = 3)
                 .TheNext(20)
-                     .With(o => o.ReproductionId = null)
+                     .With(o => o.TriggeredObservationRuleReproductionId = null)
                .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);

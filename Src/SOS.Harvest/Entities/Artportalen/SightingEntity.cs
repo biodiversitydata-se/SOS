@@ -269,9 +269,11 @@
         [Obsolete("This is too be deleted")]
         public int? RegionalSightingStateId { get; set; }
 
-        public int? FrequencyId { get; set; }
+        public int? TriggeredObservationRuleFrequencyId { get; set; }
 
-        public int? ReproductionId { get; set; }
+        public int? TriggeredObservationRuleReproductionId { get; set; }
+
+        public bool? TriggeredObservationRuleUnspontaneous { get; set; }
 
         public string SightingPublishTypeIds { get; set; }
 

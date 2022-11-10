@@ -335,7 +335,6 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.DeterminationYear = sourceObservation.DeterminationYear;
                 obs.StartTime = sourceObservation.StartTime;
                 obs.EndTime = sourceObservation.EndTime;
-                obs.FrequencyId = sourceObservation.FrequencyId;
                 obs.HasUserComments = sourceObservation.HasUserComments;
                 obs.HiddenByProvider = sourceObservation.HiddenByProvider;
                 obs.Label = sourceObservation.Label;
@@ -354,7 +353,6 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.Quantity = sourceObservation.Quantity;
                 obs.QuantityOfSubstrate = sourceObservation.QuantityOfSubstrate;
                 obs.RegionalSightingStateId = sourceObservation.RegionalSightingStateId;
-                obs.ReproductionId = sourceObservation.ReproductionId;
                 obs.SightingPublishTypeIds = sourceObservation.SightingPublishTypeIds;
                 obs.SightingSpeciesCollectionItemId = sourceObservation.SightingSpeciesCollectionItemId;
                 obs.SightingTypeId = sourceObservation.SightingTypeId;
@@ -368,6 +366,9 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.Weight = sourceObservation.Weight;
                 obs.SightingBarcodeURL = sourceObservation.SightingBarcodeURL;
                 obs.SubstrateSpeciesDescription = sourceObservation.SubstrateSpeciesDescription;
+                obs.TriggeredObservationRuleFrequencyId = sourceObservation.TriggeredObservationRuleFrequencyId;
+                obs.TriggeredObservationRuleReproductionId = sourceObservation.TriggeredObservationRuleReproductionId;
+                obs.TriggeredObservationRuleUnspontaneous = sourceObservation.TriggeredObservationRuleUnspontaneous;
             });
 
             return operable;

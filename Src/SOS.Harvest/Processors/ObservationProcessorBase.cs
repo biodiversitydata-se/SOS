@@ -1,9 +1,11 @@
 ﻿using System.Collections.Concurrent;
-using System.Reflection;
-using System.Text.Json;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Extensions;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -18,9 +20,6 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
 
 namespace SOS.Harvest.Processors
 {

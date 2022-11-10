@@ -836,12 +836,15 @@ namespace SOS.Lib
                     .Field("defects")
                     .Field("event.endHistogramWeek")
                     .Field("event.startHistogramWeek")
+                    .Field("artportalenInternal.activityCategoryId")
                     .Field("artportalenInternal.sightingTypeSearchGroupId")
+                    .Field("artportalenInternal.triggeredObservationRuleUnspontaneous")
+                    .Field("location.attributes.isPrivate")
                     .Field("location.point")
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")
                     .Field("location.pointWithDisturbanceBuffer")
-                    .Field("location.isInEconomicZoneOfSweden"));
+                    .Field("location.isInEconomicZoneOfSweden")); 
             }
             else
             {
@@ -849,9 +852,8 @@ namespace SOS.Lib
                     .Field("defects")
                     .Field("event.endHistogramWeek")
                     .Field("event.startHistogramWeek")
-                    /*.Field("artportalenInternal.reportedByUserAlias")
-                    .Field("artportalenInternal.identifiedByInternal")*/
                     .Field("artportalenInternal")
+                    .Field("location.attributes.isPrivate")
                     .Field("location.point")
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")

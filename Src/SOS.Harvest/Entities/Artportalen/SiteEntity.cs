@@ -26,6 +26,11 @@
         public int Id { get; set; }
 
         /// <summary>
+        /// Included by site id property
+        /// </summary>
+        public int? IncludedBySiteId { get; set; }
+
+        /// <summary>
         /// Bird sites are public
         /// </summary>
         public bool IsPrivate { get; set; }
