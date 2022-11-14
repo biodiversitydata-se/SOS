@@ -51,7 +51,7 @@
 
     <ItemGroup>
 	    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
-	    <PackageReference Include="CSharpFunctionalExtensions" Version="2.35.1" />
+	    <PackageReference Include="CSharpFunctionalExtensions" Version="2.36.1" />
 	    <PackageReference Include="Elastic.Apm.NLog" Version="1.5.3" />
 	    <PackageReference Include="Elastic.CommonSchema.NLog" Version="1.5.3" />
 	    <PackageReference Include="HangFire" Version="1.7.31" />
