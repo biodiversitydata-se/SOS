@@ -32,6 +32,8 @@ using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
+using MassTransit;
+using SOS.Hangfire.JobServer.ServiceBus.Consumers;
 
 namespace SOS.Hangfire.JobServer
 {
@@ -182,6 +184,25 @@ namespace SOS.Hangfire.JobServer
 
                     services.AddSingleton(_searchDbConfiguration);
                     services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(_searchDbConfiguration));
+
+                    var jobServerConfiguration = hostContext.Configuration.GetSection("JobServerConfiguration").Get<JobServerConfiguration>(); 
+                    if (jobServerConfiguration.EnableBusHarvest)
+                    {
+                        services.AddMassTransit(cfg =>
+                        {
+                            cfg.AddConsumer<ArtportalenConsumer>();
+                            cfg.UsingAzureServiceBus((context, cfg) =>
+                            {
+                                var busConfiguration = hostContext.Configuration.GetSection("BusConfiguration").Get<BusConfiguration>();
+                                cfg.Host($"Endpoint={busConfiguration.Host};SharedAccessKeyName={busConfiguration.SharedAccessKeyName};SharedAccessKey={busConfiguration.SharedAccessKey}");
+                                cfg.ReceiveEndpoint(busConfiguration.Queue, e =>
+                                {
+                                    e.MaxConcurrentCalls = 1;
+                                    e.ConfigureConsumer<ArtportalenConsumer>(context);
+                                });
+                            });
+                        });
+                    }
                 })
                 .UseServiceProviderFactory(hostContext =>
                     {

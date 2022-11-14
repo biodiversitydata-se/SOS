@@ -2,7 +2,6 @@
 using CSharpFunctionalExtensions;
 using Hangfire;
 using Hangfire.Server;
-using Hangfire.Storage;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Harvesters.AquaSupport.FishData.Interfaces;
 using SOS.Harvest.Harvesters.AquaSupport.Kul.Interfaces;

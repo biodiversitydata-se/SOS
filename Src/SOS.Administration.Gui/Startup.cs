@@ -8,7 +8,6 @@ using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
 using System.Text;
 using System.Text.Json.Serialization;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using SOS.Administration.Gui.Managers;
@@ -24,7 +23,6 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
-using SOS.Lib.ApplicationInsights;
 
 namespace SOS.Administration.Gui
 {
