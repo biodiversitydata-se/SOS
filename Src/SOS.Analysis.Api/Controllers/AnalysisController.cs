@@ -43,7 +43,7 @@ namespace SOS.Analysis.Api.Controllers
             IAreaCache areaCache,
             AnalysisConfiguration analysisConfiguration,
             ElasticSearchConfiguration elasticConfiguration,
-            ILogger<AnalysisController> logger) : base(areaCache, analysisConfiguration?.ProtectedScope!, 150000)
+            ILogger<AnalysisController> logger) : base(areaCache, analysisConfiguration?.ProtectedScope!, 350000)
         {
             _analysisManager = analysisManager ?? throw new ArgumentNullException(nameof(analysisManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
