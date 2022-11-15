@@ -882,7 +882,9 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<GeoGridMetricResult> GetMetricGridAggregationAsync(
             SearchFilter filter,
             int gridCellSizeInMeters,
-            MetricCoordinateSys metricCoordinateSys)
+            MetricCoordinateSys metricCoordinateSys,
+            int? maxBuckets = null,
+            CompositeKey afterKey = null)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -890,6 +892,12 @@ namespace SOS.Lib.Repositories.Processed
             using var operation =
                 _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_MetricGridAggregation");
             operation.Telemetry.Properties["Filter"] = filter.ToString();
+
+            // Max buckets can't exceed MaxNrElasticSearchAggregationBuckets
+            if (maxBuckets.HasValue && maxBuckets.Value > MaxNrElasticSearchAggregationBuckets)
+            {
+                maxBuckets = MaxNrElasticSearchAggregationBuckets;
+            }
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -901,7 +909,8 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Aggregations(a => a
                     .Composite("gridCells", c => c
-                        .Size(MaxNrElasticSearchAggregationBuckets + 1)
+                        .Size(maxBuckets ?? MaxNrElasticSearchAggregationBuckets + 1) 
+                        .After(afterKey ?? null)
                         .Sources(s => s
                             .Terms("metric_x", t => t
                                 .Script(sct => sct
@@ -962,7 +971,8 @@ namespace SOS.Lib.Repositories.Processed
                         ObservationsCount = b.DocCount,
                         TaxaCount = (long?)b.Cardinality("taxa_count").Value
                     }
-                )
+                ),
+                AfterKey = searchResponse.Aggregations.Composite("gridCells").AfterKey
             };
 
             // When operation is disposed, telemetry item is sent.

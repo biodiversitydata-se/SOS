@@ -7,7 +7,6 @@ using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search.Filters;
 using Result = CSharpFunctionalExtensions.Result;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -90,9 +89,18 @@ namespace SOS.Analysis.Api.Controllers
             }
         }
 
-        protected async Task<SearchFilterInternalDto> InitializeSearchFilterAsync(SearchFilterInternalDto filter) {
+        protected async Task<SearchFilterInternalDto> InitializeSearchFilterAsync(SearchFilterInternalDto filter)
+        {
 
             filter ??= new SearchFilterInternalDto();
+            filter.Geographics ??= new GeographicsFilterDto();
+            filter.Geographics.BoundingBox = await GetBoundingBoxAsync(filter.Geographics);
+            return filter;
+        }
+
+        protected async Task<SearchFilterAooEooInternalDto> InitializeSearchFilterAsync(SearchFilterAooEooInternalDto filter) {
+
+            filter ??= new SearchFilterAooEooInternalDto();
             filter.Geographics ??= new GeographicsFilterDto();
             filter.Geographics.BoundingBox = await GetBoundingBoxAsync(filter.Geographics);
             return filter;

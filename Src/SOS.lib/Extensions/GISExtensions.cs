@@ -588,13 +588,23 @@ namespace SOS.Lib.Extensions
         /// Cast envelope to geoemtry
         /// </summary>
         /// <param name="geometry"></param>
-        /// <param name="attributes"></param>
         /// <returns></returns>
         public static Envelope ToEnvelope(this Geometry geometry)
         {
             return (geometry?.Coordinates?.Any() ?? false) ? new Envelope(geometry.Coordinates) : null;
         }
 
+        /// <summary>
+        /// Cast LatLonBoundingBox to envelope
+        /// </summary>
+        /// <param name="boundingBox"></param>
+        /// <returns></returns>
+        public static Envelope ToEnvelope(this LatLonBoundingBox boundingBox)
+        {
+            return boundingBox?.BottomRight == null || boundingBox?.TopLeft == null ? 
+                null : 
+                new Envelope(new Coordinate(boundingBox.BottomRight.Longitude, boundingBox.BottomRight.Latitude), new Coordinate(boundingBox.TopLeft.Longitude, boundingBox.TopLeft.Latitude));
+        }
 
         /// <summary>
         ///     Cast geometry to geo json

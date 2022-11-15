@@ -289,7 +289,8 @@ namespace SOS.Observations.Api.Repositories
                         Week = int.Parse(b.Key.Substring(5)),
                         DocCount = b.DocCount,
                         Quantity = b.Sum("quantity").Value
-                    }).ToDictionary(b => $"{b.Year}-{b.Week}", b => b);
+                    })
+                    .OrderBy(ob => ob.Year).ThenBy(tb => tb.Week).ToDictionary(b => $"{b.Year}-{b.Week}", b => b);
 
             //Fill in gaps in returned result
             var yearWeeks = new List<dynamic>();

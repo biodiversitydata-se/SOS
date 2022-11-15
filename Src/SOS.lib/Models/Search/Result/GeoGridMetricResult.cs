@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Nest;
 using SOS.Lib.Models.Gis;
 
 namespace SOS.Lib.Models.Search.Result
@@ -8,6 +9,11 @@ namespace SOS.Lib.Models.Search.Result
     /// </summary>
     public class GeoGridMetricResult
     {
+        /// <summary>
+        /// Key used to get next page when many buckets are returned
+        /// </summary>
+        public CompositeKey AfterKey { get; set; }
+
         /// <summary>
         /// Input bounding box
         /// </summary>
