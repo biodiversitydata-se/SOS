@@ -33,9 +33,10 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="filter"></param>
         /// <param name="gridCellsInMeters"></param>
         /// <param name="useCenterPoint"></param>
-        /// <param name="edgeLength"></param>
+        /// <param name="edgeLengths"></param>
         /// <param name="useEdgeLengthRatio"></param>
         /// <param name="allowHoles"></param>
+        /// <param name="returnGridCells"></param>
         /// <param name="includeEmptyCells"></param>
         /// <param name="metricCoordinateSys"></param>
         /// <param name="coordinateSystem"></param>
@@ -46,9 +47,10 @@ namespace SOS.Analysis.Api.Managers.Interfaces
             SearchFilter filter,
             int gridCellsInMeters,
             bool useCenterPoint,
-            double edgeLength,
+            IEnumerable<double> edgeLengths,
             bool useEdgeLengthRatio,
             bool allowHoles,
+            bool returnGridCells,
             bool includeEmptyCells,
             MetricCoordinateSys metricCoordinateSys,
             CoordinateSys coordinateSystem);

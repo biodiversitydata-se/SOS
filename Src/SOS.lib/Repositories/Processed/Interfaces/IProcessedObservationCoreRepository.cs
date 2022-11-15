@@ -92,16 +92,20 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<DataQualityReport> GetDataQualityReportAsync(string organismGroup);
 
         /// <summary>
-        ///  Get aggregation in metric tiles 
+        /// Get aggregation in metric tiles 
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="gridCellSizeInMeters"></param>
         /// <param name="metricCoordinateSys"></param>
+        /// <param name="maxBuckets">No of buckets</param>
+        /// <param name="afterKey"></param>
         /// <returns></returns>
         Task<GeoGridMetricResult> GetMetricGridAggregationAsync(
             SearchFilter filter, 
             int gridCellSizeInMeters,
-            MetricCoordinateSys metricCoordinateSys);
+            MetricCoordinateSys metricCoordinateSys,
+            int? maxBuckets = null,
+            CompositeKey afterKey = null);
 
         /// <summary>
         /// Get index health status

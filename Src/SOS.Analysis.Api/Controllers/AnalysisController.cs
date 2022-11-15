@@ -43,7 +43,7 @@ namespace SOS.Analysis.Api.Controllers
             IAreaCache areaCache,
             AnalysisConfiguration analysisConfiguration,
             ElasticSearchConfiguration elasticConfiguration,
-            ILogger<AnalysisController> logger) : base(areaCache, analysisConfiguration?.ProtectedScope!, elasticConfiguration?.MaxNrAggregationBuckets ?? 0)
+            ILogger<AnalysisController> logger) : base(areaCache, analysisConfiguration?.ProtectedScope!, 150000)
         {
             _analysisManager = analysisManager ?? throw new ArgumentNullException(nameof(analysisManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -108,12 +108,12 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="searchFilter"></param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="useCenterPoint">If true, grid cell center point will be used, else grid cell corner points will be used.</param>
-        /// <param name="edgeLength">The target edge length ratio when useEdgeLengthRatio is true, else the target maximum edge length. Calculate convex hull when 0 else concave hull</param>
         /// <param name="useEdgeLengthRatio">Change behavior of edgeLength. When true: 
         /// Computes the concave hull of the vertices in a geometry using the target criterion of edge length ratio. 
         /// The edge length ratio is a fraction of the length difference between the longest and shortest edges in the Delaunay Triangulation of the input points.
         /// When false: Computes the concave hull of the vertices in a geometry using the target criterion of edge length, and optionally allowing holes (see below). </param>
         /// <param name="allowHoles">Gets or sets whether holes are allowed in the concave hull polygon.</param>
+        /// <param name="returnGridCells">Return grid cells features</param>
         /// <param name="includeEmptyCells">Include grid cells with no observations</param>
         /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
         /// <param name="coordinateSystem">Gemometry coordinate system</param>
@@ -127,12 +127,12 @@ namespace SOS.Analysis.Api.Controllers
         public async Task<IActionResult> CalculateAooAndEooInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
-            [FromBody] SearchFilterInternalDto searchFilter,
+            [FromBody] SearchFilterAooEooInternalDto searchFilter,
             [FromQuery] int? gridCellSizeInMeters = 2000,
             [FromQuery] bool? useCenterPoint = true,
-            [FromQuery] double? edgeLength = 0.5,
             [FromQuery] bool? useEdgeLengthRatio = true,
             [FromQuery] bool? allowHoles = false,
+            [FromQuery] bool? returnGridCells = false,
             [FromQuery] bool? includeEmptyCells = false,
             [FromQuery] MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.ETRS89,
             [FromQuery] CoordinateSys? coordinateSystem = CoordinateSys.ETRS89)
@@ -141,9 +141,22 @@ namespace SOS.Analysis.Api.Controllers
             {
                 CheckAuthorization(searchFilter.ProtectionFilter);
                 searchFilter = await InitializeSearchFilterAsync(searchFilter);
-               
+                var edgeLengthValidation = Result.Success();
+                if ((useEdgeLengthRatio ?? false) && (searchFilter.EdgeLengths?.Any() ?? false))
+                {
+                    foreach(var edgeLength in searchFilter.EdgeLengths)
+                    {
+                        edgeLengthValidation = ValidateDouble(edgeLength, 0.0, 1.0, "Edge length");
+                        if (edgeLengthValidation.IsFailure)
+                        {
+                            break;
+                        }
+                    }
+                }
+
                 var validationResult = Result.Combine(
-                    useEdgeLengthRatio ?? false ? ValidateDouble(edgeLength!.Value, 0.0, 1.0, "Edge length") : Result.Success(),
+                    edgeLengthValidation,
+                    searchFilter.EdgeLengths?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one edge length"),
                     ValidateSearchFilter(searchFilter!),
                     ValidateInt(gridCellSizeInMeters!.Value, minLimit: 100, maxLimit: 100000, "Grid cell size in meters"),
                     ValidateMetricTilesLimit(searchFilter.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters.Value));
@@ -160,12 +173,13 @@ namespace SOS.Analysis.Api.Controllers
                     authorizationApplicationIdentifier,
                     filter, 
                     gridCellSizeInMeters!.Value, 
-                    useCenterPoint!.Value, 
-                    edgeLength!.Value, 
+                    useCenterPoint!.Value,
+                    searchFilter!.EdgeLengths!, 
                     useEdgeLengthRatio!.Value, 
-                    allowHoles!.Value, 
+                    allowHoles!.Value,
+                    returnGridCells!.Value,
                     includeEmptyCells!.Value,
-                    metricCoordinateSys.Value,
+                    metricCoordinateSys!.Value,
                     coordinateSystem!.Value
                 );
                 return new OkObjectResult(result!);
