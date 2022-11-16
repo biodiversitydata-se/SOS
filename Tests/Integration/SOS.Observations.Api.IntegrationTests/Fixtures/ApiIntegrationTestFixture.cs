@@ -59,6 +59,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public VocabulariesController VocabulariesController { get; private set; }
         public UserController UserController { get; private set; }
         public DataProvidersController DataProvidersController { get; private set; }
+        public AreasController AreasController { get; private set; }
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
         public IProcessedObservationRepository CustomProcessedObservationRepository { get; set; }
         public ObservationsController CustomObservationsController { get; private set; }
@@ -258,6 +259,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 new NullLogger<ProcessedLocationRepository>());
             var locationManager = new LocationManager(processedLocationController, filterManager, new NullLogger<LocationManager>());
             LocationsController = new LocationsController(locationManager, areaManager, observationApiConfiguration, new NullLogger<LocationsController>());
+            AreasController = new AreasController(areaManager, new NullLogger<AreasController>());
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
