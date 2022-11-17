@@ -1,13 +1,14 @@
 # OGC Web Feature Service (WFS) - Get started guide
 All public observations that SOS harvests are available in a OGC Web Feature Service (WFS). This page is a get started guide, for more details see the [SOS WFS technical overview page](WfsService.md).
 - [Get started](#get-started)
+- [Sensitive observations](#sensitive-observations)
 - [Number of observations returned](#number-of-observations-returned)
 - [Known problems](#known-problems)
 - [Support](#support)
 
 
 ## Get started
-Using a GIS application as ArcGIS or QGIS connect to SOS geoServer by selecting _Add layer_: 
+Using a GIS application as ArcGIS or QGIS connect to SOS GeoServer by selecting _Add layer_: 
 
 ![addLayer1](Images/wfs_addLayer1.jpg)
 
@@ -18,6 +19,8 @@ Then add a new connection:
 Select _Connect_:
 
 ![addLayer3](Images/wfs_addLayer3.jpg)
+
+There is no need for authentication in order to connect to SOS GeoServer. 
 
 Now select _Swedish species observations_ and select _Add_:
 
@@ -48,6 +51,9 @@ and the result:
 ![filterObservations1b](Images/wfs_filterObservations1b.jpg)
 
 You can also combine filters. For example, if you want to get all observations for vascular plants in Mora municipality then you can use as filter: organismGroup = 'Kärlxäxter' AND municipality = 'Mora'. If you instead wnat to get all observations of species classified as exotic in Sweden ('främmande arter' in Swedish) in Mora municipality your filter should look like: isInvasiveInSweden = TRUE AND municipality = 'Mora'.
+
+## Sensitive observations
+The service currently only supports public observations that SOS harvests. Observations of species classified sensitive (["nationellet skyddsklassade arter"](https://www.artdatabanken.se/var-verksamhet/fynddata/skyddsklassade-arter/)) can be accessed (given the user has permission) by direct requests to the SOS API (downloading results as shape files to import to a GIS application) or using the [Analysportalen](https://www.analysisportal.se/) (to be replaced by a new application during 2023).
 
 ## Number of observations returned
 There is limit allowing only max 5000 observations to be returned for one request, but using paging you can get up to 100 000 observations. To reduce the number of observations per request you can use filters like date, taxa, bounding box, municipality, etc. Using QGIS you need to specify page size (max can be 5000) when you add the new connection. Without this specification you get only a total of max 5000 observations, but specifying page size as a number between, for example, 1000 - 5000 then you can get up to 100 000 observations.
