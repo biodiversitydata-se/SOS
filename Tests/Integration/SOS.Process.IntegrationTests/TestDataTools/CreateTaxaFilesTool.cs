@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 using MessagePack;
 using MessagePack.Resolvers;
@@ -8,6 +12,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource;
 using Xunit;
@@ -81,6 +86,61 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
             var bin = MessagePackSerializer.Serialize(basicTaxa, options);
             File.WriteAllBytes(filePath, bin);
+        }
+
+
+        [Fact]
+        [Trait("Category", "Tool")]
+        public async Task Create_TaxonInfo_Json_file()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------            
+            var taxonProcessedRepository = CreateTaxonProcessedRepository();
+            
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            IEnumerable<Taxon> taxa = await taxonProcessedRepository.GetAllAsync();
+            var taxonInfos = new List<TaxonInfo>();
+            var oneWordTaxonInfos = new List<TaxonInfo>();
+            foreach (var taxon in taxa)
+            {
+                if (!string.IsNullOrEmpty(taxon.VernacularName))
+                {
+                    var taxonInfo = new TaxonInfo
+                    {
+                        Name = taxon.VernacularName,
+                        TaxonId = taxon.Id
+                    };
+
+                    if (!taxonInfo.Name.Any(Char.IsWhiteSpace))
+                    {
+                        oneWordTaxonInfos.Add(taxonInfo);
+                    }
+
+                    taxonInfos.Add(taxonInfo);
+                }
+            }
+
+            oneWordTaxonInfos = oneWordTaxonInfos.DistinctBy(m => m.Name).ToList();
+
+            var jsonSerializerOptions = new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement) // Display å,ä,ö e.t.c. properly
+            };
+
+            string strJson = JsonSerializer.Serialize(oneWordTaxonInfos, jsonSerializerOptions);
+            var filename = FilenameHelper.CreateFilenameWithDate("taxon", "json");
+            var filePath = Path.Combine(@"C:\temp\", filename);
+            await File.WriteAllTextAsync(filePath, strJson);
+        }
+
+        private class TaxonInfo
+        {
+            public string Name { get; set; }
+            public int TaxonId { get; set; }
         }
     }
 }
