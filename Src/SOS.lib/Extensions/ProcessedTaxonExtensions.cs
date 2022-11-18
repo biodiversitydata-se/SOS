@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Extensions
@@ -10,7 +11,7 @@ namespace SOS.Lib.Extensions
         ///     Cast ProcessedTaxon objects to ProcessedBasicTaxon objects.
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<BasicTaxon> ToProcessedBasicTaxa(this IEnumerable<Taxon> sourceTaxa)
+        public static IEnumerable<IBasicTaxon> ToProcessedBasicTaxa(this IEnumerable<Taxon> sourceTaxa)
         {
             return sourceTaxa?.Select(m => m.ToProcessedBasicTaxon());
         }
@@ -20,7 +21,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="sourceTaxon"></param>
         /// <returns></returns>
-        public static BasicTaxon ToProcessedBasicTaxon(this Taxon sourceTaxon)
+        public static IBasicTaxon ToProcessedBasicTaxon(this Taxon sourceTaxon)
         {
             return new BasicTaxon
             {

@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Linq;
 using FluentAssertions;
 using SOS.Lib.Factories;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.UnitTests.TestHelpers.Fixtures;
 using Xunit;
 
@@ -23,7 +25,7 @@ namespace SOS.Lib.UnitTests.Models.TaxonTree
             //-----------------------------------------------------------------------------------------------------------
             const int ichthyaetusTaxonId = 6011885;
             int[] expectedUnderlyingTaxonIds = {266836, 103067, 266238, 267106, 266835};
-            var sut = TaxonTreeFactory.CreateTaxonTree(_fixture.Taxa);
+            var sut = TaxonTreeFactory.CreateTaxonTree(_fixture.Taxa.ToDictionary(t => t.Id, t => t));
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -13,6 +14,8 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
+using SOS.Lib.Models.Interfaces;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -129,8 +132,8 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 var dwcTaxa = await _taxonService.GetTaxaAsync();
-                var taxa = dwcTaxa.ToProcessedTaxa().ToList();
-                var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
+                var taxa = dwcTaxa.ToProcessedTaxa();
+                var taxonTree = TaxonTreeFactory.CreateTaxonTree((IDictionary<int, IBasicTaxon>)taxa);
 
                 string strGraphviz = null;
                 if (diagramFormat == DiagramFormat.GraphViz)
