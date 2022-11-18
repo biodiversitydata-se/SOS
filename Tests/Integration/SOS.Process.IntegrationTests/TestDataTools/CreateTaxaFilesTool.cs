@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource;
@@ -54,7 +53,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            IEnumerable<Taxon> taxa = await taxonProcessedRepository.GetAllAsync();
+            var taxa = await taxonProcessedRepository.GetAllAsync();
             var basicTaxa = taxa.ToProcessedBasicTaxa();
             var tree = TaxonTreeFactory.CreateTaxonTree(basicTaxa.ToDictionary(t => t.Id, t => t));
             var mammaliaTaxonIds = tree.GetUnderlyingTaxonIds(MammaliaTaxonId, true);
