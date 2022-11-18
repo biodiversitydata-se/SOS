@@ -316,7 +316,7 @@ namespace SOS.Harvest.Processors.Taxon
                     return -1;
                 }
 
-                var taxonTree = TaxonTreeFactory.CreateTaxonTree((IDictionary<int, IBasicTaxon>)taxa!);
+                var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
                 bool isTaxonDataOk = IsTaxonDataOk(taxa.Values, taxonTree);
                 if (!isTaxonDataOk)
                 {

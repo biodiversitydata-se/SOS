@@ -8,7 +8,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
 {
     public class VirtualHerbariumHarvestFactory : HarvestBaseFactory, IHarvestFactory<XDocument, VirtualHerbariumObservationVerbatim>
     {
-        private readonly IDictionary<string, double[]> _localities;
+        private readonly IDictionary<string, (double lon, double lat, int? coordinatePrecision)> _localities;
         
         /// <summary>
         ///     Create virtual herbarium verbatim from one row of data
@@ -27,7 +27,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
 
             foreach (var cell in rowData.Elements())
             {
-                var value = cell.Value;
+                var value = cell.Value?.Trim();
                 if (!string.IsNullOrEmpty(value))
                 {
                     observation.SetProperty(propertyMapping[index], value);
@@ -41,14 +41,21 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                 !string.IsNullOrEmpty(observation.Province) &&
                 !string.IsNullOrEmpty(observation.District))
             {
-                _localities.TryGetValue(GetLocalityKey(observation.Province, observation.District, observation.Locality),
-                    out var locality);
-
-                if (locality != null)
+                
+                if (_localities.TryGetValue(
+                    GetLocalityKey(observation.Province, observation.District, observation.Locality),
+                    out var locality))
                 {
-                    observation.DecimalLongitude = locality[0];
-                    observation.DecimalLatitude = locality[1];
+                    observation.DecimalLongitude = locality.lon;
+                    observation.DecimalLatitude = locality.lat;
+                    observation.CoordinatePrecision = locality.coordinatePrecision;
+                    observation.CoordinateOverrideDistrict = true;
                 }
+            }
+
+            if (string.IsNullOrEmpty(observation.ScientificName))
+            {
+                observation.ScientificName = observation.OriginalName;
             }
 
             return observation;
@@ -64,7 +71,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
         private string GetLocalityKey(string province, string district, string locality)
         {
             return
-                $"{province?.Replace(" ", "").ToLower()}:{district?.Replace(" ", "").ToLower()}:{locality?.Replace(" ", "").ToLower()}";
+                $"{province?.Replace(" ", "").Trim().ToLower() ?? string.Empty}:{district?.Replace(" ", "").Trim().ToLower() ?? string.Empty}:{locality?.Replace(" ", "").Trim().ToLower() ?? string.Empty}";
         }
 
         /// <summary>
@@ -72,9 +79,9 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
         /// </summary>
         /// <param name="xDocument"></param>
         /// <returns></returns>
-        private IDictionary<string, double[]> InitializeLocalities(XDocument xDocument)
+        private IDictionary<string, (double lon, double lat, int? coordinatePrecision)> InitializeLocalities(XDocument xDocument)
         {
-            var localities = new Dictionary<string, double[]>();
+            var localities = new Dictionary<string, (double lon, double lat, int? coordinatePrecision)>();
 
             if (xDocument?.Document == null)
             {
@@ -97,7 +104,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
 
                 foreach (var cell in header.Elements())
                 {
-                    if (new[] { "country", "province", "district", "locality", "long", "lat" }.Contains(cell.Value,
+                    if (new[] { "country", "province", "district", "locality", "long", "lat", "coordinate_precision" }.Contains(cell.Value,
                         StringComparer.CurrentCultureIgnoreCase))
                     {
                         propertyMapping.Add(cell.Value.ToLower(), index);
@@ -119,9 +126,15 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                     var lon = double.Parse(cells[propertyMapping["long"]].Value, CultureInfo.InvariantCulture);
                     var lat = double.Parse(cells[propertyMapping["lat"]].Value, CultureInfo.InvariantCulture);
 
+                    int? coordinatePrecision = null;
+                    if (int.TryParse(cells[propertyMapping["coordinate_precision"]].Value, out var coorPrec))
+                    {
+                        coordinatePrecision = coorPrec;
+                    }
+                    
                     if (!localities.ContainsKey(key))
                     {
-                        localities.Add(key, new[] { lon, lat });
+                        localities.Add(key, (lon, lat, coordinatePrecision));
                     }
                 }
             }
@@ -153,10 +166,10 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
 
                 // var table = xDocument.Elements(xmlns + "Workbook")?.Elements()?.Elements();
                 var workbook = xDocument.Elements(xmlns + "Workbook").FirstOrDefault();
-                var worksheet = workbook.Elements(xmlns + "Worksheet").FirstOrDefault();
-                var table = worksheet.Elements(xmlns + "Table");
+                var worksheet = workbook?.Elements(xmlns + "Worksheet").FirstOrDefault();
+                var table = worksheet?.Elements(xmlns + "Table");
 
-                if (table.FirstOrDefault()?.HasElements ?? false)
+                if (table?.FirstOrDefault()?.HasElements ?? false)
                 {
                     // Header data in first row
                     var header = table.Elements().FirstOrDefault();
@@ -165,7 +178,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
 
                     foreach (var cell in header.Elements())
                     {
-                        propertyMapping.Add(index, cell.Value.Replace("_", "").ToLower());
+                        propertyMapping.Add(index, cell.Value.Replace("_", "").Replace(" ", "").ToLower());
                         index++;
                     }
 

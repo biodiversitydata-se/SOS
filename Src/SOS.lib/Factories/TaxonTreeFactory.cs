@@ -18,6 +18,16 @@ namespace SOS.Lib.Factories
     {
         private const int BiotaTaxonId = 0;
 
+        public static TaxonTree<IBasicTaxon> CreateTaxonTree(IDictionary<int, Taxon> taxa)
+        {
+            if (!taxa?.Any() ?? true)
+            {
+                return null;
+            }
+
+            return CreateTaxonTree(taxa.ToDictionary(t => t.Key, t => (IBasicTaxon) t.Value));
+        }
+
         public static TaxonTree<IBasicTaxon> CreateTaxonTree(IDictionary<int, IBasicTaxon> taxa)
         {
             if (!taxa?.Any() ?? true)

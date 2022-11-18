@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Extensions

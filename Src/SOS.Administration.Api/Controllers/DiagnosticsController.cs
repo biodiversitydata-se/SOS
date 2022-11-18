@@ -133,7 +133,7 @@ namespace SOS.Administration.Api.Controllers
             {
                 var dwcTaxa = await _taxonService.GetTaxaAsync();
                 var taxa = dwcTaxa.ToProcessedTaxa();
-                var taxonTree = TaxonTreeFactory.CreateTaxonTree((IDictionary<int, IBasicTaxon>)taxa);
+                var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
 
                 string strGraphviz = null;
                 if (diagramFormat == DiagramFormat.GraphViz)
