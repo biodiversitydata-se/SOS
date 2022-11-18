@@ -1,14 +1,22 @@
 # Changelog
 
-## [1.5.1]
+## [1.5.2]
+**Prod**: 2022-11-17
+### `Changed`
+ - Improved user role information by adding information about authorities and areas in the endpoint `/User/Information`.
 
+ ### `Fixed`
+ - Some taxa hade wrong `ProtectedByLaw` value.
+ - Improved GeoJSON serialization to encode å ä ö properly.
+
+## [1.5.1]
+**Prod**: 2022-10-17 
  ### `Fixed`
  - When searching with `TaxonListIds` underlying taxa will be added if `IncludeUnderlyingTaxa=true`.
  - TimeRange file order bug.
  - Aggregation by day bug.
 
 ## [1.5]
-
 **Prod**: 2022-05-24 
 
 ### `Added`

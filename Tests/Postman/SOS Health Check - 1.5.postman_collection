@@ -377,72 +377,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\",\n        \"dateFilterType\": \"OverlappingStartDateAndEndDate\"\n    },\n    \"taxon\" : {\n        \"ids\" : [100077]        \n    },\n    \"geographics\": {\n        \"areas\" : [\n            {\n                \"areaType\": \"Municipality\",\n                \"featureId\": \"687\"\n            },\n            {\n                \"areaType\": \"County\",\n                \"featureId\": \"6\"\n            }        \n        ]\n    },    \n    \"occurrenceStatus\":\"present\"    \n}"
-						},
-						"url": {
-							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
-							"host": [
-								"{{testUrl}}"
-							],
-							"path": [
-								"Observations",
-								"search"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök i Riksskogstaxeringen (absent)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"",
-									"pm.test(\"Municipality is Tranås\", function () {    ",
-									"    pm.expect(observation.location.municipality.name).to.eql('Tranås');",
-									"});",
-									"",
-									"pm.test(\"OccurrenceStatus is 'absent'\", function () {    ",
-									"    pm.expect(observation.occurrence.occurrenceStatus.value).to.eql('absent');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"dataprovider\": {\n        \"ids\": [16]\n    },\n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\",\n        \"dateFilterType\": \"OverlappingStartDateAndEndDate\"\n    },\n    \"geographics\": {\n        \"areas\" : [\n            {\n                \"areaType\": \"Municipality\",\n                \"featureId\": \"687\"\n            }\n        ]\n    },    \n    \"occurrenceStatus\":\"absent\"\n}"
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2022-01-31T07:59:46.862Z\",\n        \"dateFilterType\": \"OverlappingStartDateAndEndDate\"\n    },\n    \"taxon\" : {\n        \"ids\" : [100077]        \n    },\n    \"geographics\": {\n        \"areas\" : [\n            {\n                \"areaType\": \"Municipality\",\n                \"featureId\": \"687\"\n            },\n            {\n                \"areaType\": \"County\",\n                \"featureId\": \"6\"\n            }        \n        ]\n    },    \n    \"occurrenceStatus\":\"present\"    \n}"
 						},
 						"url": {
 							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
@@ -933,7 +868,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"projectIds\": [2976],\n    \"date\": {\n        \"startDate\":\"2016-09-01\",\n\t    \"endDate\":\"2016-09-30\"\n    },\n    \"output\": {\n        \"fieldSet\":\"all\"        \n    }\n}"
+							"raw": "{\n    \"projectIds\": [2976],\n    \"date\": {\n        \"startDate\":\"2016-09-01\",\n\t    \"endDate\":\"2022-09-30\"\n    },\n    \"output\": {\n        \"fieldSet\":\"all\"        \n    }\n}"
 						},
 						"url": {
 							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
