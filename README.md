@@ -15,6 +15,7 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 - [FAQ](Docs/FAQ.md)
 - [Web Feature Service (WFS) - Technical overview](Docs/WfsService.md)
 - [Web Feature Service (WFS) - Get started guide](Docs/WfsServiceGetStarted.md)
+- [Web Map Service (WMS)](Docs/WmsService.md)
 
 ## Data types and vocabularies
 - [Observation](Docs/Observation.md)
