@@ -14,9 +14,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="Autofac" Version="6.4.0" />
+	  <PackageReference Include="Autofac" Version="6.5.0" />
 	  <PackageReference Include="Azure.Storage.Blobs" Version="12.14.1" />
-	  <PackageReference Include="Hangfire.Core" Version="1.7.31" />
+	  <PackageReference Include="Hangfire.Core" Version="1.7.32" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
 	  <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
 	  <PackageReference Include="MongoDB.Driver" Version="2.18.0" />

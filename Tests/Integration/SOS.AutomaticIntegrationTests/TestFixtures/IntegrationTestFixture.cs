@@ -383,6 +383,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 string strJson = sr.ReadToEnd();                
                 var jsonSerializerOptions = new System.Text.Json.JsonSerializerOptions() { PropertyNameCaseInsensitive = true };                            
                 var taxa = System.Text.Json.JsonSerializer.Deserialize<List<Taxon>>(strJson, jsonSerializerOptions);
+
                 return taxa;
             }
         }

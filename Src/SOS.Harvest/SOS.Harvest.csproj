@@ -16,10 +16,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Autofac" Version="6.4.0" />
-		<PackageReference Include="CSharpFunctionalExtensions" Version="2.36.1" />
+		<PackageReference Include="Autofac" Version="6.5.0" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="2.37.0" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
-		<PackageReference Include="Hangfire.Core" Version="1.7.31" />
+		<PackageReference Include="Hangfire.Core" Version="1.7.32" />
 		<PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
 		<PackageReference Include="MongoDB.Driver" Version="2.18.0" />
