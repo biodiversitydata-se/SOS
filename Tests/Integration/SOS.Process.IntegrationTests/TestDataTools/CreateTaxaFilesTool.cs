@@ -53,9 +53,9 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            IEnumerable<Taxon> taxa = await taxonProcessedRepository.GetAllAsync();
+            var taxa = await taxonProcessedRepository.GetAllAsync();
             var basicTaxa = taxa.ToProcessedBasicTaxa();
-            var tree = TaxonTreeFactory.CreateTaxonTree(basicTaxa);
+            var tree = TaxonTreeFactory.CreateTaxonTree(basicTaxa.ToDictionary(t => t.Id, t => t));
             var mammaliaTaxonIds = tree.GetUnderlyingTaxonIds(MammaliaTaxonId, true);
             var mammaliaProcessedTaxa = taxa.Where(m => mammaliaTaxonIds.Contains(m.Id));
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);

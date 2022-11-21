@@ -21,7 +21,7 @@ namespace SOS.Lib.Models.Processed.Observation
             {
                 return null!;
             }
-            
+            date = date.Value.ToLocalTime();
             var cal = new GregorianCalendar();
             return ((date.Value.Month - 1) * 4) + (int)Math.Ceiling(date.Value.Day / Math.Round((double)cal.GetDaysInMonth(date.Value.Year, date.Value.Month) / 4));
         }

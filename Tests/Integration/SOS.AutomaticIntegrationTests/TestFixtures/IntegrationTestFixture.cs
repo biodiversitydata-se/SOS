@@ -282,7 +282,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 Taxa = await taxonRepository.GetAllAsync();
             }
             _taxaById = Taxa.ToDictionary(m => m.Id, m => m);
-            TaxonTree<IBasicTaxon>? basicTaxonTree = TaxonTreeFactory.CreateTaxonTree(Taxa);
+            TaxonTree<IBasicTaxon>? basicTaxonTree = TaxonTreeFactory.CreateTaxonTree(Taxa.ToDictionary(t => t.Id, t => t));
             var taxonTreeCache = new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache);
             taxonTreeCache.Set(basicTaxonTree);
             var taxonManager = CreateTaxonManager(_processClient, taxonRepository, memoryCache, taxonTreeCache);

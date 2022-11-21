@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
@@ -31,7 +32,7 @@ namespace SOS.Lib.Repositories.Resource
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<BasicTaxon>> GetBasicTaxonChunkAsync(int skip, int take)
+        public async Task<IEnumerable<IBasicTaxon>> GetBasicTaxonChunkAsync(int skip, int take)
         {
             var res = await MongoCollection
                 .Find(x => true)

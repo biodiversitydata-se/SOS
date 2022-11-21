@@ -1,11 +1,9 @@
-﻿using System.Text.RegularExpressions;
-using NetTopologySuite.Features;
+﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -22,6 +20,77 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
     {
         private readonly IAreaHelper _areaHelper;
         private readonly IDictionary<string, (double longitude, double latitude, int precision)> _communities;
+
+        private string GetLocality(VirtualHerbariumObservationVerbatim verbatim)
+        {
+            if (verbatim == null)
+            {
+                return null!;
+            }
+
+            // 1. Locality has value
+            if (!string.IsNullOrEmpty(verbatim.Locality))
+            {
+                return verbatim.Locality;
+            }
+
+            // 2. CoordinateSource = "District" and District != ""
+            // 3. District != "" och koordinater saknas men har slagits upp med hjälp av Excel-fil för distrikt. Detta villkor gäller oberoende av värdet på CoordinateSource
+            if ((verbatim.CoordinateSource?.ToLower() == "district" || verbatim.CoordinateOverrideDistrict) && !string.IsNullOrEmpty(verbatim.District))
+            {
+                return $"Sockenkoordinat för {verbatim.District} sn. Se kommentarsfält för mer exakt lokal";
+            }
+
+            if (!string.IsNullOrEmpty(verbatim.CoordinateValue))
+            {
+                // 4. CoordinateSource = "LocalityVH" and CoordinateValue != ""
+                if (verbatim.CoordinateSource?.ToLower() == "localityvh")
+                {
+                    return verbatim.CoordinateValue;
+                }
+
+                // 5. CoordinateValue != "" och coordinateSource != "None" och coordinateSource != ""
+                if (verbatim.CoordinateSource?.ToLower() != "none" && !string.IsNullOrEmpty(verbatim.CoordinateSource))
+                {
+                    return $"{(string.IsNullOrEmpty(verbatim.Province) ? $"{verbatim.Province}, " : string.Empty)}{verbatim.CoordinateSource}, {verbatim.CoordinateValue}, Se kommentarsfält för mer exakt lokal.";
+                }
+            }
+
+            // Fallback?
+            return $"{(string.IsNullOrEmpty(verbatim.Province) ? string.Empty : $"{verbatim.Province}, ")}{(string.IsNullOrEmpty(verbatim.CoordinateSource) || verbatim.CoordinateSource.ToLower() == "none" ? string.Empty : $"{verbatim.CoordinateSource}, ")}Se kommentarsfält för mer exakt lokal.";
+        }
+
+        private (DateTime? StartDate, DateTime? EndDate) GetStartAndEndDate(string datecollected)
+        {
+            if (string.IsNullOrEmpty(datecollected))
+            {
+                return (null, null);
+            }
+
+            var dateArray = datecollected.Replace("&", "6").Split('-');
+            var firstPossibleYear = 1628;
+
+            try
+            {
+               
+                int month;
+                int day;
+                if (int.TryParse(dateArray[0], out var year) && year > firstPossibleYear && year <= DateTime.Today.Year)
+                {
+                    return dateArray.Length switch
+                    {
+                        3 => int.TryParse(dateArray[1], out month) && int.TryParse(dateArray[2], out day) ? (new DateTime(year, month, day), new DateTime(year, month, day)) : (null, null),
+                        2 => int.TryParse(dateArray[1], out month) ? (new DateTime(year, month, 1), month == 12 ? new DateTime(year + 1, 1, 1).AddDays(-1) : new DateTime(year, month + 1, 1).AddDays(-1)) : (null, null),
+                        _ => (new DateTime(year, 1, 1), new DateTime(year, 12, 31))
+                    };
+                }
+                
+            }
+            catch (Exception)
+            {}
+
+            return (null, null);
+        }
 
         /// <summary>
         /// Constructor
@@ -134,20 +203,12 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 return null;
             }
 
-            var taxon = GetTaxon(verbatim.DyntaxaId);
+            var taxon = GetTaxon(verbatim.DyntaxaId, new[] { verbatim.ScientificName });
             var defects = new Dictionary<string, string>();
-            DateTime? dateCollected = DwcParser.ParseDate(verbatim.DateCollected?.Replace("&", "6"));
-            if (dateCollected == null)
+            var eventDates = GetStartAndEndDate(verbatim.DateCollected);
+            if (eventDates.StartDate == null && eventDates.EndDate == null)
             {
                 defects.Add("DateCollected", verbatim.DateCollected);
-            }
-
-            var notes = verbatim.Notes;
-            if (!string.IsNullOrEmpty(notes))
-            {
-                // Remove invalid charaters.
-                notes = Regex.Replace(verbatim.Notes, @"[\x00-\x1F]", string.Empty);
-                notes = Regex.Replace(notes, @"\s\&\s", " och "); // replace ' & ' with ' och '
             }
 
             var obs = new Observation
@@ -158,7 +219,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 DatasetName = "Virtual Herbarium",
                 Defects = defects.Count == 0 ? null : defects,
                 DiffusionStatus = DiffusionStatus.NotDiffused,
-                Event = new Event(dateCollected, null, dateCollected, null),
+                Event = new Event(eventDates.StartDate, null, eventDates.EndDate, null),
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
@@ -167,14 +228,14 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 },
                 Location = new Location
                 {
-                    Locality = verbatim.Locality,
+                    Locality = GetLocality(verbatim),
                     VerbatimLocality = verbatim.Locality
                 },
                 Occurrence = new Occurrence
                 {
                     BirdNestActivityId = taxon?.IsBird() ?? false ? 1000000 : 0,
-                    CatalogNumber = $"{verbatim.InstitutionCode}-{verbatim.AccessionNo}-{verbatim.DyntaxaId}",
-                    OccurrenceId =  $"urn:lsid:herbarium.emg.umu.se:observation:{verbatim.InstitutionCode}*{verbatim.AccessionNo}*{verbatim.DyntaxaId}",
+                    CatalogNumber = $"{verbatim.InstitutionCode}-{verbatim.AccessionNo}-{taxon?.Id ?? verbatim.DyntaxaId}",
+                    OccurrenceId =  $"urn:lsid:herbarium.emg.umu.se:observation:{verbatim.InstitutionCode}*{verbatim.AccessionNo}*{taxon?.Id ?? verbatim.DyntaxaId}",
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,
@@ -183,7 +244,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                     ProtectionLevel = CalculateProtectionLevel(taxon),
                     SensitivityCategory = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.Collector,
-                    OccurrenceRemarks = notes.Clean()
+                    OccurrenceRemarks = string.IsNullOrEmpty(verbatim.OriginalText) ? verbatim.Notes.Clean() : $"{verbatim.OriginalText} {verbatim.Notes}".Clean()
                 },
                 OwnerInstitutionCode = verbatim.InstitutionCode,
                 Taxon = taxon

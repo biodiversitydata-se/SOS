@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Factories;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -118,18 +117,18 @@ namespace SOS.Lib.Managers
         private async Task<TaxonTree<IBasicTaxon>> GetTaxonTreeAsync()
         {
             var taxa = await GetBasicTaxaAsync();
-            var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
+            var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa?.ToDictionary(t => t.Id, t => t));
             return taxonTree;
         }
 
-        private async Task<IEnumerable<BasicTaxon>> GetBasicTaxaAsync()
+        private async Task<IEnumerable<IBasicTaxon>> GetBasicTaxaAsync()
         {
             try
             {
                 var taxaCount = await _processedTaxonRepository.CountAllDocumentsAsync();
                 const int batchSize = 10000;
                 var skip = 0;
-                var tasks = new List<Task<IEnumerable<BasicTaxon>>>();
+                var tasks = new List<Task<IEnumerable<IBasicTaxon>>>();
                
                 while(skip < taxaCount)
                 {
@@ -138,7 +137,7 @@ namespace SOS.Lib.Managers
                 }
            
                 await Task.WhenAll(tasks);
-                var taxa = new List<BasicTaxon>();
+                var taxa = new List<IBasicTaxon>();
                 foreach (var task in tasks)
                 {
                     taxa.AddRange(task.Result);

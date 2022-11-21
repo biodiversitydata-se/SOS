@@ -309,14 +309,14 @@ namespace SOS.Harvest.Processors.Taxon
                 await AddTaxonAttributesAsync(dwcTaxa);
                 _logger.LogDebug("Finish adding taxon attributes");
 
-                var taxa = dwcTaxa.ToProcessedTaxa().ToDictionary(m => m.Id, m => m);
+                var taxa = dwcTaxa.ToProcessedTaxa();
 
                 if (!taxa?.Any() ?? true)
                 {
                     return -1;
                 }
 
-                var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa.Values);
+                var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
                 bool isTaxonDataOk = IsTaxonDataOk(taxa.Values, taxonTree);
                 if (!isTaxonDataOk)
                 {

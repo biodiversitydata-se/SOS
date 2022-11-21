@@ -18,15 +18,24 @@ namespace SOS.Lib.Factories
     {
         private const int BiotaTaxonId = 0;
 
-        public static TaxonTree<IBasicTaxon> CreateTaxonTree(IEnumerable<IBasicTaxon> taxa)
+        public static TaxonTree<IBasicTaxon> CreateTaxonTree(IDictionary<int, Taxon> taxa)
         {
             if (!taxa?.Any() ?? true)
             {
                 return null;
             }
 
-            var taxonById = taxa.ToDictionary(m => m.Id, m => m);
-            var treeNodeById = CreateTaxonTreeNodeDictionary(taxonById);
+            return CreateTaxonTree(taxa.ToDictionary(t => t.Key, t => (IBasicTaxon) t.Value));
+        }
+
+        public static TaxonTree<IBasicTaxon> CreateTaxonTree(IDictionary<int, IBasicTaxon> taxa)
+        {
+            if (!taxa?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var treeNodeById = CreateTaxonTreeNodeDictionary(taxa);
             treeNodeById.TryGetValue(BiotaTaxonId, out var rootNode);
             var tree = new TaxonTree<IBasicTaxon>(rootNode, treeNodeById);
             RemoveIllegalRelations(tree); // Temporary fix.
@@ -35,7 +44,7 @@ namespace SOS.Lib.Factories
         }
 
         public static Dictionary<int, TaxonTreeNode<IBasicTaxon>> CreateTaxonTreeNodeDictionary(
-            Dictionary<int, IBasicTaxon> taxonById)
+            IDictionary<int, IBasicTaxon> taxonById)
         {
             if (!taxonById?.Any() ?? true)
             {

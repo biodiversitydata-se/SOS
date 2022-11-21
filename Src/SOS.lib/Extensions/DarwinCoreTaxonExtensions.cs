@@ -15,12 +15,51 @@ namespace SOS.Lib.Extensions
         private static IDictionary<int, VocabularyValue> _protectionLevelCache =
             new ConcurrentDictionary<int, VocabularyValue>();
 
-        private static HashSet<string> _redlistCategories = new HashSet<string>() {"cr", "en", "vu", "nt"};
-        private static HashSet<string> _isInvasiveInSwedenCategories = new HashSet<string>() {"5", "7", "8", "9" };
+        private static HashSet<string> _isInvasiveInSwedenCategories = new HashSet<string>() { "5", "7", "8", "9" };
 
-        public static IEnumerable<Taxon> ToProcessedTaxa(this IEnumerable<DarwinCoreTaxon> sourceTaxa)
+        /// <summary>
+        /// Update red list category derivied
+        /// </summary>
+        /// <param name="taxa"></param>
+        private static IDictionary<int, Taxon> PopulateDeriviedRedListCategory(IDictionary<int, Taxon> taxa)
         {
-            return sourceTaxa?.Select(t => t.ToProcessedTaxon());
+            if (!taxa?.Any() ?? true)
+            {
+                return null;
+            }
+
+            foreach (var taxon in taxa.Values)
+            {
+                // If taxon lacks red list category or it's NE - Not Evaluated, try to get parent red list category
+                if (string.IsNullOrEmpty(taxon.Attributes.RedlistCategory) || taxon.Attributes.RedlistCategory == "NE")
+                {
+                    taxa.TryGetValue(taxon.Attributes.ParentDyntaxaTaxonId ?? -1, out var parentTaxon);
+                    while (parentTaxon != null)
+                    {
+                        // If parent is evaluated, get it's red list category
+                        if (!string.IsNullOrEmpty(parentTaxon.Attributes?.RedlistCategory) && parentTaxon.Attributes?.RedlistCategory != "NE")
+                        {
+                            taxon.Attributes.RedlistCategoryDerived = parentTaxon.Attributes.RedlistCategory;
+                            break;
+                        }
+
+                        taxa.TryGetValue(parentTaxon.Attributes.ParentDyntaxaTaxonId ?? -1, out parentTaxon);
+                    }
+                }
+                else
+                {
+                    // If taxon is evaluated or no parent evaluation was found, Set derivied rlc to current 
+                    taxon.Attributes.RedlistCategoryDerived = taxon.Attributes.RedlistCategory;
+                }
+            }
+
+            return taxa;
+        }
+
+        public static IDictionary<int, Taxon> ToProcessedTaxa(this IEnumerable<DarwinCoreTaxon> sourceTaxa)
+        {
+            var taxa = sourceTaxa?.Select(t => t.ToProcessedTaxon());
+            return PopulateDeriviedRedListCategory(taxa?.ToDictionary(t => t.Id, t => t));
         }
 
         public static Taxon ToProcessedTaxon(this DarwinCoreTaxon sourceTaxon)
@@ -72,7 +111,6 @@ namespace SOS.Lib.Extensions
             taxon.Attributes.IsInvasiveInSweden = _isInvasiveInSwedenCategories.Contains(sourceTaxon.DynamicProperties?.SwedishHistoryId ?? string.Empty);
             taxon.Attributes.InvasiveRiskAssessmentCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2);            
             taxon.Attributes.RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory?.Substring(0, 2);
-            taxon.Attributes.IsRedlisted = _redlistCategories.Contains(taxon.Attributes.RedlistCategory?.ToLower() ?? string.Empty);
             taxon.Attributes.SortOrder = sourceTaxon.SortOrder;
             taxon.Attributes.SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory;
             taxon.Attributes.SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence;

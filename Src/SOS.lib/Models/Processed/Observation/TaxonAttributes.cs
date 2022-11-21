@@ -9,6 +9,8 @@ namespace SOS.Lib.Models.Processed.Observation
     /// </summary>
     public class TaxonAttributes 
     {
+        private static HashSet<string> _redlistCategories = new HashSet<string>() { "cr", "en", "vu", "nt" };
+
         /// <summary>
         /// Indicates whether the species is the subject
         /// of an action plan ('åtgärdsprogram' in swedish).
@@ -38,12 +40,12 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Invasive risk assessment category.
         /// </summary>
-        public string InvasiveRiskAssessmentCategory { get; set; }        
+        public string InvasiveRiskAssessmentCategory { get; set; }
 
         /// <summary>
-        /// True if redlist category is one of CR, EN, VU, NT.
+        /// True if derivied redlist category is one of CR, EN, VU, NT.
         /// </summary>
-        public bool IsRedlisted { get; set; }
+        public bool IsRedlisted => _redlistCategories.Contains(RedlistCategoryDerived?.ToLower() ?? string.Empty);
 
         /// <summary>
         /// Natura 2000, Habitats directive article 2.
@@ -95,6 +97,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Not redlisted species has no value in this property.
         /// </summary>
         public string RedlistCategory { get; set; }
+
+        /// <summary>
+        /// Derivied red list category from parent taxa
+        /// </summary>
+        public string RedlistCategoryDerived { get; set; }
 
         /// <summary>
         /// Information about how protected information about a species is in Sweden.

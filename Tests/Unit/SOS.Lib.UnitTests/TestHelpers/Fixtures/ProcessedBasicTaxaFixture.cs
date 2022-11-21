@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Interfaces;
 using SOS.TestHelpers.Helpers;
 
 namespace SOS.Lib.UnitTests.TestHelpers.Fixtures
@@ -13,11 +13,11 @@ namespace SOS.Lib.UnitTests.TestHelpers.Fixtures
     {
         public ProcessedBasicTaxaFixture()
         {
-            Taxa = MessagePackHelper.CreateListFromMessagePackFile<BasicTaxon>(
+            Taxa = MessagePackHelper.CreateListFromMessagePackFile<IBasicTaxon>(
                 @"Resources\AllProcessedBasicTaxa.msgpck");
         }
 
-        public IEnumerable<BasicTaxon> Taxa { get; private set; }
+        public IEnumerable<IBasicTaxon> Taxa { get; private set; }
 
         public void Dispose()
         {
