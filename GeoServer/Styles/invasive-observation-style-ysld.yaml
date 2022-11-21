@@ -1,0 +1,49 @@
+title: observation style
+feature-styles:
+- rules:
+  - title: not rediscovered observation
+    filter: ${isNotRediscoveredObservation = true}
+    scale: [min, max]
+    symbolizers:
+    - point:
+        size: 10
+        symbols:
+        - mark:
+            shape: circle
+            stroke-color: 'black'
+            stroke-width: 0.5
+            fill-color: 'white'
+    - point:
+        size: 6
+        rotation: 45.0
+        symbols:
+        - mark:
+            shape: cross
+            stroke-color: 'black'
+            stroke-width: 0.5
+            fill-color: 'black'    
+  - filter: ${isPresentObservation = false AND isNotRediscoveredObservation = false}
+    title: absent observation
+    scale: [min, max]
+    symbolizers:
+    - point:
+        size: 8
+        rotation: 45.0
+        symbols:
+        - mark:
+            shape: cross
+            stroke-width: 1
+            stroke-color: 'black'
+            fill-color: 'gray'
+  - filter: ${isPresentObservation = true}
+    title: present observation
+    scale: [min, max]
+    symbolizers:
+    - point:
+        size: 8
+        symbols:
+        - mark:
+            shape: circle            
+            stroke-width: 1
+            stroke-color: '#000000'
+            fill-color: '#FF8300'
