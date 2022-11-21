@@ -320,6 +320,7 @@ namespace SOS.Lib.Extensions
                         .KeyWordLowerCase(kwlc => kwlc.OrganismGroup)
                         .KeyWordLowerCase(kwlc => kwlc.InvasiveRiskAssessmentCategory)
                         .KeyWordLowerCase(kwlc => kwlc.RedlistCategory)
+                        .KeyWordLowerCase(kwlc => kwlc.RedlistCategoryDerived)
                         .KeyWordLowerCase(kwlc => kwlc.SwedishOccurrence)
                         .KeyWordLowerCase(kwlc => kwlc.SwedishHistory)
                         .Nested<TaxonSynonymName>(n => n
