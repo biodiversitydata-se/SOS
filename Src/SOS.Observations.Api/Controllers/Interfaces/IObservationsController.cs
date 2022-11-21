@@ -100,7 +100,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
             int? roleId,
             string authorizationApplicationIdentifier,
-            SearchFilterAggregationDto filter,
+            SearchFilterAggregationInternalDto filter,
             int zoom,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",

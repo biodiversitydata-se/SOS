@@ -10,9 +10,9 @@ using SOS.Lib.Exceptions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Lib.Cache.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -34,9 +34,13 @@ namespace SOS.Observations.Api.Controllers
             return Regex.Replace(str, string.Format(@"(https?:\/\/.*?)(\/{0}\/v2)?(\/.*)", path), m => domain + m.Groups[3].Value);
         }
 
-        protected void CheckAuthorization(bool sensitiveObservations)
+        /// <summary>
+        /// Check if user has access to protetced observations if requested
+        /// </summary>
+        /// <param name="protectionFilter"></param>
+        protected void CheckAuthorization(ProtectionFilterDto? protectionFilter)
         {
-            if (sensitiveObservations && (!User?.HasAccessToScope(_observationApiConfiguration.ProtectedScope) ?? true))
+            if((protectionFilter ?? ProtectionFilterDto.Public) != ProtectionFilterDto.Public && (!User?.HasAccessToScope(_observationApiConfiguration.ProtectedScope) ?? true))
             {
                 throw new AuthenticationRequiredException("Not authorized");
             }

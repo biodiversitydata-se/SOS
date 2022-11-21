@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Location;
 using SOS.Observations.Api.Extensions;
@@ -84,7 +85,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 var searchFilter = new SearchFilterBaseDto { Geographics = filter };
                 var validationResult = Result.Combine(

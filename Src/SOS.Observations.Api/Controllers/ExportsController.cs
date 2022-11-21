@@ -24,6 +24,7 @@ using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Export;
 using SOS.Observations.Api.Dtos.Filter;
+using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 
@@ -343,7 +344,7 @@ namespace SOS.Observations.Api.Controllers
             FileExportResult fileExportResult = null;
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -406,7 +407,7 @@ namespace SOS.Observations.Api.Controllers
 
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, sensitiveObservations);
                 if (validateResult is not OkObjectResult okResult)
@@ -466,7 +467,7 @@ namespace SOS.Observations.Api.Controllers
 
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -535,7 +536,7 @@ namespace SOS.Observations.Api.Controllers
 
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -607,7 +608,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
@@ -672,7 +673,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 var userExports = await GetUserExportsAsync();
                 var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
@@ -737,7 +738,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
@@ -808,7 +809,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
@@ -872,7 +873,7 @@ namespace SOS.Observations.Api.Controllers
             FileExportResult fileExportResult = null;
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(filter.ProtectionFilter ?? (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public));
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -936,7 +937,7 @@ namespace SOS.Observations.Api.Controllers
 
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(filter.ProtectionFilter ?? (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public));
 
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, sensitiveObservations);
                 if (validateResult is not OkObjectResult okResult)
@@ -997,7 +998,7 @@ namespace SOS.Observations.Api.Controllers
 
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(filter.ProtectionFilter ?? (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public));
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -1067,7 +1068,7 @@ namespace SOS.Observations.Api.Controllers
 
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(filter.ProtectionFilter ?? (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public));
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -1140,7 +1141,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(filter.ProtectionFilter ?? (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public));
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
@@ -1206,7 +1207,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(filter.ProtectionFilter ?? (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public));
 
                 var userExports = await GetUserExportsAsync();
                 var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, sensitiveObservations, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
@@ -1272,7 +1273,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(filter.ProtectionFilter ?? (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public));
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
@@ -1344,7 +1345,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(filter.ProtectionFilter ?? (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public));
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();

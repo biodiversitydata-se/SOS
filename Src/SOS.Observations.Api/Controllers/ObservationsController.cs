@@ -20,6 +20,7 @@ using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Observation;
 using SOS.Observations.Api.Extensions;
@@ -130,6 +131,7 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="taxonSearchManager"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="areaManager"></param>
         /// <param name="observationApiConfiguration"></param>
         /// <param name="elasticConfiguration"></param>
@@ -183,7 +185,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 occurrenceId = WebUtility.UrlDecode(occurrenceId ?? id);
 
@@ -237,7 +239,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 filter = await InitializeSearchFilterAsync(filter);
 
                 var validationResult = Result.Combine(
@@ -322,7 +324,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
 
@@ -394,7 +396,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
 
@@ -482,7 +484,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
@@ -562,7 +564,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var searchFilter = new SearchFilterInternal(UserId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public)
@@ -683,7 +685,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
@@ -762,7 +764,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 occurrenceId = WebUtility.UrlDecode(occurrenceId ?? id);
                 var observation = await ObservationManager.GetObservationAsync(
@@ -818,7 +820,9 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                // sensitiveObservations is preserved for backward compability
+                filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                CheckAuthorization(filter.ProtectionFilter);
 
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success());
@@ -962,7 +966,10 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                // sensitiveObservations is preserved for backward compability
+                filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                CheckAuthorization(filter.ProtectionFilter);
+
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
@@ -1025,7 +1032,7 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromBody] SearchFilterAggregationDto filter,
+            [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
@@ -1033,7 +1040,10 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                // sensitiveObservations is preserved for backward compability
+                filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                CheckAuthorization(filter.ProtectionFilter);
+
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
@@ -1136,6 +1146,8 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                CheckAuthorization(filter.ProtectionFilter);
+
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
@@ -1202,7 +1214,10 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                // sensitiveObservations is preserved for backward compability
+                filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                CheckAuthorization(filter.ProtectionFilter);
+
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 var validationResult = Result.Combine(
@@ -1295,7 +1310,9 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                // sensitiveObservations is preserved for backward compability
+                filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                CheckAuthorization(filter.ProtectionFilter);
 
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
@@ -1395,7 +1412,9 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                // sensitiveObservations is preserved for backward compability
+                filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                CheckAuthorization(filter.ProtectionFilter);
 
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
@@ -1482,7 +1501,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 const int maxTotalCount = 100000;
@@ -1537,7 +1556,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(true);
+                CheckAuthorization(ProtectionFilterDto.Sensitive);
 
                 var validationResult = Result.Combine(
                     ValidateSignalSearch(filter, validateSearchFilter, areaBuffer));
@@ -1603,7 +1622,10 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                // sensitiveObservations is preserved for backward compability
+                filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                CheckAuthorization(filter.ProtectionFilter);
+
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
@@ -1735,7 +1757,9 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations);
+                // sensitiveObservations is preserved for backward compability
+                filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                CheckAuthorization(filter.ProtectionFilter);
 
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),

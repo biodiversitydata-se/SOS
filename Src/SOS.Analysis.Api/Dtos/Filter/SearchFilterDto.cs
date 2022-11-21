@@ -17,11 +17,6 @@ namespace SOS.Analysis.Api.Dtos.Filter
         public int? BirdNestActivityLimit { get; set; }
 
         /// <summary>
-        /// Observation protection filter
-        /// </summary>
-        public ProtectionFilterDto ProtectionFilter { get; set; }
-
-        /// <summary>
         ///     Only get data from these providers.
         /// </summary>
         public DataProviderFilterDto? DataProvider { get; set; }
@@ -76,6 +71,11 @@ namespace SOS.Analysis.Api.Dtos.Filter
         /// Project id's to match.
         /// </summary>
         public IEnumerable<int>? ProjectIds { get; set; }
+
+        /// <summary>
+        /// Observation protection filter
+        /// </summary>
+        public ProtectionFilterDto ProtectionFilter { get; set; }
 
         /// <summary>
         /// Only get observations reported by me

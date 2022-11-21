@@ -587,7 +587,7 @@ namespace SOS.Lib
                 return;
             }
 
-            query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.RedListCategories?.Select(m => m.ToUpper()));
+            query.TryAddTermsCriteria("taxon.attributes.redlistCategoryDerived", filter.RedListCategories?.Select(m => m.ToUpper()));
             query.TryAddTermsCriteria("taxon.id", filter.Ids);
             query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
         }
