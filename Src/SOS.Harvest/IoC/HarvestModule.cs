@@ -416,6 +416,7 @@ namespace SOS.Harvest.IoC.Modules
 
             // Add managers
             builder.RegisterType<DiffusionManager>().As<IDiffusionManager>().InstancePerLifetimeScope();
+            builder.RegisterType<InvalidObservationsManager>().As<IInvalidObservationsManager>().InstancePerLifetimeScope();            
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessManager>().As<IProcessManager>().InstancePerLifetimeScope();
