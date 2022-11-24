@@ -38,6 +38,11 @@ namespace SOS.Lib.Models.DarwinCore
         public int DisturbanceRadius { get; set; }
 
         /// <summary>
+        /// Id of taxon in GBIF
+        /// </summary>
+        public int? GbifTaxonId { get; set; }
+
+        /// <summary>
         /// True if alien in sweden according to EU Regulation 1143/2014
         /// </summary>
         public bool IsEURegulation_1143_2014 { get; set; }

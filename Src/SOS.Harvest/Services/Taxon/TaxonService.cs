@@ -104,7 +104,8 @@ namespace SOS.Harvest.Services.Taxon
             .Map(t => t.TaxonCategoryId, 4)
             .Map(t => t.TaxonCategorySwedishName, 5)
             .Map(t => t.TaxonCategoryEnglishName, 6)
-            .Map(t => t.TaxonCategoryDarwinCoreName, 7);
+            .Map(t => t.TaxonCategoryDarwinCoreName, 7)
+            .Map(t => t.GbifTaxonId, 10);
 
         private IVariableLengthReaderBuilder<DarwinCoreVernacularName> VernacularNameMapping =>
             new VariableLengthReaderBuilder<DarwinCoreVernacularName>()
@@ -304,6 +305,7 @@ namespace SOS.Harvest.Services.Taxon
                 .GetRecords(TaxonPropertiesMapping)
                 .Select(m => new TaxonProperties<int>
                 {
+                    GbifTaxonId = m.GbifTaxonId,
                     TaxonCategoryId = m.TaxonCategoryId,
                     TaxonCategorySwedishName = m.TaxonCategorySwedishName,
                     TaxonCategoryEnglishName = m.TaxonCategoryEnglishName,
@@ -320,6 +322,7 @@ namespace SOS.Harvest.Services.Taxon
                 if (taxonPropertiesById.TryGetValue(taxon.DynamicProperties.DyntaxaTaxonId, out var taxonProperties))
                 {
                     taxon.SortOrder = taxonProperties.SortOrder.GetValueOrDefault(0);
+                    taxon.DynamicProperties.GbifTaxonId = taxonProperties.GbifTaxonId;
                     taxon.DynamicProperties.TaxonCategoryId = taxonProperties.TaxonCategoryId;
                     taxon.DynamicProperties.TaxonCategorySwedishName = taxonProperties.TaxonCategorySwedishName;
                     taxon.DynamicProperties.TaxonCategoryEnglishName = taxonProperties.TaxonCategoryEnglishName;
