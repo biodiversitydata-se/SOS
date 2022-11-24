@@ -18,6 +18,35 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
     public class DwcObservationHarvesterIntegrationTests : TestBase
     {
         [Fact]
+        public async Task Harvest_datastewardship_dwc_archive()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-datastewardship-bats.zip";
+            var dataProvider = new DataProvider
+            {
+                Id = 105,
+                Identifier = "TestDataStewardshipBats",
+                Type = DataProviderType.DwcA
+            };
+            var dwcObservationHarvester = CreateDwcObservationHarvester();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
+                archivePath,
+                dataProvider,
+                JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            harvestInfo.Status.Should().Be(RunStatus.Success);
+        }
+
+        [Fact]
         public async Task Harvest_occurrence_dwc_archive_with_emof_extension()
         {
             //-----------------------------------------------------------------------------------------------------------

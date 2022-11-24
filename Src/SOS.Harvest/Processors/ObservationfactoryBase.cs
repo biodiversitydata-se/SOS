@@ -93,12 +93,14 @@ namespace SOS.Harvest.Processors
         /// <returns></returns>
         protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!)
         {
-            if (!Taxa.TryGetValue(taxonId, out var taxon) && (names?.Any() ?? false))
+            var taxonFound = Taxa.TryGetValue(taxonId, out var taxon);
+            if ((!taxonFound || taxonId == 0) && (names?.Any() ?? false))
             {
-                // If we can't find taxon by id, try by scientific name if passed
+                // If we can't find taxon by id or taxon id is biota, try by scientific name if passed
                 foreach (var name in names)
                 {
-                    if(!string.IsNullOrEmpty(name) && TaxaByName.TryGetValue(name?.ToLower() ?? string.Empty, out taxon)){
+                    if (!string.IsNullOrEmpty(name) && TaxaByName.TryGetValue(name?.ToLower() ?? string.Empty, out taxon))
+                    {
                         break;
                     }
                 }
