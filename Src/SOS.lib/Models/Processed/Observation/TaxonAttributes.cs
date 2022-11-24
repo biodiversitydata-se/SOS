@@ -28,6 +28,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int DyntaxaTaxonId { get; set; }
 
         /// <summary>
+        /// Id for taxon in GBIF
+        /// </summary>
+        public int? GbifTaxonId { get; set; }
+
+        /// <summary>
         /// True if invasive in sweden according to EU Regulation 1143/2014.
         /// </summary>
         public bool IsInvasiveAccordingToEuRegulation { get; set; }

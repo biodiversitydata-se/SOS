@@ -11,5 +11,6 @@
         public string TaxonCategorySwedishName { get; set; }
         public string TaxonCategoryEnglishName { get; set; }
         public string TaxonCategoryDarwinCoreName { get; set; }
+        public int? GbifTaxonId { get; set; }
     }
 }
