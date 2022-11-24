@@ -68,6 +68,19 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> DeleteCollectionAsync();
 
         /// <summary>
+        ///     Get cursor to all documents in collection
+        /// </summary>
+        /// <returns></returns>
+        Task<IAsyncCursor<TEntity>> GetAllByCursorAsync();
+
+        /// <summary>
+        ///     Get cursor to all documents in collection
+        /// </summary>
+        /// <returns></returns>
+        Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection,
+            bool noCursorTimeout = false);
+
+        /// <summary>
         ///     Get all items.
         /// </summary>
         /// <returns></returns>

@@ -150,5 +150,38 @@ namespace SOS.Administration.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <summary>
+        /// Create Excel file with invalid observations.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("CreateExcelFileReport/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> RunCreateInvalidObservationsExcelFileJob([FromQuery] string dataProviderIdOrIdentifier, [FromQuery] string createdBy)
+        {
+            try
+            {
+                var dataProvider =
+                    await _dataProviderManager.GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier);
+                if (dataProvider == null)
+                {
+                    return new BadRequestObjectResult(
+                        $"No data provider exist with Id={dataProviderIdOrIdentifier}");
+                }
+
+                var reportId = Report.CreateReportId();
+                
+
+                BackgroundJob.Enqueue<IInvalidObservationsReportsJob>(job => job.RunCreateExcelFileReportAsync(reportId, dataProvider.Id, createdBy));
+                return new OkObjectResult($"Create Invalid Observations Excel report job with Id \"{reportId}\" was enqueued to Hangfire.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Enqueuing Invalid Observations Excel report job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
     }
 }
