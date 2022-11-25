@@ -104,7 +104,7 @@ namespace SOS.Harvest.Processors
         /// </summary>
         /// <param name="taxonId"></param>
         /// <returns></returns>
-        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!)
+        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!, bool ignoreDuplicates = false)
         {
             var taxonFound = Taxa.TryGetValue(taxonId, out var taxon);
             if ((!taxonFound || taxonId == 0) && (names?.Any() ?? false))
@@ -112,7 +112,7 @@ namespace SOS.Harvest.Processors
                 // If we can't find taxon by id or taxon id is biota, try by scientific name if passed
                 foreach (var name in names)
                 {
-                    taxon = GetTaxonByName(name);
+                    taxon = GetTaxonByName(name, ignoreDuplicates);
                     if (taxon != null) break;
                 }
             }
@@ -120,15 +120,15 @@ namespace SOS.Harvest.Processors
             return taxon ?? new Lib.Models.Processed.Observation.Taxon { Id = -1, VerbatimId = taxonId.ToString() };
         }
 
-        protected Lib.Models.Processed.Observation.Taxon GetTaxonByName(string name)
+        protected Lib.Models.Processed.Observation.Taxon GetTaxonByName(string name, bool ignoreDuplicates = false)
         {
             if (string.IsNullOrEmpty(name)) return null;
             name = name.ToLower();
 
             // Get by scientific name
             if (TaxonByScientificName.TryGetValues(name, out var taxa))
-            {
-                if (taxa.Count == 1)
+            {                
+                if (taxa.Count == 1 || ignoreDuplicates)
                 {
                     return taxa.First();
                 }
@@ -137,7 +137,7 @@ namespace SOS.Harvest.Processors
             // Get by scientific name + author
             if (TaxonByScientificNameAuthor.TryGetValues(name, out taxa))
             {
-                if (taxa.Count == 1)
+                if (taxa.Count == 1 || ignoreDuplicates)
                 {
                     return taxa.First();
                 }
@@ -146,7 +146,7 @@ namespace SOS.Harvest.Processors
             // Get by synonyme
             if (TaxonBySynonymName.TryGetValues(name, out taxa))
             {
-                if (taxa.Count == 1)
+                if (taxa.Count == 1 || ignoreDuplicates)
                 {
                     return taxa.First();
                 }
@@ -155,7 +155,7 @@ namespace SOS.Harvest.Processors
             // Get by synonyme + author
             if (TaxonBySynonymNameAuthor.TryGetValues(name, out taxa))
             {
-                if (taxa.Count == 1)
+                if (taxa.Count == 1 || ignoreDuplicates )
                 {
                     return taxa.First();
                 }

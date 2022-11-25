@@ -268,7 +268,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 return null;
             }
 
-            var taxon = GetTaxon(verbatim.DyntaxaId, new[] { verbatim.ScientificName });
+            var taxon = GetTaxon(verbatim.DyntaxaId, new[] { verbatim.ScientificName }, true);
             var defects = new Dictionary<string, string>();
             var eventDates = GetStartAndEndDate(verbatim.DateCollected);
             if (eventDates.StartDate == null && eventDates.EndDate == null)
