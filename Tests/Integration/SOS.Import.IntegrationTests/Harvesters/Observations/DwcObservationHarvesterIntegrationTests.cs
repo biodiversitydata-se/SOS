@@ -224,7 +224,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), 
-                new DwcaConfiguration {ImportPath = @"C:\Temp"},
+                new DwcaConfiguration {ImportPath = @"C:\Temp", BatchSize=100},
                 new NullLogger<DwcObservationHarvester>());
             return dwcObservationHarvester;
         }
