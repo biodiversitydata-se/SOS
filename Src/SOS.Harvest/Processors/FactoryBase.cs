@@ -80,6 +80,12 @@ namespace SOS.Harvest.Processors
             location.Etrs89Y = etrs89Point.Coordinate.Y;
             TimeManager.Stop(ProcessTimeManager.TimerTypes.CoordinateConversion, coordinateConversionTimerSessionId);
 
+            var gridCellSize = 10000;
+            location.Point10KGridCellCenter = (new Point(
+                (int)(Math.Floor(sweRef99TmPoint.Coordinate.X / gridCellSize) * gridCellSize) + (gridCellSize / 2),
+                (int)(Math.Floor(sweRef99TmPoint.Coordinate.Y / gridCellSize) * gridCellSize) + (gridCellSize / 2)
+            ).Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84) as Point).ToGeoLocation();
+
             location.VerbatimSRS = verbatimCoordinateSystem.EpsgCode();
 
             if (!verbatimLatitude.HasValue || !verbatimLongitude.HasValue)

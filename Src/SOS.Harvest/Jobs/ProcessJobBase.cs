@@ -31,7 +31,7 @@ namespace SOS.Harvest.Jobs
         {
             var monitoringApi = JobStorage.Current.GetMonitoringApi();
             return monitoringApi.ProcessingJobs(0, (int)monitoringApi.ProcessingCount())?
-                .Where(j => j.Value.InProcessingState && filter.Contains(j.Value.Job.Type.Name, StringComparer.CurrentCultureIgnoreCase))
+                .Where(j => j.Value.InProcessingState && filter.Contains(j.Value?.Job?.Type.Name, StringComparer.CurrentCultureIgnoreCase))
                 .Select(j => j.Key)?.ToArray()!;
         }
          
