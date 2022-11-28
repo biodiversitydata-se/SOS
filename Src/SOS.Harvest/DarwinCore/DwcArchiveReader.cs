@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using System.Data;
 
@@ -77,6 +78,15 @@ namespace SOS.Harvest.DarwinCore
             return await reader.ReadEvents(archiveReader, idIdentifierTuple);
         }
 
+
+        public async Task<IEnumerable<DwcEventVerbatim>> ReadEventsAsync(
+            ArchiveReader archiveReader,
+            IIdIdentifierTuple idIdentifierTuple)
+        {
+            var reader = CreateDwcReader(RowTypes.Event);
+            return await reader.ReadEvents(archiveReader, idIdentifierTuple);
+        }
+
         /// <summary>
         /// Read data stewardship datasets.
         /// </summary>
@@ -88,6 +98,44 @@ namespace SOS.Harvest.DarwinCore
             var reader = CreateDwcReader(archiveReader.CoreFile.FileMetaData.RowType);
             var datasets = await reader.ReadDatasetsAsync(archiveReader);
             return datasets;
+        }
+
+        public async Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
+        {
+            var reader = CreateDwcReader(archiveReaderContext.ArchiveReader.CoreFile.FileMetaData.RowType);
+            var datasets = await reader.ReadDatasetsAsync(archiveReaderContext);
+            return datasets;
+        }
+
+        public async Task<IEnumerable<DwcObservationVerbatim>> ReadOccurrencesAsync(ArchiveReaderContext archiveReaderContext)
+        {            
+            var observationsBatches = ReadOccurrencesInBatchesAsync(archiveReaderContext);
+            var observations = new List<DwcObservationVerbatim>();
+            await foreach (var observationsBatch in observationsBatches)
+            {
+                observations.AddRange(observationsBatch);
+                if (observations.Count >= archiveReaderContext.MaxNrObservationsToReturn)
+                {
+                    return observations.Take(archiveReaderContext.MaxNrObservationsToReturn).ToList();
+                }
+            }
+
+            return observations;
+        }
+
+        public async IAsyncEnumerable<IEnumerable<DwcObservationVerbatim>> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext)
+        {
+            var reader = CreateDwcReader(archiveReaderContext.ArchiveReader.CoreFile.FileMetaData.RowType);
+            await foreach (var batch in reader.ReadOccurrencesInBatchesAsync(archiveReaderContext))
+            {
+                yield return batch;
+            }
+        }
+
+        public async Task<IEnumerable<DwcEventVerbatim>> ReadEventsAsync(ArchiveReaderContext archiveReaderContext)
+        {
+            var reader = CreateDwcReader(RowTypes.Event);
+            return await reader.ReadEvents(archiveReaderContext);
         }
     }
 }

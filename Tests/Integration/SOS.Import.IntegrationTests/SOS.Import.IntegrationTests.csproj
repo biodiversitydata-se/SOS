@@ -64,6 +64,9 @@
 		<None Update="Resources\AllMongoDbTaxa.zip">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="Resources\Dwca\dwca-datastewardship-bats-taxalists.zip">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Resources\Dwca\dwca-datastewardship-bats.zip">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

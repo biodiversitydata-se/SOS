@@ -13,6 +13,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Harvest.DarwinCore
@@ -47,14 +48,14 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="occurrenceRecords"></param>
         /// <returns></returns>
         private async Task AddDataFromExtensionsAsync(ArchiveReader archiveReader,
-            List<DwcObservationVerbatim> occurrenceRecords)
+            List<DwcObservationVerbatim> occurrenceRecords, bool addOnlyOccurrenceData = false)
         {
             await Task.WhenAll(
-              AddEventDataAsync(occurrenceRecords, archiveReader),
-              AddEmofExtensionDataAsync(occurrenceRecords, archiveReader),
-              AddMofExtensionDataAsync(occurrenceRecords, archiveReader),
-              AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader),
-              AddAudubonMediaExtensionDataAsync(occurrenceRecords, archiveReader)
+              AddEventDataAsync(occurrenceRecords, archiveReader, addOnlyOccurrenceData),
+              AddEmofExtensionDataAsync(occurrenceRecords, archiveReader, addOnlyOccurrenceData),
+              AddMofExtensionDataAsync(occurrenceRecords, archiveReader, addOnlyOccurrenceData),
+              AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader, addOnlyOccurrenceData),
+              AddAudubonMediaExtensionDataAsync(occurrenceRecords, archiveReader, addOnlyOccurrenceData)
           );
         }
 
@@ -65,7 +66,7 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="archiveReader"></param>
         /// <returns></returns>
         private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
-            ArchiveReader archiveReader)
+            ArchiveReader archiveReader, bool addOnlyOccurrenceData = false)
         {
             try
             {
@@ -98,7 +99,7 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="archiveReader"></param>
         /// <returns></returns>
         private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
-            ArchiveReader archiveReader)
+            ArchiveReader archiveReader, bool addOnlyOccurrenceData = false)
         {
             try
             {
@@ -134,7 +135,7 @@ namespace SOS.Harvest.DarwinCore
         }
 
         private async Task AddAudubonMediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
-            ArchiveReader archiveReader)
+            ArchiveReader archiveReader, bool addOnlyOccurrenceData = false)
         {
             try
             {
@@ -200,8 +201,9 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="archiveReader"></param>
         /// <returns></returns>
         private async Task AddEventDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
-            ArchiveReader archiveReader)
+            ArchiveReader archiveReader, bool addOnlyOccurrenceData = false)
         {
+            if (addOnlyOccurrenceData) return;
             var eventFileReader = archiveReader.GetAsyncCoreFile();
             var idIndex = eventFileReader.GetIdIndex();
             var observationsByRecordId =
@@ -231,7 +233,7 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="archiveReader"></param>
         /// <returns></returns>
         private async Task AddEmofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
-            ArchiveReader archiveReader)
+            ArchiveReader archiveReader, bool addOnlyOccurrenceData = false)
         {
             try
             {
@@ -778,6 +780,87 @@ namespace SOS.Harvest.DarwinCore
 
             return events;
         }
+
+        public async Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
+        {            
+            var datasets = await GetDatasetsFromJsonOrXmlAsync(archiveReaderContext.ArchiveReader.OutputPath);
+            archiveReaderContext.ObservationDatasetByEventId = CreateEventObservationDatasetDictionary(datasets);            
+            return datasets;
+        }
+
+        private void AddOccurrenceEventData(ArchiveReaderContext archiveReaderContext, DwcObservationVerbatim occurrence)
+        {
+            if (string.IsNullOrEmpty(occurrence.EventID)) return;
+
+            if (!archiveReaderContext.OccurrenceIdsByEventId.ContainsKey(occurrence.EventID))
+            {
+                archiveReaderContext.OccurrenceIdsByEventId.Add(occurrence.EventID, new List<string>());
+            }
+
+            archiveReaderContext.OccurrenceIdsByEventId[occurrence.EventID].Add(occurrence.OccurrenceID);
+        }
+
+        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext)
+        {
+            var occurrenceFileReader = archiveReaderContext.ArchiveReader.GetAsyncFileReader(RowTypes.Occurrence);
+            if (occurrenceFileReader == null) yield break;
+            var occurrenceRecords = new List<DwcObservationVerbatim>();
+            var idIndex = occurrenceFileReader.GetIdIndex();
+            if (archiveReaderContext.OccurrenceIdsByEventId == null) archiveReaderContext.OccurrenceIdsByEventId = new Dictionary<string, List<string>>();
+            if (archiveReaderContext.ObservationDatasetByEventId == null) await ReadDatasetsAsync(archiveReaderContext);
+            
+            await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
+            {
+                var occurrenceRecord = DwcObservationVerbatimFactory.Create(NextId, row, archiveReaderContext.DataProvider, idIndex);
+                AddOccurrenceEventData(archiveReaderContext, occurrenceRecord);
+                occurrenceRecords.Add(occurrenceRecord);
+
+                if (occurrenceRecords.Count % archiveReaderContext.BatchSize == 0)
+                {
+                    await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, occurrenceRecords);
+                    AddDatasetInformation(occurrenceRecords, archiveReaderContext.ObservationDatasetByEventId);
+                    yield return occurrenceRecords;
+                    occurrenceRecords.Clear();
+                }
+            }
+
+            await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, occurrenceRecords);
+            AddDatasetInformation(occurrenceRecords, archiveReaderContext.ObservationDatasetByEventId);
+            yield return occurrenceRecords;
+        }
+
+        public async Task<IEnumerable<DwcEventVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext)
+        {
+            var eventFileReader = archiveReaderContext.ArchiveReader.GetAsyncFileReader(RowTypes.Event);
+            if (eventFileReader == null)
+            {
+                return null;
+            }
+
+            var idIndex = eventFileReader.GetIdIndex();
+            var events = new List<DwcEventOccurrenceVerbatim>();
+
+            await foreach (var row in eventFileReader.GetDataRowsAsync())
+            {
+                var eventRecord = DwcEventOccurrenceVerbatimFactory.Create(NextId, row, archiveReaderContext.DataProvider, idIndex);
+                if (archiveReaderContext.OccurrenceIdsByEventId != null) // Add occurrenceIds
+                {
+                    if (archiveReaderContext.OccurrenceIdsByEventId.TryGetValue(eventRecord.EventID, out var occurrenceIds))
+                    {
+                        eventRecord.OccurrenceIds = occurrenceIds;
+                    }
+                }
+                events.Add(eventRecord);
+            }
+
+            await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, events);
+            if (events.Any(e => e.Taxa != null && e.Taxa.Count > 0))
+            {
+                await AddNotPresentTaxaToArchive(archiveReaderContext.ArchiveReader, events);
+            }
+
+            return events;
+        }      
 
         private class SamplingEventTaxonList
         {

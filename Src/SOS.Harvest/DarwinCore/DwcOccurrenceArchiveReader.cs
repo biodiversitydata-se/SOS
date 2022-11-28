@@ -242,5 +242,20 @@ namespace SOS.Harvest.DarwinCore
         {
             return null;
         }
+
+        public Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<List<DwcObservationVerbatim>> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<DwcEventVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext)
+        {
+            return null;
+        }
     }
 }
