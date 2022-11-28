@@ -1,9 +1,11 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using DwC_A;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Harvest.DarwinCore;
+using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Harvesters.DwC;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
@@ -18,18 +20,39 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
     public class DwcObservationHarvesterIntegrationTests : TestBase
     {
         [Fact]
+        public async Task Read_datastewardship_dwc_archive()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-datastewardship-bats.zip";
+            var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
+            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            using var archiveReader = new ArchiveReader(archivePath, @"C:\temp");
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var datasets = await dwcArchiveReader.ReadDatasetsAsync(archiveReader);
+            var occurrences = await dwcArchiveReader.ReadArchiveAsync(archiveReader, dataProvider);
+            var events = await dwcArchiveReader.ReadSamplingEventArchiveAsync(archiveReader, dataProvider);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            datasets.Should().NotBeNull();
+            occurrences.Should().NotBeNull();
+            events.Should().NotBeNull();
+        }
+
+        [Fact]
         public async Task Harvest_datastewardship_dwc_archive()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-datastewardship-bats.zip";
-            var dataProvider = new DataProvider
-            {
-                Id = 105,
-                Identifier = "TestDataStewardshipBats",
-                Type = DataProviderType.DwcA
-            };
+            var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
             var dwcObservationHarvester = CreateDwcObservationHarvester();
 
             //-----------------------------------------------------------------------------------------------------------

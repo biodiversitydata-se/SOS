@@ -3,7 +3,9 @@ using DwC_A.Terms;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using System.Data;
 
 namespace SOS.Harvest.DarwinCore
 {
@@ -73,6 +75,19 @@ namespace SOS.Harvest.DarwinCore
         {
             var reader = CreateDwcReader(RowTypes.Event);
             return await reader.ReadEvents(archiveReader, idIdentifierTuple);
-        }        
+        }
+
+        /// <summary>
+        /// Read data stewardship datasets.
+        /// </summary>
+        /// <param name="archiveReader"></param>
+        /// <returns></returns>
+
+        public async Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
+        {
+            var reader = CreateDwcReader(archiveReader.CoreFile.FileMetaData.RowType);
+            var datasets = await reader.ReadDatasetsAsync(archiveReader);
+            return datasets;
+        }
     }
 }

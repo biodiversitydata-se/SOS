@@ -72,6 +72,11 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// </summary>
         public int Id { get; set; }
 
+        /// <summary>
+        ///     OccurrenceIds linked to the event.
+        /// </summary>
+        public ICollection<string> OccurrenceIds { get; set; }
+
         #region RecordLevel
 
         /// <summary>

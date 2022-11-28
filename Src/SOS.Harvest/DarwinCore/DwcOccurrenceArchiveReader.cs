@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Harvest.DarwinCore.Factories;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Harvest.DarwinCore
@@ -230,6 +231,16 @@ namespace SOS.Harvest.DarwinCore
                 _logger.LogError(e, "Failed to add ExtendedMeasurementOrFact extension data");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Read data stewardship datasets.
+        /// </summary>
+        /// <param name="archiveReader"></param>
+        /// <returns></returns>
+        public Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
+        {
+            return null;
         }
     }
 }

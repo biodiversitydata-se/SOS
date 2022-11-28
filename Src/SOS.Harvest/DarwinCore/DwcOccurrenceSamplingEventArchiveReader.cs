@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.IO;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Linq;
@@ -329,12 +330,15 @@ namespace SOS.Harvest.DarwinCore
             IEnumerable<DwcEventOccurrenceVerbatim> eventRecords)
         {
             var eventDictionary = eventRecords?.ToDictionary(e => e.RecordId, e => e);
-            await Task.WhenAll(
-                AddOccurencesDataAsync(eventDictionary, archiveReader),
-                AddEmofExtensionDataAsync(eventDictionary, archiveReader),
-                AddMofExtensionDataAsync(eventDictionary, archiveReader),
-                AddTaxonListDataAsync(eventDictionary, archiveReader.OutputPath)
-            );
+            await AddOccurencesDataAsync(eventDictionary, archiveReader);
+            await AddEmofExtensionDataAsync(eventDictionary, archiveReader);
+            await AddMofExtensionDataAsync(eventDictionary, archiveReader);
+            try
+            {
+                if (File.Exists(Path.Combine(archiveReader.OutputPath, "taxonlist.xml")))
+                    await AddTaxonListDataAsync(eventDictionary, archiveReader.OutputPath);
+            }
+            catch (Exception) { };
         }
 
         /// <summary>
@@ -464,6 +468,17 @@ namespace SOS.Harvest.DarwinCore
                 _logger.LogError(e, "Failed to add taxon list data");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Read data stewardship datasets.
+        /// </summary>
+        /// <param name="archiveReader"></param>
+        /// <returns></returns>
+        public async Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
+        {
+            var datasets = await GetDatasetsFromJsonOrXmlAsync(archiveReader.OutputPath);
+            return datasets;
         }
 
         private async Task<List<ObservationDataset>?> GetDatasetsFromJsonOrXmlAsync(string path)
@@ -756,7 +771,10 @@ namespace SOS.Harvest.DarwinCore
             }
 
             await AddDataFromExtensionsAsync(archiveReader, events);
-            await AddNotPresentTaxaToArchive(archiveReader, events);
+            if (events.Any(e => e.Taxa != null && e.Taxa.Count > 0))
+            {
+                await AddNotPresentTaxaToArchive(archiveReader, events);
+            }
 
             return events;
         }

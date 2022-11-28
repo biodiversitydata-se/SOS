@@ -1,5 +1,6 @@
 ﻿using DwC_A;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Harvest.DarwinCore.Interfaces
@@ -39,5 +40,12 @@ namespace SOS.Harvest.DarwinCore.Interfaces
         Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadSamplingEventArchiveAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple);
+
+        /// <summary>
+        /// Read data stewardship datasets.
+        /// </summary>
+        /// <param name="archiveReader"></param>
+        /// <returns></returns>
+        Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReader archiveReader);
     }
 }
