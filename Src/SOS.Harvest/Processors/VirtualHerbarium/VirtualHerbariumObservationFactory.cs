@@ -19,7 +19,8 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
     public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObservationFactory<VirtualHerbariumObservationVerbatim>
     {
         private readonly IAreaHelper _areaHelper;
-        private readonly IDictionary<string, (double longitude, double latitude, int precision)> _communities;
+        private IDictionary<string, (double longitude, double latitude, int precision)> _communities;
+        private IDictionary<string, (double longitude, double latitude, int precision)> _parishes;
 
         private string GetLocality(VirtualHerbariumObservationVerbatim verbatim)
         {
@@ -106,16 +107,22 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
         {
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-            _communities = new Dictionary<string, (double longitude, double latitude, int precision)>();
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));            
         }
 
         public async Task InitializeAsync()
         {
-            var communities = await _areaHelper.GetAreasAsync(AreaType.Community);
+            _communities = await GetCommunitiesAsync();
+            _parishes = await GetAreaCentroidsAsync(AreaType.Parish);
+        }
+
+        private async Task<IDictionary<string, (double longitude, double latitude, int precision)>> GetCommunitiesAsync()
+        {
+            var dic = new Dictionary<string, (double longitude, double latitude, int precision)>();
+            IEnumerable<Lib.Models.Shared.Area>? communities = await _areaHelper.GetAreasAsync(AreaType.Community);
             if (!communities?.Any() ?? true)
             {
-                return;
+                return null;
             }
             var duplictes = new HashSet<string>();
             foreach (var community in communities)
@@ -141,7 +148,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                     }
                 }
                 var maxDistanceInM = 0;
-                
+
                 //If we have found a point, get distance in meters
                 if (maxDistance > 0)
                 {
@@ -150,13 +157,13 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
 
                 // Get point county, parish etc
                 var features = _areaHelper.GetPointFeatures(geometry.Centroid);
-                
+
                 if (!features?.Any() ?? true)
                 {
                     continue;
                 }
                 var proviceName = string.Empty;
-                foreach(var feature in features)
+                foreach (var feature in features)
                 {
                     var attributes = feature.Attributes as AttributesTable;
 
@@ -166,7 +173,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                         break;
                     }
                 }
-                
+
                 if (!string.IsNullOrEmpty(proviceName))
                 {
                     var key = $"{proviceName.Trim()}-{community.Name.Trim()}".ToLower();
@@ -178,17 +185,75 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                     }
 
                     // If combination of province and community exists more than once, we can't use it to determine position
-                    if (_communities.ContainsKey(key))
+                    if (dic.ContainsKey(key))
                     {
-                        _communities.Remove(key);
+                        dic.Remove(key);
                         duplictes.Add(key);
                         continue;
                     }
 
-                    _communities.Add(key, (centroid.X, centroid.Y, maxDistanceInM));
+                    dic.Add(key, (centroid.X, centroid.Y, maxDistanceInM));
                 }
             }
+
+            return dic;
         }
+
+
+        private async Task<IDictionary<string, (double longitude, double latitude, int precision)>> GetAreaCentroidsAsync(AreaType areaType)
+        {
+            IEnumerable<Lib.Models.Shared.Area>? areas = await _areaHelper.GetAreasAsync(areaType);
+            var dic = new Dictionary<string, (double longitude, double latitude, int precision)>();
+            if (!areas?.Any() ?? true)
+            {
+                return null;
+            }
+            var duplicates = new HashSet<string>();
+            foreach (var area in areas)
+            {
+                var geometry = await _areaHelper.GetGeometryAsync(area.AreaType, area.FeatureId);
+                if (geometry == null)
+                {
+                    continue;
+                }
+
+                var centroid = geometry.Centroid;
+                var maxDistance = 0d;
+                var maxPoint = centroid;
+                // Find point most far away from centroid
+                foreach (var coordinate in geometry.Coordinates)
+                {
+                    var distance = centroid.Coordinate.Distance(coordinate);
+
+                    if (distance > maxDistance)
+                    {
+                        maxDistance = distance;
+                        maxPoint = new Point(coordinate);
+                    }
+                }
+                var maxDistanceInM = 0;
+
+                //If we have found a point, get distance in meters
+                if (maxDistance > 0)
+                {
+                    maxDistanceInM = (int)centroid.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM).Distance(maxPoint.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM));
+                }
+                
+                string key = area.Name.Trim().ToLower();
+                if (!dic.TryAdd(key, (centroid.X, centroid.Y, maxDistanceInM)))
+                {
+                    duplicates.Add(key);
+                }                    
+            }
+
+            foreach(var key in duplicates)
+            {
+                dic.Remove(key);
+            }
+
+            return dic;
+        }
+
 
         /// <summary>
         /// Cast verbatim observations to processed data model
@@ -203,7 +268,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 return null;
             }
 
-            var taxon = GetTaxon(verbatim.DyntaxaId, new[] { verbatim.ScientificName });
+            var taxon = GetTaxon(verbatim.DyntaxaId, new[] { verbatim.ScientificName }, true);
             var defects = new Dictionary<string, string>();
             var eventDates = GetStartAndEndDate(verbatim.DateCollected);
             if (eventDates.StartDate == null && eventDates.EndDate == null)
@@ -257,6 +322,12 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                     verbatim.DecimalLongitude = parish.longitude;
                     verbatim.DecimalLatitude = parish.latitude;
                     verbatim.CoordinatePrecision = parish.precision;
+                }
+                else if (_parishes.TryGetValue(verbatim.District.ToLower(), out var par))
+                {
+                    verbatim.DecimalLongitude = par.longitude;
+                    verbatim.DecimalLatitude = par.latitude;
+                    verbatim.CoordinatePrecision = par.precision;
                 }
             }
 

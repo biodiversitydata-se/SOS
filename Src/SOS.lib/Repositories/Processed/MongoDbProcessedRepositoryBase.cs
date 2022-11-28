@@ -174,6 +174,18 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync()
+        {
+            return await GetAllByCursorAsync(MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection,
+            bool noCursorTimeout = false)
+        {
+            return await mongoCollection.FindAsync(FilterDefinition<TEntity>.Empty,
+                new FindOptions<TEntity, TEntity> { NoCursorTimeout = noCursorTimeout, BatchSize = _client.ReadBatchSize, AllowPartialResults = true, CursorType = CursorType.NonTailable });
+        }
 
         /// <inheritdoc />
         public virtual async Task<List<TEntity>> GetAllAsync()

@@ -1,4 +1,6 @@
-﻿using System.Xml;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Xml;
 using System.Xml.Linq;
 using DwC_A;
 using DwC_A.Terms;
@@ -6,8 +8,10 @@ using Microsoft.Extensions.Logging;
 using RecordParser.Builders.Reader;
 using SOS.Harvest.DarwinCore.Factories;
 using SOS.Harvest.DarwinCore.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Harvest.DarwinCore
@@ -462,6 +466,66 @@ namespace SOS.Harvest.DarwinCore
             }
         }
 
+        private async Task<List<ObservationDataset>> GetDatasetsFromXmlOrJsonAsync(string path)
+        {
+            try
+            {
+                // JSON
+                await using var jsonFileStream = File.OpenRead(Path.Combine(path, "datastewardship.json"));
+                var jsonSerializerOptions = new JsonSerializerOptions()
+                {
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new JsonStringEnumConverter() }
+                };
+                
+                var observationDatasetsV2 = JsonSerializer.Deserialize<List<ObservationDatasetV2>>(jsonFileStream, jsonSerializerOptions);
+                var observationDatasets = observationDatasetsV2.Select(m => m.ToObservationDataset()).ToList();
+                return observationDatasets;
+
+                //// XML - todo
+                //await using var xmlFileStream = File.OpenRead(Path.Combine(path, "datastewardship.xml")); //"datastewardship.json"
+                //using var xmlReader = XmlReader.Create(xmlFileStream);
+                //var xmlDoc = XDocument.Load(xmlReader);
+                //var ns = xmlDoc.Root.GetDefaultNamespace();
+                //var datasetsElement = xmlDoc.Element(ns + "datasets");
+
+                //if (datasetsElement == null)
+                //{
+                //    return null;
+                //}
+
+                //foreach (var datasetElement in datasetsElement.Elements(ns + "dataset"))
+                //{
+                //    var identifier = datasetElement.Element(ns + "identifier")?.Value;
+
+                //    var eventIdElements = datasetElement.Element(ns + "eventIds").Elements();
+                //    List<string> eventIds = new List<string>();
+                //    foreach (var eventIdElement in eventIdElements)
+                //    {
+                //        eventIds.Add(eventIdElement.Value);
+                //    }                    
+                //}            
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to read dataset xml/json");
+                throw;
+            }
+        }
+
+        private Dictionary<string, ObservationDataset> CreateEventObservationDatasetDictionary(IEnumerable<ObservationDataset> observationDatasets)
+        {
+            var observationDatasetByEventId = new Dictionary<string, ObservationDataset>();
+            foreach (var observationDataset in observationDatasets)
+            {
+                foreach (var eventId in observationDataset.EventIds)
+                {
+                    observationDatasetByEventId[eventId] = observationDataset;
+                }
+            }
+
+            return observationDatasetByEventId;
+        }
 
         /// <summary>
         ///     Add Measurement Or Fact extension data
@@ -612,6 +676,8 @@ namespace SOS.Harvest.DarwinCore
             if (occurrenceFileReader == null) yield break;
             var occurrenceRecords = new List<DwcObservationVerbatim>();
             var idIndex = occurrenceFileReader.GetIdIndex();
+            //var observationDatasets = await GetDatasetsFromXmlOrJsonAsync(archiveReader.OutputPath);
+            //var observationDatasetByEventId = CreateEventObservationDatasetDictionary(observationDatasets);
 
             await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
             {
@@ -628,7 +694,7 @@ namespace SOS.Harvest.DarwinCore
 
             await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
             yield return occurrenceRecords;
-        }
+        }        
 
         public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
             ArchiveReader archiveReader,
@@ -657,7 +723,7 @@ namespace SOS.Harvest.DarwinCore
             {
                 return null;
             }
-
+            
             var idIndex = eventFileReader.GetIdIndex();
             var events = new List<DwcEventOccurrenceVerbatim>();
 

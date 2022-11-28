@@ -7,6 +7,7 @@
     {
         Unknown = 0,
         DataValidationReport = 1,
-        ApiUsageStatistics = 2
+        ApiUsageStatistics = 2,
+        InvalidObservations = 3
     }
 }

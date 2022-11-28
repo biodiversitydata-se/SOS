@@ -416,6 +416,7 @@ namespace SOS.Harvest.IoC.Modules
 
             // Add managers
             builder.RegisterType<DiffusionManager>().As<IDiffusionManager>().InstancePerLifetimeScope();
+            builder.RegisterType<InvalidObservationsManager>().As<IInvalidObservationsManager>().InstancePerLifetimeScope();            
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessManager>().As<IProcessManager>().InstancePerLifetimeScope();
@@ -426,6 +427,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
             builder.RegisterType<AreasHarvestJob>().As<IAreasHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ApiUsageStatisticsHarvestJob>().As<IApiUsageStatisticsHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<InvalidObservationsReportsJob>().As<IInvalidObservationsReportsJob>().InstancePerLifetimeScope();
             builder.RegisterType<ChecklistsHarvestJob>().As<IChecklistsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<DwcArchiveHarvestJob>().As<IDwcArchiveHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<VocabulariesImportJob>().As<IVocabulariesImportJob>().InstancePerLifetimeScope();

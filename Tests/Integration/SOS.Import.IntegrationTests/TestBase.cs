@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using MongoDB.Bson.Serialization.Conventions;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Shared;
 
@@ -6,6 +7,19 @@ namespace SOS.Import.IntegrationTests
 {
     public class TestBase
     {
+        public TestBase() 
+        {
+            // MongoDB conventions.
+            ConventionRegistry.Register(
+                "MongoDB Solution Conventions",
+                new ConventionPack
+                {
+                    new IgnoreExtraElementsConvention(true),
+                    new IgnoreIfNullConvention(true)
+                },
+                t => true);
+        }
+
         protected ImportConfiguration GetImportConfiguration()
         {
             var config = new ConfigurationBuilder()
