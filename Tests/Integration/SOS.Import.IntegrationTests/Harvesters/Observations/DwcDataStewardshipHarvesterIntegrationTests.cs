@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using DwC_A;
 using FluentAssertions;
@@ -9,9 +10,12 @@ using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Harvesters.DwC;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services;
 using Xunit;
 
@@ -19,6 +23,88 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
 {
     public class DwcDataStewardshipHarvesterIntegrationTests : TestBase
     {
+        [Fact]
+        public async Task Harvest_datastewardship_dwc_archive_with_taxalist_with_context()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-datastewardship-bats-taxalists.zip";
+            var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
+            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            using var archiveReader = new ArchiveReader(archivePath, @"C:\temp");
+            var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var datasets = await dwcArchiveReader.ReadDatasetsAsync(archiveReaderContext);
+            var occurrences = await dwcArchiveReader.ReadOccurrencesAsync(archiveReaderContext);
+            var events = await dwcArchiveReader.ReadEventsAsync(archiveReaderContext);
+
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var verbatimClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
+
+            DwcCollectionRepository dwcCollectionRepository = new DwcCollectionRepository(dataProvider, verbatimClient, new NullLogger<DwcCollectionRepository>());
+            dwcCollectionRepository.BeginTempMode();
+            await dwcCollectionRepository.DeleteCollectionsAsync();
+            await dwcCollectionRepository.AddCollectionsAsync();
+            await dwcCollectionRepository.OccurrenceRepository.AddManyAsync(occurrences);
+            await dwcCollectionRepository.EventRepository.AddManyAsync(events.Cast<DwcEventOccurrenceVerbatim>());
+            await dwcCollectionRepository.DatasetRepository.AddManyAsync(datasets);
+            await dwcCollectionRepository.PermanentizeCollectionsAsync();
+            dwcCollectionRepository.EndTempMode();
+
+            var readOccurrences = await dwcCollectionRepository.OccurrenceRepository.GetAllAsync();
+            var readDatasets = await dwcCollectionRepository.DatasetRepository.GetAllAsync();
+            var readEvents = await dwcCollectionRepository.EventRepository.GetAllAsync();
+            
+            var dwcObservationHarvester = CreateDwcObservationHarvester();
+            var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
+                archivePath,
+                dataProvider,
+                JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            datasets.Should().NotBeNull();
+            occurrences.Should().NotBeNull();
+            events.Should().NotBeNull();
+        }
+
+
+        [Fact]
+        public async Task Read_datastewardship_dwc_archive_with_taxalist_with_context()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-datastewardship-bats-taxalists.zip";
+            var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
+            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            using var archiveReader = new ArchiveReader(archivePath, @"C:\temp");
+            var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var datasets = await dwcArchiveReader.ReadDatasetsAsync(archiveReaderContext);
+            var occurrences = await dwcArchiveReader.ReadOccurrencesAsync(archiveReaderContext);
+            var events = await dwcArchiveReader.ReadEventsAsync(archiveReaderContext);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            datasets.Should().NotBeNull();
+            occurrences.Should().NotBeNull();
+            events.Should().NotBeNull();
+        }
+
         [Fact]
         public async Task Read_datastewardship_dwc_archive_with_context()
         {
@@ -45,7 +131,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             occurrences.Should().NotBeNull();
             events.Should().NotBeNull();
         }
-
 
         [Fact]
         public async Task Read_datastewardship_dwc_archive()

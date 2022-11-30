@@ -52,6 +52,19 @@ namespace SOS.Lib.Repositories.Verbatim
         /// </summary>
         public virtual bool TempMode { get; set; }
 
+        protected virtual string GetCollectionName(bool? tempMode)
+        {
+            if (tempMode.HasValue)
+                return $"{base.CollectionName}{(tempMode.Value ? "_temp" : "")}";
+            else
+                return $"{base.CollectionName}{(TempMode ? "_temp" : "")}";
+        }
+
+        public virtual async Task<bool> AddCollectionAsync(bool? tempMode)
+        {
+            return await AddCollectionAsync(GetCollectionName(tempMode));
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -89,8 +102,13 @@ namespace SOS.Lib.Repositories.Verbatim
         /// </summary>
         protected override string CollectionName => $"{base.CollectionName}{(TempMode ? "_temp" : "")}";
 
-        /// <inheritdoc />
         public virtual async Task<bool> PermanentizeCollectionAsync()
+        {
+            return await PermanentizeCollectionAsync(null);
+        }
+
+        /// <inheritdoc />
+        public virtual async Task<bool> PermanentizeCollectionAsync(bool? tempMode = null)
         {
             if (!TempMode || !await CheckIfCollectionExistsAsync() || await CountAllDocumentsAsync() == 0)
             {

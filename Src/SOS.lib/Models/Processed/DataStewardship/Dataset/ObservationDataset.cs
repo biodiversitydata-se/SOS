@@ -13,14 +13,16 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
 {
     public class ObservationDataset : IEntity<string>
-    {
+    {        
+        /// </remarks>
         /// <summary>
         ///     Unique id.
-        /// </summary>
-        /// <remarks>
-        /// Omit to automatically generate an id on insert (best performance).
-        /// </remarks>
-        public string Id { get; set; }
+        /// </summary>        
+        public string Id
+        {
+            get => Identifier;
+            set { }
+        }
 
         /// <summary>
         /// The dataset id-number within the metadata catalogue administered by the authority that is responsible for the information.

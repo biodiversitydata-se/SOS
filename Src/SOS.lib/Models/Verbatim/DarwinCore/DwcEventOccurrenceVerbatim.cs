@@ -53,5 +53,15 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// List of taxon
         /// </summary>
         public ICollection<DwcTaxon> Taxa { get; set; }
+
+        /// <summary>
+        /// List of not found taxa
+        /// </summary>
+        public ICollection<DwcTaxon> NotFoundTaxa { get; set; }
+
+        /// <summary>
+        /// List of not found taxon ids
+        /// </summary>
+        public ICollection<string> NotFoundTaxonIds { get; set; }
     }
 }

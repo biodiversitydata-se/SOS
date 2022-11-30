@@ -343,6 +343,22 @@ namespace SOS.Harvest.DarwinCore
             catch (Exception) { };
         }
 
+        private async Task AddDataFromExtensionsAsync(ArchiveReaderContext archiveReaderContext,
+            IEnumerable<DwcEventOccurrenceVerbatim> eventRecords)
+        {
+            var archiveReader  = archiveReaderContext.ArchiveReader;
+            var eventDictionary = eventRecords?.ToDictionary(e => e.RecordId, e => e);
+            await AddOccurencesDataAsync(eventDictionary, archiveReader);
+            await AddEmofExtensionDataAsync(eventDictionary, archiveReader);
+            await AddMofExtensionDataAsync(eventDictionary, archiveReader);
+            try
+            {
+                if (File.Exists(Path.Combine(archiveReader.OutputPath, "taxonlist.xml")))
+                    await AddTaxonListDataAsync(eventDictionary, archiveReader.OutputPath);
+            }
+            catch (Exception) { };
+        }
+
         /// <summary>
         /// Add occurrences to event
         /// </summary>
@@ -498,7 +514,7 @@ namespace SOS.Harvest.DarwinCore
                     Converters = { new JsonStringEnumConverter() }
                 };
                 
-                var observationDatasetsV2 = JsonSerializer.Deserialize<List<ObservationDatasetV2>>(jsonFileStream, jsonSerializerOptions);
+                var observationDatasetsV2 = JsonSerializer.Deserialize<List<ObservationDatasetV2>>(jsonFileStream, jsonSerializerOptions);                
                 var observationDatasets = observationDatasetsV2.Select(m => m.ToObservationDataset()).ToList();
                 return observationDatasets;
 
@@ -647,7 +663,7 @@ namespace SOS.Harvest.DarwinCore
             csvHelper.NextRecord();
             foreach (var eve in events)
             {
-                var notFoundTaxa = eve.Taxa?.Where(t => !(eve.Observations?.Any(o => o.TaxonID.Equals(t.TaxonID)) ?? false));
+                var notFoundTaxa = eve.Taxa?.Where(t => !(eve.Observations?.Any(o => t.TaxonID.Equals(o.TaxonID)) ?? false)).ToList();                
                 if (notFoundTaxa == null)
                 {
                     continue;
@@ -853,11 +869,18 @@ namespace SOS.Harvest.DarwinCore
                 events.Add(eventRecord);
             }
 
-            await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, events);
-            if (events.Any(e => e.Taxa != null && e.Taxa.Count > 0))
+            await AddDataFromExtensionsAsync(archiveReaderContext, events);
+            foreach (var eve in events)
             {
-                await AddNotPresentTaxaToArchive(archiveReaderContext.ArchiveReader, events);
+                //eve.Observations = null;
+                eve.NotFoundTaxa = eve.Taxa?.Where(t => !(eve.Observations?.Any(o => t.TaxonID.Equals(o.TaxonID)) ?? false)).ToList();
+                eve.NotFoundTaxonIds = eve?.NotFoundTaxa?.Select(m => m.TaxonID).ToList();
             }
+
+            //if (events.Any(e => e.Taxa != null && e.Taxa.Count > 0))
+            //{
+            //    await AddNotPresentTaxaToArchive(archiveReaderContext.ArchiveReader, events);
+            //}
 
             return events;
         }      
