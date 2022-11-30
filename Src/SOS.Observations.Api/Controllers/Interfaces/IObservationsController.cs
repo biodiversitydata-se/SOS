@@ -48,6 +48,13 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string sortBy,
             SearchSortOrder sortOrder);
 
+        Task<IActionResult> ObservationByIdDwc(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            string id,
+            string translationCultureCode = "sv-SE",
+            bool sensitiveObservations = false);
+
         Task<IActionResult> CountInternal(
             int? roleId,
             string authorizationApplicationIdentifier,

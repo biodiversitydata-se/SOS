@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SOS.Lib.Models.Processed.Observation;
+using System;
+using System.Collections.Generic;
 
 namespace SOS.Observations.Api.Dtos.Observation
 {
@@ -587,6 +589,11 @@ namespace SOS.Observations.Api.Dtos.Observation
         /// A list (concatenated and separated) of identifiers (publication, global unique identifier, URI) of media associated with the Occurrence. 
         /// </summary>
         public string AssociatedMedia { get; set; }
+
+        /// <summary>
+        ///     Media associated with the observation
+        /// </summary>
+        public IEnumerable<Multimedia> Media { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of identifiers of other Occurrence records and their associations to this Occurrence.
