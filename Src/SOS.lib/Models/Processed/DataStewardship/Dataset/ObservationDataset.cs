@@ -13,8 +13,7 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
 {
     public class ObservationDataset : IEntity<string>
-    {        
-        /// </remarks>
+    {
         /// <summary>
         ///     Unique id.
         /// </summary>        
@@ -22,7 +21,7 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         {
             get => Identifier;
             set { }
-        }
+        }        
 
         /// <summary>
         /// The dataset id-number within the metadata catalogue administered by the authority that is responsible for the information.

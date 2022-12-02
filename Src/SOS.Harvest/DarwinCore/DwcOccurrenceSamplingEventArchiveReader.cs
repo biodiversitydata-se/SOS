@@ -493,13 +493,13 @@ namespace SOS.Harvest.DarwinCore
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        public async Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
+        public async Task<List<DwcVerbatimObservationDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
         {
             var datasets = await GetDatasetsFromJsonOrXmlAsync(archiveReader.OutputPath);
             return datasets;
         }
 
-        private async Task<List<ObservationDataset>?> GetDatasetsFromJsonOrXmlAsync(string path)
+        private async Task<List<DwcVerbatimObservationDataset>?> GetDatasetsFromJsonOrXmlAsync(string path)
         {
             try
             {
@@ -514,8 +514,10 @@ namespace SOS.Harvest.DarwinCore
                     Converters = { new JsonStringEnumConverter() }
                 };
                 
-                var observationDatasetsV2 = JsonSerializer.Deserialize<List<ObservationDatasetV2>>(jsonFileStream, jsonSerializerOptions);                
-                var observationDatasets = observationDatasetsV2.Select(m => m.ToObservationDataset()).ToList();
+                var observationDatasetsV2 = JsonSerializer.Deserialize<List<DwcVerbatimObservationDatasetV2>>(jsonFileStream, jsonSerializerOptions);
+                for (int i= 0; i < observationDatasetsV2.Count; i++)
+                    observationDatasetsV2[i].Id = i+1;
+                var observationDatasets = observationDatasetsV2.Select(m => m.ToDwcVerbatimObservationDataset()).ToList();
                 return observationDatasets;
 
                 //// XML - todo
@@ -550,10 +552,10 @@ namespace SOS.Harvest.DarwinCore
             }
         }
 
-        private Dictionary<string, ObservationDataset> CreateEventObservationDatasetDictionary(IEnumerable<ObservationDataset> observationDatasets)
+        private Dictionary<string, DwcVerbatimObservationDataset> CreateEventObservationDatasetDictionary(IEnumerable<DwcVerbatimObservationDataset> observationDatasets)
         {
             if (observationDatasets == null || !observationDatasets.Any()) return null;
-            var observationDatasetByEventId = new Dictionary<string, ObservationDataset>();
+            var observationDatasetByEventId = new Dictionary<string, DwcVerbatimObservationDataset>();
             foreach (var observationDataset in observationDatasets)
             {
                 foreach (var eventId in observationDataset.EventIds)
@@ -737,7 +739,7 @@ namespace SOS.Harvest.DarwinCore
         }        
 
         private void AddDatasetInformation(List<DwcObservationVerbatim> occurrenceRecords, 
-            Dictionary<string, ObservationDataset> observationDatasetByEventId)
+            Dictionary<string, DwcVerbatimObservationDataset> observationDatasetByEventId)
         {
             if (observationDatasetByEventId == null) return;
             foreach (var occurrenceRecord in occurrenceRecords)
@@ -797,7 +799,7 @@ namespace SOS.Harvest.DarwinCore
             return events;
         }
 
-        public async Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
+        public async Task<List<DwcVerbatimObservationDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
         {            
             var datasets = await GetDatasetsFromJsonOrXmlAsync(archiveReaderContext.ArchiveReader.OutputPath);
             archiveReaderContext.ObservationDatasetByEventId = CreateEventObservationDatasetDictionary(datasets);            

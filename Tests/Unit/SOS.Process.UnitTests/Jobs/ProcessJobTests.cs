@@ -76,6 +76,7 @@ namespace SOS.Process.UnitTests.Jobs
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _dataProviderCache = new Mock<IDataProviderCache>();
             _processConfigurationMock = new Mock<ProcessConfiguration>();
+            _dwcaDatasetProcessorMock = new Mock<IDwcaDatasetProcessor>();
         }
 
         private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
@@ -103,6 +104,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IDwcaObservationProcessor> _dwcaObservationProcessor;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
+        private readonly Mock<IDwcaDatasetProcessor> _dwcaDatasetProcessorMock;
         private readonly Mock<ILogger<ProcessObservationsJob>> _loggerMock;
         private readonly Mock<ProcessConfiguration> _processConfigurationMock;
 
@@ -132,6 +134,7 @@ namespace SOS.Process.UnitTests.Jobs
             _userObservationRepositoryMock.Object,
             _observationDatasetRepository.Object,
             _observationEventRepository.Object,
+            _dwcaDatasetProcessorMock.Object,
             _loggerMock.Object);
 
         /// <summary>

@@ -342,6 +342,7 @@ namespace SOS.Harvest.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<TaxonProcessor>().As<ITaxonProcessor>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<DwcaDatasetProcessor>().As<IDwcaDatasetProcessor>().InstancePerLifetimeScope();            
 
             // Add checklist processors
             builder.RegisterType<ArtportalenChecklistProcessor>().As<IArtportalenChecklistProcessor>()

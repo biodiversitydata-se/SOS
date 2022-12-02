@@ -6,16 +6,12 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 
 namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
 {
-    public class ObservationDatasetV2 : IEntity<string>
-    {
+    public class DwcVerbatimObservationDataset : IEntity<int>
+    {        
         /// <summary>
-        ///     Unique id.
-        /// </summary>        
-        public string Id
-        {
-            get => Identifier;
-            set { }
-        }        
+        ///     MongoDb Id. // todo - should we use Id, RecordId or occurrenceID as Id field?
+        /// </summary>
+        public int Id { get; set; }
 
         /// <summary>
         /// The dataset id-number within the metadata catalogue administered by the authority that is responsible for the information.
@@ -50,7 +46,7 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         /// <summary>
         /// Creator
         /// </summary>
-        public List<Organisation> Creator { get; set; }
+        public Organisation Creator { get; set; }
 
         /// <summary>
         /// OwnerinstitutionCode

@@ -38,6 +38,8 @@ using Xunit;
 using SOS.Lib.Managers.Interfaces;
 using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
 using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
+using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
+
 namespace SOS.Process.IntegrationTests.Jobs
 {
     public class ProcessObservationsJobIntegrationTests : TestBase
@@ -94,6 +96,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             IUserObservationRepository userObservationRepository = new Mock<IUserObservationRepository>().Object;
             IObservationDatasetRepository observationDatasetRepository = new Mock<IObservationDatasetRepository>().Object;
             IObservationEventRepository observationEventRepository = new Mock<IObservationEventRepository>().Object;
+            IDwcaDatasetProcessor dwcaDatasetProcessor = new Mock<IDwcaDatasetProcessor>().Object;
 
             var processInfoRepository =
                 new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
@@ -289,6 +292,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 userObservationRepository,
                 observationDatasetRepository,
                 observationEventRepository,
+                dwcaDatasetProcessor,
                 new NullLogger<ProcessObservationsJob>());
 
             return processJob;

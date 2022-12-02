@@ -5,9 +5,9 @@ namespace SOS.Lib.Extensions
 {
     public static class ObservationDatasetExtensions
     {
-        public static ObservationDataset ToObservationDataset(this ObservationDatasetV2 observationDatasetV2)
+        public static DwcVerbatimObservationDataset ToDwcVerbatimObservationDataset(this DwcVerbatimObservationDatasetV2 observationDatasetV2)
         {
-            return new ObservationDataset()
+            return new DwcVerbatimObservationDataset()
             {
                 AccessRights = observationDatasetV2.AccessRights,
                 Assigner = observationDatasetV2.Assigner,

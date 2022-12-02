@@ -63,6 +63,7 @@ namespace SOS.Harvest.Jobs
         private readonly ProcessConfiguration _processConfiguration;
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly Dictionary<DataProviderType, IObservationProcessor> _processorByType;
+        private readonly Dictionary<DataProviderType, IDatasetProcessor> _datasetProcessorByType;
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly string _exportContainer;
         private readonly bool _runIncrementalAfterFull;
@@ -412,6 +413,10 @@ namespace SOS.Harvest.Jobs
         {
             try
             {
+                // uncomment when test processing.
+                //var testResult = await RunTestProcessingAsync(dataProvidersToProcess, mode, cancellationToken);
+                //return testResult;
+
                 var processOverallTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ProcessOverall);
 
                 //-----------------
@@ -430,7 +435,7 @@ namespace SOS.Harvest.Jobs
                 //----------------------------------------------------------------------
                 // 3. Initialization of meta data etc
                 //----------------------------------------------------------------------
-                var getTaxaTask = GetTaxaAsync(mode);
+                var getTaxaTask = GetTaxaAsync(mode);                
                 await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(), _validationManager.VerifyCollectionAsync(mode));
 
                 var taxonById = await getTaxaTask;
@@ -466,10 +471,10 @@ namespace SOS.Harvest.Jobs
                 // 6. Create ElasticSearch index
                 //---------------------------------
                 if (success)
-                {
+                {                    
                     // Update dynamic provider data
                     await UpdateProvidersMetadataAsync(dataProvidersToProcess);
-                    
+
                     if (mode == JobRunModes.Full)
                     {
                         // Enable indexing for public and protected index
@@ -494,7 +499,7 @@ namespace SOS.Harvest.Jobs
                             var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunIncrementalInactiveAsync(cancellationToken));
 
                             _logger.LogInformation($"Incremental harvest/process job with Id={jobId} was enqueued");
-                        }                        
+                        }
 
                         //----------------------------------------------------------------------------
                         // 7. End create DwC CSV files and merge the files into multiple DwC-A files.
@@ -513,7 +518,7 @@ namespace SOS.Harvest.Jobs
 
                                 _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
                             }
-                        }                        
+                        }
                     }
 
                     if (!await _processedObservationRepository.EnsureNoDuplicatesAsync())
@@ -607,6 +612,121 @@ namespace SOS.Harvest.Jobs
             }
         }
 
+        private async Task<bool> RunTestProcessingAsync(
+            IEnumerable<DataProvider> dataProvidersToProcess,
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {                
+                //-----------------
+                // 1. Arrange
+                //-----------------
+                _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+
+                //-----------------
+                // 2. Validation
+                //-----------------
+                if (!dataProvidersToProcess.Any())
+                {
+                    return false;
+                }
+
+                //----------------------------------------------------------------------
+                // 3. Initialization of meta data etc
+                //----------------------------------------------------------------------
+                var getTaxaTask = GetTaxaAsync(JobRunModes.IncrementalActiveInstance);
+                await Task.WhenAll(InitializeAreaHelperAsync(), _validationManager.VerifyCollectionAsync(mode));                
+
+                var taxonById = await getTaxaTask;
+
+                if ((taxonById?.Count ?? 0) == 0)
+                {
+                    return false;
+                }
+
+                cancellationToken?.ThrowIfCancellationRequested();
+
+                // Init indexes
+                await InitializeElasticSearchAsync(mode);
+
+                if (mode == JobRunModes.Full)
+                {
+                    //------------------------------------------------------------------------
+                    // 4. Start DWC file writing
+                    //------------------------------------------------------------------------
+                    _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
+
+                    // Disable indexing for public and protected index
+                    await DisableIndexingAsync();
+                }
+
+                //------------------------------------------------------------------------
+                // 5.1 Create dataset processing tasks, and wait for them to complete
+                //------------------------------------------------------------------------                
+                await InitializeElasticSearchDatasetAsync();
+                await DisableEsDatasetIndexingAsync();
+                var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess, mode, taxonById, cancellationToken);
+                var datasetSuccess = datasetResult.All(t => t.Value.Status == RunStatus.Success);
+                await EnableEsDatasetIndexingAsync();
+
+                //------------------------------------------------------------------------
+                // 5.2 Create observation processing tasks, and wait for them to complete
+                //------------------------------------------------------------------------                
+                var result = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, cancellationToken);
+                var success = result.All(t => t.Value.Status == RunStatus.Success);
+              
+
+                //---------------------------------
+                // 6. Create ElasticSearch index
+                //---------------------------------
+                if (success)
+                {
+                    await EnableIndexingAsync();                    
+                    
+                    // Add data stewardardship datasets
+                    if (_processConfiguration.ProcessObservationDataset)
+                    {
+                        await AddObservationDatasetsAsync();
+                        await AddObservationEventsAsync();
+                    }
+
+                    //// Toggle active instance if we are done
+                    //_logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstance} => {_processedObservationRepository.InActiveInstance}");
+                    //await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
+                    //    .InActiveInstance);                                            
+                }
+
+                _logger.LogInformation($"Processing done: {success} {mode}");                
+
+                //-------------------------------
+                // 8. Return processing result
+                //-------------------------------
+                return success ? true : throw new Exception($@"Failed to process observations. {string.Join(", ", result
+                    .Where(r => r.Value.Status != RunStatus.Success)
+                        .Select(r => $"Provider: {r.Key}-{r.Value.Status}"))}");
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Process job was cancelled.");
+                return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Process sightings job failed.");
+                throw new Exception("Process sightings job failed.");
+            }
+            finally
+            {
+                if (mode == JobRunModes.Full)
+                {
+                    _dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
+                }
+            }
+        }
+
+
+
         /// <summary>
         ///  Process verbatim observations
         /// </summary>
@@ -640,6 +760,39 @@ namespace SOS.Harvest.Jobs
             var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
 
             await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
+            return processTaskByDataProvider.ToDictionary(pt => pt.Key, pt => pt.Value.Result);
+        }
+
+
+        private async Task<IDictionary<DataProvider, ProcessingStatus>> ProcessVerbatimDatasets(
+            IEnumerable<DataProvider> dataProvidersToProcess,
+            JobRunModes mode,
+            IDictionary<int, Taxon> taxonById,
+            IJobCancellationToken cancellationToken)
+        {
+            var processStart = DateTime.Now;
+
+            var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
+            var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
+            var processor = _datasetProcessorByType[DataProviderType.DwcA];
+            processTaskByDataProvider.Add(dataProvider, processor.ProcessAsync(dataProvider, cancellationToken));
+
+            //foreach (var dataProvider in dataProvidersToProcess)
+            //{
+            //    if (!dataProvider.IsActive ||
+            //        (mode != JobRunModes.Full && !dataProvider.SupportIncrementalHarvest))
+            //    {
+            //        continue;
+            //    }
+
+            //    var processor = _processorByType[dataProvider.Type];
+            //    processTaskByDataProvider.Add(dataProvider,
+            //        processor.ProcessAsync(dataProvider, taxonById, mode, cancellationToken));
+            //}
+
+            var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
+
+            //await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
             return processTaskByDataProvider.ToDictionary(pt => pt.Key, pt => pt.Value.Result);
         }
 
@@ -865,6 +1018,7 @@ namespace SOS.Harvest.Jobs
             IUserObservationRepository userObservationRepository,            
             IObservationDatasetRepository observationDatasetRepository,
             IObservationEventRepository observationEventRepository,
+            IDwcaDatasetProcessor dwcaDatasetProcessor,
             ILogger<ProcessObservationsJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -906,6 +1060,11 @@ namespace SOS.Harvest.Jobs
                 {DataProviderType.SharkObservations, sharkObservationProcessor},
                 {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationProcessor},
                 {DataProviderType.iNaturalistObservations, dwcaObservationProcessor}
+            };
+
+            _datasetProcessorByType = new Dictionary<DataProviderType, IDatasetProcessor>
+            {                
+                {DataProviderType.DwcA, dwcaDatasetProcessor},                
             };
 
             _exportContainer = processConfiguration?.Export_Container ??

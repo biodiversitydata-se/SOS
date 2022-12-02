@@ -20,9 +20,9 @@ namespace SOS.Lib.Repositories.Verbatim
     /// <summary>
     ///     Darwin core event verbatim repository
     /// </summary>
-    public class DwcCollectionRepository
-    {
-        private readonly ILogger<DwcCollectionRepository> _logger;
+    public class DwcCollectionRepository : IDisposable
+    {        
+        private readonly Microsoft.Extensions.Logging.ILogger _logger;
         private readonly DataProvider _dataProvider;
         private readonly EventVerbatimRepository _eventRepository;
         private readonly OccurrenceVerbatimRepository _occurrenceRepository;
@@ -69,7 +69,7 @@ namespace SOS.Lib.Repositories.Verbatim
         public DwcCollectionRepository(
             DataProvider dataProvider,
             IVerbatimClient importClient,
-            ILogger<DwcCollectionRepository> logger)
+            Microsoft.Extensions.Logging.ILogger logger)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _logger = logger?? throw new ArgumentNullException(nameof(logger));
@@ -123,9 +123,13 @@ namespace SOS.Lib.Repositories.Verbatim
             return results.All(m => m == true);
         }
 
+        public void Dispose()
+        {
+            
+        }
     }
 
-    public class DatasetVerbatimRepository : VerbatimRepositoryBase<ObservationDataset, string>
+    public class DatasetVerbatimRepository : VerbatimRepositoryBase<DwcVerbatimObservationDataset, int>
     {
         private readonly DataProvider _dataProvider;
 
@@ -136,7 +140,7 @@ namespace SOS.Lib.Repositories.Verbatim
 
         /// <inheritdoc />
         public IEnumerable<DistinictValueCount<string>> GetDistinctValuesCount(
-            Expression<Func<ObservationDataset, DistinctValueObject<string>>> expression,
+            Expression<Func<DwcVerbatimObservationDataset, DistinctValueObject<string>>> expression,
             int limit)
         {
             var result = GetMongoCollection(CollectionName).Aggregate(new AggregateOptions { AllowDiskUse = true })
@@ -172,8 +176,8 @@ namespace SOS.Lib.Repositories.Verbatim
 
             var indexModels = new[]
             {
-                new CreateIndexModel<ObservationDataset>(
-                    Builders<ObservationDataset>.IndexKeys.Ascending(io => io.Identifier))
+                new CreateIndexModel<DwcVerbatimObservationDataset>(
+                    Builders<DwcVerbatimObservationDataset>.IndexKeys.Ascending(io => io.Identifier))
             };
             await AddIndexes(indexModels);
 
@@ -181,7 +185,7 @@ namespace SOS.Lib.Repositories.Verbatim
         }
 
         /// <inheritdoc />
-        public override async Task<bool> AddManyAsync(IEnumerable<ObservationDataset> datasetRecords)
+        public override async Task<bool> AddManyAsync(IEnumerable<DwcVerbatimObservationDataset> datasetRecords)
         {
             if (!datasetRecords?.Any() ?? true)
             {
