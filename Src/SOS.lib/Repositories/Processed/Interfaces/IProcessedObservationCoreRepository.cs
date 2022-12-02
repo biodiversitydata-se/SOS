@@ -97,13 +97,15 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="filter"></param>
         /// <param name="gridCellSizeInMeters"></param>
         /// <param name="metricCoordinateSys"></param>
-        /// <param name="maxBuckets">No of buckets</param>
+        /// <param name="skipAuthorizationFilters"></param>
+        /// <param name="maxBuckets"></param>
         /// <param name="afterKey"></param>
         /// <returns></returns>
         Task<GeoGridMetricResult> GetMetricGridAggregationAsync(
             SearchFilter filter, 
             int gridCellSizeInMeters,
             MetricCoordinateSys metricCoordinateSys,
+            bool skipAuthorizationFilters = false,
             int? maxBuckets = null,
             CompositeKey afterKey = null);
 

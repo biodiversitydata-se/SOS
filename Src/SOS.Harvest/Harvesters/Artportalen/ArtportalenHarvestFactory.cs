@@ -455,12 +455,12 @@ namespace SOS.Harvest.Harvesters.Artportalen
             ILogger<ArtportalenObservationHarvester> logger) : base(siteRepository, areaHelper, noOfThreads)
         {
             _mediaRepository = mediaRepository ?? throw new ArgumentNullException(nameof(mediaRepository));
-            _projectRepository = projectRepository;
-            _sightingRepository = sightingRepository;
-            _sightingRelationRepository = sightingRelationRepository;
-            _speciesCollectionRepository = speciesCollectionRepository;
-            _artportalenMetadataContainer = artportalenMetadataContainer;
-            _logger = logger;
+            _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
+            _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
+            _sightingRelationRepository = sightingRelationRepository ?? throw new ArgumentNullException(nameof(sightingRelationRepository));
+            _speciesCollectionRepository = speciesCollectionRepository ?? throw new ArgumentNullException(nameof(speciesCollectionRepository));
+            _artportalenMetadataContainer = artportalenMetadataContainer ?? throw new ArgumentNullException(nameof(artportalenMetadataContainer));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
         
         /// <inheritdoc />

@@ -352,12 +352,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Point used in distance from point search.
         /// </summary>
         [SwaggerExclude]
-        public GeoLocation Point10KGridCellCenter { get; set; }
-
-        /// <summary>
-        ///     Point used in distance from point search.
-        /// </summary>
-        [SwaggerExclude]
         public GeoLocation PointLocation { get; set; }
 
         /// <summary>

@@ -46,6 +46,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <returns></returns>
         private async Task<ArtportalenHarvestFactory> GetHarvestFactoryAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
+            SetRepositoriesMode(mode);
+
             // Populate data on full harvest or if it's not initialized
             if (mode == JobRunModes.Full || !_artportalenMetadataContainer.IsInitialized)
             {
@@ -388,11 +390,11 @@ namespace SOS.Harvest.Harvesters.Artportalen
         private void SetRepositoriesMode(JobRunModes mode)
         {
             // Use active index if it's a incremental active instance harvest 
-            _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+            var live = mode == JobRunModes.IncrementalActiveInstance;
+
+            _processedObservationRepository.LiveMode = live;
             _artportalenVerbatimRepository.Mode = mode;
 
-            // Incremental harvest always use live AP data
-            var live = mode != JobRunModes.Full;
             _mediaRepository.Live = live;
             _metadataRepository.Live = live;
             _personRepository.Live = live;
@@ -477,7 +479,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             try
             {
-                SetRepositoriesMode(mode);
                 var harvestFactory = await GetHarvestFactoryAsync(mode, cancellationToken);
 
                 // Make sure we have an empty public collection
@@ -533,8 +534,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
             try
             {
                var mode = JobRunModes.IncrementalActiveInstance;
-               SetRepositoriesMode(mode);
-
                using var harvestFactory = await GetHarvestFactoryAsync(mode, cancellationToken);
 
                 return await GetVerbatimBatchAsync(harvestFactory,
