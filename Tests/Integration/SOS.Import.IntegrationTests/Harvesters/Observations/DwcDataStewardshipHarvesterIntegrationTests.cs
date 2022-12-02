@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DwC_A;
@@ -32,7 +34,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             const string archivePath = "./resources/dwca/dwca-datastewardship-bats-taxalists.zip";
             var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
             IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
-            using var archiveReader = new ArchiveReader(archivePath, @"C:\temp");
+            using var archiveReader = new ArchiveReader(archivePath, @"C:\Temp\DwcaImport");
             var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -75,6 +77,44 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             datasets.Should().NotBeNull();
             occurrences.Should().NotBeNull();
             events.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task Test_Parse_Multiple_DwcaFiles()
+        {
+            foreach(var archivePath in _dwcaFiles)
+            {
+                await ParseDwcaFileAsync(archivePath);
+            }            
+        }
+
+        private List<string> _dwcaFiles = new List<string>
+        {            
+            "./resources/dwca/dwca-datastewardship-bats-taxalists.zip",
+            "./resources/dwca/dwca-event-emof-vims_neamap.zip",
+            "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip",
+            "./resources/dwca/dwca-occurrence-audubonmedia-rrel-cumv_amph.zip",
+            "./resources/dwca/dwca-occurrence-emof-lifewatch-artportalen.zip",
+            "./resources/dwca/SHARK_Zooplankton_NAT_DwC-A.zip"
+        };
+
+
+        private async Task ParseDwcaFileAsync(string archivePath)
+        {
+            try
+            {
+                var dataProvider = new DataProvider { Id = 200, Identifier = "TestDataset", Type = DataProviderType.DwcA };
+                IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+                using var archiveReader = new ArchiveReader(archivePath, @"C:\Temp\DwcaImport");
+                var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
+                var datasets = await dwcArchiveReader.ReadDatasetsAsync(archiveReaderContext);
+                var occurrences = await dwcArchiveReader.ReadOccurrencesAsync(archiveReaderContext);
+                var events = await dwcArchiveReader.ReadEventsAsync(archiveReaderContext);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
 

@@ -10,6 +10,7 @@ using SOS.Harvest.DarwinCore.Factories;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Harvest.DarwinCore
@@ -238,22 +239,40 @@ namespace SOS.Harvest.DarwinCore
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        public Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
+        public async Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
         {
             return null;
         }
 
-        public Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
+        public async Task<List<ObservationDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
-        public IAsyncEnumerable<List<DwcObservationVerbatim>> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext)
+        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext)
         {
-            throw new NotImplementedException();
+            var occurrenceFileReader = archiveReaderContext.ArchiveReader.GetAsyncCoreFile();
+            var idIndex = occurrenceFileReader.GetIdIndex();
+            var occurrenceRecords = new List<DwcObservationVerbatim>();
+
+            await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
+            {
+                var occurrenceRecord = DwcObservationVerbatimFactory.Create(NextId, row, archiveReaderContext.DataProvider, idIndex);
+                occurrenceRecords.Add(occurrenceRecord);
+
+                if (occurrenceRecords.Count % archiveReaderContext.BatchSize == 0)
+                {
+                    await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, occurrenceRecords);
+                    yield return occurrenceRecords;
+                    occurrenceRecords.Clear();
+                }
+            }
+
+            await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, occurrenceRecords);
+            yield return occurrenceRecords;
         }
 
-        public Task<IEnumerable<DwcEventVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext)
+        public async Task<IEnumerable<DwcEventVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext)
         {
             return null;
         }
