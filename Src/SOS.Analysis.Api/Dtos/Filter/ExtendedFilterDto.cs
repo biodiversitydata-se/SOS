@@ -1,6 +1,4 @@
-﻿using SOS.Lib.Models.Processed.Observation;
-
-namespace SOS.Analysis.Api.Dtos.Filter
+﻿namespace SOS.Analysis.Api.Dtos.Filter
 {
     public class ExtendedFilterDto
     {

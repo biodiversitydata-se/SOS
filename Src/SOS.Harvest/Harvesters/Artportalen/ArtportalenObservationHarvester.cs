@@ -24,15 +24,13 @@ namespace SOS.Harvest.Harvesters.Artportalen
         private readonly ArtportalenConfiguration _artportalenConfiguration;
         private readonly IMediaRepository _mediaRepository;
         private readonly IMetadataRepository _metadataRepository;
-        private readonly IPersonRepository _personRepository;
-        private readonly IProjectRepository _projectRepository;        
+        private readonly IProjectRepository _projectRepository;
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly ISightingRepository _sightingRepository;
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly ISiteRepository _siteRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
-        private readonly ITaxonRepository _taxonRepository;
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
         private readonly IAreaHelper _areaHelper;
         private readonly SemaphoreSlim _semaphore;
@@ -46,53 +44,15 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <returns></returns>
         private async Task<ArtportalenHarvestFactory> GetHarvestFactoryAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
-            SetRepositoriesMode(mode);
-
+            SetRunMode(mode);
+ 
             // Populate data on full harvest or if it's not initialized
             if (mode == JobRunModes.Full || !_artportalenMetadataContainer.IsInitialized)
             {
-                _logger.LogDebug("Start getting static metadata");
-                var activities = await GetActivitiesAsync();
-                var (biotopes,
-                    genders,
-                    organizations,
-                    stages,
-                    substrates,
-                    units,
-                    validationStatus,
-                    discoveryMethods,
-                    determinationMethods) = await GetMetadataAsync();
-                var taxa = await _taxonRepository.GetAsync();
-
+                _artportalenMetadataContainer.InitializeAsync();
+                await _artportalenMetadataContainer.InitializeAsync();
                 cancellationToken?.ThrowIfCancellationRequested();
-                _logger.LogDebug("Finish getting static metadata");
-
-                _logger.LogDebug("Start Initialize static metadata");
-                _artportalenMetadataContainer.InitializeStatic(
-                    activities,
-                    biotopes,
-                    determinationMethods,
-                    discoveryMethods,
-                    genders,
-                    organizations,
-                    stages,
-                    substrates,
-                    taxa,
-                    units,
-                    validationStatus);
-                _logger.LogDebug("Finish Initialize static metadata");
             }
-
-            _logger.LogDebug("Start getting dynamic metadata");
-            var persons = await _personRepository.GetAsync();
-            var projects = await _projectRepository.GetProjectsAsync();
-            _logger.LogDebug("Finish getting dynamic metadata");
-
-            _logger.LogDebug("Start Initialize dynamic metadata");
-            _artportalenMetadataContainer.InitializeDynamic(
-                persons,
-                projects);
-            _logger.LogDebug("Finish Initialize dynamic metadata");
 
             _logger.LogDebug("Start creating factory");
             var harvestFactory = new ArtportalenHarvestFactory(
@@ -334,76 +294,21 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
         }
 
-        /// <summary>
-        /// Initialize activities
-        /// </summary>
-        /// <returns></returns>
-        private async Task<IEnumerable<MetadataWithCategoryEntity>> GetActivitiesAsync()
-        {
-            return await _metadataRepository.GetActivitiesAsync();
-        }
-
-        /// <summary>
-        /// Initialize meta data
-        /// </summary>
-        /// <returns></returns>
-        private async Task<(
-            IEnumerable<MetadataEntity>,
-            IEnumerable<MetadataEntity>,
-            IEnumerable<MetadataEntity>,
-            IEnumerable<MetadataEntity>,
-            IEnumerable<MetadataEntity>,
-            IEnumerable<MetadataEntity>,
-            IEnumerable<MetadataEntity>,
-            IEnumerable<MetadataEntity>,
-            IEnumerable<MetadataEntity>)> GetMetadataAsync()
-        {
-            _logger.LogDebug("Start getting meta data");
-
-            var metaDataTasks = new[]
-            {
-                _metadataRepository.GetBiotopesAsync(),
-                _metadataRepository.GetGendersAsync(),
-                _metadataRepository.GetOrganizationsAsync(),
-                _metadataRepository.GetStagesAsync(),
-                _metadataRepository.GetSubstratesAsync(),
-                _metadataRepository.GetUnitsAsync(),
-                _metadataRepository.GetValidationStatusAsync(),
-                _metadataRepository.GetDiscoveryMethodsAsync(),
-                _metadataRepository.GetDeterminationMethodsAsync()
-            };
-
-            await Task.WhenAll(metaDataTasks);
-            _logger.LogDebug("Finish getting meta data");
-
-            return (metaDataTasks[0].Result,
-                metaDataTasks[1].Result,
-                metaDataTasks[2].Result,
-                metaDataTasks[3].Result,
-                metaDataTasks[4].Result,
-                metaDataTasks[5].Result,
-                metaDataTasks[6].Result,
-                metaDataTasks[7].Result,
-                metaDataTasks[8].Result);
-        }
-
-        private void SetRepositoriesMode(JobRunModes mode)
+        private void SetRunMode(JobRunModes mode)
         {
             // Use active index if it's a incremental active instance harvest 
             var live = mode == JobRunModes.IncrementalActiveInstance;
 
             _processedObservationRepository.LiveMode = live;
             _artportalenVerbatimRepository.Mode = mode;
-
             _mediaRepository.Live = live;
-            _metadataRepository.Live = live;
-            _personRepository.Live = live;
             _projectRepository.Live = live;
             _sightingRelationRepository.Live = live;
             _sightingRepository.Live = live;
             _siteRepository.Live = live;
             _speciesCollectionRepository.Live = live;
-            _taxonRepository.Live = live;
+
+            _artportalenMetadataContainer.Live = mode == JobRunModes.IncrementalActiveInstance;
         }
 
         /// <summary>
@@ -416,11 +321,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="sightingRepository"></param>
         /// <param name="siteRepository"></param>
         /// <param name="artportalenVerbatimRepository"></param>
-        /// <param name="personRepository"></param>
         /// <param name="sightingRelationRepository"></param>
         /// <param name="speciesCollectionItemRepository"></param>
         /// <param name="processedObservationRepository"></param>
-        /// <param name="taxonRepository"></param>
         /// <param name="artportalenMetadataContainer"></param>
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
@@ -432,11 +335,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
             ISightingRepository sightingRepository,
             ISiteRepository siteRepository,
             IArtportalenVerbatimRepository artportalenVerbatimRepository,
-            IPersonRepository personRepository,
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
             IProcessedObservationCoreRepository processedObservationRepository,
-            ITaxonRepository taxonRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
             IAreaHelper areaHelper,
             ILogger<ArtportalenObservationHarvester> logger)
@@ -450,13 +351,11 @@ namespace SOS.Harvest.Harvesters.Artportalen
             _siteRepository = siteRepository ?? throw new ArgumentNullException(nameof(siteRepository));
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
-            _personRepository = personRepository ?? throw new ArgumentNullException(nameof(personRepository));
             _sightingRelationRepository = sightingRelationRepository ??
                                           throw new ArgumentNullException(nameof(sightingRelationRepository));
             _speciesCollectionRepository = speciesCollectionItemRepository ??
                                            throw new ArgumentNullException(nameof(speciesCollectionItemRepository));
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
-            _taxonRepository = taxonRepository ?? throw new ArgumentNullException(nameof(taxonRepository));
             _artportalenMetadataContainer = artportalenMetadataContainer ?? throw new ArgumentNullException(nameof(artportalenMetadataContainer));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

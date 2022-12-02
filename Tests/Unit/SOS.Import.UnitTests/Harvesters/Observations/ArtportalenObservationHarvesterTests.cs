@@ -71,11 +71,9 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _sightingRepositoryMock.Object,
             _siteRepositoryMockMock.Object,
             _artportalenVerbatimRepositoryMock.Object,
-            _personRepository.Object,
             _sightingRelationRepository.Object,
             _speciesCollectionItemRepository.Object,
             _processedObservationRepositoryMock.Object,
-            _taxonRepositoryMock.Object,
             _artportalenMetadataContainerMock.Object,
             _areaHelperMock.Object,
             _loggerMock.Object);
