@@ -49,7 +49,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
             // Populate data on full harvest or if it's not initialized
             if (mode == JobRunModes.Full || !_artportalenMetadataContainer.IsInitialized)
             {
-                _artportalenMetadataContainer.InitializeAsync();
                 await _artportalenMetadataContainer.InitializeAsync();
                 cancellationToken?.ThrowIfCancellationRequested();
             }

@@ -25,6 +25,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         {
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<PersonEntity>> GetAsync()
         {
             try
@@ -38,11 +39,14 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             }
         }
 
-        public async Task<PersonEntity> GetAsync(int id)
+        /// <inheritdoc/>
+        public async Task<PersonEntity> GetByUserIdAsync(int id)
         {
             try
             {
-                return (await QueryAsync<PersonEntity>(_query, null!))?.FirstOrDefault()!;
+                var query = $"{_query} u.UserServiceUserId = @UserServiceUserId";
+
+                return (await QueryAsync<PersonEntity>(query, new { UserServiceUserId = id }))?.FirstOrDefault()!;
             }
             catch (Exception e)
             {

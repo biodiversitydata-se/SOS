@@ -15,6 +15,6 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<PersonEntity> GetAsync(int id);
+        Task<PersonEntity> GetByUserIdAsync(int id);
     }
 }

@@ -406,7 +406,7 @@ namespace SOS.Harvest.Containers
                 return null!;
             }
             if(!_personsByUserId.TryGetValue(id ?? 0, out var person)) {
-                var personEntity = await _personRepository.GetAsync(id ?? 0);
+                var personEntity = await _personRepository.GetByUserIdAsync(id ?? 0);
                 if (personEntity != null)
                 {
                     person = CastPersonEntityToVerbatim(personEntity);
