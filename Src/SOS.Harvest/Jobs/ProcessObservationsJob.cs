@@ -64,6 +64,7 @@ namespace SOS.Harvest.Jobs
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly Dictionary<DataProviderType, IObservationProcessor> _processorByType;
         private readonly Dictionary<DataProviderType, IDatasetProcessor> _datasetProcessorByType;
+        private readonly Dictionary<DataProviderType, IEventProcessor> _eventProcessorByType;
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly string _exportContainer;
         private readonly bool _runIncrementalAfterFull;
@@ -414,8 +415,8 @@ namespace SOS.Harvest.Jobs
             try
             {
                 // uncomment when test processing.
-                //var testResult = await RunTestProcessingAsync(dataProvidersToProcess, mode, cancellationToken);
-                //return testResult;
+                var testResult = await RunTestProcessingAsync(dataProvidersToProcess, mode, cancellationToken);
+                return testResult;
 
                 var processOverallTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ProcessOverall);
 
@@ -666,7 +667,7 @@ namespace SOS.Harvest.Jobs
                 //------------------------------------------------------------------------                
                 await InitializeElasticSearchDatasetAsync();
                 await DisableEsDatasetIndexingAsync();
-                var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess, mode, taxonById, cancellationToken);
+                var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
                 var datasetSuccess = datasetResult.All(t => t.Value.Status == RunStatus.Success);
                 await EnableEsDatasetIndexingAsync();
 
@@ -770,25 +771,20 @@ namespace SOS.Harvest.Jobs
             IDictionary<int, Taxon> taxonById,
             IJobCancellationToken cancellationToken)
         {
+            if (dataProvidersToProcess == null || !dataProvidersToProcess.Any()) return null;
             var processStart = DateTime.Now;
 
             var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
-            var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
-            var processor = _datasetProcessorByType[DataProviderType.DwcA];
-            processTaskByDataProvider.Add(dataProvider, processor.ProcessAsync(dataProvider, cancellationToken));
+            //var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
+            //var processor = _datasetProcessorByType[DataProviderType.DwcA];
+            //processTaskByDataProvider.Add(dataProvider, processor.ProcessAsync(dataProvider, cancellationToken));
 
-            //foreach (var dataProvider in dataProvidersToProcess)
-            //{
-            //    if (!dataProvider.IsActive ||
-            //        (mode != JobRunModes.Full && !dataProvider.SupportIncrementalHarvest))
-            //    {
-            //        continue;
-            //    }
-
-            //    var processor = _processorByType[dataProvider.Type];
-            //    processTaskByDataProvider.Add(dataProvider,
-            //        processor.ProcessAsync(dataProvider, taxonById, mode, cancellationToken));
-            //}
+            foreach (var dataProvider in dataProvidersToProcess)
+            {                
+                var processor = _datasetProcessorByType[dataProvider.Type];
+                processTaskByDataProvider.Add(dataProvider,
+                    processor.ProcessAsync(dataProvider, cancellationToken));
+            }
 
             var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
 
@@ -1019,6 +1015,9 @@ namespace SOS.Harvest.Jobs
             IObservationDatasetRepository observationDatasetRepository,
             IObservationEventRepository observationEventRepository,
             IDwcaDatasetProcessor dwcaDatasetProcessor,
+            IArtportalenDatasetProcessor artportalenDatasetProcessor,
+            IArtportalenEventProcessor artportalenEventProcessor,
+            IDwcaEventProcessor dwcaEventProcessor,
             ILogger<ProcessObservationsJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -1064,7 +1063,14 @@ namespace SOS.Harvest.Jobs
 
             _datasetProcessorByType = new Dictionary<DataProviderType, IDatasetProcessor>
             {                
-                {DataProviderType.DwcA, dwcaDatasetProcessor},                
+                {DataProviderType.DwcA, dwcaDatasetProcessor},
+                {DataProviderType.ArtportalenObservations, artportalenDatasetProcessor},
+            };
+
+            _eventProcessorByType = new Dictionary<DataProviderType, IEventProcessor>
+            {
+                {DataProviderType.DwcA, dwcaEventProcessor},
+                {DataProviderType.ArtportalenObservations, artportalenEventProcessor},
             };
 
             _exportContainer = processConfiguration?.Export_Container ??

@@ -39,6 +39,7 @@ using SOS.Lib.Managers.Interfaces;
 using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
 using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
+using SOS.Harvest.Processors.Artportalen.Interfaces;
 
 namespace SOS.Process.IntegrationTests.Jobs
 {
@@ -97,6 +98,9 @@ namespace SOS.Process.IntegrationTests.Jobs
             IObservationDatasetRepository observationDatasetRepository = new Mock<IObservationDatasetRepository>().Object;
             IObservationEventRepository observationEventRepository = new Mock<IObservationEventRepository>().Object;
             IDwcaDatasetProcessor dwcaDatasetProcessor = new Mock<IDwcaDatasetProcessor>().Object;
+            IArtportalenDatasetProcessor artportalenDatasetProcessor = new Mock<IArtportalenDatasetProcessor>().Object;
+            IArtportalenEventProcessor artportalenEventProcessor = new Mock<IArtportalenEventProcessor>().Object;
+            IDwcaEventProcessor dwcaEventProcessor = new Mock<IDwcaEventProcessor>().Object;
 
             var processInfoRepository =
                 new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
@@ -293,6 +297,9 @@ namespace SOS.Process.IntegrationTests.Jobs
                 observationDatasetRepository,
                 observationEventRepository,
                 dwcaDatasetProcessor,
+                artportalenDatasetProcessor,
+                artportalenEventProcessor,
+                dwcaEventProcessor,
                 new NullLogger<ProcessObservationsJob>());
 
             return processJob;

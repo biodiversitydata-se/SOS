@@ -77,6 +77,9 @@ namespace SOS.Process.UnitTests.Jobs
             _dataProviderCache = new Mock<IDataProviderCache>();
             _processConfigurationMock = new Mock<ProcessConfiguration>();
             _dwcaDatasetProcessorMock = new Mock<IDwcaDatasetProcessor>();
+            _artportalenDatasetProcessorMock = new Mock<IArtportalenDatasetProcessor>();
+            _dwcaEventProcessorMock = new Mock<IDwcaEventProcessor>();
+            _artportalenEventProcessorMock = new Mock<IArtportalenEventProcessor>();
         }
 
         private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
@@ -105,6 +108,9 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IDwcaDatasetProcessor> _dwcaDatasetProcessorMock;
+        private readonly Mock<IArtportalenDatasetProcessor> _artportalenDatasetProcessorMock;
+        private readonly Mock<IArtportalenEventProcessor> _artportalenEventProcessorMock;
+        private readonly Mock<IDwcaEventProcessor> _dwcaEventProcessorMock;
         private readonly Mock<ILogger<ProcessObservationsJob>> _loggerMock;
         private readonly Mock<ProcessConfiguration> _processConfigurationMock;
 
@@ -135,6 +141,9 @@ namespace SOS.Process.UnitTests.Jobs
             _observationDatasetRepository.Object,
             _observationEventRepository.Object,
             _dwcaDatasetProcessorMock.Object,
+            _artportalenDatasetProcessorMock.Object,
+            _artportalenEventProcessorMock.Object,
+            _dwcaEventProcessorMock.Object,
             _loggerMock.Object);
 
         /// <summary>

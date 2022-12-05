@@ -342,7 +342,10 @@ namespace SOS.Harvest.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<TaxonProcessor>().As<ITaxonProcessor>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<DwcaDatasetProcessor>().As<IDwcaDatasetProcessor>().InstancePerLifetimeScope();            
+            builder.RegisterType<DwcaDatasetProcessor>().As<IDwcaDatasetProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenDatasetProcessor>().As<IArtportalenDatasetProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenEventProcessor>().As<IArtportalenEventProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<DwcaEventProcessor>().As<IDwcaEventProcessor>().InstancePerLifetimeScope();
 
             // Add checklist processors
             builder.RegisterType<ArtportalenChecklistProcessor>().As<IArtportalenChecklistProcessor>()

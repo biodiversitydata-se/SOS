@@ -113,6 +113,16 @@ namespace SOS.Lib.Models.Shared
         public bool SupportChecklists { get; set; } = false;
 
         /// <summary>
+        /// True if dataset harvest is supported
+        /// </summary>
+        public bool SupportDatasets { get; set; }
+
+        /// <summary>
+        /// True if event harvest is supported
+        /// </summary>
+        public bool SupportEvents { get; set; }
+
+        /// <summary>
         /// Get identifier used for checklists
         /// </summary>
         [JsonIgnore]
