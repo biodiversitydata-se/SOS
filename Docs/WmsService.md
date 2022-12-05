@@ -20,7 +20,7 @@ All public observations that SOS harvests are available in a OGC Web Maps Servic
 | SpeciesObservationsRedlisted | Species observations of redlisted species |
 
 ## Service details
-- The service currently only supports public observations that SOS harvests. Observations of species classified sensitive (["nationellet skyddsklassade arter"](https://www.artdatabanken.se/var-verksamhet/fynddata/skyddsklassade-arter/)) can be accessed (given the user has permission) by direct requests to the SOS API (downloading results as shape files to import to a GIS application) or using the [Analysportalen](https://www.analysisportal.se/) (to be replaced by a new application during 2023).
+- The service currently only supports public observations that SOS harvests. Observations of species classified sensitive (["nationellt skyddsklassade arter"](https://www.artdatabanken.se/var-verksamhet/fynddata/skyddsklassade-arter/)) can be accessed (given the user has permission) by direct requests to the SOS API (downloading results as shape files to import to a GIS application) or using the [Analysportalen](https://www.analysisportal.se/) (to be replaced by a new application during 2023).
 
 ## Recommendations
 - Since the maximum number of observations rendered is 5000, you should rather use the WFS service which can handle 100 000.
