@@ -22,7 +22,7 @@ All public observations that SOS harvests are available in a OGC Web Feature Ser
 - The maximum number of observations returned in a request is 5 000. If you need to retrieve more observations, you need to use a filter or paging.
 - The maximum paging startIndex is 100 000. If you need to retrieve more observations, you need to use a filter to split your search into several requests.
 - The vocabulary values are always translated into swedish language.
-- The service currently only supports public observations that SOS harvests. Observations of species classified sensitive (["nationellet skyddsklassade arter"](https://www.artdatabanken.se/var-verksamhet/fynddata/skyddsklassade-arter/)) can be accessed (given the user has permission) by direct requests to the SOS API (downloading results as shape files to import to a GIS application) or using the [Analysportalen](https://www.analysisportal.se/) (to be replaced by a new application during 2023).
+- The service currently only supports public observations that SOS harvests. Observations of species classified sensitive (["nationellt skyddsklassade arter"](https://www.artdatabanken.se/var-verksamhet/fynddata/skyddsklassade-arter/)) can be accessed (given the user has permission) by direct requests to the SOS API (downloading results as shape files to import to a GIS application) or using the [Analysportalen](https://www.analysisportal.se/) (to be replaced by a new application during 2023).
 
 ## HTTP Request examples
 
