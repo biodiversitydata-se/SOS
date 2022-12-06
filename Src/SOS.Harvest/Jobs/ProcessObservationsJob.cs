@@ -35,12 +35,6 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System.Data;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Extensions;
-using SOS.Lib.Models.Processed.DataStewardship.Enums;
-using SOS.Lib.Models.Processed.DataStewardship.Common;
-using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
 
 namespace SOS.Harvest.Jobs
 {
@@ -538,11 +532,22 @@ namespace SOS.Harvest.Jobs
                             throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
                         }
 
-                        // Add data stewardardship datasets
+                        // Add data stewardardship events & datasets
                         if (_processConfiguration.ProcessObservationDataset)
                         {
-                            await AddObservationDatasetsAsync();
-                            await AddObservationEventsAsync();
+                            // Process Events
+                            await InitializeElasticSearchEventAsync();
+                            await DisableEsEventIndexingAsync();
+                            var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
+                            var eventSuccess = eventResult.All(t => t.Value.Status == RunStatus.Success);
+                            await EnableEsEventIndexingAsync();
+
+                            // Process Datasets
+                            await InitializeElasticSearchDatasetAsync();
+                            await DisableEsDatasetIndexingAsync();
+                            var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
+                            var datasetSuccess = datasetResult.All(t => t.Value.Status == RunStatus.Success);
+                            await EnableEsDatasetIndexingAsync();
                         }
 
                         _logger.LogInformation($"Finish validate indexes");
@@ -1000,32 +1005,7 @@ namespace SOS.Harvest.Jobs
 
         /// <summary>
         /// Constructor
-        /// </summary>
-        /// <param name="processedObservationRepository"></param>
-        /// <param name="processInfoRepository"></param>
-        /// <param name="harvestInfoRepository"></param>
-        /// <param name="artportalenObservationProcessor"></param>
-        /// <param name="fishDataObservationProcessor"></param>
-        /// <param name="kulObservationProcessor"></param>
-        /// <param name="mvmObservationProcessor"></param>
-        /// <param name="norsObservationProcessor"></param>
-        /// <param name="observationDatabaseProcessor"></param>
-        /// <param name="sersObservationProcessor"></param>
-        /// <param name="sharkObservationProcessor"></param>
-        /// <param name="virtualHerbariumObservationProcessor"></param>
-        /// <param name="dwcaObservationProcessor"></param>
-        /// <param name="taxonCache"></param>
-        /// <param name="dataProviderCache"></param>
-        /// <param name="cacheManager"></param>
-        /// <param name="processTimeManager"></param>
-        /// <param name="validationManager"></param>
-        /// <param name="processTaxaJob"></param>
-        /// <param name="areaHelper"></param>
-        /// <param name="dwcArchiveFileWriterCoordinator"></param>
-        /// <param name="processConfiguration"></param>
-        /// <param name="userObservationRepository"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// </summary>      
         public ProcessObservationsJob(IProcessedObservationCoreRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
@@ -1178,155 +1158,6 @@ namespace SOS.Harvest.Jobs
             var taxa = await GetTaxaAsync(JobRunModes.IncrementalActiveInstance);
             _processedObservationRepository.LiveMode = true;
             return await processor.ProcessObservationsAsync(provider, taxa, verbatims);
-        }
-
-        private async Task AddObservationDatasetsAsync()
-        {
-            try
-            {
-                /*
-                 * Workflow - Med nuvarande SOS-struktur
-                 * --------------------------------------
-                 *  1. Observationer skördas från Artportalen till MongoDB precis som vanligt, men nu ska också en ny property DataStewardshipDatasetId sättas för de observationer som ingår i datavärdskapet. En ny tabell i Artportalen behövs som beskriver datasetet och ytterligare en som pekar på vilka projekt som ingår i datasetet.
-                 *  2. Datasetets metadata ska skördas från Artportalen till MongoDB.
-                 *  3. Observationerna processas precis som tidigare.
-                 *  4. När processningen av alla observationer är klara så processas dataseten, dels utifrån metadatainformationen som finns i MongoDB och dels från de processade observationerna för att få fram vilka EventId:n som ingår i datasetet.
-                 *
-                 *  Problem
-                 *  ----------------------------------
-                 *  1. Det finns en del strukturer som inte finns i SOS idag. Exempelvis:
-                 *    - WeatherVariable
-                 *  Lösning: Antingen får vi lägga till mer properties till nuvarande struktur, eller så får vi skapa ett nytt index för datavärdskapet.
-                 */
-                _logger.LogInformation("Start AddObservationDatasetsAsync()");
-                await InitializeElasticSearchDatasetAsync();
-                await DisableEsDatasetIndexingAsync();
-                List<ObservationDataset> datasets = new List<ObservationDataset>();
-                var batDataset = GetSampleBatDataset();
-                batDataset.EndDate = DateTime.Now;
-
-                // Determine which events that belongs to this dataset. Aggregate unique EventIds with filter: ProjectIds in [3606]
-                _logger.LogInformation($"AddObservationDatasetsAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
-                var searchFilter = new SearchFilter(0);
-                searchFilter.DataStewardshipDatasetIds = new List<string> { batDataset.Identifier };
-                var eventIds = await _processedObservationRepository.GetAllAggregationItemsAsync(searchFilter, "event.eventId");
-                batDataset.EventIds = eventIds.Select(m => m.AggregationKey).ToList();
-                datasets.Add(batDataset);
-                await _observationDatasetRepository.AddManyAsync(datasets);
-                await EnableEsDatasetIndexingAsync();
-                _logger.LogInformation("End AddObservationDatasetsAsync()");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Add data stewardship datasets failed.");
-            }
-        }
-
-        private readonly List<string> _observationEventOutputFields = new List<string>()
-        {
-            "occurrence",
-            "location",
-            "event",
-            "dataStewardshipDatasetId",
-            "institutionCode",
-        };
-
-        private async Task AddObservationEventsAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Start AddObservationEventsAsync()");
-                await InitializeElasticSearchEventAsync();
-                await DisableEsEventIndexingAsync();
-                int batchSize = 5000;
-                var filter = new SearchFilter(0);
-                filter.IsPartOfDataStewardshipDataset = true;
-                _logger.LogInformation($"AddObservationEventsAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
-                var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
-                Dictionary<string, List<string>> totalOccurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
-                var chunks = totalOccurrenceIdsByEventId.Chunk(batchSize);
-
-                foreach (var chunk in chunks) // todo - do this step in parallel
-                {
-                    var occurrenceIdsByEventId = chunk.ToDictionary(m => m.Key, m => m.Value);
-                    var firstOccurrenceIdInEvents = occurrenceIdsByEventId.Select(m => m.Value.First());
-                    var observations = await _processedObservationRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
-                    var events = new List<ObservationEvent>();
-                    foreach (var observation in observations)
-                    {
-                        var occurrenceIds = occurrenceIdsByEventId[observation.Event.EventId.ToLower()];
-                        var eventModel = observation.ToObservationEvent(occurrenceIds);
-                        events.Add(eventModel);
-                    }
-
-                    // write to ES
-                    await _observationEventRepository.AddManyAsync(events);
-                }
-                await EnableEsEventIndexingAsync();
-                _logger.LogInformation("End AddObservationEventsAsync()");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Add data stewardship events failed.");
-            }
-        }
-
-        private ObservationDataset GetSampleBatDataset()
-        {
-            var dataset = new ObservationDataset            
-            {
-                Identifier = "ArtportalenDataHost - Dataset Bats", // Ändra till Id-nummer. Enligt DPS:en ska det vara ett id-nummer från informationsägarens metadatakatalog. Om det är LST som är informationsägare så bör de ha datamängden registrerad i sin metadatakatalog, med ett id där.
-                Metadatalanguage = "Swedish",
-                Language = "Swedish",
-                AccessRights = AccessRights.Publik,
-                Purpose = Purpose.NationellMiljöövervakning,                
-                Assigner = new Organisation
-                {
-                    OrganisationID = "2021001975",
-                    OrganisationCode = "Naturvårdsverket"
-                },
-                // Creator = Utförare av datainsamling.
-                Creator = new Organisation
-                {
-                    OrganisationID = "OrganisationId-unknown",
-                    OrganisationCode = "SLU Artdatabanken"
-                },
-                // Finns inte alltid i AP, behöver skapas/hämtasandra DV informationskällor?
-                OwnerinstitutionCode = new Organisation
-                {
-                    OrganisationID = "OrganisationId-unknown",
-                    OrganisationCode = "Länsstyrelsen Jönköping"
-                },
-                Publisher = new Organisation
-                {
-                    OrganisationID = "OrganisationId-unknown",
-                    OrganisationCode = "SLU Artdatabanken"
-                },
-                DataStewardship = "Datavärdskap Naturdata: Arter",
-                StartDate = new DateTime(2011, 1, 1),
-                EndDate = null,
-                Description = "Inventeringar av fladdermöss som görs inom det gemensamma delprogrammet för fladdermöss, dvs inom regional miljöövervakning, biogeografisk uppföljning och områdesvis uppföljning (uppföljning av skyddade områden).\r\n\r\nDet finns totalt tre projekt på Artportalen för det gemensamma delprogrammet och i detta projekt rapporteras data från den biogeografiska uppföljningen. Syftet med övervakningen är att följa upp hur antal och utbredning av olika arter förändras över tid. Övervakningen ger viktig information till bland annat EU-rapporteringar, rödlistningsarbetet och kan även användas i uppföljning av miljömålen och som underlag i ärendehandläggning. Den biogeografiska uppföljningen omfattar för närvarande några av de mest artrika fladdermuslokalerna i de olika biogeografiska regionerna i Sverige. Dessa inventeras vartannat år. Ett fåartsområde för fransfladdermus i norra Sverige samt några övervintringslokaler ingår också i övervakningen.",
-                Title = "Fladdermöss",
-                Spatial = "Sverige",                
-                ProjectId = "Artportalen ProjectId:3606",
-                ProjectCode = "Fladdermöss - gemensamt delprogram (biogeografisk uppföljning)",
-                Methodology = new List<Methodology>
-                {
-                    new Methodology
-                    {
-                        MethodologyDescription = "Methodology description?", // finns sällan i projektbeskrivning i AP, behöver hämtas från andra DV informationskällor
-                        MethodologyLink = "https://www.naturvardsverket.se/upload/stod-i-miljoarbetet/vagledning/miljoovervakning/handledning/metoder/undersokningstyper/landskap/fladdermus-artkartering-2017-06-05.pdf",
-                        MethodologyName = "Undersökningstyp fladdermöss - artkartering",
-                        SpeciesList = "Species list?" // artlistan behöver skapas, alternativt "all species occurring in Sweden"
-                    }
-                },
-                EventIds = new List<string>
-                {
-                    //"urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00"
-                }
-            };
-
-            return dataset;
         }
     }
 }
