@@ -465,7 +465,7 @@ namespace SOS.Harvest.Jobs
                 //------------------------------------------------------------------------
                 // 5. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------                
-                var result = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, cancellationToken);
+                var result = await ProcessVerbatimObservations(dataProvidersToProcess, mode, taxonById, cancellationToken);
                 var success = result.All(t => t.Value.Status == RunStatus.Success);
                 
                 //---------------------------------
@@ -619,7 +619,14 @@ namespace SOS.Harvest.Jobs
             IJobCancellationToken cancellationToken)
         {
             try
-            {                
+            {
+                var artportalenProvider = dataProvidersToProcess.FirstOrDefault(m => m.Type == DataProviderType.ArtportalenObservations);
+                if (artportalenProvider != null)
+                {
+                    artportalenProvider.SupportEvents = true;
+                    artportalenProvider.SupportDatasets = true;
+                }
+
                 //-----------------
                 // 1. Arrange
                 //-----------------
@@ -664,19 +671,19 @@ namespace SOS.Harvest.Jobs
 
                 //------------------------------------------------------------------------
                 // 5.1 Create dataset processing tasks, and wait for them to complete
-                //------------------------------------------------------------------------                
-                await InitializeElasticSearchDatasetAsync();
-                await DisableEsDatasetIndexingAsync();
-                var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
-                var datasetSuccess = datasetResult.All(t => t.Value.Status == RunStatus.Success);
-                await EnableEsDatasetIndexingAsync();
+                ////------------------------------------------------------------------------                
+                //await InitializeElasticSearchDatasetAsync();
+                //await DisableEsDatasetIndexingAsync();
+                //var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
+                //var datasetSuccess = datasetResult.All(t => t.Value.Status == RunStatus.Success);
+                //await EnableEsDatasetIndexingAsync();
 
                 //------------------------------------------------------------------------
                 // 5.2 Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------                
-                var result = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, cancellationToken);
-                var success = result.All(t => t.Value.Status == RunStatus.Success);
-              
+                //var result = await ProcessVerbatimObservations(dataProvidersToProcess, mode, taxonById, cancellationToken);
+                //var success = result.All(t => t.Value.Status == RunStatus.Success);
+                bool success = true;
 
                 //---------------------------------
                 // 6. Create ElasticSearch index
@@ -686,10 +693,22 @@ namespace SOS.Harvest.Jobs
                     await EnableIndexingAsync();                    
                     
                     // Add data stewardardship datasets
-                    if (_processConfiguration.ProcessObservationDataset)
-                    {
-                        await AddObservationDatasetsAsync();
-                        await AddObservationEventsAsync();
+                    if (_processConfiguration.ProcessObservationDataset && mode == JobRunModes.Full)
+                    {                        
+                        // Process Events
+                        await InitializeElasticSearchEventAsync();
+                        await DisableEsEventIndexingAsync();
+                        var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
+                        var eventSuccess = eventResult.All(t => t.Value.Status == RunStatus.Success);
+                        await EnableEsEventIndexingAsync();
+
+                        // Process Datasets
+                        await InitializeElasticSearchDatasetAsync();
+                        await DisableEsDatasetIndexingAsync();
+                        var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
+                        var datasetSuccess = datasetResult.All(t => t.Value.Status == RunStatus.Success);
+                        await EnableEsDatasetIndexingAsync();
+
                     }
 
                     //// Toggle active instance if we are done
@@ -698,14 +717,15 @@ namespace SOS.Harvest.Jobs
                     //    .InActiveInstance);                                            
                 }
 
-                _logger.LogInformation($"Processing done: {success} {mode}");                
+                _logger.LogInformation($"Processing done: {success} {mode}");
 
                 //-------------------------------
                 // 8. Return processing result
                 //-------------------------------
-                return success ? true : throw new Exception($@"Failed to process observations. {string.Join(", ", result
-                    .Where(r => r.Value.Status != RunStatus.Success)
-                        .Select(r => $"Provider: {r.Key}-{r.Value.Status}"))}");
+                return true;
+                //return success ? true : throw new Exception($@"Failed to process observations. {string.Join(", ", result
+                //    .Where(r => r.Value.Status != RunStatus.Success)
+                //        .Select(r => $"Provider: {r.Key}-{r.Value.Status}"))}");
             }
             catch (JobAbortedException)
             {
@@ -736,7 +756,7 @@ namespace SOS.Harvest.Jobs
         /// <param name="taxonById"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<IDictionary<DataProvider, ProcessingStatus>> ProcessVerbatim(
+        private async Task<IDictionary<DataProvider, ProcessingStatus>> ProcessVerbatimObservations(
             IEnumerable<DataProvider> dataProvidersToProcess,
             JobRunModes mode,
             IDictionary<int, Taxon> taxonById,
@@ -764,6 +784,27 @@ namespace SOS.Harvest.Jobs
             return processTaskByDataProvider.ToDictionary(pt => pt.Key, pt => pt.Value.Result);
         }
 
+        private async Task<IDictionary<DataProvider, ProcessingStatus>> ProcessVerbatimEvents(
+            IEnumerable<DataProvider> dataProvidersToProcess,
+            JobRunModes mode,
+            IDictionary<int, Taxon> taxonById,
+            IJobCancellationToken cancellationToken)
+        {
+            if (dataProvidersToProcess == null || !dataProvidersToProcess.Any()) return null;
+            var processStart = DateTime.Now;
+            var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
+            foreach (var dataProvider in dataProvidersToProcess)
+            {
+                var processor = _eventProcessorByType[dataProvider.Type];
+                processTaskByDataProvider.Add(dataProvider,
+                    processor.ProcessAsync(dataProvider, cancellationToken));
+            }
+
+            var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
+
+            //await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
+            return processTaskByDataProvider.ToDictionary(pt => pt.Key, pt => pt.Value.Result);
+        }
 
         private async Task<IDictionary<DataProvider, ProcessingStatus>> ProcessVerbatimDatasets(
             IEnumerable<DataProvider> dataProvidersToProcess,
@@ -774,11 +815,7 @@ namespace SOS.Harvest.Jobs
             if (dataProvidersToProcess == null || !dataProvidersToProcess.Any()) return null;
             var processStart = DateTime.Now;
 
-            var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
-            //var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
-            //var processor = _datasetProcessorByType[DataProviderType.DwcA];
-            //processTaskByDataProvider.Add(dataProvider, processor.ProcessAsync(dataProvider, cancellationToken));
-
+            var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();            
             foreach (var dataProvider in dataProvidersToProcess)
             {                
                 var processor = _datasetProcessorByType[dataProvider.Type];
