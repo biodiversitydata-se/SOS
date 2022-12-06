@@ -385,610 +385,310 @@ namespace SOS.Lib.Models.Processed.Observation
             : string.Join(", ", _observation?.Taxon?.SecondaryParentDyntaxaTaxonIds);
         public object GetValue(PropertyFieldDescription propertyField)
         {
-            switch (propertyField.PropertyPath)
+            return propertyField.PropertyPath.ToLower() switch
             {
-                case "Occurrence.OccurrenceId":
-                    return OccurrenceOccurrenceId;
-                case "DataProviderId":
-                    return DataProviderId;
-                case "DatasetName":
-                    return DatasetName;
-                case "Modified":
-                    return Modified;
-                case "Protected":
-                    return Protected;
-                case "Sensitive":
-                    return Sensitive;
-                case "AccessRights":
-                    return AccessRights;
-                case "AccessRights.Id":
-                    return AccessRightsId;
-                case "AccessRights.Value":
-                    return AccessRightsValue;
-                case "BasisOfRecord":
-                    return BasisOfRecord;
-                case "BasisOfRecord.Id":
-                    return BasisOfRecordId;
-                case "BasisOfRecord.Value":
-                    return BasisOfRecordValue;
-                case "CollectionCode":
-                    return CollectionCode;
-                case "CollectionId":
-                    return CollectionId;
-                case "InstitutionCode":
-                    return InstitutionCode;
-                case "InstitutionCode.Id":
-                    return InstitutionCodeId;
-                case "InstitutionCode.Value":
-                    return InstitutionCodeValue;
-                case "OwnerInstitutionCode":
-                    return OwnerInstitutionCode;
-                case "RightsHolder":
-                    return RightsHolder;
-                case "Event.StartDate":
-                    return EventStartDate;
-                case "Event.EndDate":
-                    return EventEndDate;
-                case "Event.PlainStartDate":
-                    return EventPlainStartDate;
-                case "Event.PlainEndDate":
-                    return EventPlainEndDate;
-                case "Event.PlainStartTime":
-                    return EventStartTimeString;
-                case "Event.PlainEndTime":
-                    return EventEndTimeString;
-                case "Event.EventId":
-                    return EventEventId;
-                case "Event.EventRemarks":
-                    return EventEventRemarks;
-                case "Event.Habitat":
-                    return EventHabitat;
-                case "Event.DiscoveryMethod":
-                    return EventDiscoveryMethod;
-                case "Event.DiscoveryMethod.Id":
-                    return EventDiscoveryMethodId;
-                case "Event.DiscoveryMethod.Value":
-                    return EventDiscoveryMethodValue;
-                case "Event.SamplingEffort":
-                    return EventSamplingEffort;
-                case "Event.SamplingProtocol":
-                    return EventSamplingProtocol;
-                case "Event.SampleSizeUnit":
-                    return EventSampleSizeUnit;
-                case "Event.SampleSizeValue":
-                    return EventSampleSizeValue;
-                case "Event.Media":
-                    return EventMedia;
-                case "Event.MeasurementOrFacts":
-                    return EventMeasurementOrFacts;
-                case "Event.FieldNotes":
-                    return EventFieldNotes;
-                case "Event.FieldNumber":
-                    return EventFieldNumber;
-                case "Event.ParentEventId":
-                    return EventParentEventId;
-                case "Event.VerbatimEventDate":
-                    return EventVerbatimEventDate;
-                case "Identification.Validated":
-                    return IdentificationValidated;
-                case "Identification.Verified":
-                    return IdentificationVerified;
-                case "Identification.ValidationStatus":
-                    return IdentificationValidationStatus;
-                case "Identification.ValidationStatus.Id":
-                    return IdentificationValidationStatusId;
-                case "Identification.ValidationStatus.Value":
-                    return IdentificationValidationStatusValue;
-                case "Identification.VerificationStatus":
-                    return IdentificationVerificationStatus;
-                case "Identification.VerificationStatus.Id":
-                    return IdentificationVerificationStatusId;
-                case "Identification.VerificationStatus.Value":
-                    return IdentificationVerificationStatusValue;
-                case "Identification.ConfirmedBy":
-                    return IdentificationConfirmedBy;
-                case "Identification.ConfirmedDate":
-                    return IdentificationConfirmedDate;
-                case "Identification.IdentifiedBy":
-                    return IdentificationIdentifiedBy;
-                case "Identification.DateIdentified":
-                    return IdentificationDateIdentified;
-                case "Identification.UncertainIdentification":
-                    return IdentificationUncertainIdentification;
-                case "Identification.DeterminationMethod":
-                    return IdentificationDeterminationMethod;
-                case "Identification.DeterminationMethod.Id":
-                    return IdentificationDeterminationMethodId;
-                case "Identification.DeterminationMethod.Value":
-                    return IdentificationDeterminationMethodValue;
-                case "Identification.VerifiedBy":
-                    return IdentificationVerifiedBy;
-                case "Identification.IdentificationQualifier":
-                    return IdentificationIdentificationQualifier;
-                case "Identification.TypeStatus":
-                    return IdentificationTypeStatus;
-                case "Identification.IdentificationId":
-                    return IdentificationIdentificationId;
-                case "Identification.IdentificationReferences":
-                    return IdentificationIdentificationReferences;
-                case "Identification.IdentificationRemarks":
-                    return IdentificationIdentificationRemarks;
-                case "Location.DecimalLatitude":
-                    return LocationDecimalLatitude;
-                case "Location.DecimalLongitude":
-                    return LocationDecimalLongitude;
-                case "Location.Sweref99TmX":
-                    return LocationSweref99TmX;
-                case "Location.Sweref99TmY":
-                    return LocationSweref99TmY;
-                case "Location.GeodeticDatum":
-                    return LocationGeodeticDatum;
-                case "Location.CoordinateUncertaintyInMeters":
-                    return LocationCoordinateUncertaintyInMeters;
-                case "Location.LocationId":
-                    return LocationLocationId;
-                case "Location.Locality":
-                    return LocationLocality;
-                case "Location.LocationRemarks":
-                    return LocationLocationRemarks;
-                case "Location.Municipality":
-                    return LocationMunicipality;
-                case "Location.Municipality.FeatureId":
-                    return LocationMunicipalityFeatureId;
-                case "Location.Municipality.Name":
-                    return LocationMunicipalityName;
-                case "Location.County":
-                    return LocationCounty;
-                case "Location.County.FeatureId":
-                    return LocationCountyFeatureId;
-                case "Location.County.Name":
-                    return LocationCountyName;
-                case "Location.Parish":
-                    return LocationParish;
-                case "Location.Parish.FeatureId":
-                    return LocationParishFeatureId;
-                case "Location.Parish.Name":
-                    return LocationParishName;
-                case "Location.Province":
-                    return LocationProvince;
-                case "Location.Province.FeatureId":
-                    return LocationProvinceFeatureId;
-                case "Location.Province.Name":
-                    return LocationProvinceName;
-                case "Location.Continent":
-                    return LocationContinent;
-                case "Location.Continent.Id":
-                    return LocationContinentId;
-                case "Location.Continent.Value":
-                    return LocationContinentValue;
-                case "Location.Country":
-                    return LocationCountry;
-                case "Location.Country.Id":
-                    return LocationCountryId;
-                case "Location.Country.Value":
-                    return LocationCountryValue;
-                case "Location.CountryCode":
-                    return LocationCountryCode;
-                case "Location.GeoreferencedBy":
-                    return LocationGeoreferencedBy;
-                case "Location.GeoreferencedDate":
-                    return LocationGeoreferencedDate;
-                case "Location.GeoreferenceRemarks":
-                    return LocationGeoreferenceRemarks;
-                case "Location.HigherGeography":
-                    return LocationHigherGeography;
-                case "Location.Island":
-                    return LocationIsland;
-                case "Location.MaximumDepthInMeters":
-                    return LocationMaximumDepthInMeters;
-                case "Location.MaximumElevationInMeters":
-                    return LocationMaximumElevationInMeters;
-                case "Location.MinimumDepthInMeters":
-                    return LocationMinimumDepthInMeters;
-                case "Location.MinimumElevationInMeters":
-                    return LocationMinimumElevationInMeters;
-                case "Location.VerbatimCoordinateSystem":
-                    return LocationVerbatimCoordinateSystem;
-                case "Location.VerbatimLatitude":
-                    return LocationVerbatimLatitude;
-                case "Location.VerbatimLongitude":
-                    return LocationVerbatimLongitude;
-                case "Location.VerbatimSRS":
-                    return LocationVerbatimSRS;
-                case "Location.WaterBody":
-                    return LocationWaterBody;
-                case "Location.CoordinatePrecision":
-                    return LocationCoordinatePrecision;
-                case "Location.FootprintSpatialFit":
-                    return LocationFootprintSpatialFit;
-                case "Location.FootprintSRS":
-                    return LocationFootprintSRS;
-                case "Location.FootprintWKT":
-                    return LocationFootprintWKT;
-                case "Location.GeoreferenceProtocol":
-                    return LocationGeoreferenceProtocol;
-                case "Location.GeoreferenceSources":
-                    return LocationGeoreferenceSources;
-                case "Location.GeoreferenceVerificationStatus":
-                    return LocationGeoreferenceVerificationStatus;
-                case "Location.HigherGeographyId":
-                    return LocationHigherGeographyId;
-                case "Location.IslandGroup":
-                    return LocationIslandGroup;
-                case "Location.LocationAccordingTo":
-                    return LocationLocationAccordingTo;
-                case "Location.MaximumDistanceAboveSurfaceInMeters":
-                    return LocationMaximumDistanceAboveSurfaceInMeters;
-                case "Location.MinimumDistanceAboveSurfaceInMeters":
-                    return LocationMinimumDistanceAboveSurfaceInMeters;
-                case "Location.PointRadiusSpatialFit":
-                    return LocationPointRadiusSpatialFit;
-                case "Location.VerbatimCoordinates":
-                    return LocationVerbatimCoordinates;
-                case "Location.VerbatimDepth":
-                    return LocationVerbatimDepth;
-                case "Location.VerbatimElevation":
-                    return LocationVerbatimElevation;
-                case "Location.VerbatimLocality":
-                    return LocationVerbatimLocality;
-                case "Occurrence.RecordedBy":
-                    return OccurrenceRecordedBy;
-                case "Occurrence.ReportedBy":
-                    return OccurrenceReportedBy;
-                case "Occurrence.OccurrenceStatus":
-                    return OccurrenceOccurrenceStatus;
-                case "Occurrence.OccurrenceStatus.Id":
-                    return OccurrenceOccurrenceStatusId;
-                case "Occurrence.OccurrenceStatus.Value":
-                    return OccurrenceOccurrenceStatusValue;
-                case "Occurrence.IndividualCount":
-                    return OccurrenceIndividualCount;
-                case "Occurrence.OrganismQuantity":
-                    return OccurrenceOrganismQuantity;
-                case "Occurrence.OrganismQuantityInt":
-                    return OccurrenceOrganismQuantityInt;
-                case "Occurrence.OrganismQuantityUnit":
-                    return OccurrenceOrganismQuantityUnit;
-                case "Occurrence.OrganismQuantityUnit.Id":
-                    return OccurrenceOrganismQuantityUnitId;
-                case "Occurrence.OrganismQuantityUnit.Value":
-                    return OccurrenceOrganismQuantityUnitValue;
-                case "Occurrence.IsNaturalOccurrence":
-                    return OccurrenceIsNaturalOccurrence;
-                case "Occurrence.IsNeverFoundObservation":
-                    return OccurrenceIsNeverFoundObservation;
-                case "Occurrence.IsNotRediscoveredObservation":
-                    return OccurrenceIsNotRediscoveredObservation;
-                case "Occurrence.IsPositiveObservation":
-                    return OccurrenceIsPositiveObservation;
-                case "Occurrence.OccurrenceRemarks":
-                    return OccurrenceOccurrenceRemarks;
-                case "Occurrence.ProtectionLevel":
-                    return OccurrenceProtectionLevel;
-                case "Occurrence.SensitivityCategory":
-                    return OccurrenceSensitivityCategory;
-                case "Occurrence.Activity":
-                    return OccurrenceActivity;
-                case "Occurrence.Activity.Id":
-                    return OccurrenceActivityId;
-                case "Occurrence.Activity.Value":
-                    return OccurrenceActivityValue;
-                case "Occurrence.Behavior":
-                    return OccurrenceBehavior;
-                case "Occurrence.Behavior.Id":
-                    return OccurrenceBehaviorId;
-                case "Occurrence.Behavior.Value":
-                    return OccurrenceBehaviorValue;
-                case "Occurrence.Biotope":
-                    return OccurrenceBiotope;
-                case "Occurrence.Biotope.Id":
-                    return OccurrenceBiotopeId;
-                case "Occurrence.Biotope.Value":
-                    return OccurrenceBiotopeValue;
-                case "Occurrence.BiotopeDescription":
-                    return OccurrenceBiotopeDescription;
-                case "Occurrence.AssociatedMedia":
-                    return OccurrenceAssociatedMedia;
-                case "Occurrence.LifeStage":
-                    return OccurrenceLifeStage;
-                case "Occurrence.LifeStage.Id":
-                    return OccurrenceLifeStageId;
-                case "Occurrence.LifeStage.Value":
-                    return OccurrenceLifeStageValue;
-                case "Occurrence.ReproductiveCondition":
-                    return OccurrenceReproductiveCondition;
-                case "Occurrence.ReproductiveCondition.Id":
-                    return OccurrenceReproductiveConditionId;
-                case "Occurrence.ReproductiveCondition.Value":
-                    return OccurrenceReproductiveConditionValue;
-                case "Occurrence.Sex":
-                    return OccurrenceSex;
-                case "Occurrence.Sex.Id":
-                    return OccurrenceSexId;
-                case "Occurrence.Sex.Value":
-                    return OccurrenceSexValue;
-                case "Occurrence.Url":
-                    return OccurrenceUrl;
-                case "Occurrence.Length":
-                    return OccurrenceLength;
-                case "Occurrence.Weight":
-                    return OccurrenceWeight;
-                case "Occurrence.Substrate.Description":
-                    return OccurrenceSubstrateDescription;
-                case "Occurrence.Substrate.Id":
-                    return OccurrenceSubstrateId;
-                case "Occurrence.Substrate.Name":
-                    return OccurrenceSubstrateName;
-                case "Occurrence.Substrate.Name.Id":
-                    return OccurrenceSubstrateNameId;
-                case "Occurrence.Substrate.Name.Value":
-                    return OccurrenceSubstrateNameValue;
-                case "Occurrence.Substrate.Quantity":
-                    return OccurrenceSubstrateQuantity;
-                case "Occurrence.Substrate.SpeciesDescription":
-                    return OccurrenceSubstrateSpeciesDescription;
-                case "Occurrence.Substrate.SpeciesId":
-                    return OccurrenceSubstrateSpeciesId;
-                case "Occurrence.Substrate.SpeciesScientificName":
-                    return OccurrenceSubstrateSpeciesScientificName;
-                case "Occurrence.Substrate.SpeciesVernacularName":
-                    return OccurrenceSubstrateSpeciesVernacularName;
-                case "Occurrence.BirdNestActivityId":
-                    return OccurrenceBirdNestActivityId;
-                case "Occurrence.CatalogNumber":
-                    return OccurrenceCatalogNumber;
-                case "Occurrence.CatalogId":
-                    return OccurrenceCatalogId;
-                case "Occurrence.AssociatedReferences":
-                    return OccurrenceAssociatedReferences;
-                case "Occurrence.IndividualId":
-                    return OccurrenceIndividualId;
-                case "Occurrence.Media":
-                    return OccurrenceMedia;
-                case "Occurrence.Preparations":
-                    return OccurrencePreparations;
-                case "Occurrence.RecordNumber":
-                    return OccurrenceRecordNumber;
-                case "Occurrence.ReportedDate":
-                    return OccurrenceReportedDate;
-                case "Occurrence.AssociatedOccurrences":
-                    return OccurrenceAssociatedOccurrences;
-                case "Occurrence.AssociatedSequences":
-                    return OccurrenceAssociatedSequences;
-                case "Occurrence.AssociatedTaxa":
-                    return OccurrenceAssociatedTaxa;
-                case "Occurrence.Disposition":
-                    return OccurrenceDisposition;
-                case "Occurrence.EstablishmentMeans":
-                    return OccurrenceEstablishmentMeans;
-                case "Occurrence.EstablishmentMeans.Id":
-                    return OccurrenceEstablishmentMeansId;
-                case "Occurrence.EstablishmentMeans.Value":
-                    return OccurrenceEstablishmentMeansValue;
-                case "Occurrence.OtherCatalogNumbers":
-                    return OccurrenceOtherCatalogNumbers;
-                case "Taxon.AcceptedNameUsage":
-                    return TaxonAcceptedNameUsage;
-                case "Taxon.AcceptedNameUsageId":
-                    return TaxonAcceptedNameUsageId;
-                case "Taxon.BirdDirective":
-                    return TaxonBirdDirective;
-                case "Taxon.HigherClassification":
-                    return TaxonHigherClassification;
-                case "Taxon.Id":
-                    return TaxonId;
-                case "Taxon.ScientificName":
-                    return TaxonScientificName;
-                case "Taxon.ScientificNameAuthorship":
-                    return TaxonScientificNameAuthorship;
-                case "Taxon.VernacularName":
-                    return TaxonVernacularName;
-                case "Taxon.Kingdom":
-                    return TaxonKingdom;
-                case "Taxon.Phylum":
-                    return TaxonPhylum;
-                case "Taxon.Class":
-                    return TaxonClass;
-                case "Taxon.Order":
-                    return TaxonOrder;
-                case "Taxon.Family":
-                    return TaxonFamily;
-                case "Taxon.Genus":
-                    return TaxonGenus;
-                case "Taxon.InfraspecificEpithet":
-                    return TaxonInfraspecificEpithet;
-                case "Taxon.NameAccordingTo":
-                    return TaxonNameAccordingTo;
-                case "Taxon.NameAccordingToId":
-                    return TaxonNameAccordingToId;
-                case "Taxon.NamePublishedIn":
-                    return TaxonNamePublishedIn;
-                case "Taxon.NamePublishedInId":
-                    return TaxonNamePublishedInId;
-                case "Taxon.NamePublishedInYear":
-                    return TaxonNamePublishedInYear;
-                case "Taxon.NomenclaturalCode":
-                    return TaxonNomenclaturalCode;
-                case "Taxon.NomenclaturalStatus":
-                    return TaxonNomenclaturalStatus;
-                case "Taxon.OriginalNameUsage":
-                    return TaxonOriginalNameUsage;
-                case "Taxon.OriginalNameUsageId":
-                    return TaxonOriginalNameUsageId;
-                case "Taxon.ParentNameUsage":
-                    return TaxonParentNameUsage;
-                case "Taxon.ParentNameUsageId":
-                    return TaxonParentNameUsageId;
-                case "Taxon.ScientificNameId":
-                    return TaxonScientificNameId;
-                case "Taxon.SecondaryParentDyntaxaTaxonIds":
-                    return TaxonSecondaryParentDyntaxaTaxonIds;
-                case "Taxon.SpecificEpithet":
-                    return TaxonSpecificEpithet;
-                case "Taxon.Subgenus":
-                    return TaxonSubgenus;
-                case "Taxon.TaxonConceptId":
-                    return TaxonTaxonConceptId;
-                case "Taxon.TaxonId":
-                    return TaxonTaxonId;
-                case "Taxon.TaxonomicStatus":
-                    return TaxonTaxonomicStatus;
-                case "Taxon.TaxonRank":
-                    return TaxonTaxonRank;
-                case "Taxon.TaxonRemarks":
-                    return TaxonTaxonRemarks;
-                case "Taxon.VerbatimTaxonRank":
-                    return TaxonVerbatimTaxonRank;
-                case "Taxon.Attributes.ActionPlan":
-                    return TaxonAttributesActionPlan;
-                case "Taxon.Attributes.DisturbanceRadius":
-                    return TaxonAttributesDisturbanceRadius;
-                case "Taxon.Attributes.DyntaxaTaxonId":
-                    return TaxonAttributesDyntaxaTaxonId;
-                case "Taxon.Attributes.Natura2000HabitatsDirectiveArticle2":
-                    return TaxonAttributesNatura2000HabitatsDirectiveArticle2;
-                case "Taxon.Attributes.Natura2000HabitatsDirectiveArticle4":
-                    return TaxonAttributesNatura2000HabitatsDirectiveArticle4;
-                case "Taxon.Attributes.Natura2000HabitatsDirectiveArticle5":
-                    return TaxonAttributesNatura2000HabitatsDirectiveArticle5;
-                case "Taxon.Attributes.OrganismGroup":
-                    return TaxonAttributesOrganismGroup;
-                case "Taxon.Attributes.ParentDyntaxaTaxonId":
-                    return TaxonAttributesParentDyntaxaTaxonId;
-                case "Taxon.Attributes.ProtectedByLaw":
-                    return TaxonAttributesProtectedByLaw;
-                case "Taxon.Attributes.ProtectionLevel":
-                    return TaxonAttributesProtectionLevel;
-                case "Taxon.Attributes.ProtectionLevel.Id":
-                    return TaxonAttributesProtectionLevelId;
-                case "Taxon.Attributes.ProtectionLevel.Value":
-                    return TaxonAttributesProtectionLevelValue;
-                case "Taxon.Attributes.SensitivityCategory":
-                    return TaxonAttributesSensitivityCategory;
-                case "Taxon.Attributes.SensitivityCategory.Id":
-                    return TaxonAttributesSensitivityCategoryId;
-                case "Taxon.Attributes.SensitivityCategory.Value":
-                    return TaxonAttributesSensitivityCategoryValue;
-                case "Taxon.Attributes.RedlistCategory":
-                    return TaxonAttributesRedlistCategory;
-                case "Taxon.Attributes.SortOrder":
-                    return TaxonAttributesSortOrder;
-                case "Taxon.Attributes.SwedishHistory":
-                    return TaxonAttributesSwedishHistory;
-                case "Taxon.Attributes.SwedishOccurrence":
-                    return TaxonAttributesSwedishOccurrence;
-                case "Taxon.Attributes.Synonyms":
-                    return TaxonAttributesSynonyms;
-                case "Taxon.Attributes.VernacularNames":
-                    return TaxonAttributesVernacularNames;
-                case "Taxon.Attributes.TaxonCategory":
-                    return TaxonAttributesTaxonCategory;
-                case "Taxon.Attributes.TaxonCategory.Id":
-                    return TaxonAttributesTaxonCategoryId;
-                case "Taxon.Attributes.TaxonCategory.Value":
-                    return TaxonAttributesTaxonCategoryValue;
-                case "Taxon.Attributes.IsRedlisted":
-                    return TaxonAttributesIsRedlisted;
-                case "Taxon.Attributes.IsInvasiveAccordingToEuRegulation":
-                    return TaxonAttributesIsInvasiveAccordingToEuRegulation;
-                case "Taxon.Attributes.IsInvasiveInSweden":
-                    return TaxonAttributesIsInvasiveInSweden;
-                case "Taxon.Attributes.InvasiveRiskAssessmentCategory":
-                    return TaxonAttributesRiskAssessmentCategory;
-                case "DatasetId":
-                    return DatasetId;
-                case "DynamicProperties":
-                    return DynamicProperties;
-                case "InstitutionId":
-                    return InstitutionId;
-                case "Id":
-                    return Id;
-                case "Language":
-                    return Language;
-                case "License":
-                    return License;
-                case "PrivateCollection":
-                    return PrivateCollection;
-                case "PublicCollection":
-                    return PublicCollection;
-                case "SpeciesCollectionLabel":
-                    return SpeciesCollectionLabel;
-                case "BibliographicCitation":
-                    return BibliographicCitation;
-                case "DataGeneralizations":
-                    return DataGeneralizations;
-                case "InformationWithheld":
-                    return InformationWithheld;
-                case "References":
-                    return References;
-                case "Type":
-                    return Type;
-                case "Type.Id":
-                    return TypeId;
-                case "Type.Value":
-                    return TypeValue;
-                case "MeasurementOrFacts":
-                    return MeasurementOrFacts;
-                case "Projects":
-                    return Projects;
-                case "GeologicalContext.Bed":
-                    return GeologicalContextBed;
-                case "GeologicalContext.EarliestAgeOrLowestStage":
-                    return GeologicalContextEarliestAgeOrLowestStage;
-                case "GeologicalContext.EarliestEonOrLowestEonothem":
-                    return GeologicalContextEarliestEonOrLowestEonothem;
-                case "GeologicalContext.EarliestEpochOrLowestSeries":
-                    return GeologicalContextEarliestEpochOrLowestSeries;
-                case "GeologicalContext.EarliestEraOrLowestErathem":
-                    return GeologicalContextEarliestEraOrLowestErathem;
-                case "GeologicalContext.EarliestGeochronologicalEra":
-                    return GeologicalContextEarliestGeochronologicalEra;
-                case "GeologicalContext.EarliestPeriodOrLowestSystem":
-                    return GeologicalContextEarliestPeriodOrLowestSystem;
-                case "GeologicalContext.Formation":
-                    return GeologicalContextFormation;
-                case "GeologicalContext.GeologicalContextId":
-                    return GeologicalContextGeologicalContextId;
-                case "GeologicalContext.Group":
-                    return GeologicalContextGroup;
-                case "GeologicalContext.HighestBiostratigraphicZone":
-                    return GeologicalContextHighestBiostratigraphicZone;
-                case "GeologicalContext.LatestAgeOrHighestStage":
-                    return GeologicalContextLatestAgeOrHighestStage;
-                case "GeologicalContext.LatestEonOrHighestEonothem":
-                    return GeologicalContextLatestEonOrHighestEonothem;
-                case "GeologicalContext.LatestEpochOrHighestSeries":
-                    return GeologicalContextLatestEpochOrHighestSeries;
-                case "GeologicalContext.LatestEraOrHighestErathem":
-                    return GeologicalContextLatestEraOrHighestErathem;
-                case "GeologicalContext.LatestGeochronologicalEra":
-                    return GeologicalContextLatestGeochronologicalEra;
-                case "GeologicalContext.LatestPeriodOrHighestSystem":
-                    return GeologicalContextLatestPeriodOrHighestSystem;
-                case "GeologicalContext.LithostratigraphicTerms":
-                    return GeologicalContextLithostratigraphicTerms;
-                case "GeologicalContext.LowestBiostratigraphicZone":
-                    return GeologicalContextLowestBiostratigraphicZone;
-                case "GeologicalContext.Member":
-                    return GeologicalContextMember;
-                case "MaterialSample.MaterialSampleId":
-                    return MaterialSampleMaterialSampleId;
-                case "Organism.OrganismId":
-                    return OrganismOrganismId;
-                case "Organism.OrganismName":
-                    return OrganismOrganismName;
-                case "Organism.OrganismScope":
-                    return OrganismOrganismScope;
-                case "Organism.AssociatedOrganisms":
-                    return OrganismAssociatedOrganisms;
-                case "Organism.PreviousIdentifications":
-                    return OrganismPreviousIdentifications;
-                case "Organism.OrganismRemarks":
-                    return OrganismOrganismRemarks;
-
-                default:
-                    throw new ArgumentException($"Field is not mapped: \"{propertyField.PropertyPath}\"");
-            }
+                "occurrence.occurrenceid" => OccurrenceOccurrenceId,
+                "dataproviderid" => DataProviderId,
+                "datasetname" => DatasetName,
+                "modified" => Modified,
+                "protected" => Protected,
+                "sensitive" => Sensitive,
+                "accessrights" => AccessRights,
+                "accessrights.id" => AccessRightsId,
+                "accessrights.value" => AccessRightsValue,
+                "basisofrecord" => BasisOfRecord,
+                "basisofrecord.id" => BasisOfRecordId,
+                "basisofrecord.value" => BasisOfRecordValue,
+                "collectioncode" => CollectionCode,
+                "collectionid" => CollectionId,
+                "institutioncode" => InstitutionCode,
+                "institutioncode.id" => InstitutionCodeId,
+                "institutioncode.value" => InstitutionCodeValue,
+                "ownerinstitutioncode" => OwnerInstitutionCode,
+                "rightsholder" => RightsHolder,
+                "event.startdate" => EventStartDate,
+                "event.enddate" => EventEndDate,
+                "event.plainstartdate" => EventPlainStartDate,
+                "event.plainenddate" => EventPlainEndDate,
+                "event.plainstarttime" => EventStartTimeString,
+                "event.plainendtime" => EventEndTimeString,
+                "event.eventid" => EventEventId,
+                "event.eventremarks" => EventEventRemarks,
+                "event.habitat" => EventHabitat,
+                "event.discoverymethod" => EventDiscoveryMethod,
+                "event.discoverymethod.id" => EventDiscoveryMethodId,
+                "event.discoverymethod.value" => EventDiscoveryMethodValue,
+                "event.samplingeffort" => EventSamplingEffort,
+                "event.samplingprotocol" => EventSamplingProtocol,
+                "event.samplesizeunit" => EventSampleSizeUnit,
+                "event.samplesizevalue" => EventSampleSizeValue,
+                "event.media" => EventMedia,
+                "event.measurementorfacts" => EventMeasurementOrFacts,
+                "event.fieldnotes" => EventFieldNotes,
+                "event.fieldnumber" => EventFieldNumber,
+                "event.parenteventid" => EventParentEventId,
+                "event.verbatimeventdate" => EventVerbatimEventDate,
+                "identification.validated" => IdentificationValidated,
+                "identification.verified" => IdentificationVerified,
+                "identification.validationstatus" => IdentificationValidationStatus,
+                "identification.validationstatus.id" => IdentificationValidationStatusId,
+                "identification.validationstatus.value" => IdentificationValidationStatusValue,
+                "identification.verificationstatus" => IdentificationVerificationStatus,
+                "identification.verificationstatus.id" => IdentificationVerificationStatusId,
+                "identification.verificationstatus.value" => IdentificationVerificationStatusValue,
+                "identification.confirmedby" => IdentificationConfirmedBy,
+                "identification.confirmeddate" => IdentificationConfirmedDate,
+                "identification.identifiedby" => IdentificationIdentifiedBy,
+                "identification.dateidentified" => IdentificationDateIdentified,
+                "identification.uncertainidentification" => IdentificationUncertainIdentification,
+                "identification.determinationmethod" => IdentificationDeterminationMethod,
+                "identification.determinationmethod.id" => IdentificationDeterminationMethodId,
+                "identification.determinationmethod.value" => IdentificationDeterminationMethodValue,
+                "identification.verifiedby" => IdentificationVerifiedBy,
+                "identification.identificationqualifier" => IdentificationIdentificationQualifier,
+                "identification.typestatus" => IdentificationTypeStatus,
+                "identification.identificationid" => IdentificationIdentificationId,
+                "identification.identificationreferences" => IdentificationIdentificationReferences,
+                "identification.identificationremarks" => IdentificationIdentificationRemarks,
+                "location.decimallatitude" => LocationDecimalLatitude,
+                "location.decimallongitude" => LocationDecimalLongitude,
+                "location.sweref99tmx" => LocationSweref99TmX,
+                "location.sweref99tmy" => LocationSweref99TmY,
+                "location.geodeticdatum" => LocationGeodeticDatum,
+                "location.coordinateuncertaintyinmeters" => LocationCoordinateUncertaintyInMeters,
+                "location.locationid" => LocationLocationId,
+                "location.locality" => LocationLocality,
+                "location.locationremarks" => LocationLocationRemarks,
+                "location.municipality" => LocationMunicipality,
+                "location.municipality.featureid" => LocationMunicipalityFeatureId,
+                "location.municipality.name" => LocationMunicipalityName,
+                "location.county" => LocationCounty,
+                "location.county.featureid" => LocationCountyFeatureId,
+                "location.county.name" => LocationCountyName,
+                "location.parish" => LocationParish,
+                "location.parish.featureid" => LocationParishFeatureId,
+                "location.parish.name" => LocationParishName,
+                "location.province" => LocationProvince,
+                "location.province.featureid" => LocationProvinceFeatureId,
+                "location.province.name" => LocationProvinceName,
+                "location.continent" => LocationContinent,
+                "location.continent.id" => LocationContinentId,
+                "location.continent.value" => LocationContinentValue,
+                "location.country" => LocationCountry,
+                "location.country.id" => LocationCountryId,
+                "location.country.value" => LocationCountryValue,
+                "location.countrycode" => LocationCountryCode,
+                "location.georeferencedby" => LocationGeoreferencedBy,
+                "location.georeferenceddate" => LocationGeoreferencedDate,
+                "location.georeferenceremarks" => LocationGeoreferenceRemarks,
+                "location.highergeography" => LocationHigherGeography,
+                "location.island" => LocationIsland,
+                "location.maximumdepthinmeters" => LocationMaximumDepthInMeters,
+                "location.maximumelevationinmeters" => LocationMaximumElevationInMeters,
+                "location.minimumdepthinmeters" => LocationMinimumDepthInMeters,
+                "location.minimumelevationinmeters" => LocationMinimumElevationInMeters,
+                "location.verbatimcoordinatesystem" => LocationVerbatimCoordinateSystem,
+                "location.verbatimlatitude" => LocationVerbatimLatitude,
+                "location.verbatimlongitude" => LocationVerbatimLongitude,
+                "location.verbatimsrs" => LocationVerbatimSRS,
+                "location.waterbody" => LocationWaterBody,
+                "location.coordinateprecision" => LocationCoordinatePrecision,
+                "location.footprintspatialfit" => LocationFootprintSpatialFit,
+                "location.footprintsrs" => LocationFootprintSRS,
+                "location.footprintwkt" => LocationFootprintWKT,
+                "location.georeferenceprotocol" => LocationGeoreferenceProtocol,
+                "location.georeferencesources" => LocationGeoreferenceSources,
+                "location.georeferenceverificationstatus" => LocationGeoreferenceVerificationStatus,
+                "location.highergeographyid" => LocationHigherGeographyId,
+                "location.islandgroup" => LocationIslandGroup,
+                "location.locationaccordingto" => LocationLocationAccordingTo,
+                "location.maximumdistanceabovesurfaceinmeters" => LocationMaximumDistanceAboveSurfaceInMeters,
+                "location.minimumdistanceabovesurfaceinmeters" => LocationMinimumDistanceAboveSurfaceInMeters,
+                "location.pointradiusdpatialfit" => LocationPointRadiusSpatialFit,
+                "location.verbatimcoordinates" => LocationVerbatimCoordinates,
+                "location.verbatimdepth" => LocationVerbatimDepth,
+                "location.verbatimelevation" => LocationVerbatimElevation,
+                "location.verbatimlocality" => LocationVerbatimLocality,
+                "occurrence.recordedby" => OccurrenceRecordedBy,
+                "occurrence.reportedby" => OccurrenceReportedBy,
+                "occurrence.occurrencestatus" => OccurrenceOccurrenceStatus,
+                "occurrence.occurrencestatus.id" => OccurrenceOccurrenceStatusId,
+                "occurrence.occurrencestatus.value" => OccurrenceOccurrenceStatusValue,
+                "occurrence.individualcount" => OccurrenceIndividualCount,
+                "occurrence.organismquantity" => OccurrenceOrganismQuantity,
+                "occurrence.organismquantityint" => OccurrenceOrganismQuantityInt,
+                "occurrence.organismquantityunit" => OccurrenceOrganismQuantityUnit,
+                "occurrence.organismquantityunit.id" => OccurrenceOrganismQuantityUnitId,
+                "occurrence.organismquantityunit.value" => OccurrenceOrganismQuantityUnitValue,
+                "occurrence.isnaturaloccurrence" => OccurrenceIsNaturalOccurrence,
+                "occurrence.isneverfoundobservation" => OccurrenceIsNeverFoundObservation,
+                "occurrence.isnotrediscoveredobservation" => OccurrenceIsNotRediscoveredObservation,
+                "occurrence.ispositiveobservation" => OccurrenceIsPositiveObservation,
+                "occurrence.occurrenceremarks" => OccurrenceOccurrenceRemarks,
+                "occurrence.protectionlevel" => OccurrenceProtectionLevel,
+                "occurrence.sensitivitycategory" => OccurrenceSensitivityCategory,
+                "occurrence.activity" => OccurrenceActivity,
+                "occurrence.activity.id" => OccurrenceActivityId,
+                "occurrence.activity.value" => OccurrenceActivityValue,
+                "occurrence.behavior" => OccurrenceBehavior,
+                "occurrence.behavior.id" => OccurrenceBehaviorId,
+                "occurrence.behavior.value" => OccurrenceBehaviorValue,
+                "occurrence.biotope" => OccurrenceBiotope,
+                "occurrence.biotope.id" => OccurrenceBiotopeId,
+                "occurrence.biotope.value" => OccurrenceBiotopeValue,
+                "occurrence.biotopedescription" => OccurrenceBiotopeDescription,
+                "occurrence.associatedmedia" => OccurrenceAssociatedMedia,
+                "occurrence.lifestage" => OccurrenceLifeStage,
+                "occurrence.lifestage.id" => OccurrenceLifeStageId,
+                "occurrence.lifestage.value" => OccurrenceLifeStageValue,
+                "occurrence.OccurrenceStatus" => OccurrenceOccurrenceStatus,
+                "occurrence.reproductivecondition" => OccurrenceReproductiveCondition,
+                "occurrence.reproductivecondition.id" => OccurrenceReproductiveConditionId,
+                "occurrence.reproductivecondition.value" => OccurrenceReproductiveConditionValue,
+                "occurrence.sex" => OccurrenceSex, 
+                "occurrence.sex.id" => OccurrenceSexId,
+                "occurrence.sex.value" => OccurrenceSexValue,
+                "occurrence.url" => OccurrenceUrl,
+                "occurrence.length" => OccurrenceLength,
+                "occurrence.weight" => OccurrenceWeight,
+                "occurrence.substrate.description" => OccurrenceSubstrateDescription,
+                "occurrence.substrate.id" => OccurrenceSubstrateId,
+                "occurrence.substrate.name" => OccurrenceSubstrateName,
+                "occurrence.substrate.name.id" => OccurrenceSubstrateNameId,
+                "occurrence.substrate.name.value" => OccurrenceSubstrateNameValue,
+                "occurrence.substrate.quantity" => OccurrenceSubstrateQuantity,
+                "occurrence.substrate.speciesdescription" => OccurrenceSubstrateSpeciesDescription,
+                "occurrence.substrate.speciesid" => OccurrenceSubstrateSpeciesId,
+                "occurrence.substrate.speciesscientificname" => OccurrenceSubstrateSpeciesScientificName,
+                "occurrence.substrate.speciesvernacularname" => OccurrenceSubstrateSpeciesVernacularName,
+                "occurrence.birdnestactivityid" => OccurrenceBirdNestActivityId,
+                "occurrence.catalognumber" => OccurrenceCatalogNumber,
+                "occurrence.catalogid" => OccurrenceCatalogId,
+                "occurrence.associatedreferences" => OccurrenceAssociatedReferences,
+                "occurrence.individualid" => OccurrenceIndividualId,
+                "occurrence.media" => OccurrenceMedia,
+                "occurrence.preparations" => OccurrencePreparations,
+                "occurrence.recordnumber" => OccurrenceRecordNumber,
+                "occurrence.reporteddate" => OccurrenceReportedDate,
+                "occurrence.associatedoccurrences" => OccurrenceAssociatedOccurrences,
+                "occurrence.associatedsequences" => OccurrenceAssociatedSequences,
+                "occurrence.associatedtaxa" => OccurrenceAssociatedTaxa,
+                "occurrence.disposition" => OccurrenceDisposition,
+                "occurrence.establishmentmeans" => OccurrenceEstablishmentMeans,
+                "occurrence.establishmentmeans.id" => OccurrenceEstablishmentMeansId,
+                "occurrence.establishmentmeans.value" => OccurrenceEstablishmentMeansValue,
+                "occurrence.othercatalognumbers" => OccurrenceOtherCatalogNumbers,
+                "taxon.acceptednameusage" => TaxonAcceptedNameUsage,
+                "taxon.acceptednameusageid" => TaxonAcceptedNameUsageId,
+                "taxon.birddirective" => TaxonBirdDirective,
+                "taxon.higherclassification" => TaxonHigherClassification,
+                "taxon.id" => TaxonId,
+                "taxon.scientificname" => TaxonScientificName,
+                "taxon.scientificnameauthorship" => TaxonScientificNameAuthorship,
+                "taxon.vernacularname" => TaxonVernacularName,
+                "taxon.kingdom" => TaxonKingdom,
+                "taxon.phylum" => TaxonPhylum,
+                "taxon.class" => TaxonClass,
+                "taxon.order" => TaxonOrder,
+                "taxon.family" => TaxonFamily,
+                "taxon.genus" => TaxonGenus,
+                "taxon.infraspecificepithet" => TaxonInfraspecificEpithet,
+                "taxon.nameaccordingto" => TaxonNameAccordingTo,
+                "taxon.nameaccordingtoid" => TaxonNameAccordingToId,
+                "taxon.namepublishedin" => TaxonNamePublishedIn,
+                "taxon.namepublishedinid" => TaxonNamePublishedInId,
+                "taxon.namepublishedinyear" => TaxonNamePublishedInYear,
+                "taxon.nomenclaturalcode" => TaxonNomenclaturalCode,
+                "taxon.nomenclaturalstatus" => TaxonNomenclaturalStatus,
+                "taxon.originalnameusage" => TaxonOriginalNameUsage,
+                "taxon.originalnameusageid" => TaxonOriginalNameUsageId,
+                "taxon.parentnameusage" => TaxonParentNameUsage,
+                "taxon.parentnameusageid" => TaxonParentNameUsageId,
+                "taxon.scientificnameid" => TaxonScientificNameId,
+                "taxon.secondaryparentdyntaxataxonids" => TaxonSecondaryParentDyntaxaTaxonIds,
+                "taxon.specificepithet" => TaxonSpecificEpithet,
+                "taxon.subgenus" => TaxonSubgenus,
+                "taxon.taxonconceptid" => TaxonTaxonConceptId,
+                "taxon.taxonid" => TaxonTaxonId,
+                "taxon.taxonomicstatus" => TaxonTaxonomicStatus,
+                "taxon.taxonrank" => TaxonTaxonRank,
+                "taxon.taxonremarks" => TaxonTaxonRemarks,
+                "taxon.verbatimtaxonrank" => TaxonVerbatimTaxonRank,
+                "taxon.attributes.actionplan" => TaxonAttributesActionPlan,
+                "taxon.attributes.disturbanceradius" => TaxonAttributesDisturbanceRadius,
+                "taxon.attributes.dyntaxataxonid" => TaxonAttributesDyntaxaTaxonId,
+                "taxon.attributes.natura2000habitatsdirectivearticle2" => TaxonAttributesNatura2000HabitatsDirectiveArticle2,
+                "taxon.attributes.natura2000habitatsdirectivearticle4" => TaxonAttributesNatura2000HabitatsDirectiveArticle4,
+                "taxon.attributes.natura2000habitatsdirectivearticle5" => TaxonAttributesNatura2000HabitatsDirectiveArticle5,
+                "taxon.attributes.organismgroup" => TaxonAttributesOrganismGroup,
+                "taxon.attributes.parentdyntaxataxonid" => TaxonAttributesParentDyntaxaTaxonId,
+                "taxon.attributes.protectedbylaw" => TaxonAttributesProtectedByLaw,
+                "taxon.attributes.protectionlevel" => TaxonAttributesProtectionLevel,
+                "taxon.attributes.protectionlevel.id" => TaxonAttributesProtectionLevelId,
+                "taxon.attributes.protectionlevel.value" => TaxonAttributesProtectionLevelValue,
+                "taxon.attributes.sensitivitycategory" => TaxonAttributesSensitivityCategory,
+                "taxon.attributes.sensitivitycategory.id" => TaxonAttributesSensitivityCategoryId,
+                "taxon.attributes.sensitivitycategory.value" => TaxonAttributesSensitivityCategoryValue,
+                "taxon.attributes.redlistcategory" => TaxonAttributesRedlistCategory,
+                "taxon.attributes.sortorder" => TaxonAttributesSortOrder,
+                "taxon.attributes.swedishhistory" => TaxonAttributesSwedishHistory,
+                "taxon.attributes.swedishoccurrence" => TaxonAttributesSwedishOccurrence,
+                "taxon.attributes.synonyms" => TaxonAttributesSynonyms,
+                "taxon.attributes.vernacularnames" => TaxonAttributesVernacularNames,
+                "taxon.attributes.taxoncategory" => TaxonAttributesTaxonCategory,
+                "taxon.attributes.taxoncategory.id" => TaxonAttributesTaxonCategoryId,
+                "taxon.attributes.taxoncategory.value" => TaxonAttributesTaxonCategoryValue,
+                "taxon.attributes.isredlisted" => TaxonAttributesIsRedlisted,
+                "taxon.attributes.isinvasiveaccordingtoeuregulation" => TaxonAttributesIsInvasiveAccordingToEuRegulation,
+                "taxon.attributes.isinvasiveinsweden" => TaxonAttributesIsInvasiveInSweden,
+                "taxon.attributes.invasiveriskassessmentcategory" => TaxonAttributesRiskAssessmentCategory,
+                "datasetid" => DatasetId,
+                "dynamicproperties" => DynamicProperties,
+                "institutionid" => InstitutionId,
+                "id" => Id,
+                "language" => Language,
+                "license" => License,
+                "privatecollection" => PrivateCollection,
+                "publiccollection" => PublicCollection,
+                "speciescollectionlabel" => SpeciesCollectionLabel,
+                "bibliographiccitation" => BibliographicCitation,
+                "datageneralizations" => DataGeneralizations,
+                "informationwithheld" => InformationWithheld,
+                "references" => References,
+                "type" => Type,
+                "type.id" => TypeId,
+                "type.value" => TypeValue,
+                "measurementorfacts" => MeasurementOrFacts,
+                "projects" => Projects,
+                "geologicalcontext.bed" => GeologicalContextBed,
+                "geologicalcontext.earliestageorloweststage" => GeologicalContextEarliestAgeOrLowestStage,
+                "geologicalcontext.earliesteonorlowesteonothem" => GeologicalContextEarliestEonOrLowestEonothem,
+                "geologicalcontext.earliestepochorlowestseries" => GeologicalContextEarliestEpochOrLowestSeries,
+                "geologicalcontext.earliesteraorlowesterathem" => GeologicalContextEarliestEraOrLowestErathem,
+                "geologicalcontext.earliestgeochronologicalera" => GeologicalContextEarliestGeochronologicalEra,
+                "geologicalcontext.earliestperiodorlowestsystem" => GeologicalContextEarliestPeriodOrLowestSystem,
+                "geologicalcontext.formation" => GeologicalContextFormation,
+                "geologicalcontext.geologicalcontextid" => GeologicalContextGeologicalContextId,
+                "geologicalcontext.group" => GeologicalContextGroup,
+                "geologicalcontext.highestbiostratigraphiczone" => GeologicalContextHighestBiostratigraphicZone,
+                "geologicalcontext.latestageorhigheststage" => GeologicalContextLatestAgeOrHighestStage,
+                "geologicalcontext.latesteonorhighesteonothem" => GeologicalContextLatestEonOrHighestEonothem,
+                "geologicalcontext.latestepochorhighestseries" => GeologicalContextLatestEpochOrHighestSeries,
+                "geologicalcontext.latesteraorhighesterathem" => GeologicalContextLatestEraOrHighestErathem,
+                "geologicalcontext.latestgeochronologicalera" => GeologicalContextLatestGeochronologicalEra,
+                "geologicalcontext.latestperiodorhighestsystem" => GeologicalContextLatestPeriodOrHighestSystem,
+                "geologicalcontext.lithostratigraphicterms" => GeologicalContextLithostratigraphicTerms,
+                "geologicalcontext.lowestbiostratigraphiczone" => GeologicalContextLowestBiostratigraphicZone,
+                "geologicalcontext.member" => GeologicalContextMember,
+                "materialsample.materialsampleid" => MaterialSampleMaterialSampleId,
+                "organism.organismid" => OrganismOrganismId,
+                "organism.organismname" => OrganismOrganismName,
+                "organism.organismscope" => OrganismOrganismScope,
+                "organism.associatedorganisms" => OrganismAssociatedOrganisms,
+                "organism.previousidentifications" => OrganismPreviousIdentifications,
+                "organism.organismremarks" => OrganismOrganismRemarks,
+                _ => throw new ArgumentException($"Field is not mapped: \"{propertyField.PropertyPath}\"")
+            };
         }
     }
 }

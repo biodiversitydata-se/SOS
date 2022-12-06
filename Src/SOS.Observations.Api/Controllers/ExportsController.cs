@@ -430,6 +430,11 @@ namespace SOS.Observations.Api.Controllers
                         true,
                         JobCancellationToken.Null);
 
+                if (fileExportResult == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
                 HttpContext.LogObservationCount(fileExportResult.NrObservations);
                 return GetFile(fileExportResult.FilePath, "Observations_DwC.zip", "application/zip");
             }
