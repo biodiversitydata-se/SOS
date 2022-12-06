@@ -3,12 +3,15 @@ using DwC_A;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using SOS.Harvest.DarwinCore;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
@@ -77,17 +80,13 @@ namespace SOS.Harvest.Harvesters.DwC
         {
             var harvestInfo = new HarvestInfo(dataProvider.Identifier, DateTime.Now);
             harvestInfo.Id = dataProvider.Identifier;
-            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
-                    dataProvider,
-                    _verbatimClient,
-                    _logger)
-            { TempMode = true };
-
+            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(dataProvider, _verbatimClient, _logger) { TempMode = true };
+                        
             try
             {
                 _logger.LogDebug($"Start clearing DwC-A observations for {dataProvider.Identifier}");
                 await dwcArchiveVerbatimRepository.DeleteCollectionAsync();
-                await dwcArchiveVerbatimRepository.AddCollectionAsync();
+                await dwcArchiveVerbatimRepository.AddCollectionAsync();                          
                 _logger.LogDebug($"Finish clearing DwC-A observations for {dataProvider.Identifier}");
 
                 _logger.LogDebug($"Start storing DwC-A observations for {dataProvider.Identifier}");
@@ -109,6 +108,54 @@ namespace SOS.Harvest.Harvesters.DwC
 
                     observationCount += verbatimObservationsBatch.Count();
                     await dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
+                }
+
+                
+                if (_dwcaConfiguration.UseDwcaCollectionRepository)
+                {
+                    var dwcCollectionArchiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider, _dwcaConfiguration);
+                    var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, new NullLogger<DwcCollectionRepository>());
+                    dwcCollectionRepository.BeginTempMode();
+                    await dwcCollectionRepository.DeleteCollectionsAsync();
+
+                    // Read observations
+                    await dwcCollectionRepository.OccurrenceRepository.AddCollectionAsync();
+                    int colObservationCount = 0;
+                    var colObservationBatches = _dwcArchiveReader.ReadOccurrencesInBatchesAsync(dwcCollectionArchiveReaderContext);
+                    await foreach (var verbatimObservationsBatch in colObservationBatches)
+                    {
+                        cancellationToken?.ThrowIfCancellationRequested();                        
+                        if (_dwcaConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                            colObservationCount >= _dwcaConfiguration.MaxNumberOfSightingsHarvested)
+                        {
+                            _logger.LogInformation($"Max observations for {dataProvider.Identifier} reached");
+                            break;
+                        }
+
+                        colObservationCount += verbatimObservationsBatch.Count();
+                        await dwcCollectionRepository.OccurrenceRepository.AddManyAsync(verbatimObservationsBatch);                        
+                    }
+                    await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync();
+
+                    // Read events
+                    var events = await _dwcArchiveReader.ReadEventsAsync(dwcCollectionArchiveReaderContext);
+                    if (events != null && events.Any())
+                    {
+                        await dwcCollectionRepository.EventRepository.AddCollectionAsync();
+                        await dwcCollectionRepository.EventRepository.AddManyAsync(events.Cast<DwcEventOccurrenceVerbatim>());
+                        await dwcCollectionRepository.EventRepository.PermanentizeCollectionAsync();
+                    }
+
+                    // Read datasets
+                    var datasets = await _dwcArchiveReader.ReadDatasetsAsync(dwcCollectionArchiveReaderContext);
+                    if (datasets != null && datasets.Any())
+                    {
+                        await dwcCollectionRepository.DatasetRepository.AddCollectionAsync();
+                        await dwcCollectionRepository.DatasetRepository.AddManyAsync(datasets);
+                        await dwcCollectionRepository.DatasetRepository.PermanentizeCollectionAsync();
+                    }
+
+                    dwcCollectionRepository.EndTempMode();
                 }
 
                 if (dataProvider.UseVerbatimFileInExport)
@@ -139,7 +186,7 @@ namespace SOS.Harvest.Harvesters.DwC
             {
                 _logger.LogError(e, $"Failed harvest of DwC Archive for {dataProvider.Identifier}");
                 harvestInfo.Status = RunStatus.Failed;
-            }
+            }            
 
             return harvestInfo;
         }

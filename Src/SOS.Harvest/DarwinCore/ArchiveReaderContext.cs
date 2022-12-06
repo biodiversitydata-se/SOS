@@ -1,4 +1,5 @@
 ﻿using DwC_A;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 
@@ -27,6 +28,17 @@ namespace SOS.Harvest.DarwinCore
             {
                 ArchiveReader = archiveReader,
                 DataProvider = dataProvider
+            };
+        }
+
+        public static ArchiveReaderContext Create(ArchiveReader archiveReader, IIdIdentifierTuple dataProvider, DwcaConfiguration dwcaConfiguration)
+        {
+            return new ArchiveReaderContext
+            {
+                ArchiveReader = archiveReader,
+                DataProvider = dataProvider,
+                MaxNrObservationsToReturn = dwcaConfiguration.MaxNumberOfSightingsHarvested.GetValueOrDefault(int.MaxValue),
+                BatchSize= dwcaConfiguration.BatchSize
             };
         }
     }
