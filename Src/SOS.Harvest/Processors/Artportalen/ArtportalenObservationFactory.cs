@@ -1,6 +1,7 @@
-﻿using System.Collections.Concurrent;
-using System.Text;
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
@@ -10,17 +11,14 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
+using System.Collections.Concurrent;
+using System.Globalization;
+using System.Text;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
-using DateTime = System.DateTime;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
 using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
-using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
-using SOS.Lib.Configuration.Process;
-using System.Diagnostics;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -174,7 +172,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 // Event
                 obs.Event = new Event(startDate, endDate);
-                var eventId = $"{verbatimObservation.Site?.Id ?? 0}:{obs.Event.VerbatimEventDate}:{(obs.Projects?.Any() ?? false ? string.Join(',', obs.Projects.Select(p => p.Id)) : "N/A")}".ToHash();
+                var eventId = $"{verbatimObservation.Site?.Id ?? 0}:{$"{(startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : "")}{(endDate.HasValue ? $"-{endDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}" : "")}"}:{(obs.Projects?.Any() ?? false ? string.Join(',', obs.Projects.Select(p => p.Id)) : "N/A")}".ToHash();
                 obs.Event.EventId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}:event:{eventId}";
                 obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation.DiscoveryMethod, VocabularyId.DiscoveryMethod);
                 obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation);
@@ -232,11 +230,11 @@ namespace SOS.Harvest.Processors.Artportalen
                         verbatimObservation.Site?.Accuracy,
                         taxon?.Attributes?.DisturbanceRadius);
                 }
-
+                
                 // Occurrence
                 obs.Occurrence = new Occurrence();
                 obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages && verbatimObservation.FirstImageId > 0
-                    ? $"https://www.artportalen.se/Image/{verbatimObservation.FirstImageId}"
+                    ? $"https://www.artportalen.se/Image/{verbatimObservation.FirstImageId}" //verbatimObservation.Media?.FirstOrDefault(m => m.FileUri?.StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ?? true).FileUri
                     : "";
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
                 obs.Occurrence.Biotope = GetSosIdFromMetadata(verbatimObservation.Biotope!, VocabularyId.Biotope);

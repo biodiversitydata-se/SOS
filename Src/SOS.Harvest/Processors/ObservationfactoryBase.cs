@@ -43,6 +43,10 @@ namespace SOS.Harvest.Processors
         }
 
         private readonly IDictionary<int, HashSet<string>> _protectedTaxa;
+        private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificName { get; }
+        private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificNameAuthor { get; }
+        private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymName { get; }
+        private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymNameAuthor { get; }
 
         private string GetAreaKey(AreaType areatype, string? featureId) => $"{areatype}-{featureId}";
 
@@ -58,12 +62,7 @@ namespace SOS.Harvest.Processors
         }
 
         protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }        
-        protected HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> TaxonByScientificName { get; }
-        protected HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> TaxonByScientificNameAuthor { get; }
-        protected HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> TaxonBySynonymName { get; }
-        protected HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> TaxonBySynonymNameAuthor { get; }
-
-
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -78,20 +77,24 @@ namespace SOS.Harvest.Processors
         {
             Taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
 
-            TaxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
-            TaxonByScientificNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
-            TaxonBySynonymName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
-            TaxonBySynonymNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
+            _taxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
+            _taxonByScientificNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
+            _taxonBySynonymName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
+            _taxonBySynonymNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
+
             foreach (var processedTaxon in taxa.Values)
             {
-                TaxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
-                TaxonByScientificNameAuthor.Add(processedTaxon.ScientificName.ToLower() + " " + processedTaxon.ScientificNameAuthorship.ToLower(), processedTaxon);
+                _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
+                if (!string.IsNullOrEmpty(processedTaxon.ScientificNameAuthorship))
+                {
+                    _taxonByScientificNameAuthor.Add(processedTaxon.ScientificName.ToLower() + " " + processedTaxon.ScientificNameAuthorship.ToLower(), processedTaxon);
+                }
                 if (processedTaxon.Attributes?.Synonyms != null)
                 {
                     foreach (var synonyme in processedTaxon.Attributes.Synonyms)
                     {
-                        TaxonBySynonymName.Add(synonyme.Name.ToLower(), processedTaxon);
-                        TaxonBySynonymNameAuthor.Add(synonyme.Name.ToLower() + " " + synonyme.Author.ToLower(), processedTaxon);
+                        _taxonBySynonymName.Add(synonyme.Name.ToLower(), processedTaxon);
+                        _taxonBySynonymNameAuthor.Add(synonyme.Name.ToLower() + " " + synonyme.Author.ToLower(), processedTaxon);
                     }
                 }
             }
@@ -104,7 +107,7 @@ namespace SOS.Harvest.Processors
         /// </summary>
         /// <param name="taxonId"></param>
         /// <returns></returns>
-        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!)
+        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!, bool ignoreDuplicates = false)
         {
             var taxonFound = Taxa.TryGetValue(taxonId, out var taxon);
             if ((!taxonFound || taxonId == 0) && (names?.Any() ?? false))
@@ -112,7 +115,7 @@ namespace SOS.Harvest.Processors
                 // If we can't find taxon by id or taxon id is biota, try by scientific name if passed
                 foreach (var name in names)
                 {
-                    taxon = GetTaxonByName(name);
+                    taxon = GetTaxonByName(name, ignoreDuplicates);
                     if (taxon != null) break;
                 }
             }
@@ -120,42 +123,42 @@ namespace SOS.Harvest.Processors
             return taxon ?? new Lib.Models.Processed.Observation.Taxon { Id = -1, VerbatimId = taxonId.ToString() };
         }
 
-        protected Lib.Models.Processed.Observation.Taxon GetTaxonByName(string name)
+        protected Lib.Models.Processed.Observation.Taxon GetTaxonByName(string name, bool ignoreDuplicates = false)
         {
             if (string.IsNullOrEmpty(name)) return null;
             name = name.ToLower();
 
             // Get by scientific name
-            if (TaxonByScientificName.TryGetValues(name, out var taxa))
-            {
-                if (taxa.Count == 1)
+            if (_taxonByScientificName.TryGetValues(name, out var taxa))
+            {                
+                if (taxa.Count == 1 || ignoreDuplicates)
                 {
                     return taxa.First();
                 }
             }
 
             // Get by scientific name + author
-            if (TaxonByScientificNameAuthor.TryGetValues(name, out taxa))
+            if (_taxonByScientificNameAuthor.TryGetValues(name, out taxa))
             {
-                if (taxa.Count == 1)
+                if (taxa.Count == 1 || ignoreDuplicates)
                 {
                     return taxa.First();
                 }
             }
 
             // Get by synonyme
-            if (TaxonBySynonymName.TryGetValues(name, out taxa))
+            if (_taxonBySynonymName.TryGetValues(name, out taxa))
             {
-                if (taxa.Count == 1)
+                if (taxa.Count == 1 || ignoreDuplicates)
                 {
                     return taxa.First();
                 }
             }
 
             // Get by synonyme + author
-            if (TaxonBySynonymNameAuthor.TryGetValues(name, out taxa))
+            if (_taxonBySynonymNameAuthor.TryGetValues(name, out taxa))
             {
-                if (taxa.Count == 1)
+                if (taxa.Count == 1 || ignoreDuplicates )
                 {
                     return taxa.First();
                 }

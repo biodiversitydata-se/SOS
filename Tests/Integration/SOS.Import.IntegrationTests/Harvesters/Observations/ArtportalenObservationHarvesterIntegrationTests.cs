@@ -18,6 +18,8 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using Xunit;
+using ITaxonRepository = SOS.Harvest.Repositories.Source.Artportalen.Interfaces.ITaxonRepository;
+using TaxonRepository = SOS.Harvest.Repositories.Source.Artportalen.TaxonRepository;
 
 namespace SOS.Import.IntegrationTests.Harvesters.Observations
 {
@@ -78,12 +80,10 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 sightingRepository,
                 siteRepositoryMock.Object,
                 sightingVerbatimRepository,
-                personRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 processedObservationRepository,
-                taxonRepository,
-                new ArtportalenMetadataContainer(),
+                new ArtportalenMetadataContainer(metadataRepository, personRepository, projectRepository, taxonRepository, new Mock<ILogger<ArtportalenMetadataContainer>>().Object),
                 areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
@@ -141,13 +141,11 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 projectRepository,
                 sightingRepository,
                 siteRepositoryMock.Object,
-                sightingVerbatimRepositoryMock.Object,
-                personRepository,
+                 sightingVerbatimRepositoryMock.Object,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 processedObservationRepository,
-                taxonRepositoryMock,
-                new ArtportalenMetadataContainer(),
+                new ArtportalenMetadataContainer(metadataRepository, personRepository, projectRepository, taxonRepositoryMock, new Mock<ILogger<ArtportalenMetadataContainer>>().Object),
                 areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 

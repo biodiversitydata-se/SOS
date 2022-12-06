@@ -727,10 +727,18 @@ namespace SOS.Lib
                 return query;
             }
 
-            if (!skipAuthorizationFilters)
+            if (skipAuthorizationFilters)
+            {
+                // A observation can exists in both public (as diffused) and in protected (as not diffused) index.
+                // If we only get non diffused observations, we make sure we don't get a observation twice when searching both indexes
+                query.TryAddTermCriteria("diffusionStatus", 0);
+            }
+            else
             {
                 query.AddAuthorizationFilters(filter.ExtendedAuthorization);
-            }  
+            }
+
+            query.TryAddTermsCriteria("occurrence.sensitivityCategory", filter.SensitivityCategories);
 
             if (!skipSightingTypeFilters)
             {

@@ -109,6 +109,11 @@ namespace SOS.Lib.Models.Search.Filters
         public bool? PositiveSightings { get; set; }
 
         /// <summary>
+        /// Sensitivity categories to match
+        /// </summary>
+        public IEnumerable<int> SensitivityCategories { get; set; }
+
+        /// <summary>
         ///     Sex id's to match. Queryable values are available in sex vocabulary.
         /// </summary>
         public List<int> SexIds { get; set; }

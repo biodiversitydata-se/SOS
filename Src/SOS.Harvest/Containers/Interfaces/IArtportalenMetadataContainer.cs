@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using SOS.Harvest.Entities.Artportalen;
+﻿using SOS.Harvest.Entities.Artportalen;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
@@ -11,60 +10,116 @@ namespace SOS.Harvest.Containers.Interfaces
     public interface IArtportalenMetadataContainer
     {
         bool IsInitialized { get; }
-        /// <summary>
-        /// Add a project
-        /// </summary>
-        /// <param name="entities"></param>
-        void AddProject(ProjectEntity project);
-
-        ConcurrentDictionary<int, MetadataWithCategory> Activities { get; }
-        ConcurrentDictionary<int, Metadata> Biotopes { get; }
-        ConcurrentDictionary<int, Metadata> DeterminationMethods { get; }
-        ConcurrentDictionary<int, Metadata> DiscoveryMethods { get; }
-        ConcurrentDictionary<int, Metadata> Genders { get; }
-        ConcurrentDictionary<int, Metadata> Organizations { get; }
-        ConcurrentDictionary<int, Person> PersonsByUserId { get; }
-        ConcurrentDictionary<int, Project> Projects { get; }
-        ConcurrentDictionary<int, Metadata> Stages { get; }
-        ConcurrentDictionary<int, Metadata> Substrates { get; }
-        ConcurrentDictionary<int, int?> TaxonSpeciesGroups { get; }
-        ConcurrentDictionary<int, Metadata> Units { get; }
-        ConcurrentDictionary<int, Metadata> ValidationStatus { get; }
-
+      
         /// <summary>
         ///  Initialize static meta data 
         /// </summary>
-        /// <param name="activities"></param>
-        /// <param name="biotopes"></param>
-        /// <param name="determinationMethods"></param>
-        /// <param name="discoveryMethods"></param>
-        /// <param name="genders"></param>
-        /// <param name="organizations"></param>
-        /// <param name="stages"></param>
-        /// <param name="substrates"></param>
-        /// <param name="taxa"></param>
-        /// <param name="units"></param>
-        /// <param name="validationStatus"></param>
-        void InitializeStatic(
-            IEnumerable<MetadataWithCategoryEntity> activities,
-            IEnumerable<MetadataEntity> biotopes,
-            IEnumerable<MetadataEntity> determinationMethods,
-            IEnumerable<MetadataEntity> discoveryMethods,
-            IEnumerable<MetadataEntity> genders,
-            IEnumerable<MetadataEntity> organizations,
-            IEnumerable<MetadataEntity> stages,
-            IEnumerable<MetadataEntity> substrates,
-            IEnumerable<TaxonEntity> taxa,
-            IEnumerable<MetadataEntity> units,
-            IEnumerable<MetadataEntity> validationStatus);
+        Task InitializeAsync();
 
         /// <summary>
-        ///  Initialize dynamic meta data
+        /// Repository mode
         /// </summary>
-        /// <param name="personByUserId"></param>
-        /// <param name="projectEntities"></param>
-        void InitializeDynamic(
-            IEnumerable<PersonEntity> personByUserId,
-            IEnumerable<ProjectEntity> projectEntities);
+        bool Live { set; }
+
+        /// <summary>
+        /// All organizations
+        /// </summary>
+        IDictionary<int, Metadata> Organizations { get; }
+
+        /// <summary>
+        /// All persons
+        /// </summary>
+        IDictionary<int, Person> PersonsByUserId { get; }
+
+        /// <summary>
+        /// Try to get a activity by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        MetadataWithCategory TryGetActivity(int? id);
+
+        /// <summary>
+        /// Try to get a xxx by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Metadata TryGetBiotope(int? id);
+
+        /// <summary>
+        /// Try to get a xxx by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Metadata TryGetDeterminationMethod(int? id);
+
+        /// <summary>
+        /// Try to get a xxx by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Metadata TryGetDiscoveryMethod(int? id);
+
+        /// <summary>
+        /// Try to get a xxx by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Metadata TryGetGender(int? id);
+
+        /// <summary>
+        /// Try to get a xxx by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Metadata TryGetOrganization(int? id);
+
+        /// <summary>
+        /// Try get person by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<Person> TryGetPersonByUserIdAsync(int? id);
+
+        /// <summary>
+        /// Try get project by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<Project> TryGetProjectAsync(int? id);
+
+        /// <summary>
+        /// Try to get a xxx by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Metadata TryGetStage(int? id);
+
+        /// <summary>
+        /// Try get substrate by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Metadata TryGetSubstrate(int? id);
+
+        /// <summary>
+        /// Try to get a xxx by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        int? TryGetTaxonSpeciesGroupId(int? id);
+
+        /// <summary>
+        /// Try to get a xxx by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Metadata TryGetUnit(int? id);
+
+        /// <summary>
+        /// Try to get a xxx by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Metadata TryGetValidationStatus(int? id);
     }
 }

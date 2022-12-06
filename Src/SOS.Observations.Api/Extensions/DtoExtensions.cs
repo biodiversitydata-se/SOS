@@ -770,6 +770,7 @@ namespace SOS.Observations.Api.Extensions
                 dto.CatalogNumber = observation.Occurrence.CatalogNumber;
                 dto.IndividualCount = observation.Occurrence.IndividualCount;
                 dto.LifeStage = observation.Occurrence.LifeStage?.Value;
+                dto.Media = observation.Occurrence.Media;
                 dto.OccurrenceID = observation.Occurrence.OccurrenceId;
                 dto.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
                 dto.OccurrenceStatus = observation.Occurrence.OccurrenceStatus?.Value;

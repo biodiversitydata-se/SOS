@@ -187,7 +187,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
 
-                occurrenceId = WebUtility.UrlDecode(occurrenceId ?? id);
+                occurrenceId = WebUtility.UrlDecode(id ?? occurrenceId);
 
                 var observation = await ObservationManager.GetObservationAsync(UserId, roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
                     includeInternalFields: false, false);
@@ -648,6 +648,64 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Search DwC error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Gets a single observation.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="id">The occurrence id of the observation to fetch.</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="sensitiveObservations">
+        /// If true, and the requested observation is sensitive (protected), then the original data will be returned (this requires authentication and authorization).
+        /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.
+        /// </param>
+        /// <returns></returns>
+        [HttpGet("DwC/{id}")]
+        [ProducesResponseType(typeof(IEnumerable<DarwinCoreOccurrenceDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ObservationByIdDwc(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromRoute] string id,
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool sensitiveObservations = false)
+        {
+            try
+            {
+                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                id = WebUtility.UrlDecode(id);
+
+                var observation = await ObservationManager.GetObservationAsync(UserId, roleId, authorizationApplicationIdentifier, id, OutputFieldSet.All, translationCultureCode, sensitiveObservations,
+                    includeInternalFields: false, false);
+
+                if (observation == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
+                HttpContext.LogObservationCount(1);
+
+                var dto = new[] { observation }.ToObservations().Select(o => o.ToDto()).FirstOrDefault();
+                return new OkObjectResult(dto);
+            }
+            catch (AuthenticationRequiredException)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TimeoutException)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Error getting observation {id}");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

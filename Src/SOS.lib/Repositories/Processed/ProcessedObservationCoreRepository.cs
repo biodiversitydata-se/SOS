@@ -883,11 +883,12 @@ namespace SOS.Lib.Repositories.Processed
             SearchFilter filter,
             int gridCellSizeInMeters,
             MetricCoordinateSys metricCoordinateSys,
+            bool skipAuthorizationFilters = false,
             int? maxBuckets = null,
             CompositeKey afterKey = null)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter, skipAuthorizationFilters: skipAuthorizationFilters);
 
             using var operation =
                 _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_MetricGridAggregation");

@@ -113,11 +113,11 @@ namespace SOS.Analysis.Api.Managers
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var gridCells = new List<GridCell>();
                 const int pageSize = 10000;
-                var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, pageSize);
+                var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize);
                 while((result?.GridCellCount ?? 0) > 0)
                 {
                     gridCells.AddRange(result!.GridCells);
-                    result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, pageSize, result.AfterKey);
+                    result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize, result.AfterKey);
                 }
                 var metaData = CalculateMetadata(gridCells);
                 if (!gridCells.Any())
