@@ -272,7 +272,7 @@ namespace SOS.Harvest.DarwinCore
             yield return occurrenceRecords;
         }
 
-        public async Task<IEnumerable<DwcEventVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext)
+        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext)
         {
             return null;
         }

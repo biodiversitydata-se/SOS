@@ -811,7 +811,7 @@ namespace SOS.Harvest.DarwinCore
             if (string.IsNullOrEmpty(occurrence.EventID)) return;
 
             if (!archiveReaderContext.OccurrenceIdsByEventId.ContainsKey(occurrence.EventID))
-            {
+            {                
                 archiveReaderContext.OccurrenceIdsByEventId.Add(occurrence.EventID, new List<string>());
             }
 
@@ -847,7 +847,7 @@ namespace SOS.Harvest.DarwinCore
             yield return occurrenceRecords;
         }
 
-        public async Task<IEnumerable<DwcEventVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext)
+        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext)
         {
             var eventFileReader = archiveReaderContext.ArchiveReader.GetAsyncFileReader(RowTypes.Event);
             if (eventFileReader == null)

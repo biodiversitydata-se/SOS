@@ -132,7 +132,7 @@ namespace SOS.Harvest.DarwinCore
             }
         }
 
-        public async Task<IEnumerable<DwcEventVerbatim>> ReadEventsAsync(ArchiveReaderContext archiveReaderContext)
+        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEventsAsync(ArchiveReaderContext archiveReaderContext)
         {
             var reader = CreateDwcReader(RowTypes.Event);
             return await reader.ReadEvents(archiveReaderContext);

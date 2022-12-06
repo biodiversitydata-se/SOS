@@ -36,6 +36,6 @@ namespace SOS.Harvest.DarwinCore.Interfaces
         Task<List<DwcVerbatimObservationDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext);
 
         IAsyncEnumerable<List<DwcObservationVerbatim>> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext);
-        Task<IEnumerable<DwcEventVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext);
+        Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext);
     }
 }

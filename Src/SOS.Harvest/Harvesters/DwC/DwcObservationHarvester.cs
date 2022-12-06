@@ -137,10 +137,22 @@ namespace SOS.Harvest.Harvesters.DwC
                     }
                     await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync();
 
+                    int observationDatasetByEventIdCount = 0;
+                    if (dwcCollectionArchiveReaderContext?.ObservationDatasetByEventId != null)
+                    {
+                        observationDatasetByEventIdCount = dwcCollectionArchiveReaderContext.ObservationDatasetByEventId.Count();
+                    }
+                    _logger.LogDebug($"ObservationDatasetByEventId.Count={observationDatasetByEventIdCount} for data provider {dataProvider}");
+
                     // Read events
                     var events = await _dwcArchiveReader.ReadEventsAsync(dwcCollectionArchiveReaderContext);
                     if (events != null && events.Any())
                     {
+                        foreach (var ev in events)
+                        {
+                            ev.Observations = null;
+                        }
+
                         await dwcCollectionRepository.EventRepository.AddCollectionAsync();
                         await dwcCollectionRepository.EventRepository.AddManyAsync(events.Cast<DwcEventOccurrenceVerbatim>());
                         await dwcCollectionRepository.EventRepository.PermanentizeCollectionAsync();
