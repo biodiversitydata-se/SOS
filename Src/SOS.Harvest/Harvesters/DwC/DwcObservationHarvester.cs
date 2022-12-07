@@ -114,7 +114,7 @@ namespace SOS.Harvest.Harvesters.DwC
                 if (_dwcaConfiguration.UseDwcaCollectionRepository)
                 {
                     var dwcCollectionArchiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider, _dwcaConfiguration);
-                    var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, new NullLogger<DwcCollectionRepository>());
+                    var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, _logger);
                     dwcCollectionRepository.BeginTempMode();
                     await dwcCollectionRepository.DeleteCollectionsAsync();
 

@@ -538,6 +538,8 @@ namespace SOS.Harvest.Jobs
                             // Process Events
                             await InitializeElasticSearchEventAsync();
                             await DisableEsEventIndexingAsync();
+                            _logger.LogDebug($"Number of data providers that supports events: {dataProvidersToProcess.Where(m => m.SupportEvents).Count()}");
+                            _logger.LogDebug($"Number of data providers that don't supports events: {dataProvidersToProcess.Where(m => !m.SupportEvents).Count()}");
                             var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
                             var eventSuccess = eventResult.All(t => t.Value.Status == RunStatus.Success);
                             await EnableEsEventIndexingAsync();
@@ -795,18 +797,20 @@ namespace SOS.Harvest.Jobs
             IDictionary<int, Taxon> taxonById,
             IJobCancellationToken cancellationToken)
         {
+            _logger.LogDebug("Start processing verbatim events");
             if (dataProvidersToProcess == null || !dataProvidersToProcess.Any()) return null;
             var processStart = DateTime.Now;
             var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
             foreach (var dataProvider in dataProvidersToProcess)
             {
+                _logger.LogDebug($"Start processing verbatim events for data provider: {dataProvider}");
                 var processor = _eventProcessorByType[dataProvider.Type];
                 processTaskByDataProvider.Add(dataProvider,
                     processor.ProcessAsync(dataProvider, cancellationToken));
             }
-
+            
             var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
-
+            _logger.LogDebug("End processing verbatim events");
             //await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
             return processTaskByDataProvider.ToDictionary(pt => pt.Key, pt => pt.Value.Result);
         }

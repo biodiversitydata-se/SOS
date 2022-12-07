@@ -38,7 +38,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             //    dataProvider,
             //    _verbatimClient,
             //    Logger);
-            using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, new NullLogger<DwcCollectionRepository>());
+            using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, Logger);
 
             var observationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProvider,

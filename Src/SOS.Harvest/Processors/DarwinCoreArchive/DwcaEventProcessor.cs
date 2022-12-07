@@ -53,7 +53,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
         protected override async Task<int> ProcessEventsAsync(DataProvider dataProvider, IJobCancellationToken cancellationToken)
         {
-            using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, new NullLogger<DwcCollectionRepository>());
+            using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, Logger);
             DwcaEventFactory dwcaEventFactory = await DwcaEventFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager, ProcessConfiguration);
 
             return await base.ProcessEventsAsync(
