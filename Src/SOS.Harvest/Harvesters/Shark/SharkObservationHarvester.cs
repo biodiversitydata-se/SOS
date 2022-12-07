@@ -8,6 +8,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.Shark;
+using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Harvesters.Shark
@@ -45,6 +46,10 @@ namespace SOS.Harvest.Harvesters.Shark
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
+            // Get current document count from permanent index
+            _sharkObservationVerbatimRepository.TempMode = false;
+            var currentDocCount = await _sharkObservationVerbatimRepository.CountAllDocumentsAsync();
+
             var harvestInfo = new HarvestInfo("SHARK", DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
             _sharkObservationVerbatimRepository.TempMode = true;
@@ -130,12 +135,20 @@ namespace SOS.Harvest.Harvesters.Shark
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
-                harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
 
-                _logger.LogInformation("Start permanentize temp collection for SHARK verbatim");
-                await _sharkObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for SHARK verbatim");
+                if (nrSightingsHarvested >= currentDocCount * 0.8)
+                {
+                    harvestInfo.Status = RunStatus.Success;
+                    _logger.LogInformation("Start permanentize temp collection for SHARK verbatim");
+                    await _sharkObservationVerbatimRepository.PermanentizeCollectionAsync();
+                    _logger.LogInformation("Finish permanentize temp collection for SHARK verbatim");
+                }
+                else
+                {
+                    harvestInfo.Status = RunStatus.Failed;
+                    _logger.LogError($"SHARK: Previous harvested observation count is: {currentDocCount}. Now only {nrSightingsHarvested} observations where harvested.");
+                }
             }
             catch (JobAbortedException)
             {

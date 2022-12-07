@@ -12,6 +12,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Harvest.Harvesters.DwC
@@ -81,7 +82,12 @@ namespace SOS.Harvest.Harvesters.DwC
                     dataProvider,
                     _verbatimClient,
                     _logger)
-            { TempMode = true };
+            { TempMode = false };
+
+            // Get current document count from permanent index
+            var currentDocCount = await dwcArchiveVerbatimRepository.CountAllDocumentsAsync();
+
+            dwcArchiveVerbatimRepository.TempMode = true;
 
             try
             {

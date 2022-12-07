@@ -10,6 +10,7 @@ using SOS.Harvest.Repositories.Source.ObservationsDatabase.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ObservationDatabase;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
 
 namespace SOS.Harvest.Harvesters.ObservationDatabase
 {
@@ -154,6 +155,10 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
+            // Get current document count from permanent index
+            _observationDatabaseVerbatimRepository.TempMode = false;
+            var currentDocCount = await _observationDatabaseVerbatimRepository.CountAllDocumentsAsync();
+
             var harvestInfo = new HarvestInfo("ObservationDatabase", DateTime.Now);
             _observationDatabaseVerbatimRepository.TempMode = true;
 
@@ -212,12 +217,20 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
                 // Update harvest info
                 harvestInfo.DataLastModified = await _observationDatabaseRepository.GetLastModifiedDateAsyc();
                 harvestInfo.End = DateTime.Now;
-                harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrObservationsHarvested;
 
-                _logger.LogInformation("Start permanentize temp collection for observation database verbatim");
-                await _observationDatabaseVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for observation database verbatim");
+                if (nrObservationsHarvested >= currentDocCount * 0.8)
+                {
+                    harvestInfo.Status = RunStatus.Success;
+                    _logger.LogInformation("Start permanentize temp collection for observation database verbatim");
+                    await _observationDatabaseVerbatimRepository.PermanentizeCollectionAsync();
+                    _logger.LogInformation("Finish permanentize temp collection for observation database verbatim");
+                }
+                else
+                {
+                    harvestInfo.Status = RunStatus.Failed;
+                    _logger.LogError($"Observation database: Previous harvested observation count is: {currentDocCount}. Now only {nrObservationsHarvested} observations where harvested.");
+                }
             }
             catch (JobAbortedException e)
             {

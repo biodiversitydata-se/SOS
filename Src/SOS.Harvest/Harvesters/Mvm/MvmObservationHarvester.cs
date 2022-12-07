@@ -45,6 +45,10 @@ namespace SOS.Harvest.Harvesters.Mvm
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
+            // Get current document count from permanent index
+            _mvmObservationVerbatimRepository.TempMode = false;
+            var currentDocCount = await _mvmObservationVerbatimRepository.CountAllDocumentsAsync();
+
             var harvestInfo = new HarvestInfo("MVM", DateTime.Now);
             _mvmObservationVerbatimRepository.TempMode = true;
 
@@ -103,12 +107,20 @@ namespace SOS.Harvest.Harvesters.Mvm
                 harvestInfo.DataLastModified =
                     dataLastModified == DateTime.MinValue ? (DateTime?) null : dataLastModified;
                 harvestInfo.End = DateTime.Now;
-                harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
 
-                _logger.LogInformation("Start permanentize temp collection for MVM verbatim");
-                await _mvmObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for MVM verbatim");
+                if (nrSightingsHarvested >= currentDocCount * 0.8)
+                {
+                    harvestInfo.Status = RunStatus.Success;
+                    _logger.LogInformation("Start permanentize temp collection for MVM verbatim");
+                    await _mvmObservationVerbatimRepository.PermanentizeCollectionAsync();
+                    _logger.LogInformation("Finish permanentize temp collection for MVM verbatim");
+                }
+                else
+                {
+                    harvestInfo.Status = RunStatus.Failed;
+                    _logger.LogError($"MVM: Previous harvested observation count is: {currentDocCount}. Now only {nrSightingsHarvested} observations where harvested.");
+                }
             }
             catch (JobAbortedException)
             {

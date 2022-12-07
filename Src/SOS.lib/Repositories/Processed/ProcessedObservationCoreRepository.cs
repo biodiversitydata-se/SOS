@@ -750,7 +750,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task EnableIndexingAsync(bool protectedIndex)
         {
             await Client.Indices.UpdateSettingsAsync(protectedIndex ? ProtectedIndexName : PublicIndexName,
-                p => p.IndexSettings(g => g.RefreshInterval(1)));
+                p => p.IndexSettings(g => g.RefreshInterval(new Time(5000))));
         }
 
         /// <inheritdoc />

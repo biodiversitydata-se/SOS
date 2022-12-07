@@ -13,6 +13,7 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Harvest.Repositories.Source.Artportalen;
 
 namespace SOS.Harvest.Harvesters.Artportalen
 {
@@ -296,18 +297,19 @@ namespace SOS.Harvest.Harvesters.Artportalen
         private void SetRunMode(JobRunModes mode)
         {
             // Use active index if it's a incremental active instance harvest 
-            var live = mode == JobRunModes.IncrementalActiveInstance;
-
-            _processedObservationRepository.LiveMode = live;
+            _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
             _artportalenVerbatimRepository.Mode = mode;
+
+            // Incremental harvest always use live AP data
+            var live = mode != JobRunModes.Full;
+            _artportalenMetadataContainer.Live = live;
             _mediaRepository.Live = live;
+            _metadataRepository.Live = live;
             _projectRepository.Live = live;
             _sightingRelationRepository.Live = live;
             _sightingRepository.Live = live;
             _siteRepository.Live = live;
             _speciesCollectionRepository.Live = live;
-
-            _artportalenMetadataContainer.Live = live;
         }
 
         /// <summary>

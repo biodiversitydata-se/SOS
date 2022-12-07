@@ -9,6 +9,7 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Harvesters.iNaturalist
 {
@@ -55,8 +56,13 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 _verbatimClient,
                 _logger)
             {
-                TempMode = true
+                TempMode = false
             };
+
+            // Get current document count from permanent index
+            var currentDocCount = await dwcArchiveVerbatimRepository.CountAllDocumentsAsync();
+            dwcArchiveVerbatimRepository.TempMode = true;
+
             try
             {
                 _logger.LogInformation("Start harvesting sightings for iNaturalist data provider");
@@ -110,12 +116,21 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
-                harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
 
-                _logger.LogInformation("Start permanentize temp collection for iNaturalist verbatim");
-                await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for iNaturalist verbatim");
+                if (nrSightingsHarvested >= currentDocCount * 0.8)
+                {
+                    harvestInfo.Status = RunStatus.Success;
+                    _logger.LogInformation("Start permanentize temp collection for iNaturalist verbatim");
+                    await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
+                    _logger.LogInformation("Finish permanentize temp collection for iNaturalist verbatim");
+                }
+                else
+                {
+                    harvestInfo.Status = RunStatus.Failed;
+                    _logger.LogError($"iNaturalist: Previous harvested observation count is: {currentDocCount}. Now only {nrSightingsHarvested} observations where harvested.");
+                }
+                
             }
             catch (JobAbortedException)
             {

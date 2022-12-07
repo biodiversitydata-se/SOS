@@ -8,6 +8,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
+using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Harvesters.VirtualHerbarium
@@ -47,6 +48,10 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
+            // Get current document count from permanent index
+            _virtualHerbariumObservationVerbatimRepository.TempMode = false;
+            var currentDocCount = await _virtualHerbariumObservationVerbatimRepository.CountAllDocumentsAsync();
+
             var harvestInfo = new HarvestInfo("VirtualHerbarium", DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
             var occurrenceIdsSet = new HashSet<string>();
@@ -122,12 +127,22 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
-                harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
 
-                _logger.LogInformation("Start permanentize temp collection for Virtual Herbarium verbatim");
-                await _virtualHerbariumObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for Virtual Herbarium verbatim");
+                if (nrSightingsHarvested >= currentDocCount * 0.8)
+                {
+                    harvestInfo.Status = RunStatus.Success;
+                    _logger.LogInformation("Start permanentize temp collection for Virtual Herbarium verbatim");
+                    await _virtualHerbariumObservationVerbatimRepository.PermanentizeCollectionAsync();
+                    _logger.LogInformation("Finish permanentize temp collection for Virtual Herbarium verbatim");
+                }
+                else
+                {
+                    harvestInfo.Status = RunStatus.Failed;
+                    _logger.LogError($"Virtual Herbarium: Previous harvested observation count is: {currentDocCount}. Now only {nrSightingsHarvested} observations where harvested.");
+                }
+
+                
             }
             catch (JobAbortedException)
             {

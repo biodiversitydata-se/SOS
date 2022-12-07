@@ -292,7 +292,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         {
             try
             {
-                var query = $@"SELECT TOP({limit})   
+                var query = $@"SELECT DISTINCT TOP({limit})   
 	                s.SightingId AS Id /*,
                     MAX(CASE 
 		                WHEN sc.CreationTime > s.EditDate AND sc.CreationTime > mfc.CreationTime THEN sc.CreationTime
@@ -317,13 +317,13 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     SortDate*/";
 
                 var result = await QueryAsync<int>(query, new { modifiedSince = modifiedSince.ToLocalTime() });
-                var sightingIds = result?.Distinct();
-                Logger.LogDebug($"GetModifiedIdsAsync({modifiedSince}, {limit}, Live={Live}) returned {sightingIds?.Count() ?? 0} sightingIds");
-                if (!sightingIds?.Any() ?? true)
+
+                Logger.LogDebug($"GetModifiedIdsAsync({modifiedSince}, {limit}, Live={Live}) returned {result?.Count() ?? 0} sightingIds");
+                if (!result?.Any() ?? true)
                 {                    
                     Logger.LogDebug($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}, Query: {query}");
                 }
-                return sightingIds!;
+                return result!;
             }
             catch (Exception e)
             {
