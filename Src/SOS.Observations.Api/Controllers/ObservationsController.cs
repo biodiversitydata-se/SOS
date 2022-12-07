@@ -1397,6 +1397,9 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -1407,6 +1410,26 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "SearchInternal error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        private void LogUserInformation()
+        {
+            try
+            {
+                _logger.LogInformation($"User.UserId={UserId}");
+                _logger.LogInformation($"User.Email={UserEmail?.ToString() ?? "[null]"}");
+                if (User?.Claims != null)
+                {                    
+                    foreach (var claim in User.Claims)
+                    {
+                        _logger.LogInformation($"User.Claim.{claim.Type}={claim.Value.ToString() ?? "[null]"}");
+                    }
+                }                
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e, "LogUserInformation error");
             }
         }
 
@@ -1631,6 +1654,9 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
