@@ -13,66 +13,83 @@ using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Harvest.Processors.Artportalen;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
     /// <summary>
-    ///     DwC-A observation processor.
+    ///     DwC-A event processor.
     /// </summary>
-    public class DwcaEventProcessor : ChecklistProcessorBase<DwcaChecklistProcessor, DwcEventOccurrenceVerbatim, IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int>>,
-        IDwcaChecklistProcessor, IDwcaEventProcessor
+    public class DwcaEventProcessor : EventProcessorBase<DwcaEventProcessor, DwcEventOccurrenceVerbatim, IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int>>,
+        IDwcaEventProcessor
     {
-        private readonly IVerbatimClient _verbatimClient;
+        private readonly IVerbatimClient _verbatimClient;        
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly IVocabularyRepository _vocabularyRepository;
+        public override DataProviderType Type => DataProviderType.DwcA;
 
-        /// <inheritdoc />
-        protected override async Task<int> ProcessChecklistsAsync(
-            DataProvider dataProvider,
-            IJobCancellationToken cancellationToken)
-        {
-            using var dwcArchiveVerbatimRepository = new EventOccurrenceDarwinCoreArchiveVerbatimRepository(
-                dataProvider,
-                _verbatimClient,
-                Logger);
-
-            var checklistFactory = await DwcaChecklistFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager, ProcessConfiguration);
-
-            return await base.ProcessChecklistsAsync(
-                dataProvider,
-                checklistFactory,
-                dwcArchiveVerbatimRepository,
-                cancellationToken);
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="verbatimClient"></param>
-        /// <param name="processedChecklistRepository"></param>
-        /// <param name="processManager"></param>
-        /// <param name="processTimeManager"></param>
-        /// <param name="areaHelper"></param>
-        /// <param name="vocabularyRepository"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
         public DwcaEventProcessor(
-            IVerbatimClient verbatimClient,
-            IProcessedChecklistRepository processedChecklistRepository,
-            IProcessManager processManager,
-            IProcessTimeManager processTimeManager,
+            //IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int> artportalenVerbatimRepository,
+            //IArtportalenVerbatimRepository artportalenVerbatimRepository // observation verbatim repository
+            //    IVerbatimClient verbatimClient,
+            IProcessedObservationCoreRepository processedObservationRepository,
+            IObservationEventRepository observationEventRepository,
             IAreaHelper areaHelper,
             IVocabularyRepository vocabularyRepository,
+            IProcessManager processManager,
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
-            ILogger<DwcaChecklistProcessor> logger) :
-                base(processedChecklistRepository, processManager, processTimeManager, processConfiguration, logger)
+            ILogger<DwcaEventProcessor> logger) :
+                base(observationEventRepository, processManager, processTimeManager, processConfiguration, logger)
         {
-            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-            _vocabularyRepository = vocabularyRepository ??
-                                    throw new ArgumentNullException(nameof(vocabularyRepository));
+            _processedObservationRepository = processedObservationRepository;
+            _areaHelper = areaHelper;
+            _vocabularyRepository = vocabularyRepository;
         }
 
-        public override DataProviderType Type => DataProviderType.DwcA;
+        protected override async Task<int> ProcessEventsAsync(DataProvider dataProvider, IJobCancellationToken cancellationToken)
+        {
+            using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, new NullLogger<DwcCollectionRepository>());
+            DwcaEventFactory dwcaEventFactory = await DwcaEventFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager, ProcessConfiguration);
+
+            return await base.ProcessEventsAsync(
+                dataProvider,
+                dwcaEventFactory,
+                dwcCollectionRepository.EventRepository,
+                cancellationToken);
+
+            // Artportalen implementation
+            //int nrAddedEvents = await AddObservationEventsAsync(dataProvider);
+            //return nrAddedEvents;
+
+            //using var dwcArchiveVerbatimRepository = new EventOccurrenceDarwinCoreArchiveVerbatimRepository(
+            //    dataProvider,
+            //    _verbatimClient,
+            //    Logger);
+
+            //var checklistFactory = await DwcaChecklistFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager, ProcessConfiguration);
+
+            //return await base.ProcessChecklistsAsync(
+            //    dataProvider,
+            //    checklistFactory,
+            //    dwcArchiveVerbatimRepository,
+            //    cancellationToken);
+        }
+
+        // Artportalen implementation
+        //private async Task<int> AddObservationEventsAsync(DataProvider dataProvider)
+        //{            
+        //    Logger.LogInformation("Start AddObservationEventsAsync()");
+        //    int batchSize = 5000;
+        //    var filter = new SearchFilter(0);
+        //    filter.IsPartOfDataStewardshipDataset = true;
+        //    Logger.LogInformation($"AddObservationEventsAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
+        //    var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);   
+        //}        
+
     }
 }

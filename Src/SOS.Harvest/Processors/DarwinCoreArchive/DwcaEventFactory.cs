@@ -13,27 +13,43 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
     /// <summary>
     ///     DwC-A event factory.
     /// </summary>
-    public class DwcaEventFactory : ChecklistFactoryBase, IChecklistFactory<DwcEventOccurrenceVerbatim>
+    public class DwcaEventFactory : EventFactoryBase, IEventFactory<DwcEventOccurrenceVerbatim>
+    //public class DwcaEventFactory : IEventFactory<DwcEventOccurrenceVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
 
-        private enum MappingNotFoundLogic
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="taxa"></param>
+        /// <param name="vocabularyById"></param>
+        /// <param name="areaHelper"></param>
+        public DwcaEventFactory(
+            DataProvider dataProvider,
+            IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
+            IAreaHelper areaHelper,
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
         {
-            UseSourceValue,
-            UseDefaultValue
+            _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
-        private Event CreateEvent(DwcEventOccurrenceVerbatim verbatim)
+        public ObservationEvent CreateEventObservation(DwcEventOccurrenceVerbatim verbatim)
         {
-            DwcParser.TryParseEventDate(
+            try
+            {
+                DwcParser.TryParseEventDate(
                 verbatim.EventDate,
                 verbatim.Year,
                 verbatim.Month,
@@ -42,21 +58,46 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 out var startDate,
                 out var endDate);
 
-            var processedEvent = new Event(startDate, endDate);
-            processedEvent.EventId = verbatim.EventID;
-            processedEvent.ParentEventId = verbatim.ParentEventID;
-            processedEvent.EventRemarks = verbatim.EventRemarks;
-            processedEvent.FieldNotes = verbatim.FieldNotes;
-            processedEvent.FieldNumber = verbatim.FieldNumber;
-            processedEvent.Habitat = verbatim.Habitat;
-            processedEvent.SampleSizeUnit = verbatim.SampleSizeUnit;
-            processedEvent.SampleSizeValue = verbatim.SampleSizeValue;
-            processedEvent.SamplingEffort = verbatim.SamplingEffort;
-            processedEvent.SamplingProtocol = verbatim.SamplingProtocol;
-            processedEvent.VerbatimEventDate = verbatim.VerbatimEventDate;
+                var processedEvent = new ObservationEvent();
+                processedEvent.Id = verbatim.Id.ToString();
+                processedEvent.StartDate = startDate;
+                processedEvent.EndDate = endDate;
+                processedEvent.EventId = verbatim.EventID;
+                processedEvent.ParentEventId = verbatim.ParentEventID;
+                processedEvent.EventRemarks = verbatim.EventRemarks;
+                processedEvent.Habitat = verbatim.Habitat;
+                processedEvent.SampleSizeUnit = verbatim.SampleSizeUnit;
+                processedEvent.SampleSizeValue = verbatim.SampleSizeValue;
+                processedEvent.SamplingEffort = verbatim.SamplingEffort;
+                processedEvent.SamplingProtocol = verbatim.SamplingProtocol;
+                processedEvent.OccurrenceIds = verbatim.OccurrenceIds?.ToList();
+                processedEvent.Location = CreateLocation(verbatim);
+                processedEvent.Dataset = new EventDataset
+                {
+                    Identifier = "ReplaceWithDataStewardshipIdentifier",
+                    //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event
+                };
+                if (!GISExtensions.TryParseCoordinateSystem(verbatim.GeodeticDatum, out var coordinateSystem))
+                {
+                    coordinateSystem = CoordinateSys.WGS84;
+                }
+                AddPositionData(processedEvent.Location, verbatim.DecimalLongitude.ParseDouble(), verbatim.DecimalLatitude.ParseDouble(),
+                    coordinateSystem, verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, 0);
+                _areaHelper.AddAreaDataToProcessedLocation(processedEvent.Location);
 
-            return processedEvent;
+                return processedEvent;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error when processing DwC verbatim event with Id={verbatim.Id}", e);
+            }
         }
+
+        private enum MappingNotFoundLogic
+        {
+            UseSourceValue,
+            UseDefaultValue
+        }        
 
         private Location CreateLocation(DwcEventOccurrenceVerbatim verbatim)
         {
@@ -215,27 +256,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
             return taxonIds;
         }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        /// <param name="taxa"></param>
-        /// <param name="vocabularyById"></param>
-        /// <param name="areaHelper"></param>
-        public DwcaEventFactory(
-            DataProvider dataProvider,
-            IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
-        {
-            _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-        }
-
-
-        public static async Task<DwcaChecklistFactory> CreateAsync(
+        
+        public static async Task<DwcaEventFactory> CreateAsync(
             DataProvider dataProvider,
             IVocabularyRepository processedVocabularyRepository,
             IAreaHelper areaHelper,
@@ -247,58 +269,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 ExternalSystemId.DarwinCore,
                 vocabularies.ToArray(),
                 true);
-            return new DwcaChecklistFactory(dataProvider, vocabularyById, areaHelper, processTimeManager, processConfiguration);
-        }
-
-        /// <summary>
-        ///     Cast verbatim checklist to processed data model
-        /// </summary>
-        /// <param name="verbatimChecklist"></param>
-        /// <returns></returns>
-        public Checklist CreateProcessedChecklist(DwcEventOccurrenceVerbatim verbatimChecklist)
-        {
-            try
-            {
-                if (verbatimChecklist == null)
-                {
-                    return null;
-                }
-
-                var id = $"urn:lsid:{DataProvider.ChecklistIdentifier}:Checklist:{verbatimChecklist.Id}";
-
-                DateTime.TryParse(verbatimChecklist.EventDate, out var eventDate);
-                DateTime.TryParse(verbatimChecklist.Modified, out var modified);
-
-                var checklist = new Checklist
-                {
-                    DataProviderId = DataProvider.Id,
-                    Id = id,
-                    Event = CreateEvent(verbatimChecklist),
-                    Location = CreateLocation(verbatimChecklist),
-                    Modified = modified,
-                    Name = $"{DataProvider.ChecklistIdentifier}-{verbatimChecklist.EventID}",
-                    OccurrenceIds =
-                        verbatimChecklist.Observations?.Select(o => o.OccurrenceID),
-                    RecordedBy = verbatimChecklist.RecordedBy,
-                    SamplingEffortTime = verbatimChecklist.SamplingEffortTime,
-                    TaxonIds = TryParseTaxonIds(verbatimChecklist.Taxa?.Select(t => t.TaxonID)),
-                    TaxonIdsFound = TryParseTaxonIds(verbatimChecklist.Observations?.Select(o => o.TaxonID))?.Distinct()
-                };
-
-                if (!GISExtensions.TryParseCoordinateSystem(verbatimChecklist.GeodeticDatum, out var coordinateSystem))
-                {
-                    coordinateSystem = CoordinateSys.WGS84;
-                }
-                AddPositionData(checklist.Location, verbatimChecklist.DecimalLongitude.ParseDouble(), verbatimChecklist.DecimalLatitude.ParseDouble(),
-                    coordinateSystem, verbatimChecklist.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, 0);
-                _areaHelper.AddAreaDataToProcessedLocation(checklist.Location);
-
-                return checklist;
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Error when processing DwC verbatim checklist with Id={verbatimChecklist.Id}", e);
-            }
+            return new DwcaEventFactory(dataProvider, vocabularyById, areaHelper, processTimeManager, processConfiguration);
         }
     }
 }

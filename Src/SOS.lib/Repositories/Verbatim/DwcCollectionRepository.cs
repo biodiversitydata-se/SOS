@@ -21,6 +21,7 @@ namespace SOS.Lib.Repositories.Verbatim
     ///     Darwin core event verbatim repository
     /// </summary>
     public class DwcCollectionRepository : IDisposable
+    //public class DwcCollectionRepository : VerbatimRepositoryBase<DwcObservationVerbatim, int>
     {        
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
         private readonly DataProvider _dataProvider;
@@ -28,6 +29,14 @@ namespace SOS.Lib.Repositories.Verbatim
         private readonly OccurrenceVerbatimRepository _occurrenceRepository;
         private readonly DatasetVerbatimRepository _datasetRepository;
 
+        //protected override string CollectionName => GetCollectionName(_occurrenceRepository.TempMode);
+        //protected override string GetCollectionName(bool? tempMode)
+        //{
+        //    if (tempMode.HasValue)
+        //        return $"DwcaCollection_{_dataProvider.Id:D3}_{_dataProvider.Identifier}_Observations{(tempMode.Value ? "_temp" : "")}";
+        //    else
+        //        return $"DwcaCollection_{_dataProvider.Id:D3}_{_dataProvider.Identifier}_Observations{(TempMode ? "_temp" : "")}";
+        //}
         public DatasetVerbatimRepository DatasetRepository => _datasetRepository;
         public EventVerbatimRepository EventRepository => _eventRepository;
         public OccurrenceVerbatimRepository OccurrenceRepository => _occurrenceRepository;        
@@ -69,7 +78,7 @@ namespace SOS.Lib.Repositories.Verbatim
         public DwcCollectionRepository(
             DataProvider dataProvider,
             IVerbatimClient importClient,
-            Microsoft.Extensions.Logging.ILogger logger)
+            Microsoft.Extensions.Logging.ILogger logger) //: base(importClient, logger)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _logger = logger?? throw new ArgumentNullException(nameof(logger));
@@ -371,7 +380,7 @@ namespace SOS.Lib.Repositories.Verbatim
     }
 
 
-    public class OccurrenceVerbatimRepository : VerbatimRepositoryBase<DwcObservationVerbatim, int>        
+    public class OccurrenceVerbatimRepository : VerbatimRepositoryBase<DwcObservationVerbatim, int>, IDarwinCoreArchiveVerbatimRepository        
     {
         private readonly DataProvider _dataProvider;        
 

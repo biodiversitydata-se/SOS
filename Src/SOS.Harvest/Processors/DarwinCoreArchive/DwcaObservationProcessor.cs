@@ -14,6 +14,7 @@ using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -33,10 +34,11 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
-                dataProvider,
-                _verbatimClient,
-                Logger);
+            //using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+            //    dataProvider,
+            //    _verbatimClient,
+            //    Logger);
+            using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, new NullLogger<DwcCollectionRepository>());
 
             var observationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProvider,
@@ -50,7 +52,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 dataProvider,
                 mode,
                 observationFactory,
-                dwcArchiveVerbatimRepository,
+                dwcCollectionRepository.OccurrenceRepository,
+                //dwcArchiveVerbatimRepository,
                 cancellationToken);
         }
 
