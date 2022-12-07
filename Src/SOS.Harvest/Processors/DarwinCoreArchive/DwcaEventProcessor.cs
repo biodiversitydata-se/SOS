@@ -35,7 +35,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         public DwcaEventProcessor(
             //IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int> artportalenVerbatimRepository,
             //IArtportalenVerbatimRepository artportalenVerbatimRepository // observation verbatim repository
-            //    IVerbatimClient verbatimClient,
+            IVerbatimClient verbatimClient,
             IProcessedObservationCoreRepository processedObservationRepository,
             IObservationEventRepository observationEventRepository,
             IAreaHelper areaHelper,
@@ -46,6 +46,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             ILogger<DwcaEventProcessor> logger) :
                 base(observationEventRepository, processManager, processTimeManager, processConfiguration, logger)
         {
+            _verbatimClient = verbatimClient;
             _processedObservationRepository = processedObservationRepository;
             _areaHelper = areaHelper;
             _vocabularyRepository = vocabularyRepository;
