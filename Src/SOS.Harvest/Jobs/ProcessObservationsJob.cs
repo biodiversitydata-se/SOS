@@ -541,14 +541,14 @@ namespace SOS.Harvest.Jobs
                             _logger.LogDebug($"Number of data providers that supports events: {dataProvidersToProcess.Where(m => m.SupportEvents).Count()}");
                             _logger.LogDebug($"Number of data providers that don't supports events: {dataProvidersToProcess.Where(m => !m.SupportEvents).Count()}");
                             var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
-                            var eventSuccess = eventResult.All(t => t.Value.Status == RunStatus.Success);
+                            var eventSuccess = eventResult == null || eventResult.All(t => t.Value.Status == RunStatus.Success);
                             await EnableEsEventIndexingAsync();
 
                             // Process Datasets
                             await InitializeElasticSearchDatasetAsync();
                             await DisableEsDatasetIndexingAsync();
                             var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
-                            var datasetSuccess = datasetResult.All(t => t.Value.Status == RunStatus.Success);
+                            var datasetSuccess = datasetResult == null || datasetResult.All(t => t.Value.Status == RunStatus.Success);
                             await EnableEsDatasetIndexingAsync();
                         }
 
@@ -821,18 +821,21 @@ namespace SOS.Harvest.Jobs
             IDictionary<int, Taxon> taxonById,
             IJobCancellationToken cancellationToken)
         {
+            _logger.LogDebug("Start processing verbatim datasets");
             if (dataProvidersToProcess == null || !dataProvidersToProcess.Any()) return null;
             var processStart = DateTime.Now;
 
             var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();            
             foreach (var dataProvider in dataProvidersToProcess)
-            {                
+            {
+                _logger.LogDebug($"Start processing verbatim datasets for data provider: {dataProvider}");
                 var processor = _datasetProcessorByType[dataProvider.Type];
                 processTaskByDataProvider.Add(dataProvider,
                     processor.ProcessAsync(dataProvider, cancellationToken));
             }
 
             var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
+            _logger.LogDebug("End processing verbatim datasets");
 
             //await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
             return processTaskByDataProvider.ToDictionary(pt => pt.Key, pt => pt.Value.Result);
