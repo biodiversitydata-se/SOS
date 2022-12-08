@@ -105,8 +105,6 @@ namespace SOS.Harvest.Processors.Artportalen
                     });
                     Logger.LogDebug($"Finish deleting {idsToDelete.Count():N0} Artportalen sightings ({mode})");
                 }
-
-
             }
             
             return await base.ProcessObservationsAsync(

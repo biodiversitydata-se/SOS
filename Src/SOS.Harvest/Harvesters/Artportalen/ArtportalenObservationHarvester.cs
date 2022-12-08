@@ -13,7 +13,6 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Repositories.Source.Artportalen;
 
 namespace SOS.Harvest.Harvesters.Artportalen
 {
