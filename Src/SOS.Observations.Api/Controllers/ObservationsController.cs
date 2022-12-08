@@ -202,6 +202,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -253,6 +257,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -355,6 +363,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -424,6 +436,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -501,6 +517,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch(TimeoutException e)
@@ -639,6 +659,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -695,8 +719,12 @@ namespace SOS.Observations.Api.Controllers
                 var dto = new[] { observation }.ToObservations().Select(o => o.ToDto()).FirstOrDefault();
                 return new OkObjectResult(dto);
             }
-            catch (AuthenticationRequiredException)
+            catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException)
@@ -777,6 +805,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -840,6 +872,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -894,6 +930,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -1056,6 +1096,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -1129,6 +1173,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -1305,6 +1353,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -1397,6 +1449,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
                 _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
                 _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
                 LogUserInformation();
@@ -1522,6 +1575,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -1606,6 +1663,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -1654,6 +1715,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
                 _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
                 _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
                 LogUserInformation();
@@ -1742,6 +1804,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -1801,6 +1867,8 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);                
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TimeoutException e)
@@ -1862,6 +1930,10 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TaxonValidationException e)
@@ -1906,6 +1978,8 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TaxonValidationException e)
@@ -1950,6 +2024,8 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TaxonValidationException e)
@@ -1996,6 +2072,8 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
+                _logger.LogInformation(e, e.Message);
+                LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (TaxonValidationException e)
