@@ -63,5 +63,10 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// List of not found taxon ids
         /// </summary>
         public ICollection<string> NotFoundTaxonIds { get; set; }
+
+        /// <summary>
+        /// Data stewardship dataset Id.
+        /// </summary>
+        public string DataStewardshipDatasetId { get; set; }
     }
 }

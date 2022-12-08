@@ -74,7 +74,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 processedEvent.Location = CreateLocation(verbatim);
                 processedEvent.Dataset = new EventDataset
                 {
-                    Identifier = "ReplaceWithDataStewardshipIdentifier",
+                    Identifier = verbatim.DataStewardshipDatasetId
                     //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event
                 };
                 if (!GISExtensions.TryParseCoordinateSystem(verbatim.GeodeticDatum, out var coordinateSystem))

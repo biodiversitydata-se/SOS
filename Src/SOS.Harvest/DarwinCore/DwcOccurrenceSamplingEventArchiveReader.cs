@@ -753,6 +753,21 @@ namespace SOS.Harvest.DarwinCore
             }
         }
 
+        private void AddDatasetInformation(List<DwcEventOccurrenceVerbatim> events,
+            Dictionary<string, DwcVerbatimObservationDataset> observationDatasetByEventId)
+        {
+            if (observationDatasetByEventId == null) return;
+            foreach (var ev in events)
+            {
+                if (string.IsNullOrEmpty(ev.EventID)) continue;
+
+                if (observationDatasetByEventId.TryGetValue(ev.EventID, out var observationDataset))
+                {
+                    ev.DataStewardshipDatasetId = observationDataset.Identifier;
+                }
+            }
+        }
+
         public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple)
@@ -872,6 +887,7 @@ namespace SOS.Harvest.DarwinCore
             }
 
             await AddDataFromExtensionsAsync(archiveReaderContext, events);
+            AddDatasetInformation(events, archiveReaderContext.ObservationDatasetByEventId);
             foreach (var eve in events)
             {
                 //eve.Observations = null;
