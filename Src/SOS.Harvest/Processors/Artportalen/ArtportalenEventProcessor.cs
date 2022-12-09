@@ -73,7 +73,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 filter.DataProviderIds = new List<int> { 1 };
                 Logger.LogInformation($"AddObservationEventsAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
                 var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
-                Dictionary<string, List<string>> totalOccurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
+                Dictionary<string, List<string>> totalOccurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId.ToLower(), m => m.OccurrenceIds);
                 var chunks = totalOccurrenceIdsByEventId.Chunk(batchSize);
                 int eventCount = 0;
 
@@ -84,7 +84,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     var observations = await _processedObservationRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
                     var events = new List<ObservationEvent>();
                     foreach (var observation in observations)
-                    {
+                    {                        
                         var occurrenceIds = occurrenceIdsByEventId[observation.Event.EventId.ToLower()];
                         var eventModel = observation.ToObservationEvent(occurrenceIds);
                         events.Add(eventModel);

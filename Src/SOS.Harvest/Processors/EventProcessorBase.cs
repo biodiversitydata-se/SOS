@@ -92,7 +92,7 @@ namespace SOS.Harvest.Processors
         /// <param name="eventVerbatimRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<int> ProcessBatchAsync(
+        protected virtual async Task<int> ProcessBatchAsync(
             DataProvider dataProvider,
             int startId,
             int endId,

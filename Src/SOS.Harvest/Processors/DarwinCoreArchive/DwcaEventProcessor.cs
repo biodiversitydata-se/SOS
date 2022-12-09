@@ -10,13 +10,14 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Harvest.Processors.Artportalen;
-using Microsoft.Extensions.Logging.Abstractions;
+using Hangfire.Server;
+using SOS.Harvest.Processors.Interfaces;
+using System.Collections.Concurrent;
+using MongoDB.Driver;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -80,6 +81,149 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             //    dwcArchiveVerbatimRepository,
             //    cancellationToken);
         }
+
+        protected override async Task<int> ProcessBatchAsync(
+            DataProvider dataProvider,
+            int startId,
+            int endId,
+            IEventFactory<DwcEventOccurrenceVerbatim> eventFactory,
+            IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int> eventVerbatimRepository,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
+                Logger.LogDebug($"Event - Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                var verbatimEventsBatch = await eventVerbatimRepository.GetBatchAsync(startId, endId);
+                Logger.LogDebug($"Event - Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                if (!verbatimEventsBatch?.Any() ?? true) return 0;
+
+                Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                var processedEvents = new ConcurrentDictionary<string, ObservationEvent>();
+                foreach (var verbatimEvent in verbatimEventsBatch)
+                {
+                    var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
+                    if (processedEvent == null) continue;
+                    processedEvents.TryAdd(processedEvent.Id, processedEvent);
+                }
+
+                await GetEventObservations(processedEvents);
+                Logger.LogDebug($"Event - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                return await ValidateAndStoreEvents(dataProvider, processedEvents.Values, $"{startId}-{endId}");
+            }
+            catch (JobAbortedException e)
+            {
+                // Throw cancelation again to let function above handle it
+                throw;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Event - Process {dataProvider.Identifier} event from id: {startId} to id: {endId} failed");
+                throw;
+            }
+            finally
+            {
+                ProcessManager.Release();
+            }
+        }
+
+        private async Task GetEventObservations(ConcurrentDictionary<string, ObservationEvent> processedEvents)
+        {
+            var filter = new SearchFilter(0);
+            filter.IsPartOfDataStewardshipDataset = true;
+            filter.EventIds = processedEvents.Keys.ToList();
+            var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
+            var occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
+            foreach (var eventPair in processedEvents)
+            {
+                if (occurrenceIdsByEventId.TryGetValue(eventPair.Key, out var occurrenceIds))
+                {
+                    if (occurrenceIds != null && eventPair.Value.OccurrenceIds != null && occurrenceIds.Count != eventPair.Value.OccurrenceIds.Count)
+                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed={occurrenceIds.Count}");
+                    eventPair.Value.OccurrenceIds = occurrenceIds;
+                }
+                else
+                {
+                    if (eventPair.Value.OccurrenceIds != null && eventPair.Value.OccurrenceIds.Count > 0)
+                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed=0");
+                    eventPair.Value.OccurrenceIds = null;
+                }
+            }
+        }
+
+        //protected override async Task<int> ProcessBatchAsync(
+        //    DataProvider dataProvider, 
+        //    int startId, 
+        //    int endId, 
+        //    IEventFactory<DwcEventOccurrenceVerbatim> eventFactory, 
+        //    IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int> eventVerbatimRepository, 
+        //    IJobCancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        cancellationToken?.ThrowIfCancellationRequested();
+        //        Logger.LogDebug($"Event - Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+        //        var verbatimEventsBatch = await eventVerbatimRepository.GetBatchAsync(startId, endId);
+        //        Logger.LogDebug($"Event - Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+        //        if (!verbatimEventsBatch?.Any() ?? true) return 0;
+
+        //        Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
+        //        var processedEvents = new ConcurrentDictionary<string, ObservationEvent>();
+        //        foreach (var verbatimEvent in verbatimEventsBatch)
+        //        {
+        //            var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
+        //            if (processedEvent == null) continue;
+        //            processedEvents.TryAdd(processedEvent.Id, processedEvent);
+        //        }
+
+        //        CheckIfOcurrencesExists(processedEvents);
+        //        Logger.LogDebug($"Event - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
+        //        return await ValidateAndStoreEvents(dataProvider, processedEvents.Values, $"{startId}-{endId}");
+        //    }
+        //    catch (JobAbortedException e)
+        //    {
+        //        // Throw cancelation again to let function above handle it
+        //        throw;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e, $"Event - Process {dataProvider.Identifier} event from id: {startId} to id: {endId} failed");
+        //        throw;
+        //    }
+        //    finally
+        //    {
+        //        ProcessManager.Release();
+        //    }
+        //}
+
+        //private static void CheckIfOcurrencesExists(ConcurrentDictionary<string, ObservationEvent> processedEvents)
+        //{
+        //    // Check if processed observations exists. This is a naive implementation and can probably be improved.
+        //    HashSet<string> occurrenceIds = new HashSet<string>();
+        //    foreach (var ev in processedEvents.Values)
+        //    {
+        //        if (ev.OccurrenceIds != null)
+        //        {
+        //            foreach (var occurrenceId in ev.OccurrenceIds)
+        //            {
+        //                occurrenceIds.Add(occurrenceId);
+        //            }
+        //        }
+        //    }
+
+        //    //HashSet<string> notFoundOccurrenceIds = _processedObservationRepository. // todo - get all not found occurrenceIds.
+        //    HashSet<string> notFoundOccurrenceIds = new HashSet<string>();
+        //    if (notFoundOccurrenceIds.Count > 0)
+        //    {
+        //        foreach (var ev in processedEvents.Values)
+        //        {
+        //            if (ev.OccurrenceIds != null)
+        //            {
+        //                ev.OccurrenceIds = ev.OccurrenceIds.Except(notFoundOccurrenceIds).ToList();
+        //            }
+        //        }
+        //    }
+        //}
 
         // Artportalen implementation
         //private async Task<int> AddObservationEventsAsync(DataProvider dataProvider)
