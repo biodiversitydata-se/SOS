@@ -20,6 +20,12 @@ namespace SOS.Lib.Models.Search.Result
         public int DocCount { get; set; }
     }
 
+    public class AggregationItemList<TKey, TValue>
+    {
+        public TKey AggregationKey { get; set; }
+        public List<TValue> Items { get; set; }        
+    }
+
     public class EventOccurrenceAggregationItem
     {
         public string EventId { get; set; }

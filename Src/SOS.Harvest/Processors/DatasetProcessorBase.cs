@@ -12,6 +12,8 @@ using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Harvest.Processors
 {
@@ -86,7 +88,7 @@ namespace SOS.Harvest.Processors
         /// <param name="datasetVerbatimRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<int> ProcessBatchAsync(
+        protected virtual async Task<int> ProcessBatchAsync(
             DataProvider dataProvider,
             int startId,
             int endId,
@@ -238,6 +240,6 @@ namespace SOS.Harvest.Processors
                 Logger.LogError(e, $"Failed to process {dataProvider.Identifier} datasets");
                 return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
             }
-        }
+        }        
     }
 }

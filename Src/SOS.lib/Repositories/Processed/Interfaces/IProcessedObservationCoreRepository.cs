@@ -301,6 +301,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             int take);
 
         Task<List<AggregationItem>> GetAllAggregationItemsAsync(SearchFilter filter, string aggregationField);
+        Task<List<AggregationItemList<TKey, TValue>>> GetAllAggregationItemsListAsync<TKey, TValue>(SearchFilter filter, string aggregationFieldKey, string aggregationFieldList);
         Task<List<EventOccurrenceAggregationItem>> GetEventOccurrenceItemsAsync(SearchFilter filter);
 
         /// <summary>

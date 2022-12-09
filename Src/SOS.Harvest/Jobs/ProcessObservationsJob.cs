@@ -544,6 +544,7 @@ namespace SOS.Harvest.Jobs
                             //var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
                             var eventSuccess = eventResult == null || eventResult.All(t => t.Value.Status == RunStatus.Success);
                             await EnableEsEventIndexingAsync();
+                            Thread.Sleep(TimeSpan.FromSeconds(6)); // Wait for Elasticsearch indexing to finish.
 
                             // Process Datasets
                             await InitializeElasticSearchDatasetAsync();

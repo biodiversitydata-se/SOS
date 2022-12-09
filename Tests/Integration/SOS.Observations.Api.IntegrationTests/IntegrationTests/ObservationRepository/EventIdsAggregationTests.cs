@@ -116,5 +116,33 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             //-----------------------------------------------------------------------------------------------------------
             eventOccurrenceIds.Should().NotBeNull();
         }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Get_occurrences_by_ids()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            SearchFilter searchFilter = new SearchFilter(0)
+            {
+                DataProviderIds = new List<int>() { 1 },
+                Taxa = new TaxonFilter
+                {
+                    Ids= new List<int>() { 3000299 }, // bats
+                    IncludeUnderlyingTaxa= true
+                }                
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------            
+            var occurrenceIdsByEventIdItems = await _fixture.ProcessedObservationRepository.GetAllAggregationItemsListAsync<string, string>(searchFilter, "event.eventId", "occurrence.occurrenceId");
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            occurrenceIdsByEventIdItems.Should().NotBeNull();            
+        }
     }
 }
