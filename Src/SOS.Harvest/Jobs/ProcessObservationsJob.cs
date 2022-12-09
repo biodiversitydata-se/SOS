@@ -540,14 +540,16 @@ namespace SOS.Harvest.Jobs
                             await DisableEsEventIndexingAsync();
                             _logger.LogDebug($"Number of data providers that supports events: {dataProvidersToProcess.Where(m => m.SupportEvents).Count()}");
                             _logger.LogDebug($"Number of data providers that don't supports events: {dataProvidersToProcess.Where(m => !m.SupportEvents).Count()}");
-                            var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
+                            var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
+                            //var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
                             var eventSuccess = eventResult == null || eventResult.All(t => t.Value.Status == RunStatus.Success);
                             await EnableEsEventIndexingAsync();
 
                             // Process Datasets
                             await InitializeElasticSearchDatasetAsync();
                             await DisableEsDatasetIndexingAsync();
-                            var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
+                            var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
+                            //var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
                             var datasetSuccess = datasetResult == null || datasetResult.All(t => t.Value.Status == RunStatus.Success);
                             await EnableEsDatasetIndexingAsync();
                         }
@@ -804,9 +806,11 @@ namespace SOS.Harvest.Jobs
             foreach (var dataProvider in dataProvidersToProcess)
             {
                 _logger.LogDebug($"Start processing verbatim events for data provider: {dataProvider}");
-                var processor = _eventProcessorByType[dataProvider.Type];
-                processTaskByDataProvider.Add(dataProvider,
+                if (_eventProcessorByType.TryGetValue(dataProvider.Type, out var processor))
+                {
+                    processTaskByDataProvider.Add(dataProvider,
                     processor.ProcessAsync(dataProvider, cancellationToken));
+                }
             }
             
             var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
@@ -829,9 +833,11 @@ namespace SOS.Harvest.Jobs
             foreach (var dataProvider in dataProvidersToProcess)
             {
                 _logger.LogDebug($"Start processing verbatim datasets for data provider: {dataProvider}");
-                var processor = _datasetProcessorByType[dataProvider.Type];
-                processTaskByDataProvider.Add(dataProvider,
+                if (_datasetProcessorByType.TryGetValue(dataProvider.Type, out var processor))
+                {
+                    processTaskByDataProvider.Add(dataProvider,
                     processor.ProcessAsync(dataProvider, cancellationToken));
+                }
             }
 
             var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
