@@ -134,18 +134,18 @@ namespace SOS.Observations.Api.Managers
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedTaxonRepository"></param>
         /// <param name="filterManager"></param>
         /// <param name="taxonSumAggregationCache"></param>
         /// <param name="logger"></param>
         public TaxonSearchManager(
-            IProcessedTaxonRepository processedObservationRepository,
+            IProcessedTaxonRepository processedTaxonRepository,
             IFilterManager filterManager,
             IClassCache<Dictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
             ILogger<TaxonSearchManager> logger)
         {
-            _processedTaxonRepository = processedObservationRepository ??
-                                              throw new ArgumentNullException(nameof(processedObservationRepository));
+            _processedTaxonRepository = processedTaxonRepository ??
+                                              throw new ArgumentNullException(nameof(processedTaxonRepository));
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));     
             _taxonSumAggregationCache = taxonSumAggregationCache ?? throw new ArgumentNullException(nameof(taxonSumAggregationCache));
 

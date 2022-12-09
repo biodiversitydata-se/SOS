@@ -369,6 +369,31 @@ namespace SOS.Lib.Repositories.Processed
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create observation index. Error: {createIndexResponse.DebugInformation}");
         }
 
+        
+        /// <summary>
+        /// Make sure Elasticserach nodes are up
+        /// </summary>
+        /// <param name="clusterCount"></param>
+        private void CheckNodes(int clusterCount)
+        {
+            CheckNode(PublicIndexName, clusterCount);
+            CheckNode(ProtectedIndexName, clusterCount);
+        }
+
+        /// <summary>
+        /// Make sure all clusters are available
+        /// </summary>
+        /// <param name="indexName"></param>
+        /// <exception cref="Exception"></exception>
+        private void CheckNode(string indexName, int clusterCount)
+        {
+            var health = Client.Cluster.Health(indexName);
+            if (health.NumberOfDataNodes != clusterCount)
+            {
+                throw new Exception($"Only {health.NumberOfDataNodes} Elasticsearch nodes of expected {clusterCount} available.");
+            }
+        }
+
         /// <summary>
         /// Cast dynamic to observation
         /// </summary>
@@ -591,6 +616,7 @@ namespace SOS.Lib.Repositories.Processed
             ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
+            CheckNodes(elasticConfiguration.Clusters.Count());
         }
 
         /// <summary>
