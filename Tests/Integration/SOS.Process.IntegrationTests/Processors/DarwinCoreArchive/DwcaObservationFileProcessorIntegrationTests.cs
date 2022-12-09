@@ -32,6 +32,7 @@ using SOS.Harvest.Processors.DarwinCoreArchive;
 using Xunit;
 using Xunit.Abstractions;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Configuration.Import;
 
 namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 {
@@ -118,6 +119,12 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new NullLogger<DwcArchiveFileWriter>()
             ), new FileService(), dataProviderRepository, importClient, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            var dwcaConfiguration = new DwcaConfiguration()
+            {
+                BatchSize = 5000,
+                ImportPath = @"C:\Temp",
+                UseDwcaCollectionRepository = true
+            };
 
             return new DwcaObservationProcessor(
                 verbatimClient.Object,
@@ -131,6 +138,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 diffusionManager,
                 processTimeManager,
                 processConfiguration,
+                dwcaConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
         }
 

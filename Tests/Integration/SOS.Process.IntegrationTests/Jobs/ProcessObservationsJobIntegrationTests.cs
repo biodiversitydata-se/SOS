@@ -40,6 +40,7 @@ using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
 using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Lib.Configuration.Import;
 
 namespace SOS.Process.IntegrationTests.Jobs
 {
@@ -237,7 +238,14 @@ namespace SOS.Process.IntegrationTests.Jobs
             
 
             var processTaxaJob = new ProcessTaxaJob(null, // todo
-                harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());                       
+                harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
+
+            var dwcaConfiguration = new DwcaConfiguration()
+            {
+                BatchSize = 5000,
+                ImportPath = @"C:\Temp",
+                UseDwcaCollectionRepository = true
+            };
 
             var dwcaProcessor = new DwcaObservationProcessor(
                 verbatimClient,
@@ -251,6 +259,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 diffusionManager,
                 processTimeManager,
                 processConfiguration,
+                dwcaConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
 
             var observationDatabaseProcessor = new ObservationDatabaseProcessor(

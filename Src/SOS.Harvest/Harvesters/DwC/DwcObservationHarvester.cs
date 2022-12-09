@@ -4,6 +4,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Nest;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
@@ -78,15 +79,28 @@ namespace SOS.Harvest.Harvesters.DwC
             DataProvider dataProvider,
             IJobCancellationToken cancellationToken)
         {
+            if (_dwcaConfiguration.UseDwcaCollectionRepository)
+            {
+                return await HarvestObservationsUsingCollectionDwcaAsync(archivePath, dataProvider, cancellationToken);
+            }
+
+            return await HarvestObservationsUsingDwcaAsync(archivePath, dataProvider, cancellationToken);
+        }
+
+        private async Task<HarvestInfo> HarvestObservationsUsingDwcaAsync(
+            string archivePath,
+            DataProvider dataProvider,
+            IJobCancellationToken cancellationToken)
+        {
             var harvestInfo = new HarvestInfo(dataProvider.Identifier, DateTime.Now);
             harvestInfo.Id = dataProvider.Identifier;
             using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(dataProvider, _verbatimClient, _logger) { TempMode = true };
-                        
+
             try
             {
                 _logger.LogDebug($"Start clearing DwC-A observations for {dataProvider.Identifier}");
                 await dwcArchiveVerbatimRepository.DeleteCollectionAsync();
-                await dwcArchiveVerbatimRepository.AddCollectionAsync();                          
+                await dwcArchiveVerbatimRepository.AddCollectionAsync();
                 _logger.LogDebug($"Finish clearing DwC-A observations for {dataProvider.Identifier}");
 
                 _logger.LogDebug($"Start storing DwC-A observations for {dataProvider.Identifier}");
@@ -108,67 +122,7 @@ namespace SOS.Harvest.Harvesters.DwC
 
                     observationCount += verbatimObservationsBatch.Count();
                     await dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
-                }
-
-                
-                if (_dwcaConfiguration.UseDwcaCollectionRepository)
-                {
-                    var dwcCollectionArchiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider, _dwcaConfiguration);
-                    var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, _logger);
-                    dwcCollectionRepository.BeginTempMode();
-                    await dwcCollectionRepository.DeleteCollectionsAsync();
-
-                    // Read observations
-                    await dwcCollectionRepository.OccurrenceRepository.AddCollectionAsync();
-                    int colObservationCount = 0;
-                    var colObservationBatches = _dwcArchiveReader.ReadOccurrencesInBatchesAsync(dwcCollectionArchiveReaderContext);
-                    await foreach (var verbatimObservationsBatch in colObservationBatches)
-                    {
-                        cancellationToken?.ThrowIfCancellationRequested();                        
-                        if (_dwcaConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                            colObservationCount >= _dwcaConfiguration.MaxNumberOfSightingsHarvested)
-                        {
-                            _logger.LogInformation($"Max observations for {dataProvider.Identifier} reached");
-                            break;
-                        }
-
-                        colObservationCount += verbatimObservationsBatch.Count();
-                        await dwcCollectionRepository.OccurrenceRepository.AddManyAsync(verbatimObservationsBatch);                        
-                    }
-                    await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync();
-                    
-                    int occurrenceIdsByEventId = 0;
-                    if (dwcCollectionArchiveReaderContext?.OccurrenceIdsByEventId != null)
-                    {
-                        occurrenceIdsByEventId = dwcCollectionArchiveReaderContext.OccurrenceIdsByEventId.Count();
-                    }
-                    _logger.LogDebug($"OccurrenceIdsByEventId.Count={occurrenceIdsByEventId} for data provider {dataProvider}");
-
-                    // Read events
-                    var events = await _dwcArchiveReader.ReadEventsAsync(dwcCollectionArchiveReaderContext);
-                    if (events != null && events.Any())
-                    {
-                        foreach (var ev in events)
-                        {
-                            ev.Observations = null;
-                        }
-
-                        await dwcCollectionRepository.EventRepository.AddCollectionAsync();
-                        await dwcCollectionRepository.EventRepository.AddManyAsync(events.Cast<DwcEventOccurrenceVerbatim>());
-                        await dwcCollectionRepository.EventRepository.PermanentizeCollectionAsync();
-                    }
-
-                    // Read datasets
-                    var datasets = await _dwcArchiveReader.ReadDatasetsAsync(dwcCollectionArchiveReaderContext);
-                    if (datasets != null && datasets.Any())
-                    {
-                        await dwcCollectionRepository.DatasetRepository.AddCollectionAsync();
-                        await dwcCollectionRepository.DatasetRepository.AddManyAsync(datasets);
-                        await dwcCollectionRepository.DatasetRepository.PermanentizeCollectionAsync();
-                    }
-
-                    dwcCollectionRepository.EndTempMode();
-                }
+                }                
 
                 if (dataProvider.UseVerbatimFileInExport)
                 {
@@ -198,10 +152,124 @@ namespace SOS.Harvest.Harvesters.DwC
             {
                 _logger.LogError(e, $"Failed harvest of DwC Archive for {dataProvider.Identifier}");
                 harvestInfo.Status = RunStatus.Failed;
-            }            
+            }
 
             return harvestInfo;
         }
+
+        private async Task<HarvestInfo> HarvestObservationsUsingCollectionDwcaAsync(
+            string archivePath,
+            DataProvider dataProvider,
+            IJobCancellationToken cancellationToken)
+        {
+            var harvestInfo = new HarvestInfo(dataProvider.Identifier, DateTime.Now);
+            harvestInfo.Id = dataProvider.Identifier;
+            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(dataProvider, _verbatimClient, _logger) { TempMode = true };
+
+            try
+            {                
+                using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
+                var dwcCollectionArchiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider, _dwcaConfiguration);
+                var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, _logger);
+                dwcCollectionRepository.BeginTempMode();
+                _logger.LogDebug($"Clear DwC-A observations for {dataProvider.Identifier}");
+                await dwcCollectionRepository.DeleteCollectionsAsync();
+
+                // Read datasets
+                try
+                {
+                    var datasets = await _dwcArchiveReader.ReadDatasetsAsync(dwcCollectionArchiveReaderContext);
+                    if (datasets != null && datasets.Any())
+                    {
+                        _logger.LogDebug($"Start storing DwC-A datasets for {dataProvider.Identifier}");
+                        await dwcCollectionRepository.DatasetRepository.AddCollectionAsync();
+                        await dwcCollectionRepository.DatasetRepository.AddManyAsync(datasets);
+                        await dwcCollectionRepository.DatasetRepository.PermanentizeCollectionAsync();
+                        _logger.LogDebug($"Finish storing DwC-A datasets for {dataProvider.Identifier}");
+                    }
+                } 
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error reading DwC-A datasets");
+                }
+
+                // Read observations
+                _logger.LogDebug($"Start storing DwC-A observations for {dataProvider.Identifier}");
+                await dwcCollectionRepository.OccurrenceRepository.AddCollectionAsync();
+                int observationCount = 0;
+                var observationBatches = _dwcArchiveReader.ReadOccurrencesInBatchesAsync(dwcCollectionArchiveReaderContext);
+                await foreach (var verbatimObservationsBatch in observationBatches)
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    if (_dwcaConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        observationCount >= _dwcaConfiguration.MaxNumberOfSightingsHarvested)
+                    {
+                        _logger.LogInformation($"Max observations for {dataProvider.Identifier} reached");
+                        break;
+                    }
+
+                    observationCount += verbatimObservationsBatch.Count();
+                    await dwcCollectionRepository.OccurrenceRepository.AddManyAsync(verbatimObservationsBatch);
+                }
+                await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync();
+                _logger.LogDebug($"Finish storing DwC-A observations for {dataProvider.Identifier}");
+                
+
+                // Read events
+                try
+                { 
+                    var events = await _dwcArchiveReader.ReadEventsAsync(dwcCollectionArchiveReaderContext);
+                    if (events != null && events.Any())
+                    {
+                        _logger.LogDebug($"Start storing DwC-A events for {dataProvider.Identifier}");
+                        foreach (var ev in events)
+                        {
+                            ev.Observations = null; // todo - handle this logic in the DwC-A parser.
+                        }
+
+                        await dwcCollectionRepository.EventRepository.AddCollectionAsync();
+                        await dwcCollectionRepository.EventRepository.AddManyAsync(events);
+                        await dwcCollectionRepository.EventRepository.PermanentizeCollectionAsync();
+                        _logger.LogDebug($"Finish storing DwC-A events for {dataProvider.Identifier}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error reading DwC-A events");
+                }
+
+                dwcCollectionRepository.EndTempMode();                
+                // END
+
+
+                if (dataProvider.UseVerbatimFileInExport)
+                {
+                    _logger.LogDebug($"Start storing source file for {dataProvider.Identifier}");
+                    await using var fileStream = File.OpenRead(archivePath);
+                    await dwcArchiveVerbatimRepository.StoreSourceFileAsync(dataProvider.Id, fileStream);
+                    _logger.LogDebug($"Finish storing source file for {dataProvider.Identifier}");
+                }
+                
+                // Update harvest info
+                harvestInfo.End = DateTime.Now;
+                harvestInfo.Status = RunStatus.Success;
+                harvestInfo.Count = observationCount;                
+            }
+            catch (JobAbortedException e)
+            {
+                _logger.LogError(e, $"Canceled harvest of DwC Archive for {dataProvider.Identifier}");
+                harvestInfo.Status = RunStatus.Canceled;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Failed harvest of DwC Archive for {dataProvider.Identifier}");
+                harvestInfo.Status = RunStatus.Failed;
+            }
+
+            return harvestInfo;
+        }
+
+
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)

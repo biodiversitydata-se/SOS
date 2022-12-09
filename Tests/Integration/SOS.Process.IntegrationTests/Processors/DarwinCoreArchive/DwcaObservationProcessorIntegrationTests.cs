@@ -26,6 +26,7 @@ using SOS.Harvest.Processors.DarwinCoreArchive;
 using Xunit;
 using Xunit.Abstractions;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Configuration.Import;
 
 namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 {
@@ -147,6 +148,13 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
 
+            var dwcaConfiguration = new DwcaConfiguration()
+            {
+                BatchSize = 5000,
+                ImportPath = @"C:\Temp",
+                UseDwcaCollectionRepository = true
+            };
+
             return new DwcaObservationProcessor(
                 verbatimClient,
                 processedObservationRepository,
@@ -159,6 +167,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 diffusionManager,
                 processTimeManager,
                 processConfiguration,
+                dwcaConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
         }
 

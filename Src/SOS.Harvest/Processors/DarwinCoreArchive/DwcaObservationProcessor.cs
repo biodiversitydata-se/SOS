@@ -15,6 +15,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
+using SOS.Lib.Configuration.Import;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -27,6 +28,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         private readonly IVerbatimClient _verbatimClient;
         private readonly IAreaHelper _areaHelper;
         private readonly IVocabularyRepository _processedVocabularyRepository;
+        private readonly DwcaConfiguration _dwcaConfiguration;
 
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
@@ -34,10 +36,48 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            //using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
-            //    dataProvider,
-            //    _verbatimClient,
-            //    Logger);
+
+            if (_dwcaConfiguration.UseDwcaCollectionRepository)
+            {
+                return await ProcessObservationsUsingCollectionDwcAsync(dataProvider, taxa, mode, cancellationToken);
+            }
+
+            return await ProcessObservationsUsingDwcAsync(dataProvider, taxa, mode, cancellationToken);
+        }
+
+        private async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsUsingDwcAsync(
+            DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+                dataProvider,
+                _verbatimClient,
+                Logger);
+
+            var observationFactory = await DwcaObservationFactory.CreateAsync(
+                dataProvider,
+                taxa,
+                _processedVocabularyRepository,
+                _areaHelper,
+                TimeManager,
+                ProcessConfiguration);
+
+            return await base.ProcessObservationsAsync(
+                dataProvider,
+                mode,
+                observationFactory,
+                dwcArchiveVerbatimRepository,
+                cancellationToken);
+        }
+
+        private async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsUsingCollectionDwcAsync(
+            DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
             using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, Logger);
 
             var observationFactory = await DwcaObservationFactory.CreateAsync(
@@ -52,10 +92,10 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 dataProvider,
                 mode,
                 observationFactory,
-                dwcCollectionRepository.OccurrenceRepository,
-                //dwcArchiveVerbatimRepository,
+                dwcCollectionRepository.OccurrenceRepository,                
                 cancellationToken);
         }
+
 
         /// <summary>
         /// Constructor
@@ -85,6 +125,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             IDiffusionManager diffusionManager,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
+            DwcaConfiguration dwcaConfiguration,
             ILogger<DwcaObservationProcessor> logger) :
                 base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
         {
@@ -92,6 +133,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             _processedVocabularyRepository = processedVocabularyRepository ??
                                                throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
         }
 
         public override DataProviderType Type => DataProviderType.DwcA;
