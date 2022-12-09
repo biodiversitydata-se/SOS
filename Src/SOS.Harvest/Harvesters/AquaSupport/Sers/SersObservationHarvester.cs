@@ -11,6 +11,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Harvesters.AquaSupport.Sers
@@ -48,6 +49,10 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
+            // Get current document count from permanent index
+            _sersObservationVerbatimRepository.TempMode = false;
+            var currentDocCount = await _sersObservationVerbatimRepository.CountAllDocumentsAsync();
+
             var harvestInfo = new HarvestInfo("SERS", DateTime.Now);
             _sersObservationVerbatimRepository.TempMode = true;
 
@@ -66,53 +71,45 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
                 var verbatimFactory = new AquaSupportHarvestFactory<SersObservationVerbatim>();
                 var nrSightingsHarvested = 0;
                 var startDate = new DateTime(_sersServiceConfiguration.StartHarvestYear, 1, 1);
-                var endDate = startDate.AddYears(1).AddDays(-1);
+                var endDate = DateTime.Now;
                 var changeId = 0L;
                 var dataLastModified = DateTime.MinValue;
 
+                var xmlDocument = await _sersObservationService.GetAsync(startDate, endDate, changeId);
+                changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
+
                 // Loop until all sightings are fetched.
-                while (startDate < DateTime.Now)
+                while (changeId != 0)
                 {
                     var lastRequesetTime = DateTime.Now;
-                    var xmlDocument = await _sersObservationService.GetAsync(startDate, endDate, changeId);
-                    changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
 
-                    // Change id equals 0 => nothing more to fetch for this year
-                    if (changeId.Equals(0))
+                    _logger.LogDebug(
+                           $"Fetching SERS observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
+
+                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
+                    // Clean up
+                    xmlDocument = null;
+
+                    // Add sightings to MongoDb
+                    await _sersObservationVerbatimRepository.AddManyAsync(verbatims);
+
+                    nrSightingsHarvested += verbatims.Count();
+
+                    _logger.LogDebug($"{nrSightingsHarvested} SERS observations harvested");
+
+                    var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
+
+                    if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
                     {
-                        startDate = endDate.AddDays(1);
-                        endDate = startDate.AddYears(1).AddDays(-1);
+                        dataLastModified = batchDataLastModified.Value;
                     }
-                    else
+
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    if (_sersServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        nrSightingsHarvested >= _sersServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
-                        _logger.LogDebug(
-                            $"Fetching SERS observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
-
-                        var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
-                        // Clean up
-                        xmlDocument = null;
-
-                        // Add sightings to MongoDb
-                        await _sersObservationVerbatimRepository.AddManyAsync(verbatims);
-
-                        nrSightingsHarvested += verbatims.Count();
-
-                        _logger.LogDebug($"{nrSightingsHarvested} SERS observations harvested");
-
-                        var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
-
-                        if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
-                        {
-                            dataLastModified = batchDataLastModified.Value;
-                        }
-
-                        cancellationToken?.ThrowIfCancellationRequested();
-                        if (_sersServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                            nrSightingsHarvested >= _sersServiceConfiguration.MaxNumberOfSightingsHarvested)
-                        {
-                            _logger.LogInformation("Max SERS observations reached");
-                            break;
-                        }
+                        _logger.LogInformation("Max SERS observations reached");
+                        break;
                     }
 
                     var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
@@ -120,6 +117,9 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
                     {
                         Thread.Sleep(2000 - timeSinceLastCall);
                     }
+
+                    xmlDocument = await _sersObservationService.GetAsync(startDate, endDate, changeId);
+                    changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for SERS data provider");

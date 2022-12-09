@@ -462,10 +462,13 @@ namespace SOS.Lib.IO.DwcArchive
             var filePaths = new List<string>();
             foreach (var dwcaFilePartsInfo in dwcaFilePartsInfos)
             {
-                filePaths.AddRange(Directory.EnumerateFiles(
+                if (Directory.Exists(dwcaFilePartsInfo.ExportFolder))
+                {
+                    filePaths.AddRange(Directory.EnumerateFiles(
                     dwcaFilePartsInfo.ExportFolder,
                     searchPattern,
                     SearchOption.TopDirectoryOnly));
+                }    
             }
 
             return filePaths;

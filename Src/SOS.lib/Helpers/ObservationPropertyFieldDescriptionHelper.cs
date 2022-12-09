@@ -23,7 +23,7 @@ namespace SOS.Lib.Helpers
         {
             AllFields = LoadFieldDescriptionsFromJson();
             InitDataTypeEnum(AllFields);
-            FieldByPropertyPath = AllFields.ToDictionary(x => x.PropertyPath, x => x);
+            FieldByPropertyPath = AllFields.ToDictionary(x => x.PropertyPath.ToLower(), x => x);
             FieldsByFieldSet = CreateFieldSetDictionary(AllFields);
             OutputFieldsByFieldSet = CreateOutputFieldsDictionary(FieldsByFieldSet);
             JsonFormatDependencyByFieldSet = CreateJsonFormatDependencyDictionary(FieldsByFieldSet);
@@ -218,7 +218,7 @@ namespace SOS.Lib.Helpers
                 {
                     foreach (var dependentField in dependentFields)
                     {
-                        exportFormatFieldByJsonFormatField.TryAdd(dependentField, field.PropertyPath);
+                        exportFormatFieldByJsonFormatField.TryAdd(dependentField.ToLower(), field.PropertyPath);
                     }
                 }
             }
@@ -300,7 +300,7 @@ namespace SOS.Lib.Helpers
             var fieldsSet = new HashSet<string>();
             foreach (var outputField in outputFields)
             {
-                if (ExportFormatFieldByJsonFormatField.TryGetValue(outputField, out string exportField))
+                if (ExportFormatFieldByJsonFormatField.TryGetValue(outputField.ToLower(), out string exportField))
                 {
                     fieldsSet.Add(exportField);
                 }
@@ -313,7 +313,7 @@ namespace SOS.Lib.Helpers
             var propertyFields = new List<PropertyFieldDescription>();
             foreach (var field in fieldsSet)
             {
-                if (FieldByPropertyPath.TryGetValue(field, out var propertyField))
+                if (FieldByPropertyPath.TryGetValue(field.ToLower(), out var propertyField))
                 {
                     propertyFields.Add(propertyField);
                 }

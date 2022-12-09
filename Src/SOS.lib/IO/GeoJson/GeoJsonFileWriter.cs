@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
@@ -19,7 +18,6 @@ using SOS.Lib.Models;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
@@ -178,7 +176,7 @@ namespace SOS.Lib.IO.GeoJson
             var geoJsonConverterFactory = new NetTopologySuite.IO.Converters.GeoJsonConverterFactory();
             var attributesTableConverter = geoJsonConverterFactory.CreateConverter(typeof(AttributesTable), null);
             var geometryConverter = geoJsonConverterFactory.CreateConverter(typeof(Geometry), null);
-            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions();
+            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             jsonSerializerOptions.Converters.Add(attributesTableConverter);
             jsonSerializerOptions.Converters.Add(geometryConverter);
             return jsonSerializerOptions;
@@ -273,9 +271,9 @@ namespace SOS.Lib.IO.GeoJson
                 jsonWriter.WritePropertyName("geometry");
             }
 
-            System.Text.Json.JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
+            JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
             jsonWriter.WritePropertyName("properties");
-            System.Text.Json.JsonSerializer.Serialize(jsonWriter, attributesTable, jsonSerializerOptions);
+            JsonSerializer.Serialize(jsonWriter, attributesTable, jsonSerializerOptions);
             jsonWriter.WriteEndObject();
         }
 

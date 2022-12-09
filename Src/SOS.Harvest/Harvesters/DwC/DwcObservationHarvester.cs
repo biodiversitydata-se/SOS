@@ -16,6 +16,7 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Harvest.Harvesters.DwC

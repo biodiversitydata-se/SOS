@@ -28,7 +28,7 @@ namespace SOS.Harvest.Services
             _semaphore = new SemaphoreSlim(1, 1);
         }
 
-        public async Task<XDocument> GetAsync(string baseUrl, DateTime startDate, DateTime endDate, long changeId, int maxReturnedChanges = 10000)
+        public async Task<XDocument> GetAsync(string baseUrl, DateTime startDate, DateTime endDate, long changeId, int maxReturnedChanges = 100000)
         {
             try
             {

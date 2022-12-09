@@ -11,6 +11,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Nors;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Harvesters.AquaSupport.Nors
@@ -48,6 +49,10 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
+            // Get current document count from permanent index
+            _norsObservationVerbatimRepository.TempMode = false;
+            var currentDocCount = await _norsObservationVerbatimRepository.CountAllDocumentsAsync();
+
             var harvestInfo = new HarvestInfo("NORS", DateTime.Now);
             _norsObservationVerbatimRepository.TempMode = true;
 
@@ -70,50 +75,42 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
                 var endDate = startDate.AddYears(1).AddDays(-1);
                 var changeId = 0L;
                 var dataLastModified = DateTime.MinValue;
-                
+
+                var xmlDocument = await _norsObservationService.GetAsync(startDate, endDate, changeId);
+                changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
+
                 // Loop until all sightings are fetched.
-                while(startDate < DateTime.Now)
+                while (changeId != 0)
                 {
                     var lastRequesetTime = DateTime.Now;
-                    var xmlDocument = await _norsObservationService.GetAsync(startDate, endDate, changeId);
-                    changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
 
-                    // Change id equals 0 => nothing more to fetch for this year
-                    if (changeId.Equals(0))
-                    {
-                        startDate = endDate.AddDays(1);
-                        endDate = startDate.AddYears(1).AddDays(-1);
-                    }
-                    else
-                    {
-                        _logger.LogDebug(
+                    _logger.LogDebug(
                             $"Fetching NORS observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
 
-                        var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
-                        // Clean up
-                        xmlDocument = null;
+                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
+                    // Clean up
+                    xmlDocument = null;
 
-                        // Add sightings to MongoDb
-                        await _norsObservationVerbatimRepository.AddManyAsync(verbatims);
+                    // Add sightings to MongoDb
+                    await _norsObservationVerbatimRepository.AddManyAsync(verbatims);
 
-                        nrSightingsHarvested += verbatims.Count();
+                    nrSightingsHarvested += verbatims.Count();
 
-                        _logger.LogDebug($"{nrSightingsHarvested} NORS observations harvested");
+                    _logger.LogDebug($"{nrSightingsHarvested} NORS observations harvested");
 
-                        var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
+                    var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
 
-                        if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
-                        {
-                            dataLastModified = batchDataLastModified.Value;
-                        }
+                    if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
+                    {
+                        dataLastModified = batchDataLastModified.Value;
+                    }
 
-                        cancellationToken?.ThrowIfCancellationRequested();
-                        if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                            nrSightingsHarvested >= _norsServiceConfiguration.MaxNumberOfSightingsHarvested)
-                        {
-                            _logger.LogInformation("Max NORS observations reached");
-                            break;
-                        }
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        nrSightingsHarvested >= _norsServiceConfiguration.MaxNumberOfSightingsHarvested)
+                    {
+                        _logger.LogInformation("Max NORS observations reached");
+                        break;
                     }
 
                     var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
@@ -121,6 +118,9 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
                     {
                         Thread.Sleep(2000 - timeSinceLastCall);
                     }
+
+                    xmlDocument = await _norsObservationService.GetAsync(startDate, endDate, changeId);
+                    changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for NORS data provider");
@@ -129,12 +129,20 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
                 harvestInfo.DataLastModified =
                     dataLastModified == DateTime.MinValue ? (DateTime?) null : dataLastModified;
                 harvestInfo.End = DateTime.Now;
-                harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
 
-                _logger.LogInformation("Start permanentize temp collection for NORS verbatim");
-                await _norsObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for NORS verbatim");
+                if (nrSightingsHarvested >= currentDocCount * 0.8)
+                {
+                    harvestInfo.Status = RunStatus.Success;
+                    _logger.LogInformation("Start permanentize temp collection for NORS verbatim");
+                    await _norsObservationVerbatimRepository.PermanentizeCollectionAsync();
+                    _logger.LogInformation("Finish permanentize temp collection for NORS verbatim");
+                }
+                else
+                {
+                    harvestInfo.Status = RunStatus.Failed;
+                    _logger.LogError($"NORS: Previous harvested observation count is: {currentDocCount}. Now only {nrSightingsHarvested} observations where harvested.");
+                }
             }
             catch (JobAbortedException)
             {

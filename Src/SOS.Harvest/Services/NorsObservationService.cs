@@ -35,7 +35,7 @@ namespace SOS.Harvest.Services
             try
             {
                 return await _aquaSupportRequestService.GetAsync($"{_norsServiceConfiguration.BaseAddress}/api/v1/NorsSpeciesObservation?token={_norsServiceConfiguration.Token}",
-                    startDate, endDate, changeId);
+                    startDate, endDate, changeId, 10000);
             }
             catch (Exception e)
             {
