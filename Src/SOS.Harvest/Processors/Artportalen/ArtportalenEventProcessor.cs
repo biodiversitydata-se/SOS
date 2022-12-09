@@ -70,6 +70,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 int batchSize = 5000;
                 var filter = new SearchFilter(0);
                 filter.IsPartOfDataStewardshipDataset = true;
+                filter.DataProviderIds = new List<int> { 1 };
                 Logger.LogInformation($"AddObservationEventsAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
                 var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
                 Dictionary<string, List<string>> totalOccurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
