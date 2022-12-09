@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
 using Elasticsearch.Net;
 using Nest;
 using SOS.Lib.Enums;
-using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Models.Processed.Observation;

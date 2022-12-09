@@ -13,11 +13,7 @@ using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using static SOS.Lib.Models.Processed.DataStewardship.Dataset.ObservationDataset;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -244,7 +240,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task EnableIndexingAsync()
         {
             await Client.Indices.UpdateSettingsAsync(IndexName,
-                p => p.IndexSettings(g => g.RefreshInterval(1)));
+                p => p.IndexSettings(g => g.RefreshInterval(new Time(5000))));
         }
 
         /// <inheritdoc />
