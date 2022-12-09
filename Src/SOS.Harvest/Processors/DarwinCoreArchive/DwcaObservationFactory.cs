@@ -15,6 +15,7 @@ using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -134,6 +135,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             obs.RightsHolder = verbatim.RightsHolder;
             obs.Type = GetSosId(verbatim.Type,
                 _vocabularyById[VocabularyId.Type]);
+            obs.DataStewardshipDatasetId = verbatim.DataStewardshipDatasetId;            
 
             // Event
             obs.Event = CreateProcessedEvent(verbatim);
