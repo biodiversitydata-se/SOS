@@ -119,6 +119,34 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
+        public async Task Get_EventOccurrenceIds_with_eventIds_filter()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            SearchFilter searchFilter = new SearchFilter(0)
+            {
+                EventIds = new List<string>
+                {
+                    "SFTspkt:19770610:241"
+                    //"SFTstd:20060627:461",
+                    //"SFTstd:20050606:106"
+                }
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var eventOccurrenceIds = await _fixture.ProcessedObservationRepository.GetEventOccurrenceItemsAsync(searchFilter);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            eventOccurrenceIds.Should().NotBeNull();
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
         public async Task Get_occurrences_by_ids()
         {
             //-----------------------------------------------------------------------------------------------------------

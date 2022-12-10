@@ -133,19 +133,19 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             //filter.IsPartOfDataStewardshipDataset = true;
             filter.EventIds = processedEvents.Keys.ToList();
             var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
-            var occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
+            var occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId.ToLower(), m => m.OccurrenceIds);
             foreach (var eventPair in processedEvents)
             {
-                if (occurrenceIdsByEventId.TryGetValue(eventPair.Key, out var occurrenceIds))
+                if (occurrenceIdsByEventId.TryGetValue(eventPair.Key.ToLower(), out var occurrenceIds))
                 {
                     if (occurrenceIds != null && eventPair.Value.OccurrenceIds != null && occurrenceIds.Count != eventPair.Value.OccurrenceIds.Count)
-                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed={occurrenceIds.Count}");
+                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed={occurrenceIds.Count}, EventId={eventPair.Key}");
                     eventPair.Value.OccurrenceIds = occurrenceIds;
                 }
                 else
                 {
                     if (eventPair.Value.OccurrenceIds != null && eventPair.Value.OccurrenceIds.Count > 0)
-                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed=0");
+                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed=0, EventId={eventPair.Key}");
                     eventPair.Value.OccurrenceIds = null;
                 }
             }
