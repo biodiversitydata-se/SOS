@@ -130,7 +130,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         private async Task GetEventObservations(ConcurrentDictionary<string, ObservationEvent> processedEvents)
         {
             var filter = new SearchFilter(0);
-            filter.IsPartOfDataStewardshipDataset = true;
+            //filter.IsPartOfDataStewardshipDataset = true;
             filter.EventIds = processedEvents.Keys.ToList();
             var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
             var occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
