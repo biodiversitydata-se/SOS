@@ -104,7 +104,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 {
                     var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
                     if (processedEvent == null) continue;
-                    processedEvents.TryAdd(processedEvent.Id, processedEvent);
+                    processedEvents.TryAdd(processedEvent.EventId, processedEvent);
                 }
 
                 await GetEventObservations(processedEvents);
