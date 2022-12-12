@@ -120,7 +120,7 @@ namespace SOS.Lib.Repositories.Processed
                             .AutoMap()
                             .Name(nm => nm.ArtportalenInternal)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.LocationExternalId)
+                               // .KeyWordLowerCase(kwlc => kwlc.LocationExternalId)
                                 .KeyWordLowerCase(kwlc => kwlc.LocationPresentationNameParishRegion, false)
                                 .KeyWordLowerCase(kwlc => kwlc.ParentLocality)
                                 .KeyWordLowerCase(kwlc => kwlc.ReportedByUserAlias)
@@ -210,7 +210,7 @@ namespace SOS.Lib.Repositories.Processed
                                     .Properties(ps => ps.GetMapping())
                                 )
                                 .Object<VocabularyValue>(c => c
-                                    .Name(nm => nm.ValidationStatus)
+                                    .Name(nm => nm.VerificationStatus)
                                     .Properties(ps => ps.GetMapping())
                                 )
                                 .Object<VocabularyValue>(c => c
@@ -250,7 +250,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .KeyWordLowerCase(kwlc => kwlc.AssociatedSequences, false)
                                 .KeyWordLowerCase(kwlc => kwlc.AssociatedTaxa, false)
                                 .KeyWordLowerCase(kwlc => kwlc.BiotopeDescription, false)
-                                .KeyWordLowerCase(kwlc => kwlc.IndividualId, false)
+                              //  .KeyWordLowerCase(kwlc => kwlc.IndividualId, false)
                                 .KeyWordLowerCase(kwlc => kwlc.RecordedBy)
                                 .KeyWordLowerCase(kwlc => kwlc.CatalogNumber)
                                 .KeyWordLowerCase(kwlc => kwlc.Disposition, false)
@@ -367,6 +367,31 @@ namespace SOS.Lib.Repositories.Processed
             );
 
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create observation index. Error: {createIndexResponse.DebugInformation}");
+        }
+
+        
+        /// <summary>
+        /// Make sure Elasticserach nodes are up
+        /// </summary>
+        /// <param name="clusterCount"></param>
+        private void CheckNodes(int clusterCount)
+        {
+            CheckNode(PublicIndexName, clusterCount);
+            CheckNode(ProtectedIndexName, clusterCount);
+        }
+
+        /// <summary>
+        /// Make sure all clusters are available
+        /// </summary>
+        /// <param name="indexName"></param>
+        /// <exception cref="Exception"></exception>
+        private void CheckNode(string indexName, int clusterCount)
+        {
+            var health = Client.Cluster.Health(indexName);
+            if (health.NumberOfDataNodes != clusterCount)
+            {
+                throw new Exception($"Only {health.NumberOfDataNodes} Elasticsearch nodes of expected {clusterCount} available.");
+            }
         }
 
         /// <summary>
@@ -591,6 +616,7 @@ namespace SOS.Lib.Repositories.Processed
             ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
+            CheckNodes(elasticConfiguration.Clusters.Count());
         }
 
         /// <summary>

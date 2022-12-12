@@ -10,20 +10,17 @@ using SOS.Harvest.Repositories.Source.ObservationsDatabase.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ObservationDatabase;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Lib.Repositories.Verbatim;
 
 namespace SOS.Harvest.Harvesters.ObservationDatabase
 {
     /// <summary>
     ///     observation database observation harvester
     /// </summary>
-    public class ObservationDatabaseHarvester : IObservationDatabaseHarvester
+    public class ObservationDatabaseHarvester : ObservationHarvesterBase<ObservationDatabaseVerbatim, int>, IObservationDatabaseHarvester
     {
         private readonly IObservationDatabaseRepository _observationDatabaseRepository;
-        private readonly IObservationDatabaseVerbatimRepository _observationDatabaseVerbatimRepository;
         private readonly ObservationDatabaseConfiguration _observationDatabaseConfiguration;
         private readonly SemaphoreSlim _semaphore;
-        private readonly ILogger<ObservationDatabaseHarvester> _logger;
 
         /// <summary>
         ///  Harvest a batch of sightings
@@ -38,38 +35,38 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
         {
             try
             {
-                _logger.LogDebug(
+                Logger.LogDebug(
                     $"Start getting observation database sightings ({batchIndex})");
                 // Get chunk of observations
                 var observations = (await getChunkTask)?.ToArray();
-                _logger.LogDebug(
+                Logger.LogDebug(
                     $"Finish getting observation database sightings ({batchIndex})");
 
                 if (!observations?.Any() ?? true)
                 {
-                    _logger.LogDebug(
+                    Logger.LogDebug(
                     $"No observations found ({batchIndex})");
                     return 0;
                 }
 
-                _logger.LogDebug($"Start casting entities to verbatim ({batchIndex})");
+                Logger.LogDebug($"Start casting entities to verbatim ({batchIndex})");
 
                 // Cast sightings to verbatim observations
                 var verbatimObservations = observations.Select(e => CastEntityToVerbatim(e))?.ToArray(); 
                 observations = null;
-                _logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
+                Logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
 
-                _logger.LogDebug($"Start storing batch ({batchIndex})");
+                Logger.LogDebug($"Start storing batch ({batchIndex})");
                 // Add sightings to mongodb
 
-                await _observationDatabaseVerbatimRepository.AddManyAsync(verbatimObservations);
-                _logger.LogDebug($"Finish storing batch ({batchIndex})");
+                await VerbatimRepository.AddManyAsync(verbatimObservations);
+                Logger.LogDebug($"Finish storing batch ({batchIndex})");
 
                 return verbatimObservations?.Count() ?? 0;
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                Logger.LogError(e,
                     $"Harvest observation database sightings ({batchIndex})");
                 throw;
             }
@@ -141,34 +138,23 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
             IObservationDatabaseRepository observationDatabaseRepository,
             IObservationDatabaseVerbatimRepository observationDatabaseVerbatimRepository,
             ObservationDatabaseConfiguration observationDatabaseConfiguration,
-            ILogger<ObservationDatabaseHarvester> logger)
+            ILogger<ObservationDatabaseHarvester> logger) : base("Observation Database", observationDatabaseVerbatimRepository, logger)
         {
             _observationDatabaseRepository = observationDatabaseRepository ?? throw new ArgumentNullException(nameof(observationDatabaseRepository));
-            _observationDatabaseVerbatimRepository = observationDatabaseVerbatimRepository ?? throw new ArgumentNullException(nameof(observationDatabaseVerbatimRepository));
             _observationDatabaseConfiguration = observationDatabaseConfiguration ??
                                                 throw new ArgumentNullException(nameof(observationDatabaseConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
             _semaphore = new SemaphoreSlim(_observationDatabaseConfiguration.NoOfThreads, _observationDatabaseConfiguration.NoOfThreads);            
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            // Get current document count from permanent index
-            _observationDatabaseVerbatimRepository.TempMode = false;
-            var currentDocCount = await _observationDatabaseVerbatimRepository.CountAllDocumentsAsync();
-
-            var harvestInfo = new HarvestInfo("ObservationDatabase", DateTime.Now);
-            _observationDatabaseVerbatimRepository.TempMode = true;
+            var runStatus = RunStatus.Success;
+            var harvestCount = 0;
 
             try
             {
-                _logger.LogInformation("Start harvesting sightings for observation database provider");
-                await _observationDatabaseVerbatimRepository.DeleteCollectionAsync();
-                await _observationDatabaseVerbatimRepository.AddCollectionAsync();
-
-                var nrObservationsHarvested = 0;
+                await InitializeharvestAsync(true);
                 var (minId, maxId) = await _observationDatabaseRepository.GetIdSpanAsync();
 
                 if (maxId > minId)
@@ -176,7 +162,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
                     var currentId = minId;
                     var harvestBatchTasks = new List<Task<int>>();
 
-                    _logger.LogDebug($"Start getting observation database observations");
+                    Logger.LogDebug($"Start getting observation database observations");
 
                     var batchIndex = 0;
                     // Loop until all sightings are fetched
@@ -205,50 +191,23 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
                     await Task.WhenAll(harvestBatchTasks);
 
                     // Sum each batch harvested
-                    nrObservationsHarvested = harvestBatchTasks.Sum(t => t.Result);
-
-                    _logger.LogDebug($"Finish getting observation database sightings ({nrObservationsHarvested})");
+                    harvestCount = harvestBatchTasks.Sum(t => t.Result);
                 }
 
                 cancellationToken?.ThrowIfCancellationRequested();
-
-                _logger.LogInformation("Finished harvesting sightings for observation database data provider");
-
-                // Update harvest info
-                harvestInfo.DataLastModified = await _observationDatabaseRepository.GetLastModifiedDateAsyc();
-                harvestInfo.End = DateTime.Now;
-                harvestInfo.Count = nrObservationsHarvested;
-
-                if (nrObservationsHarvested >= currentDocCount * 0.8)
-                {
-                    harvestInfo.Status = RunStatus.Success;
-                    _logger.LogInformation("Start permanentize temp collection for observation database verbatim");
-                    await _observationDatabaseVerbatimRepository.PermanentizeCollectionAsync();
-                    _logger.LogInformation("Finish permanentize temp collection for observation database verbatim");
-                }
-                else
-                {
-                    harvestInfo.Status = RunStatus.Failed;
-                    _logger.LogError($"Observation database: Previous harvested observation count is: {currentDocCount}. Now only {nrObservationsHarvested} observations where harvested.");
-                }
             }
             catch (JobAbortedException e)
             {
-                _logger.LogError(e, "Canceled harvest of observation database");
-                harvestInfo.Status = RunStatus.Canceled;
+                Logger.LogError(e, "Canceled harvest of observation database");
+                runStatus = RunStatus.Canceled;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed harvest of observation database");
-                harvestInfo.Status = RunStatus.Failed;
-            }
-            finally
-            {
-                _observationDatabaseVerbatimRepository.TempMode = false;
+                Logger.LogError(e, "Failed harvest of observation database");
+                runStatus = RunStatus.Failed;
             }
 
-            _logger.LogInformation($"Finish harvesting sightings for observation database provider. Status={harvestInfo.Status}");
-            return harvestInfo;
+            return await FinishHarvestAsync(runStatus, harvestCount);
         }
 
         /// inheritdoc />

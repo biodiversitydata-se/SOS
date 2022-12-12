@@ -54,8 +54,8 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Has Triggered Validation Rules
         /// </summary>
-        [Obsolete("Replaced by HasTriggeredVerificationRules")]
-        public bool HasTriggeredValidationRules => HasTriggeredVerificationRules;
+        //[Obsolete("Replaced by HasTriggeredVerificationRules")]
+        //public bool HasTriggeredValidationRules => HasTriggeredVerificationRules;
 
         /// <summary>
         ///     Has Triggered Verification Rules
@@ -65,8 +65,8 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Has any Triggered Validation Rule with Warning
         /// </summary>
-        [Obsolete("Replaced by HasAnyTriggeredVerificationRuleWithWarning")]
-        public bool HasAnyTriggeredValidationRuleWithWarning => HasAnyTriggeredVerificationRuleWithWarning;
+        //[Obsolete("Replaced by HasAnyTriggeredVerificationRuleWithWarning")]
+        //public bool HasAnyTriggeredValidationRuleWithWarning => HasAnyTriggeredVerificationRuleWithWarning;
 
         /// <summary>
         ///     Has any Triggered Verification Rule with Warning
@@ -81,8 +81,8 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     ExternalId of Site in Artportalen.
         /// </summary>
-        [Obsolete("Use Location.Attributes.ExternalId")]
-        public string LocationExternalId { get; set; }
+        //[Obsolete("Use Location.Attributes.ExternalId")]
+        //public string LocationExternalId { get; set; }
 
         /// <summary>
         ///     Note of Interest.
@@ -117,14 +117,14 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Species group id.
         /// </summary>
-        [Obsolete("Replaced by taxon.SpeciesGroup (Enum)")]
-        public int? SpeciesGroupId { get; set; }
+        //[Obsolete("Replaced by taxon.SpeciesGroup (Enum)")]
+        //public int? SpeciesGroupId { get; set; }
 
         /// <summary>
         ///     Id of sightings RegionalSightingState
         /// </summary>
-        [Obsolete("This is too be deleted")]
-        public int? RegionalSightingStateId { get; set; }
+        //[Obsolete("This is too be deleted")]
+        //public int? RegionalSightingStateId { get; set; }
 
         /// <summary>
         ///     Id of publishing types.

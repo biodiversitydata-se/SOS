@@ -21,14 +21,13 @@ using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Location;
 using SOS.Observations.Api.Dtos.Observation;
 using SOS.Observations.Api.Dtos.Vocabulary;
-using static SOS.Observations.Api.Dtos.Filter.SearchFilterBaseDto;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Observations.Api.Extensions
 {
     public static class DtoExtensions
     {
-        public static StatusVerificationDto ToStatusVerification(this StatusValidationDto statusValidationDto)
+      /*  public static StatusVerificationDto ToStatusVerification(this StatusValidationDto statusValidationDto)
         {
             switch (statusValidationDto)
             {
@@ -40,7 +39,7 @@ namespace SOS.Observations.Api.Extensions
                     return StatusVerificationDto.BothVerifiedAndNotVerified;
                 default: return StatusVerificationDto.BothVerifiedAndNotVerified;
             }
-        }
+        }*/
 
         private static SearchFilterBase PopulateFilter(SearchFilterBaseDto searchFilterBaseDto, int userId, ProtectionFilterDto? protectionFilter, string translationCultureCode)
         {
@@ -54,7 +53,9 @@ namespace SOS.Observations.Api.Extensions
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
-            filter.VerificationStatus = searchFilterBaseDto.ValidationStatus.HasValue ? (SearchFilterBase.StatusVerification)searchFilterBaseDto.ValidationStatus.Value.ToStatusVerification() : (SearchFilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
+            //filter.VerificationStatus = searchFilterBaseDto.ValidationStatus.HasValue ? (SearchFilterBase.StatusVerification)searchFilterBaseDto.ValidationStatus.Value.ToStatusVerification() : (SearchFilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
+            filter.VerificationStatus = (SearchFilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
+            filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
             filter.Location = PopulateLocationFilter(searchFilterBaseDto.Geographics);
@@ -85,7 +86,6 @@ namespace SOS.Observations.Api.Extensions
             }
 
             filter.DiffusionStatuses = searchFilterBaseDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus)dsd)?.ToList();
-
             filter.DeterminationFilter = (SightingDeterminationFilter)searchFilterBaseDto.DeterminationFilter;
 
             filter.Output = new OutputFilter();
@@ -142,17 +142,21 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.DiscoveryMethodIds = searchFilterInternalDto.ExtendedFilter.DiscoveryMethodIds;
                 internalFilter.LifeStageIds = searchFilterInternalDto.ExtendedFilter.LifeStageIds;
                 internalFilter.ActivityIds = searchFilterInternalDto.ExtendedFilter.ActivityIds;
-                internalFilter.HasTriggeredVerificationRule = searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRule ?? searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRule;
-                internalFilter.HasTriggeredVerificationRuleWithWarning =
-                    searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRuleWithWarning ?? searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRuleWithWarning;
+                //internalFilter.HasTriggeredVerificationRule = searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRule ?? searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRule;
+                internalFilter.HasTriggeredVerificationRule = searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRule;
+                /*internalFilter.HasTriggeredVerificationRuleWithWarning =
+                    searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRuleWithWarning ?? searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRuleWithWarning;*/
+                internalFilter.HasTriggeredVerificationRuleWithWarning = searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRuleWithWarning;
                 internalFilter.Length = searchFilterInternalDto.ExtendedFilter.Length;
                 internalFilter.LengthOperator = searchFilterInternalDto.ExtendedFilter.LengthOperator;
                 internalFilter.Weight = searchFilterInternalDto.ExtendedFilter.Weight;
                 internalFilter.WeightOperator = searchFilterInternalDto.ExtendedFilter.WeightOperator;
                 internalFilter.Quantity = searchFilterInternalDto.ExtendedFilter.Quantity;
                 internalFilter.QuantityOperator = searchFilterInternalDto.ExtendedFilter.QuantityOperator;
-                internalFilter.VerificationStatusIds = searchFilterInternalDto.ExtendedFilter.ValidationStatusIds != null && searchFilterInternalDto.ExtendedFilter.ValidationStatusIds.Any() ? searchFilterInternalDto.ExtendedFilter.ValidationStatusIds : searchFilterInternalDto.ExtendedFilter.VerificationStatusIds;
-                internalFilter.ExcludeVerificationStatusIds = searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds != null && searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds.Any() ? searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds : searchFilterInternalDto.ExtendedFilter.ExcludeVerificationStatusIds;
+                //internalFilter.VerificationStatusIds = searchFilterInternalDto.ExtendedFilter.ValidationStatusIds != null && searchFilterInternalDto.ExtendedFilter.ValidationStatusIds.Any() ? searchFilterInternalDto.ExtendedFilter.ValidationStatusIds : searchFilterInternalDto.ExtendedFilter.VerificationStatusIds;
+                internalFilter.VerificationStatusIds = searchFilterInternalDto.ExtendedFilter.VerificationStatusIds;
+                //internalFilter.ExcludeVerificationStatusIds = searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds != null && searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds.Any() ? searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds : searchFilterInternalDto.ExtendedFilter.ExcludeVerificationStatusIds;
+                internalFilter.ExcludeVerificationStatusIds = searchFilterInternalDto.ExtendedFilter.ExcludeVerificationStatusIds;
                 internalFilter.UnspontaneousFilter =
                     (SightingUnspontaneousFilter)searchFilterInternalDto.ExtendedFilter
                         .UnspontaneousFilter;
@@ -177,11 +181,11 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.SpeciesFactsIds = searchFilterInternalDto.ExtendedFilter.SpeciesFactsIds;
                 internalFilter.InstitutionId = searchFilterInternalDto.ExtendedFilter.InstitutionId;
                 internalFilter.DatasourceIds = searchFilterInternalDto.ExtendedFilter.DatasourceIds;
-                if (searchFilterInternalDto?.ExtendedFilter?.LocationNameFilter != null)
+                /*if (searchFilterInternalDto?.ExtendedFilter?.LocationNameFilter != null)
                 {
                     if (internalFilter.Location == null) internalFilter.Location = new LocationFilter();
                     internalFilter.Location.NameFilter = searchFilterInternalDto.ExtendedFilter.LocationNameFilter;
-                }
+                }*/
 
                 if (searchFilterInternalDto.ExtendedFilter.SexIds?.Any() ?? false)
                 {

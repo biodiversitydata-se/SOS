@@ -105,7 +105,7 @@ namespace SOS.Lib.Extensions
             taxon.Attributes.Natura2000HabitatsDirectiveArticle5 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle5 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5.GetValueOrDefault();
             taxon.Attributes.OrganismGroup = sourceTaxon.DynamicProperties?.OrganismGroup;
             taxon.Attributes.ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties?.ParentDyntaxaTaxonId;
-            taxon.Attributes.ProtectionLevel = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();
+            //taxon.Attributes.ProtectionLevel = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();
             taxon.Attributes.SensitivityCategory = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();
             taxon.Attributes.ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw ?? false;
             taxon.Attributes.IsInvasiveAccordingToEuRegulation = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false;

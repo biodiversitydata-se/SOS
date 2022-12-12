@@ -19,7 +19,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
     /// <summary>
     ///     Artportalen observation harvester
     /// </summary>
-    public class ArtportalenObservationHarvester : IArtportalenObservationHarvester
+    public class ArtportalenObservationHarvester : ObservationHarvesterBase<ArtportalenObservationVerbatim, int>, IArtportalenObservationHarvester
     {
         private readonly ArtportalenConfiguration _artportalenConfiguration;
         private readonly IMediaRepository _mediaRepository;
@@ -27,14 +27,12 @@ namespace SOS.Harvest.Harvesters.Artportalen
         private readonly IProjectRepository _projectRepository;
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly ISightingRepository _sightingRepository;
-        private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly ISiteRepository _siteRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
         private readonly IAreaHelper _areaHelper;
         private readonly SemaphoreSlim _semaphore;
-        private readonly ILogger<ArtportalenObservationHarvester> _logger;
 
         /// <summary>
         /// Get harvest factory
@@ -53,7 +51,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 cancellationToken?.ThrowIfCancellationRequested();
             }
 
-            _logger.LogDebug("Start creating factory");
+            Logger.LogDebug("Start creating factory");
             var harvestFactory = new ArtportalenHarvestFactory(
                 _mediaRepository,
                 _projectRepository,
@@ -64,15 +62,15 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _artportalenMetadataContainer,
                 _areaHelper,
                 _artportalenConfiguration.NoOfThreads,
-                _logger
+                Logger
             );
-            _logger.LogDebug("Finish creating factory");
+            Logger.LogDebug("Finish creating factory");
 
             if (mode.Equals(JobRunModes.Full))
             {
-                _logger.LogDebug("Start caching sites");
+                Logger.LogDebug("Start caching sites");
                 await harvestFactory.CacheFreqventlyUsedSitesAsync();
-                _logger.LogDebug("Finish caching sites");
+                Logger.LogDebug("Finish caching sites");
             }
 
             return harvestFactory;
@@ -89,13 +87,13 @@ namespace SOS.Harvest.Harvesters.Artportalen
         {
             if (_artportalenConfiguration.AddTestSightings && (_artportalenConfiguration.AddTestSightingIds?.Any() ?? false))
             { 
-                _logger.LogDebug("Start adding test sightings");
+                Logger.LogDebug("Start adding test sightings");
                 await _semaphore.WaitAsync();
                 await HarvestBatchAsync(harvestFactory,
                        _sightingRepository.GetChunkAsync(_artportalenConfiguration.AddTestSightingIds),
                         0);
 
-                _logger.LogDebug("Finish adding test sightings");
+                Logger.LogDebug("Finish adding test sightings");
             }
 
             // Get source min and max id
@@ -114,7 +112,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 var currentId = minId;
                 var harvestBatchTasks = new List<Task<int>>();
 
-                _logger.LogDebug($"Start getting Artportalen sightings");
+                Logger.LogDebug($"Start getting Artportalen sightings");
                 
                 var batchIndex = 0;
                 // Loop until all sightings are fetched
@@ -140,7 +138,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 // Sum each batch harvested
                 var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
-                _logger.LogDebug($"Finish getting Artportalen sightings ({ nrSightingsHarvested })");
+                Logger.LogDebug($"Finish getting Artportalen sightings ({ nrSightingsHarvested })");
 
                 return nrSightingsHarvested;
             }
@@ -160,7 +158,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         private async Task<int> HarvestIncrementalAsync(JobRunModes mode, ArtportalenHarvestFactory harvestFactory, 
             IJobCancellationToken cancellationToken)
         {
-            _logger.LogDebug($"Start getting Artportalen sightings ({mode})");
+            Logger.LogDebug($"Start getting Artportalen sightings ({mode})");
 
             // We start from last harvested sighting 
             var lastModified = await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
@@ -168,7 +166,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             // Get list of id's to Make sure we don't harvest more than #limit 
             var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(lastModified, _artportalenConfiguration.CatchUpLimit))?.ToArray();
-            _logger.LogDebug($"Number of Artportalen Ids to harvest: {idsToHarvest?.Length ?? 0}, lastModifiedQuery={lastModified} ({mode})");
+            Logger.LogDebug($"Number of Artportalen Ids to harvest: {idsToHarvest?.Length ?? 0}, lastModifiedQuery={lastModified} ({mode})");
 
             if (!idsToHarvest?.Any() ?? true)
             {
@@ -204,7 +202,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             // Sum each batch harvested
             var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
-            _logger.LogDebug($"Finish getting Artportalen sightings ({mode}) (NrSightingsHarvested={nrSightingsHarvested:N0})");
+            Logger.LogDebug($"Finish getting Artportalen sightings ({mode}) (NrSightingsHarvested={nrSightingsHarvested:N0})");
 
             return nrSightingsHarvested;
         }
@@ -228,31 +226,31 @@ namespace SOS.Harvest.Harvesters.Artportalen
         {
             try
             {
-                _logger.LogDebug(
+                Logger.LogDebug(
                     $"Start getting Artportalen sightings (BatchIndex={batchIndex})");
                 // Get chunk of sightings
                 var sightings = (await getChunkTask)?.ToArray();
-                _logger.LogDebug(
+                Logger.LogDebug(
                     $"Finish getting Artportalen sightings (BatchIndex={batchIndex})");
 
                 if (!sightings?.Any() ?? true)
                 {
-                    _logger.LogDebug(
+                    Logger.LogDebug(
                     $"No sightings found (BatchIndex={batchIndex})");
                     return null;
                 }
 
-                _logger.LogDebug($"Start casting entities to verbatim ({batchIndex})");
+                Logger.LogDebug($"Start casting entities to verbatim ({batchIndex})");
 
                 // Cast sightings to verbatim observations
                 var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(sightings!);
-                _logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
+                Logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
 
                 return verbatimObservations;
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                Logger.LogError(e,
                     $"Harvest Artportalen sightings ({batchIndex}) failed");
                 throw new Exception("Harvest Artportalen batch failed");
             }
@@ -268,9 +266,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
             {
                 var verbatimObservations = await GetVerbatimBatchAsync(harvestFactory, getChunkTask, batchIndex);
 
-                _logger.LogDebug($"Start storing batch ({batchIndex})");
-                await _artportalenVerbatimRepository.AddManyAsync(verbatimObservations);
-                _logger.LogDebug($"Finish storing batch ({batchIndex})");
+                Logger.LogDebug($"Start storing batch ({batchIndex})");
+                await VerbatimRepository.AddManyAsync(verbatimObservations);
+                Logger.LogDebug($"Finish storing batch ({batchIndex})");
 
                 // If sleep is required to free resources to other systems
                 if (_artportalenConfiguration.SleepAfterBatch > 0)
@@ -282,7 +280,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                Logger.LogError(e,
                     $"Harvest Artportalen sightings ({batchIndex}) failed");
                 throw new Exception("Harvest Artportalen batch failed");
             }
@@ -297,7 +295,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         {
             // Use active index if it's a incremental active instance harvest 
             _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
-            _artportalenVerbatimRepository.Mode = mode;
+            VerbatimRepository.Mode = mode;
 
             // Incremental harvest always use live AP data
             var live = mode != JobRunModes.Full;
@@ -340,7 +338,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             IProcessedObservationCoreRepository processedObservationRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
             IAreaHelper areaHelper,
-            ILogger<ArtportalenObservationHarvester> logger)
+            ILogger<ArtportalenObservationHarvester> logger) : base("Artportalen", artportalenVerbatimRepository, logger)
         {
             _artportalenConfiguration = artportalenConfiguration ??
                                         throw new ArgumentNullException(nameof(artportalenConfiguration));
@@ -349,8 +347,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
             _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
             _siteRepository = siteRepository ?? throw new ArgumentNullException(nameof(siteRepository));
-            _artportalenVerbatimRepository = artportalenVerbatimRepository ??
-                                             throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _sightingRelationRepository = sightingRelationRepository ??
                                           throw new ArgumentNullException(nameof(sightingRelationRepository));
             _speciesCollectionRepository = speciesCollectionItemRepository ??
@@ -358,8 +354,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _artportalenMetadataContainer = artportalenMetadataContainer ?? throw new ArgumentNullException(nameof(artportalenMetadataContainer));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
+            
             _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads, artportalenConfiguration.NoOfThreads);
         }
 
@@ -373,51 +368,45 @@ namespace SOS.Harvest.Harvesters.Artportalen
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo("Artportalen", DateTime.Now);
-            _logger.LogInformation($"Start harvesting sightings for Artportalen data provider. Mode={mode}");
-
+            var runStatus = RunStatus.Success;
+            var harvestCount = 0;
+            var dataLastModified = (DateTime?)null;
+            var notes = (string?)null;
             try
             {
+                await InitializeharvestAsync(false);
+
                 var harvestFactory = await GetHarvestFactoryAsync(mode, cancellationToken);
 
-                // Make sure we have an empty public collection
-                _logger.LogDebug("Start empty artportalen verbatim collection");
-                await _artportalenVerbatimRepository.DeleteCollectionAsync();
-                await _artportalenVerbatimRepository.AddCollectionAsync();
-                _logger.LogDebug("Finish empty artportalen verbatim collection");
-
-                var nrSightingsHarvested = mode == JobRunModes.Full ?
+                harvestCount = mode == JobRunModes.Full ?
                     await HarvestAllAsync(harvestFactory, cancellationToken)
                     :
                     await HarvestIncrementalAsync(mode, harvestFactory, cancellationToken);
                 harvestFactory.Dispose();
 
                 // Update harvest info
-                harvestInfo.Status = nrSightingsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;
+                runStatus = harvestCount >= 0 ? RunStatus.Success : RunStatus.Failed;
                 
                 if (mode == JobRunModes.Full)
                 {
-                    harvestInfo.DataLastModified = await _sightingRepository.GetLastModifiedDateAsyc();
+                    dataLastModified = await _sightingRepository.GetLastModifiedDateAsyc();
 
                     var lastBackupDate = await _metadataRepository.GetLastBackupDateAsync();
-                    harvestInfo.Notes = lastBackupDate.HasValue ? $"Database backup restore: {lastBackupDate}" : null;
+                    notes = lastBackupDate.HasValue ? $"Database backup restore: {lastBackupDate}" : null;
                 }
-                harvestInfo.End = DateTime.Now;
-                harvestInfo.Count = nrSightingsHarvested;
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("Artportalen harvest was cancelled.");
-                harvestInfo.Status = RunStatus.Canceled;
+                Logger.LogInformation("Artportalen harvest was cancelled.");
+                runStatus = RunStatus.Canceled;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed aggregation of sightings");
-                harvestInfo.Status = RunStatus.Failed;
+                Logger.LogError(e, "Failed aggregation of sightings");
+                runStatus = RunStatus.Failed;
             }
 
-            _logger.LogInformation($"Finish harvesting sightings for Artportalen data provider. Mode={mode}, Status={harvestInfo.Status}");
-            return harvestInfo;
+            return await FinishHarvestAsync(runStatus, harvestCount, dataLastModified, notes);
         }
 
         /// inheritdoc />
@@ -441,11 +430,11 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("Harvest Artportalen observations by id was cancelled.");
+                Logger.LogInformation("Harvest Artportalen observations by id was cancelled.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Harvest Artportalen observations by id failed");
+                Logger.LogError(e, "Harvest Artportalen observations by id failed");
             }
 
             return null;

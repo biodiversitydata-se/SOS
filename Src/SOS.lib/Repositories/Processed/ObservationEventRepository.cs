@@ -14,8 +14,6 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using static SOS.Lib.Models.Processed.DataStewardship.Dataset.ObservationDataset;
-using static SOS.Lib.Models.Processed.DataStewardship.Event.ObservationEvent;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -288,7 +286,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task EnableIndexingAsync()
         {
             await Client.Indices.UpdateSettingsAsync(IndexName,
-                p => p.IndexSettings(g => g.RefreshInterval(1)));
+                p => p.IndexSettings(g => g.RefreshInterval(new Time(5000))));
         }
 
         /// <inheritdoc />

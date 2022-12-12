@@ -206,8 +206,8 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var vocabularies = await _vocabularyManager.GetVocabulariesAsync();
-                if (vocabularyId == VocabularyIdDto.ValidationStatus) vocabularyId = VocabularyIdDto.VerificationStatus;
-                if (vocabularyId == VocabularyIdDto.TaxonProtectionLevel) vocabularyId = VocabularyIdDto.SensitivityCategory;
+                if (vocabularyId == VocabularyIdDto.VerificationStatus) vocabularyId = VocabularyIdDto.VerificationStatus;
+                if (vocabularyId == VocabularyIdDto.SensitivityCategory) vocabularyId = VocabularyIdDto.SensitivityCategory;
                 var vocabulary = vocabularies.FirstOrDefault(f => f.Id == (VocabularyId)vocabularyId);
 
                 if (vocabulary == null)

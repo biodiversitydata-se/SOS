@@ -65,7 +65,7 @@ namespace SOS.Lib.Extensions
 
             return new DarwinCoreIdentification
             {
-                IdentificationVerificationStatus = source.ValidationStatus?.Value,
+                IdentificationVerificationStatus = source.VerificationStatus?.Value,
                 IdentifiedBy = source.IdentifiedBy,
                 IdentificationReferences = source.IdentificationReferences,
                 IdentificationRemarks = source.IdentificationRemarks,
@@ -159,7 +159,7 @@ namespace SOS.Lib.Extensions
                 Disposition = source.Disposition,
                 EstablishmentMeans = source.EstablishmentMeans?.Value,
                 IndividualCount = source.IndividualCount,
-                IndividualID = source.IndividualId,
+                //IndividualID = source.IndividualId,
                 LifeStage = source.LifeStage?.Value,
                 OccurrenceID = source.OccurrenceId,
                 OccurrenceRemarks = source.OccurrenceRemarks,

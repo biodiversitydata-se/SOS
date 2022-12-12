@@ -367,7 +367,15 @@ namespace SOS.Lib.Repositories
         /// <inheritdoc />
         public async Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection)
         {
-            return await mongoCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
+            try
+            {
+                return await mongoCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
+            }
+            catch
+            {
+                return 0;
+            }
+            
         }
 
         /// <inheritdoc />

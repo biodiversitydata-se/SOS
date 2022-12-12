@@ -18,7 +18,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         private readonly ISightingRepository _sightingRepository;        
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;        
-        private readonly ILogger<ArtportalenObservationHarvester> _logger;
+        private readonly ILogger<IObservationHarvester> _logger;
 
         /// <summary>
         /// Cast sighting itemEntity to model
@@ -114,7 +114,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.ConfirmedBy = (await _artportalenMetadataContainer.TryGetPersonByUserIdAsync(entity.ConfirmatorUserId))?.FullName;
                 observation.ConfirmationYear = entity.ConfirmationYear;
 
-                observation.RegionalSightingStateId = entity.RegionalSightingStateId;
+                //observation.RegionalSightingStateId = entity.RegionalSightingStateId;
                 observation.SightingPublishTypeIds = ConvertCsvStringToListOfIntegers(entity.SightingPublishTypeIds);
                 observation.SpeciesFactsIds = ConvertCsvStringToListOfIntegers(entity.SpeciesFactsIds);
 
@@ -424,7 +424,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             IArtportalenMetadataContainer artportalenMetadataContainer,
             IAreaHelper areaHelper,
             int noOfThreads,
-            ILogger<ArtportalenObservationHarvester> logger) : base(siteRepository, areaHelper, noOfThreads)
+            ILogger<IObservationHarvester> logger) : base(siteRepository, areaHelper, noOfThreads)
         {
             _mediaRepository = mediaRepository ?? throw new ArgumentNullException(nameof(mediaRepository));
             _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));

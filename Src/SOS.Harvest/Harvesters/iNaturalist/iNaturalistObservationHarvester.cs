@@ -9,7 +9,6 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim;
-using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Harvesters.iNaturalist
 {

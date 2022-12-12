@@ -11,17 +11,28 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Harvesters.AquaSupport.Sers
 {
-    public class SersObservationHarvester : ISersObservationHarvester
+    public class SersObservationHarvester : ObservationHarvesterBase<SersObservationVerbatim, int>, ISersObservationHarvester
     {
-        private readonly ILogger<SersObservationHarvester> _logger;
         private readonly ISersObservationService _sersObservationService;
-        private readonly ISersObservationVerbatimRepository _sersObservationVerbatimRepository;
         private readonly SersServiceConfiguration _sersServiceConfiguration;
+
+        private string GetSersHarvestSettingsInfoString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("SERS Harvest settings:");
+            sb.AppendLine($"  Start Harvest Year: {_sersServiceConfiguration.StartHarvestYear}");
+            if (_sersServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
+            {
+                sb.AppendLine(
+                    $"  Max Number Of Sightings Harvested: {_sersServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            }
+
+            return sb.ToString();
+        }
 
         /// <summary>
         ///     Constructor
@@ -34,42 +45,27 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
             ISersObservationService sersObservationService,
             ISersObservationVerbatimRepository sersObservationVerbatimRepository,
             SersServiceConfiguration sersServiceConfiguration,
-            ILogger<SersObservationHarvester> logger)
+            ILogger<SersObservationHarvester> logger) : base("SERS", sersObservationVerbatimRepository, logger)
         {
             _sersObservationService =
                 sersObservationService ?? throw new ArgumentNullException(nameof(sersObservationService));
-            _sersObservationVerbatimRepository = sersObservationVerbatimRepository ??
-                                                 throw new ArgumentNullException(
-                                                     nameof(sersObservationVerbatimRepository));
             _sersServiceConfiguration = sersServiceConfiguration ??
-                                        throw new ArgumentNullException(nameof(sersServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
+                                        throw new ArgumentNullException(nameof(sersServiceConfiguration));  
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            // Get current document count from permanent index
-            _sersObservationVerbatimRepository.TempMode = false;
-            var currentDocCount = await _sersObservationVerbatimRepository.CountAllDocumentsAsync();
-
-            var harvestInfo = new HarvestInfo("SERS", DateTime.Now);
-            _sersObservationVerbatimRepository.TempMode = true;
+            var runStatus = RunStatus.Success;
+            var harvestCount = 0;
 
             try
             {
-                _logger.LogInformation("Start harvesting sightings for SERS data provider");
-                _logger.LogInformation(GetSersHarvestSettingsInfoString());
-
-                // Make sure we have an empty collection.
-                _logger.LogInformation("Start empty collection for SERS verbatim collection");
-                await _sersObservationVerbatimRepository.DeleteCollectionAsync();
-                await _sersObservationVerbatimRepository.AddCollectionAsync();
-                _logger.LogInformation("Finish empty collection for SERS verbatim collection");
+                await InitializeharvestAsync(true);
+                Logger.LogInformation(GetSersHarvestSettingsInfoString());
 
                 var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
                 var verbatimFactory = new AquaSupportHarvestFactory<SersObservationVerbatim>();
-                var nrSightingsHarvested = 0;
                 var startDate = new DateTime(_sersServiceConfiguration.StartHarvestYear, 1, 1);
                 var endDate = DateTime.Now;
                 var changeId = 0L;
@@ -83,7 +79,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
                 {
                     var lastRequesetTime = DateTime.Now;
 
-                    _logger.LogDebug(
+                    Logger.LogDebug(
                            $"Fetching SERS observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
 
                     var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
@@ -91,11 +87,11 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
                     xmlDocument = null;
 
                     // Add sightings to MongoDb
-                    await _sersObservationVerbatimRepository.AddManyAsync(verbatims);
+                    await VerbatimRepository.AddManyAsync(verbatims);
 
-                    nrSightingsHarvested += verbatims.Count();
+                    harvestCount += verbatims.Count();
 
-                    _logger.LogDebug($"{nrSightingsHarvested} SERS observations harvested");
+                    Logger.LogDebug($"{harvestCount} SERS observations harvested");
 
                     var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
 
@@ -106,9 +102,9 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
 
                     cancellationToken?.ThrowIfCancellationRequested();
                     if (_sersServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        nrSightingsHarvested >= _sersServiceConfiguration.MaxNumberOfSightingsHarvested)
+                        harvestCount >= _sersServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
-                        _logger.LogInformation("Max SERS observations reached");
+                        Logger.LogInformation("Max SERS observations reached");
                         break;
                     }
 
@@ -121,37 +117,19 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
                     xmlDocument = await _sersObservationService.GetAsync(startDate, endDate, changeId);
                     changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
                 }
-
-                _logger.LogInformation("Finished harvesting sightings for SERS data provider");
-
-                // Update harvest info
-                harvestInfo.DataLastModified =
-                    dataLastModified == DateTime.MinValue ? (DateTime?) null : dataLastModified;
-                harvestInfo.End = DateTime.Now;
-                harvestInfo.Status = RunStatus.Success;
-                harvestInfo.Count = nrSightingsHarvested;
-
-                _logger.LogInformation("Start permanentize temp collection for SERS verbatim");
-                await _sersObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for SERS verbatim");
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("SERS harvest was cancelled.");
-                harvestInfo.Status = RunStatus.Canceled;
+                Logger.LogInformation("SERS harvest was cancelled.");
+                runStatus = RunStatus.Canceled;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to harvest SERS");
-                harvestInfo.Status = RunStatus.Failed;
-            }
-            finally
-            {
-                _sersObservationVerbatimRepository.TempMode = false;
+                Logger.LogError(e, "Failed to harvest SERS");
+                runStatus = RunStatus.Failed;
             }
 
-            _logger.LogInformation($"Finish harvesting sightings for SERS data provider. Status={harvestInfo.Status}");
-            return harvestInfo;
+            return await FinishHarvestAsync(runStatus, harvestCount);
         }
 
         /// inheritdoc />
@@ -167,18 +145,6 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
             throw new NotImplementedException("Not implemented for this provider");
         }
 
-        private string GetSersHarvestSettingsInfoString()
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("SERS Harvest settings:");
-            sb.AppendLine($"  Start Harvest Year: {_sersServiceConfiguration.StartHarvestYear}");
-            if (_sersServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
-            {
-                sb.AppendLine(
-                    $"  Max Number Of Sightings Harvested: {_sersServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            }
-            
-            return sb.ToString();
-        }
+        
     }
 }

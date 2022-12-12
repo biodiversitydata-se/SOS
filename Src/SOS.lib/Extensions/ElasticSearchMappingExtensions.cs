@@ -344,10 +344,10 @@ namespace SOS.Lib.Extensions
                                 .KeyWordLowerCase(kwlc => kwlc.Language, false)
                             )
                         )
-                        .Object<VocabularyValue>(c => c
+                       /* .Object<VocabularyValue>(c => c
                             .Name(nm => nm.ProtectionLevel)
                             .Properties(ps => ps.GetMapping())
-                        )
+                        )*/
                         .Object<VocabularyValue>(c => c
                             .Name(nm => nm.SensitivityCategory)
                             .Properties(ps => ps.GetMapping())

@@ -314,7 +314,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedIdentification.IdentificationReferences = verbatim.IdentificationReferences;
             processedIdentification.IdentificationRemarks = verbatim.IdentificationRemarks?.Clean();
             processedIdentification.VerificationStatus = GetSosId(verbatim.IdentificationVerificationStatus, _vocabularyById[VocabularyId.VerificationStatus]);
-            processedIdentification.Verified = GetIsValidated(processedIdentification.ValidationStatus);
+            processedIdentification.Verified = GetIsValidated(processedIdentification.VerificationStatus);
             processedIdentification.IdentifiedBy = verbatim.IdentifiedBy?.Clean();
             processedIdentification.TypeStatus = verbatim.TypeStatus;
             return processedIdentification;
@@ -445,7 +445,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 processedOccurrence.IsNeverFoundObservation = true;
             }
 
-            processedOccurrence.ProtectionLevel = CalculateProtectionLevel(taxon, accessRightsId);
+            //processedOccurrence.ProtectionLevel = CalculateProtectionLevel(taxon, accessRightsId);
             processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);            
             return processedOccurrence;
         }

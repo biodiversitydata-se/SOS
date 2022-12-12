@@ -96,7 +96,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                     OccurrenceId = $"urn:lsid:observationsdatabasen.se:observation:{verbatim.Id}",
                     OccurrenceRemarks = verbatim.OccurrenceRemarks?.Clean(),
                     OccurrenceStatus = new VocabularyValue { Id = (int)(verbatim.TaxonId == 0 ? OccurrenceStatusId.Absent : OccurrenceStatusId.Present) },
-                    ProtectionLevel = verbatim.ProtectionLevel,
+                    //ProtectionLevel = verbatim.ProtectionLevel,
                     SensitivityCategory = verbatim.ProtectionLevel,
                     RecordedBy = verbatim.Observers,
                     ReportedDate = verbatim.StartDate.ToUniversalTime()

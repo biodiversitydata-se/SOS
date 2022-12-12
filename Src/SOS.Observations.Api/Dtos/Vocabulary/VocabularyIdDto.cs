@@ -26,10 +26,10 @@ namespace SOS.Observations.Api.Dtos.Vocabulary
         Behavior = 23,
         SensitivityCategory = 24,
         BirdNestActivity = 25,
-        [Obsolete]
+        /*[Obsolete]
         ValidationStatus = 26,
         [Obsolete]
-        TaxonProtectionLevel = 27,        
+        TaxonProtectionLevel = 27,   */     
         TaxonCategory = 28
     }
 }

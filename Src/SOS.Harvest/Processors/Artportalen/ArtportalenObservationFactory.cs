@@ -64,7 +64,7 @@ namespace SOS.Harvest.Processors.Artportalen
         private int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, DateTime? hiddenByProviderUntil, bool protectedBySystem)
         {
             var hiddenByProvider = hiddenByProviderUntil.HasValue && hiddenByProviderUntil.Value >= DateTime.Now;
-            var taxonProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 3;
+            var taxonProtectionLevel = taxon?.Attributes?.SensitivityCategory?.Id ?? 3;
 
             if (hiddenByProvider || protectedBySystem)
             {
@@ -250,7 +250,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Occurrence.IsPositiveObservation = !(verbatimObservation.NotPresent || verbatimObservation.NotRecovered);
                 obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
                 obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
-                obs.Occurrence.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
+                //obs.Occurrence.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.Occurrence.SensitivityCategory = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.Occurrence.ReportedBy = verbatimObservation.ReportedBy;
                 obs.Occurrence.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
@@ -320,7 +320,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ArtportalenInternal.HasAnyTriggeredVerificationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;
                 obs.ArtportalenInternal.SightingSpeciesCollectionItemId = verbatimObservation.SightingSpeciesCollectionItemId;
                 obs.ArtportalenInternal.SpeciesFactsIds = verbatimObservation.SpeciesFactsIds;
-                obs.ArtportalenInternal.LocationExternalId = verbatimObservation.Site?.ExternalId;
+              // obs.ArtportalenInternal.LocationExternalId = verbatimObservation.Site?.ExternalId;
                 obs.ArtportalenInternal.NoteOfInterest = verbatimObservation.NoteOfInterest;
                 obs.ArtportalenInternal.HasUserComments = verbatimObservation.HasUserComments;
                 obs.ArtportalenInternal.ParentLocationId = verbatimObservation.Site?.ParentSiteId;
@@ -328,8 +328,8 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ArtportalenInternal.SightingId = verbatimObservation.SightingId;
                 obs.ArtportalenInternal.SightingTypeId = verbatimObservation.SightingTypeId;
                 obs.ArtportalenInternal.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
-                obs.ArtportalenInternal.SpeciesGroupId = verbatimObservation.SpeciesGroupId;
-                obs.ArtportalenInternal.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;
+               /* obs.ArtportalenInternal.SpeciesGroupId = verbatimObservation.SpeciesGroupId;
+                obs.ArtportalenInternal.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;*/
                 obs.ArtportalenInternal.SightingPublishTypeIds = verbatimObservation.SightingPublishTypeIds;
                 obs.ArtportalenInternal.ReportedByUserId = verbatimObservation.ReportedByUserId;
                 obs.ArtportalenInternal.ReportedByUserServiceUserId = verbatimObservation.ReportedByUserServiceUserId;

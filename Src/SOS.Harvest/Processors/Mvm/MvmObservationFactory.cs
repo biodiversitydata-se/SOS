@@ -78,7 +78,7 @@ namespace SOS.Harvest.Processors.Mvm
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = verbatim.IsPositiveObservation,
                     OccurrenceId = verbatim.OccurrenceId,
-                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    //ProtectionLevel = CalculateProtectionLevel(taxon),
                     SensitivityCategory = CalculateProtectionLevel(taxon),
                     OrganismQuantity = verbatim.Quantity,                    
                     OrganismQuantityUnit = string.IsNullOrEmpty(verbatim.QuantityUnit) ? null : new VocabularyValue { Id = -1, Value = verbatim.QuantityUnit },

@@ -266,8 +266,8 @@
 
         public int? ConfirmationYear { get; set; }
 
-        [Obsolete("This is too be deleted")]
-        public int? RegionalSightingStateId { get; set; }
+        //[Obsolete("This is too be deleted")]
+        //public int? RegionalSightingStateId { get; set; }
 
         public int? TriggeredObservationRuleFrequencyId { get; set; }
 
