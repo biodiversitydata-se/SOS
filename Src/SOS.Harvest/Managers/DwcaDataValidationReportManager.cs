@@ -260,7 +260,7 @@ namespace SOS.Harvest.Managers
             UpdateTermDictionaryValue(VocabularyId.Sex, verbatimObservation.Sex, processedObservation.Occurrence.Sex, processedFieldValues, verbatimFieldValues);
             UpdateTermDictionaryValue(VocabularyId.ReproductiveCondition, verbatimObservation.ReproductiveCondition, processedObservation.Occurrence.ReproductiveCondition, processedFieldValues, verbatimFieldValues);
             UpdateTermDictionaryValue(VocabularyId.Behavior, verbatimObservation.Behavior, processedObservation.Occurrence.Behavior, processedFieldValues, verbatimFieldValues);
-            UpdateTermDictionaryValue(VocabularyId.VerificationStatus, verbatimObservation.IdentificationVerificationStatus, processedObservation.Identification.ValidationStatus, processedFieldValues, verbatimFieldValues);
+           // UpdateTermDictionaryValue(VocabularyId.VerificationStatus, verbatimObservation.IdentificationVerificationStatus, processedObservation.Identification.ValidationStatus, processedFieldValues, verbatimFieldValues);
             UpdateTermDictionaryValue(VocabularyId.VerificationStatus, verbatimObservation.IdentificationVerificationStatus, processedObservation.Identification.VerificationStatus, processedFieldValues, verbatimFieldValues);
             UpdateTermDictionaryValue(VocabularyId.Institution, verbatimObservation.InstitutionCode, processedObservation.InstitutionCode, processedFieldValues, verbatimFieldValues);
             UpdateTermDictionaryValue(VocabularyId.Unit, verbatimObservation.OrganismQuantityType, processedObservation.Occurrence.OrganismQuantityUnit, processedFieldValues, verbatimFieldValues);

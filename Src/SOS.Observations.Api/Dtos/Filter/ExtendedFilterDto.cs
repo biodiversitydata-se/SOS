@@ -101,10 +101,10 @@ namespace SOS.Observations.Api.Dtos.Filter
         public IEnumerable<int> ActivityIds { get; set; }
 
 
-        [Obsolete]
+        /*[Obsolete]
         public bool? HasTriggerdValidationRule { get; set; }
         [Obsolete]
-        public bool? HasTriggerdValidationRuleWithWarning { get; set; }
+        public bool? HasTriggerdValidationRuleWithWarning { get; set; }*/
         public bool HasTriggeredVerificationRule { get; set; }
         public bool HasTriggeredVerificationRuleWithWarning { get; set; }
 
@@ -116,10 +116,11 @@ namespace SOS.Observations.Api.Dtos.Filter
         public int? Quantity { get; set; }
         public string QuantityOperator { get; set; }
 
-        [Obsolete]
+        /*[Obsolete]
         public IEnumerable<int> ValidationStatusIds { get; set; }
         [Obsolete]
-        public IEnumerable<int> ExcludeValidationStatusIds { get; set; }
+        public IEnumerable<int> ExcludeValidationStatusIds { get; set; }*/
+
         public IEnumerable<int> VerificationStatusIds { get; set; }
         public IEnumerable<int> ExcludeVerificationStatusIds { get; set; }
 
@@ -157,9 +158,9 @@ namespace SOS.Observations.Api.Dtos.Filter
 
         public IEnumerable<int> DatasourceIds { get; set; }
 
-        [Obsolete("Use geographics.locationNameFilter")]
+        /*[Obsolete("Use geographics.locationNameFilter")]
         public string LocationNameFilter { get; set; }
-
+        */
         public IEnumerable<int> Years { get; set; }
 
         public DateFilterComparisonDto YearsComparison { get; set; } = DateFilterComparisonDto.StartDate;

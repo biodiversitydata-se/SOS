@@ -33,7 +33,7 @@ namespace SOS.Harvest.Managers
             if (observation?.ArtportalenInternal != null)
             {
                 observation.ArtportalenInternal.BirdValidationAreaIds = null;
-                observation.ArtportalenInternal.LocationExternalId = null;
+               // observation.ArtportalenInternal.LocationExternalId = null;
                 observation.ArtportalenInternal.LocationPresentationNameParishRegion = null;
                 observation.ArtportalenInternal.ParentLocality = null;
                 observation.ArtportalenInternal.ParentLocationId = null;
@@ -64,7 +64,7 @@ namespace SOS.Harvest.Managers
                 return;
             }
 
-            var (mod, add) = GetDiffusionValues(observation.Occurrence?.ProtectionLevel ?? 0);
+            var (mod, add) = GetDiffusionValues(observation.Occurrence?.SensitivityCategory ?? 0);
 
            
             //transform the point into the same format as Artportalen so that we can use the same diffusion as them

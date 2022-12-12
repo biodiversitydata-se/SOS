@@ -319,7 +319,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             {
                 ExtendedFilter = new ExtendedFilterDto
                 {
-                    ExcludeValidationStatusIds = new[] { 10, 20 }
+                    ExcludeVerificationStatusIds = new[] { 10, 20 }
                 }
             };
 
@@ -409,7 +409,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             {
                 ExtendedFilter = new ExtendedFilterDto
                 {
-                    HasTriggerdValidationRule = true
+                    HasTriggeredVerificationRule = true
                 }
             };
 
@@ -495,7 +495,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             {
                 ExtendedFilter = new ExtendedFilterDto
                 {
-                    HasTriggerdValidationRuleWithWarning = true
+                    HasTriggeredVerificationRuleWithWarning = true
                 }
             };
 
@@ -811,7 +811,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var searchFilter = new SearchFilterInternalDto
             {
-                ExtendedFilter = new ExtendedFilterDto
+                Geographics = new GeographicsFilterDto
                 {
                     LocationNameFilter = "Test*"
                 }
@@ -2178,7 +2178,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             {
                 ExtendedFilter = new ExtendedFilterDto
                 {
-                    ValidationStatusIds = new [] { 10, 20 },
+                    VerificationStatusIds = new [] { 10, 20 },
                 }
             };
 

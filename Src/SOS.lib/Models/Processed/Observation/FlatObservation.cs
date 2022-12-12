@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 
 namespace SOS.Lib.Models.Processed.Observation
@@ -89,7 +88,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string IdentificationIdentificationRemarks => _observation?.Identification?.IdentificationRemarks;
         public bool? IdentificationVerified => _observation?.Identification?.Verified;
 
-        [Obsolete]
+        /*[Obsolete]
         public bool? IdentificationValidated => IdentificationVerified;
         [Obsolete]
         public string IdentificationValidationStatus => IdentificationVerificationStatus;
@@ -97,7 +96,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? IdentificationValidationStatusId => IdentificationVerificationStatusId;
         [Obsolete]
         public string IdentificationValidationStatusValue => IdentificationVerificationStatusValue;
-
+        */
         public string IdentificationVerificationStatus => _observation?.Identification?.VerificationStatus?.ToString();
         public int? IdentificationVerificationStatusId => _observation?.Identification?.VerificationStatus?.Id;
         public string IdentificationVerificationStatusValue => _observation?.Identification?.VerificationStatus?.Value;
@@ -196,7 +195,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? OccurrenceEstablishmentMeansId => _observation?.Occurrence?.EstablishmentMeans?.Id;
         public string OccurrenceEstablishmentMeansValue => _observation?.Occurrence?.EstablishmentMeans?.Value;
         public string OccurrenceIndividualCount => _observation?.Occurrence?.IndividualCount;
-        public string OccurrenceIndividualId => _observation?.Occurrence?.IndividualId;
+      //  public string OccurrenceIndividualId => _observation?.Occurrence?.IndividualId;
         public bool? OccurrenceIsNaturalOccurrence => _observation?.Occurrence?.IsNaturalOccurrence;
         public bool? OccurrenceIsNeverFoundObservation => _observation?.Occurrence?.IsNeverFoundObservation;
         public bool? OccurrenceIsNotRediscoveredObservation => _observation?.Occurrence?.IsNotRediscoveredObservation;
@@ -218,8 +217,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OccurrenceOrganismQuantityUnitValue => _observation?.Occurrence?.OrganismQuantityUnit?.Value;
         public string OccurrencePreparations => _observation?.Occurrence?.Preparations;
        
-        [Obsolete]
-        public int? OccurrenceProtectionLevel => OccurrenceSensitivityCategory;
+        //[Obsolete]
+        //public int? OccurrenceProtectionLevel => OccurrenceSensitivityCategory;
        
         public int? OccurrenceSensitivityCategory => _observation?.Occurrence?.SensitivityCategory;
         public string OccurrenceRecordedBy => _observation?.Occurrence?.RecordedBy;
@@ -273,13 +272,13 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? TaxonAttributesParentDyntaxaTaxonId => _observation?.Taxon?.Attributes?.ParentDyntaxaTaxonId;
         public bool? TaxonAttributesProtectedByLaw => _observation?.Taxon?.Attributes?.ProtectedByLaw;
        
-        [Obsolete]
+       /* [Obsolete]
         public string TaxonAttributesProtectionLevel => TaxonAttributesSensitivityCategory;
         [Obsolete]
         public int? TaxonAttributesProtectionLevelId => TaxonAttributesSensitivityCategoryId;
         [Obsolete]
         public string TaxonAttributesProtectionLevelValue => TaxonAttributesSensitivityCategoryValue;
-        
+        */
         public string TaxonAttributesSensitivityCategory => _observation?.Taxon?.Attributes?.SensitivityCategory?.ToString();
         public int? TaxonAttributesSensitivityCategoryId => _observation?.Taxon?.Attributes?.SensitivityCategory?.Id;
         public string TaxonAttributesSensitivityCategoryValue => _observation?.Taxon?.Attributes?.SensitivityCategory?.Value;
@@ -366,8 +365,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OwnerInstitutionCode => _observation?.OwnerInstitutionCode;
         public string PrivateCollection => _observation?.PrivateCollection;
 
-        [Obsolete]
-        public bool? Protected => Sensitive;
+      //  [Obsolete]
+      //  public bool? Protected => Sensitive;
 
         public bool? Sensitive => _observation?.Sensitive;
         public string PublicCollection => _observation?.PublicCollection;
@@ -391,7 +390,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "dataproviderid" => DataProviderId,
                 "datasetname" => DatasetName,
                 "modified" => Modified,
-                "protected" => Protected,
+               // "protected" => Protected,
                 "sensitive" => Sensitive,
                 "accessrights" => AccessRights,
                 "accessrights.id" => AccessRightsId,
@@ -428,11 +427,11 @@ namespace SOS.Lib.Models.Processed.Observation
                 "event.fieldnumber" => EventFieldNumber,
                 "event.parenteventid" => EventParentEventId,
                 "event.verbatimeventdate" => EventVerbatimEventDate,
-                "identification.validated" => IdentificationValidated,
+               // "identification.validated" => IdentificationValidated,
                 "identification.verified" => IdentificationVerified,
-                "identification.validationstatus" => IdentificationValidationStatus,
+               /* "identification.validationstatus" => IdentificationValidationStatus,
                 "identification.validationstatus.id" => IdentificationValidationStatusId,
-                "identification.validationstatus.value" => IdentificationValidationStatusValue,
+                "identification.validationstatus.value" => IdentificationValidationStatusValue,*/
                 "identification.verificationstatus" => IdentificationVerificationStatus,
                 "identification.verificationstatus.id" => IdentificationVerificationStatusId,
                 "identification.verificationstatus.value" => IdentificationVerificationStatusValue,
@@ -525,7 +524,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "occurrence.isnotrediscoveredobservation" => OccurrenceIsNotRediscoveredObservation,
                 "occurrence.ispositiveobservation" => OccurrenceIsPositiveObservation,
                 "occurrence.occurrenceremarks" => OccurrenceOccurrenceRemarks,
-                "occurrence.protectionlevel" => OccurrenceProtectionLevel,
+               // "occurrence.protectionlevel" => OccurrenceProtectionLevel,
                 "occurrence.sensitivitycategory" => OccurrenceSensitivityCategory,
                 "occurrence.activity" => OccurrenceActivity,
                 "occurrence.activity.id" => OccurrenceActivityId,
@@ -565,7 +564,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "occurrence.catalognumber" => OccurrenceCatalogNumber,
                 "occurrence.catalogid" => OccurrenceCatalogId,
                 "occurrence.associatedreferences" => OccurrenceAssociatedReferences,
-                "occurrence.individualid" => OccurrenceIndividualId,
+               // "occurrence.individualid" => OccurrenceIndividualId,
                 "occurrence.media" => OccurrenceMedia,
                 "occurrence.preparations" => OccurrencePreparations,
                 "occurrence.recordnumber" => OccurrenceRecordNumber,
@@ -623,9 +622,9 @@ namespace SOS.Lib.Models.Processed.Observation
                 "taxon.attributes.organismgroup" => TaxonAttributesOrganismGroup,
                 "taxon.attributes.parentdyntaxataxonid" => TaxonAttributesParentDyntaxaTaxonId,
                 "taxon.attributes.protectedbylaw" => TaxonAttributesProtectedByLaw,
-                "taxon.attributes.protectionlevel" => TaxonAttributesProtectionLevel,
+               /* "taxon.attributes.protectionlevel" => TaxonAttributesProtectionLevel,
                 "taxon.attributes.protectionlevel.id" => TaxonAttributesProtectionLevelId,
-                "taxon.attributes.protectionlevel.value" => TaxonAttributesProtectionLevelValue,
+                "taxon.attributes.protectionlevel.value" => TaxonAttributesProtectionLevelValue,*/
                 "taxon.attributes.sensitivitycategory" => TaxonAttributesSensitivityCategory,
                 "taxon.attributes.sensitivitycategory.id" => TaxonAttributesSensitivityCategoryId,
                 "taxon.attributes.sensitivitycategory.value" => TaxonAttributesSensitivityCategoryValue,

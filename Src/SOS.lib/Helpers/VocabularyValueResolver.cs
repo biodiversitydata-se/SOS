@@ -89,7 +89,7 @@ namespace SOS.Lib.Helpers
                 out var identificationObject))
             {
                 var identificationDictionary = identificationObject as IDictionary<string, object>;
-                ResolveVocabularyMappedValue(identificationDictionary, nameof(Observation.Identification.ValidationStatus), valueMappingDictionaries[VocabularyId.VerificationStatus]);
+              //  ResolveVocabularyMappedValue(identificationDictionary, nameof(Observation.Identification.ValidationStatus), valueMappingDictionaries[VocabularyId.VerificationStatus]);
                 ResolveVocabularyMappedValue(identificationDictionary, nameof(Observation.Identification.VerificationStatus), valueMappingDictionaries[VocabularyId.VerificationStatus]);
                 ResolveVocabularyMappedValue(identificationDictionary, nameof(Observation.Identification.DeterminationMethod), valueMappingDictionaries[VocabularyId.DeterminationMethod]);
             }
@@ -138,7 +138,7 @@ namespace SOS.Lib.Helpers
                     out var taxonAttributesObject))
                 {
                     var taxonAttributesDictionary = taxonAttributesObject as IDictionary<string, object>;
-                    ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.ProtectionLevel), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
+                 //   ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.ProtectionLevel), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
                     ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.SensitivityCategory), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
                     ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.TaxonCategory), valueMappingDictionaries[VocabularyId.TaxonCategory]);
                 }
@@ -220,8 +220,8 @@ namespace SOS.Lib.Helpers
                     valueMappingDictionaries[VocabularyId.Biotope]);
                 ResolveVocabularyMappedValue(observation.Event?.DiscoveryMethod,
                     valueMappingDictionaries[VocabularyId.DiscoveryMethod]);
-                ResolveVocabularyMappedValue(observation.Identification?.ValidationStatus,
-                    valueMappingDictionaries[VocabularyId.VerificationStatus]);
+               /* ResolveVocabularyMappedValue(observation.Identification?.ValidationStatus,
+                    valueMappingDictionaries[VocabularyId.VerificationStatus]);*/
                 ResolveVocabularyMappedValue(observation.Identification?.VerificationStatus,
                     valueMappingDictionaries[VocabularyId.VerificationStatus]);
                 ResolveVocabularyMappedValue(observation.Occurrence?.LifeStage,
@@ -244,8 +244,8 @@ namespace SOS.Lib.Helpers
                     valueMappingDictionaries[VocabularyId.OccurrenceStatus]);
                 ResolveVocabularyMappedValue(observation.Identification?.DeterminationMethod,
                     valueMappingDictionaries[VocabularyId.DeterminationMethod]);
-                ResolveVocabularyMappedValue(observation.Taxon?.Attributes?.ProtectionLevel,
-                    valueMappingDictionaries[VocabularyId.SensitivityCategory]);
+                /*ResolveVocabularyMappedValue(observation.Taxon?.Attributes?.ProtectionLevel,
+                    valueMappingDictionaries[VocabularyId.SensitivityCategory]);*/
                 ResolveVocabularyMappedValue(observation.Taxon?.Attributes?.SensitivityCategory,
                     valueMappingDictionaries[VocabularyId.SensitivityCategory]);
                 ResolveVocabularyMappedValue(observation.Taxon?.Attributes.TaxonCategory,

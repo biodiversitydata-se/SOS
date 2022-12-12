@@ -80,7 +80,7 @@ namespace SOS.Harvest.Processors.Shark
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    //ProtectionLevel = CalculateProtectionLevel(taxon),
                     SensitivityCategory = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.Taxonomist,
                     ReportedBy = verbatim.ReportedStationName,

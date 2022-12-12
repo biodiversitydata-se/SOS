@@ -119,8 +119,8 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     identifier or an identifier specific to a data set.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        [Obsolete("This property is deprecated in Darwin Core")]
-        public string IndividualId { get; set; }
+       // [Obsolete("This property is deprecated in Darwin Core")]
+       // public string IndividualId { get; set; }
 
         /// <summary>
         ///     Indicates if this species occurrence is natural or
@@ -241,8 +241,8 @@ namespace SOS.Lib.Models.Processed.Observation
         /// 1 indicates public access and 5 is the highest used security level.
         /// This property is deprecated and replaced by the SensitivityCategory property.
         /// </summary>
-        [Obsolete("Replaced by SensitivityCategory")]
-        public int ProtectionLevel { get; set; }
+        //[Obsolete("Replaced by SensitivityCategory")]
+        //public int ProtectionLevel { get; set; }
 
         /// <summary>
         /// Information about how protected information about a species is in Sweden.

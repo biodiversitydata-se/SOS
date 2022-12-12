@@ -91,8 +91,8 @@ namespace SOS.Lib.Models.Processed.Observation
         /// 1 indicates public access and 5 is the highest used security level.
         /// This property is deprecated and replaced by the SensitivityCategory property.
         /// </summary>
-        [Obsolete("Replaced by SensitivityCategory")]
-        public VocabularyValue ProtectionLevel { get; set; }
+        //[Obsolete("Replaced by SensitivityCategory")]
+        //public VocabularyValue ProtectionLevel { get; set; }
 
         /// <summary>
         /// Redlist category for redlisted species. Possible redlist values

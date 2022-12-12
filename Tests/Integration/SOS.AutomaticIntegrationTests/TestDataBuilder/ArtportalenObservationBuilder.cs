@@ -352,7 +352,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.PublicCollection = sourceObservation.PublicCollection;
                 obs.Quantity = sourceObservation.Quantity;
                 obs.QuantityOfSubstrate = sourceObservation.QuantityOfSubstrate;
-                obs.RegionalSightingStateId = sourceObservation.RegionalSightingStateId;
+                //obs.RegionalSightingStateId = sourceObservation.RegionalSightingStateId;
                 obs.SightingPublishTypeIds = sourceObservation.SightingPublishTypeIds;
                 obs.SightingSpeciesCollectionItemId = sourceObservation.SightingSpeciesCollectionItemId;
                 obs.SightingTypeId = sourceObservation.SightingTypeId;

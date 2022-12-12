@@ -175,7 +175,7 @@ namespace SOS.Harvest.Processors
         protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, AccessRightsId? accessRightsId)
         {
             if (accessRightsId is AccessRightsId.FreeUsage) return 1;
-            var protectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1;
+            var protectionLevel = taxon?.Attributes?.SensitivityCategory?.Id ?? 1;
             return protectionLevel > 0 ? protectionLevel : 1;
         }
 

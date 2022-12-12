@@ -50,6 +50,7 @@ namespace SOS.Harvest.Harvesters.Shark
 
                 if (!dataSetsInfo?.Rows.Any() ?? true)
                 {
+                    runStatus = RunStatus.Failed;
                     Logger.LogInformation("SHARK harvest failed due too missing data set info.");
                 }
                 else
@@ -67,6 +68,7 @@ namespace SOS.Harvest.Harvesters.Shark
 
                     if (datasetNameIndex == -1)
                     {
+                        runStatus = RunStatus.Failed;
                         Logger.LogInformation("SHARK harvest failed. Could not find data set name index");
                     }
                     else

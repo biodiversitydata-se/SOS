@@ -39,6 +39,8 @@ namespace SOS.Harvest.Harvesters
         /// <returns></returns>
         protected async Task InitializeharvestAsync(bool useTempMode)
         {
+            _harvestInfo = new HarvestInfo(_provider, DateTime.Now);
+
             Logger.LogInformation($"Start harvesting observations for {_provider} data provider");
 
             // Get current document count from permanent index
@@ -50,9 +52,7 @@ namespace SOS.Harvest.Harvesters
             Logger.LogInformation($"Start empty collection for {_provider} verbatim collection");
             await VerbatimRepository.DeleteCollectionAsync();
             await VerbatimRepository.AddCollectionAsync();
-            Logger.LogInformation($"Finish empty collection for {_provider} verbatim collection");
-
-            _harvestInfo = new HarvestInfo(_provider, DateTime.Now);
+            Logger.LogInformation($"Finish empty collection for {_provider} verbatim collection");  
         }
 
         /// <summary>

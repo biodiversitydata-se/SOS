@@ -23,13 +23,13 @@ namespace SOS.Observations.Api.Dtos.Filter
             DontIncludeNotRecovered
         }
 
-        [Obsolete]
+        /*[Obsolete]
         public enum StatusValidationDto
         {
             BothValidatedAndNotValidated,
             Validated,
             NotValidated
-        }
+        }*/
 
         public enum StatusVerificationDto
         {
@@ -116,8 +116,8 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         /// Requested validation status. Deprecated and replaced by VerificationStatus.
         /// </summary>
-        [Obsolete]
-        public StatusValidationDto? ValidationStatus { get; set; }
+        /*[Obsolete]
+        public StatusValidationDto? ValidationStatus { get; set; }*/
 
         /// <summary>
         /// Requested verification status.

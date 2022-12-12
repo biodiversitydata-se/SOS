@@ -120,7 +120,7 @@ namespace SOS.Lib.Repositories.Processed
                             .AutoMap()
                             .Name(nm => nm.ArtportalenInternal)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.LocationExternalId)
+                               // .KeyWordLowerCase(kwlc => kwlc.LocationExternalId)
                                 .KeyWordLowerCase(kwlc => kwlc.LocationPresentationNameParishRegion, false)
                                 .KeyWordLowerCase(kwlc => kwlc.ParentLocality)
                                 .KeyWordLowerCase(kwlc => kwlc.ReportedByUserAlias)
@@ -210,7 +210,7 @@ namespace SOS.Lib.Repositories.Processed
                                     .Properties(ps => ps.GetMapping())
                                 )
                                 .Object<VocabularyValue>(c => c
-                                    .Name(nm => nm.ValidationStatus)
+                                    .Name(nm => nm.VerificationStatus)
                                     .Properties(ps => ps.GetMapping())
                                 )
                                 .Object<VocabularyValue>(c => c
@@ -250,7 +250,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .KeyWordLowerCase(kwlc => kwlc.AssociatedSequences, false)
                                 .KeyWordLowerCase(kwlc => kwlc.AssociatedTaxa, false)
                                 .KeyWordLowerCase(kwlc => kwlc.BiotopeDescription, false)
-                                .KeyWordLowerCase(kwlc => kwlc.IndividualId, false)
+                              //  .KeyWordLowerCase(kwlc => kwlc.IndividualId, false)
                                 .KeyWordLowerCase(kwlc => kwlc.RecordedBy)
                                 .KeyWordLowerCase(kwlc => kwlc.CatalogNumber)
                                 .KeyWordLowerCase(kwlc => kwlc.Disposition, false)

@@ -306,7 +306,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    //ProtectionLevel = CalculateProtectionLevel(taxon),
                     SensitivityCategory = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.Collector,
                     OccurrenceRemarks = string.IsNullOrEmpty(verbatim.OriginalText) ? verbatim.Notes.Clean() : $"{verbatim.OriginalText} {verbatim.Notes}".Clean()

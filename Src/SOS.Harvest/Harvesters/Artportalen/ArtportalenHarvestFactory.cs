@@ -114,7 +114,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.ConfirmedBy = (await _artportalenMetadataContainer.TryGetPersonByUserIdAsync(entity.ConfirmatorUserId))?.FullName;
                 observation.ConfirmationYear = entity.ConfirmationYear;
 
-                observation.RegionalSightingStateId = entity.RegionalSightingStateId;
+                //observation.RegionalSightingStateId = entity.RegionalSightingStateId;
                 observation.SightingPublishTypeIds = ConvertCsvStringToListOfIntegers(entity.SightingPublishTypeIds);
                 observation.SpeciesFactsIds = ConvertCsvStringToListOfIntegers(entity.SpeciesFactsIds);
 
