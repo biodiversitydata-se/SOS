@@ -407,11 +407,7 @@ namespace SOS.Harvest.Jobs
             IJobCancellationToken cancellationToken)
         {
             try
-            {
-                // uncomment when test processing.
-                //var testResult = await RunTestProcessingAsync(dataProvidersToProcess, mode, cancellationToken);
-                //return testResult;
-
+            {                
                 var processOverallTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ProcessOverall);
 
                 //-----------------

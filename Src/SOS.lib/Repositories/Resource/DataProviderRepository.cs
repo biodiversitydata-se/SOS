@@ -41,8 +41,7 @@ namespace SOS.Lib.Repositories.Resource
         /// <inheritdoc />
         public override async Task<List<DataProvider>> GetAllAsync()
         {
-            var allDataProviders = await base.GetAllAsync();
-            //allDataProviders.AddRange(GetTestDataProviders());
+            var allDataProviders = await base.GetAllAsync();            
             return allDataProviders.OrderBy(provider => provider.Id).ToList();
         }
 
@@ -119,22 +118,5 @@ namespace SOS.Lib.Repositories.Resource
                 return false;
             }
         }
-
-        //public List<DataProvider> GetTestDataProviders()
-        //{      
-            
-        //    return new List<DataProvider> {
-        //        new DataProvider()
-        //        {
-        //            Id = 105,
-        //            Identifier = "TestDataStewardshipBats",
-        //            IsActive = true,
-        //            Type = DataProviderType.DwcA,
-        //            SupportDatasets = true,
-        //            SupportEvents = true,
-        //            SupportChecklists = true
-        //        }
-        //    };
-        //}
     }
 }

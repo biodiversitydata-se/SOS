@@ -20,8 +20,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     /// <summary>
     ///     DwC-A event factory.
     /// </summary>
-    public class DwcaEventFactory : EventFactoryBase, IEventFactory<DwcEventOccurrenceVerbatim>
-    //public class DwcaEventFactory : IEventFactory<DwcEventOccurrenceVerbatim>
+    public class DwcaEventFactory : EventFactoryBase, IEventFactory<DwcEventOccurrenceVerbatim>    
     {
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;

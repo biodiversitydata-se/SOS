@@ -63,23 +63,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 dwcaEventFactory,
                 dwcCollectionRepository.EventRepository,
                 cancellationToken);
-
-            // Artportalen implementation
-            //int nrAddedEvents = await AddObservationEventsAsync(dataProvider);
-            //return nrAddedEvents;
-
-            //using var dwcArchiveVerbatimRepository = new EventOccurrenceDarwinCoreArchiveVerbatimRepository(
-            //    dataProvider,
-            //    _verbatimClient,
-            //    Logger);
-
-            //var checklistFactory = await DwcaChecklistFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager, ProcessConfiguration);
-
-            //return await base.ProcessChecklistsAsync(
-            //    dataProvider,
-            //    checklistFactory,
-            //    dwcArchiveVerbatimRepository,
-            //    cancellationToken);
         }
 
         protected override async Task<int> ProcessBatchAsync(
@@ -150,91 +133,5 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 }
             }
         }
-
-        //protected override async Task<int> ProcessBatchAsync(
-        //    DataProvider dataProvider, 
-        //    int startId, 
-        //    int endId, 
-        //    IEventFactory<DwcEventOccurrenceVerbatim> eventFactory, 
-        //    IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int> eventVerbatimRepository, 
-        //    IJobCancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        cancellationToken?.ThrowIfCancellationRequested();
-        //        Logger.LogDebug($"Event - Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
-        //        var verbatimEventsBatch = await eventVerbatimRepository.GetBatchAsync(startId, endId);
-        //        Logger.LogDebug($"Event - Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
-        //        if (!verbatimEventsBatch?.Any() ?? true) return 0;
-
-        //        Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
-        //        var processedEvents = new ConcurrentDictionary<string, ObservationEvent>();
-        //        foreach (var verbatimEvent in verbatimEventsBatch)
-        //        {
-        //            var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
-        //            if (processedEvent == null) continue;
-        //            processedEvents.TryAdd(processedEvent.Id, processedEvent);
-        //        }
-
-        //        CheckIfOcurrencesExists(processedEvents);
-        //        Logger.LogDebug($"Event - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
-        //        return await ValidateAndStoreEvents(dataProvider, processedEvents.Values, $"{startId}-{endId}");
-        //    }
-        //    catch (JobAbortedException e)
-        //    {
-        //        // Throw cancelation again to let function above handle it
-        //        throw;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Logger.LogError(e, $"Event - Process {dataProvider.Identifier} event from id: {startId} to id: {endId} failed");
-        //        throw;
-        //    }
-        //    finally
-        //    {
-        //        ProcessManager.Release();
-        //    }
-        //}
-
-        //private static void CheckIfOcurrencesExists(ConcurrentDictionary<string, ObservationEvent> processedEvents)
-        //{
-        //    // Check if processed observations exists. This is a naive implementation and can probably be improved.
-        //    HashSet<string> occurrenceIds = new HashSet<string>();
-        //    foreach (var ev in processedEvents.Values)
-        //    {
-        //        if (ev.OccurrenceIds != null)
-        //        {
-        //            foreach (var occurrenceId in ev.OccurrenceIds)
-        //            {
-        //                occurrenceIds.Add(occurrenceId);
-        //            }
-        //        }
-        //    }
-
-        //    //HashSet<string> notFoundOccurrenceIds = _processedObservationRepository. // todo - get all not found occurrenceIds.
-        //    HashSet<string> notFoundOccurrenceIds = new HashSet<string>();
-        //    if (notFoundOccurrenceIds.Count > 0)
-        //    {
-        //        foreach (var ev in processedEvents.Values)
-        //        {
-        //            if (ev.OccurrenceIds != null)
-        //            {
-        //                ev.OccurrenceIds = ev.OccurrenceIds.Except(notFoundOccurrenceIds).ToList();
-        //            }
-        //        }
-        //    }
-        //}
-
-        // Artportalen implementation
-        //private async Task<int> AddObservationEventsAsync(DataProvider dataProvider)
-        //{            
-        //    Logger.LogInformation("Start AddObservationEventsAsync()");
-        //    int batchSize = 5000;
-        //    var filter = new SearchFilter(0);
-        //    filter.IsPartOfDataStewardshipDataset = true;
-        //    Logger.LogInformation($"AddObservationEventsAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
-        //    var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);   
-        //}        
-
     }
 }

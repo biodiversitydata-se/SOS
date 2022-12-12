@@ -4,6 +4,9 @@ using SOS.Lib.Models.Shared;
 
 namespace SOS.Harvest.Processors.Interfaces
 {
+    /// <summary>
+    /// Event processor interface.
+    /// </summary>
     public interface IEventProcessor
     {
         /// <summary>

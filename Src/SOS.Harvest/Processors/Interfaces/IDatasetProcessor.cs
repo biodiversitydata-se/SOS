@@ -4,6 +4,9 @@ using SOS.Lib.Models.Shared;
 
 namespace SOS.Harvest.Processors.Interfaces
 {
+    /// <summary>
+    /// Dataset processor interface.
+    /// </summary>
     public interface IDatasetProcessor
     {
         /// <summary>

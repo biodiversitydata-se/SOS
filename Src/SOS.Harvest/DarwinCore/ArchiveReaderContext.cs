@@ -5,6 +5,13 @@ using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 
 namespace SOS.Harvest.DarwinCore
 {
+    /// <summary>
+    /// Holds context information used when reading DwC-A files. 
+    /// The files should be read in the following order:
+    /// 1. Dataset
+    /// 2. Occurrences (because dataset info is used)
+    /// 3. Events (because dataset and occurrence info is used)
+    /// </summary>
     public class ArchiveReaderContext
     {
         public ArchiveReader ArchiveReader { get; set; }

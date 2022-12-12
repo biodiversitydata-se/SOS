@@ -300,8 +300,30 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             int skip,
             int take);
 
+        /// <summary>
+        /// Aggregate by a field and return the number of documents for each value.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="aggregationField"></param>
+        /// <returns></returns>
         Task<List<AggregationItem>> GetAllAggregationItemsAsync(SearchFilter filter, string aggregationField);
+        
+        /// <summary>
+        /// Aggregate by a key field and a list field and return the distinct value list for each key field.
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="filter"></param>
+        /// <param name="aggregationFieldKey"></param>
+        /// <param name="aggregationFieldList"></param>
+        /// <returns></returns>
         Task<List<AggregationItemList<TKey, TValue>>> GetAllAggregationItemsListAsync<TKey, TValue>(SearchFilter filter, string aggregationFieldKey, string aggregationFieldList);
+        
+        /// <summary>
+        /// Get occurrence ids for events.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         Task<List<EventOccurrenceAggregationItem>> GetEventOccurrenceItemsAsync(SearchFilter filter);
 
         /// <summary>

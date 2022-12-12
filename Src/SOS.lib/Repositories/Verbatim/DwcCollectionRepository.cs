@@ -20,23 +20,14 @@ namespace SOS.Lib.Repositories.Verbatim
     /// <summary>
     ///     Darwin core event verbatim repository
     /// </summary>
-    public class DwcCollectionRepository : IDisposable
-    //public class DwcCollectionRepository : VerbatimRepositoryBase<DwcObservationVerbatim, int>
+    public class DwcCollectionRepository : IDisposable    
     {        
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
         private readonly DataProvider _dataProvider;
         private readonly EventVerbatimRepository _eventRepository;
         private readonly OccurrenceVerbatimRepository _occurrenceRepository;
         private readonly DatasetVerbatimRepository _datasetRepository;
-
-        //protected override string CollectionName => GetCollectionName(_occurrenceRepository.TempMode);
-        //protected override string GetCollectionName(bool? tempMode)
-        //{
-        //    if (tempMode.HasValue)
-        //        return $"DwcaCollection_{_dataProvider.Id:D3}_{_dataProvider.Identifier}_Observations{(tempMode.Value ? "_temp" : "")}";
-        //    else
-        //        return $"DwcaCollection_{_dataProvider.Id:D3}_{_dataProvider.Identifier}_Observations{(TempMode ? "_temp" : "")}";
-        //}
+        
         public DatasetVerbatimRepository DatasetRepository => _datasetRepository;
         public EventVerbatimRepository EventRepository => _eventRepository;
         public OccurrenceVerbatimRepository OccurrenceRepository => _occurrenceRepository;        
@@ -53,22 +44,7 @@ namespace SOS.Lib.Repositories.Verbatim
             EventRepository.TempMode = false;
             OccurrenceRepository.TempMode = false;
         }
-        ///// <inheritdoc />
-        //public IEnumerable<DistinictValueCount<string>> GetDistinctValuesCount(
-        //    Expression<Func<DwcEventVerbatim, DistinctValueObject<string>>> expression,
-        //    int limit)
-        //{
-        //    var result = GetMongoCollection(CollectionName).Aggregate(new AggregateOptions { AllowDiskUse = true })
-        //        .Project(expression)
-        //        .Group(o => o.Value,
-        //            grouping => new DistinictValueCount<string> { Value = grouping.Key, Count = grouping.Count() })
-        //        .SortByDescending(o => o.Count)
-        //        .Limit(limit)
-        //        .ToList();
-
-        //    return result;
-        //}
-
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -209,26 +185,7 @@ namespace SOS.Lib.Repositories.Verbatim
         {
             var result = await base.DeleteCollectionAsync();
             return result;
-        }
-
-        ///// <inheritdoc />
-        //public override async Task<IEnumerable<ObservationDataset>> GetBatchAsync(int startId, int endId)
-        //{
-        //    var datasets = (await base.GetBatchAsync(startId, endId, MongoCollection))?.ToArray();
-
-        //    if (!datasets?.Any() ?? true)
-        //    {
-        //        return null;
-        //    }
-
-        //    //foreach (var eventRecord in occurrences)
-        //    //{
-        //    //    var observationsFilter = Builders<DwcObservationVerbatim>.Filter.Eq(e => e.EventID, eventRecord.EventID);
-        //    //    eventRecord.Observations = (await _observationsRepository.QueryAsync(observationsFilter))?.ToList();
-        //    //}
-
-        //    return datasets;
-        //}
+        }        
 
         /// <inheritdoc />
         public override async Task<bool> PermanentizeCollectionAsync()
@@ -289,9 +246,6 @@ namespace SOS.Lib.Repositories.Verbatim
             Microsoft.Extensions.Logging.ILogger logger) : base(importClient, logger)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-
-            //_observationsRepository =
-            //    new VerbatimRepositoryBase<DwcObservationVerbatim, int>(importClient, CollectionNameObservations, logger);
         }
 
         /// <inheritdoc />
@@ -319,12 +273,6 @@ namespace SOS.Lib.Repositories.Verbatim
                 return true;
             }
 
-            // Store observations in own collection
-            //foreach (var eventRecord in eventRecords)
-            //{
-            //    await _observationsRepository.AddManyAsync(eventRecord.Observations);
-            //    eventRecord.Observations = null;
-            //}            
             return await AddManyAsync(eventRecords, MongoCollection);
         }
 
@@ -334,13 +282,7 @@ namespace SOS.Lib.Repositories.Verbatim
             {
                 return true;
             }
-
-            // Store observations in own collection
-            //foreach (var eventRecord in eventRecords)
-            //{
-            //    await _observationsRepository.AddManyAsync(eventRecord.Observations);
-            //    eventRecord.Observations = null;
-            //}
+           
             var mongoCollection = GetMongoCollection(tempMode);
             return await AddManyAsync(eventRecords, mongoCollection);
         }
@@ -368,13 +310,7 @@ namespace SOS.Lib.Repositories.Verbatim
             {
                 return null;
             }
-
-            //foreach (var eventRecord in events)
-            //{
-            //    var observationsFilter = Builders<DwcObservationVerbatim>.Filter.Eq(e => e.EventID, eventRecord.EventID);
-            //    eventRecord.Observations = (await _observationsRepository.QueryAsync(observationsFilter))?.ToList();
-            //}
-
+           
             return events;
         }
     }
@@ -472,13 +408,7 @@ namespace SOS.Lib.Repositories.Verbatim
             {
                 return null;
             }
-
-            //foreach (var eventRecord in occurrences)
-            //{
-            //    var observationsFilter = Builders<DwcObservationVerbatim>.Filter.Eq(e => e.EventID, eventRecord.EventID);
-            //    eventRecord.Observations = (await _observationsRepository.QueryAsync(observationsFilter))?.ToList();
-            //}
-
+          
             return occurrences;
         }
     }

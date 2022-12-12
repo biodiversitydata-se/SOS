@@ -27,21 +27,6 @@ namespace SOS.Harvest.Processors.Artportalen
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         public override DataProviderType Type => DataProviderType.ArtportalenObservations;
 
-        /*
-        * Workflow - Med nuvarande SOS-struktur
-        * --------------------------------------
-        *  1. Observationer skördas från Artportalen till MongoDB precis som vanligt, men nu ska också en ny property DataStewardshipDatasetId sättas för de observationer som ingår i datavärdskapet. En ny tabell i Artportalen behövs som beskriver datasetet och ytterligare en som pekar på vilka projekt som ingår i datasetet.
-        *  2. Datasetets metadata ska skördas från Artportalen till MongoDB.
-        *  3. Observationerna processas precis som tidigare.
-        *  4. När processningen av alla observationer är klara så processas dataseten, dels utifrån metadatainformationen som finns i MongoDB och dels från de processade observationerna för att få fram vilka EventId:n som ingår i datasetet.
-        *
-        *  Problem
-        *  ----------------------------------
-        *  1. Det finns en del strukturer som inte finns i SOS idag. Exempelvis:
-        *    - WeatherVariable
-        *  Lösning: Antingen får vi lägga till mer properties till nuvarande struktur, eller så får vi skapa ett nytt index för datavärdskapet.
-        */
-
         /// <summary>
         /// Constructor
         /// </summary>

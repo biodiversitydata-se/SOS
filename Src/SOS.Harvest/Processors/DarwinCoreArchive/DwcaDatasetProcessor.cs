@@ -72,7 +72,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 cancellationToken);
         }
 
-
         protected override async Task<int> ProcessBatchAsync(
             DataProvider dataProvider, 
             int startId, 
