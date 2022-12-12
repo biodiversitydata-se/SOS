@@ -131,8 +131,8 @@ namespace SOS.DataStewardship.Api.Models
         /// <summary>
         /// A unique identity of the event where the observation were made.
         /// </summary>
-        [DataMember(Name="event")]
-        public string Event { get; set; }
+        [DataMember(Name="eventID")]
+        public string EventID { get; set; }
 
         /// <summary>
         /// Data stewardship dataset identifier.

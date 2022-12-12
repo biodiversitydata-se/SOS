@@ -59,7 +59,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                     SpeciesList = "Species list?" // artlistan behöver skapas, alternativt "all species occurring in Sweden"
                 }
             },
-            Events = new List<string>
+            EventIds = new List<string>
             {
                 "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00"
             }
@@ -91,8 +91,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 }
             },
             SamplingProtocol = "Undersökningstyp fladdermöss - artkartering",
-            NoObservations = NoObservations.Falskt,
-            Occurrences = new List<string>
+            NoObservations = false,
+            OccurrenceIds = new List<string>
             {
                 "urn:lsid:artportalen.se:sighting:74542663",
                 "urn:lsid:artportalen.se:sighting:74542662",
@@ -128,7 +128,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
         public static OccurrenceModel EventBats1Occurrence1 = new OccurrenceModel()
         {
             OccurrenceID = "urn:lsid:artportalen.se:sighting:74542663",
-            Event = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",
+            EventID = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",
             ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), // Ej obligatorisk, men kan sättas om StartDate och EndDate har samma värde. EventDate ger tiden för själva besöket (t.ex. från 8:10 på morgonen till 11:36 på förmiddagen. Occ under den tiden gjordes en obs av spillkråka kl 10:54. Det är den tiden (10:54) som är observationstidpunkt.
             BasisOfRecord = BasisOfRecord.MänskligObservation,
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Ovaliderad  // för värdelistan väntar vi på vad arbetsgruppen för verifieringsmodulen skulle ha som slutgiltig förslag på kategorier - vi bör fråga de om att få den listan         
@@ -165,7 +165,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
         public static OccurrenceModel EventBats1Occurrence2 = new OccurrenceModel()
         {
             OccurrenceID = "urn:lsid:artportalen.se:sighting:74542662",
-            Event = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",            
+            EventID = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",            
             ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), 
             BasisOfRecord = BasisOfRecord.MänskligObservation,            
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, 
@@ -202,7 +202,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
         public static OccurrenceModel EventBats1Occurrence3 = new OccurrenceModel()
         {
             OccurrenceID = "urn:lsid:artportalen.se:sighting:74542657",
-            Event = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",
+            EventID = "urn:lsid:artportalen.se:site:3775204#2012-03-06T08:00:00+01:00/2012-03-06T13:00:00+01:00",
             ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), // StartDate och EndDate verkar saknas i OccurrenceModel?
             BasisOfRecord = BasisOfRecord.MänskligObservation,
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
@@ -262,8 +262,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 }
             },
             SamplingProtocol = "Undersökningstyp fladdermöss - artkartering",
-            NoObservations = NoObservations.Falskt,
-            Occurrences = new List<string>
+            NoObservations = false,
+            OccurrenceIds = new List<string>
             {
                 "urn:lsid:artportalen.se:sighting:85188138",
                 "urn:lsid:artportalen.se:sighting:85188141",
@@ -293,7 +293,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
         public static OccurrenceModel EventBats2Occurrence1 = new OccurrenceModel()
         {
             OccurrenceID = "urn:lsid:artportalen.se:sighting:85188138",
-            Event = "urn:lsid:artportalen.se:site:5084342#2016-07-14T22:00:00+02:00/2016-07-15T05:00:00+02:00",
+            EventID = "urn:lsid:artportalen.se:site:5084342#2016-07-14T22:00:00+02:00/2016-07-15T05:00:00+02:00",
             ObservationTime = new DateTime(2016, 7, 14), // StartDate och EndDate verkar saknas i OccurrenceModel?
             BasisOfRecord = BasisOfRecord.MänskligObservation,
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
@@ -330,7 +330,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
         public static OccurrenceModel EventBats2Occurrence2 = new OccurrenceModel()
         {
             OccurrenceID = "urn:lsid:artportalen.se:sighting:85188141",
-            Event = "urn:lsid:artportalen.se:site:5084342#2016-07-14T22:00:00+02:00/2016-07-15T05:00:00+02:00",
+            EventID = "urn:lsid:artportalen.se:site:5084342#2016-07-14T22:00:00+02:00/2016-07-15T05:00:00+02:00",
             ObservationTime = new DateTime(2016, 7, 14), // StartDate och EndDate verkar saknas i OccurrenceModel?
             BasisOfRecord = BasisOfRecord.MänskligObservation,
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter

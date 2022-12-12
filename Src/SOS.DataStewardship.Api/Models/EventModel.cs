@@ -95,7 +95,7 @@ namespace SOS.DataStewardship.Api.Models
         /// States whether any of the sought after organisms were observed during the survey event or not. \&quot;Sant\&quot; (i.e. True) means that none of the sought after organisms were observed at all.
         /// </summary>
         [DataMember(Name="noObservations")]
-        public NoObservations? NoObservations { get; set; }
+        public bool? NoObservations { get; set; }
 
         /// <summary>
         /// Attached information about the survey event, e.g. media files like images, sound recordings, maps etc.
@@ -112,7 +112,7 @@ namespace SOS.DataStewardship.Api.Models
         /// <summary>
         /// A list of unique identities of the occurances made during an event
         /// </summary>
-        [DataMember(Name="Occurrences")]
-        public List<string> Occurrences { get; set; }
+        [DataMember(Name="OccurrenceIds")]
+        public List<string> OccurrenceIds { get; set; }
     }
 }

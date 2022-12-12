@@ -6,6 +6,7 @@ using SOS.DataStewardship.Api.Managers.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using SOS.Lib.JsonConverters;
+using SOS.DataStewardship.Api.Models.Enums;
 
 namespace SOS.DataStewardship.Api.Modules;
 
@@ -78,7 +79,8 @@ public class DataStewardshipModule : IModule
             .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get occurrence by id. Example: urn:lsid:artportalen.se:sighting:98571689"));
 
         application.MapPost("/datastewardship/occurrences", GetOccurrencesBySearchAsync)
-            .Produces<Models.PagedResult<OccurrenceModel>>(StatusCodes.Status200OK)
+            .Produces<Models.PagedResult<OccurrenceModel>>(StatusCodes.Status200OK, "application/json")
+            .Produces<Models.PagedResult<OccurrenceModel>>(StatusCodes.Status200OK, "text/csv")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
             .WithName("GetOccurrencesBySearch")
@@ -92,7 +94,9 @@ public class DataStewardshipModule : IModule
     /// <param name="id">The dataset id.</param>
     /// <returns></returns>
     internal async Task<IResult> GetDatasetByIdAsync(IDataStewardshipManager dataStewardshipManager, 
-        [FromRoute][Required] string id)
+        [FromRoute][Required] string id,
+        [FromQuery] ExportMode exportMode = ExportMode.Json,
+        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
         try
         {
@@ -116,7 +120,9 @@ public class DataStewardshipModule : IModule
     internal async Task<IResult> GetDatasetsBySearchAsync(IDataStewardshipManager dataStewardshipManager, 
         [FromBody] DatasetFilter filter, 
         [FromQuery] int? skip, 
-        [FromQuery] int? take)
+        [FromQuery] int? take,
+        [FromQuery] ExportMode exportMode = ExportMode.Json,
+        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
         try
         {
@@ -135,7 +141,9 @@ public class DataStewardshipModule : IModule
     /// <param name="id">EventId of the event to get.</param>
     /// <returns></returns>
     internal async Task<IResult> GetEventByIdAsync(IDataStewardshipManager dataStewardshipManager, 
-        [FromRoute][Required] string id)
+        [FromRoute][Required] string id,
+        [FromQuery] ExportMode exportMode = ExportMode.Json,
+        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
         try
         {
@@ -159,7 +167,9 @@ public class DataStewardshipModule : IModule
     internal async Task<IResult> GetEventsBySearchAsync(IDataStewardshipManager dataStewardshipManager, 
         [FromBody] EventsFilter filter,
         [FromQuery] int? skip, 
-        [FromQuery] int? take)
+        [FromQuery] int? take,
+        [FromQuery] ExportMode exportMode = ExportMode.Json,
+        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
         try
         {
@@ -178,7 +188,9 @@ public class DataStewardshipModule : IModule
     /// <param name="id">OccurrenceId of the occurrence to get.</param>
     /// <returns></returns>
     internal async Task<IResult> GetOccurrenceByIdAsync(IDataStewardshipManager dataStewardshipManager, 
-        [FromRoute][Required] string id)
+        [FromRoute][Required] string id,
+        [FromQuery] ExportMode exportMode = ExportMode.Json,
+        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
         try
         {
@@ -202,7 +214,9 @@ public class DataStewardshipModule : IModule
     internal async Task<IResult> GetOccurrencesBySearchAsync(IDataStewardshipManager dataStewardshipManager, 
         [FromBody] OccurrenceFilter filter, 
         [FromQuery] int? skip, 
-        [FromQuery] int? take)
+        [FromQuery] int? take,
+        [FromQuery] ExportMode exportMode = ExportMode.Json,
+        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
         try
         {
@@ -216,4 +230,9 @@ public class DataStewardshipModule : IModule
             return Results.BadRequest("Failed");
         }
     }
+
+
+
+
+
 }

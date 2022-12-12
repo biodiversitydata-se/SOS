@@ -26,7 +26,7 @@ namespace SOS.DataStewardship.Api.Extensions
                 DataStewardship = dataset.DataStewardship,
                 Description = dataset.Description,
                 EndDate = dataset.EndDate,
-                Events = dataset.EventIds,
+                EventIds = dataset.EventIds,
                 Identifier = dataset.Identifier,
                 Language = dataset.Language,
                 Metadatalanguage = dataset.Metadatalanguage,
@@ -106,15 +106,8 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.RecorderCode = observationEvent.RecorderCode;
             ev.RecorderOrganisation = observationEvent?.RecorderOrganisation?.Select(m => m.ToOrganisation()).ToList();
 
-            ev.Occurrences = observationEvent.OccurrenceIds;
-            if (ev.Occurrences.Any())
-            {
-                ev.NoObservations = NoObservations.Falskt;
-            }
-            else
-            {
-                ev.NoObservations = NoObservations.Sant;
-            }
+            ev.OccurrenceIds = observationEvent?.OccurrenceIds;
+            ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
 
             return ev;
         }       
@@ -156,15 +149,8 @@ namespace SOS.DataStewardship.Api.Extensions
                 };
             }
 
-            ev.Occurrences = occurrenceIds.ToList();
-            if (ev.Occurrences.Any())
-            {
-                ev.NoObservations = NoObservations.Falskt;
-            }
-            else
-            {
-                ev.NoObservations = NoObservations.Sant;
-            }
+            ev.OccurrenceIds = occurrenceIds?.ToList();
+            ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
 
             return ev;
         }
@@ -236,7 +222,7 @@ namespace SOS.DataStewardship.Api.Extensions
                 occurrence.BasisOfRecord = GetBasisOfRecordEnum((BasisOfRecordId)observation.BasisOfRecord.Id);
             }
 
-            occurrence.Event = observation.Event.EventId;
+            occurrence.EventID = observation.Event.EventId;
             occurrence.DatasetIdentifier = observation.DataStewardshipDatasetId;
             occurrence.IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas; // todo - implement when the value list is defined
             occurrence.ObservationCertainty = Convert.ToDecimal(observation.Location.CoordinateUncertaintyInMeters);
@@ -385,7 +371,7 @@ namespace SOS.DataStewardship.Api.Extensions
 
             if (datasetFilter.Datum != null)
             {
-                filter.Date = new DateFilter
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
                 {
                     StartDate = datasetFilter.Datum.StartDate,
                     EndDate = datasetFilter.Datum.EndDate,
@@ -416,7 +402,7 @@ namespace SOS.DataStewardship.Api.Extensions
 
             if (eventsFilter.Datum != null)
             {
-                filter.Date = new DateFilter
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
                 {
                     StartDate = eventsFilter.Datum.StartDate,
                     EndDate = eventsFilter.Datum.EndDate,
@@ -435,7 +421,7 @@ namespace SOS.DataStewardship.Api.Extensions
 
             var filter = new SearchFilter(0);
             filter.EventIds = occurrenceFilter.EventIds;
-            filter.DataStewardshipDatasetIds = occurrenceFilter.DatasetList;
+            filter.DataStewardshipDatasetIds = occurrenceFilter.DatasetIds;
             filter.IsPartOfDataStewardshipDataset = true;
             if (occurrenceFilter.Taxon?.Ids != null && occurrenceFilter.Taxon.Ids.Any())
             {
@@ -448,7 +434,7 @@ namespace SOS.DataStewardship.Api.Extensions
             
             if (occurrenceFilter.Datum != null)
             {
-                filter.Date = new DateFilter
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
                 {
                     StartDate = occurrenceFilter.Datum.StartDate,
                     EndDate = occurrenceFilter.Datum.EndDate,
@@ -498,20 +484,20 @@ namespace SOS.DataStewardship.Api.Extensions
         }
 
 
-        public static DateFilter.DateRangeFilterType ToDateRangeFilterType(this DatumFilterType datumFilterType)
+        public static Lib.Models.Search.Filters.DateFilter.DateRangeFilterType ToDateRangeFilterType(this DatumFilterType datumFilterType)
         {
             switch (datumFilterType)
             {
                 case DatumFilterType.OnlyStartDate:
-                    return DateFilter.DateRangeFilterType.OnlyStartDate;
+                    return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyStartDate;
                 case DatumFilterType.OnlyEndDate:
-                    return DateFilter.DateRangeFilterType.OnlyEndDate;
+                    return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyEndDate;
                 case DatumFilterType.OverlappingStartDateAndEndDate:
-                    return DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate;
+                    return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate;
                 case DatumFilterType.BetweenStartDateAndEndDate:
-                    return DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate;
+                    return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate;
                 default:
-                    return DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate;
+                    return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate;
             }
         }
     }

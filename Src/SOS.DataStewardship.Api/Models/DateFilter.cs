@@ -8,7 +8,7 @@ namespace SOS.DataStewardship.Api.Models
     /// Date filter.
     /// </summary>
     [DataContract]
-    public class DatumFilter
+    public class DateFilter
     { 
         /// <summary>
         /// Event start date specified in the ISO 8601 standard. If no timezone is specified, GMT+1 (CEST) is assumed

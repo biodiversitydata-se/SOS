@@ -59,7 +59,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                         SpeciesList = "SpeciesList"
                     }
                 },
-                Events = new List<string>
+                EventIds = new List<string>
                 {
                     "d9baea4e-2436-4481-accb-7c2fe835039e",
                     "60152666-8c2c-4d33-a5c8-da1dda106c5d",
@@ -93,8 +93,8 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             EventRemarks = "EventRemarks",
             EventType = "EventType",
             LocationProtected = false,
-            NoObservations = NoObservations.Falskt,
-            Occurrences = new List<string>()
+            NoObservations = false,
+            OccurrenceIds = new List<string>()
             {
                 "Occurrence-1", "Occurrence-2"
             },
@@ -151,7 +151,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 }
             },
             BasisOfRecord = BasisOfRecord.MänskligObservation,
-            Event = "EventId-1",
+            EventID = "EventId-1",
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, 
             ObservationCertainty = 25m, 
             ObservationPoint = null,

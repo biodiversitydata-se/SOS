@@ -8,18 +8,12 @@ namespace SOS.DataStewardship.Api.Models
     /// </summary>
     [DataContract]
     public class OccurrenceFilter
-    {
-        /// <summary>
-        /// ExportMode. Todo - this property should not be in a filter?
-        /// </summary>
-        [DataMember(Name = "exportMode")]
-        public ExportMode ExportMode { get; set; }
-
+    {        
         /// <summary>
         /// DatasetList
         /// </summary>
-        [DataMember(Name = "datasetList")]
-        public List<string> DatasetList { get; set; }
+        [DataMember(Name = "datasetIds")]
+        public List<string> DatasetIds { get; set; }
 
         /// <summary>
         /// EventIds
@@ -31,7 +25,7 @@ namespace SOS.DataStewardship.Api.Models
         /// Datum
         /// </summary>
         [DataMember(Name="datum")]
-        public DatumFilter Datum { get; set; }
+        public DateFilter Datum { get; set; }
 
         /// <summary>
         /// Taxon

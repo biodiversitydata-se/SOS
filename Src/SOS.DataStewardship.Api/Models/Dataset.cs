@@ -148,7 +148,7 @@ namespace SOS.DataStewardship.Api.Models
         /// <summary>
         /// A list of unique identites for surveys that is part of the dataset.
         /// </summary>
-        [DataMember(Name="events")]
-        public List<string> Events { get; set; }
+        [DataMember(Name="eventIds")]
+        public List<string> EventIds { get; set; }
     }
 }

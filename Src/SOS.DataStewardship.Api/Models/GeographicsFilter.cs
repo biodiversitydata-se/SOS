@@ -21,8 +21,5 @@ namespace SOS.DataStewardship.Api.Models
 
         [DataMember(Name = "area")]
         public GeographicsFilterArea Area { get; set; }
-
-        [DataMember(Name = "responseCoordinateSystem")]
-        public CoordinateSystem ResponseCoordinateSystem { get; set; } // todo - this is not really a filter
     }
 }

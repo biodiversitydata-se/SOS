@@ -27,7 +27,7 @@ namespace SOS.DataStewardship.Api.Models
         /// Datum
         /// </summary>
         [DataMember(Name="datum")]
-        public DatumFilter Datum { get; set; }
+        public DateFilter Datum { get; set; }
 
         /// <summary>
         /// Taxon
