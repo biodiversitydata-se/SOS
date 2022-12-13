@@ -58,10 +58,11 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
         {
             var runStatus = RunStatus.Success;
             var harvestCount = 0;
+            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
 
             try
             {
-                await InitializeharvestAsync(true);
+                initValues.preHarvestCount = await InitializeharvestAsync(true);
                 Logger.LogInformation(GetNorsHarvestSettingsInfoString());
 
                 var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
@@ -129,7 +130,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
                 runStatus = RunStatus.Failed;
             }
 
-            return await FinishHarvestAsync(runStatus, harvestCount);
+            return await FinishHarvestAsync(initValues, runStatus, harvestCount);
         }
 
         /// inheritdoc />

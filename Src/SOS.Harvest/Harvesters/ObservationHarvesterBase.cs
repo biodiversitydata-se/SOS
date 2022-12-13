@@ -10,12 +10,10 @@ namespace SOS.Harvest.Harvesters
     public class ObservationHarvesterBase<TVerbatim, TKey> where TVerbatim : IEntity<TKey>
     {
         private string _provider { get; set; }
-        private HarvestInfo? _harvestInfo;
-        private long _preHarvestCount;
 
         protected IVerbatimRepositoryBase<TVerbatim, TKey> VerbatimRepository { get; private set; }
         protected readonly ILogger<IObservationHarvester> Logger;
-        
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -26,7 +24,7 @@ namespace SOS.Harvest.Harvesters
         protected ObservationHarvesterBase(
             string provider,
             IVerbatimRepositoryBase<TVerbatim, TKey> verbatimRepository,
-            ILogger<IObservationHarvester> logger) 
+            ILogger<IObservationHarvester> logger)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
             VerbatimRepository = verbatimRepository ?? throw new ArgumentNullException(nameof(verbatimRepository));
@@ -37,64 +35,68 @@ namespace SOS.Harvest.Harvesters
         /// Initialize a new harvest
         /// </summary>
         /// <returns></returns>
-        protected async Task InitializeharvestAsync(bool useTempMode)
+        protected async Task<long> InitializeharvestAsync(bool useTempMode)
         {
-            _harvestInfo = new HarvestInfo(_provider, DateTime.Now);
-
             Logger.LogInformation($"Start harvesting observations for {_provider} data provider");
 
             // Get current document count from permanent index
             VerbatimRepository.TempMode = false;
-            _preHarvestCount = await VerbatimRepository.CountAllDocumentsAsync();
+            var preHarvestCount = await VerbatimRepository.CountAllDocumentsAsync();
             VerbatimRepository.TempMode = useTempMode;
 
             // Make sure we have an empty collection.
             Logger.LogInformation($"Start empty collection for {_provider} verbatim collection");
             await VerbatimRepository.DeleteCollectionAsync();
             await VerbatimRepository.AddCollectionAsync();
-            Logger.LogInformation($"Finish empty collection for {_provider} verbatim collection");  
+            Logger.LogInformation($"Finish empty collection for {_provider} verbatim collection");
+
+            return preHarvestCount;
         }
 
         /// <summary>
         /// Finish harvest
         /// </summary>
+        /// <param name="initValues"></param>
         /// <param name="runStatus"></param>
         /// <param name="harvestCount"></param>
+        /// <param name="dataLastModified"></param>
+        /// <param name="notes"></param>
         /// <returns></returns>
-        protected async Task<HarvestInfo> FinishHarvestAsync(RunStatus runStatus, int harvestCount, DateTime? dataLastModified = null, string? notes = null)
+        protected async Task<HarvestInfo> FinishHarvestAsync((DateTime startDate, long preHarvestCount) initValues,  RunStatus runStatus, int harvestCount, DateTime? dataLastModified = null, string? notes = null)
         {
             // Update harvest info
-            _harvestInfo!.End = DateTime.Now;
-            _harvestInfo!.Count = harvestCount;
-            _harvestInfo.DataLastModified = dataLastModified;
-            _harvestInfo.Notes = notes;
+            var harvestInfo = new HarvestInfo(_provider, initValues.startDate);
+            harvestInfo!.End = DateTime.Now;
+            harvestInfo!.Count = harvestCount;
+            harvestInfo.DataLastModified = dataLastModified;
+            harvestInfo.Notes = notes;
 
             if (VerbatimRepository.TempMode && runStatus == RunStatus.Success)
             {
-                if (harvestCount >= _preHarvestCount * 0.8)
+                if (harvestCount >= initValues.preHarvestCount * 0.8)
                 {
-                    _harvestInfo.Status = RunStatus.Success;
+                    harvestInfo.Status = RunStatus.Success;
                     Logger.LogInformation($"Start permanentize temp collection for {_provider} verbatim");
                     await VerbatimRepository.PermanentizeCollectionAsync();
                     Logger.LogInformation($"Finish permanentize temp collection for {_provider} verbatim");
                 }
                 else
                 {
-                    _harvestInfo.Status = RunStatus.Failed;
-                    Logger.LogError($"{_provider}: Previous harvested observation count is: {_preHarvestCount}. Now only {harvestCount} observations where harvested.");
+                    harvestInfo.Status = RunStatus.Failed;
+                    Logger.LogError($"{_provider}: Previous harvested observation count is: {initValues.preHarvestCount}. Now only {harvestCount} observations where harvested.");
                 }
             }
             else
             {
-                _harvestInfo.Status = runStatus;
+                harvestInfo.Status = runStatus;
             }
 
-            Logger.LogInformation($"Finish harvesting {harvestCount} observations for {_provider} data provider. Status: {_harvestInfo.Status}");
+            Logger.LogInformation($"Finish harvesting {harvestCount} observations for {_provider} data provider. Status: {harvestInfo.Status}");
 
             // Make sure temp mode is disabled
             VerbatimRepository.TempMode = false;
 
-            return _harvestInfo;
+            return harvestInfo;
         }
     }
 }

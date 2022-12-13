@@ -78,7 +78,7 @@ namespace SOS.Harvest.Jobs
                 if (!await _processTaxaJob.RunAsync())
                 {
                     _logger.LogError("Failed to process taxonomy");
-                    return null;
+                    return null!;
                 }
                 _taxonCache.Clear();
                 _logger.LogInformation("Finish processing taxonomy");
@@ -93,7 +93,7 @@ namespace SOS.Harvest.Jobs
             if (!taxa?.Any() ?? true)
             {
                 _logger.LogWarning("Failed to get processed taxa");
-                return null;
+                return null!;
             }
 
             var taxaDictonary = new ConcurrentDictionary<int, Taxon>();

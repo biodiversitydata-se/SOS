@@ -245,7 +245,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             SearchDataProvidersHealthCheck = new SearchDataProvidersHealthCheck(ObservationManager, dataProviderCache);
             SearchPerformanceHealthCheck = new SearchPerformanceHealthCheck(ObservationManager);
             AzureSearchHealthCheck = new AzureSearchHealthCheck(healthCheckConfiguration, new NullLogger<AzureSearchHealthCheck>());
-            SystemsController = new SystemsController(processInfoManager, processedObservationRepository, new NullLogger<SystemsController>());
+            SystemsController = new SystemsController(new Mock<DevOpsManager>().Object, processInfoManager, processedObservationRepository, new NullLogger<SystemsController>());
             _userManager = new UserManager(userService, areaCache, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
             var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };

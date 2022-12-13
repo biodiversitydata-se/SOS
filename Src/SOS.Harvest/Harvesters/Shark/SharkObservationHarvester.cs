@@ -41,10 +41,10 @@ namespace SOS.Harvest.Harvesters.Shark
         {
             var runStatus = RunStatus.Success;
             var harvestCount = 0;
-
+            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
-                await InitializeharvestAsync(true);
+                initValues.preHarvestCount = await InitializeharvestAsync(true);
                
                 var dataSetsInfo = await _sharkObservationService.GetDataSetsAsync();
 
@@ -126,7 +126,7 @@ namespace SOS.Harvest.Harvesters.Shark
                 Logger.LogError(e, "Failed to harvest SHARK");
             }
 
-            return await FinishHarvestAsync(runStatus, harvestCount);
+            return await FinishHarvestAsync(initValues, runStatus, harvestCount);
         }
 
         /// inheritdoc />

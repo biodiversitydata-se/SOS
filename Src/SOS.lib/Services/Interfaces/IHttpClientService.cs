@@ -25,7 +25,7 @@ namespace SOS.Lib.Services.Interfaces
         /// <param name="requestUri"></param>
         /// <param name="headerData"></param>
         /// <returns></returns>
-        Task<T> GetDataAsync<T>(Uri requestUri, Dictionary<string, string> headerData);
+        Task<T> GetDataAsync<T>(Uri requestUri, IDictionary<string, string> headerData);
 
         /// <summary>
         ///     Get file data stream
@@ -33,7 +33,7 @@ namespace SOS.Lib.Services.Interfaces
         /// <param name="requestUri"></param>
         /// <param name="headerData"></param>
         /// <returns></returns>
-        Task<Stream> GetFileStreamAsync(Uri requestUri, Dictionary<string, string> headerData = null);
+        Task<Stream> GetFileStreamAsync(Uri requestUri, IDictionary<string, string> headerData = null);
 
         /// <summary>
         /// Post request
@@ -53,7 +53,7 @@ namespace SOS.Lib.Services.Interfaces
         /// <param name="model"></param>
         /// <param name="headerData"></param>
         /// <returns></returns>
-        Task<T> PostDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData);
+        Task<T> PostDataAsync<T>(Uri requestUri, object model, IDictionary<string, string> headerData);
 
         /// <summary>
         /// Post request with header data and content type
@@ -64,7 +64,7 @@ namespace SOS.Lib.Services.Interfaces
         /// <param name="headerData"></param>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        Task<T> PostDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData, string contentType);
+        Task<T> PostDataAsync<T>(Uri requestUri, object model, IDictionary<string, string> headerData, string contentType);
 
         /// <summary>
         /// Put requests
@@ -83,7 +83,7 @@ namespace SOS.Lib.Services.Interfaces
         /// <param name="model"></param>
         /// <param name="headerData"></param>
         /// <returns></returns>
-        Task<T> PutDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData);
+        Task<T> PutDataAsync<T>(Uri requestUri, object model, IDictionary<string, string> headerData);
 
         /// <summary>
         /// Put requests
@@ -94,7 +94,7 @@ namespace SOS.Lib.Services.Interfaces
         /// <param name="headerData"></param>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        Task<T> PutDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData, string contentType);
+        Task<T> PutDataAsync<T>(Uri requestUri, object model, IDictionary<string, string> headerData, string contentType);
 
         /// <summary>
         ///     Delete requests

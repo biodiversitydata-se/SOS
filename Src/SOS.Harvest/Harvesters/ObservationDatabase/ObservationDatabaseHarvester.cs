@@ -151,10 +151,10 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
         {
             var runStatus = RunStatus.Success;
             var harvestCount = 0;
-
+            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
-                await InitializeharvestAsync(true);
+                initValues.preHarvestCount = await InitializeharvestAsync(true);
                 var (minId, maxId) = await _observationDatabaseRepository.GetIdSpanAsync();
 
                 if (maxId > minId)
@@ -207,7 +207,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
                 runStatus = RunStatus.Failed;
             }
 
-            return await FinishHarvestAsync(runStatus, harvestCount);
+            return await FinishHarvestAsync(initValues, runStatus, harvestCount);
         }
 
         /// inheritdoc />

@@ -374,9 +374,10 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var harvestCount = 0;
             var dataLastModified = (DateTime?)null;
             var notes = (string?)null;
+            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
-                await InitializeharvestAsync(false);
+                initValues.preHarvestCount = await InitializeharvestAsync(false);
 
                 var harvestFactory = await GetHarvestFactoryAsync(mode, cancellationToken);
 
@@ -408,7 +409,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 runStatus = RunStatus.Failed;
             }
 
-            return await FinishHarvestAsync(runStatus, harvestCount, dataLastModified, notes);
+            return await FinishHarvestAsync(initValues, runStatus, harvestCount, dataLastModified, notes);
         }
 
         /// inheritdoc />

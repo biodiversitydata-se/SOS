@@ -44,10 +44,10 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
             var occurrenceIdsSet = new HashSet<string>();
             var runStatus = RunStatus.Success;
             var harvestCount = 0;
-
+            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
-                await InitializeharvestAsync(true);
+                initValues.preHarvestCount = await InitializeharvestAsync(true);
 
                 Logger.LogDebug($"Start getting Localities for Virtual Herbarium");
                 var localitiesXml = await _virtualHerbariumObservationService.GetLocalitiesAsync();
@@ -115,7 +115,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                 runStatus = RunStatus.Failed;
             }
 
-            return await FinishHarvestAsync(runStatus, harvestCount);
+            return await FinishHarvestAsync(initValues, runStatus, harvestCount);
         }
 
         /// inheritdoc />
