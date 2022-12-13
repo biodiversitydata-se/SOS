@@ -220,6 +220,7 @@ namespace SOS.Lib.Repositories
             {
                 // Create the collection
                 await Database.CreateCollectionAsync(collectionName);
+                Logger.LogInformation($"The following MongoDB collection was created: [{collectionName}]");
 
                 return true;
             }
@@ -348,6 +349,7 @@ namespace SOS.Lib.Repositories
             {
                 // Create the collection
                 await Database.DropCollectionAsync(collectionName);
+                Logger.LogInformation($"The following MongoDB collection was deleted: [{collectionName}]");
 
                 return true;
             }

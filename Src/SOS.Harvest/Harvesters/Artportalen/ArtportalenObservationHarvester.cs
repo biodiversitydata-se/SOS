@@ -85,6 +85,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <returns></returns>
         private async Task<int> HarvestAllAsync(ArtportalenHarvestFactory harvestFactory, IJobCancellationToken cancellationToken)
         {
+            Logger.LogInformation($"Start Artportalen HarvestAllAsync()");
             if (_artportalenConfiguration.AddTestSightings && (_artportalenConfiguration.AddTestSightingIds?.Any() ?? false))
             { 
                 Logger.LogDebug("Start adding test sightings");
@@ -139,7 +140,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
                 Logger.LogDebug($"Finish getting Artportalen sightings ({ nrSightingsHarvested })");
-
+                Logger.LogInformation($"Finish Artportalen HarvestAllAsync(). NrSightingsHarvested={nrSightingsHarvested:N0}");
                 return nrSightingsHarvested;
             }
 
@@ -158,6 +159,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         private async Task<int> HarvestIncrementalAsync(JobRunModes mode, ArtportalenHarvestFactory harvestFactory, 
             IJobCancellationToken cancellationToken)
         {
+            Logger.LogInformation($"Start Artportalen HarvestIncrementalAsync()");
             Logger.LogDebug($"Start getting Artportalen sightings ({mode})");
 
             // We start from last harvested sighting 
@@ -203,7 +205,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
             Logger.LogDebug($"Finish getting Artportalen sightings ({mode}) (NrSightingsHarvested={nrSightingsHarvested:N0})");
-
+            Logger.LogInformation($"Finish Artportalen HarvestIncrementalAsync(). NrSightingsHarvested={nrSightingsHarvested:N0}");
             return nrSightingsHarvested;
         }
         #endregion Incremental
