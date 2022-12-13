@@ -1,5 +1,5 @@
 <Project>
  <PropertyGroup>
-   <Copyright>Copyright © $([System.DateTime]::UtcNow.Year) SLU Artdatabanken ($([System.DateTime]::UtcNow.ToString("s")))</Copyright>
+   <Copyright>Copyright © $([System.DateTime]::UtcNow.Year) SLU Artdatabanken</Copyright>
  </PropertyGroup>
 </Project>
