@@ -60,6 +60,7 @@ using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories;
+using SOS.Observations.Api.Services.Interfaces;
 using SOS.TestHelpers;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 
@@ -341,7 +342,9 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             SearchDataProvidersHealthCheck = new SearchDataProvidersHealthCheck(observationManager, dataProviderCache);
             SearchPerformanceHealthCheck = new SearchPerformanceHealthCheck(observationManager);
             AzureSearchHealthCheck = new AzureSearchHealthCheck(healthCheckConfiguration, new NullLogger<AzureSearchHealthCheck>());
-            SystemsController = new SystemsController(new Mock<DevOpsManager>().Object, processInfoManager, processedObservationRepository, new NullLogger<SystemsController>());
+            var devOpsService = new DevOpsService(new HttpClientService(new NullLogger<HttpClientService>()), new DevOpsConfiguration(), new NullLogger<DevOpsService>());
+            var devOpsManager = new DevOpsManager(devOpsService, new DevOpsConfiguration(), new NullLogger<DevOpsManager>());
+            SystemsController = new SystemsController(devOpsManager, processInfoManager, processedObservationRepository, new NullLogger<SystemsController>());
             _userManager = new UserManager(_userService, areaCache, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
             var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
