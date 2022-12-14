@@ -54,9 +54,6 @@ namespace SOS.Hangfire.JobServer.ServiceBus.Consumers
             var message = context.Message;
             try
             {
-                message.SightingId = 99509833;
-                message.TaxonId = 206135;
-
                 _logger.LogInformation($"SightingPublishedEvent: Sighting id: {message.SightingId}. Taxon: {message.TaxonName} ({message.TaxonId}).");
 
                 var verbatims = await _artportalenObservationHarvester.HarvestObservationsAsync(new[] { context.Message.SightingId }, JobCancellationToken.Null);

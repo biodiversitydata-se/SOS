@@ -46,7 +46,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting Species Collection Items");
-                return null;
+                throw;
             }
         }
     }

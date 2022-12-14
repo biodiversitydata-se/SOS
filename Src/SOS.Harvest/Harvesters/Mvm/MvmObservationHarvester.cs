@@ -52,10 +52,10 @@ namespace SOS.Harvest.Harvesters.Mvm
         {
             var runStatus = RunStatus.Success;
             var harvestCount = 0;
-
+            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
-                await InitializeharvestAsync(true);
+                initValues.preHarvestCount = await InitializeHarvestAsync(true);
                 Logger.LogInformation(GetMvmHarvestSettingsInfoString());
 
                 var result = await _mvmObservationService.GetAsync(0);
@@ -106,7 +106,7 @@ namespace SOS.Harvest.Harvesters.Mvm
                 runStatus = RunStatus.Failed;
             }
 
-            return await FinishHarvestAsync(runStatus, harvestCount);
+            return await FinishHarvestAsync(initValues, runStatus, harvestCount);
         }
 
         /// inheritdoc />

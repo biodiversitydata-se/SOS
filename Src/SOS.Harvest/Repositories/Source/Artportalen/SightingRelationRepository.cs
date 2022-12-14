@@ -38,7 +38,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting sighting relations");
-                return null!;
+                throw;
             }
         }
     }

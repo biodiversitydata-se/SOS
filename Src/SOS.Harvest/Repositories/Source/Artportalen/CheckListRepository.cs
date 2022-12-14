@@ -101,7 +101,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 Logger.LogError(e, "Error getting checklists");
 
-                return null;
+                throw;
             }
         }
 
@@ -123,7 +123,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 Logger.LogError(e, "Error getting min and max id");
 
-                return default;
+                throw;
             }
         }
     }

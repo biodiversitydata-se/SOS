@@ -40,7 +40,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<ArtportalenHarvestFactory> GetHarvestFactoryAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
+        private async Task<ArtportalenHarvestFactory> PrepareHarvestAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
             SetRunMode(mode);
  
@@ -374,11 +374,11 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var harvestCount = 0;
             var dataLastModified = (DateTime?)null;
             var notes = (string?)null;
+            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
-                await InitializeharvestAsync(false);
-
-                var harvestFactory = await GetHarvestFactoryAsync(mode, cancellationToken);
+                using var harvestFactory = await PrepareHarvestAsync(mode, cancellationToken);
+                initValues.preHarvestCount = await InitializeHarvestAsync(false);
 
                 harvestCount = mode == JobRunModes.Full ?
                     await HarvestAllAsync(harvestFactory, cancellationToken)
@@ -408,7 +408,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 runStatus = RunStatus.Failed;
             }
 
-            return await FinishHarvestAsync(runStatus, harvestCount, dataLastModified, notes);
+            return await FinishHarvestAsync(initValues, runStatus, harvestCount, dataLastModified, notes);
         }
 
         /// inheritdoc />
@@ -424,7 +424,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             try
             {
                var mode = JobRunModes.IncrementalActiveInstance;
-               using var harvestFactory = await GetHarvestFactoryAsync(mode, cancellationToken);
+               using var harvestFactory = await PrepareHarvestAsync(mode, cancellationToken);
 
                 return await GetVerbatimBatchAsync(harvestFactory,
                     _sightingRepository.GetChunkAsync(ids),

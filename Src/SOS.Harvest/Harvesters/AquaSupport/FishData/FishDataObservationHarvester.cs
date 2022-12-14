@@ -58,16 +58,14 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
         {
             var runStatus = RunStatus.Success;
             var harvestCount = 0;
-
+            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
-                await InitializeharvestAsync(true);
+                initValues.preHarvestCount = await InitializeHarvestAsync(true);
                 Logger.LogInformation(GetFishDataHarvestSettingsInfoString());
 
                 var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
                 var verbatimFactory = new AquaSupportHarvestFactory<FishDataObservationVerbatim>();
-
-
                 var startDate = new DateTime(_fishDataServiceConfiguration.StartHarvestYear, 1, 1);
                 var endDate = DateTime.Now;
                 var changeId = 0L;
@@ -131,7 +129,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
                 runStatus = RunStatus.Failed;
             }
 
-            return await FinishHarvestAsync(runStatus, harvestCount);
+            return await FinishHarvestAsync(initValues, runStatus, harvestCount);
         }
 
         /// inheritdoc />

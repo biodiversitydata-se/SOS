@@ -81,6 +81,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
+using SOS.Lib.Jobs.Shared;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
@@ -431,18 +432,23 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
             builder.RegisterType<AreasHarvestJob>().As<IAreasHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ApiUsageStatisticsHarvestJob>().As<IApiUsageStatisticsHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<InvalidObservationsReportsJob>().As<IInvalidObservationsReportsJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ChecklistsHarvestJob>().As<IChecklistsHarvestJob>().InstancePerLifetimeScope();
+            
+            
+            builder.RegisterType<ClearCacheJob>().As<IClearCacheJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
+            builder.RegisterType<CreateDwcaDataValidationReportJob>().As<ICreateDwcaDataValidationReportJob>().InstancePerLifetimeScope();
+            builder.RegisterType<DataValidationReportJob>().As<IDataValidationReportJob>().InstancePerLifetimeScope();
             builder.RegisterType<DwcArchiveHarvestJob>().As<IDwcArchiveHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<VocabulariesImportJob>().As<IVocabulariesImportJob>().InstancePerLifetimeScope();
+            builder.RegisterType<InvalidObservationsReportsJob>().As<IInvalidObservationsReportsJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessChecklistsJob>().As<IProcessChecklistsJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessObservationsJob>().As<IProcessObservationsJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessTaxaJob>().As<IProcessTaxaJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectsHarvestJob>().As<IProjectsHarvestJob>().InstancePerLifetimeScope();
+            
+           
             builder.RegisterType<TaxonListsHarvestJob>().As<ITaxonListsHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<CreateDwcaDataValidationReportJob>().As<ICreateDwcaDataValidationReportJob>().InstancePerLifetimeScope();
-            builder.RegisterType<DataValidationReportJob>().As<IDataValidationReportJob>().InstancePerLifetimeScope();
+            builder.RegisterType<VocabulariesImportJob>().As<IVocabulariesImportJob>().InstancePerLifetimeScope();
         }
     }
 }

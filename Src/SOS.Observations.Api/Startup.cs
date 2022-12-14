@@ -77,6 +77,7 @@ using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
+using SOS.Observations.Api.Services.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
@@ -349,6 +350,7 @@ namespace SOS.Observations.Api
             services.AddSingleton(artportalenApiServiceConfiguration);
             services.AddSingleton(observationApiConfiguration);
             services.AddSingleton(blobStorageConfiguration);
+            services.AddSingleton(Configuration.GetSection("DevOpsConfiguration").Get<DevOpsConfiguration>());
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
             services.AddSingleton(healthCheckConfiguration);
@@ -403,7 +405,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IChecklistManager, ChecklistManager>();
             services.AddScoped<IDataProviderManager, DataProviderManager>();
             services.AddScoped<IDataQualityManager, DataQualityManager>();
-            services.AddScoped<IUserManager, UserManager>();
+            services.AddScoped<IDevOpsManager, DevOpsManager>();
             services.AddScoped<IExportManager, ExportManager>();
             services.AddScoped<IFilterManager, FilterManager>();
             services.AddScoped<ILocationManager, LocationManager>();
@@ -413,6 +415,7 @@ namespace SOS.Observations.Api
             services.AddScoped<ITaxonListManager, TaxonListManager>();
             services.AddSingleton<ITaxonManager, TaxonManager>();
             services.AddScoped<ITaxonSearchManager, TaxonSearchManager>();
+            services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IVocabularyManager, VocabularyManager>();
 
             // Add repositories
@@ -436,6 +439,7 @@ namespace SOS.Observations.Api
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();
+            services.AddSingleton<IDevOpsService, DevOpsService>();
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddSingleton<IUserService, UserService>();

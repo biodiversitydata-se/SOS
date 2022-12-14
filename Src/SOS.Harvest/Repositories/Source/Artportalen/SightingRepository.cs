@@ -155,7 +155,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 Logger.LogError(e, "Error getting sightings");
 
-                return null!;
+                throw;
             }
         }
 
@@ -178,7 +178,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 Logger.LogError(e, "Error getting sightings");
 
-                return null!;
+                throw;
             }
         }
 
@@ -201,7 +201,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 Logger.LogError(e, "Error getting sightings");
 
-                return null!;
+                throw;
             }
         }
 
@@ -260,7 +260,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 Logger.LogError(e, "Error getting min and max id");
 
-                return default;
+                throw;
             }
         }
 
@@ -283,7 +283,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 Logger.LogError(e, "Error getting last modified date");
 
-                return null;
+                throw;
             }
         }
 
@@ -329,7 +329,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 Logger.LogError(e, "Error getting modified id's");
 
-                return null!;
+                throw;
             }
         }
 
@@ -355,7 +355,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting sighting/project connections");
-                return null!;
+                throw;
             }
         }
 
