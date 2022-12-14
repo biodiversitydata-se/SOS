@@ -79,7 +79,7 @@ namespace SOS.Harvest.Jobs
                 _vocabularyCache.Clear();
             }
 
-            _logger.LogInformation($"Caches cleared ({string.Join(',', caches!)})");
+            _logger.LogInformation($"Cache/s cleared ({string.Join(',', caches!)})");
         }
     }
 }
