@@ -55,7 +55,7 @@ namespace SOS.Harvest.Harvesters.Mvm
             (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
-                initValues.preHarvestCount = await InitializeharvestAsync(true);
+                initValues.preHarvestCount = await InitializeHarvestAsync(true);
                 Logger.LogInformation(GetMvmHarvestSettingsInfoString());
 
                 var result = await _mvmObservationService.GetAsync(0);

@@ -154,7 +154,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
             (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
-                initValues.preHarvestCount = await InitializeharvestAsync(true);
+                initValues.preHarvestCount = await InitializeHarvestAsync(true);
                 var (minId, maxId) = await _observationDatabaseRepository.GetIdSpanAsync();
 
                 if (maxId > minId)

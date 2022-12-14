@@ -61,7 +61,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
             (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
-                initValues.preHarvestCount = await InitializeharvestAsync(true);
+                initValues.preHarvestCount = await InitializeHarvestAsync(true);
                 Logger.LogInformation(GetFishDataHarvestSettingsInfoString());
 
                 var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";

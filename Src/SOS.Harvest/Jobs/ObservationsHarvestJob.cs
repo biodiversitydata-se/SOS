@@ -107,7 +107,7 @@ namespace SOS.Harvest.Jobs
         {
             _logger.LogInformation($"Start harvest job ({mode})");
             await HarvestResources(mode, cancellationToken);
-            var harvestCount = await Harvest(harvestProviders, mode, cancellationToken);
+            var harvestCount = await HarvestAsync(harvestProviders, mode, cancellationToken);
 
             if (harvestCount == -1)
             {
@@ -166,7 +166,7 @@ namespace SOS.Harvest.Jobs
         /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<long> Harvest(
+        private async Task<long> HarvestAsync(
         IEnumerable<DataProvider> dataProviders,
         JobRunModes mode,
         IJobCancellationToken cancellationToken)
@@ -438,7 +438,7 @@ namespace SOS.Harvest.Jobs
                 return false;
             }
 
-            return (await Harvest(
+            return (await HarvestAsync(
                 harvestDataProviders.Select(d => d.Value).ToList(),
                 JobRunModes.Full,
                 cancellationToken)) != -1;

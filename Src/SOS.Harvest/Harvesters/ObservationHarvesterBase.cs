@@ -35,7 +35,7 @@ namespace SOS.Harvest.Harvesters
         /// Initialize a new harvest
         /// </summary>
         /// <returns></returns>
-        protected async Task<long> InitializeharvestAsync(bool useTempMode)
+        protected async Task<long> InitializeHarvestAsync(bool useTempMode)
         {
             Logger.LogInformation($"Start harvesting observations for {_provider} data provider");
 

@@ -47,7 +47,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
             (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
-                initValues.preHarvestCount = await InitializeharvestAsync(true);
+                initValues.preHarvestCount = await InitializeHarvestAsync(true);
 
                 Logger.LogDebug($"Start getting Localities for Virtual Herbarium");
                 var localitiesXml = await _virtualHerbariumObservationService.GetLocalitiesAsync();

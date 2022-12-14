@@ -62,7 +62,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
 
             try
             {
-                initValues.preHarvestCount = await InitializeharvestAsync(true);
+                initValues.preHarvestCount = await InitializeHarvestAsync(true);
                 Logger.LogInformation(GetNorsHarvestSettingsInfoString());
 
                 var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
