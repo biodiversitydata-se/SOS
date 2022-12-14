@@ -50,5 +50,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> VerifyCollectionAsync();
 
         Task<List<ObservationEvent>> GetEventsByIds(IEnumerable<string> ids);
+
+        Task<bool> DeleteAllDocumentsAsync();
     }
 }

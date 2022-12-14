@@ -59,6 +59,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
 
         Task<List<ObservationDataset>> GetDatasetsByIds(IEnumerable<string> ids);
 
-        Task<bool> DeleteAllDocumentsAsync();        
+        Task<bool> DeleteAllDocumentsAsync();
     }
 }
