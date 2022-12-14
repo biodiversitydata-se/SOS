@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Jobs.Process;
+using SOS.Lib.Jobs.Shared;
 using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Administration.Api.Controllers
@@ -38,6 +41,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                BackgroundJob.Enqueue<IClearCacheJob>(job => job.RunAsync(new[] {cache}));
                 return new OkObjectResult(await _cacheManager.ClearAsync(cache));
             }
             catch (Exception e)
