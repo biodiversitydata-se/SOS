@@ -63,7 +63,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting projects");
-                return null!;
+                throw;
             }
         }
 
@@ -79,7 +79,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, $"Error getting project: {projectId}");
-                return null;
+                throw;
             }
         }
 
@@ -133,7 +133,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting project parameters");
-                return null;
+                throw;
             }
         }
     }

@@ -63,7 +63,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting media files");
-                return null!;
+                throw;
             }
         }
     }

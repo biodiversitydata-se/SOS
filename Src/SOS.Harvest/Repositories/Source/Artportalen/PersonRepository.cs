@@ -35,7 +35,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting persons");
-                return null!;
+                throw;
             }
         }
 
@@ -51,7 +51,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, $"Error getting person: {id} ");
-                return null!;
+                throw;
             }
         }
     }

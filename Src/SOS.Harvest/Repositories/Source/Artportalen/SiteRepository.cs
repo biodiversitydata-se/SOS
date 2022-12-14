@@ -60,7 +60,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     return await GetByIdsAsync(ids, ++attempt);
                 }
 
-                return null!;
+                throw;
             }
         }
 
@@ -118,7 +118,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting sites areas");
-                return null;
+                throw;
             }
         }
 
@@ -153,7 +153,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting frequently used sites");
-                return null!;
+                throw;
             }
         }
 
@@ -191,7 +191,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting sites geometry");
-                return null;
+                throw;
             }
         }
     }

@@ -53,7 +53,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting activities");
-                return null;
+                throw;
             }
         }
 
@@ -83,7 +83,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting biotopes");
-                return null;
+                throw;
             }
         }
 
@@ -113,7 +113,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting genders");
-                return null;
+                throw;
             }
         }
 
@@ -135,7 +135,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting organizations");
-                return null;
+                throw;
             }
         }
 
@@ -165,7 +165,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting stages");
-                return null;
+                throw;
             }
         }
 
@@ -195,7 +195,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting substrates");
-                return null;
+                throw;
             }
         }
 
@@ -225,7 +225,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting unite");
-                return null;
+                throw;
             }
         }
 
@@ -255,7 +255,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting validation status");
-                return null;
+                throw;
             }
         }
 
@@ -289,7 +289,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting area types status");
-                return null;
+                throw;
             }
         }
 
@@ -319,7 +319,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting discovery methods");
-                return null;
+                throw;
             }
         }
 
@@ -349,7 +349,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting determination methods");
-                return null;
+                throw;
             }
         }
 
@@ -375,7 +375,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting latest backup date");
-                return null;
+                throw;
             }
         }
     }
