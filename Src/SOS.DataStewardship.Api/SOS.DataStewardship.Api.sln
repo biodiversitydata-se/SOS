@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FA6F93ED
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Lib", "..\SOS.lib\SOS.Lib.csproj", "{5E4908ED-6221-44E0-B54E-1D3A737354EB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.DataStewardship.Api.IntegrationTests", "..\..\Tests\Integration\SOS.DataStewardship.Api.IntegrationTests\SOS.DataStewardship.Api.IntegrationTests.csproj", "{91ABB4A9-25B6-40EB-975A-EF15E838C544}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{5E4908ED-6221-44E0-B54E-1D3A737354EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E4908ED-6221-44E0-B54E-1D3A737354EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E4908ED-6221-44E0-B54E-1D3A737354EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91ABB4A9-25B6-40EB-975A-EF15E838C544}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91ABB4A9-25B6-40EB-975A-EF15E838C544}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91ABB4A9-25B6-40EB-975A-EF15E838C544}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91ABB4A9-25B6-40EB-975A-EF15E838C544}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{67AABC8C-1E20-49BD-B014-017F27AB1DFA} = {B4C58DE1-7436-407A-8B69-A1A2C5AACED8}
 		{CE53E7EE-7838-43FF-AD2F-3D3CEDB5CBFB} = {B4C58DE1-7436-407A-8B69-A1A2C5AACED8}
 		{5E4908ED-6221-44E0-B54E-1D3A737354EB} = {B4C58DE1-7436-407A-8B69-A1A2C5AACED8}
+		{91ABB4A9-25B6-40EB-975A-EF15E838C544} = {FA6F93ED-7F08-451A-954D-001712177F47}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7FC36558-1827-4EDC-9FAA-4BC1C21B2FE7}
