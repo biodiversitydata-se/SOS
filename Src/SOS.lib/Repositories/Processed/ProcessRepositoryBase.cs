@@ -157,7 +157,13 @@ namespace SOS.Lib.Repositories.Processed
 
         /// <inheritdoc />
         public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;
-       
+
+        /// <inheritdoc />
+        public void ClearConfigurationCache()
+        {
+            _processedConfigurationCache.Clear();
+        }
+
         public string IndexName => IndexHelper.GetIndexName<TEntity>(_elasticConfiguration.IndexPrefix, ClientCount == 1, LiveMode ? ActiveInstance : InActiveInstance, false);
 
         /// <inheritdoc />

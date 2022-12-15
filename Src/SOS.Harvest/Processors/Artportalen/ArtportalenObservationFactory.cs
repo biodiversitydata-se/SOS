@@ -75,6 +75,31 @@ namespace SOS.Harvest.Processors.Artportalen
         }
 
         /// <summary>
+        /// Calculate quantity used in aggregations
+        /// </summary>
+        /// <param name="verbatimObservation"></param>
+        /// <returns></returns>
+        private int? CalculateQuantityAggregation(ArtportalenObservationVerbatim verbatimObservation)
+        {
+            if (verbatimObservation.Quantity.HasValue)
+            {
+                return verbatimObservation.Quantity;
+            }
+
+            if (!verbatimObservation.NotRecovered && !verbatimObservation.NotPresent)
+            {
+                return 1;
+            }
+
+            if (verbatimObservation.NotRecovered || verbatimObservation.NotPresent)
+            {
+                return 0;
+            }
+
+            return null!;
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
@@ -248,6 +273,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Occurrence.IsNeverFoundObservation = verbatimObservation.NotPresent;
                 obs.Occurrence.IsNotRediscoveredObservation = verbatimObservation.NotRecovered;
                 obs.Occurrence.IsPositiveObservation = !(verbatimObservation.NotPresent || verbatimObservation.NotRecovered);
+                obs.Occurrence.OrganismQuantityAggregation = CalculateQuantityAggregation(verbatimObservation); 
                 obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
                 obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
                 //obs.Occurrence.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);

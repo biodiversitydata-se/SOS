@@ -422,6 +422,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedOccurrence.OrganismQuantity = verbatim.OrganismQuantity;
             if (int.TryParse(verbatim.OrganismQuantity, out var quantity))
             {
+                processedOccurrence.OrganismQuantityAggregation = quantity;
                 processedOccurrence.OrganismQuantityInt = quantity;
             }
             processedOccurrence.OrganismQuantityUnit = GetSosId(verbatim.OrganismQuantityType, _vocabularyById[VocabularyId.Unit]);
