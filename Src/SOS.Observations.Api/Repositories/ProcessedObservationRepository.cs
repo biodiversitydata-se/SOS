@@ -194,7 +194,7 @@ namespace SOS.Observations.Api.Repositories
                         .Format("yyyy-MM-dd")
                         .Aggregations(a => a
                             .Sum("quantity", sum => sum
-                                .Field("occurrence.organismQuantityInt")
+                                .Field("occurrence.organismQuantityAggregation")
                             )
                         )
                     )
@@ -265,7 +265,7 @@ namespace SOS.Observations.Api.Repositories
                         )
                         .Aggregations(a => a
                             .Sum("quantity", sum => sum
-                                .Field("occurrence.organismQuantityInt")
+                                .Field("occurrence.organismQuantityAggregation")
                             )
                         )
                     )

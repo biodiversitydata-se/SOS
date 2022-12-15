@@ -85,6 +85,7 @@ namespace SOS.Harvest.Processors.Kul
 
             if (int.TryParse(obs.Occurrence.OrganismQuantity, out var quantity))
             {
+                obs.Occurrence.OrganismQuantityAggregation = quantity;
                 obs.Occurrence.OrganismQuantityInt = quantity;
             }
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
