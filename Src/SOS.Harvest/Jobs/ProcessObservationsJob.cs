@@ -113,6 +113,9 @@ namespace SOS.Harvest.Jobs
 
         private async Task InitializeElasticSearchAsync(JobRunModes mode)
         {
+            //Make sure we get latest info about current instance
+            _processedObservationRepository.ClearConfigurationCache();
+
             if (mode == JobRunModes.Full)
             {
                 _logger.LogInformation(
