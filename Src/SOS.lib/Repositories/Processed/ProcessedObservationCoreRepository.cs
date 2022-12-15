@@ -616,7 +616,10 @@ namespace SOS.Lib.Repositories.Processed
             ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
-            CheckNodes(elasticConfiguration.Clusters.Count());
+            if (elasticConfiguration.Clusters != null)
+            {
+                CheckNodes(elasticConfiguration.Clusters.Count());
+            }
         }
 
         /// <summary>

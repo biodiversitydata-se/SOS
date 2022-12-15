@@ -90,16 +90,12 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.EventID = observationEvent.EventId;
             ev.ParentEventID = observationEvent.ParentEventId;
             ev.EventRemarks = observationEvent.EventRemarks;
-            ev.AssociatedMedia = observationEvent.Media.ToAssociatedMedias();            
-            ev.Dataset = new EventDataset
-            {
-                Identifier = observationEvent.Dataset.Identifier,
-                //Title = // need to lookup this from observationEvent.ataset index or store this information in observationEvent.Event
-            };
+            ev.AssociatedMedia = observationEvent.Media.ToAssociatedMedias();
+            ev.Dataset = observationEvent?.Dataset.ToEventDataset();            
             ev.EventStartDate = observationEvent.StartDate;
             ev.EventEndDate = observationEvent.EndDate;
             ev.SamplingProtocol = observationEvent.SamplingProtocol;
-            ev.SurveyLocation = observationEvent.Location.ToLocation();
+            ev.SurveyLocation = observationEvent?.Location?.ToLocation();
             //ev.LocationProtected = ?
             //ev.EventType = ?
             //ev.Weather = ?
@@ -111,6 +107,16 @@ namespace SOS.DataStewardship.Api.Extensions
 
             return ev;
         }       
+
+        public static EventDataset ToEventDataset(this SOS.Lib.Models.Processed.DataStewardship.Event.EventDataset source)
+        {
+            if (source == null) return null;
+            return new EventDataset
+            {
+                Identifier = source.Identifier,
+                Title = source.Title,
+            };
+        }
 
         public static EventModel ToEventModel(this Observation observation, IEnumerable<string> occurrenceIds)
         {
