@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
@@ -56,5 +58,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> VerifyCollectionAsync();
 
         Task<List<ObservationDataset>> GetDatasetsByIds(IEnumerable<string> ids);
+
+        Task<bool> DeleteAllDocumentsAsync();
     }
 }
