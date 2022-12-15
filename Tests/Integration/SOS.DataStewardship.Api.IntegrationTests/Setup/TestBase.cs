@@ -1,6 +1,10 @@
-﻿using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+﻿using Microsoft.Extensions.Options;
+using SOS.Lib.JsonConverters;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Setup;
 
@@ -9,6 +13,16 @@ public class TestBase
 {
     protected HttpClient Client => _factory.CreateClient();
     protected readonly DataStewardshipApiWebApplicationFactory<Program> _factory;
+    protected readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        PropertyNameCaseInsensitive = true,
+        Converters = {
+            new JsonStringEnumConverter(),
+            new GeoShapeConverter(),
+            new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+        }
+    };
 
     public TestBase(DataStewardshipApiWebApplicationFactory<Program> webApplicationFactory)
     {

@@ -10,7 +10,7 @@ public class DatasetTests : TestBase
     [Fact]
     public async Task Get_DatasetById_Success()
     {
-        // Arrange data
+        // Arrange
         string identifier = "Abc";
         var datasets = Builder<ObservationDataset>.CreateListOfSize(1)
             .TheFirst(1)
@@ -22,42 +22,17 @@ public class DatasetTests : TestBase
         await AddDatasetsToElasticsearchAsync(datasets);        
 
         // Act
-        var response = await Client.GetFromJsonAsync<Dataset>($"datastewardship/datasets/{identifier}");
+        var response = await Client.GetFromJsonAsync<Dataset>($"datastewardship/datasets/{identifier}", jsonSerializerOptions);
 
         // Assert        
         response.Should().NotBeNull();
         response.Identifier.Should().Be("Abc");
-    }
-
-    /// <remarks>
-    /// There is a bug when serializing enums
-    /// </remarks>    
-    [Fact]
-    public async Task Bug_Get_DatasetById_with_json_enum_serialization()
-    {
-        // Arrange data
-        var datasets = Builder<ObservationDataset>.CreateListOfSize(1)
-            .TheFirst(1)
-                .With(m => m.Identifier = "Abc")
-                .With(m => m.Creator = new Lib.Models.Processed.DataStewardship.Common.Organisation { OrganisationCode = "A", OrganisationID = "B" })
-                .With(m => m.Purpose = null)
-                .With(m => m.AccessRights = Lib.Models.Processed.DataStewardship.Enums.AccessRights.Publik)
-            .Build();
-        await AddDatasetsToElasticsearchAsync(datasets);
-        string identifier = "abc";
-
-        // Act
-        var response = await Client.GetFromJsonAsync<Dataset>($"datastewardship/datasets/{identifier}");
-
-        // Assert        
-        response.Should().NotBeNull();
-        response.Identifier.Should().Be("Abc");
-    }
+    }  
 
     [Fact]
     public async Task Post_DatasetBySearch_Success()
     {
-        // Arrange data
+        // Arrange
         string identifier = "Abc";
         var datasets = Builder<ObservationDataset>.CreateListOfSize(1)
             .TheFirst(1)
@@ -77,8 +52,8 @@ public class DatasetTests : TestBase
         var body = new DatasetFilter { DatasetList = new List<string> { "Abc" } };
         
         // Act
-        var response = await Client.PostAsJsonAsync($"datastewardship/datasets", body);
-        var pageResult = await response.Content.ReadFromJsonAsync<PagedResult<Dataset>>();
+        var response = await Client.PostAsJsonAsync($"datastewardship/datasets", body, jsonSerializerOptions);
+        var pageResult = await response.Content.ReadFromJsonAsync<PagedResult<Dataset>>(jsonSerializerOptions);
 
         // Assert        
         pageResult.Records.First().Identifier.Should().Be("Abc");        

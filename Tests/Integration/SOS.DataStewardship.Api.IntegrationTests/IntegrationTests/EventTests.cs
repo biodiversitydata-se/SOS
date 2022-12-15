@@ -12,7 +12,7 @@ public class EventTests : TestBase
     [Fact]
     public async Task Get_EventById_Success()
     {
-        // Arrange data
+        // Arrange
         string identifier = "Abc";
         var events = Builder<ObservationEvent>.CreateListOfSize(1)
             .TheFirst(1)
@@ -21,7 +21,7 @@ public class EventTests : TestBase
         await AddEventsToElasticsearchAsync(events);
 
         // Act
-        var response = await Client.GetFromJsonAsync<EventModel>($"datastewardship/events/{identifier}");
+        var response = await Client.GetFromJsonAsync<EventModel>($"datastewardship/events/{identifier}", jsonSerializerOptions);
 
         // Assert        
         response.Should().NotBeNull();
@@ -31,7 +31,7 @@ public class EventTests : TestBase
     [Fact]
     public async Task Post_EventBySearch_Success()
     {
-        // Arrange data        
+        // Arrange        
         var events = Builder<ObservationEvent>.CreateListOfSize(1)
             .TheFirst(1)
                 .With(m => m.EventId = "Abc")
@@ -60,8 +60,8 @@ public class EventTests : TestBase
         var body = new EventsFilter { DatasetList = new List<string> { "Cde" } };
 
         // Act
-        var response = await Client.PostAsJsonAsync($"datastewardship/events", body);
-        var pageResult = await response.Content.ReadFromJsonAsync<PagedResult<EventModel>>();
+        var response = await Client.PostAsJsonAsync($"datastewardship/events", body, jsonSerializerOptions);
+        var pageResult = await response.Content.ReadFromJsonAsync<PagedResult<EventModel>>(jsonSerializerOptions);
 
         // Assert        
         pageResult.Records.First().EventID.Should().Be("Abc");

@@ -231,9 +231,9 @@ namespace SOS.DataStewardship.Api.Extensions
             occurrence.EventID = observation.Event.EventId;
             occurrence.DatasetIdentifier = observation.DataStewardshipDatasetId;
             occurrence.IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas; // todo - implement when the value list is defined
-            occurrence.ObservationCertainty = Convert.ToDecimal(observation.Location.CoordinateUncertaintyInMeters);
-            occurrence.ObservationPoint = observation.Location.Point;
-            occurrence.ObservationPointTest = new GeometryObject
+            occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDecimal(observation.Location.CoordinateUncertaintyInMeters);
+            occurrence.ObservationPoint = observation?.Location?.Point;
+            occurrence.ObservationPointTest = observation?.Location?.Point?.Coordinates == null ? null : new GeometryObject
             {
                 Type = "point",
                 Coordinates = new double[] { observation.Location.Point.Coordinates.Longitude, observation.Location.Point.Coordinates.Latitude }
@@ -249,7 +249,7 @@ namespace SOS.DataStewardship.Api.Extensions
             {
                 occurrence.QuantityVariable = GetQuantityVariableEnum((UnitId)observation.Occurrence.OrganismQuantityUnit.Id);
             }
-            occurrence.Taxon = observation.Taxon.ToTaxonModel();
+            occurrence.Taxon = observation?.Taxon?.ToTaxonModel();
             //occurrence.Unit = ?
             occurrence.Organism = new OrganismVariable
             {
