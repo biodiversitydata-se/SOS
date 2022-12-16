@@ -2,42 +2,30 @@
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Logging.Abstractions;
-using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Repositories.Resource;
-using static SOS.Lib.Configuration.Shared.ElasticSearchConfiguration;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Setup;
 
-public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<T>, IAsyncLifetime where T : class
-{    
-    public TestcontainerDatabase ElasticsearchContainer { get; set; }
-    //public TestcontainerDatabase MongoDbContainer { get; set; }    
+public sealed class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<T>, IAsyncLifetime where T : class
+{
+
+    private readonly TestcontainerDatabase _elasticsearchContainer = new TestcontainersBuilder<ElasticsearchTestcontainer>()
+        .WithDatabase(new ElasticsearchTestcontainerConfiguration { Password = "secret" })
+        .Build();
+
     public IObservationDatasetRepository? ObservationDatasetRepository { get; private set; }
+
     public IObservationEventRepository? ObservationEventRepository { get; private set; }
-    public IProcessedObservationCoreRepository? ProcessedObservationCoreRepository { get; private set; }    
 
-    public DataStewardshipApiWebApplicationFactory()
+    public IProcessedObservationCoreRepository? ProcessedObservationCoreRepository { get; private set; }
+
+    static DataStewardshipApiWebApplicationFactory()
     {
-        //Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "DEV");
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");        
-        var elasticsearchConfiguration = new ElasticsearchTestcontainerConfiguration { Password = "secret" };
-        ElasticsearchContainer = new TestcontainersBuilder<ElasticsearchTestcontainer>()
-                .WithDatabase(elasticsearchConfiguration)
-                .WithCleanUp(true)
-                .Build();
-
-        //var mongoDbNoAuthConfiguration = new MongoDbTestcontainerConfiguration { Database = "db", Username = null, Password = null };
-        //var mongodbConfiguration = new MongoDbTestcontainerConfiguration { Database = "db", Username = "mongo", Password = "mongo" };
-        //MongoDbContainer = new TestcontainersBuilder<MongoDbTestcontainer>()
-        //        .WithDatabase(mongodbConfiguration)
-        //        .WithCleanUp(true)                
-        //        .Build();
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -50,29 +38,27 @@ public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<
                 ((IList<AuthenticationSchemeBuilder>)options.Schemes).Clear();
             });
 
-            services.AddAuthentication(TestAuthHandler.AuthenticationScheme)
-                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, options => { });
-            services.Replace(ServiceDescriptor.Scoped<IObservationDatasetRepository>(x => ObservationDatasetRepository));
-            services.Replace(ServiceDescriptor.Scoped<IObservationEventRepository>(x => ObservationEventRepository));
-            services.Replace(ServiceDescriptor.Scoped<IProcessedObservationCoreRepository>(x => ProcessedObservationCoreRepository));            
+            services.AddAuthentication(TestAuthHandler.AuthenticationScheme).AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, _ => { });
+            services.Replace(ServiceDescriptor.Scoped<IObservationDatasetRepository>(_ => ObservationDatasetRepository));
+            services.Replace(ServiceDescriptor.Scoped<IObservationEventRepository>(_ => ObservationEventRepository));
+            services.Replace(ServiceDescriptor.Scoped<IProcessedObservationCoreRepository>(_ => ProcessedObservationCoreRepository));
         });
     }
-
-    private async Task<ElasticClient> InitializeElasticsearchAsync()
+    
+    public async Task InitializeAsync()
     {
-        await ElasticsearchContainer.StartAsync().ConfigureAwait(false);
-        var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(this.ElasticsearchContainer.ConnectionString))
+        await _elasticsearchContainer.StartAsync()
+            .ConfigureAwait(false);
+        
+        var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(_elasticsearchContainer.ConnectionString))
             .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
             .EnableApiVersioningHeader()
-            .BasicAuthentication(this.ElasticsearchContainer.Username, this.ElasticsearchContainer.Password)
-        .EnableDebugMode());
-        return elasticClient;
-    }
-
-    private async Task InitializeElasticsearchRepositoriesAsync(ElasticClient elasticClient)
-    {        
-        string[] strHosts = elasticClient.ConnectionSettings.ConnectionPool.Nodes.Select(m => m.Uri.ToString()).ToArray();
-        ElasticSearchConfiguration elasticConfiguration = new ElasticSearchConfiguration()
+            .BasicAuthentication(_elasticsearchContainer.Username, _elasticsearchContainer.Password)
+            .EnableDebugMode());
+        
+        var elasticClientManager = new ElasticClientTestManager(elasticClient);
+        
+        var elasticConfiguration = new ElasticSearchConfiguration
         {
             WriteBatchSize = 1000,
             RequestTimeout = 300,
@@ -84,58 +70,31 @@ public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<
             NumberOfReplicas = 0,
             IndexPrefix = "",
             Clusters = null
-            //Clusters = new[]
-            //{
-            //    new Cluster()
-            //    {
-            //        Hosts = strHosts                    
-            //    }
-            //}
         };
-
-        var elasticClientManager = new ElasticClientTestManager(elasticClient);
-        var processClientMock = new Mock<IProcessClient>();
-        var processedConfiguration = new ProcessedConfiguration();
-        processedConfiguration.ActiveInstance = 0;
+        
+        var telemetryClient = new TelemetryClient(new TelemetryConfiguration { DisableTelemetry = true });
+        
         var processedConfigurationCacheMock = new Mock<ICache<string, ProcessedConfiguration>>();
-        processedConfigurationCacheMock.Setup(x => x.GetAsync(It.IsAny<string>()))
-            .Returns(Task.FromResult(processedConfiguration));
+        processedConfigurationCacheMock.Setup(expression => expression.GetAsync(It.IsAny<string>()))
+            .Returns(Task.FromResult(new ProcessedConfiguration { ActiveInstance = 1 }));
+        
+        ObservationDatasetRepository = new ObservationDatasetRepository(elasticClientManager, elasticConfiguration, processedConfigurationCacheMock.Object, NullLogger<ObservationDatasetRepository>.Instance);
+        await ObservationDatasetRepository.ClearCollectionAsync()
+            .ConfigureAwait(false);
+        
+        ObservationEventRepository = new ObservationEventRepository(elasticClientManager, elasticConfiguration, processedConfigurationCacheMock.Object,  NullLogger<ObservationEventRepository>.Instance);
+        await ObservationEventRepository.ClearCollectionAsync()
+            .ConfigureAwait(false);
 
-        var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClientMock.Object, new NullLogger<ProcessedConfigurationRepository>()));
-        ObservationDatasetRepository = new ObservationDatasetRepository(elasticClientManager, elasticConfiguration, processedConfigurationCacheMock.Object, new NullLogger<ObservationDatasetRepository>());
-        await ObservationDatasetRepository.ClearCollectionAsync();
-        ObservationEventRepository = new ObservationEventRepository(elasticClientManager, elasticConfiguration, processedConfigurationCacheMock.Object, new NullLogger<ObservationEventRepository>());
-        await ObservationEventRepository.ClearCollectionAsync();
-        var telemetryClient = new TelemetryClient();
-        TelemetryConfiguration.Active.DisableTelemetry = true;
-        ProcessedObservationCoreRepository = new ProcessedObservationCoreRepository(elasticClientManager, elasticConfiguration, processedConfigurationCacheMock.Object, telemetryClient, new NullLogger<ProcessedObservationCoreRepository>());
-        await ProcessedObservationCoreRepository.ClearCollectionAsync(false);
-        await ProcessedObservationCoreRepository.ClearCollectionAsync(true);
+        ProcessedObservationCoreRepository = new ProcessedObservationCoreRepository(elasticClientManager, elasticConfiguration, processedConfigurationCacheMock.Object, telemetryClient, NullLogger<ProcessedObservationCoreRepository>.Instance);
+        await ProcessedObservationCoreRepository.ClearCollectionAsync(false)
+            .ConfigureAwait(false);
+        await ProcessedObservationCoreRepository.ClearCollectionAsync(true)
+            .ConfigureAwait(false);
     }
 
-    //private async Task InitializeMongoDbAsync()
-    //{
-    //    await MongoDbContainer.StartAsync().ConfigureAwait(false);
-    //    var mongoDbClient = new MongoClient(MongoDbContainer.ConnectionString);
-    //    var mongoDbDatabase = mongoDbClient.GetDatabase(this.MongoDbContainer.Database);
-    //}
-
-    public async Task InitializeAsync()
+    public new Task DisposeAsync()
     {
-        //await InitializeMongoDbAsync();
-        var elasticClient = await InitializeElasticsearchAsync();
-        await InitializeElasticsearchRepositoriesAsync(elasticClient);
+        return Task.WhenAll(base.DisposeAsync().AsTask(), _elasticsearchContainer.DisposeAsync().AsTask());
     }
-
-    public new async Task DisposeAsync()
-    {
-        await ElasticsearchContainer.DisposeAsync();
-        //await MongoDbContainer.DisposeAsync();        
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        base.Dispose(disposing);
-    }
-
 }
