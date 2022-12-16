@@ -27,6 +27,7 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 
 ## API changes
 - [Changelog](CHANGELOG.md)
+- [Obsolete properties](Docs/ObsoleteProperties.md)
 
 ## Dev documentation
 - [How to install SOS on your own machine](Docs/Install.md)
