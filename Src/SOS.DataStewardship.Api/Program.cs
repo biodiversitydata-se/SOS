@@ -1,11 +1,7 @@
-using Autofac.Core;
 using Microsoft.ApplicationInsights.Extensibility;
 using SOS.DataStewardship.Api.Extensions;
 using SOS.Lib.JsonConverters;
-using Swashbuckle.AspNetCore.SwaggerUI;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using static CSharpFunctionalExtensions.Result;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var logger = NLogBuilder.ConfigureNLog($"nlog.{env}.config").GetCurrentClassLogger();
