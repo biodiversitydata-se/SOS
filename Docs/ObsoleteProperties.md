@@ -3,8 +3,8 @@ The following properties are obsolete and will be removed in next SOS release (j
 
 
 ## Observation
-| Property                                                     | Replaced by                                                    |
-| ------------------------------------------------------------ | -------------------------------------------------------------- |
+| Obsolete Property                                            | Replaced by                                                    |
+| :----------------------------------------------------------- | :------------------------------------------------------------- |
 | Identification.Validated                                     | Identification.Verified                                        |
 | Identification.ValidationStatus                              | Identification.VerificationStatus                              |
 | Protected                                                    | Sensitive                                                      |
