@@ -514,10 +514,9 @@ namespace SOS.Harvest.DarwinCore
                     Converters = { new JsonStringEnumConverter() }
                 };
                 
-                var observationDatasetsV2 = JsonSerializer.Deserialize<List<DwcVerbatimObservationDatasetV2>>(jsonFileStream, jsonSerializerOptions);
-                for (int i= 0; i < observationDatasetsV2.Count; i++)
-                    observationDatasetsV2[i].Id = i+1;
-                var observationDatasets = observationDatasetsV2.Select(m => m.ToDwcVerbatimObservationDataset()).ToList();
+                var observationDatasets = JsonSerializer.Deserialize<List<DwcVerbatimObservationDataset>>(jsonFileStream, jsonSerializerOptions);
+                for (int i= 0; i < observationDatasets.Count; i++)
+                    observationDatasets[i].Id = i+1;
                 return observationDatasets;
 
                 //// XML - todo

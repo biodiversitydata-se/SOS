@@ -47,8 +47,12 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 Description = "description",
                 Title = "Svensk Fågeltaxering: Standardrutterna",
                 Spatial = "Sverige",
-                ProjectID = "ProjectId",
-                ProjectCode = "ProjectCode",
+                Project = new Project
+                {
+                    ProjectID = "ProjectId",
+                    ProjectCode = "ProjectCode",
+                    ProjectType = ProjectType.Delprogram
+                },                
                 Methodology = new List<Methodology>
                 {
                     new Methodology()

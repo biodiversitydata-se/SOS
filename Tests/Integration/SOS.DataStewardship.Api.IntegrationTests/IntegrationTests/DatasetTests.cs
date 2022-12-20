@@ -14,8 +14,7 @@ public class DatasetTests : TestBase
         string identifier = "Abc";
         var datasets = Builder<ObservationDataset>.CreateListOfSize(1)
             .TheFirst(1)
-                .With(m => m.Identifier = identifier)
-                .With(m => m.Creator = new Lib.Models.Processed.DataStewardship.Common.Organisation { OrganisationCode = "A", OrganisationID = "B" })
+                .With(m => m.Identifier = identifier)                
                 .With(m => m.Purpose = null)
                 .With(m => m.AccessRights = null)
             .Build();
@@ -36,8 +35,7 @@ public class DatasetTests : TestBase
         string identifier = "Abc";
         var datasets = Builder<ObservationDataset>.CreateListOfSize(1)
             .TheFirst(1)
-                .With(m => m.Identifier = identifier)
-                .With(m => m.Creator = new Lib.Models.Processed.DataStewardship.Common.Organisation { OrganisationCode = "A", OrganisationID = "B" })
+                .With(m => m.Identifier = identifier)                
                 .With(m => m.Purpose = null)
                 .With(m => m.AccessRights = null)
             .Build();

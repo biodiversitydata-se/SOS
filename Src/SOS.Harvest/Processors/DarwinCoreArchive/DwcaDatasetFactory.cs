@@ -49,8 +49,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     Metadatalanguage = verbatimDataset.Metadatalanguage,
                     Methodology = verbatimDataset.Methodology,
                     OwnerinstitutionCode = verbatimDataset.OwnerinstitutionCode,
-                    ProjectCode = verbatimDataset.ProjectCode,
-                    ProjectId = verbatimDataset.ProjectId,
+                    Project = verbatimDataset.Project,                    
                     Publisher = verbatimDataset.Publisher,
                     Purpose = verbatimDataset.Purpose,
                     Spatial = verbatimDataset.Spatial,
@@ -64,6 +63,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             {
                 throw new Exception($"Error when processing DwC verbatim dataset with Identifier={verbatimDataset.Identifier ?? "null"}", e);
             }
-        }        
+        }
     }
 }

@@ -23,5 +23,4 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Enums
         [EnumMember(Value = "ej offentlig")]
         EjOffentlig = 2
     }
-
 }

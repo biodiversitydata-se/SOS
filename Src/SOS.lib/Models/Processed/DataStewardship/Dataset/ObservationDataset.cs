@@ -1,11 +1,5 @@
-﻿using Nest;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Enums;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
@@ -21,7 +15,7 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         {
             get => Identifier;
             set { }
-        }        
+        }
 
         /// <summary>
         /// The dataset id-number within the metadata catalogue administered by the authority that is responsible for the information.
@@ -39,14 +33,14 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         public string DataStewardship { get; set; }
 
         /// <summary>
-        /// Unique id for the project within which the dataset was collected.
+        /// Project
         /// </summary>
-        public string ProjectId { get; set; }
+        public Project Project { get; set; }
 
         /// <summary>
-        /// Name of the project within which the dataset was collected. Can sometimes be the same as the name of the dataset.
-        /// </summary>
-        public string ProjectCode { get; set; }
+        /// The program area within environmental monitoring that the dataset belongs to.
+        /// </summary>                
+        public ProgrammeArea? ProgrammeArea { get; set; }
 
         /// <summary>
         /// Assigner
@@ -56,7 +50,7 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         /// <summary>
         /// Creator
         /// </summary>
-        public Organisation Creator { get; set; }
+        public List<Organisation> Creator { get; set; }
 
         /// <summary>
         /// OwnerinstitutionCode
@@ -102,6 +96,11 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         /// Information about whether the whole, parts of, or nothing in the dataset is publically available.
         /// </summary>
         public AccessRights? AccessRights { get; set; }
+
+        /// <summary>
+        /// When the dataset is not public or access is restricted  (see the property accessRights), how and/or why is described here.
+        /// </summary>
+        public string DescriptionAccessRights { get; set; }
 
         /// <summary>
         /// The language that is used when writing metadata about the dataset.
