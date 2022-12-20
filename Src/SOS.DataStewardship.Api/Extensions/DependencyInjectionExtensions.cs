@@ -27,7 +27,6 @@ internal static class DependencyInjectionExtensions
         
         webApplicationBuilder.Services.AddSingleton(webApplicationBuilder.Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
 
-
         // Cache
         webApplicationBuilder.Services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
         webApplicationBuilder.Services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();

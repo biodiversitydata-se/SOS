@@ -1,7 +1,3 @@
-using SOS.DataStewardship.Api.Models;
-using SOS.DataStewardship.Api.Models.Enums;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 

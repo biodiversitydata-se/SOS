@@ -3,10 +3,9 @@ using SOS.DataStewardship.Api.Modules.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using Swashbuckle.AspNetCore.Annotations;
 using SOS.DataStewardship.Api.Managers.Interfaces;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using SOS.Lib.JsonConverters;
 using SOS.DataStewardship.Api.Models.Enums;
+using SOS.DataStewardship.Api.Extensions;
+using System.Data;
 
 namespace SOS.DataStewardship.Api.Modules;
 
@@ -101,10 +100,11 @@ public class DataStewardshipModule : IModule
         try
         {
             var dataset = await dataStewardshipManager.GetDatasetByIdAsync(id);
-            if (dataset == null) return Results.NotFound();            
-            return Results.Ok(dataset);
+            if (dataset == null) return Results.NotFound();      
+            
+            return exportMode.Equals(ExportMode.Csv) ? Results.File(dataset.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(dataset);
         }
-        catch (Exception ex)
+        catch
         {
             return Results.BadRequest("Failed");
         }
@@ -126,10 +126,12 @@ public class DataStewardshipModule : IModule
     {
         try
         {
-            var datasets = await dataStewardshipManager.GetDatasetsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));            
-            return Results.Ok(datasets);
+            var datasets = await dataStewardshipManager.GetDatasetsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));
+            if (!datasets?.Records?.Any() ?? true) return Results.NotFound();
+
+            return exportMode.Equals(ExportMode.Csv) ? Results.File(datasets.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(datasets);
         }
-        catch (Exception ex)
+        catch
         {
             return Results.BadRequest("Failed");
         }
@@ -148,10 +150,11 @@ public class DataStewardshipModule : IModule
         try
         {
             var eventModel = await dataStewardshipManager.GetEventByIdAsync(id);
-            if (eventModel == null) return Results.NotFound();            
-            return Results.Ok(eventModel);
+            if (eventModel == null) return Results.NotFound();
+
+            return exportMode.Equals(ExportMode.Csv) ? Results.File(eventModel.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(eventModel);
         }
-        catch (Exception ex)
+        catch
         {
             return Results.BadRequest("Failed");
         }
@@ -173,10 +176,12 @@ public class DataStewardshipModule : IModule
     {
         try
         {
-            var eventModels = await dataStewardshipManager.GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));            
-            return Results.Ok(eventModels);
+            var eventModels = await dataStewardshipManager.GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));
+            if (!eventModels?.Records?.Any() ?? true) return Results.NotFound();
+
+            return exportMode.Equals(ExportMode.Csv) ? Results.File(eventModels.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(eventModels);
         }
-        catch (Exception ex)
+        catch
         {
             return Results.BadRequest("Failed");
         }
@@ -195,10 +200,10 @@ public class DataStewardshipModule : IModule
         try
         {
             var occurrenceModel = await dataStewardshipManager.GetOccurrenceByIdAsync(id);
-            if (occurrenceModel == null) return Results.NotFound();                        
-            return Results.Ok(occurrenceModel);
+            if (occurrenceModel == null) return Results.NotFound();
+            return exportMode.Equals(ExportMode.Csv) ? Results.File(occurrenceModel.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(occurrenceModel);
         }
-        catch (Exception ex)
+        catch
         {
             return Results.BadRequest("Failed");
         }
@@ -222,17 +227,12 @@ public class DataStewardshipModule : IModule
         {
             var occurrences = await dataStewardshipManager.GetOccurrencesBySearchAsync(filter, 
                 skip.GetValueOrDefault(0), 
-                take.GetValueOrDefault(20));            
-            return Results.Ok(occurrences);
+                take.GetValueOrDefault(20));
+            return occurrences.Equals(ExportMode.Csv) ? Results.File(occurrences.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(occurrences);
         }
-        catch (Exception ex)
+        catch
         {
             return Results.BadRequest("Failed");
         }
     }
-
-
-
-
-
 }

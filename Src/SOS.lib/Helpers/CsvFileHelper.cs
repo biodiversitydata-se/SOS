@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NReco.Csv;
@@ -56,6 +55,18 @@ namespace SOS.Lib.Helpers
             _streamWriter?.Dispose();
         }
 
+        /// <summary>
+        /// Flush writer
+        /// </summary>
+        public void Flush()
+        {
+            _streamWriter.Flush();
+        }
+
+        /// <summary>
+        /// Flush writer
+        /// </summary>
+        /// <returns></returns>
         public async Task FlushAsync()
         {
             await _streamWriter.FlushAsync();
