@@ -42,4 +42,10 @@
     <ProjectReference Include="..\..\..\Src\SOS.DataStewardship.Api\SOS.DataStewardship.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Resources\mongodb-sos-dev.gz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
