@@ -31,7 +31,7 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         /// <summary>
         /// Project
         /// </summary>
-        public Project Project { get; set; }
+        public List<Project> Project { get; set; }
 
         /// <summary>
         /// The program area within environmental monitoring that the dataset belongs to.

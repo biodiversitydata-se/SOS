@@ -36,7 +36,7 @@ namespace SOS.DataStewardship.Api.Models
         /// Project
         /// </summary>
         [DataMember(Name = "project")]
-        public Project Project { get; set; }        
+        public List<Project> Project { get; set; }        
 
         /// <summary>
         /// The program area within environmental monitoring that the dataset belongs to.

@@ -82,7 +82,7 @@ namespace SOS.DataStewardship.Api.Extensions
                     dataset.Identifier,
                     dataset.License,
                     dataset.Title,
-                    dataset.Project?.ToString(),
+                    dataset.Project?.FirstOrDefault()?.ToString(),
                     dataset.ProgrammeArea?.ToString(),
                     $"{dataset.Assigner?.OrganisationID}/{dataset.Assigner?.OrganisationCode}",
                     dataset.Creator?.Select(c => $"{c.OrganisationID}/{c.OrganisationCode}")?.Concat(),
@@ -95,8 +95,7 @@ namespace SOS.DataStewardship.Api.Extensions
                     dataset.StartDate.HasValue ? dataset.StartDate.Value.ToLongDateString() : string.Empty,
                     dataset.EndDate.HasValue ? dataset.EndDate.Value.ToLongDateString() : string.Empty,
                     dataset.Spatial,
-                    dataset.AccessRights?.ToString(),
-                    dataset.Project?.ToString(),
+                    dataset.AccessRights?.ToString(),                    
                     dataset.Metadatalanguage,
                     dataset.Language,
                     dataset.EventIds?.Concat(10)

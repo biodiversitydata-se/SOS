@@ -33,7 +33,7 @@ namespace SOS.DataStewardship.Api.Extensions
                 Metadatalanguage = dataset.Metadatalanguage,
                 Methodology = dataset.Methodology.ToMethodologies(),
                 OwnerinstitutionCode = dataset.OwnerinstitutionCode.ToOrganisation(),
-                Project = dataset.Project?.ToProject(),
+                Project = dataset.Project?.Select(m => m.ToProject())?.ToList(),
                 ProgrammeArea = dataset.ProgrammeArea.ToProgrammeAreaEnum(),
                 Publisher = dataset.Publisher.ToOrganisation(),
                 Purpose = dataset.Purpose.ToDatasetPurposeEnum(),
