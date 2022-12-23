@@ -48,18 +48,6 @@
         "FieldSet": "Extended"
     },
     {
-        "PropertyName": "Protected",
-        "PropertyPath": "Protected",
-        "DataType": "Boolean",
-        "DataTypeIsNullable": false,
-        "SwedishTitle": "Skyddad",
-        "EnglishTitle": "Protected",
-        "DwcName": "",
-        "DwcIdentifier": "",
-        "DependsOn": "Protected",
-        "FieldSet": ""
-    },
-    {
         "PropertyName": "Sensitive",
         "PropertyPath": "Sensitive",
         "DataType": "Boolean",
@@ -814,42 +802,6 @@
         "DwcName": "",
         "DwcIdentifier": "",
         "DependsOn": "Identification",
-        "FieldSet": ""
-    },
-    {
-        "PropertyName": "Validated",
-        "PropertyPath": "Identification.Validated",
-        "DataType": "Boolean",
-        "DataTypeIsNullable": false,
-        "SwedishTitle": "Validerad",
-        "EnglishTitle": "Verified",
-        "DwcName": "",
-        "DwcIdentifier": "",
-        "DependsOn": "Identification.Validated",
-        "FieldSet": ""
-    },
-    {
-        "PropertyName": "ValidationStatus",
-        "PropertyPath": "Identification.ValidationStatus",
-        "DataType": "String",
-        "DataTypeIsNullable": false,
-        "SwedishTitle": "Valideringsstatus",
-        "EnglishTitle": "Verification status",
-        "DwcName": "",
-        "DwcIdentifier": "",
-        "DependsOn": "Identification.ValidationStatus",
-        "FieldSet": ""
-    },
-    {
-        "PropertyName": "ValidationStatusId",
-        "PropertyPath": "Identification.ValidationStatus.Id",
-        "DataType": "Int32",
-        "DataTypeIsNullable": false,
-        "SwedishTitle": "Valideringsstatus Id",
-        "EnglishTitle": "Verification status Id",
-        "DwcName": "",
-        "DwcIdentifier": "",
-        "DependsOn": "Identification.ValidationStatus.Id",
         "FieldSet": ""
     },
     {
@@ -1933,18 +1885,6 @@
         "FieldSet": "Extended"
     },
     {
-        "PropertyName": "ProtectionLevel",
-        "PropertyPath": "Occurrence.ProtectionLevel",
-        "DataType": "Int32",
-        "DataTypeIsNullable": false,
-        "SwedishTitle": "Säkerhetsklass",
-        "EnglishTitle": "Protection level",
-        "DwcName": "",
-        "DwcIdentifier": "",
-        "DependsOn": "Occurrence.ProtectionLevel",
-        "FieldSet": ""
-    },
-    {
         "PropertyName": "SensitivityCategory",
         "PropertyPath": "Occurrence.SensitivityCategory",
         "DataType": "Int32",
@@ -2326,18 +2266,6 @@
         "DwcName": "associatedReferences",
         "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedReferences",
         "DependsOn": "Occurrence.AssociatedReferences",
-        "FieldSet": "AllWithValues"
-    },
-    {
-        "PropertyName": "IndividualId",
-        "PropertyPath": "Occurrence.IndividualId",
-        "DataType": "String",
-        "DataTypeIsNullable": false,
-        "SwedishTitle": "Individnummer",
-        "EnglishTitle": "Individual Id",
-        "DwcName": "",
-        "DwcIdentifier": "",
-        "DependsOn": "Occurrence.IndividualId",
         "FieldSet": "AllWithValues"
     },
     {
@@ -3287,30 +3215,6 @@
         "DwcIdentifier": "",
         "DependsOn": "Taxon.Attributes.ProtectedByLaw",
         "FieldSet": "Extended"
-    },
-    {
-        "PropertyName": "TaxonProtectionLevel",
-        "PropertyPath": "Taxon.Attributes.ProtectionLevel",
-        "DataType": "String",
-        "DataTypeIsNullable": false,
-        "SwedishTitle": "Artens säkerhetsklass",
-        "EnglishTitle": "Species sensitivity category",
-        "DwcName": "",
-        "DwcIdentifier": "",
-        "DependsOn": "Taxon.Attributes.ProtectionLevel",
-        "FieldSet": ""
-    },
-    {
-        "PropertyName": "TaxonProtectionLevelId",
-        "PropertyPath": "Taxon.Attributes.ProtectionLevel.Id",
-        "DataType": "Int32",
-        "DataTypeIsNullable": false,
-        "SwedishTitle": "Artens säkerhetsklass Id",
-        "EnglishTitle": "Species sensitivity category Id",
-        "DwcName": "",
-        "DwcIdentifier": "",
-        "DependsOn": "Taxon.Attributes.ProtectionLevel.Id",
-        "FieldSet": ""
     },
     {
         "PropertyName": "TaxonSensitivityCategory",
