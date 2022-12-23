@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Enums;
@@ -10,7 +11,7 @@ using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
-
+using System.Reflection;
 
 namespace SOS.Harvest.Harvesters
 {
@@ -50,7 +51,7 @@ namespace SOS.Harvest.Harvesters
             _geoRegionApiService = geoRegionApiService ?? throw new ArgumentNullException(nameof(geoRegionApiService));
             _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        }        
 
         /// <inheritdoc />
         public async Task<HarvestInfo> HarvestAreasAsync()
@@ -61,7 +62,7 @@ namespace SOS.Harvest.Harvesters
                 _logger.LogDebug("Start getting areas");
                 var featureCollection = await _geoRegionApiService.GetFeatureCollectionFromZipAsync(Enum.GetValues(typeof(AreaType)).Cast<int>(), 4326);
                 _logger.LogDebug("Finish getting areas");
-
+                
                 var areas = new List<Area>();
                 var areaGeometries = new Dictionary<string, Geometry>();
                 foreach (IFeature feature in featureCollection)
@@ -78,6 +79,7 @@ namespace SOS.Harvest.Harvesters
                     areas.Add(area);
                     areaGeometries.Add(area.Id, feature.Geometry);
                 }
+                //UseSimplifiedEconomicZoneOfSweden(areaGeometries); // used when creating database dumps that can be hosted publicly.
 
                 // Make sure we have an empty collection
                 if (areas.Count > 0 && await _areaProcessedRepository.DeleteCollectionAsync())
@@ -118,6 +120,17 @@ namespace SOS.Harvest.Harvesters
             }
 
             return harvestInfo;
+        }
+
+        private void UseSimplifiedEconomicZoneOfSweden(Dictionary<string, Geometry> geometries)
+        {
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var filePath = Path.Combine(assemblyPath, @"Resources\Gis\swedenExtentSimplified.geojson");
+            var str = File.ReadAllText(filePath);
+            var geoJsonReader = new GeoJsonReader();
+            var swedenExtentSimplified = geoJsonReader.Read<FeatureCollection>(str);
+            var id = geometries.Keys.FirstOrDefault(m => m.ToLower().Contains(AreaType.EconomicZoneOfSweden.ToString().ToLower()));
+            geometries[id] = swedenExtentSimplified.First().Geometry;
         }
     }
 }

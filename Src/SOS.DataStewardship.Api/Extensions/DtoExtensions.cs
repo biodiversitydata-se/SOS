@@ -21,8 +21,9 @@ namespace SOS.DataStewardship.Api.Extensions
             return new Dataset
             {
                 AccessRights = dataset.AccessRights.ToDatasetAccessRightsEnum(),
+                DescriptionAccessRights= dataset.DescriptionAccessRights,
                 Assigner = dataset.Assigner.ToOrganisation(),
-                Creator = new List<Organisation> { dataset.Creator.ToOrganisation() }, // todo - support list of creators in ES index.
+                Creator = dataset?.Creator?.Select(m => m.ToOrganisation())?.ToList(),
                 DataStewardship = dataset.DataStewardship,
                 Description = dataset.Description,
                 EndDate = dataset.EndDate,
@@ -32,8 +33,8 @@ namespace SOS.DataStewardship.Api.Extensions
                 Metadatalanguage = dataset.Metadatalanguage,
                 Methodology = dataset.Methodology.ToMethodologies(),
                 OwnerinstitutionCode = dataset.OwnerinstitutionCode.ToOrganisation(),
-                ProjectCode = dataset.ProjectCode,
-                ProjectID = dataset.ProjectId,
+                Project = dataset.Project?.Select(m => m.ToProject())?.ToList(),
+                ProgrammeArea = dataset.ProgrammeArea.ToProgrammeAreaEnum(),
                 Publisher = dataset.Publisher.ToOrganisation(),
                 Purpose = dataset.Purpose.ToDatasetPurposeEnum(),
                 Spatial = dataset.Spatial,
@@ -42,10 +43,27 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
+        public static Models.Project ToProject(this ProcessedDataStewardship.Common.Project project)
+        {
+            if (project == null) return null;
+            return new Models.Project
+            {
+                ProjectCode= project.ProjectCode,
+                ProjectID = project.ProjectId,
+                ProjectType = project.ProjectType == null ? null : (ProjectType)project.ProjectType
+            };
+        }
+
         public static Purpose? ToDatasetPurposeEnum(this ProcessedDataStewardship.Enums.Purpose? purposeEnum)
         {
             if (purposeEnum == null) return null;
             return (Purpose)purposeEnum;
+        }
+
+        public static ProgrammeArea? ToProgrammeAreaEnum(this ProcessedDataStewardship.Enums.ProgrammeArea? programmeArea)
+        {
+            if (programmeArea == null) return null;
+            return (ProgrammeArea)programmeArea;
         }
 
         public static AccessRights? ToDatasetAccessRightsEnum(this ProcessedDataStewardship.Enums.AccessRights? accessRightsEnum)

@@ -47,8 +47,14 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             Description = "Inventeringar av fladdermöss som görs inom det gemensamma delprogrammet för fladdermöss, dvs inom regional miljöövervakning, biogeografisk uppföljning och områdesvis uppföljning (uppföljning av skyddade områden).\r\n\r\nDet finns totalt tre projekt på Artportalen för det gemensamma delprogrammet och i detta projekt rapporteras data från den biogeografiska uppföljningen. Syftet med övervakningen är att följa upp hur antal och utbredning av olika arter förändras över tid. Övervakningen ger viktig information till bland annat EU-rapporteringar, rödlistningsarbetet och kan även användas i uppföljning av miljömålen och som underlag i ärendehandläggning. Den biogeografiska uppföljningen omfattar för närvarande några av de mest artrika fladdermuslokalerna i de olika biogeografiska regionerna i Sverige. Dessa inventeras vartannat år. Ett fåartsområde för fransfladdermus i norra Sverige samt några övervintringslokaler ingår också i övervakningen.",
             Title = "Fladdermöss",
             Spatial = "Sverige",
-            ProjectID = "Artportalen ProjectId:3606",
-            ProjectCode = "Fladdermöss - gemensamt delprogram (biogeografisk uppföljning)",
+            Project = new List<Project> {
+                new Project
+                {
+                    ProjectID = "Artportalen ProjectId:3606",
+                    ProjectCode = "Fladdermöss - gemensamt delprogram (biogeografisk uppföljning)",
+                    ProjectType = ProjectType.Artportalenprojekt
+                }
+            },
             Methodology = new List<Methodology>
             {
                 new Methodology

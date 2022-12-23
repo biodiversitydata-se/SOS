@@ -33,16 +33,17 @@ namespace SOS.DataStewardship.Api.Models
         public string Title { get; set; }
 
         /// <summary>
-        /// Unique id for the project within which the dataset was collected.
+        /// Project
         /// </summary>
-        [DataMember(Name="projectID")]
-        public string ProjectID { get; set; }
+        [DataMember(Name = "project")]
+        public List<Project> Project { get; set; }        
 
         /// <summary>
-        /// Name of the project within which the dataset was collected. Can sometimes be the same as the name of the dataset.
-        /// </summary>
-        [DataMember(Name="projectCode")]
-        public string ProjectCode { get; set; }
+        /// The program area within environmental monitoring that the dataset belongs to.
+        /// </summary>        
+        [Required]
+        [DataMember(Name = "programmeArea")]
+        public ProgrammeArea? ProgrammeArea { get; set; }
 
         /// <summary>
         /// The organisation that orders the data collection.
@@ -53,8 +54,7 @@ namespace SOS.DataStewardship.Api.Models
 
         /// <summary>
         /// The organisation responsible for the data collection. More than  one organisation can be given here.
-        /// </summary>
-        /// <value>The organisation responsible for the data collection. More than  one organisation can be given here.</value>
+        /// </summary>        
         [Required]
         [DataMember(Name = "creator")]
         public List<Organisation> Creator { get; set; }
@@ -127,6 +127,12 @@ namespace SOS.DataStewardship.Api.Models
         [Required]
         [DataMember(Name="accessRights")]
         public AccessRights? AccessRights { get; set; }
+
+        /// <summary>
+        /// When the dataset is not public or access is restricted  (see the property accessRights), how and/or why is described here.
+        /// </summary>        
+        [DataMember(Name = "descriptionAccessRights")]
+        public string DescriptionAccessRights { get; set; }
 
         /// <summary>
         /// The language that is used when writing metadata about the dataset.

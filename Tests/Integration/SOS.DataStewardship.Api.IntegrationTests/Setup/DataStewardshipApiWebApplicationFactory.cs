@@ -2,26 +2,28 @@
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Logging.Abstractions;
+using MongoDB.Driver;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
-using static SOS.Lib.Configuration.Shared.ElasticSearchConfiguration;
+using System.Reflection;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Setup;
 
 public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<T>, IAsyncLifetime where T : class
 {    
     public TestcontainerDatabase ElasticsearchContainer { get; set; }
-    //public TestcontainerDatabase MongoDbContainer { get; set; }    
+    public TestcontainerDatabase MongoDbContainer { get; set; }    
     public IObservationDatasetRepository? ObservationDatasetRepository { get; private set; }
     public IObservationEventRepository? ObservationEventRepository { get; private set; }
     public IProcessedObservationCoreRepository? ProcessedObservationCoreRepository { get; private set; }    
-
+    public IProcessClient? ProcessClient { get; private set; }
     public DataStewardshipApiWebApplicationFactory()
     {
         //Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "DEV");
@@ -33,11 +35,11 @@ public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<
                 .Build();
 
         //var mongoDbNoAuthConfiguration = new MongoDbTestcontainerConfiguration { Database = "db", Username = null, Password = null };
-        //var mongodbConfiguration = new MongoDbTestcontainerConfiguration { Database = "db", Username = "mongo", Password = "mongo" };
-        //MongoDbContainer = new TestcontainersBuilder<MongoDbTestcontainer>()
-        //        .WithDatabase(mongodbConfiguration)
-        //        .WithCleanUp(true)                
-        //        .Build();
+        var mongodbConfiguration = new MongoDbTestcontainerConfiguration { Database = "db", Username = "mongo", Password = "mongo" };
+        MongoDbContainer = new TestcontainersBuilder<MongoDbTestcontainer>()
+                .WithDatabase(mongodbConfiguration)
+                .WithCleanUp(true)                
+                .Build();                
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -54,7 +56,8 @@ public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, options => { });
             services.Replace(ServiceDescriptor.Scoped<IObservationDatasetRepository>(x => ObservationDatasetRepository));
             services.Replace(ServiceDescriptor.Scoped<IObservationEventRepository>(x => ObservationEventRepository));
-            services.Replace(ServiceDescriptor.Scoped<IProcessedObservationCoreRepository>(x => ProcessedObservationCoreRepository));            
+            services.Replace(ServiceDescriptor.Scoped<IProcessedObservationCoreRepository>(x => ProcessedObservationCoreRepository));
+            services.Replace(ServiceDescriptor.Singleton<IProcessClient>(x => ProcessClient));
         });
     }
 
@@ -113,16 +116,27 @@ public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<
         await ProcessedObservationCoreRepository.ClearCollectionAsync(true);
     }
 
-    //private async Task InitializeMongoDbAsync()
-    //{
-    //    await MongoDbContainer.StartAsync().ConfigureAwait(false);
-    //    var mongoDbClient = new MongoClient(MongoDbContainer.ConnectionString);
-    //    var mongoDbDatabase = mongoDbClient.GetDatabase(this.MongoDbContainer.Database);
-    //}
+    private async Task InitializeMongoDbAsync()
+    {
+        var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var filePath = Path.Combine(assemblyPath, @"Resources\mongodb-sos-dev.gz");
+        var mongoDbBackupBytes = await File.ReadAllBytesAsync(filePath);        
+
+        await MongoDbContainer.StartAsync().ConfigureAwait(false);
+        await MongoDbContainer.CopyFileAsync("/dump/mongodb-sos-dev.gz", mongoDbBackupBytes);
+        var cmds = new List<string>()
+        {
+            "mongorestore", "--gzip", "--archive=/dump/mongodb-sos-dev.gz", "--username", "mongo", "--password", "mongo"            
+        };
+
+        var execResult = await MongoDbContainer.ExecAsync(cmds);        
+        var mongoClientSettings = MongoClientSettings.FromConnectionString(MongoDbContainer.ConnectionString);
+        ProcessClient = new ProcessClient(mongoClientSettings, "sos-dev", 10000, 10000);
+    }
 
     public async Task InitializeAsync()
     {
-        //await InitializeMongoDbAsync();
+        await InitializeMongoDbAsync();
         var elasticClient = await InitializeElasticsearchAsync();
         await InitializeElasticsearchRepositoriesAsync(elasticClient);
     }
@@ -130,12 +144,11 @@ public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<
     public new async Task DisposeAsync()
     {
         await ElasticsearchContainer.DisposeAsync();
-        //await MongoDbContainer.DisposeAsync();        
+        await MongoDbContainer.DisposeAsync();        
     }
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
     }
-
 }

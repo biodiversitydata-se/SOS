@@ -12,7 +12,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using SOS.Lib.Models.Processed.Observation;
+//using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.Repositories.Processed
@@ -43,12 +43,20 @@ namespace SOS.Lib.Repositories.Processed
                         .KeyWordLowerCase(kwlc => kwlc.Identifier)                        
                         .KeyWordLowerCase(kwlc => kwlc.DataStewardship)
                         .KeyWordLowerCase(kwlc => kwlc.Title, false)
-                        .KeyWordLowerCase(kwlc => kwlc.ProjectId)
-                        .KeyWordLowerCase(kwlc => kwlc.ProjectCode, false)
+                        .KeyWordLowerCase(kwlc => kwlc.ProgrammeArea, false)
+                        .KeyWordLowerCase(kwlc => kwlc.DescriptionAccessRights, false)
                         .KeyWordLowerCase(kwlc => kwlc.Description, false)
                         .KeyWordLowerCase(kwlc => kwlc.Spatial, false)
                         .KeyWordLowerCase(kwlc => kwlc.Language, false)
                         .KeyWordLowerCase(kwlc => kwlc.Metadatalanguage, false)
+                        .Object<Project>(t => t
+                            .AutoMap()
+                            .Name(nm => nm.Project)
+                            .Properties(ps => ps
+                                .KeyWordLowerCase(kwlc => kwlc.ProjectId)
+                                .KeyWordLowerCase(kwlc => kwlc.ProjectCode)
+                            )
+                        )
                         .Object<Organisation>(t => t
                             .AutoMap()
                             .Name(nm => nm.Assigner)
@@ -187,7 +195,7 @@ namespace SOS.Lib.Repositories.Processed
             ILogger<ObservationDatasetRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             LiveMode = true;
-            _id = nameof(Observation); // The active instance should be the same as the ProcessedObservationRepository which uses the Observation type.
+            _id = nameof(Models.Processed.Observation.Observation); // The active instance should be the same as the ProcessedObservationRepository which uses the Observation type.
         }
 
         /// <inheritdoc />
