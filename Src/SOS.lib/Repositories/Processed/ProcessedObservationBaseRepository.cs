@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
@@ -59,6 +61,57 @@ namespace SOS.Lib.Repositories.Processed
                 ProtectionFilter.Sensitive => ProtectedIndexName,
                 _ => PublicIndexName
             };
+        }
+
+        /// <summary>
+        /// Execute search after query
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="searchIndex"></param>
+        /// <param name="searchDescriptor"></param>
+        /// <param name="pointInTimeId"></param>
+        /// <param name="searchAfter"></param>
+        /// <returns></returns>
+        protected async Task<ISearchResponse<T>> SearchAfterAsync<T>(
+           string searchIndex,
+           SearchDescriptor<T> searchDescriptor,
+           string pointInTimeId = null,
+           IEnumerable<object> searchAfter = null) where T : class
+        {
+            var keepAlive = "20m";
+            if (string.IsNullOrEmpty(pointInTimeId))
+            {
+                var pitResponse = await Client.OpenPointInTimeAsync(searchIndex, pit => pit
+                    .RequestConfiguration(c => c
+                        .RequestTimeout(TimeSpan.FromSeconds(30))
+                    )
+                    .KeepAlive(keepAlive)
+                );
+                pointInTimeId = pitResponse.Id;
+            }
+
+            // Retry policy by Polly
+            var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+            {
+                var queryResponse = await Client.SearchAsync<T>(searchDescriptor
+                   .Sort(s => s.Ascending(SortSpecialField.ShardDocumentOrder))
+                   .PointInTime(pointInTimeId, pit => pit.KeepAlive(keepAlive))
+                   .SearchAfter(searchAfter)
+                   .Size(ScrollBatchSize)
+                   .TrackTotalHits(false)
+                );
+
+                queryResponse.ThrowIfInvalid();
+
+                return queryResponse;
+            });
+
+            if (!string.IsNullOrEmpty(pointInTimeId) && (searchResponse?.Hits?.Count ?? 0) == 0)
+            {
+                await Client.ClosePointInTimeAsync(pitr => pitr.Id(pointInTimeId));
+            }
+
+            return searchResponse;
         }
 
         /// <summary>

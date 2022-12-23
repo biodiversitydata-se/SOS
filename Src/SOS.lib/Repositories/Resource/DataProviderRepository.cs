@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;

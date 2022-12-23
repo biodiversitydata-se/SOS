@@ -384,13 +384,14 @@ namespace SOS.Lib.Repositories.Processed
         /// Make sure all clusters are available
         /// </summary>
         /// <param name="indexName"></param>
+        /// <param name="clusterCount"></param>
         /// <exception cref="Exception"></exception>
         private void CheckNode(string indexName, int clusterCount)
         {
             var health = Client.Cluster.Health(indexName);
             if (health.NumberOfDataNodes != clusterCount)
             {
-                throw new Exception($"Only {health.NumberOfDataNodes} Elasticsearch nodes of expected {clusterCount} available.");
+                throw new Exception($"Expected {clusterCount} nodes, found {health.NumberOfDataNodes}.");
             }
         }
 
@@ -499,48 +500,6 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-        private async Task<ISearchResponse<T>> SearchAfterAsync<T>(
-           string searchIndex,
-           SearchDescriptor<T> searchDescriptor,
-           string pointInTimeId = null,
-           IEnumerable<object> searchAfter = null) where T : class
-        {
-            var keepAlive = "20m";
-            if (string.IsNullOrEmpty(pointInTimeId))
-            {
-                var pitResponse = await Client.OpenPointInTimeAsync(searchIndex, pit => pit
-                    .RequestConfiguration(c => c
-                        .RequestTimeout(TimeSpan.FromSeconds(30))
-                    )
-                    .KeepAlive(keepAlive)
-                );
-                pointInTimeId = pitResponse.Id;
-            }
-
-            // Retry policy by Polly
-            var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
-            {
-                var queryResponse = await Client.SearchAsync<T>(searchDescriptor
-                   .Sort(s => s.Ascending(SortSpecialField.ShardDocumentOrder))
-                   .PointInTime(pointInTimeId, pit => pit.KeepAlive(keepAlive))
-                   .SearchAfter(searchAfter)
-                   .Size(ScrollBatchSize)
-                   .TrackTotalHits(false)
-                );
-
-                queryResponse.ThrowIfInvalid();
-
-                return queryResponse;
-            });
-
-            if (!string.IsNullOrEmpty(pointInTimeId) && (searchResponse?.Hits?.Count ?? 0) == 0)
-            {
-                await Client.ClosePointInTimeAsync(pitr => pitr.Id(pointInTimeId));
-            }
-
-            return searchResponse;
-        }
-
         /// <summary>
         /// Write data to elastic search
         /// </summary>
@@ -618,7 +577,7 @@ namespace SOS.Lib.Repositories.Processed
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             if (elasticConfiguration.Clusters != null)
             {
-                CheckNodes(elasticConfiguration.Clusters.Count());
+                CheckNodes(elasticConfiguration.Clusters.First().Hosts?.Count() ?? 0);
             }
         }
 
