@@ -152,7 +152,6 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
 
         protected ElasticSearchConfiguration GetCustomSearchDbConfiguration()
         {
-            return GetSearchDbConfiguration();
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
             var elasticConfiguration = config.GetSection($"{configPrefix}:CustomSearchDbConfiguration").Get<ElasticSearchConfiguration>();
