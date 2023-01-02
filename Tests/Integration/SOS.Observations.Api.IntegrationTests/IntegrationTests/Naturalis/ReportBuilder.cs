@@ -68,6 +68,14 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Naturalis
                 return;
             }
 
+            var family = taxon.Family;
+
+            // Quick fix to prevent error in file validation when family and sub family have same name
+            if (new[] { 261548, 1003756, 261522, 6009465, 261509 }.Contains(taxon.Id))
+            {
+                family += " (sub family)";
+            }
+
             csvFileHelperTaxa.WriteRow(new[] {
                 taxon.TaxonId,
                 taxon.ScientificName.Contains(',') ? $"\"{taxon.ScientificName}\"" : taxon.ScientificName,
@@ -77,7 +85,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Naturalis
                 string.IsNullOrEmpty(taxon.Phylum) ? "unknown" : taxon.Phylum,
                 string.IsNullOrEmpty(taxon.Class) ? "unknown" : taxon.Class,
                 string.IsNullOrEmpty(taxon.Order) ? "unknown" : taxon.Order,
-                taxon.Family,
+                family,
                 taxon.Genus,
                 taxon.SpecificEpithet,
                 taxon.InfraspecificEpithet
