@@ -11,32 +11,32 @@ namespace SOS.DataStewardship.Api.Models.Enums
         /// Blekinge län
         /// </summary>
         [EnumMember(Value = "Blekinge län")]
-        BlekingeLän = 0,
+        BlekingeLän = 10,
         /// <summary>
         /// Dalarnas län
         /// </summary>
         [EnumMember(Value = "Dalarnas län")]
-        DalarnasLän = 1,
+        DalarnasLän = 20,
         /// <summary>
         /// Gotlands län
         /// </summary>
         [EnumMember(Value = "Gotlands län")]
-        GotlandsLän = 2,
+        GotlandsLän = 9,
         /// <summary>
         /// Gävleborgs län
         /// </summary>
         [EnumMember(Value = "Gävleborgs län")]
-        GävleborgsLän = 3,
+        GävleborgsLän = 21,
         /// <summary>
         /// Hallands län
         /// </summary>
         [EnumMember(Value = "Hallands län")]
-        HallandsLän = 4,
+        HallandsLän = 13,
         /// <summary>
         /// Jämtlands län
         /// </summary>
         [EnumMember(Value = "Jämtlands län")]
-        JämtlandsLän = 5,
+        JämtlandsLän = 23,
         /// <summary>
         /// Jönköpings län
         /// </summary>
@@ -46,71 +46,71 @@ namespace SOS.DataStewardship.Api.Models.Enums
         /// Kalmar län
         /// </summary>
         [EnumMember(Value = "Kalmar län")]
-        KalmarLän = 7,
+        KalmarLän = 8,
         /// <summary>
         /// Kronobergs län
         /// </summary>
         [EnumMember(Value = "Kronobergs län")]
-        KronobergsLän = 8,
+        KronobergsLän = 7,
         /// <summary>
         /// Norrbottens län
         /// </summary>
         [EnumMember(Value = "Norrbottens län")]
-        NorrbottensLän = 9,
+        NorrbottensLän = 25,
         /// <summary>
         /// Skåne län
         /// </summary>
         [EnumMember(Value = "Skåne län")]
-        SkåneLän = 10,
+        SkåneLän = 12,
         /// <summary>
         /// Stockholms län
         /// </summary>
         [EnumMember(Value = "Stockholms län")]
-        StockholmsLän = 11,
+        StockholmsLän = 1,
         /// <summary>
         /// Södermanlands län
         /// </summary>
         [EnumMember(Value = "Södermanlands län")]
-        SödermanlandsLän = 12,
+        SödermanlandsLän = 4,
         /// <summary>
         /// Uppsala län
         /// </summary>
         [EnumMember(Value = "Uppsala län")]
-        UppsalaLän = 13,
+        UppsalaLän = 3,
         /// <summary>
         /// Värmlands län
         /// </summary>
         [EnumMember(Value = "Värmlands län")]
-        VärmlandsLän = 14,
+        VärmlandsLän = 17,
         /// <summary>
         /// Västerbottens län
         /// </summary>
         [EnumMember(Value = "Västerbottens län")]
-        VästerbottensLän = 15,
+        VästerbottensLän = 24,
         /// <summary>
         /// Västernorrlands län
         /// </summary>
         [EnumMember(Value = "Västernorrlands län")]
-        VästernorrlandsLän = 16,
+        VästernorrlandsLän = 22,
         /// <summary>
         /// Västmanlands län
         /// </summary>
         [EnumMember(Value = "Västmanlands län")]
-        VästmanlandsLän = 17,
+        VästmanlandsLän = 19,
         /// <summary>
         /// Västra Götalands län
         /// </summary>
         [EnumMember(Value = "Västra Götalands län")]
-        VästraGötalandsLän = 18,
+        VästraGötalandsLän = 14,
         /// <summary>
         /// Örebro län
         /// </summary>
         [EnumMember(Value = "Örebro län")]
-        ÖrebroLän = 19,
+        ÖrebroLän = 18,
         /// <summary>
         /// Östergötlands län
         /// </summary>
         [EnumMember(Value = "Östergötlands län")]
-        ÖstergötlandsLän = 20
+        ÖstergötlandsLän = 5
     }
 }

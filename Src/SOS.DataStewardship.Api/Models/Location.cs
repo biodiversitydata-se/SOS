@@ -135,7 +135,7 @@ namespace SOS.DataStewardship.Api.Models
         /// The province (swe: provins) within which the site is situated. Should be derived from the given position.
         /// </summary>
         [DataMember(Name = "province")]
-        public string Province { get; set; } // todo - create enum
+        public Province Province { get; set; } 
 
         /// <summary>
         /// Municipality
@@ -148,7 +148,7 @@ namespace SOS.DataStewardship.Api.Models
         /// The parish within which the site is situated. Should be derived from the given position.
         /// </summary>
         [DataMember(Name = "parish")]
-        public string Parish { get; set; } // todo - create enum
+        public Parish Parish { get; set; } 
 
         /// <summary>
         /// Comment (freetext) from the survey event about the site.

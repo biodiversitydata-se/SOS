@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.IO.Excel.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;

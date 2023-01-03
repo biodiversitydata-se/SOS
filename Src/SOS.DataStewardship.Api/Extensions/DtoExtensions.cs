@@ -182,13 +182,16 @@ namespace SOS.DataStewardship.Api.Extensions
         public static Models.Location ToLocation(this Lib.Models.Processed.Observation.Location location)
         {
             County? county = location?.County?.FeatureId?.GetCounty();
+            Municipality? municipality = location?.Municipality?.FeatureId?.GetMunicipality();
+            Parish? parish = location?.Parish?.FeatureId?.GetParish();
+            Province? province = location?.Province?.FeatureId?.GetProvince();
 
             return new Models.Location()
             {
                 County = county.Value,
-                //Province = 
-                //Municipality =
-                //Parish =
+                Province = province.Value,
+                Municipality = municipality.Value,
+                Parish = parish.Value,
                 Locality = location?.Locality,
                 LocationID = location?.LocationId,
                 LocationRemarks = location.LocationRemarks,
@@ -482,12 +485,36 @@ namespace SOS.DataStewardship.Api.Extensions
             {
                 areaFilter.Add(new AreaFilter {
                     AreaType = AreaType.County,
-                    FeatureId = geographicsFilter.County.Value.GetCountyFeatureId()
+                    FeatureId = ((int)geographicsFilter.County.Value).ToString()
                 });                                        
             }
 
-            // Municipality - todo
+            if (geographicsFilter.Municipality != null)
+            {
+                areaFilter.Add(new AreaFilter
+                {
+                    AreaType = AreaType.Municipality,
+                    FeatureId = ((int)geographicsFilter.Municipality.Value).ToString()
+                });
+            }
 
+            if (geographicsFilter.Parish != null)
+            {
+                areaFilter.Add(new AreaFilter
+                {
+                    AreaType = AreaType.Parish,
+                    FeatureId = ((int)geographicsFilter.Parish.Value).ToString()
+                });
+            }
+
+            if (geographicsFilter.Province != null)
+            {
+                areaFilter.Add(new AreaFilter
+                {
+                    AreaType = AreaType.Province,
+                    FeatureId = ((int)geographicsFilter.Province.Value).ToString()
+                });
+            }
 
             locationFilter.Geometries = geographicsFilter.Area?.ToGeographicsFilter();
             locationFilter.Areas = areaFilter;

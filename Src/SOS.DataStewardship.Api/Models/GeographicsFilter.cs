@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using System.Text;
 using SOS.DataStewardship.Api.Models.Enums;
 
 namespace SOS.DataStewardship.Api.Models
@@ -18,6 +14,12 @@ namespace SOS.DataStewardship.Api.Models
 
         [DataMember(Name = "municipality")]
         public Municipality? Municipality { get; set; }
+
+        [DataMember(Name = "parish")]
+        public Parish? Parish { get; set; }
+
+        [DataMember(Name = "province")]
+        public Province? Province { get; set; }
 
         [DataMember(Name = "area")]
         public GeographicsFilterArea Area { get; set; }
