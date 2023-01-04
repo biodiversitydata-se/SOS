@@ -240,7 +240,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         {
             if (!siteIds?.Any() ?? true)
             {
-                return null;
+                return null!;
             }
 
             try
@@ -254,6 +254,10 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 var sitesGeometry = await getSitesGeometriesTask; // It's faster to get geometries in separate query than join it in site query
 
                 return await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
+            }
+            catch
+            {
+                throw;
             }
             finally
             {
