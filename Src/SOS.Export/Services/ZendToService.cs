@@ -86,7 +86,14 @@ namespace SOS.Export.Services
                 {
                     try
                     {
-                        return JsonSerializer.Deserialize<ZendToResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        var zendToResponse = JsonSerializer.Deserialize<ZendToResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                        if (!zendToResponse.Success)
+                        {
+                            _logger.LogError($"Failed to send file with ZendTo. Response: {responseString}");
+                        }
+
+                        return zendToResponse;
                     }
                     catch (Exception e)
                     {

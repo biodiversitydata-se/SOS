@@ -30,16 +30,8 @@ namespace SOS.Harvest.Services.Taxon
             TaxonServiceConfiguration taxonServiceConfiguration,
             ILogger<TaxonService> logger)
         {
-            if (taxonServiceConfiguration.UseTaxonApi)
-            {
-                _taxonDwcUrl = taxonServiceConfiguration?.TaxonApiAddress ??
+            _taxonDwcUrl = taxonServiceConfiguration?.BaseAddress ??
                                throw new ArgumentNullException(nameof(taxonServiceConfiguration));
-            }
-            else
-            {
-                _taxonDwcUrl = taxonServiceConfiguration?.BaseAddress ??
-                               throw new ArgumentNullException(nameof(taxonServiceConfiguration));
-            }
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _taxonServiceProxy = taxonServiceProxy ?? throw new ArgumentNullException(nameof(taxonServiceProxy));
         }
@@ -54,7 +46,7 @@ namespace SOS.Harvest.Services.Taxon
                 if (zipFileContentStream == null)
                 {
                     _logger.LogError("Failed to fetch dwca file from taxon service:" + _taxonDwcUrl);
-                    return null;
+                    return null!;
                 }
                 using var zipArchive = new ZipArchive(zipFileContentStream, ZipArchiveMode.Read, false);
                 var csvFieldDelimiter = GetCsvFieldDelimiterFromMetaFile(zipArchive);
@@ -152,7 +144,7 @@ namespace SOS.Harvest.Services.Taxon
             if (taxonFile == null)
             {
                 _logger.LogError("Failed to open Taxon.csv");
-                return null; // If no taxon data file found, we can't do anything more
+                return null!; // If no taxon data file found, we can't do anything more
             }
             // Read taxon data
             using var csvFileHelper = new CsvFileHelper();
