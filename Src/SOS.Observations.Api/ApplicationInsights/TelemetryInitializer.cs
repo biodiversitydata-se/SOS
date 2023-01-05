@@ -26,24 +26,24 @@ namespace SOS.Observations.Api.ApplicationInsights
         {
             if (new[] { "get", "post", "put" }.Contains(platformContext.Request.Method, StringComparer.CurrentCultureIgnoreCase))
             {
-                if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !telemetry.Context.Properties.ContainsKey("Protected-observations"))
+                if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !telemetry.Context.GlobalProperties.ContainsKey("Protected-observations"))
                 {
-                    telemetry.Context.Properties.Add("Protected-observations", value);
+                    telemetry.Context.GlobalProperties.Add("Protected-observations", value);
                 }
 
                 if (_loggRequestBody && platformContext.Items.TryGetValue("Request-body", out var requestBody))
                 {
-                    if (!telemetry.Context.Properties.ContainsKey("Request-body"))
+                    if (!telemetry.Context.GlobalProperties.ContainsKey("Request-body"))
                     {
-                        telemetry.Context.Properties.Add("Request-body", requestBody?.ToString());
+                        telemetry.Context.GlobalProperties.Add("Request-body", requestBody?.ToString());
                     }
                 }
 
                 if (_loggSearchResponseCount && platformContext.Items.TryGetValue("Observation-count", out var observationCount))
                 {
-                    if (int.TryParse(observationCount?.ToString(), out var obsCount) && !telemetry.Context.Properties.ContainsKey("Observation-count"))
+                    if (int.TryParse(observationCount?.ToString(), out var obsCount) && !telemetry.Context.GlobalProperties.ContainsKey("Observation-count"))
                     {
-                        telemetry.Context.Properties.Add("Observation-count", obsCount.ToString());
+                        telemetry.Context.GlobalProperties.Add("Observation-count", obsCount.ToString());
                     }
                 }
             }
