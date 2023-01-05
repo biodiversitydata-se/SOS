@@ -373,7 +373,8 @@ namespace SOS.Observations.Api
                 .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
                 .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
                 .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" })
-                .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" });
+                .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" })
+                .AddCheck<APDbRestoreHealthCheck>("Artportalen database backup restore", tags: new[] { "database", "sql server" });
 
             if (CurrentEnvironment.IsEnvironment("prod"))
             {

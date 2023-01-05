@@ -34,5 +34,11 @@
         /// Azure API Subscription key.
         /// </summary>
         public string AzureSubscriptionKey { get; set; }
+
+        /// <summary>
+        /// Max number of hours accepted since latest database backup file was taken
+        /// 0 = infinity
+        /// </summary>
+        public int ApLatestDbBackupHours { get; set; }
     }
 }
