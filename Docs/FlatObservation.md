@@ -167,7 +167,6 @@ All fields in the Minimum and Extended field sets, and also the following fields
 | CatalogNumber | Occurrence.CatalogNumber | Ursprungkällans observationsid | Catalog number | String | AllWithValues |
 | CatalogId | Occurrence.CatalogId | CatalogId | CatalogId | Int32 | AllWithValues |
 | AssociatedReferences | Occurrence.AssociatedReferences | Associerade referenser | Associated References | String | AllWithValues |
-| IndividualId | Occurrence.IndividualId | Individnummer | Individual Id | String | AllWithValues |
 | Media | Occurrence.Media | Media | Media | String | AllWithValues |
 | Preparations | Occurrence.Preparations | Preparations | Preparations | String | AllWithValues |
 | RecordNumber | Occurrence.RecordNumber | Rapportörens observationsId | Record number | String | AllWithValues |
