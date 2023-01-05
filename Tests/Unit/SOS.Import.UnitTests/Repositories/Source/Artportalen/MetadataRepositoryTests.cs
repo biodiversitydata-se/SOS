@@ -8,6 +8,7 @@ using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Constants;
+using SOS.Lib.Models.Shared;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
@@ -46,12 +47,15 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetActivitiesAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetActivitiesAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -101,12 +105,15 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetBiotopesAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetBiotopesAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -149,12 +156,15 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetGendersAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetGendersAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -197,12 +207,15 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetStagesAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetStagesAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -245,12 +258,15 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetSubstratesAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetSubstratesAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -293,12 +309,15 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetUnitsAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetUnitsAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -341,12 +360,15 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetValidationStatusAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetValidationStatusAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>

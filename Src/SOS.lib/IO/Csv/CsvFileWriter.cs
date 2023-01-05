@@ -81,7 +81,6 @@ namespace SOS.Lib.IO.Excel
                 csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
 
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-               
                 var scrollResult = await _processedObservationRepository.ScrollObservationsAsync<Observation>(filter, null);
 
                 while (scrollResult?.Records?.Any() ?? false)
