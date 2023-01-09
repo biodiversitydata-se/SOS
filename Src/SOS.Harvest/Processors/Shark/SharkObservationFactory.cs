@@ -60,7 +60,7 @@ namespace SOS.Harvest.Processors.Shark
                     Verified = false,
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
-                Location = new Location
+                Location = new Location(LocationType.Point)
                 {
                     MaximumDepthInMeters = verbatim.WaterDepthM,
                     MinimumDepthInMeters = verbatim.WaterDepthM

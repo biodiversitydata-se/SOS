@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Processed.Observation;
+﻿using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Export.UnitTests.TestHelpers.Builders
 {
@@ -37,7 +38,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Builders
         {
             var observation = new Observation
             {
-                Location = new Location(),
+                Location = new Location(LocationType.Point),
                 Event = new Event(System.DateTime.Now.AddHours(-2), System.DateTime.Now.AddHours(-1)),
                 Identification = new Identification(),
                 MaterialSample = new MaterialSample(),

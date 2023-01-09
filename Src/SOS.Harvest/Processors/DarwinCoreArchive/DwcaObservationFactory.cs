@@ -343,7 +343,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {
            
            
-            var processedLocation = new Location();
+            var processedLocation = new Location(LocationType.Point);
             processedLocation.Continent = GetSosId(
                 verbatim.Continent,
                 _vocabularyById[VocabularyId.Continent],
