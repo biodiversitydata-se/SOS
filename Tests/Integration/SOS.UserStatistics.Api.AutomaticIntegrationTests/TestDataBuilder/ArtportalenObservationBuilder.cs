@@ -317,8 +317,7 @@ public static class ArtportalenObservationBuilder
             obs.DatasourceId = sourceObservation.DatasourceId;
             obs.DeterminationYear = sourceObservation.DeterminationYear;
             obs.StartTime = sourceObservation.StartTime;
-            obs.EndTime = sourceObservation.EndTime;
-            obs.FrequencyId = sourceObservation.FrequencyId;
+            obs.EndTime = sourceObservation.EndTime;            
             obs.HasUserComments = sourceObservation.HasUserComments;
             obs.HiddenByProvider = sourceObservation.HiddenByProvider;
             obs.Label = sourceObservation.Label;
@@ -336,8 +335,7 @@ public static class ArtportalenObservationBuilder
             obs.PublicCollection = sourceObservation.PublicCollection;
             obs.Quantity = sourceObservation.Quantity;
             obs.QuantityOfSubstrate = sourceObservation.QuantityOfSubstrate;
-            //obs.RegionalSightingStateId = sourceObservation.RegionalSightingStateId;
-            obs.ReproductionId = sourceObservation.ReproductionId;
+            //obs.RegionalSightingStateId = sourceObservation.RegionalSightingStateId;            
             obs.SightingPublishTypeIds = sourceObservation.SightingPublishTypeIds;
             obs.SightingSpeciesCollectionItemId = sourceObservation.SightingSpeciesCollectionItemId;
             obs.SightingTypeId = sourceObservation.SightingTypeId;
