@@ -1,6 +1,7 @@
 ﻿using SOS.UserStatistics.Api.Cache.Managers;
 using SOS.UserStatistics.Api.Cache.Managers.Interfaces;
 using SOS.UserStatistics.Api.Configuration;
+using SOS.Harvest.Extensions;
 
 namespace SOS.UserStatistics.Api.AutomaticIntegrationTests.Fixtures;
 
@@ -53,7 +54,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         var taxonRepository = new TaxonRepository(_processClient, new NullLogger<TaxonRepository>());
         _taxa = GetUseTaxonZipCollection() ? GetTaxaFromZipFile() : await taxonRepository.GetAllAsync();
         _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
-        var basicTaxonTree = TaxonTreeFactory.CreateTaxonTree(_taxa);
+        var basicTaxonTree = TaxonTreeFactory.CreateTaxonTree(_taxaById);
         var taxonTreeCache = new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache);
         taxonTreeCache.Set(basicTaxonTree);
         var taxonManager = CreateTaxonManager(_processClient, taxonRepository, memoryCache, taxonTreeCache);

@@ -80,7 +80,9 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
         var userStatisticsObservationRepository = new UserStatisticsObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<UserObservationRepository>());
         var userService = CreateUserService();
         UserStatisticsProcessedObservationRepository = userStatisticsProcessedObservationRepository;
-        _userManager = new UserManager(userService, new NullLogger<UserManager>());
+        var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
+        var areaCache = new AreaCache(areaRepository);
+        _userManager = new UserManager(userService, areaCache, new NullLogger<UserManager>());
         var userStatisticsCacheManager = new UserStatisticsCacheManager(new MemoryCache(new MemoryCacheOptions()));
         UserStatisticsManager = new UserStatisticsManager(userStatisticsCacheManager, userStatisticsObservationRepository, userStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
     }
