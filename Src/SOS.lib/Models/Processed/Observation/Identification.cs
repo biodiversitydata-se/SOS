@@ -57,8 +57,8 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     True if sighting is validated.
         /// This property is deprecated and replaced by the Verified property.
         /// </summary>
-      //  [Obsolete("Replaced by Verified")]
-      //  public bool Validated => Verified;
+        [Obsolete("Replaced by Verified")]
+        public bool Validated => Verified;
 
         /// <summary>
         ///     True if sighting is verified (validated).
@@ -72,8 +72,8 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        //[Obsolete("Replaced by VerificationStatus")]
-        //public VocabularyValue ValidationStatus => VerificationStatus;
+        [Obsolete("Replaced by VerificationStatus")]
+        public VocabularyValue ValidationStatus => VerificationStatus;
 
         /// <summary>
         ///     A categorical indicator of the extent to which the taxonomic
