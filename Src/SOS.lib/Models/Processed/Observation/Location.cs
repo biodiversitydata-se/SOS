@@ -1,4 +1,5 @@
 ﻿using Nest;
+using SOS.Lib.Enums;
 using SOS.Lib.Swagger;
 using System.Text.Json.Serialization;
 
@@ -12,9 +13,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Constructor
         /// </summary>
-        public Location()
+        /// <param name="type"></param>
+        public Location(LocationType type)
         {
             Attributes = new LocationAttributes();
+            Type = type;
         }
 
         /// <summary>
@@ -393,6 +396,8 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Y coordinate in SWEREF99 TM.
         /// </summary>
         public double? Sweref99TmY { get; set; }
+
+        public LocationType Type { get; set; }
 
         /// <summary>
         ///     The verbatim original spatial coordinates of the Location.

@@ -291,7 +291,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                     Verified = false,
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
-                Location = new Location
+                Location = new Location(LocationType.Point)
                 {
                     Locality = GetLocality(verbatim),
                     VerbatimLocality = verbatim.Locality

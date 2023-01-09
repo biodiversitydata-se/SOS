@@ -56,6 +56,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string ExternalId { get; set; }
 
         /// <summary>
+        /// Tru if site has a geometry 
+        /// </summary>
+        public bool HasGeometry { get; set; }
+
+        /// <summary>
         ///     Id of site
         /// </summary>
         public int Id { get; set; }

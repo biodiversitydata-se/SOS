@@ -214,48 +214,44 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Identification.IdentificationRemarks = verbatimObservation.UnsureDetermination ? "Uncertain determination" : string.Empty;
               
                 // Location
-                obs.Location = new Location();
-                obs.Location.Attributes.CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate;
-                obs.Location.Attributes.ExternalId = verbatimObservation.Site?.ExternalId;
-                obs.Location.Attributes.IsPrivate = verbatimObservation.Site?.IsPrivate ?? false;
-                obs.Location.Attributes.ProjectId = verbatimObservation.Site?.ProjectId;
-                obs.Location.Attributes.ProvincePartIdByCoordinate = verbatimObservation.Site?.ProvincePartIdByCoordinate;
-                obs.Location.CountryRegion = CastToArea(verbatimObservation.Site?.CountryRegion!);
-                obs.Location.County = CastToArea(verbatimObservation.Site?.County!);
+                obs.Location = new Location(LocationType.Unknown);
                 obs.Location.IsInEconomicZoneOfSweden = hasPosition;
-                obs.Location.Locality = verbatimObservation.Site?.Name.Trim().Clean();
-                obs.Location.LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}";
                 obs.Location.MaximumDepthInMeters = verbatimObservation.MaxDepth;
                 obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
                 obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;
                 obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;
-                obs.Location.Municipality = CastToArea(verbatimObservation.Site?.Municipality!);
-                obs.Location.Parish = CastToArea(verbatimObservation.Site?.Parish!);
-                obs.Location.Province = CastToArea(verbatimObservation.Site?.Province!);
                 obs.Location.VerbatimLocality = obs.Location.Locality;
-                if (diffuse)
+
+                if (verbatimObservation.Site != null)
                 {
-                    AddPositionData(obs.Location, 
-                        verbatimObservation.Site?.XCoord,
-                        verbatimObservation.Site?.YCoord,
+                    var site = verbatimObservation.Site;
+
+                    obs.Location.Attributes.CountyPartIdByCoordinate = site.CountyPartIdByCoordinate;
+                    obs.Location.Attributes.ExternalId = site.ExternalId;
+                    obs.Location.Attributes.IsPrivate = site.IsPrivate;
+                    obs.Location.Attributes.ProjectId = site.ProjectId;
+                    obs.Location.Attributes.ProvincePartIdByCoordinate = site.ProvincePartIdByCoordinate;
+                    obs.Location.CountryRegion = CastToArea(site.CountryRegion!);
+                    obs.Location.County = CastToArea(site.County!);
+                    obs.Location.Locality = site.Name.Trim().Clean();
+                    obs.Location.LocationId = $"urn:lsid:artportalen.se:site:{site.Id}";
+                    obs.Location.Municipality = CastToArea(site.Municipality!);
+                    obs.Location.Parish = CastToArea(site.Parish!);
+                    obs.Location.Province = CastToArea(site.Province!);
+                    obs.Location.Type = site.HasGeometry ? LocationType.Polygon : LocationType.Point;
+
+                    AddPositionData(
+                        obs.Location,
+                        site.XCoord,
+                        site.YCoord,
                         CoordinateSys.WebMercator,
-                        (Point)verbatimObservation.Site?.DiffusedPoint?.ToGeometry()!,
-                        verbatimObservation.Site?.DiffusedPointWithBuffer!,
-                        verbatimObservation.Site?.Accuracy,
-                        taxon?.Attributes?.DisturbanceRadius);
+                        (Point) (diffuse ? site.DiffusedPoint : site.Point)?.ToGeometry()!,
+                        diffuse ? site.DiffusedPointWithBuffer! : site.PointWithBuffer!,
+                        site.Accuracy,
+                        taxon?.Attributes?.DisturbanceRadius
+                    );
                 }
-                else
-                {
-                    AddPositionData(obs.Location, 
-                        verbatimObservation.Site?.XCoord,
-                        verbatimObservation.Site?.YCoord,
-                        CoordinateSys.WebMercator,
-                        (Point)verbatimObservation.Site?.Point?.ToGeometry()!,
-                        verbatimObservation.Site?.PointWithBuffer!,
-                        verbatimObservation.Site?.Accuracy,
-                        taxon?.Attributes?.DisturbanceRadius);
-                }
-                
+               
                 // Occurrence
                 obs.Occurrence = new Occurrence();
                 obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages && verbatimObservation.FirstImageId > 0

@@ -71,7 +71,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 InstitutionId = verbatim.SCI_code,
-                Location = new Location
+                Location = new Location(LocationType.Point)
                 {
                     Attributes = new LocationAttributes
                     {

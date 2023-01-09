@@ -61,7 +61,7 @@ namespace SOS.Harvest.Processors.Mvm
                     Verified = false,
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
-                Location = new Location
+                Location = new Location(LocationType.Point)
                 {
                     Locality = verbatim.Locality,
                     LocationRemarks = verbatim.LocationRemarks,

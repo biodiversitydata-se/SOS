@@ -52,7 +52,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <returns></returns>
         private Location CreateLocation(ArtportalenChecklistVerbatim verbatim)
         {
-            var location = new Location();
+            var location = new Location(LocationType.Point);
 
             if (verbatim.Site == null)
             {
@@ -75,6 +75,8 @@ namespace SOS.Harvest.Processors.Artportalen
             location.Municipality = CastToArea(site?.Municipality!);
             location.Parish = CastToArea(site?.Parish!);
             location.Province = CastToArea(site?.Province!);
+            location.Type = site.HasGeometry ? LocationType.Polygon : LocationType.Point;
+
             AddPositionData(location, site.XCoord,
                 site.YCoord,
                 CoordinateSys.WebMercator,

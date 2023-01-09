@@ -60,7 +60,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
         private Location CreateLocation(DwcEventOccurrenceVerbatim verbatim)
         {
-            var processedLocation = new Location();
+            var processedLocation = new Location(LocationType.Point);
             processedLocation.Continent = GetSosId(
                 verbatim.Continent,
                 _vocabularyById[VocabularyId.Continent],

@@ -153,6 +153,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 Accuracy = accuracy,
                 DiffusionFactor = entity.DiffusionFactor,
                 ExternalId = entity.ExternalId,
+                HasGeometry = siteGeometry?.IsValid() ?? false,
                 Id = entity.Id,
                 IncludedBySiteId = entity.IncludedBySiteId,
                 IsPrivate = entity.IsPrivate,

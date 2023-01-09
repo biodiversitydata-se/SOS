@@ -28,7 +28,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             var observations = new List<Observation>();
             var observation = new Observation
             {
-                Location = new Location
+                Location = new Location(LocationType.Point)
                 {
                     DecimalLatitude = Coordinates.BorgholmMunicipality.Latitude,
                     DecimalLongitude = Coordinates.BorgholmMunicipality.Longitude
@@ -58,7 +58,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             var observations = new List<Observation>();
             var observation = new Observation
             {
-                Location = new Location
+                Location = new Location(LocationType.Point)
                 {
                     DecimalLatitude = Coordinates.KalmarMunicipality.Latitude,
                     DecimalLongitude = Coordinates.KalmarMunicipality.Longitude
@@ -88,7 +88,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             var observation = new Observation
             {
-                Location = new Location
+                Location = new Location(LocationType.Point)
                 {
                     DecimalLatitude = Coordinates.KirunaMunicipality.Latitude,
                     DecimalLongitude = Coordinates.KirunaMunicipality.Longitude
