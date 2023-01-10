@@ -23,9 +23,10 @@ namespace SOS.Export.Services
         /// <summary>
         ///     Constructor
         /// </summary>
-        public ZendToService(ZendToConfiguration configuration)
+        public ZendToService(ZendToConfiguration configuration, ILogger<ZendToService> logger)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
