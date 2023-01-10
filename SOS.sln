@@ -34,6 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7768AF04-8
 		Docs\index.md = Docs\index.md
 		Docs\Install.md = Docs\Install.md
 		LICENSE = LICENSE
+		Docs\Locations.md = Docs\Locations.md
 		Docs\Observation.md = Docs\Observation.md
 		Docs\ObsoleteProperties.md = Docs\ObsoleteProperties.md
 		README.md = README.md
