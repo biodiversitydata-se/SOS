@@ -128,14 +128,12 @@ namespace SOS.Administration.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public IActionResult RunIncrementalObservationHarvestAndProcessJob()
+        public IActionResult RunIncrementalObservationHarvestAndProcessJob(DateTime? fromDate)
         {
             try
             {
-                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunIncrementalActiveAsync(
+                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunIncrementalActiveAsync(fromDate,
                   JobCancellationToken.Null));
-
-                
 
                 return new OkObjectResult("Incremental observation Harvest and process job enqued");
             }
@@ -182,7 +180,7 @@ namespace SOS.Administration.Api.Controllers
                 }
 
                 RecurringJob.AddOrUpdate<IObservationsHarvestJob>(
-                    $"{nameof(IObservationsHarvestJob)}-Incremental", job => job.RunIncrementalActiveAsync(JobCancellationToken.Null),
+                    $"{nameof(IObservationsHarvestJob)}-Incremental", job => job.RunIncrementalActiveAsync(null, JobCancellationToken.Null),
                     $"*/{runIntervalInMinutes} * * * *", TimeZoneInfo.Local);
 
                 return new OkObjectResult("Incremental observation Harvest and process job scheduled");

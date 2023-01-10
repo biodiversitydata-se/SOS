@@ -59,7 +59,9 @@ namespace SOS.Harvest.Jobs
             }; 
         }
 
-        private async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
+        private async Task<bool> RunAsync(JobRunModes mode, 
+            DateTime? fromDate,
+            IJobCancellationToken cancellationToken)
         {
             var activeProviders = (await _dataProviderManager.GetAllDataProvidersAsync()).Where(dp =>
                 dp.IsActive
@@ -84,6 +86,7 @@ namespace SOS.Harvest.Jobs
             );
 
             return await RunAsync(mode,
+                fromDate,
                 harvestProviders,
                 processProviders,
                 true,
@@ -94,12 +97,15 @@ namespace SOS.Harvest.Jobs
         /// Run harvest and start processing on success if requested
         /// </summary>
         /// <param name="mode"></param>
+        /// <param name="fromDate"></param>
         /// <param name="harvestProviders"></param>
         /// <param name="processProviders"></param>
         /// <param name="processOnSuccess"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> RunAsync(JobRunModes mode, 
+        /// <exception cref="Exception"></exception>
+        private async Task<bool> RunAsync(JobRunModes mode,
+            DateTime? fromDate,
             IEnumerable<DataProvider> harvestProviders,
             IEnumerable<DataProvider> processProviders,
             bool processOnSuccess,
@@ -107,7 +113,7 @@ namespace SOS.Harvest.Jobs
         {
             _logger.LogInformation($"Start harvest job ({mode})");
             await HarvestResources(mode, cancellationToken);
-            var harvestCount = await HarvestAsync(harvestProviders, mode, cancellationToken);
+            var harvestCount = await HarvestAsync(harvestProviders, mode, fromDate, cancellationToken);
 
             if (harvestCount == -1)
             {
@@ -169,6 +175,7 @@ namespace SOS.Harvest.Jobs
         private async Task<long> HarvestAsync(
         IEnumerable<DataProvider> dataProviders,
         JobRunModes mode,
+        DateTime? fromDate,
         IJobCancellationToken cancellationToken)
         {
             try
@@ -202,7 +209,7 @@ namespace SOS.Harvest.Jobs
                     {
                         if (dataProvider.SupportIncrementalHarvest)
                         {
-                            harvestTaskByDataProvider.Add(dataProvider, harvestJob.HarvestObservationsAsync(mode, cancellationToken));
+                            harvestTaskByDataProvider.Add(dataProvider, harvestJob.HarvestObservationsAsync(mode, fromDate, cancellationToken));
                         }
                         else
                         {
@@ -354,19 +361,19 @@ namespace SOS.Harvest.Jobs
         public async Task<bool> RunFullAsync(IJobCancellationToken cancellationToken)
         {
             StopHarvestIfProcessingIsRunning(JobRunModes.Full, cancellationToken);
-            return await RunAsync(JobRunModes.Full, cancellationToken);
+            return await RunAsync(JobRunModes.Full, null, cancellationToken);
         }
 
-        public async Task<bool> RunIncrementalActiveAsync(IJobCancellationToken cancellationToken)
+        public async Task<bool> RunIncrementalActiveAsync(DateTime? fromDate, IJobCancellationToken cancellationToken)
         {
             StopHarvestIfProcessingIsRunning(JobRunModes.IncrementalActiveInstance, cancellationToken);
-            return await RunAsync(JobRunModes.IncrementalActiveInstance, cancellationToken);
+            return await RunAsync(JobRunModes.IncrementalActiveInstance, fromDate, cancellationToken);
         }
 
         public async Task<bool> RunIncrementalInactiveAsync(IJobCancellationToken cancellationToken)
         {
             StopHarvestIfProcessingIsRunning(JobRunModes.IncrementalInactiveInstance, cancellationToken);
-            return await RunAsync(JobRunModes.IncrementalInactiveInstance, cancellationToken);
+            return await RunAsync(JobRunModes.IncrementalInactiveInstance, null, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -411,7 +418,7 @@ namespace SOS.Harvest.Jobs
                 return false;
             }
 
-            return await RunAsync(JobRunModes.Full, harvestDataProviders.Select(p => p.Value), processDataProviders.Select(p => p.Value), true, cancellationToken);
+            return await RunAsync(JobRunModes.Full, null, harvestDataProviders.Select(p => p.Value), processDataProviders.Select(p => p.Value), true, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -441,6 +448,7 @@ namespace SOS.Harvest.Jobs
             return (await HarvestAsync(
                 harvestDataProviders.Select(d => d.Value).ToList(),
                 JobRunModes.Full,
+                null,
                 cancellationToken)) != -1;
         }
 

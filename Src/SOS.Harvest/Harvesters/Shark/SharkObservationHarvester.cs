@@ -131,6 +131,7 @@ namespace SOS.Harvest.Harvesters.Shark
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
+            DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
             throw new NotImplementedException("Not implemented for this provider");
