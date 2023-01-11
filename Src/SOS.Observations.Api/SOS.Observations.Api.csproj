@@ -38,22 +38,22 @@
 		<PackageReference Include="CSharpFunctionalExtensions" Version="2.37.0" />
 		<PackageReference Include="HangFire" Version="1.7.32" />
 		<PackageReference Include="HangFire.Autofac" Version="2.3.1" />
-		<PackageReference Include="HangFire.Mongo" Version="1.7.3" />
+		<PackageReference Include="HangFire.Mongo" Version="1.9.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="6.0.10" />
-		<PackageReference Include="Microsoft.OpenApi" Version="1.4.4" />
+		<PackageReference Include="Microsoft.OpenApi" Version="1.4.5" />
 		<PackageReference Include="MongoDB.Driver" Version="2.18.0" />
 		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.18.0" />
 		<PackageReference Include="NGeoHash" Version="1.2.0" />
 		<PackageReference Include="NLog.Targets.ElasticSearch" Version="7.7.0" />
-		<PackageReference Include="NLog.Web.AspNetCore" Version="5.1.5" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.2.1" />
 		<PackageReference Include="SauceControl.InheritDoc" Version="1.3.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="Topshelf" Version="4.3.0" />
     </ItemGroup>
     <ItemGroup>
