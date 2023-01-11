@@ -120,6 +120,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
+            DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
             throw new NotImplementedException("Not implemented for this provider");

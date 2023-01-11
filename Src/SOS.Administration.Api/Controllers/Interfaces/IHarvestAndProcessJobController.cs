@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,10 +35,11 @@ namespace SOS.Administration.Api.Controllers.Interfaces
             List<string> processDataProviderIdOrIdentifiers);
 
         /// <summary>
-        /// Run incremaental harvest and processing
+        ///  Run incremaental harvest and processing
         /// </summary>
+        /// <param name="fromDate"></param>
         /// <returns></returns>
-        IActionResult RunIncrementalObservationHarvestAndProcessJob();
+        IActionResult RunIncrementalObservationHarvestAndProcessJob(DateTime? fromDate);
 
         /// <summary>
         /// Run incremaental harvest and processing of specified Artportalen observations

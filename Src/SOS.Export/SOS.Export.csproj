@@ -21,7 +21,7 @@
 	  <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
 	  <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
 	  <PackageReference Include="MongoDB.Driver.GridFS" Version="2.18.0" />
-	  <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+	  <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
     </ItemGroup>
 
   <ItemGroup>

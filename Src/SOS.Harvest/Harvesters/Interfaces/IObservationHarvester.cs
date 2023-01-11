@@ -15,12 +15,13 @@ namespace SOS.Harvest.Harvesters.Interfaces
         Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken);
 
         /// <summary>
-        /// Harvest observations based on mode
+        ///  Harvest observations based on mode
         /// </summary>
         /// <param name="mode"></param>
+        /// <param name="fromDate"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken);
+        Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, DateTime? fromDate, IJobCancellationToken cancellationToken);
 
         /// <summary>
         ///  Harvest observations generic by provider

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hangfire;
 using SOS.Lib.HangfireAttributes;
@@ -20,8 +21,9 @@ namespace SOS.Lib.Jobs.Import
         Task<bool> RunFullAsync(IJobCancellationToken cancellationToken);
 
         /// <summary>
-        ///     Incremental harvest of multiple sources, start processing when done
+        ///  Incremental harvest of multiple sources, start processing when done
         /// </summary>
+        /// <param name="fromDate"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [JobExpirationTimeout(Minutes = 0)]
@@ -29,7 +31,7 @@ namespace SOS.Lib.Jobs.Import
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [JobDisplayName("Incremental Harvest Observations, active instance")]
         [Queue("high")]
-        Task<bool> RunIncrementalActiveAsync(IJobCancellationToken cancellationToken);
+        Task<bool> RunIncrementalActiveAsync(DateTime? fromDate, IJobCancellationToken cancellationToken);
 
         /// <summary>
         ///     Incremental harvest of multiple sources, start processing when done

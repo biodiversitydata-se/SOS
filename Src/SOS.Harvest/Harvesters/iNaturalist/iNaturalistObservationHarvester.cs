@@ -41,7 +41,9 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
+            DateTime? fromDate,
+            IJobCancellationToken cancellationToken)
         {
             throw new NotImplementedException("Not implemented for this provider");
         }

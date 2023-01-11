@@ -153,22 +153,23 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// Harvest incremental
         /// </summary>
         /// <param name="mode"></param>
+        /// <param name="fromDate"></param>
         /// <param name="harvestFactory"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<int> HarvestIncrementalAsync(JobRunModes mode, ArtportalenHarvestFactory harvestFactory, 
+        private async Task<int> HarvestIncrementalAsync(JobRunModes mode, DateTime? fromDate, ArtportalenHarvestFactory harvestFactory, 
             IJobCancellationToken cancellationToken)
         {
             Logger.LogInformation($"Start Artportalen HarvestIncrementalAsync()");
             Logger.LogDebug($"Start getting Artportalen sightings ({mode})");
 
-            // We start from last harvested sighting 
-            var lastModified = await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
-            lastModified = lastModified.AddMinutes(-1); // When we force fetching data from AP (get one observation), we mess up the logic. Back track 1 min to make sure we get all modified obseervations
+            // If no from date is passed, we start from last harvested sighting 
+            var harvestFromDate = fromDate ?? (await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1)).AddMinutes(-5);
+            // When we force fetching data from AP (get one observation), we mess up the logic. Back track 5 min to make sure we get all modified obseervations
 
             // Get list of id's to Make sure we don't harvest more than #limit 
-            var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(lastModified, _artportalenConfiguration.CatchUpLimit))?.ToArray();
-            Logger.LogDebug($"Number of Artportalen Ids to harvest: {idsToHarvest?.Length ?? 0}, lastModifiedQuery={lastModified} ({mode})");
+            var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(harvestFromDate, _artportalenConfiguration.CatchUpLimit))?.ToArray();
+            Logger.LogDebug($"Number of Artportalen Ids to harvest: {idsToHarvest?.Length ?? 0}, lastModifiedQuery={harvestFromDate} ({mode})");
 
             if (!idsToHarvest?.Any() ?? true)
             {
@@ -368,6 +369,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
+            DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
             var runStatus = RunStatus.Success;
@@ -383,7 +385,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 harvestCount = mode == JobRunModes.Full ?
                     await HarvestAllAsync(harvestFactory, cancellationToken)
                     :
-                    await HarvestIncrementalAsync(mode, harvestFactory, cancellationToken);
+                    await HarvestIncrementalAsync(mode, fromDate, harvestFactory, cancellationToken);
                 harvestFactory.Dispose();
 
                 // Update harvest info
