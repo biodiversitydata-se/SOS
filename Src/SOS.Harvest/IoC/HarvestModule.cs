@@ -243,6 +243,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<SightingRepository>().As<ISightingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ApiUsageStatisticsRepository>().As<IApiUsageStatisticsRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SiteRepository>().As<ISiteRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<DatasetRepository>().As<IDatasetRepository>().InstancePerLifetimeScope();
             builder.RegisterType<PersonRepository>().As<IPersonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingRelationRepository>().As<ISightingRelationRepository>()
                 .InstancePerLifetimeScope();
@@ -255,6 +256,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<InvalidObservationRepository>().As<IInvalidObservationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectInfoRepository>().As<IProjectInfoRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenDatasetMetadataRepository>().As<IArtportalenDatasetMetadataRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedConfigurationRepository>().As<IProcessedConfigurationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ReportRepository>().As<IReportRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonRepository>().As<ITaxonRepository>().InstancePerLifetimeScope();
@@ -306,6 +308,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<DwcObservationHarvester>().As<IDwcObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<VocabularyHarvester>().As<IVocabularyHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectHarvester>().As<IProjectHarvester>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenDatasetMetadataHarvester>().As<IArtportalenDatasetMetadataHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonListHarvester>().As<ITaxonListHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationHarvester>().As<IFishDataObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationHarvester>().As<IKulObservationHarvester>().InstancePerLifetimeScope();
@@ -446,9 +449,9 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<ProcessTaxaJob>().As<IProcessTaxaJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectsHarvestJob>().As<IProjectsHarvestJob>().InstancePerLifetimeScope();
             
-           
             builder.RegisterType<TaxonListsHarvestJob>().As<ITaxonListsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<VocabulariesImportJob>().As<IVocabulariesImportJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenDatasetMetadataHarvestJob>().As<IArtportalenDatasetMetadataHarvestJob>().InstancePerLifetimeScope();            
         }
     }
 }

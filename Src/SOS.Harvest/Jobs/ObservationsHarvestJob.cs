@@ -36,6 +36,7 @@ namespace SOS.Harvest.Jobs
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly IDictionary<DataProviderType, IObservationHarvester> _harvestersByType;
         private readonly IProjectHarvester _projectHarvester;
+        private readonly IArtportalenDatasetMetadataHarvester _artportalenDatasetMetadataHarvester;
         private readonly ITaxonListHarvester _taxonListHarvester;
         private readonly IProcessObservationsJob _processObservationsJob;
         private readonly ILogger<ObservationsHarvestJob> _logger;
@@ -148,6 +149,7 @@ namespace SOS.Harvest.Jobs
                 {
                     await _projectHarvester.HarvestProjectsAsync();
                     await _taxonListHarvester.HarvestTaxonListsAsync();
+                    await _artportalenDatasetMetadataHarvester.HarvestDatasetsAsync();
                 }
 
                 _logger.LogInformation($"Finish {mode} resources harvest jobs");
@@ -311,6 +313,7 @@ namespace SOS.Harvest.Jobs
             IVirtualHerbariumObservationHarvester virtualHerbariumObservationHarvester,
             IiNaturalistObservationHarvester iNaturalistObservationHarvester,
             IProjectHarvester projectHarvester,
+            IArtportalenDatasetMetadataHarvester artportalenDatasetMetadataHarvester,            
             ITaxonListHarvester taxonListHarvester,
             IDataProviderManager dataProviderManager,
             IHarvestInfoRepository harvestInfoRepository,
@@ -321,6 +324,7 @@ namespace SOS.Harvest.Jobs
             _harvestInfoRepository =
                 harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _projectHarvester = projectHarvester ?? throw new ArgumentNullException(nameof(projectHarvester));
+            _artportalenDatasetMetadataHarvester = artportalenDatasetMetadataHarvester ?? throw new ArgumentNullException(nameof(artportalenDatasetMetadataHarvester));
             _taxonListHarvester = taxonListHarvester ?? throw new ArgumentNullException(nameof(taxonListHarvester));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             if (artportalenObservationHarvester == null) throw new ArgumentNullException(nameof(artportalenObservationHarvester));
