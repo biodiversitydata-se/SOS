@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
@@ -21,7 +21,7 @@
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Hangfire.Core" Version="1.7.32" />
 		<PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
 		<PackageReference Include="MongoDB.Driver" Version="2.18.0" />
 		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.18.0" />
 		<PackageReference Include="NetTopologySuite" Version="2.5.0" />
