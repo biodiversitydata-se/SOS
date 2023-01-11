@@ -37,6 +37,7 @@ namespace SOS.Process.UnitTests.Processors
             _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
             _userObservationRepositoryMock = new Mock<IUserObservationRepository>();
             _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
+            _artportalenDatasetRepositoryMock = new Mock<IArtportalenDatasetMetadataRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _processConfiguration = new ProcessConfiguration() { ArtportalenUrl = "https://www.artportalen.se" };
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
@@ -52,6 +53,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
         private readonly Mock<IUserObservationRepository> _userObservationRepositoryMock;
         private readonly Mock<IVocabularyRepository> _vocabularyRepositoryMock;
+        private readonly Mock<IArtportalenDatasetMetadataRepository> _artportalenDatasetRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
@@ -66,6 +68,7 @@ namespace SOS.Process.UnitTests.Processors
             _artportalenVerbatimRepository.Object,
             _processedObservationRepositoryMock.Object,
             _vocabularyRepositoryMock.Object,
+            _artportalenDatasetRepositoryMock.Object,
             _vocabularyResolverMock.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processManagerMock.Object,
@@ -111,7 +114,7 @@ namespace SOS.Process.UnitTests.Processors
         [Fact]
         public async Task ProcessAsyncException()
         {
-            // -----------------------------------------------------------------------------------------------------------
+            //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dataProvider = new DataProvider

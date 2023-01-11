@@ -26,6 +26,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
                 dataProvider, 
                 new Dictionary<int, Taxon>(),
                 new Dictionary<VocabularyId, IDictionary<object, int>>(),
+                new Dictionary<int, ArtportalenObservationFactory.DatasetMapping>(),
                 false,
                 "https://artportalen-st.artdata.slu.se",
                 new ProcessTimeManager(processConfiguration),
