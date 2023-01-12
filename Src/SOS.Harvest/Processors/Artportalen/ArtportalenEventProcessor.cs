@@ -12,6 +12,7 @@ using DnsClient.Internal;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Extensions;
+using System.Text.Json;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -70,21 +71,38 @@ namespace SOS.Harvest.Processors.Artportalen
                 filter.DataProviderIds = new List<int> { 1 };
                 Logger.LogInformation($"AddObservationEventsAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
                 var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
-                Dictionary<string, List<string>> totalOccurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId.ToLower(), m => m.OccurrenceIds);
+                Dictionary<string, List<string>> totalOccurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId.ToLower(), m => m.OccurrenceIds, StringComparer.OrdinalIgnoreCase);
                 var chunks = totalOccurrenceIdsByEventId.Chunk(batchSize);
                 int eventCount = 0;
 
-                foreach (var chunk in chunks) // todo - do this step in parallel
-                {
-                    var occurrenceIdsByEventId = chunk.ToDictionary(m => m.Key, m => m.Value);
+                foreach (KeyValuePair<string, List<string>>[] chunk in chunks) // todo - do this step in parallel
+                {                    
+                    int nrErrors = 0;
+                    Dictionary<string, List<string>> occurrenceIdsByEventId = chunk.ToDictionary(m => m.Key, m => m.Value, StringComparer.OrdinalIgnoreCase);
                     var firstOccurrenceIdInEvents = occurrenceIdsByEventId.Select(m => m.Value.First());
                     var observations = await _processedObservationRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
                     var events = new List<ObservationEvent>();
                     foreach (var observation in observations)
-                    {                        
-                        var occurrenceIds = occurrenceIdsByEventId[observation.Event.EventId.ToLower()];
-                        var eventModel = observation.ToObservationEvent(occurrenceIds);
-                        events.Add(eventModel);
+                    {
+                        string eventId = observation.Event.EventId.ToLower();
+                        if (occurrenceIdsByEventId.TryGetValue(eventId, out var occurrenceIds))
+                        {                            
+                            var eventModel = observation.ToObservationEvent(occurrenceIds);
+                            events.Add(eventModel);
+                        }
+                        else
+                        {
+                            if (nrErrors == 0)
+                            {
+                                Logger.LogError($"Couldnt find the following event in occurrenceIdsByEventId: {eventId}. The following eventIds exists in the dictionary: { JsonSerializer.Serialize(occurrenceIdsByEventId.Keys) }");
+                            }                            
+                            nrErrors++;
+                        }                        
+                    }
+
+                    if (nrErrors > 0)
+                    {
+                        Logger.LogInformation($"Number of errors in AddObservationEventsAsync={nrErrors}");
                     }
 
                     // write to ES
