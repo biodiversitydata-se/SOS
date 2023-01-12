@@ -124,6 +124,7 @@ namespace SOS.Harvest.Processors.Artportalen
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _incrementalMode = incrementalMode;
             _artPortalenUrl = artPortalenUrl ?? throw new ArgumentNullException(nameof(artPortalenUrl));
+            _datasetByProjectId = datasetByProjectId == null ? new Dictionary<int, DatasetMapping>() : datasetByProjectId;
         }
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
@@ -818,7 +819,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
 
         protected string? GetDataStewardshipDatasetId(Observation observation)
-        {
+        {            
             if (observation.Projects == null || observation.Projects.Count() == 0) return null;
 
             DatasetMapping? datasetMapping = null;
@@ -830,7 +831,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 }
             }
             if (datasetMapping == null) return null;
-            return datasetMapping.DatasetIdentifier;
+            return datasetMapping.DatasetIdentifier;            
         }        
 
         public class DatasetMapping
