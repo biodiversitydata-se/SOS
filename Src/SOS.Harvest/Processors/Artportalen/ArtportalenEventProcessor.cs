@@ -76,9 +76,10 @@ namespace SOS.Harvest.Processors.Artportalen
                 int eventCount = 0;
 
                 foreach (KeyValuePair<string, List<string>>[] chunk in chunks) // todo - do this step in parallel
-                {                    
+                {
                     int nrErrors = 0;
                     Dictionary<string, List<string>> occurrenceIdsByEventId = chunk.ToDictionary(m => m.Key, m => m.Value, StringComparer.OrdinalIgnoreCase);
+                    Dictionary<string, string> eventIdByOccurrenceId = CreateEventIdByOccurrenceIdDictionary(occurrenceIdsByEventId);
                     var firstOccurrenceIdInEvents = occurrenceIdsByEventId.Select(m => m.Value.First());
                     var observations = await _processedObservationRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
                     var events = new List<ObservationEvent>();
@@ -86,7 +87,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     {
                         string eventId = observation.Event.EventId.ToLower();
                         if (occurrenceIdsByEventId.TryGetValue(eventId, out var occurrenceIds))
-                        {                            
+                        {
                             var eventModel = observation.ToObservationEvent(occurrenceIds);
                             events.Add(eventModel);
                         }
@@ -94,10 +95,11 @@ namespace SOS.Harvest.Processors.Artportalen
                         {
                             if (nrErrors == 0)
                             {
-                                Logger.LogError($"Couldnt find the following event in occurrenceIdsByEventId: {eventId}. The following eventIds exists in the dictionary: { JsonSerializer.Serialize(occurrenceIdsByEventId.Keys) }");
-                            }                            
+                                string expectedEventId = eventIdByOccurrenceId.GetValueOrDefault(observation.Occurrence.OccurrenceId.ToLower(), "NotFound");
+                                Logger.LogError($"Couldnt find the following event in occurrenceIdsByEventId: EventId={eventId}. OccurrenceId={observation.Occurrence.OccurrenceId}. ExpectedEventId={expectedEventId}. The following eventIds exists in the dictionary: {JsonSerializer.Serialize(occurrenceIdsByEventId.Keys)}");
+                            }
                             nrErrors++;
-                        }                        
+                        }
                     }
 
                     if (nrErrors > 0)
@@ -106,7 +108,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     }
 
                     // write to ES
-                    eventCount += await ValidateAndStoreEvents(dataProvider, events, "");                    
+                    eventCount += await ValidateAndStoreEvents(dataProvider, events, "");
                 }
 
                 Logger.LogInformation("End AddObservationEventsAsync()");
@@ -117,6 +119,20 @@ namespace SOS.Harvest.Processors.Artportalen
                 Logger.LogError(e, "Add data stewardship events failed.");
                 return 0;
             }
+        }
+
+        private static Dictionary<string, string> CreateEventIdByOccurrenceIdDictionary(Dictionary<string, List<string>> occurrenceIdsByEventId)
+        {
+            var eventIdByOccurrenceId = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var pair in occurrenceIdsByEventId)
+            {
+                foreach (var occurrenceId in pair.Value)
+                {
+                    eventIdByOccurrenceId.TryAdd(occurrenceId.ToLower(), pair.Key);
+                }
+            }
+
+            return eventIdByOccurrenceId;
         }
 
         private readonly List<string> _observationEventOutputFields = new List<string>()
