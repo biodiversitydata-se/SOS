@@ -241,11 +241,11 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             
             var customElasticConfiguration = GetCustomSearchDbConfiguration();
             var customElasticClientManager = new ElasticClientManager(customElasticConfiguration);
-            CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, customElasticClientManager, processedConfigurationCache, processClient, memoryCache);
+            //CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, customElasticClientManager, processedConfigurationCache, processClient, memoryCache);
             
             
-            var customObservationManager = CreateObservationManager((ProcessedObservationRepository)CustomProcessedObservationRepository, VocabularyValueResolver, processClient, filterManager);
-            CustomObservationsController = new ObservationsController(customObservationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, customElasticConfiguration, new NullLogger<ObservationsController>());
+            //var customObservationManager = CreateObservationManager((ProcessedObservationRepository)CustomProcessedObservationRepository, VocabularyValueResolver, processClient, filterManager);
+            //CustomObservationsController = new ObservationsController(customObservationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, customElasticConfiguration, new NullLogger<ObservationsController>());
             DwcArchiveFileWriter = dwcArchiveFileWriter;
             var healthCheckConfiguration = new HealthCheckConfiguration
             {
