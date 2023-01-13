@@ -207,6 +207,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var csvFileWriter = new CsvFileWriter(ProcessedObservationRepository, fileService,
                 VocabularyValueResolver, new NullLogger<CsvFileWriter>());
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(VocabularyValueResolver, processClient);
+            var dwcArchiveEventFileWriter = CreateDwcArchiveEventFileWriter(VocabularyValueResolver, processClient);
             var excelFileWriter = new ExcelFileWriter(ProcessedObservationRepository, fileService,
                 VocabularyValueResolver, new NullLogger<ExcelFileWriter>());
             var geojsonFileWriter = new GeoJsonFileWriter(ProcessedObservationRepository, fileService,
@@ -219,7 +220,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ObservationManager = CreateObservationManager((ProcessedObservationRepository)ProcessedObservationRepository, VocabularyValueResolver, processClient, filterManager);
             var taxonSearchManager = CreateTaxonSearchManager(processedTaxonRepository, filterManager);
 
-            var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
+            var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, dwcArchiveEventFileWriter, excelFileWriter, geojsonFileWriter,
                 ProcessedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
             ObservationsController = new ObservationsController(ObservationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
@@ -281,6 +282,22 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 new NullLogger<DwcArchiveFileWriter>());
 
             return dwcArchiveFileWriter;
+        }
+
+        private DwcArchiveEventFileWriter CreateDwcArchiveEventFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
+        {
+            var dwcArchiveEventFileWriter = new DwcArchiveEventFileWriter(
+                new DwcArchiveOccurrenceCsvWriter(vocabularyValueResolver,
+                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                new DwcArchiveEventCsvWriter(vocabularyValueResolver,
+                    new NullLogger<DwcArchiveEventCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new FileService(),
+                new NullLogger<DwcArchiveEventFileWriter>()); ;
+
+            return dwcArchiveEventFileWriter;
         }
 
         private AreaManager CreateAreaManager(ProcessClient processClient)

@@ -11,6 +11,13 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Location
     {
         /// <summary>
+        /// Constructor shoud only be used by reflection
+        /// </summary>
+        public Location() : this(LocationType.Unknown)
+        {
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="type"></param>

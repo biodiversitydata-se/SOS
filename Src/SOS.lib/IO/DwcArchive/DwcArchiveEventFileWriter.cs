@@ -16,6 +16,13 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Models.Export;
+using Hangfire.Server;
+using Hangfire;
+using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -24,26 +31,30 @@ namespace SOS.Lib.IO.DwcArchive
         private readonly IDwcArchiveOccurrenceCsvWriter _dwcArchiveOccurrenceCsvWriter;
         private readonly IDwcArchiveEventCsvWriter _dwcArchiveEventCsvWriter;
         private readonly IExtendedMeasurementOrFactCsvWriter _extendedMeasurementOrFactCsvWriter;
+        private readonly IFileService _fileService;
         private readonly ISimpleMultimediaCsvWriter _simpleMultimediaCsvWriter;
         private readonly IDataProviderRepository _dataProviderRepository;
-        private readonly ILogger<DwcArchiveFileWriter> _logger;
+        private readonly ILogger<DwcArchiveEventFileWriter> _logger;
         private readonly object _eventsLock = new object();
 
         /// <summary>
-        /// Constructor.
+        /// Constructor
         /// </summary>
         /// <param name="dwcArchiveOccurrenceCsvWriter"></param>
         /// <param name="dwcArchiveEventCsvWriter"></param>
         /// <param name="extendedMeasurementOrFactCsvWriter"></param>
         /// <param name="simpleMultimediaCsvWriter"></param>
         /// <param name="dataProviderRepository"></param>
+        /// <param name="fileService"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DwcArchiveEventFileWriter(IDwcArchiveOccurrenceCsvWriter dwcArchiveOccurrenceCsvWriter,
             IDwcArchiveEventCsvWriter dwcArchiveEventCsvWriter,
             IExtendedMeasurementOrFactCsvWriter extendedMeasurementOrFactCsvWriter,
             ISimpleMultimediaCsvWriter simpleMultimediaCsvWriter,
             IDataProviderRepository dataProviderRepository,
-            ILogger<DwcArchiveFileWriter> logger)
+            IFileService fileService,
+            ILogger<DwcArchiveEventFileWriter> logger)
         {
             _dwcArchiveOccurrenceCsvWriter = dwcArchiveOccurrenceCsvWriter ??
                                              throw new ArgumentNullException(nameof(dwcArchiveOccurrenceCsvWriter));
@@ -55,6 +66,7 @@ namespace SOS.Lib.IO.DwcArchive
             _simpleMultimediaCsvWriter = simpleMultimediaCsvWriter ?? throw new ArgumentNullException(nameof(simpleMultimediaCsvWriter));
             _dataProviderRepository =
                 dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -137,7 +149,7 @@ namespace SOS.Lib.IO.DwcArchive
             // Create Occurrence event CSV file - exclude event data
             var occurrenceCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Occurrence];
             var dwcEventObservations = processedObservations.ToDarwinCore();
-            var occurrenceFieldDescriptions = FieldDescriptionHelper.GetAllDwcEventCoreOccurrenceFieldDescriptions();
+            var occurrenceFieldDescriptions = FieldDescriptionHelper.GetAllDwcCoreEventOccurrenceFieldDescriptions();
             await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
             await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
                 dwcEventObservations,
@@ -158,7 +170,142 @@ namespace SOS.Lib.IO.DwcArchive
             //}
         }
 
-        public async Task<string> CreateEventDwcArchiveFileAsync(
+        public async Task<FileExportResult> CreateEventDwcArchiveFileAsync(
+            DataProvider dataProvider,
+            SearchFilter filter,
+            string fileName,
+            IProcessedObservationCoreRepository processedObservationRepository,
+            ProcessInfo processInfo,
+            string exportFolderPath,
+            IJobCancellationToken cancellationToken)
+        {
+            string temporaryZipExportFolderPath = null;
+
+            try
+            {
+                temporaryZipExportFolderPath = Path.Combine(exportFolderPath, fileName);
+                _fileService.CreateFolder(temporaryZipExportFolderPath);
+                var eventCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "event.txt");
+                var occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.txt");
+                var emofCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "extendedMeasurementOrFact.txt");
+                var multimediaCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "multimedia.txt");
+                var metaXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "meta.xml");
+                var emlXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "eml.xml");
+                var processInfoXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "processinfo.xml");
+                bool eventFileCreated = false;
+                bool emofFileCreated = false;
+                bool multimediaFileCreated = false;
+                int nrObservations = 0;
+                var expectedNoOfObservations = await processedObservationRepository.GetMatchCountAsync(filter);
+
+                // Create Event.txt
+                using (var fileStream = File.Create(eventCsvFilePath, 128 * 1024))
+                {
+                    eventFileCreated = await _dwcArchiveEventCsvWriter.CreateEventCsvFileAsync(
+                        filter,
+                        fileStream,
+                        FieldDescriptionHelper.GetAllDwcEventCoreFieldDescriptions(),
+                        processedObservationRepository,
+                        cancellationToken);
+                }
+
+                // Create Occurrence.txt
+                using (var fileStream = File.Create(occurrenceCsvFilePath, 128 * 1024))
+                {
+                    nrObservations = await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                        filter,
+                        fileStream,
+                        FieldDescriptionHelper.GetAllDwcCoreEventOccurrenceFieldDescriptions(),
+                        processedObservationRepository,
+                        cancellationToken,
+                        false,
+                        true);
+                }
+
+                // If less than 99% of expected observations where fetched, something is wrong
+                if (nrObservations < expectedNoOfObservations * 0.99)
+                {
+                    throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
+                }
+
+                // Create ExtendedMeasurementOrFact.txt
+                using (var fileStream = File.Create(emofCsvFilePath))
+                {
+                    emofFileCreated = await _extendedMeasurementOrFactCsvWriter.CreateCsvFileAsync(
+                        filter,
+                        fileStream,
+                        processedObservationRepository,
+                        cancellationToken);
+                }
+
+                // Create multimedia.txt
+                using (var fileStream = File.Create(multimediaCsvFilePath))
+                {
+                    multimediaFileCreated = await _simpleMultimediaCsvWriter.CreateCsvFileAsync(
+                        filter,
+                        fileStream,
+                        processedObservationRepository,
+                        cancellationToken);
+                }
+
+                // Delete extension files if not used.
+                if (!emofFileCreated && File.Exists(emofCsvFilePath)) File.Delete(emofCsvFilePath);
+                if (!multimediaFileCreated && File.Exists(multimediaCsvFilePath)) File.Delete(multimediaCsvFilePath);
+
+                // Create meta.xml
+                using (var fileStream = File.Create(metaXmlFilePath))
+                {
+                    var dwcExtensions = new List<DwcaFilePart>();
+                    if (emofFileCreated) dwcExtensions.Add(DwcaFilePart.Emof);
+                    if (multimediaFileCreated) dwcExtensions.Add(DwcaFilePart.Multimedia);
+                    //DwcArchiveMetaFileWriter.CreateMetaXmlFile(fileStream, fieldDescriptions.ToList(), dwcExtensions);
+                }
+
+                var emlFile = await _dataProviderRepository.GetEmlAsync(dataProvider.Id);
+                if (emlFile == null)
+                {
+                    throw new Exception($"No eml found for provider: {dataProvider.Identifier}");
+                }
+                else
+                {
+                    DwCArchiveEmlFileFactory.SetPubDateToCurrentDate(emlFile);
+                    await using var fileStream = File.Create(emlXmlFilePath);
+                    await emlFile.SaveAsync(fileStream, SaveOptions.None, CancellationToken.None);
+                }
+
+                // Create processinfo.xml
+                if (processInfo != null)
+                {
+                    await using var processInfoFileStream = File.Create(processInfoXmlFilePath);
+                    DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
+                    processInfoFileStream.Close();
+                }
+
+                var zipFilePath = _fileService.CompressFolder(exportFolderPath, fileName);
+                _fileService.DeleteFolder(temporaryZipExportFolderPath);
+                return new FileExportResult
+                {
+                    FilePath = zipFilePath,
+                    NrObservations = nrObservations
+                };
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("CreateDwcArchiveFile was canceled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to create Dwc Archive File.");
+                throw;
+            }
+            finally
+            {
+                _fileService.DeleteFolder(temporaryZipExportFolderPath);
+            }
+        }
+
+        public async Task<FileExportResult> CreateEventDwcArchiveFileAsync(
             DataProvider dataProvider,
             string exportFolderPath,
             DwcaFilePartsInfo dwcaFilePartsInfo)
@@ -175,7 +322,7 @@ namespace SOS.Lib.IO.DwcArchive
                 File.Move(tempFilePath, filePath, true);
                 _logger.LogInformation($"A new .zip({filePath}) was created.");
 
-                return filePath;
+                return new FileExportResult { FilePath = filePath };
             }
             catch (Exception e)
             {
@@ -193,7 +340,7 @@ namespace SOS.Lib.IO.DwcArchive
         {
             var fieldDescriptions = FieldDescriptionHelper.GetAllDwcEventCoreFieldDescriptions().ToList();
             var eventCoreOccurrenceFieldDescriptions =
-                FieldDescriptionHelper.GetAllDwcEventCoreOccurrenceFieldDescriptions().ToList();
+                FieldDescriptionHelper.GetAllDwcCoreEventOccurrenceFieldDescriptions().ToList();
            
             using var archive = ZipFile.Open(tempFilePath, ZipArchiveMode.Create);
             var dwcExtensions = new List<DwcaEventFilePart>();
@@ -308,7 +455,7 @@ namespace SOS.Lib.IO.DwcArchive
             csvFileHelper.InitializeWrite(compressedFileStream, "\t");
 
             _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvFileHelper,
-                FieldDescriptionHelper.GetAllDwcEventCoreOccurrenceFieldDescriptions());
+                FieldDescriptionHelper.GetAllDwcCoreEventOccurrenceFieldDescriptions());
             csvFileHelper.FinishWrite();
         }
 

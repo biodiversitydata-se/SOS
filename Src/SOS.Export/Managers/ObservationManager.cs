@@ -18,6 +18,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.IO.DwcArchive;
 
 namespace SOS.Export.Managers
 {
@@ -30,6 +31,7 @@ namespace SOS.Export.Managers
         private readonly IBlobStorageService _blobStorageService;
         private readonly ICsvFileWriter _csvWriter;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
+        private readonly IDwcArchiveEventFileWriter _dwcArchiveEventFileWriter;
         private readonly IExcelFileWriter _excelWriter;
         private readonly IGeoJsonFileWriter _geoJsonWriter;
         private readonly string _exportPath;
@@ -43,6 +45,7 @@ namespace SOS.Export.Managers
         /// Constructor
         /// </summary>
         /// <param name="dwcArchiveFileWriter"></param>
+        /// <param name="dwcArchiveEventFileWriter"></param>
         /// <param name="excelWriter"></param>
         /// <param name="geoJsonWriter"></param>
         /// <param name="csvWriter"></param>
@@ -54,8 +57,10 @@ namespace SOS.Export.Managers
         /// <param name="fileDestination"></param>
         /// <param name="filterManager"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ObservationManager(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
+            IDwcArchiveEventFileWriter dwcArchiveEventFileWriter,
             IExcelFileWriter excelWriter,
             IGeoJsonFileWriter geoJsonWriter,
             ICsvFileWriter csvWriter,
@@ -70,6 +75,8 @@ namespace SOS.Export.Managers
         {
             _dwcArchiveFileWriter =
                 dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
+            _dwcArchiveEventFileWriter = 
+                dwcArchiveEventFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveEventFileWriter));
             _excelWriter =
                 excelWriter ?? throw new ArgumentNullException(nameof(excelWriter));
             _geoJsonWriter =
@@ -117,7 +124,7 @@ namespace SOS.Export.Managers
                 fileExportResult = exportFormat switch
                 {
                     ExportFormat.Csv => await CreateCsvExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, cancellationToken),
-                    ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken),
+                    ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), false, cancellationToken),
                     ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, cancellationToken),
                     ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken)
                 };
@@ -166,7 +173,7 @@ namespace SOS.Export.Managers
             try
             {
                 await _filterManager.PrepareFilterAsync(null, null, filter);
-                fileExportResult = await CreateDWCExportAsync(filter, fileName, cancellationToken);
+                fileExportResult = await CreateDWCExportAsync(filter, fileName, false, cancellationToken);
 
                 // Blob Storage Containers must be in lower case
                 blobStorageContainer = blobStorageContainer?.ToLower();
@@ -240,20 +247,33 @@ namespace SOS.Export.Managers
         }
 
         /// <summary>
-        ///     Create a Darwin Core Archive file
+        ///  Create a Darwin Core Archive file
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
+        /// <param name="eventDwC"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>Path to created file</returns>
-        private async Task<FileExportResult> CreateDWCExportAsync(SearchFilter filter, string fileName,
+        /// <returns></returns>
+        private async Task<FileExportResult> CreateDWCExportAsync(SearchFilter filter, string fileName, bool eventDwC,
             IJobCancellationToken cancellationToken)
         {
             try
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
+                if (eventDwC)
+                {
+                    return await _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileAsync(
+                       DataProvider.FilterSubsetDataProvider,
+                       filter,
+                       fileName,
+                       _processedObservationRepository,
+                       processInfo,
+                       _exportPath,
+                       cancellationToken);
+                }
+               
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
-                var fileExportResult = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                return await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,
                     filter,
                     fileName,
@@ -261,10 +281,7 @@ namespace SOS.Export.Managers
                     fieldDescriptions,
                     processInfo,
                     _exportPath,
-                    cancellationToken);
-                cancellationToken?.ThrowIfCancellationRequested();
-
-                return fileExportResult;
+                    cancellationToken); 
             }
             catch (JobAbortedException)
             {

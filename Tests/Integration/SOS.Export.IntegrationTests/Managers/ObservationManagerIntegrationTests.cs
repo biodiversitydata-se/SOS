@@ -25,6 +25,7 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
 using Xunit;
+using SOS.Lib.IO.DwcArchive.Interfaces;
 
 namespace SOS.Export.IntegrationTests.Managers
 {
@@ -56,6 +57,18 @@ namespace SOS.Export.IntegrationTests.Managers
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new NullLogger<DwcArchiveFileWriter>());
 
+            var dwcArchiveEventFileWriter = new DwcArchiveEventFileWriter(
+                new DwcArchiveOccurrenceCsvWriter(
+                    vocabularyValueResolver,
+                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                new DwcArchiveEventCsvWriter(vocabularyValueResolver, new NullLogger<DwcArchiveEventCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new FileService(),
+                new NullLogger<DwcArchiveEventFileWriter>());
+
+
             var processedConfigurationRepository = new ProcessedConfigurationRepository(processClient,
                 new NullLogger<ProcessedConfigurationRepository>());
 
@@ -81,6 +94,7 @@ namespace SOS.Export.IntegrationTests.Managers
 
             var observationManager = new ObservationManager(
                 dwcArchiveFileWriter,
+                dwcArchiveEventFileWriter,
                 excelWriter,
                 geoJsonlWriter,
                 csvWriter,

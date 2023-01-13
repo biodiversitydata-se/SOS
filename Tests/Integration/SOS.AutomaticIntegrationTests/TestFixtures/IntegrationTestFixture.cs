@@ -303,6 +303,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var csvFileWriter = new CsvFileWriter(processedObservationRepository, fileService,
                 _vocabularyValueResolver, new NullLogger<CsvFileWriter>());
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(_vocabularyValueResolver, _processClient);
+            var dwcArchiveEventFileWriter = CreateDwcArchiveEventFileWriter(_vocabularyValueResolver, _processClient);
             var excelFileWriter = new ExcelFileWriter(processedObservationRepository, fileService,
                 _vocabularyValueResolver, new NullLogger<ExcelFileWriter>());
             var geojsonFileWriter = new GeoJsonFileWriter(processedObservationRepository, fileService,
@@ -315,7 +316,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var observationManager = CreateObservationManager(processedObservationRepository, _vocabularyValueResolver, _processClient, filterManager);
             var taxonProcessedTaxonRepository = CreateProcessedTaxonRepository(elasticConfiguration, elasticClientManager, _processClient, taxonManager);
             var taxonSearchManager = CreateTaxonSearchManager(taxonProcessedTaxonRepository, filterManager);
-            var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
+            var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, dwcArchiveEventFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(_processClient, new NullLogger<UserExportRepository>());
             ObservationsController = new ObservationsController(observationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
@@ -402,6 +403,22 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 new NullLogger<DwcArchiveFileWriter>());
 
             return dwcArchiveFileWriter;
+        }
+
+        private DwcArchiveEventFileWriter CreateDwcArchiveEventFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
+        {
+            var dwcArchiveEventFileWriter = new DwcArchiveEventFileWriter(
+                new DwcArchiveOccurrenceCsvWriter(vocabularyValueResolver,
+                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                 new DwcArchiveEventCsvWriter(vocabularyValueResolver,
+                    new NullLogger<DwcArchiveEventCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new FileService(),
+                new NullLogger<DwcArchiveEventFileWriter>());
+
+            return dwcArchiveEventFileWriter;
         }
 
         private AreaManager CreateAreaManager(ProcessClient processClient)

@@ -10,9 +10,13 @@
         /// </summary>
         Csv,
         /// <summary>
-        /// Export format DarwinCore Archive
+        /// Export format Darwin Core Archive
         /// </summary>
         DwC,
+        /// <summary>
+        /// Export format event based Darwin Core Archive
+        /// </summary>
+        DwCEvent,
         /// <summary>
         /// Export format GeoJson
         /// </summary>

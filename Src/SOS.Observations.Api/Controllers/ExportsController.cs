@@ -400,6 +400,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
+            [FromQuery] bool eventBased = false,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false)
         {
@@ -421,7 +422,7 @@ namespace SOS.Observations.Api.Controllers
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
-                        ExportFormat.DwC,
+                        eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
                         _exportPath, 
                         Cultures.en_GB, 
                         false,
@@ -670,6 +671,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter, 
             [FromQuery] string description,
+            [FromQuery] bool eventBased = false,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool sendMailFromZendTo = true,
@@ -690,7 +692,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.DwC, "en-GB", false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
                         PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -699,7 +701,7 @@ namespace SOS.Observations.Api.Controllers
                     Status = ExportJobStatus.Queued,
                     CreatedDate = DateTime.UtcNow,
                     NumberOfObservations = Convert.ToInt32(validateResult.Count),
-                    Format = ExportFormat.DwC,
+                    Format = eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
                     Description = description                    
                 };
 
@@ -935,6 +937,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] bool eventBased = false,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false)
         {
@@ -956,7 +959,7 @@ namespace SOS.Observations.Api.Controllers
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
-                        ExportFormat.DwC,
+                        eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
                         _exportPath,
                         Cultures.en_GB,
                         false,
@@ -1204,6 +1207,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto filter,
             [FromQuery] string description,
+            [FromQuery] bool eventBased = false,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool sendMailFromZendTo = true,
@@ -1224,7 +1228,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.DwC, "en-GB", false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
                         PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -1233,7 +1237,7 @@ namespace SOS.Observations.Api.Controllers
                     Status = ExportJobStatus.Queued,
                     CreatedDate = DateTime.UtcNow,
                     NumberOfObservations = Convert.ToInt32(validateResult.Count),
-                    Format = ExportFormat.DwC,
+                    Format = eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
                     Description = description
                 };
 

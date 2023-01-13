@@ -59,6 +59,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter"></param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
@@ -66,6 +67,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilterDto filter,
+            bool eventBased = false,
             bool validateSearchFilter = false,
             bool sensitiveObservations = false);
 
@@ -164,6 +166,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
@@ -175,6 +178,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilterDto filter,
             string description,
+            bool eventBased = false,
             bool validateSearchFilter = false,
             bool sensitiveObservations = false,
             bool sendMailFromZendTo = true,
@@ -282,6 +286,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter"></param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
@@ -289,6 +294,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilterInternalDto filter,
+            bool eventBased = false,
             bool validateSearchFilter = false,
             bool sensitiveObservations = false);
 
@@ -387,6 +393,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
@@ -398,6 +405,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilterInternalDto filter,
             string description,
+            bool eventBased = false,
             bool validateSearchFilter = false,
             bool sensitiveObservations = false,
             bool sendMailFromZendTo = true,

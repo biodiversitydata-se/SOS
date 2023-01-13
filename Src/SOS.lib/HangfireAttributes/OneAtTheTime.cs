@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Net;
 using Hangfire.Common;
 using Hangfire.States;
 using Hangfire.Storage;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SOS.Lib.HangfireAttributes
 {
@@ -76,7 +78,7 @@ namespace SOS.Lib.HangfireAttributes
                 throw new NotSupportedException("This version of storage doesn't support extended methods. Please try to update to the latest version.");
             }
 
-            string blockedBy;
+            string blockedBy = null;
 
             try
             {
@@ -97,7 +99,21 @@ namespace SOS.Lib.HangfireAttributes
                         0,
                         0);
 
-                    blockedBy = range.Count > 0 ? range[0] : null;
+                    foreach(var jobId in range)
+                    {
+                        var jobData = storageConnection.GetJobData(jobId);
+
+                        if (jobData == null)
+                        {
+                            continue;
+                        }
+
+                        if (jobData.State.Equals("Processing", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            blockedBy = jobId;
+                            break;
+                        }
+                    }
 
                     // We should permit an invocation only when the set is empty, or if current background
                     // job is already owns a resource. This may happen, when the localTransaction succeeded,

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
-using SOS.Export.Models;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search.Filters;
@@ -20,12 +19,10 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="stream"></param>
-        /// <param name="fieldDescriptions"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<bool> CreateCsvFileAsync(SearchFilterBase filter, Stream stream,
-            IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationCoreRepository processedObservationRepository,
             IJobCancellationToken cancellationToken);
 

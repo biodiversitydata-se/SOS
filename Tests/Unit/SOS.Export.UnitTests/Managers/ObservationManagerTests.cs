@@ -19,6 +19,7 @@ using SOS.Lib.Services.Interfaces;
 using Xunit;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.IO.DwcArchive;
 
 namespace SOS.Export.UnitTests.Managers
 {
@@ -33,6 +34,7 @@ namespace SOS.Export.UnitTests.Managers
         public ObservationManagerTests()
         {
             _dwcArchiveFileWriterMock = new Mock<IDwcArchiveFileWriter>();
+            _dwcArchiveEventFileWriter = new Mock<IDwcArchiveEventFileWriter>();
             _excelFileWriter = new Mock<IExcelFileWriter>();
             _geoJsonFileWriter = new Mock<IGeoJsonFileWriter>();
             _csvFileWriter = new Mock<ICsvFileWriter>();
@@ -46,6 +48,7 @@ namespace SOS.Export.UnitTests.Managers
         }
 
         private readonly Mock<IDwcArchiveFileWriter> _dwcArchiveFileWriterMock;
+        private readonly Mock<IDwcArchiveEventFileWriter> _dwcArchiveEventFileWriter;
         private readonly Mock<IExcelFileWriter> _excelFileWriter;
         private readonly Mock<IGeoJsonFileWriter> _geoJsonFileWriter;
         private readonly Mock<ICsvFileWriter> _csvFileWriter;
@@ -62,6 +65,7 @@ namespace SOS.Export.UnitTests.Managers
         /// </summary>
         private ObservationManager TestObject => new ObservationManager(
             _dwcArchiveFileWriterMock.Object,
+            _dwcArchiveEventFileWriter.Object,
             _excelFileWriter.Object,
             _geoJsonFileWriter.Object,
             _csvFileWriter.Object,

@@ -452,14 +452,15 @@ namespace SOS.Lib.Helpers
             ,FieldDescriptionId.LithostratigraphicTerms
             ,FieldDescriptionId.LowestBiostratigraphicZone
             ,FieldDescriptionId.Member
+            ,FieldDescriptionId.AccessRights
         };
 
-        public static IEnumerable<FieldDescription> GetAllDwcEventCoreOccurrenceFieldDescriptions()
+        public static IEnumerable<FieldDescription> GetAllDwcCoreEventOccurrenceFieldDescriptions()
         {
-            return GetFieldDescriptions(AllDwcEventCoreOccurrenceFieldDescriptions);
+            return GetFieldDescriptions(AllDwcCoreEventOccurrenceFieldDescriptions);
         }
 
-        private static readonly FieldDescriptionId[] AllDwcEventCoreOccurrenceFieldDescriptions =
+        private static readonly FieldDescriptionId[] AllDwcCoreEventOccurrenceFieldDescriptions =
         {
             FieldDescriptionId.EventID,
             FieldDescriptionId.OccurrenceID,

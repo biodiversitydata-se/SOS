@@ -139,7 +139,6 @@ namespace SOS.Lib.IO.DwcArchive
                     emofFileCreated = await _extendedMeasurementOrFactCsvWriter.CreateCsvFileAsync(
                         filter,
                         fileStream,
-                        fieldDescriptions,
                         processedObservationRepository,
                         cancellationToken);
                 }
@@ -150,7 +149,6 @@ namespace SOS.Lib.IO.DwcArchive
                     multimediaFileCreated = await _simpleMultimediaCsvWriter.CreateCsvFileAsync(
                         filter,
                         fileStream,
-                        fieldDescriptions,
                         processedObservationRepository,
                         cancellationToken);
                 }

@@ -27,7 +27,6 @@ namespace SOS.Lib.IO.DwcArchive
         public async Task<bool> CreateCsvFileAsync(
             SearchFilterBase filter,
             Stream stream,
-            IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationCoreRepository processedObservationRepository,
             IJobCancellationToken cancellationToken)
         {

@@ -29,16 +29,16 @@ namespace SOS.Lib.IO.DwcArchive
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="stream"></param>
-        /// <param name="fieldDescriptions"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>True if any records is written to the file; otherwise false.</returns>
+        /// <param name="isEventCore"></param>
+        /// <returns></returns>
         public async Task<bool> CreateCsvFileAsync(
             SearchFilterBase filter,
             Stream stream,
-            IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationCoreRepository processedObservationRepository,
-            IJobCancellationToken cancellationToken)
+            IJobCancellationToken cancellationToken,
+            bool isEventCore = false)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace SOS.Lib.IO.DwcArchive
                 csvFileHelper.InitializeWrite(stream, "\t");
 
                 // Write header row
-                WriteHeaderRow(csvFileHelper);
+                WriteHeaderRow(csvFileHelper, isEventCore);
 
                 while (scrollResult.Records.Any())
                 {
