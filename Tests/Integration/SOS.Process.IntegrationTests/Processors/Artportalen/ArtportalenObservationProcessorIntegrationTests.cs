@@ -114,6 +114,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
 
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
+            var datasetRepository = new ArtportalenDatasetMetadataRepository(processClient, new NullLogger<ArtportalenDatasetMetadataRepository>());
             var artportalenVerbatimRepository = new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>());
 
             
@@ -130,6 +131,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 artportalenVerbatimRepository,
                 processedObservationRepository,
                 vocabularyRepository,
+                datasetRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 dwcArchiveFileWriterCoordinator,
                 processManager,

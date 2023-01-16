@@ -69,7 +69,7 @@
             public string ProjectId { get; set; }
             public string ProjectCode { get; set; }
             public int ProjectTypeId { get; set; }
-            public int ApProjectId { get; set; }
+            public int? ApProjectId { get; set; }
         }
 
         public class DS_ProjectType

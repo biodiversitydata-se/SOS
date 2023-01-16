@@ -7,6 +7,8 @@ using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Process.UnitTests.TestHelpers.Factories;
 using Xunit;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using Moq;
 
 namespace SOS.Process.UnitTests.TestHelpers
 {
@@ -32,14 +34,15 @@ namespace SOS.Process.UnitTests.TestHelpers
 
         private ArtportalenObservationFactory CreateArtportalenObservationFactory()
         {
-
             var dataProviderDummy = new DataProvider();
             var vocabularyRepository = VocabularyRepositoryStubFactory.Create();
+            var datasetRepositoryMock = new Mock<IArtportalenDatasetMetadataRepository>();
             var processConfiguration = new ProcessConfiguration();
             var factory = ArtportalenObservationFactory.CreateAsync(
                 dataProviderDummy,
                 new Dictionary<int, Taxon>(), 
                 vocabularyRepository.Object,
+                datasetRepositoryMock.Object,
                 false,
                 "https://artportalen-st.artdata.slu.se",
                 new ProcessTimeManager(processConfiguration),

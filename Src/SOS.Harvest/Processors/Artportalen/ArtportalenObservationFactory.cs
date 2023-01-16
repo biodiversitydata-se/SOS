@@ -25,6 +25,7 @@ namespace SOS.Harvest.Processors.Artportalen
     public class ArtportalenObservationFactory : ObservationFactoryBase, IObservationFactory<ArtportalenObservationVerbatim>
     { 
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
+        private readonly IDictionary<int, DatasetMapping> _datasetByProjectId;
         private readonly bool _incrementalMode;
         private readonly string _artPortalenUrl;
         private int[] _validationStatusIdIds = new[] {
@@ -114,6 +115,7 @@ namespace SOS.Harvest.Processors.Artportalen
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
+            IDictionary<int, DatasetMapping> datasetByProjectId,
             bool incrementalMode,
             string artPortalenUrl, 
             IProcessTimeManager processTimeManager,
@@ -122,20 +124,56 @@ namespace SOS.Harvest.Processors.Artportalen
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _incrementalMode = incrementalMode;
             _artPortalenUrl = artPortalenUrl ?? throw new ArgumentNullException(nameof(artPortalenUrl));
+            _datasetByProjectId = datasetByProjectId == null ? new Dictionary<int, DatasetMapping>() : datasetByProjectId;
         }
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
+            IArtportalenDatasetMetadataRepository datasetRepository,
             bool incrementalMode,
             string artPortalenUrl,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration)
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
+            var allDatasets = await datasetRepository.GetAllAsync();
             var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies?.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode, artPortalenUrl, processTimeManager, processConfiguration);
+            var datasetByProjectId = CreateDatasetMappingDictionary(allDatasets);
+            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, datasetByProjectId, incrementalMode, artPortalenUrl, processTimeManager, processConfiguration);
+        }
+
+        private static List<DatasetMapping> GetDatasetMappings(List<ArtportalenDatasetMetadata> datasets)
+        {
+            List<DatasetMapping> mappings = new List<DatasetMapping>();
+            foreach (var dataset in datasets)
+            {
+                mappings.Add(new DatasetMapping()
+                {
+                    DatasetIdentifier = dataset.Identifier,
+                    ProjectIdsSet = dataset.Projects.Where(m => m.ApProjectId.HasValue).Select(m => m.ApProjectId.Value).ToHashSet(),
+                });
+            }
+
+            return mappings;
+        }
+
+        private static Dictionary<int, DatasetMapping> CreateDatasetMappingDictionary(List<ArtportalenDatasetMetadata> datasets)
+        {
+            var dictionary = new Dictionary<int, DatasetMapping>();
+            if (datasets == null || !datasets.Any()) return dictionary;
+
+            var mappings = GetDatasetMappings(datasets);
+            foreach (var mapping in mappings)
+            {
+                foreach (var projectId in mapping.ProjectIdsSet)
+                {
+                    dictionary.TryAdd(projectId, mapping);
+                }
+            }
+
+            return dictionary;
         }
 
         /// <summary>
@@ -781,60 +819,24 @@ namespace SOS.Harvest.Processors.Artportalen
 
 
         protected string? GetDataStewardshipDatasetId(Observation observation)
-        {
+        {            
             if (observation.Projects == null || observation.Projects.Count() == 0) return null;
 
-            DataStewardshipMapping? dataStewardshipMapping = null;
+            DatasetMapping? datasetMapping = null;
             foreach (var project in observation.Projects)
             {
-                if (DataStewardshipByProjectId.TryGetValue(project.Id, out dataStewardshipMapping))
+                if (_datasetByProjectId.TryGetValue(project.Id, out datasetMapping))
                 {
                     break;
                 }
             }
-            if (dataStewardshipMapping == null) return null;
-            return dataStewardshipMapping.DatasetId;
+            if (datasetMapping == null) return null;
+            return datasetMapping.DatasetIdentifier;            
         }        
 
-        private List<DataStewardshipMapping> dataStewardshipMappings = new List<DataStewardshipMapping>()
+        public class DatasetMapping
         {
-            new DataStewardshipMapping
-            {
-                DatasetId = "ArtportalenDataHost - Dataset Bats",
-                ProjectIdsSet = new HashSet<int>() { 3606 }
-            }
-        };
-
-        private Dictionary<int, DataStewardshipMapping> _dataStewardshipByProjectId;
-        private object _dataStewardshipByProjectIdLock = new object();
-        private Dictionary<int, DataStewardshipMapping> DataStewardshipByProjectId
-        {
-            get
-            {
-                if (_dataStewardshipByProjectId == null)
-                {
-                    lock (_dataStewardshipByProjectIdLock)
-                    {
-                        var dictionary = new Dictionary<int, DataStewardshipMapping>();                        
-                        foreach (var mapping in dataStewardshipMappings)
-                        {
-                            foreach (var projectId in mapping.ProjectIdsSet)
-                            {
-                                dictionary.TryAdd(projectId, mapping);
-                            }
-                        }
-
-                        _dataStewardshipByProjectId = dictionary;
-                    }
-                }
-
-                return _dataStewardshipByProjectId;
-            }
-        }
-
-        private class DataStewardshipMapping
-        {
-            public string DatasetId { get; set; }
+            public string DatasetIdentifier { get; set; }
             public HashSet<int> ProjectIdsSet { get; set; }
         }
     }

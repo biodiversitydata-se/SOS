@@ -64,7 +64,7 @@ namespace SOS.Lib.Models.Processed.Observation
             public string ProjectId { get; set; }
             public string ProjectCode { get; set; }
             public ProjectType ProjectType { get; set; }
-            public int ApProjectId { get; set; }
+            public int? ApProjectId { get; set; }
         }
 
         public class ProjectType

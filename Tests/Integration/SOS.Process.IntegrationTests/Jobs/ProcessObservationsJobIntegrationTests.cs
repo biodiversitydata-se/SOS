@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
@@ -35,7 +34,6 @@ using SOS.Harvest.Processors.VirtualHerbarium;
 using SOS.Harvest.Repositories.Source.Artportalen;
 using SOS.Harvest.Services;
 using Xunit;
-using SOS.Lib.Managers.Interfaces;
 using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
 using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
@@ -109,6 +107,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
+            var artportalenDatasetRepository =
+                new ArtportalenDatasetMetadataRepository( processClient, new NullLogger<ArtportalenDatasetMetadataRepository>());
             var vocabularyValueResolver =
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
@@ -217,6 +217,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedObservationRepository,
                 vocabularyRepository,
+                artportalenDatasetRepository,
                 vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 processManager,

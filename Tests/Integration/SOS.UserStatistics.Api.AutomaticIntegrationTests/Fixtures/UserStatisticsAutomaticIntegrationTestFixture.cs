@@ -50,6 +50,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
         _processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
             mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
+        var datasetRepository = new ArtportalenDatasetMetadataRepository(_processClient, new NullLogger<ArtportalenDatasetMetadataRepository>());
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
         var taxonRepository = new TaxonRepository(_processClient, new NullLogger<TaxonRepository>());
         _taxa = GetUseTaxonZipCollection() ? GetTaxaFromZipFile() : await taxonRepository.GetAllAsync();
@@ -71,6 +72,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
             new DataProvider { Id = 1 },
             _taxaById,
             _vocabularyRepository,
+            datasetRepository,
             false,
             "https://www.artportalen.se",
             _processTimeManager,

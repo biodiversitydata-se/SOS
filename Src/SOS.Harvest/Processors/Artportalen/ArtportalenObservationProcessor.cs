@@ -25,6 +25,7 @@ namespace SOS.Harvest.Processors.Artportalen
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly ISightingRepository _sightingRepository;
         private readonly IVocabularyRepository _processedVocabularyRepository;
+        private readonly IArtportalenDatasetMetadataRepository _artportalenDatasetRepository;
         private readonly string _artPortalenUrl;
 
         /// <summary>
@@ -47,6 +48,7 @@ namespace SOS.Harvest.Processors.Artportalen
         public ArtportalenObservationProcessor(IArtportalenVerbatimRepository artportalenVerbatimRepository,
             IProcessedObservationCoreRepository processedObservationRepository,
             IVocabularyRepository processedVocabularyRepository,
+            IArtportalenDatasetMetadataRepository artportalenDatasetRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,
@@ -63,6 +65,7 @@ namespace SOS.Harvest.Processors.Artportalen
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _processedVocabularyRepository = processedVocabularyRepository ??
                                                throw new ArgumentNullException(nameof(processedVocabularyRepository));
+            _artportalenDatasetRepository = artportalenDatasetRepository ?? throw new ArgumentException(nameof(artportalenDatasetRepository));
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
             _artPortalenUrl = processConfiguration?.ArtportalenUrl ?? throw new ArgumentNullException(nameof(processConfiguration));
         }
@@ -71,13 +74,14 @@ namespace SOS.Harvest.Processors.Artportalen
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,            
-            JobRunModes mode,
+            JobRunModes mode,            
             IJobCancellationToken cancellationToken)
         {
             var observationFactory =
                 await ArtportalenObservationFactory.CreateAsync(dataProvider, 
                     taxa, 
                     _processedVocabularyRepository,
+                    _artportalenDatasetRepository,
                     mode != JobRunModes.Full, 
                     _artPortalenUrl, 
                     TimeManager,
@@ -125,6 +129,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 await ArtportalenObservationFactory.CreateAsync(dataProvider,
                     taxa,
                     _processedVocabularyRepository,
+                    _artportalenDatasetRepository,
                     true,
                     _artPortalenUrl,
                     TimeManager,

@@ -292,6 +292,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             ProcessedChecklistRepository = CreateProcessedChecklistRepository(elasticConfiguration, elasticClientManager, _processClient);
             UserObservationRepository = CreateUserObservationRepository(elasticConfiguration, elasticClientManager, _processClient);
             _vocabularyRepository = new VocabularyRepository(_processClient, new NullLogger<VocabularyRepository>());
+            var datasetRepository = new ArtportalenDatasetMetadataRepository(_processClient, new NullLogger<ArtportalenDatasetMetadataRepository>());
             var vocabularyManger = CreateVocabularyManager(_processClient, _vocabularyRepository);
             var projectManger = CreateProjectManager(_processClient);
             var processInfoRepository = new ProcessInfoRepository(_processClient, new NullLogger<ProcessInfoRepository>());
@@ -356,6 +357,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 artportalenDataProvider,
                 _taxaById,
                 _vocabularyRepository,
+                datasetRepository,
                 false,
                 "https://www.artportalen.se",
                 _processTimeManager,
@@ -429,7 +431,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return areaManager;
         }
 
-        private TaxonManager CreateTaxonManager(ProcessClient processClient, 
+        private TaxonManager CreateTaxonManager(ProcessClient processClient,
             TaxonRepository taxonRepository, 
             IMemoryCache memoryCache, 
             IClassCache<TaxonTree<IBasicTaxon>> taxonTreeCache)
