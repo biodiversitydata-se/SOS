@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -39,10 +39,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Src\External\DwC-A_dotnet\DwC-A_dotnet.csproj" />
     <ProjectReference Include="..\..\..\Src\SOS.DataStewardship.Api\SOS.DataStewardship.Api.csproj" />
+    <ProjectReference Include="..\..\..\Src\SOS.Harvest\SOS.Harvest.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Resources\dwca-datastewardship-bats-taxalists.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\mongodb-sos-dev.gz">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

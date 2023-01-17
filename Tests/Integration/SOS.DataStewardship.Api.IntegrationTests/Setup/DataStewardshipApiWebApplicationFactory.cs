@@ -3,27 +3,34 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Driver;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using System.Reflection;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Setup;
 
 public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<T>, IAsyncLifetime where T : class
-{    
+{
+    public ServiceProvider ServiceProvider { get; private set; }
     public TestcontainerDatabase ElasticsearchContainer { get; set; }
     public TestcontainerDatabase MongoDbContainer { get; set; }    
     public IObservationDatasetRepository? ObservationDatasetRepository { get; private set; }
     public IObservationEventRepository? ObservationEventRepository { get; private set; }
-    public IProcessedObservationCoreRepository? ProcessedObservationCoreRepository { get; private set; }    
-    public IProcessClient? ProcessClient { get; private set; }
+    public IProcessedObservationCoreRepository? ProcessedObservationCoreRepository { get; private set; }
+    public IProcessClient? ProcessClient { get; private set; } = null;
     public DataStewardshipApiWebApplicationFactory()
     {
         //Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "DEV");
@@ -139,6 +146,7 @@ public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<
         await InitializeMongoDbAsync();
         var elasticClient = await InitializeElasticsearchAsync();
         await InitializeElasticsearchRepositoriesAsync(elasticClient);
+        ServiceProvider = RegisterServices();
     }
 
     public new async Task DisposeAsync()
@@ -150,5 +158,49 @@ public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
+    }
+
+    public ServiceProvider RegisterServices()
+    {        
+        var serviceCollection = new ServiceCollection();
+
+        // Processed Mongo Db
+        //var processedDbConfiguration = Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+        var processedDbConfiguration = new MongoDbConfiguration()
+        {
+            AuthenticationDb = "admin",
+            DatabaseName = "sos-dev",
+            ReadBatchSize = 10000,
+            WriteBatchSize = 10000,
+            Hosts = new MongoDbServer[]
+            {
+                new MongoDbServer
+                {
+                    Name = "artmongo2-1-test.artdata.slu.se",
+                    Port = 27017
+                }
+            }
+        };
+
+        var processedSettings = processedDbConfiguration.GetMongoDbSettings();
+        serviceCollection.AddSingleton<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
+            processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
+
+        serviceCollection.AddSingleton<IAreaHelper, AreaHelper>();
+        serviceCollection.AddSingleton<IAreaRepository, AreaRepository>();
+        serviceCollection.AddSingleton<ProcessFixture>();        
+
+        serviceCollection.AddLogging();
+        //serviceCollection.AddLogging(builder => builder.AddDebug());
+        //serviceCollection.AddSingleton<ILoggerFactory, NullLoggerFactory>();
+
+        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
+        serviceCollection.AddSingleton<ITaxonRepository, TaxonRepository>();
+        serviceCollection.AddSingleton<IProcessTimeManager, ProcessTimeManager>();
+        serviceCollection.AddSingleton<ProcessConfiguration>();
+        serviceCollection.AddSingleton(ProcessClient);
+
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+        return serviceProvider;
     }
 }
