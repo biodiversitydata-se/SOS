@@ -198,7 +198,7 @@ namespace SOS.Harvest.Jobs
                 // 2. Harvest observations 
                 //------------------------------------------------------------------------
                 var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<HarvestInfo>>();
-                _logger.LogInformation($"Start adding harvesters ({mode}).");
+                _logger.LogDebug($"Start adding harvesters ({mode}).");
                 foreach (var dataProvider in dataProviders)
                 {
                     var harvestJob = _harvestersByType[dataProvider.Type];
@@ -221,7 +221,7 @@ namespace SOS.Harvest.Jobs
                     
                     _logger.LogDebug($"Added {dataProvider.Names.Translate("en-GB")} for {mode} harvest");
                 }
-                _logger.LogInformation($"Finish adding harvesters ({mode}).");
+                _logger.LogDebug($"Finish adding harvesters ({mode}).");
 
                 _logger.LogInformation($"Start {mode} observations harvesting.");
 

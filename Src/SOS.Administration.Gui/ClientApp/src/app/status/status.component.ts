@@ -12,7 +12,7 @@ import { PerformanceData } from '../models/performancedata';
 import { ProcessInfo } from '../models/processinfo';
 import { SearchIndexInfo } from '../models/searchindexinfo';
 import { TestResults } from '../models/testresults';
-
+import { environment } from '../../environments/environment';
 
 function dateFormatter(params) {
   if (params.value) {
@@ -111,7 +111,8 @@ export class StatusComponent implements OnInit {
   performanceComparison: DataCompare[] = [];
   failedCalls: FailedCalls[] = [];
   sumFailedCalls: number = 0;
-  activeInstanceHarvestIsOlderThanOneDay = false;
+  activeInstanceIsExpired = false;
+  inActiveInstanceIsExpired = false;
   logDescription: string;
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
 
@@ -124,18 +125,17 @@ export class StatusComponent implements OnInit {
       this.http.get<ProcessInfo[]>(this.baseUrl + 'statusinfo/process').subscribe(result => {
         this.processInfo = result;
         this.totalDataDifference = 0;
+
         let active = this.processInfo.find(p => p.id.endsWith(this.activeInstance));
-        
-        console.log(active);
         var activeEndDate = parseISO(active.end);
-        var oneDayAgo = subHours(new Date(), 24);
-        if (compareAsc(activeEndDate, oneDayAgo) == -1) {
-          this.activeInstanceHarvestIsOlderThanOneDay = true;
-        }
-        else {
-          this.activeInstanceHarvestIsOlderThanOneDay = false;
-        }
+        var activeExpireDate = subHours(new Date(), environment.lastHarvestHourLimit);
+        this.activeInstanceIsExpired = compareAsc(activeEndDate, activeExpireDate) == -1;
+        
         let inactive = this.processInfo.find(p => !p.id.endsWith(this.activeInstance) && p.id.includes("observation"));
+        var inactiveEndDate = parseISO(inactive.end);
+        var inActiveExpireDate = subHours(new Date(), environment.lastHarvestHourLimit * 2);
+        this.inActiveInstanceIsExpired = compareAsc(inactiveEndDate, inActiveExpireDate) == -1;
+       
         for (let provider of active.providersInfo) {
           let compare = new ProcessCompare();
           compare.source = provider.dataProviderIdentifier;
@@ -227,7 +227,21 @@ export class StatusComponent implements OnInit {
    this.healthStatus = result;
    }, error => console.error(error));
   }
+  getStatusFillColor(processInfo: ProcessInfo) {
+    if (processInfo.status === 'Success') {
+      let isActive = this.isActiveProvider(processInfo.id);
+      if (
+        (isActive && !this.activeInstanceIsExpired) ||
+        (!isActive && !this.inActiveInstanceIsExpired)
+      ) {
+        return 'green';
+      }
 
+      return 'gold';
+    }
+
+    return 'red';
+  }
   formatDate(param) {
     return format(parseISO(param), 'yyyy-MM-dd HH:mm:ss');
   }
