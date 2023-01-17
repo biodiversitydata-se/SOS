@@ -8,6 +8,14 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Project : ProjectInfo
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public Project()
+        {
+
+        }
+
+        /// <summary>
         ///     Project parameters.
         /// </summary>
         public IEnumerable<ProjectParameter> ProjectParameters { get; set; }

@@ -8,6 +8,14 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Identification
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public Identification()
+        {
+
+        }
+
+        /// <summary>
         /// Confirmed by.
         /// </summary>
         public string ConfirmedBy { get; set; }

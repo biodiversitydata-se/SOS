@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InvalidMapComponent } from './invalid-map.component';
+import { InvalidMapComponent } from '../invalid-map/invalid-map.component';
 
 describe('InvalidMapComponent', () => {
   let component: InvalidMapComponent;

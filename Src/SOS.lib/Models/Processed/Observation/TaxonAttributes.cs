@@ -12,6 +12,14 @@ namespace SOS.Lib.Models.Processed.Observation
         private static HashSet<string> _redlistCategories = new HashSet<string>() { "cr", "en", "vu", "nt" };
 
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public TaxonAttributes()
+        {
+
+        }
+
+        /// <summary>
         /// Indicates whether the species is the subject
         /// of an action plan ('åtgärdsprogram' in swedish).
         /// </summary>

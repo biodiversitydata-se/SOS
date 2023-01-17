@@ -9,6 +9,14 @@ namespace SOS.Lib.Models.Processed.Observation
     public class ProjectInfo : IEntity<int>
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public ProjectInfo()
+        {
+
+        }
+
+        /// <summary>
         ///     Indicates if species observations that are reported in
         ///     a project are publicly available or not.
         /// </summary>

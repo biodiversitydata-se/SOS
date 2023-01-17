@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
 
@@ -10,6 +9,14 @@ namespace SOS.Lib.Models.Processed.Observation
     /// </summary>
     public class ArtportalenInternal
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public ArtportalenInternal()
+        {
+
+        }
+
         /// <summary>
         /// Activity category id
         /// </summary>

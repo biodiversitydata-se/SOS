@@ -8,6 +8,14 @@ namespace SOS.Lib.Models.Processed.Observation
     public class TaxonVernacularName
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public TaxonVernacularName()
+        {
+
+        }
+
+        /// <summary>
         /// A common vernacular name.
         /// </summary>
         public string Name { get; set; }

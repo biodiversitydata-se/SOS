@@ -6,6 +6,14 @@
     public class Substrate
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public Substrate()
+        {
+
+        }
+
+        /// <summary>
         ///     Description of substrate.
         /// </summary>
         public string Description { get; set; }

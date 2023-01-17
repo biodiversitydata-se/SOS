@@ -6,6 +6,14 @@
     public class TaxonSynonymName
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public TaxonSynonymName()
+        {
+
+        }
+
+        /// <summary>
         /// Name.
         /// </summary>
         public string Name { get; set; }

@@ -5,6 +5,14 @@
     /// </summary>
     public class GeologicalContext
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public GeologicalContext()
+        {
+
+        }
+
         /// <summary>        
         ///     The full name of the lithostratigraphic bed from which
         ///     the cataloged item was collected.

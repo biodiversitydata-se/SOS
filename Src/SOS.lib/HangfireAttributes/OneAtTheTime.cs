@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Net;
 using Hangfire.Common;
 using Hangfire.States;
 using Hangfire.Storage;
-using Microsoft.AspNetCore.Mvc;
 
 namespace SOS.Lib.HangfireAttributes
 {

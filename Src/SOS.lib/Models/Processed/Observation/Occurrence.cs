@@ -9,6 +9,14 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Occurrence
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public Occurrence()
+        {
+
+        }
+
+        /// <summary>
         ///     Activity property.
         /// </summary>
         /// <remarks>
