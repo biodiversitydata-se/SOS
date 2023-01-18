@@ -4,9 +4,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using System.Data;
 
 namespace SOS.Harvest.DarwinCore
 {
