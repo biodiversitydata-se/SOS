@@ -146,7 +146,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 var result = (await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}))?.ToArray();
                 if ((result?.Count() ?? 0) == 0)
                 {
-                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, startId={startId}, maxRows={maxRows}");
+                    Logger.LogDebug($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, startId={startId}, maxRows={maxRows}");
                 }
 
                 return result!;
@@ -192,7 +192,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 var result = (await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }))?.ToArray();
                 if ((result?.Count() ?? 0) == 0)
                 {
-                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings.  Live={Live}, modifiedSince={modifiedSince}, maxRows={maxRows}");
+                    Logger.LogDebug($"Artportalen SightingRepository.GetChunkAsync returned no sightings.  Live={Live}, modifiedSince={modifiedSince}, maxRows={maxRows}");
                 }
 
                 return result;
