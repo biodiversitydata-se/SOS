@@ -246,14 +246,14 @@ namespace SOS.Lib.Repositories
         /// <inheritdoc />
         public async Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
         {
-            var entities = items?.ToArray();
-            if (!entities?.Any() ?? true)
+            if (!items?.Any() ?? true)
             {
-                return false;
+                return true;
             }
 
             var success = true;
             var count = 0;
+            var entities = items.ToArray();
             var batch = entities.Skip(0).Take(BatchSizeWrite)?.ToArray();
 
             while (batch?.Any() ?? false)
