@@ -37,9 +37,9 @@
         WGS84 = 4326,
 
         /// <summary>
-        ///     ETRS-LAEA
+        ///     ETRS
         /// </summary>
-        ETRS89 = 3035
+        ETRS89 = 4258
     }
 
     public enum MetricCoordinateSys
@@ -52,6 +52,6 @@
         /// <summary>
         ///     ETRS-LAEA
         /// </summary>
-        ETRS89 = 3035
+        ETRS89 = 4258
     }
 }
