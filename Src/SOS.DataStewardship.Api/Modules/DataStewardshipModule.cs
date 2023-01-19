@@ -5,7 +5,6 @@ using Swashbuckle.AspNetCore.Annotations;
 using SOS.DataStewardship.Api.Managers.Interfaces;
 using SOS.DataStewardship.Api.Models.Enums;
 using SOS.DataStewardship.Api.Extensions;
-using System.Data;
 
 namespace SOS.DataStewardship.Api.Modules;
 
@@ -94,8 +93,7 @@ public class DataStewardshipModule : IModule
     /// <returns></returns>
     internal async Task<IResult> GetDatasetByIdAsync(IDataStewardshipManager dataStewardshipManager, 
         [FromRoute][Required] string id,
-        [FromQuery] ExportMode exportMode = ExportMode.Json,
-        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
+        [FromQuery] ExportMode exportMode = ExportMode.Json)
     {
         try
         {
@@ -121,8 +119,7 @@ public class DataStewardshipModule : IModule
         [FromBody] DatasetFilter filter, 
         [FromQuery] int? skip, 
         [FromQuery] int? take,
-        [FromQuery] ExportMode exportMode = ExportMode.Json,
-        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
+        [FromQuery] ExportMode exportMode = ExportMode.Json)
     {
         try
         {
@@ -144,8 +141,7 @@ public class DataStewardshipModule : IModule
     /// <returns></returns>
     internal async Task<IResult> GetEventByIdAsync(IDataStewardshipManager dataStewardshipManager, 
         [FromRoute][Required] string id,
-        [FromQuery] ExportMode exportMode = ExportMode.Json,
-        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
+        [FromQuery] ExportMode exportMode = ExportMode.Json)
     {
         try
         {
@@ -171,8 +167,7 @@ public class DataStewardshipModule : IModule
         [FromBody] EventsFilter filter,
         [FromQuery] int? skip, 
         [FromQuery] int? take,
-        [FromQuery] ExportMode exportMode = ExportMode.Json,
-        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
+        [FromQuery] ExportMode exportMode = ExportMode.Json)
     {
         try
         {
@@ -199,7 +194,7 @@ public class DataStewardshipModule : IModule
     {
         try
         {
-            var occurrenceModel = await dataStewardshipManager.GetOccurrenceByIdAsync(id);
+            var occurrenceModel = await dataStewardshipManager.GetOccurrenceByIdAsync(id, responseCoordinateSystem);
             if (occurrenceModel == null) return Results.NotFound();
             return exportMode.Equals(ExportMode.Csv) ? Results.File(occurrenceModel.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(occurrenceModel);
         }
@@ -227,7 +222,8 @@ public class DataStewardshipModule : IModule
         {
             var occurrences = await dataStewardshipManager.GetOccurrencesBySearchAsync(filter, 
                 skip.GetValueOrDefault(0), 
-                take.GetValueOrDefault(20));
+                take.GetValueOrDefault(20),
+                responseCoordinateSystem);
             return occurrences.Equals(ExportMode.Csv) ? Results.File(occurrences.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(occurrences);
         }
         catch

@@ -4,6 +4,7 @@ using SOS.Lib.JsonConverters;
 using System.Text.Json.Serialization;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+var isDevelopment = new[] { "local", "dev" }.Contains(env, StringComparer.CurrentCultureIgnoreCase);
 var logger = NLogBuilder.ConfigureNLog($"nlog.{env}.config").GetCurrentClassLogger();
 logger.Info("Starting application...");
 
@@ -31,11 +32,11 @@ try
     builder.Services.Configure<TelemetryConfiguration>(x => x.DisableTelemetry = true);
 #endif
     var app = builder.Build();
-    app.ConfigureExceptionHandler(logger, app.Environment.IsDevelopment());
+    app.ConfigureExceptionHandler(logger, isDevelopment);
     app.MapEndpoints();
     app.UseHttpsRedirection();
 
-    if (app.Environment.IsDevelopment())
+    if (isDevelopment)
     {
         app.UseSwagger();        
         app.UseSwaggerUI(options =>

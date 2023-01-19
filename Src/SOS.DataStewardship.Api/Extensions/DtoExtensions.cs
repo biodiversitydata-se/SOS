@@ -1,4 +1,5 @@
-﻿using SOS.DataStewardship.Api.Models;
+﻿using NetTopologySuite.Geometries;
+using SOS.DataStewardship.Api.Models;
 using SOS.DataStewardship.Api.Models.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using System.Data;
@@ -240,7 +241,7 @@ namespace SOS.DataStewardship.Api.Extensions
             return AssociatedMediaType.Bild; // default
         }
 
-        public static OccurrenceModel ToOccurrenceModel(this Observation observation)
+        public static OccurrenceModel ToOccurrenceModel(this Observation observation, CoordinateSystem responseCoordinateSystem)
         {
             var occurrence = new OccurrenceModel();
             occurrence.AssociatedMedia = observation.Occurrence?.Media.ToAssociatedMedias();
@@ -253,12 +254,30 @@ namespace SOS.DataStewardship.Api.Extensions
             occurrence.DatasetIdentifier = observation.DataStewardshipDatasetId;
             occurrence.IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas; // todo - implement when the value list is defined
             occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDecimal(observation.Location.CoordinateUncertaintyInMeters);
-            occurrence.ObservationPoint = observation?.Location?.Point;
-            occurrence.ObservationPointTest = observation?.Location?.Point?.Coordinates == null ? null : new GeometryObject
+
+            if (observation?.Location?.Point?.Coordinates != null)
             {
-                Type = "point",
-                Coordinates = new double[] { observation.Location.Point.Coordinates.Longitude, observation.Location.Point.Coordinates.Latitude }
-            };
+                var point = new Point(observation.Location.Point.Coordinates.Longitude, observation.Location.Point.Coordinates.Latitude);
+
+                var targetCoordinateSys = responseCoordinateSystem switch
+                {
+                    CoordinateSystem.EPSG3006 => CoordinateSys.SWEREF99_TM,
+                    CoordinateSystem.EPSG3857 => CoordinateSys.WebMercator,
+                    CoordinateSystem.EPSG4258 => CoordinateSys.ETRS89,
+                    CoordinateSystem.EPSG4326 => CoordinateSys.WGS84,
+                    CoordinateSystem.EPSG4619 => CoordinateSys.SWEREF99,
+                    _ => throw new Exception($"Not handled coordinate system {responseCoordinateSystem}") 
+                };
+                point = point.Transform(CoordinateSys.WGS84, targetCoordinateSys);
+
+                occurrence.ObservationPoint = point.ToGeoShape();
+                occurrence.ObservationPointTest = new GeometryObject
+                {
+                    Type = "point",
+                    Coordinates = new double[] { point.X, point.Y }
+                };
+            }
+
             occurrence.EventStartDate = observation.Event.StartDate;
             occurrence.EventEndDate = observation.Event.EndDate;
             occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;            

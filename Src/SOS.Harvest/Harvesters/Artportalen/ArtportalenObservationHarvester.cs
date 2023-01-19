@@ -239,23 +239,23 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 if (!sightings?.Any() ?? true)
                 {
                     Logger.LogDebug(
-                    $"No sightings found (BatchIndex={batchIndex})");
+                    $"No sightings found (BatchIndex: {batchIndex})");
                     return null;
                 }
 
-                Logger.LogDebug($"Start casting entities to verbatim ({batchIndex})");
+                Logger.LogDebug($"Start casting entities batch to verbatim ({batchIndex})");
 
                 // Cast sightings to verbatim observations
                 var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(sightings!);
-                Logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
+                Logger.LogDebug($"Finish casting entities batch to verbatim ({batchIndex})");
 
                 return verbatimObservations;
             }
             catch (Exception e)
             {
                 Logger.LogError(e,
-                    $"Harvest Artportalen sightings ({batchIndex}) failed");
-                throw new Exception("Harvest Artportalen batch failed");
+                    $"Harvest Artportalen sightings batch ({batchIndex}) failed");
+                throw;
             }
         }
 
@@ -269,9 +269,16 @@ namespace SOS.Harvest.Harvesters.Artportalen
             {
                 var verbatimObservations = await GetVerbatimBatchAsync(harvestFactory, getChunkTask, batchIndex);
 
+                if (!verbatimObservations?.Any() ?? true)
+                {
+                    return 0;
+                }
+
                 Logger.LogDebug($"Start storing batch ({batchIndex})");
-                await VerbatimRepository.AddManyAsync(verbatimObservations);
-                Logger.LogDebug($"Finish storing batch ({batchIndex})");
+                if (!await VerbatimRepository.AddManyAsync(verbatimObservations))
+                {
+                    throw new Exception($"Failed to store verbatims batch: {batchIndex}.");
+                }
 
                 // If sleep is required to free resources to other systems
                 if (_artportalenConfiguration.SleepAfterBatch > 0)
@@ -279,13 +286,15 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     Thread.Sleep(_artportalenConfiguration.SleepAfterBatch);
                 }
 
-                return verbatimObservations?.Count() ?? 0;
+                Logger.LogDebug($"Finish storing batch ({batchIndex})");
+
+                return verbatimObservations!.Count();
             }
             catch (Exception e)
             {
                 Logger.LogError(e,
-                    $"Harvest Artportalen sightings ({batchIndex}) failed");
-                throw new Exception("Harvest Artportalen batch failed");
+                    $"Harvest Artportalen sightings batch ({batchIndex}) failed");
+                throw;
             }
             finally
             {
@@ -406,7 +415,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Failed aggregation of sightings");
+                Logger.LogError(e, "Harvest Artportalen observations failed");
                 runStatus = RunStatus.Failed;
             }
 

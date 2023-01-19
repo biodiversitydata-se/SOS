@@ -1,6 +1,7 @@
 ﻿using SOS.DataStewardship.Api.Extensions;
 using SOS.DataStewardship.Api.Managers.Interfaces;
 using SOS.DataStewardship.Api.Models;
+using SOS.DataStewardship.Api.Models.Enums;
 using SOS.Lib.JsonConverters;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -34,6 +35,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         var observationDataset = await _observationDatasetRepository.GetDatasetsByIds(new string[] { id });
         if (observationDataset == null) return null;
         var dataset = observationDataset.FirstOrDefault()?.ToDataset();
+
         return dataset;
     }
 
@@ -177,23 +179,23 @@ public class DataStewardshipManager : IDataStewardshipManager
             "institutionCode",
         };
 
-    public async Task<OccurrenceModel> GetOccurrenceByIdAsync(string id)
+    public async Task<OccurrenceModel> GetOccurrenceByIdAsync(string id, CoordinateSystem responseCoordinateSystem)
     {
         var filter = new SearchFilter(0);                
         IEnumerable<dynamic> observations = await _processedObservationCoreRepository.GetObservationAsync(id, filter, true);
         var observation = observations.FirstOrDefault();
         Observation obs = CastDynamicToObservation(observation);
-        var occurrence = obs.ToOccurrenceModel();
+        var occurrence = obs.ToOccurrenceModel(responseCoordinateSystem);
         return occurrence;
     }
 
-    public async Task<Models.PagedResult<OccurrenceModel>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take)
+    public async Task<Models.PagedResult<OccurrenceModel>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take, CoordinateSystem responseCoordinateSystem)
     {
         var filter = occurrenceFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);
         var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, skip, take, true);
         var observations = CastDynamicsToObservations(pageResult.Records);
-        var occurrences = observations.Select(x => x.ToOccurrenceModel()).ToList();
+        var occurrences = observations.Select(x => x.ToOccurrenceModel(responseCoordinateSystem)).ToList();
 
         return new Models.PagedResult<OccurrenceModel>()
         {
