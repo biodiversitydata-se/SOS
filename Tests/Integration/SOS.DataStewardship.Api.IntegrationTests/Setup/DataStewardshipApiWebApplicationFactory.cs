@@ -33,8 +33,7 @@ public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<
     public IProcessClient? ProcessClient { get; private set; } = null;
     public DataStewardshipApiWebApplicationFactory()
     {
-        //Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "DEV");
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");        
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "dev");        
         var elasticsearchConfiguration = new ElasticsearchTestcontainerConfiguration { Password = "secret" };
         ElasticsearchContainer = new TestcontainersBuilder<ElasticsearchTestcontainer>()
                 .WithDatabase(elasticsearchConfiguration)

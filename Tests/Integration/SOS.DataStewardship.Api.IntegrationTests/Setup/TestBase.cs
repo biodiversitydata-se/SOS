@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using SOS.Lib.JsonConverters;
-using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+﻿using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
 using System.Text.Json;
