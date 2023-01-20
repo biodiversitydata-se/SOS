@@ -39,6 +39,7 @@ public class TestBase
         await _factory.ObservationDatasetRepository.DisableIndexingAsync();
         await _factory.ObservationDatasetRepository.AddManyAsync(datasets);
         await _factory.ObservationDatasetRepository.EnableIndexingAsync();
+        await Task.Delay(1000);
     }
 
     protected async Task AddEventsToElasticsearchAsync(IEnumerable<ObservationEvent> events, bool clearExistingObservations = true)
@@ -50,6 +51,7 @@ public class TestBase
         await _factory.ObservationEventRepository.DisableIndexingAsync();
         await _factory.ObservationEventRepository.AddManyAsync(events);
         await _factory.ObservationEventRepository.EnableIndexingAsync();
+        await Task.Delay(1000);
     }
 
     protected async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool protectedIndex = false, bool clearExistingObservations = true)
@@ -61,5 +63,6 @@ public class TestBase
         await _factory.ProcessedObservationCoreRepository.DisableIndexingAsync(protectedIndex);
         await _factory.ProcessedObservationCoreRepository.AddManyAsync(observations, protectedIndex);
         await _factory.ProcessedObservationCoreRepository.EnableIndexingAsync(protectedIndex);
+        await Task.Delay(1000);
     }
 }

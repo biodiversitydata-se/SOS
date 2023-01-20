@@ -41,7 +41,7 @@ namespace SOS.Harvest.Services.Taxon
         {
             try
             {
-                _logger.LogDebug("Start fetching dwca file from taxonservice:" + _taxonDwcUrl);
+                _logger.LogInformation("Start fetching dwca file from taxonservice:" + _taxonDwcUrl);
                 await using var zipFileContentStream = await _taxonServiceProxy.GetDwcaFileAsync(_taxonDwcUrl);         
                 if (zipFileContentStream == null)
                 {
@@ -137,6 +137,9 @@ namespace SOS.Harvest.Services.Taxon
             string csvFieldDelimiter)
         {
             _logger.LogDebug("Start adding taxon core data");
+            string strZipEntries = string.Join(", ", zipArchive.Entries.Select(e => e.Name));
+            _logger.LogInformation($"The Taxon DwC-A contains the following files: {strZipEntries}");
+
             // Try to get the taxon data file
             var taxonFile = zipArchive.Entries.FirstOrDefault(f =>
                 f.Name.Equals("Taxon.csv", StringComparison.CurrentCultureIgnoreCase));
