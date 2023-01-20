@@ -15,11 +15,12 @@ namespace SOS.Harvest.Services.Taxon
         public async Task<Stream> GetDwcaFileAsync(string url)
         {
             using var client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(300);
             using var result = await client.GetAsync(url);
 
             if (!result.IsSuccessStatusCode)
             {
-                return null;
+                return null!;
             }
 
             var bytes = await result.Content.ReadAsByteArrayAsync();

@@ -61,7 +61,7 @@ namespace SOS.Harvest.Services.Taxon
                 _logger.LogError(e.Message);
             }
 
-            return null;
+            return null!;
         }
 
         private IVariableLengthReaderBuilder<DarwinCoreTaxon> TaxonMapping => new VariableLengthReaderBuilder<DarwinCoreTaxon>()

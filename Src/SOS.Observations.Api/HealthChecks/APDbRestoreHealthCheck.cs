@@ -5,9 +5,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using MongoDB.Driver.Linq;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Configuration;
+using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -17,7 +17,7 @@ namespace SOS.Observations.Api.HealthChecks
     public class APDbRestoreHealthCheck : IHealthCheck
     {
         private readonly IProcessInfoRepository _processInfoRepository;
-        private readonly IProcessedObservationCoreRepository _processedObservationCoreRepository;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly HealthCheckConfiguration _healthCheckConfiguration;
         /// <summary>
         /// Constructor
@@ -26,11 +26,11 @@ namespace SOS.Observations.Api.HealthChecks
         /// <param name="healthCheckConfiguration"></param>
         public APDbRestoreHealthCheck(
             IProcessInfoRepository processInfoRepository,
-            IProcessedObservationCoreRepository processedObservationCoreRepository,
+            IProcessedObservationRepository processedObservationRepository,
             HealthCheckConfiguration healthCheckConfiguration)
         {
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
-            _processedObservationCoreRepository = processedObservationCoreRepository ?? throw new ArgumentNullException(nameof(processedObservationCoreRepository));
+            _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _healthCheckConfiguration = healthCheckConfiguration ??
                                         throw new ArgumentNullException(nameof(healthCheckConfiguration));
         }
@@ -47,7 +47,7 @@ namespace SOS.Observations.Api.HealthChecks
         {
             try
             {
-                var processInfo = await _processInfoRepository.GetAsync(_processedObservationCoreRepository.PublicIndexName);
+                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
 
                 var apInfo = processInfo.ProvidersInfo.FirstOrDefault(pi => pi.DataProviderId.Equals(1));
 
