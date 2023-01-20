@@ -33,8 +33,12 @@ public class DataStewardshipManager : IDataStewardshipManager
     {
         if (string.IsNullOrEmpty(id)) return null;
         var observationDataset = await _observationDatasetRepository.GetDatasetsByIds(new string[] { id });
-        if (observationDataset == null) return null;
-        var dataset = observationDataset.FirstOrDefault()?.ToDataset();
+        if (!observationDataset?.Any() ?? true)
+        {
+            _logger.LogInformation($"Could not find dataset with id: {id}.");
+            return null;
+        }
+        var dataset = observationDataset.FirstOrDefault().ToDataset();
 
         return dataset;
     }
@@ -62,7 +66,7 @@ public class DataStewardshipManager : IDataStewardshipManager
             Skip = skip,
             Take = take,
             Count = count,
-            TotalCount = datasetIdAggregationItems.Count(),
+            TotalCount = totalCount,
             Records = records
         };
     }
@@ -70,9 +74,15 @@ public class DataStewardshipManager : IDataStewardshipManager
     public async Task<EventModel> GetEventByIdAsync(string id)
     {
         // todo - decide if the observation or event index should be used.
-        var resFromObs = await GetEventByIdFromObservationIndexAsync(id);
-        var resFromEvent = await GetEventByIdFromEventIndexAsync(id);
-        return resFromEvent;
+        //var evnt = await GetEventByIdFromObservationIndexAsync(id);
+        var evnt = await GetEventByIdFromEventIndexAsync(id);
+
+        if (evnt == null)
+        {
+            _logger.LogInformation($"Could not find event with id: {id}.");
+        }
+
+        return evnt;
     }
 
     private async Task<EventModel> GetEventByIdFromObservationIndexAsync(string id)
@@ -81,6 +91,8 @@ public class DataStewardshipManager : IDataStewardshipManager
         filter.EventIds = new List<string> { id };
         var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 1, true);
         var observation = pageResult.Records.FirstOrDefault();
+        if (observation == null) return null;
+
         Observation obs = CastDynamicToObservation(observation);
         var occurrenceIds = await _processedObservationCoreRepository.GetAllAggregationItemsAsync(filter, "occurrence.occurrenceId");
         var ev = obs.ToEventModel(occurrenceIds.Select(m => m.AggregationKey));
@@ -90,6 +102,9 @@ public class DataStewardshipManager : IDataStewardshipManager
     private async Task<EventModel> GetEventByIdFromEventIndexAsync(string id)
     {
         var observationEvents = await _observationEventRepository.GetEventsByIds(new List<string> { id });
+
+        if (!observationEvents?.Any() ?? true) return null;
+
         var ev = observationEvents.First().ToEventModel();        
         return ev;
     }
@@ -97,7 +112,7 @@ public class DataStewardshipManager : IDataStewardshipManager
     public async Task<Models.PagedResult<EventModel>> GetEventsBySearchAsync(EventsFilter eventsFilter, int skip, int take)
     {
         // todo - decide if the observation or event index should be used.
-        var resFromObs = await GetEventsBySearchFromObservationIndexAsync(eventsFilter, skip, take);
+      //  var resFromObs = await GetEventsBySearchFromObservationIndexAsync(eventsFilter, skip, take);
         var resFromEvent = await GetEventsBySearchFromEventIndexAsync(eventsFilter, skip, take);
 
         return resFromEvent;
@@ -183,7 +198,14 @@ public class DataStewardshipManager : IDataStewardshipManager
     {
         var filter = new SearchFilter(0);                
         IEnumerable<dynamic> observations = await _processedObservationCoreRepository.GetObservationAsync(id, filter, true);
-        var observation = observations.FirstOrDefault();
+        var observation = observations?.FirstOrDefault();
+
+        if (observation == null)
+        {
+            _logger.LogInformation($"Could not find occurrence with id: {id}.");
+            return null!;
+        }
+
         Observation obs = CastDynamicToObservation(observation);
         var occurrence = obs.ToOccurrenceModel(responseCoordinateSystem);
         return occurrence;
