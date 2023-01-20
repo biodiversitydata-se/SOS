@@ -5,7 +5,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests;
 [Collection(Constants.IntegrationTestsCollectionName)]
 public class DatasetTests : TestBase
 {
-    public DatasetTests(DataStewardshipApiWebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory) { }
+    public DatasetTests(ApiWebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory) { }
 
     [Fact]
     public async Task Get_DatasetById_Success()

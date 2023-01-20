@@ -1,5 +1,6 @@
 using SOS.DataStewardship.Api.IntegrationTests.Extensions;
 using SOS.DataStewardship.Api.IntegrationTests.Helpers;
+using SOS.Lib.Models.Shared;
 using Xunit.Abstractions;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests;
@@ -8,12 +9,12 @@ namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests;
 public class DwcaImportTests : TestBase
 {
     private readonly ProcessFixture _processFixture;
-    private readonly ITestOutputHelper output;
+    private readonly ITestOutputHelper _output;    
 
-    public DwcaImportTests(DataStewardshipApiWebApplicationFactory<Program> webApplicationFactory, 
+    public DwcaImportTests(ApiWebApplicationFactory<Program> webApplicationFactory, 
         ITestOutputHelper output) : base(webApplicationFactory) 
     {
-        this.output = output;
+        this._output = output;
         using var scope = _factory.ServiceProvider.CreateScope();        
         _processFixture = scope.ServiceProvider.GetService<ProcessFixture>();
     }
@@ -23,14 +24,15 @@ public class DwcaImportTests : TestBase
     {
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
-        //-----------------------------------------------------------------------------------------------------------        
+        //-----------------------------------------------------------------------------------------------------------
         var parsedDwcaFile = await DwcaHelper.ReadDwcaFileAsync(@"resources\dwca-datastewardship-bats-taxalists.zip");
-        var dwcFactory = _processFixture.GetDarwinCoreFactory(true);       
+        var dataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
+        var dwcFactory = _processFixture.GetDwcaObservationFactory(true);       
         var processedObservations = parsedDwcaFile
             .Occurrences
             .Select(m => dwcFactory.CreateProcessedObservation(m, false))
             .ToList();
-        output.WriteLine($"Processed observations count= {processedObservations.Count}");
+        _output.WriteLine($"Processed observations count= {processedObservations.Count}");
         await AddObservationsToElasticsearchAsync(processedObservations);
         
         //-----------------------------------------------------------------------------------------------------------
@@ -63,6 +65,62 @@ public class DwcaImportTests : TestBase
         pageResultOther.Records.Should().AllSatisfy(m =>
         {
             m.DatasetIdentifier.Should().Be("ArtportalenDataHost - Dataset Bats (Other)");
+        });
+    }
+
+    [Fact]
+    public async Task Import_dwca_file_and_verify_events()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------        
+        var parsedDwcaFile = await DwcaHelper.ReadDwcaFileAsync(@"resources\dwca-datastewardship-bats-taxalists.zip");
+        var observationFactory = _processFixture.GetDwcaObservationFactory(true);
+        var eventFactory = _processFixture.GetDwcaEventFactory(true);
+        var processedObservations = parsedDwcaFile
+            .Occurrences
+            .Select(m => observationFactory.CreateProcessedObservation(m, false))
+            .ToList();
+        await AddObservationsToElasticsearchAsync(processedObservations);
+        _output.WriteLine($"Processed observations count= {processedObservations.Count}");
+
+        var processedEvents = parsedDwcaFile
+            .Events
+            .Select(m => eventFactory.CreateEventObservation(m))
+            .ToList();        
+        await AddEventsToElasticsearchAsync(processedEvents);
+        _output.WriteLine($"Processed events count= {processedEvents.Count}");
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+
+        // Get by id
+        var eventById1 = await Client.GetFromJsonAsync<EventModel>($"datastewardship/events/test:bats:event:12581041667877196608", jsonSerializerOptions);
+        var eventById2 = await Client.GetFromJsonAsync<EventModel>($"datastewardship/events/test:bats:event:14009236676399444594", jsonSerializerOptions);
+
+        // Get by search - Events with Dataset "Bats (Hallaröd)"
+        var searchFilter = new EventsFilter { DatasetList = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
+        var pageResultHallarod = await Client.PostAsJsonAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
+
+        // Get by search - Events with Dataset "Bats (Other)"
+        searchFilter = new EventsFilter { DatasetList = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
+        var pageResultOther = await Client.PostAsJsonAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        eventById1.Should().NotBeNull();
+        eventById2.Should().NotBeNull();
+
+        pageResultHallarod.Records.Should().AllSatisfy(m =>
+        {            
+            m.Dataset.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Hallaröd)");
+        });
+
+        pageResultOther.Records.Should().AllSatisfy(m =>
+        {
+            m.Dataset.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Other)");
         });
     }
 }

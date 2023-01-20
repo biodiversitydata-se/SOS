@@ -7,7 +7,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests;
 [Collection(Constants.IntegrationTestsCollectionName)]
 public class OccurrenceTests : TestBase
 {
-    public OccurrenceTests(DataStewardshipApiWebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory) { }
+    public OccurrenceTests(ApiWebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory) { }
 
     [Fact]
     public async Task Get_OccurrenceById_Success()

@@ -22,7 +22,7 @@ using System.Reflection;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Setup;
 
-public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<T>, IAsyncLifetime where T : class
+public class ApiWebApplicationFactory<T> : WebApplicationFactory<T>, IAsyncLifetime where T : class
 {
     public ServiceProvider ServiceProvider { get; private set; }
     public TestcontainerDatabase ElasticsearchContainer { get; set; }
@@ -31,10 +31,10 @@ public class DataStewardshipApiWebApplicationFactory<T> : WebApplicationFactory<
     public IObservationEventRepository? ObservationEventRepository { get; private set; }
     public IProcessedObservationCoreRepository? ProcessedObservationCoreRepository { get; private set; }
     public IProcessClient? ProcessClient { get; private set; } = null;
-    public DataStewardshipApiWebApplicationFactory()
+    public ApiWebApplicationFactory()
     {
         //Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "DEV");
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");        
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "dev");        
         var elasticsearchConfiguration = new ElasticsearchTestcontainerConfiguration { Password = "secret" };
         ElasticsearchContainer = new TestcontainersBuilder<ElasticsearchTestcontainer>()
                 .WithDatabase(elasticsearchConfiguration)

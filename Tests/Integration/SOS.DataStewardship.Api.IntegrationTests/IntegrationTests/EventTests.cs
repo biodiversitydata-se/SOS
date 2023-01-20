@@ -7,7 +7,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests;
 [Collection(Constants.IntegrationTestsCollectionName)]
 public class EventTests : TestBase
 {
-    public EventTests(DataStewardshipApiWebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory) { }
+    public EventTests(ApiWebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory) { }
 
     [Fact]
     public async Task Get_EventById_Success()

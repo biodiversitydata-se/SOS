@@ -12,7 +12,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Setup;
 public class TestBase
 {
     protected HttpClient Client => _factory.CreateClient();
-    protected readonly DataStewardshipApiWebApplicationFactory<Program> _factory;
+    protected readonly ApiWebApplicationFactory<Program> _factory;
     protected readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -24,7 +24,7 @@ public class TestBase
         }
     };
 
-    public TestBase(DataStewardshipApiWebApplicationFactory<Program> webApplicationFactory)
+    public TestBase(ApiWebApplicationFactory<Program> webApplicationFactory)
     {
         _factory = webApplicationFactory;
         //DataStewardshipApiWebApplicationFactory<Program>.SetupDatabase(webApplicationFactory.PostgresContainer.ConnectionString);
