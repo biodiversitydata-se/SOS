@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
@@ -48,36 +49,9 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Setup
 
         private async Task InitializeAsync()
         {
-
-            //bool useTaxonZipCollection = false; // GetUseTaxonZipCollection();
-            //if (useTaxonZipCollection)
-            //{
-            //    _taxa = GetTaxaFromZipFile();
-            //}
-            //else
-            //{
-            //    _taxa = await _taxonRepository.GetAllAsync();
-            //}
             _taxa = await _taxonRepository.GetAllAsync();
             _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
         }
-
-        //public DwcaObservationFactory GetDarwinCoreFactory(bool initAreaHelper)
-        //{
-        //    if (_darwinCoreFactory == null)
-        //    {
-        //        var dataProvider = new DataProvider() { Id = 1, Identifier = "Artportalen" };
-        //        _areaHelper = new AreaHelper(new AreaRepository(_processClient, new NullLogger<AreaRepository>()));
-        //        _darwinCoreFactory = CreateDarwinCoreFactoryAsync(dataProvider).Result;
-        //    }
-
-        //    if (initAreaHelper && !_areaHelper.IsInitialized)
-        //    {
-        //        _areaHelper.InitializeAsync().Wait();
-        //    }
-
-        //    return _darwinCoreFactory;
-        //}
 
         public DwcaObservationFactory GetDwcaObservationFactory(bool initAreaHelper)
         {
@@ -99,6 +73,16 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Setup
             }
                 
             return _dwcaEventFactory;
+        }
+
+        public DwcaDatasetFactory GetDwcaDatasetFactory()
+        {
+            if (_dwcaDatasetFactory == null)
+            {
+                _dwcaDatasetFactory = new DwcaDatasetFactory(_testDataProvider, _processTimeManager, _processConfiguration);
+            }
+
+            return _dwcaDatasetFactory;
         }
 
         private void InitAreaHelper()
