@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -16,16 +16,16 @@ namespace SOS.Observations.Api.HealthChecks
     public class DependenciesHealthCheck : IHealthCheck
     {
         private readonly IConfiguration _configuration;
-        private readonly IProcessedObservationCoreRepository _processedObservationCoreRepository;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
 
         /// <summary>
         /// Constructor
         /// </summary>
         public DependenciesHealthCheck(IConfiguration configuration,             
-            IProcessedObservationCoreRepository processedObservationCoreRepository)
+            IProcessedObservationRepository processedObservationRepository)
         {
             _configuration = configuration;            
-            _processedObservationCoreRepository = processedObservationCoreRepository;
+            _processedObservationRepository = processedObservationRepository;
         }
 
         /// <summary>
@@ -40,8 +40,8 @@ namespace SOS.Observations.Api.HealthChecks
         {
             try
             {
-                int esActiveIndex = _processedObservationCoreRepository.ActiveInstance;
-                var observationIndexName = _processedObservationCoreRepository.PublicIndexName;                
+                int esActiveIndex = _processedObservationRepository.ActiveInstance;
+                var observationIndexName = _processedObservationRepository.PublicIndexName;                
                 var processedDbConfiguration = _configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
                 var elasticConfiguration = _configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
                 var identityServerConfiguration = _configuration.GetSection("IdentityServer").Get<IdentityServerConfiguration>();
