@@ -1,19 +1,24 @@
-using SOS.DataStewardship.Api.Models;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
+using SOS.DataStewardship.Api.IntegrationTests.Extensions;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Filters;
+using Xunit.Abstractions;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests;
 
 [Collection(Constants.IntegrationTestsCollectionName)]
 public class OccurrenceTests : TestBase
 {
-    public OccurrenceTests(ApiWebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory) { }
+    public OccurrenceTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    {
+    }    
 
     [Fact]
     public async Task Get_OccurrenceById_Success()
     {
+        //-----------------------------------------------------------------------------------------------------------
         // Arrange
-        string identifier = "Efg";
+        //-----------------------------------------------------------------------------------------------------------
+        const string identifier = "Efg";
         var observations = Builder<Observation>.CreateListOfSize(1)
             .TheFirst(1)
                 .With(m => m.Occurrence = new Occurrence
@@ -25,26 +30,32 @@ public class OccurrenceTests : TestBase
                     EventId = "Abc",
                     StartDate = DateTime.Now,
                     EndDate = DateTime.Now,
-                })                
+                })
                 .With(m => m.DataStewardshipDatasetId = "Cde")
                 .With(m => m.DataProviderId = 1)
                 .With(m => m.ArtportalenInternal = null)
                 .With(m => m.Sensitive = false)
             .Build();
-        await AddObservationsToElasticsearchAsync(observations);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
 
+        //-----------------------------------------------------------------------------------------------------------
         // Act
-        var response = await Client.GetFromJsonAsync<OccurrenceModel>($"datastewardship/occurrences/{identifier}", jsonSerializerOptions);
+        //-----------------------------------------------------------------------------------------------------------
+        var observation = await ApiClient.GetFromJsonAsync<OccurrenceModel>($"datastewardship/occurrences/{identifier}", jsonSerializerOptions);
 
-        // Assert        
-        response.Should().NotBeNull();
-        response.OccurrenceID.Should().Be("Efg");
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        observation.Should().NotBeNull();
+        observation.OccurrenceID.Should().Be("Efg");
     }
 
     [Fact]
     public async Task Post_OccurrencesBySearch_Success()
     {
-        // Arrange data                
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
         var observations = Builder<Observation>.CreateListOfSize(1)
             .TheFirst(1)
                 .With(m => m.Occurrence = new Occurrence
@@ -56,21 +67,25 @@ public class OccurrenceTests : TestBase
                     EventId = "Abc",
                     StartDate = DateTime.Now,
                     EndDate = DateTime.Now,
-                })                
+                })
                 .With(m => m.DataStewardshipDatasetId = "Cde")
                 .With(m => m.DataProviderId = 1)
                 .With(m => m.ArtportalenInternal = null)
                 .With(m => m.Sensitive = false)
             .Build();
-        await AddObservationsToElasticsearchAsync(observations);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
 
-        var body = new OccurrenceFilter { DatasetIds = new List<string> { "Cde" } };
+        var searchFilter = new OccurrenceFilter { DatasetIds = new List<string> { "Cde" } };
 
+        //-----------------------------------------------------------------------------------------------------------
         // Act
-        var response = await Client.PostAsJsonAsync($"datastewardship/occurrences", body, jsonSerializerOptions);
-        var pageResult = await response.Content.ReadFromJsonAsync<PagedResult<OccurrenceModel>>(jsonSerializerOptions);
+        //-----------------------------------------------------------------------------------------------------------
+        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+            $"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
 
-        // Assert        
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
         pageResult.Records.First().OccurrenceID.Should().Be("Efg");
         pageResult.Records.First().DatasetIdentifier.Should().Be("Cde");
     }
