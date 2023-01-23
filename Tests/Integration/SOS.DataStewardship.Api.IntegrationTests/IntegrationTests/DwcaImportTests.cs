@@ -1,6 +1,4 @@
 using SOS.DataStewardship.Api.IntegrationTests.Extensions;
-using SOS.DataStewardship.Api.IntegrationTests.Helpers;
-using SOS.Lib.Models.Shared;
 using Xunit.Abstractions;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests;

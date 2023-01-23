@@ -1,4 +1,5 @@
 using SOS.DataStewardship.Api.IntegrationTests.Extensions;
+using SOS.DataStewardship.Api.IntegrationTests.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using Xunit.Abstractions;
@@ -10,15 +11,47 @@ public class OccurrenceTests : TestBase
 {
     public OccurrenceTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
-    }    
+    }
+
+    [Fact]
+    public async Task Get_OccurrenceById_Success()
+    {
+        // Arrange
+        string identifier = "Efg";
+        var observations = GetObservationTestData(identifier);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
+
+        // Act
+        var observation = await ApiClient.GetFromJsonAsync<OccurrenceModel>(
+            $"datastewardship/occurrences/{identifier}", jsonSerializerOptions);
+
+        // Assert        
+        observation.Should().NotBeNull();
+        observation.OccurrenceID.Should().Be(identifier);
+    }
+
+    [Fact]
+    public async Task Post_OccurrencesBySearch_Success()
+    {
+        // Arrange
+        string identifier = "Efg";
+        var observations = GetObservationTestData(identifier);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
+        var searchFilter = new OccurrenceFilter {
+            DatasetIds = new List<string> { "Cde" }
+        };
+
+        // Act
+        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+            $"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
+
+        // Assert        
+        pageResult.Records.First().OccurrenceID.Should().Be(identifier);
+    }
 
     private IEnumerable<Observation> GetObservationTestData(string firstKey)
     {
-        //-----------------------------------------------------------------------------------------------------------
-        // Arrange
-        //-----------------------------------------------------------------------------------------------------------
-        const string identifier = "Efg";
-        var observations = Builder<Observation>.CreateListOfSize(1)
+        var observations = Builder<Observation>.CreateListOfSize(10)
             .TheFirst(1)
                 .With(m => m.Occurrence = new Occurrence
                 {
@@ -31,57 +64,26 @@ public class OccurrenceTests : TestBase
                     EndDate = DateTime.Now,
                 })
                 .With(m => m.DataStewardshipDatasetId = "Cde")
-                .With(m => m.DataProviderId = 1)                
-            .Build();
-        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
-
-        //-----------------------------------------------------------------------------------------------------------
-        // Act
-        //-----------------------------------------------------------------------------------------------------------
-        var observation = await ApiClient.GetFromJsonAsync<OccurrenceModel>($"datastewardship/occurrences/{identifier}", jsonSerializerOptions);
-
-        //-----------------------------------------------------------------------------------------------------------
-        // Assert
-        //-----------------------------------------------------------------------------------------------------------
-        observation.Should().NotBeNull();
-        observation.OccurrenceID.Should().Be("Efg");
-    }
-
-    [Fact]
-    public async Task Post_OccurrencesBySearch_Success()
-    {
-        //-----------------------------------------------------------------------------------------------------------
-        // Arrange
-        //-----------------------------------------------------------------------------------------------------------
-        var observations = Builder<Observation>.CreateListOfSize(1)
-            .TheFirst(1)
-                .With(m => m.Occurrence = new Occurrence
-                {
-                    OccurrenceId = "Efg",
-                })
+                .With(m => m.DataProviderId = 1)
+                .With(m => m.ArtportalenInternal = null)
+                .With(m => m.Sensitive = false)
+            .TheNext(9)
+                 .With(m => m.Occurrence = new Occurrence
+                 {
+                     OccurrenceId = DataHelper.RandomString(3, new[] { firstKey }),
+                 })
                 .With(m => m.Event = new Event
                 {
-                    EventId = "Abc",
+                    EventId = DataHelper.RandomString(3),
                     StartDate = DateTime.Now,
                     EndDate = DateTime.Now,
                 })
-                .With(m => m.DataStewardshipDatasetId = "Cde")
-                .With(m => m.DataProviderId = 1)                
+                .With(m => m.DataStewardshipDatasetId = DataHelper.RandomString(3))
+                .With(m => m.DataProviderId = 1)
+                .With(m => m.ArtportalenInternal = null)
+                .With(m => m.Sensitive = false)
             .Build();
-        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
 
-        var searchFilter = new OccurrenceFilter { DatasetIds = new List<string> { "Cde" } };
-
-        //-----------------------------------------------------------------------------------------------------------
-        // Act
-        //-----------------------------------------------------------------------------------------------------------
-        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
-            $"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
-
-        //-----------------------------------------------------------------------------------------------------------
-        // Assert
-        //-----------------------------------------------------------------------------------------------------------
-        pageResult.Records.First().OccurrenceID.Should().Be("Efg");
-        pageResult.Records.First().DatasetIdentifier.Should().Be("Cde");
+        return observations;
     }
 }

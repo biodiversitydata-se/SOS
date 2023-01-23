@@ -1,4 +1,5 @@
 using SOS.DataStewardship.Api.IntegrationTests.Extensions;
+using SOS.DataStewardship.Api.IntegrationTests.Helpers;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
 using Xunit.Abstractions;
@@ -10,75 +11,95 @@ public class EventTests : TestBase
 {
     public EventTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
-    }    
+    }
 
     [Fact]
     public async Task Get_EventById_Success()
     {
-        //-----------------------------------------------------------------------------------------------------------
         // Arrange
-        //-----------------------------------------------------------------------------------------------------------
-        string identifier = "Abc";
-        var events = Builder<ObservationEvent>.CreateListOfSize(1)
-            .TheFirst(1)
-                .With(m => m.EventId = "Abc")
-            .Build();
+        string eventId = "Abc";
+        var events = GetEventTestData(eventId);
         await ProcessFixture.AddEventsToElasticsearchAsync(events);
 
-        //-----------------------------------------------------------------------------------------------------------
         // Act
-        //-----------------------------------------------------------------------------------------------------------
-        var ev = await ApiClient.GetFromJsonAsync<EventModel>($"datastewardship/events/{identifier}", jsonSerializerOptions);
+        var ev = await ApiClient.GetFromJsonAsync<EventModel>($"datastewardship/events/{eventId}", jsonSerializerOptions);
 
-        //-----------------------------------------------------------------------------------------------------------
-        // Assert
-        //-----------------------------------------------------------------------------------------------------------
+        // Assert        
         ev.Should().NotBeNull();
-        ev.EventID.Should().Be("Abc");
+        ev.EventID.Should().Be(eventId);
     }
 
     [Fact]
     public async Task Post_EventBySearch_Success()
     {
-        //-----------------------------------------------------------------------------------------------------------
-        // Arrange
-        //-----------------------------------------------------------------------------------------------------------
-        var events = Builder<ObservationEvent>.CreateListOfSize(1)
-            .TheFirst(1)
-                .With(m => m.EventId = "Abc")
+        // Arrange        
+        string eventId = "Abc";
+        string datasetId = "Def";
+        var events = GetEventTestData(eventId, datasetId);
+        await ProcessFixture.AddEventsToElasticsearchAsync(events);
+        var observations = GetObservationTestData(eventId, datasetId);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
+        var searchFilter = new EventsFilter { 
+            DatasetList = new List<string> { datasetId } 
+        };
+
+        // Act
+        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>(
+            $"datastewardship/events", searchFilter, jsonSerializerOptions);        
+
+        // Assert        
+        pageResult.Records.First().EventID.Should().Be(eventId);
+    }
+
+    private IEnumerable<ObservationEvent> GetEventTestData(string firstEventKey, string? firstDatasetKey = null)
+    {
+        firstDatasetKey ??= DataHelper.RandomString(3);
+
+        var events = Builder<ObservationEvent>.CreateListOfSize(10)
+             .TheFirst(1)
+                .With(m => m.EventId = firstEventKey)
                 .With(m => m.Dataset = new Lib.Models.Processed.DataStewardship.Event.EventDataset
                 {
-                    Identifier = "Cde",
+                    Identifier = firstDatasetKey,
                 })
+            .TheNext(9)
+                 .With(m => m.EventId = DataHelper.RandomString(3, new[] { firstEventKey }))
+                 .With(m => m.Dataset = new Lib.Models.Processed.DataStewardship.Event.EventDataset
+                 {
+                     Identifier = DataHelper.RandomString(3, new[] { firstDatasetKey }),
+                 })
             .Build();
-        await ProcessFixture.AddEventsToElasticsearchAsync(events);
 
-        var observations = Builder<Observation>.CreateListOfSize(1)
-            .TheFirst(1)
+        return events;
+    }
+
+    private IEnumerable<Observation> GetObservationTestData(string firstEventKey, string firstDatasetId)
+    {
+        var observations = Builder<Observation>.CreateListOfSize(10)
+             .TheFirst(1)
                 .With(m => m.Event = new Event
                 {
-                    EventId = "Abc",
+                    EventId = firstEventKey,
                     StartDate = DateTime.Now,
                     EndDate = DateTime.Now,
                 })
-                .With(m => m.DataStewardshipDatasetId = "Cde")
-                .With(m => m.DataProviderId = 1)                
+                .With(m => m.DataStewardshipDatasetId = firstDatasetId)
+                .With(m => m.DataProviderId = 1)
+                .With(m => m.ArtportalenInternal = null)
+                .With(m => m.Sensitive = false)
+            .TheNext(9)
+                .With(m => m.Event = new Event
+                {
+                    EventId = DataHelper.RandomString(3, new[] { firstEventKey }),
+                    StartDate = DateTime.Now,
+                    EndDate = DateTime.Now,
+                })
+                .With(m => m.DataStewardshipDatasetId = DataHelper.RandomString(3, new[] { firstDatasetId }))
+                .With(m => m.DataProviderId = 1)
+                .With(m => m.ArtportalenInternal = null)
+                .With(m => m.Sensitive = false)
             .Build();
-        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
 
-        var searchFilter = new EventsFilter { 
-            DatasetList = new List<string> { "Cde" } 
-        };
-
-        //-----------------------------------------------------------------------------------------------------------
-        // Act
-        //-----------------------------------------------------------------------------------------------------------
-        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
-
-        //-----------------------------------------------------------------------------------------------------------
-        // Assert
-        //-----------------------------------------------------------------------------------------------------------
-        pageResult.Records.First().EventID.Should().Be("Abc");
-        pageResult.Records.First().Dataset.Identifier.Should().Be("Cde");
+        return observations;
     }
 }
