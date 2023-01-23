@@ -12,8 +12,7 @@ public class OccurrenceTests : TestBase
     {
     }    
 
-    [Fact]
-    public async Task Get_OccurrenceById_Success()
+    private IEnumerable<Observation> GetObservationTestData(string firstKey)
     {
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
@@ -23,7 +22,7 @@ public class OccurrenceTests : TestBase
             .TheFirst(1)
                 .With(m => m.Occurrence = new Occurrence
                 {
-                    OccurrenceId = "Efg",
+                    OccurrenceId = firstKey,
                 })
                 .With(m => m.Event = new Event
                 {
