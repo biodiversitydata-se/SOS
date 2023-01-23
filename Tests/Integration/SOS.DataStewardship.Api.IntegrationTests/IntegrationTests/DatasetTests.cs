@@ -21,9 +21,7 @@ public class DatasetTests : TestBase
         string identifier = "Abc";
         var datasets = Builder<ObservationDataset>.CreateListOfSize(1)
             .TheFirst(1)
-                .With(m => m.Identifier = identifier)
-                .With(m => m.Purpose = null)
-                .With(m => m.AccessRights = null)
+                .With(m => m.Identifier = identifier)                
             .Build();
         await ProcessFixture.AddDatasetsToElasticsearchAsync(datasets);
 
@@ -48,9 +46,7 @@ public class DatasetTests : TestBase
         string identifier = "Abc";
         var datasets = Builder<ObservationDataset>.CreateListOfSize(1)
             .TheFirst(1)
-                .With(m => m.Identifier = identifier)
-                .With(m => m.Purpose = null)
-                .With(m => m.AccessRights = null)
+                .With(m => m.Identifier = identifier)                
             .Build();
         await ProcessFixture.AddDatasetsToElasticsearchAsync(datasets);
 

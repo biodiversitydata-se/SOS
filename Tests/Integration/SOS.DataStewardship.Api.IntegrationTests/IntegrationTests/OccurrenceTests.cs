@@ -32,9 +32,7 @@ public class OccurrenceTests : TestBase
                     EndDate = DateTime.Now,
                 })
                 .With(m => m.DataStewardshipDatasetId = "Cde")
-                .With(m => m.DataProviderId = 1)
-                .With(m => m.ArtportalenInternal = null)
-                .With(m => m.Sensitive = false)
+                .With(m => m.DataProviderId = 1)                
             .Build();
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
 
@@ -69,9 +67,7 @@ public class OccurrenceTests : TestBase
                     EndDate = DateTime.Now,
                 })
                 .With(m => m.DataStewardshipDatasetId = "Cde")
-                .With(m => m.DataProviderId = 1)
-                .With(m => m.ArtportalenInternal = null)
-                .With(m => m.Sensitive = false)
+                .With(m => m.DataProviderId = 1)                
             .Build();
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
 
