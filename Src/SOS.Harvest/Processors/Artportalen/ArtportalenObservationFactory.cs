@@ -257,8 +257,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Location.MaximumDepthInMeters = verbatimObservation.MaxDepth;
                 obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
                 obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;
-                obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;
-                obs.Location.VerbatimLocality = obs.Location.Locality;
+                obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;                
 
                 if (verbatimObservation.Site != null)
                 {
@@ -289,7 +288,8 @@ namespace SOS.Harvest.Processors.Artportalen
                         taxon?.Attributes?.DisturbanceRadius
                     );
                 }
-               
+                obs.Location.VerbatimLocality = obs.Location.Locality;
+
                 // Occurrence
                 obs.Occurrence = new Occurrence();
                 obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages && verbatimObservation.FirstImageId > 0
