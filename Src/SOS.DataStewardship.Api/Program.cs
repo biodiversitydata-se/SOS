@@ -28,6 +28,12 @@ try
         options.SerializerOptions.PropertyNameCaseInsensitive = true;
     });
 
+    // This registration is needed to get Swagger enums to use strings instead of ints.
+    builder.Services.Configure<JsonOptions>(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
+
 #if DEBUG
     builder.Services.Configure<TelemetryConfiguration>(x => x.DisableTelemetry = true);
 #endif
