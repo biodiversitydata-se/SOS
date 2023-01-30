@@ -115,12 +115,15 @@
 - Kolla upp: Mappas `Sex`, `LifeStage`, `Activity` korrekt?
 - Kolla upp: Mappas `Unit` korrekt?
 - Kolla upp: Mappas `QuantityVariable` korrekt?
+- Byt namn på klass och tillhörande ES-index `ObservationEvent`?
+- Byt namn på klass och tillhörande ES-index `ObservationDataset`?
 
 ## Övrigt som återstår
-- Publicera API på Azure API och koppla ihop med.
+- Publicera API på Azure API och koppla ihop med interna API:et.
 - Förbättra Open API dokumentationen.
 - Skapa dokumentation i markdown.
 - Skapa diagram som visar dataflöden.
+- Deploya på Kubernetes-kluster?
 
 ## Referenser
 - [Open API Specification (Lund)](https://github.com/Lund-University-Biodiversity-data/datahost-api/blob/main/api/openapi.yaml)
