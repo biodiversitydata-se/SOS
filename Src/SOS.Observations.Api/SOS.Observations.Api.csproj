@@ -43,7 +43,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.2" />
-		<PackageReference Include="Microsoft.OpenApi" Version="1.4.5" />
+		<PackageReference Include="Microsoft.OpenApi" Version="1.5.0" />
 		<PackageReference Include="MongoDB.Driver" Version="2.18.0" />
 		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.18.0" />
 		<PackageReference Include="NGeoHash" Version="1.2.0" />
