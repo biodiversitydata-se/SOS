@@ -24,39 +24,9 @@ namespace SOS.Lib.Configuration.Shared
         public bool DebugMode { get; set; }
 
         /// <summary>
-        ///     How many items to read in a time when scrolling
+        /// Index settings
         /// </summary>
-        public int ReadBatchSize { get; set; }
-
-        /// <summary>
-        ///     How many items to write in a time
-        /// </summary>
-        public int WriteBatchSize { get; set; }
-
-        /// <summary>
-        /// How many items to retrieve in each scroll request.
-        /// </summary>
-        public int ScrollBatchSize { get; set; } = 5000;
-
-        /// <summary>
-        /// Scroll timeout.
-        /// </summary>
-        public string ScrollTimeout { get; set; } = "300s";
-
-        /// <summary>
-        /// Max number of aggregation buckets.
-        /// </summary>
-        public int MaxNrAggregationBuckets { get; set; } = 65535;
-
-        /// <summary>
-        /// Number of shards
-        /// </summary>
-        public int NumberOfShards { get; set; } = 6;
-
-        /// <summary>
-        /// Number of replicas
-        /// </summary>
-        public int NumberOfReplicas { get; set; }
+        public IEnumerable<ElasticSearchIndexConfiguration> IndexSettings { get; set; }
 
         /// <summary>
         ///     Password

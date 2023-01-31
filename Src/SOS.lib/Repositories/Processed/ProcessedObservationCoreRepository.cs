@@ -8,6 +8,7 @@ using Elasticsearch.Net;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver.Core.Configuration;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -47,7 +48,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             var createIndexResponse = await Client.Indices.CreateAsync(protectedIndex ? ProtectedIndexName : PublicIndexName, s => s
                 .Settings(s => s
-                    .NumberOfShards(NumberOfShards)
+                    .NumberOfShards(protectedIndex ? NumberOfShardsProtected : NumberOfShards) 
                     .NumberOfReplicas(NumberOfReplicas)
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
