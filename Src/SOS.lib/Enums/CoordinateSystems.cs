@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Enums
+﻿using System;
+
+namespace SOS.Lib.Enums
 {
     /// <summary>
     ///     Enumeration of predefined coordinate system.
@@ -39,7 +41,12 @@
         /// <summary>
         ///     ETRS
         /// </summary>
-        ETRS89 = 4258
+        ETRS89 = 4258,
+
+        /// <summary>
+        ///     ETRS89-extended / LAEA Europe
+        /// </summary>
+        ETRS89_LAEA_Europe = 3035
     }
 
     public enum MetricCoordinateSys
@@ -52,6 +59,12 @@
         /// <summary>
         ///     ETRS-LAEA
         /// </summary>
-        ETRS89 = 4258
+        [Obsolete("ETRS89_LAEA_Europe should be used instead of this.")]
+        ETRS89 = 3035,
+
+        /// <summary>
+        ///     ETRS89-extended / LAEA Europe
+        /// </summary>
+        ETRS89_LAEA_Europe = 3035
     }
 }

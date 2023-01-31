@@ -57,7 +57,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             var dwcaObservation = builder
                 .WithDecimalLatitude(Coordinates.TranasMunicipality.Etrs89Y)
                 .WithDecimalLongitude(Coordinates.TranasMunicipality.Etrs89X)
-                .WithGeodeticDatum(CoordinateSys.ETRS89.EpsgCode())
+                .WithGeodeticDatum(CoordinateSys.ETRS89_LAEA_Europe.EpsgCode())
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Location.DecimalLatitude.Should().BeApproximately(Coordinates.TranasMunicipality.Latitude, 0.0001);
             result.Location.DecimalLongitude.Should().BeApproximately(Coordinates.TranasMunicipality.Longitude, 0.0001);
             result.Location.GeodeticDatum.Should().Be(CoordinateSys.WGS84.EpsgCode());
-            result.Location.VerbatimSRS.Should().Be(CoordinateSys.ETRS89.EpsgCode());
+            result.Location.VerbatimSRS.Should().Be(CoordinateSys.ETRS89_LAEA_Europe.EpsgCode());
             result.Location.VerbatimLongitude.Should().Be(Coordinates.TranasMunicipality.Etrs89X.ToString(CultureInfo.InvariantCulture));
             result.Location.VerbatimLatitude.Should().Be(Coordinates.TranasMunicipality.Etrs89Y.ToString(CultureInfo.InvariantCulture));
         }

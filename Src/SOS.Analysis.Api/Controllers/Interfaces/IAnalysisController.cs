@@ -52,7 +52,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             bool? allowHoles = false,
             bool? returnGridCells = false,
             bool? includeEmptyCells = false,
-            MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.ETRS89,
-            CoordinateSys? coordinateSystem = CoordinateSys.ETRS89);
+            MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
+            CoordinateSys? coordinateSystem = CoordinateSys.WGS84);
     }
 }
