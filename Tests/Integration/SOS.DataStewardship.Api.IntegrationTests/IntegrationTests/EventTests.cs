@@ -1,12 +1,56 @@
+using SOS.DataStewardship.Api.IntegrationTests.Extensions;
 using SOS.DataStewardship.Api.IntegrationTests.Helpers;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
+using Xunit.Abstractions;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests;
 
 [Collection(Constants.IntegrationTestsCollectionName)]
 public class EventTests : TestBase
 {
+    public EventTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    {
+    }
+
+    [Fact]
+    public async Task Get_EventById_Success()
+    {
+        // Arrange
+        string eventId = "Abc";
+        var events = GetEventTestData(eventId);
+        await ProcessFixture.AddEventsToElasticsearchAsync(events);
+
+        // Act
+        var ev = await ApiClient.GetFromJsonAsync<EventModel>($"datastewardship/events/{eventId}", jsonSerializerOptions);
+
+        // Assert        
+        ev.Should().NotBeNull();
+        ev.EventID.Should().Be(eventId);
+    }
+
+    [Fact]
+    public async Task Post_EventBySearch_Success()
+    {
+        // Arrange        
+        string eventId = "Abc";
+        string datasetId = "Def";
+        var events = GetEventTestData(eventId, datasetId);
+        await ProcessFixture.AddEventsToElasticsearchAsync(events);
+        var observations = GetObservationTestData(eventId, datasetId);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
+        var searchFilter = new EventsFilter { 
+            DatasetList = new List<string> { datasetId } 
+        };
+
+        // Act
+        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>(
+            $"datastewardship/events", searchFilter, jsonSerializerOptions);        
+
+        // Assert        
+        pageResult.Records.First().EventID.Should().Be(eventId);
+    }
+
     private IEnumerable<ObservationEvent> GetEventTestData(string firstEventKey, string? firstDatasetKey = null)
     {
         firstDatasetKey ??= DataHelper.RandomString(3);
@@ -57,45 +101,5 @@ public class EventTests : TestBase
             .Build();
 
         return observations;
-    }
-
-    public EventTests(DataStewardshipApiWebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory) { }
-
-    [Fact]
-    public async Task Get_EventById_Success()
-    {
-        // Arrange
-        string eventId = "Abc";
-        var events = GetEventTestData(eventId);
-        await AddEventsToElasticsearchAsync(events);
-
-        // Act
-        var response = await Client.GetFromJsonAsync<EventModel>($"datastewardship/events/{eventId}", jsonSerializerOptions);
-
-        // Assert        
-        response.Should().NotBeNull();
-        response.EventID.Should().Be(eventId);
-    }
-
-    [Fact]
-    public async Task Post_EventBySearch_Success()
-    {
-        // Arrange        
-        string eventId = "Abc";
-        string datasetId = "Def";
-        var events = GetEventTestData(eventId, datasetId);
-        await AddEventsToElasticsearchAsync(events);
-        
-        var observations = GetObservationTestData(eventId, datasetId);
-        await AddObservationsToElasticsearchAsync(observations);
-
-        var body = new EventsFilter { DatasetList = new List<string> { datasetId } };
-
-        // Act
-        var response = await Client.PostAsJsonAsync($"datastewardship/events", body, jsonSerializerOptions);
-        var pageResult = await response.Content.ReadFromJsonAsync<PagedResult<EventModel>>(jsonSerializerOptions);
-
-        // Assert        
-        pageResult.Records.First().EventID.Should().Be(eventId);
     }
 }

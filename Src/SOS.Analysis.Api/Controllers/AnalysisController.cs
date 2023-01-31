@@ -134,8 +134,8 @@ namespace SOS.Analysis.Api.Controllers
             [FromQuery] bool? allowHoles = false,
             [FromQuery] bool? returnGridCells = false,
             [FromQuery] bool? includeEmptyCells = false,
-            [FromQuery] MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.ETRS89,
-            [FromQuery] CoordinateSys? coordinateSystem = CoordinateSys.ETRS89)
+            [FromQuery] MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
+            [FromQuery] CoordinateSys? coordinateSystem = CoordinateSys.WGS84)
         {
             try
             {

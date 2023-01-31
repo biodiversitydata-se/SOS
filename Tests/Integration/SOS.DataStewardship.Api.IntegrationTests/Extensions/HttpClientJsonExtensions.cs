@@ -5,7 +5,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Extensions;
 
 public static class HttpClientJsonExtensions
 {
-    public static async Task<TResult> PostAsJsonAsync<TResult, TBody>(
+    public static async Task<TResult> GetFromJsonPostAsync<TResult, TBody>(
         this HttpClient client,
         string requestUri,
         TBody value,

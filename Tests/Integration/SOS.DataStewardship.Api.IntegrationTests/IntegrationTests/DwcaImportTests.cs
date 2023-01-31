@@ -1,22 +1,13 @@
 using SOS.DataStewardship.Api.IntegrationTests.Extensions;
-using SOS.DataStewardship.Api.IntegrationTests.Helpers;
-using SOS.Lib.Models.Shared;
 using Xunit.Abstractions;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests;
 
 [Collection(Constants.IntegrationTestsCollectionName)]
 public class DwcaImportTests : TestBase
-{
-    private readonly ProcessFixture _processFixture;
-    private readonly ITestOutputHelper _output;    
-
-    public DwcaImportTests(ApiWebApplicationFactory<Program> webApplicationFactory, 
-        ITestOutputHelper output) : base(webApplicationFactory) 
-    {
-        this._output = output;
-        using var scope = _factory.ServiceProvider.CreateScope();        
-        _processFixture = scope.ServiceProvider.GetService<ProcessFixture>();
+{    
+    public DwcaImportTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    { 
     }
 
     [Fact]
@@ -25,23 +16,23 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------
-        await ImportDwcaFileAsync(@"resources\dwca-datastewardship-bats-taxalists.zip");
-
+        await ProcessFixture.ImportDwcaFileAsync(@"resources\dwca-datastewardship-bats-taxalists.zip", Output);
+        
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
 
         // Get by id
-        var observationById1 = await Client.GetFromJsonAsync<OccurrenceModel>($"datastewardship/occurrences/test:bats:sighting:98571703", jsonSerializerOptions);
-        var observationById2 = await Client.GetFromJsonAsync<OccurrenceModel>($"datastewardship/occurrences/test:bats:sighting:98571253", jsonSerializerOptions);
+        var observationById1 = await ApiClient.GetFromJsonAsync<OccurrenceModel>($"datastewardship/occurrences/test:bats:sighting:98571703", jsonSerializerOptions);
+        var observationById2 = await ApiClient.GetFromJsonAsync<OccurrenceModel>($"datastewardship/occurrences/test:bats:sighting:98571253", jsonSerializerOptions);
 
         // Get by search - Observations with Dataset "Bats (Hallaröd)"
-        var searchFilter = new OccurrenceFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };        
-        var pageResultHallarod = await Client.PostAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>($"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
+        var searchFilter = new OccurrenceFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
+        var pageResultHallarod = await ApiClient.GetFromJsonPostAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>($"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
 
         // Get by search - Observations with Dataset "Bats (Other)"
         searchFilter = new OccurrenceFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
-        var pageResultOther = await Client.PostAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>($"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
+        var pageResultOther = await ApiClient.GetFromJsonPostAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>($"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
@@ -66,23 +57,23 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
-        await ImportDwcaFileAsync(@"resources\dwca-datastewardship-bats-taxalists.zip");
-
+        await ProcessFixture.ImportDwcaFileAsync(@"resources\dwca-datastewardship-bats-taxalists.zip", Output);
+        
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
 
         // Get by id
-        var eventById1 = await Client.GetFromJsonAsync<EventModel>($"datastewardship/events/test:bats:event:12581041667877196608", jsonSerializerOptions);
-        var eventById2 = await Client.GetFromJsonAsync<EventModel>($"datastewardship/events/test:bats:event:14009236676399444594", jsonSerializerOptions);
+        var eventById1 = await ApiClient.GetFromJsonAsync<EventModel>($"datastewardship/events/test:bats:event:12581041667877196608", jsonSerializerOptions);
+        var eventById2 = await ApiClient.GetFromJsonAsync<EventModel>($"datastewardship/events/test:bats:event:14009236676399444594", jsonSerializerOptions);
 
         // Get by search - Events with Dataset "Bats (Hallaröd)"
         var searchFilter = new EventsFilter { DatasetList = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
-        var pageResultHallarod = await Client.PostAsJsonAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
+        var pageResultHallarod = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
 
         // Get by search - Events with Dataset "Bats (Other)"
         searchFilter = new EventsFilter { DatasetList = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
-        var pageResultOther = await Client.PostAsJsonAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
+        var pageResultOther = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
@@ -91,7 +82,7 @@ public class DwcaImportTests : TestBase
         eventById2.Should().NotBeNull();
 
         pageResultHallarod.Records.Should().AllSatisfy(m =>
-        {            
+        {
             m.Dataset.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Hallaröd)");
         });
 
@@ -107,23 +98,22 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
-        await ImportDwcaFileAsync(@"resources\dwca-datastewardship-bats-taxalists.zip");
-
+        await ProcessFixture.ImportDwcaFileAsync(@"resources\dwca-datastewardship-bats-taxalists.zip", Output);
+        
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
-
-        // Get by id
-        var datasetById1 = await Client.GetFromJsonAsync<Dataset>($"datastewardship/datasets/ArtportalenDataHost - Dataset Bats (Hallaröd)", jsonSerializerOptions);
-        var datasetById2 = await Client.GetFromJsonAsync<Dataset>($"datastewardship/datasets/ArtportalenDataHost - Dataset Bats (Other)", jsonSerializerOptions);
+        // Get by id        
+        var datasetById1 = await ApiClient.GetFromJsonAsync<Dataset>($"datastewardship/datasets/ArtportalenDataHost - Dataset Bats (Hallaröd)", jsonSerializerOptions);
+        var datasetById2 = await ApiClient.GetFromJsonAsync<Dataset>($"datastewardship/datasets/ArtportalenDataHost - Dataset Bats (Other)", jsonSerializerOptions);
 
         // Get by search - Events with Dataset "Bats (Hallaröd)"
         var searchFilter = new DatasetFilter { DatasetList = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
-        var pageResultHallarod = await Client.PostAsJsonAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
+        var pageResultHallarod = await ApiClient.GetFromJsonPostAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
 
         // Get by search - Events with Dataset "Bats (Other)"
         searchFilter = new DatasetFilter { DatasetList = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
-        var pageResultOther = await Client.PostAsJsonAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
+        var pageResultOther = await ApiClient.GetFromJsonPostAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
@@ -140,33 +130,5 @@ public class DwcaImportTests : TestBase
         {
             m.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Other)");
         });
-    }
-
-    private async Task ImportDwcaFileAsync(string filePath)
-    {
-        var parsedDwcaFile = await DwcaHelper.ReadDwcaFileAsync(filePath);
-        var observationFactory = _processFixture.GetDwcaObservationFactory(true);
-        var eventFactory = _processFixture.GetDwcaEventFactory(true);
-        var datasetFactory = _processFixture.GetDwcaDatasetFactory();
-        var processedObservations = parsedDwcaFile
-            .Occurrences
-            .Select(m => observationFactory.CreateProcessedObservation(m, false))
-            .ToList();
-        await AddObservationsToElasticsearchAsync(processedObservations);
-        _output.WriteLine($"Processed observations count= {processedObservations.Count}");
-
-        var processedEvents = parsedDwcaFile
-            .Events
-            .Select(m => eventFactory.CreateEventObservation(m))
-            .ToList();
-        await AddEventsToElasticsearchAsync(processedEvents);
-        _output.WriteLine($"Processed events count= {processedEvents.Count}");
-
-        var processedDatasets = parsedDwcaFile
-            .Datasets
-            .Select(m => datasetFactory.CreateProcessedDataset(m))
-            .ToList();
-        await AddDatasetsToElasticsearchAsync(processedDatasets);
-        _output.WriteLine($"Processed datasets count= {processedDatasets.Count}");
-    }
+    }    
 }

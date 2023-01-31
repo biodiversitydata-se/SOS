@@ -9,25 +9,7 @@ using SOS.DataStewardship.Api.Extensions;
 namespace SOS.DataStewardship.Api.Modules;
 
 public class DataStewardshipModule : IModule
-{
-    /*
-     * API specification
-     * =================
-     * Complete: https://github.com/Lund-University-Biodiversity-data/datahost-api/blob/main/api/openapi.yaml
-     * Template: https://github.com/Lund-University-Biodiversity-data/datahost-api/blob/main/api/templateOpenapi.yaml
-     * 
-     * Todo
-     * ====               
-     * 1. Create integration tests
-     * 2. Implement Artportalen dataset database tables
-     * 3. Implement harvest Artportalen dataset database tables
-     * 4. Implement harvest Artportalen data stewardship harvesting.
-     * 5. Implement sample event DwC-A data stewardship harvesting.
-     * 6. Optimize ES search projection. Now every fields are retrieved just for convenience during development. SearchExtensionsObservation.ToProjection().
-     * 7. Implement logging
-     * 8. Move SOS.Lib.Models.Processed.Dataset.ObservationDataset.Organisation to SOS.Lib.Models.Processed.Dataset.Organisation?
-     */
-
+{    
     public void MapEndpoints(WebApplication application)
     {        
         application.MapGet("/datastewardship/datasets/{id}", GetDatasetByIdAsync)

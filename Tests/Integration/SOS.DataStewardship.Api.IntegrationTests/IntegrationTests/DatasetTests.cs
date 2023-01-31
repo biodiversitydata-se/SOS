@@ -1,11 +1,54 @@
+using SOS.DataStewardship.Api.IntegrationTests.Extensions;
 using SOS.DataStewardship.Api.IntegrationTests.Helpers;
 using SOS.Lib.Models.Processed.Observation;
+using Xunit.Abstractions;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests;
 
 [Collection(Constants.IntegrationTestsCollectionName)]
 public class DatasetTests : TestBase
 {
+    public DatasetTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    {
+    }    
+
+    [Fact]
+    public async Task Get_DatasetById_Success()
+    {
+        // Arrange
+        string identifier = "Abc";
+        var datasets = GetDatasetTestData(identifier);
+        await ProcessFixture.AddDatasetsToElasticsearchAsync(datasets);
+
+        // Act
+        var dataset = await ApiClient.GetFromJsonAsync<Dataset>($"datastewardship/datasets/{identifier}", jsonSerializerOptions);
+
+        // Assert        
+        dataset.Should().NotBeNull();
+        dataset.Identifier.Should().Be(identifier);
+    }
+
+    [Fact]
+    public async Task Post_DatasetBySearch_Success()
+    {
+        // Arrange
+        string identifier = "Abc";
+        var datasets = GetDatasetTestData(identifier);
+        await ProcessFixture.AddDatasetsToElasticsearchAsync(datasets);
+        var observations = GetObservationTestData(identifier);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
+        var searchFilter = new DatasetFilter { 
+            DatasetList = new List<string> { identifier } 
+        };
+
+        // Act
+        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<Dataset>, DatasetFilter>(
+            $"datastewardship/datasets", searchFilter, jsonSerializerOptions);        
+
+        // Assert        
+        pageResult.Records.First().Identifier.Should().Be(identifier);
+    }
+
     private IEnumerable<ObservationDataset> GetDatasetTestData(string firstKey)
     {
         var datasets = Builder<ObservationDataset>.CreateListOfSize(10)
@@ -32,44 +75,5 @@ public class DatasetTests : TestBase
             .Build();
 
         return observations;
-    }
-
-    public DatasetTests(DataStewardshipApiWebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory) { }
-
-    [Fact]
-    public async Task Get_DatasetById_Success()
-    {
-        // Arrange
-        string identifier = "Abc";
-        var datasets = GetDatasetTestData(identifier);
-        await AddDatasetsToElasticsearchAsync(datasets);        
-
-        // Act
-        var response = await Client.GetFromJsonAsync<Dataset>($"datastewardship/datasets/{identifier}", jsonSerializerOptions);
-
-        // Assert        
-        response.Should().NotBeNull();
-        response.Identifier.Should().Be(identifier);
-    }  
-
-    [Fact]
-    public async Task Post_DatasetBySearch_Success()
-    {
-        // Arrange
-        string identifier = "Abc";
-        var datasets = GetDatasetTestData(identifier);
-        await AddDatasetsToElasticsearchAsync(datasets);
-
-        var observations = GetObservationTestData(identifier);
-        await AddObservationsToElasticsearchAsync(observations);
-        
-        var body = new DatasetFilter { DatasetList = new List<string> { identifier } };
-        
-        // Act
-        var response = await Client.PostAsJsonAsync($"datastewardship/datasets", body, jsonSerializerOptions);
-        var pageResult = await response.Content.ReadFromJsonAsync<PagedResult<Dataset>>(jsonSerializerOptions);
-
-        // Assert        
-        pageResult.Records.First().Identifier.Should().Be(identifier);        
     }
 }

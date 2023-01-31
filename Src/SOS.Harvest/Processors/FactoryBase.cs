@@ -75,7 +75,7 @@ namespace SOS.Harvest.Processors
             location.Sweref99TmX = sweRef99TmPoint.Coordinate.X;
             location.Sweref99TmY = sweRef99TmPoint.Coordinate.Y;
            
-            var etrs89Point = point.Transform(CoordinateSys.WGS84, CoordinateSys.ETRS89);
+            var etrs89Point = point.Transform(CoordinateSys.WGS84, CoordinateSys.ETRS89_LAEA_Europe);
             location.Etrs89X = etrs89Point.Coordinate.X;
             location.Etrs89Y = etrs89Point.Coordinate.Y;
             TimeManager.Stop(ProcessTimeManager.TimerTypes.CoordinateConversion, coordinateConversionTimerSessionId);

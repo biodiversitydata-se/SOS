@@ -3,9 +3,9 @@
 public class ElasticClientTestManager : IElasticClientManager
 {
     private IElasticClient[] _clients;
-    public ElasticClientTestManager(ElasticClient elasticClient)
+    public ElasticClientTestManager(IElasticClient elasticClient)
     {
-        _clients= new ElasticClient[] { elasticClient };
+        _clients = new IElasticClient[] { elasticClient };
     }
 
     public IElasticClient[] Clients => _clients;

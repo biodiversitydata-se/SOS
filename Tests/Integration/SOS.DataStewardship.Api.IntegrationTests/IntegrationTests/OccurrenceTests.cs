@@ -1,12 +1,53 @@
+using SOS.DataStewardship.Api.IntegrationTests.Extensions;
 using SOS.DataStewardship.Api.IntegrationTests.Helpers;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Filters;
+using Xunit.Abstractions;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests;
 
 [Collection(Constants.IntegrationTestsCollectionName)]
 public class OccurrenceTests : TestBase
 {
-    public OccurrenceTests(ApiWebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory) { }
+    public OccurrenceTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    {
+    }
+
+    [Fact]
+    public async Task Get_OccurrenceById_Success()
+    {
+        // Arrange
+        string identifier = "Efg";
+        var observations = GetObservationTestData(identifier);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
+
+        // Act
+        var observation = await ApiClient.GetFromJsonAsync<OccurrenceModel>(
+            $"datastewardship/occurrences/{identifier}", jsonSerializerOptions);
+
+        // Assert        
+        observation.Should().NotBeNull();
+        observation.OccurrenceID.Should().Be(identifier);
+    }
+
+    [Fact]
+    public async Task Post_OccurrencesBySearch_Success()
+    {
+        // Arrange
+        string identifier = "Efg";
+        var observations = GetObservationTestData(identifier);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
+        var searchFilter = new OccurrenceFilter {
+            DatasetIds = new List<string> { "Cde" }
+        };
+
+        // Act
+        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+            $"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
+
+        // Assert        
+        pageResult.Records.First().OccurrenceID.Should().Be(identifier);
+    }
 
     private IEnumerable<Observation> GetObservationTestData(string firstKey)
     {
@@ -44,39 +85,5 @@ public class OccurrenceTests : TestBase
             .Build();
 
         return observations;
-    }
-
-    [Fact]
-    public async Task Get_OccurrenceById_Success()
-    {
-        // Arrange
-        string identifier = "Efg";
-        var observations = GetObservationTestData(identifier);
-        await AddObservationsToElasticsearchAsync(observations);
-
-        // Act
-        var response = await Client.GetFromJsonAsync<OccurrenceModel>($"datastewardship/occurrences/{identifier}", jsonSerializerOptions);
-
-        // Assert        
-        response.Should().NotBeNull();
-        response.OccurrenceID.Should().Be(identifier);
-    }
-
-    [Fact]
-    public async Task Post_OccurrencesBySearch_Success()
-    {
-        // Arrange data
-        string identifier = "Efg";
-        var observations = GetObservationTestData(identifier);
-        await AddObservationsToElasticsearchAsync(observations);
-
-        var body = new OccurrenceFilter { DatasetIds = new List<string> { "Cde" } };
-
-        // Act
-        var response = await Client.PostAsJsonAsync($"datastewardship/occurrences", body, jsonSerializerOptions);
-        var pageResult = await response.Content.ReadFromJsonAsync<PagedResult<OccurrenceModel>>(jsonSerializerOptions);
-
-        // Assert        
-        pageResult.Records.First().OccurrenceID.Should().Be(identifier);
     }
 }
