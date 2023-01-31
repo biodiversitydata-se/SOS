@@ -40,16 +40,12 @@ try
     var app = builder.Build();
     app.ConfigureExceptionHandler(logger, isDevelopment);
     app.MapEndpoints();
-    app.UseHttpsRedirection();
-
-    if (isDevelopment)
-    {
-        app.UseSwagger();        
-        app.UseSwaggerUI(options =>
-        {            
-            options.DisplayOperationId();            
-        });
-    }
+    app.UseHttpsRedirection();    
+    app.UseSwagger();        
+    app.UseSwaggerUI(options =>
+    {            
+        options.DisplayOperationId();            
+    });    
 
     app.UseAuthentication();
     //app.UseAuthorization();
