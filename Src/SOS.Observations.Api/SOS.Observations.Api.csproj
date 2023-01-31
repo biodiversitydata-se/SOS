@@ -36,7 +36,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
 		<PackageReference Include="CSharpFunctionalExtensions" Version="2.37.0" />
-		<PackageReference Include="HangFire" Version="1.7.32" />
+		<PackageReference Include="HangFire" Version="1.7.33" />
 		<PackageReference Include="HangFire.Autofac" Version="2.3.1" />
 		<PackageReference Include="HangFire.Mongo" Version="1.9.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.2" />

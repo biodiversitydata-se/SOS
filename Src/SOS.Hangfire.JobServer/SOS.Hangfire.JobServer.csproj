@@ -61,7 +61,7 @@
 		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
 		<PackageReference Include="Elastic.Apm.NLog" Version="1.5.3" />
 		<PackageReference Include="Elastic.CommonSchema.NLog" Version="1.5.3" />
-		<PackageReference Include="HangFire" Version="1.7.32" />
+		<PackageReference Include="HangFire" Version="1.7.33" />
 		<PackageReference Include="HangFire.Autofac" Version="2.3.1" />
 		<PackageReference Include="HangFire.Mongo" Version="1.9.1" />
 		<PackageReference Include="MassTransit" Version="8.0.12" />

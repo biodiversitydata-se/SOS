@@ -34,7 +34,7 @@
 	<ItemGroup>
 		<PackageReference Include="Bogus" Version="34.0.2" />		
 		<PackageReference Include="FluentAssertions" Version="6.9.0" />
-		<PackageReference Include="Hangfire.Core" Version="1.7.32" />
+		<PackageReference Include="Hangfire.Core" Version="1.7.33" />
 		<PackageReference Include="LinqStatistics" Version="2.3.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
