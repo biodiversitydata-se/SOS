@@ -21,6 +21,7 @@ namespace SOS.Lib.Repositories.Processed
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
         private readonly ElasticSearchConfiguration _elasticConfiguration;
+        private readonly ElasticSearchIndexConfiguration _elasticSearchIndexConfiguration;
         private readonly bool _toggleable;
         protected string _id = typeof(TEntity).Name;
 
@@ -95,22 +96,27 @@ namespace SOS.Lib.Repositories.Processed
         /// <summary>
         /// number of replicas
         /// </summary>
-        protected int NumberOfReplicas => _elasticConfiguration.NumberOfReplicas;
+        protected int NumberOfReplicas => _elasticSearchIndexConfiguration.NumberOfReplicas;
 
         /// <summary>
         /// Number of shards
         /// </summary>
-        protected int NumberOfShards => _elasticConfiguration.NumberOfShards;
+        protected int NumberOfShards => _elasticSearchIndexConfiguration.NumberOfShards;
+
+        /// <summary>
+        /// Number of shards
+        /// </summary>
+        protected int NumberOfShardsProtected => _elasticSearchIndexConfiguration.NumberOfShardsProtected;
 
         /// <summary>
         /// Scroll batch size
         /// </summary>
-        protected int ScrollBatchSize => _elasticConfiguration.ScrollBatchSize;
+        protected int ScrollBatchSize => _elasticSearchIndexConfiguration.ScrollBatchSize;
 
         /// <summary>
         /// Scroll timeout
         /// </summary>
-        protected string ScrollTimeout => _elasticConfiguration.ScrollTimeout;
+        protected string ScrollTimeout => _elasticSearchIndexConfiguration.ScrollTimeout;
 
         /// <summary>
         /// Constructor
@@ -133,7 +139,9 @@ namespace SOS.Lib.Repositories.Processed
             _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
             _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
-          
+            _elasticSearchIndexConfiguration = elasticConfiguration.IndexSettings?.FirstOrDefault(i => i.Name.Equals(IndexHelper.GetInstanceName<TEntity>(), StringComparison.CurrentCultureIgnoreCase)) ?? 
+                throw new ArgumentNullException($"Settings for index {IndexHelper.GetInstanceName<TEntity>()} is missing");
+
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Default use non live instance
@@ -172,10 +180,10 @@ namespace SOS.Lib.Repositories.Processed
         /// <summary>
         /// Max number of aggregation buckets
         /// </summary>
-        public int MaxNrElasticSearchAggregationBuckets => _elasticConfiguration.MaxNrAggregationBuckets;
+        public int MaxNrElasticSearchAggregationBuckets => _elasticSearchIndexConfiguration.MaxNrAggregationBuckets;
 
         /// <inheritdoc />
-        public int ReadBatchSize => _elasticConfiguration?.ReadBatchSize ?? 1000;
+        public int ReadBatchSize => _elasticSearchIndexConfiguration?.ReadBatchSize ?? 1000;
 
         /// <inheritdoc />
         public async Task<bool> SetActiveInstanceAsync(byte instance)
@@ -197,6 +205,6 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public int WriteBatchSize => _elasticConfiguration.WriteBatchSize;
+        public int WriteBatchSize => _elasticSearchIndexConfiguration.WriteBatchSize;
     }
 }

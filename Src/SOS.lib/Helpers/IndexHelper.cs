@@ -53,11 +53,19 @@ namespace SOS.Lib.Helpers
         /// Get name of instance
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
-        /// <param name="toggleable"></param>
-        /// <param name="instance"></param>
+        /// <returns></returns>
+        public static string GetInstanceName<TEntity>()
+        {
+            return $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
+        }
+
+        /// <summary>
+        /// Get name of instance
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
         /// <param name="protectedObservations"></param>
         /// <returns></returns>
-        public static string GetInstanceName<TEntity>(bool toggleable, byte instance, bool protectedObservations)
+        public static string GetInstanceName<TEntity>(bool protectedObservations)
         {
             var instanceName = GetInstanceName<TEntity>();
             if (protectedObservations)
@@ -65,7 +73,6 @@ namespace SOS.Lib.Helpers
                 instanceName += "-protected";
             }
 
-            instanceName += $"{(toggleable ? $"-{instance}" : string.Empty)}";
             return instanceName;
         }
 
@@ -73,10 +80,15 @@ namespace SOS.Lib.Helpers
         /// Get name of instance
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
+        /// <param name="toggleable"></param>
+        /// <param name="instance"></param>
+        /// <param name="protectedObservations"></param>
         /// <returns></returns>
-        public static string GetInstanceName<TEntity>()
+        public static string GetInstanceName<TEntity>(bool toggleable, byte instance, bool protectedObservations)
         {
-            return $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
+            var instanceName = GetInstanceName<TEntity>(protectedObservations);
+            instanceName += $"{(toggleable ? $"-{instance}" : string.Empty)}";
+            return instanceName;
         }
     }
 }
