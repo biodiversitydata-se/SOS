@@ -147,7 +147,7 @@ namespace SOS.Observations.Api.Controllers
             ILogger<ObservationsController> logger) : base(observationManager, areaManager, taxonManager, observationApiConfiguration)
         {
             _taxonSearchManager = taxonSearchManager ?? throw new ArgumentNullException(nameof(taxonSearchManager));
-            _tilesLimit = elasticConfiguration?.MaxNrAggregationBuckets ??
+            _tilesLimit = elasticConfiguration?.IndexSettings?.FirstOrDefault(i => i.Name.Equals("observation", StringComparison.CurrentCultureIgnoreCase))?.MaxNrAggregationBuckets ??
                           throw new ArgumentNullException(nameof(elasticConfiguration));
 
             _signalSearchTaxonListIds = (observationApiConfiguration?.SignalSearchTaxonListIds?.Any() ?? false) ? observationApiConfiguration.SignalSearchTaxonListIds : Array.Empty<int>();
