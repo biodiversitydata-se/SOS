@@ -13,7 +13,7 @@
         /// <summary>
         ///     Id of diffusion, 0 if no diffusion
         /// </summary>
-        public int DiffusionFactor { get; set; }
+        public int DiffusionId { get; set; }
 
         /// <summary>
         /// External id

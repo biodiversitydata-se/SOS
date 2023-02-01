@@ -185,7 +185,7 @@ namespace SOS.Harvest.Processors.Artportalen
         {
             try
             {
-                var diffuseFactor = verbatimObservation.Site?.DiffusionFactor ?? 0;
+                var diffuseFactor = verbatimObservation.Site?.DiffusionId ?? 0;
                 var diffuse = diffuseIfSupported && diffuseFactor > 0;
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
                                   (verbatimObservation.Site?.YCoord ?? 0) > 0;
@@ -375,6 +375,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ArtportalenInternal.ConfirmationYear = verbatimObservation.ConfirmationYear;
                 obs.ArtportalenInternal.DatasourceId = verbatimObservation.DatasourceId;
                 obs.ArtportalenInternal.DeterminationYear = verbatimObservation.DeterminationYear;
+                obs.ArtportalenInternal.DiffusionId = verbatimObservation.Site?.DiffusionId ?? 0;
                 obs.ArtportalenInternal.FieldDiaryGroupId = verbatimObservation.FieldDiaryGroupId;
                 obs.ArtportalenInternal.HasTriggeredVerificationRules = verbatimObservation.HasTriggeredValidationRules;
                 obs.ArtportalenInternal.HasAnyTriggeredVerificationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;

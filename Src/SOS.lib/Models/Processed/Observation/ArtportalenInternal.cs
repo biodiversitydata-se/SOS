@@ -49,6 +49,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? DeterminationYear { get; set; }
 
         /// <summary>
+        /// Id > 0 = diffused
+        /// </summary>
+        public int DiffusionId { get; set; }
+
+        /// <summary>
         /// Event month range start date => end date
         /// </summary>
         public IEnumerable<int> EventMonths { get; set; }

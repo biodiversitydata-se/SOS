@@ -48,7 +48,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Id of diffusion, 0 if no diffusion
         /// </summary>
-        public int DiffusionFactor { get; set; }
+        public int DiffusionId { get; set; }
 
         /// <summary>
         ///     External Id of site

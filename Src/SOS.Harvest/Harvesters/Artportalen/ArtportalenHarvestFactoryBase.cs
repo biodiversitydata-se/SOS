@@ -151,7 +151,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var site = new Site
             {
                 Accuracy = accuracy,
-                DiffusionFactor = entity.DiffusionFactor,
+                DiffusionId = entity.DiffusionId,
                 ExternalId = entity.ExternalId,
                 HasGeometry = siteGeometry?.IsValid() ?? false,
                 Id = entity.Id,
