@@ -263,6 +263,44 @@ namespace SOS.Harvest.Processors.Taxon
             }
         }
 
+        private bool ValidateTaxa(IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
+        {
+            var success = true;
+
+            if (!taxa?.Any() ?? true)
+            {
+                _logger.LogInformation("No taxa to validate");
+                return false;
+            }
+            var taxonCount = taxa.Count();
+            if (taxonCount < 105000)
+            {
+                _logger.LogInformation($"Only {taxonCount} taxon found, expect more than 105 000");
+                return false;
+            }
+
+            foreach (var taxon in taxa.Values)
+            {
+                if (string.IsNullOrEmpty(taxon.ScientificName))
+                {
+                    _logger.LogInformation($"Taxon: {taxon.Id} is missing a scientific name");
+                    success = false;
+                }
+             /*   if (string.IsNullOrEmpty(taxon.TaxonRank))
+                {
+                    _logger.LogInformation($"Taxon: {taxon.Id} is missing taxon rank");
+                    success = false;
+                }
+                if (string.IsNullOrEmpty(taxon.TaxonomicStatus))
+                {
+                    _logger.LogInformation($"Taxon: {taxon.Id} is missing taxonomic status");
+                    success = false;
+                }*/
+            }
+
+            return success;
+        }
+
        /// <summary>
        /// Constructor
        /// </summary>
@@ -332,7 +370,15 @@ namespace SOS.Harvest.Processors.Taxon
                 _logger.LogDebug("Start populating species group for taxa");
                 await PopulateSpeciesGroupField(taxa);
                 _logger.LogDebug("Finish populating species group for taxa");
-                
+
+                _logger.LogDebug("Start validating taxa");
+                if (!ValidateTaxa(taxa))
+                {
+                    _logger.LogError("Validation of taxa failed");
+                    return -1;
+                }
+                _logger.LogDebug("Finish validating taxa");
+
                 _logger.LogDebug("Start deleting processed taxa");
                 if (!await _processedTaxonRepository.DeleteCollectionAsync())
                 {

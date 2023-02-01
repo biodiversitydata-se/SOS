@@ -49,6 +49,20 @@ namespace SOS.Harvest.Services.Taxon
                     return null!;
                 }
                 using var zipArchive = new ZipArchive(zipFileContentStream, ZipArchiveMode.Read, false);
+                var missingFiles = new[] {
+                    "Taxon.csv",
+                    "TaxonNameProperties.csv",
+                    "TaxonRelations.csv",
+                    "TaxonProperties.csv" }
+                .Where(f => !zipArchive.Entries.Select(e => e.Name).Contains(f, StringComparer.CurrentCultureIgnoreCase))
+                .Select(f => f);
+
+                if (missingFiles.Any())
+                {
+                    _logger.LogError($"Missing files in Taxon DwC ({string.Join(',', missingFiles)})");
+                    return null!;
+                }
+                    
                 var csvFieldDelimiter = GetCsvFieldDelimiterFromMetaFile(zipArchive);
                 var taxa = GetTaxonCoreData(zipArchive, csvFieldDelimiter);
                 AddVernacularNames(taxa, zipArchive, csvFieldDelimiter);
