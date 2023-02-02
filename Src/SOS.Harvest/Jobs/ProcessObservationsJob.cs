@@ -761,8 +761,6 @@ namespace SOS.Harvest.Jobs
             }
         }
 
-
-
         /// <summary>
         ///  Process verbatim observations
         /// </summary>
