@@ -85,14 +85,35 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Setup
         {
             return new ElasticSearchConfiguration()
             {
-                WriteBatchSize = 1000,
+                IndexSettings = new List<ElasticSearchIndexConfiguration>()
+                {
+                    new ElasticSearchIndexConfiguration
+                    {
+                        Name = "observation",
+                        ReadBatchSize = 10000,
+                        WriteBatchSize = 1000,
+                        ScrollBatchSize = 5000,
+                        ScrollTimeout = "300s",                        
+                    },
+                    new ElasticSearchIndexConfiguration
+                    {
+                        Name = "observationEvent",
+                        ReadBatchSize = 10000,
+                        WriteBatchSize = 1000,
+                        ScrollBatchSize = 5000,
+                        ScrollTimeout = "300s"
+                    },
+                    new ElasticSearchIndexConfiguration
+                    {
+                        Name = "observationDataset",
+                        ReadBatchSize = 10000,
+                        WriteBatchSize = 1000,
+                        ScrollBatchSize = 5000,
+                        ScrollTimeout = "300s"
+                    }
+                },
                 RequestTimeout = 300,
-                ReadBatchSize = 10000,
-                DebugMode = true,
-                ScrollBatchSize = 5000,
-                ScrollTimeout = "600s",
-                NumberOfShards = 10,
-                NumberOfReplicas = 0,
+                DebugMode = true,                
                 IndexPrefix = "",
                 Clusters = null
                 //Clusters = new[]

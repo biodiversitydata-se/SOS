@@ -13,12 +13,12 @@
         /// <summary>
         ///     How many items to read in a time when scrolling
         /// </summary>
-        public int ReadBatchSize { get; set; }
+        public int ReadBatchSize { get; set; } = 10000;
 
         /// <summary>
         ///     How many items to write in a time
         /// </summary>
-        public int WriteBatchSize { get; set; }
+        public int WriteBatchSize { get; set; } = 1000;
 
         /// <summary>
         /// How many items to retrieve in each scroll request.
@@ -48,6 +48,6 @@
         /// <summary>
         /// Number of replicas
         /// </summary>
-        public int NumberOfReplicas { get; set; }
+        public int NumberOfReplicas { get; set; } = 0;
     }
 }
