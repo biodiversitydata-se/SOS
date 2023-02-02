@@ -275,7 +275,6 @@ namespace SOS.Harvest.Jobs
             }
 
             var publicCount = await _processedObservationRepository.IndexCountAsync(false);
-
             // Make sure we have a reasonable amount of observations processed
             if (publicCount < _minObservationCount)
             {
@@ -287,8 +286,15 @@ namespace SOS.Harvest.Jobs
             if (protectedCount < 1)
             {
                 _logger.LogError($"Validation failed. Only {protectedCount} protected observations processed");
-                // No protected observations found. No more validation can be done
-                return true;
+                // No protected observations found. Something is wrong
+                return false;
+            }
+
+            var diskUsagePercent = _processedObservationRepository.GetDiskUsage();
+            if (diskUsagePercent >= 95)
+            {
+                _logger.LogError($"Validation failed. Current disk usage {diskUsagePercent}%");
+                return false;
             }
 
             var validationTasks = new[]
@@ -754,8 +760,6 @@ namespace SOS.Harvest.Jobs
                 }
             }
         }
-
-
 
         /// <summary>
         ///  Process verbatim observations

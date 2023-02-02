@@ -90,6 +90,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<DataQualityReport> GetDataQualityReportAsync(string organismGroup);
 
         /// <summary>
+        /// Get current disk usage
+        /// </summary>
+        /// <returns></returns>
+        int GetDiskUsage();
+
+        /// <summary>
         /// Get aggregation in metric tiles 
         /// </summary>
         /// <param name="filter"></param>
