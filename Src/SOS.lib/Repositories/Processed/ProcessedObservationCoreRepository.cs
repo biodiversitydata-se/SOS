@@ -8,7 +8,6 @@ using Elasticsearch.Net;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver.Core.Configuration;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -513,27 +512,15 @@ namespace SOS.Lib.Repositories.Processed
             {
                 return null;
             }
+            var percentageUsed = GetDiskUsage();
 
-            //check
-            var currentAllocation = Client.Cat.Allocation();
-            if (currentAllocation != null && currentAllocation.IsValid)
+            if (percentageUsed > 90)
             {
-                var diskUsageDescription = "Current diskusage in cluster:";
-                foreach (var record in currentAllocation.Records)
-                {
-                    if (int.TryParse(record.DiskPercent, out int percentageUsed))
-                    {
-                        diskUsageDescription += percentageUsed + "% ";
-                        if (percentageUsed > 90)
-                        {
-                            Logger.LogError($"Disk usage too high in cluster ({percentageUsed}%), aborting indexing");
-                            return null;
-                        }
-                    }
-                }
-                Logger.LogDebug(diskUsageDescription);
+                Logger.LogError($"Disk usage too high in cluster ({percentageUsed}%), aborting indexing");
+                return null;
             }
-
+            Logger.LogDebug($"Current diskusage in cluster: {percentageUsed}%");
+            
             var count = 0;
             return Client.BulkAll(items, b => b
                     .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
@@ -865,6 +852,22 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             return report;
+        }
+
+        public int GetDiskUsage()
+        {
+            var currentAllocation = Client.Cat.Allocation();
+            if (currentAllocation != null && currentAllocation.IsValid)
+            {
+                foreach (var record in currentAllocation.Records)
+                {
+                    if (int.TryParse(record.DiskPercent, out int percentageUsed))
+                    {
+                        return percentageUsed;
+                    }
+                }
+            }
+            return 0;
         }
 
         /// <inheritdoc />
