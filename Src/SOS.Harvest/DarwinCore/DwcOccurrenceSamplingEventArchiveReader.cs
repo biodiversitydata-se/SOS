@@ -9,11 +9,12 @@ using Microsoft.Extensions.Logging;
 using RecordParser.Builders.Reader;
 using SOS.Harvest.DarwinCore.Factories;
 using SOS.Harvest.DarwinCore.Interfaces;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Processed.DataStewardship.Enums;
+
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Harvest.DarwinCore
@@ -503,52 +504,173 @@ namespace SOS.Harvest.DarwinCore
         {
             try
             {
-                // JSON
-                string jsonFilePath = Path.Combine(path, "datastewardship.json");
-                if (!File.Exists(jsonFilePath)) return null;
-
-                await using var jsonFileStream = File.OpenRead(Path.Combine(path, "datastewardship.json"));
-                var jsonSerializerOptions = new JsonSerializerOptions()
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter() }
-                };
-                
-                var observationDatasets = JsonSerializer.Deserialize<List<DwcVerbatimObservationDataset>>(jsonFileStream, jsonSerializerOptions);
-                for (int i= 0; i < observationDatasets.Count; i++)
-                    observationDatasets[i].Id = i+1;
-                return observationDatasets;
-
-                //// XML - todo
-                //string xmlFilePath = Path.Combine(path, "datastewardship.xml");
-                //await using var xmlFileStream = File.OpenRead(xmlFilePath);
-                //using var xmlReader = XmlReader.Create(xmlFileStream);
-                //var xmlDoc = XDocument.Load(xmlReader);
-                //var ns = xmlDoc.Root.GetDefaultNamespace();
-                //var datasetsElement = xmlDoc.Element(ns + "datasets");
-
-                //if (datasetsElement == null)
-                //{
-                //    return null;
-                //}
-
-                //foreach (var datasetElement in datasetsElement.Elements(ns + "dataset"))
-                //{
-                //    var identifier = datasetElement.Element(ns + "identifier")?.Value;
-
-                //    var eventIdElements = datasetElement.Element(ns + "eventIds").Elements();
-                //    List<string> eventIds = new List<string>();
-                //    foreach (var eventIdElement in eventIdElements)
-                //    {
-                //        eventIds.Add(eventIdElement.Value);
-                //    }                    
-                //}            
+                return (await GetDatasetsFromJsonAsync(path)) ?? (await GetDatasetsFromXmlAsync(path));
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to read dataset xml/json");
                 throw;
             }
+        }
+
+        private async Task<List<DwcVerbatimObservationDataset>?> GetDatasetsFromJsonAsync(string path)
+        {
+            // JSON
+            string jsonFilePath = Path.Combine(path, "datastewardship.json");
+            if (!File.Exists(jsonFilePath))
+            {
+                return null;
+            }
+
+            await using var jsonFileStream = File.OpenRead(Path.Combine(path, "datastewardship.json"));
+            var jsonSerializerOptions = new JsonSerializerOptions()
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+
+            var observationDatasets = JsonSerializer.Deserialize<List<DwcVerbatimObservationDataset>>(jsonFileStream, jsonSerializerOptions);
+            for (int i = 0; i < (observationDatasets?.Count ?? 0); i++)
+                observationDatasets![i].Id = i + 1;
+
+            return observationDatasets;
+        }
+
+        private async Task<List<DwcVerbatimObservationDataset>?> GetDatasetsFromXmlAsync(string path)
+        {
+            // XML
+            string xmlFilePath = Path.Combine(path, "datastewardship.xml");
+            if (!File.Exists(xmlFilePath))
+            {
+                return null;
+            }
+
+            await using var xmlFileStream = File.OpenRead(xmlFilePath);
+            using var xmlReader = XmlReader.Create(xmlFileStream);
+            var xmlDoc = XDocument.Load(xmlReader);
+            var ns = xmlDoc.Root.GetDefaultNamespace();
+            var datasetsElement = xmlDoc.Element(ns + "datasets");
+
+            if (datasetsElement == null)
+            {
+                return null;
+            }
+            var observationDatasets = new List<DwcVerbatimObservationDataset>();
+            var id = 1;
+            foreach (var datasetElement in datasetsElement.Elements(ns + "dataset"))
+            {
+                Enum.TryParse(typeof(AccessRights), datasetElement.Element(ns + "accessRights")?.Value, out var accessRights);
+                Enum.TryParse(typeof(ProgrammeArea), datasetElement.Element(ns + "programmeArea")?.Value, out var programmeArea);
+                Enum.TryParse(typeof(Purpose), datasetElement.Element(ns + "purpose")?.Value, out var purpose);
+                var endDateExists = DateTime.TryParse(datasetElement.Element(ns + "endDate")?.Value, out var endDate);
+                var startDateExists = DateTime.TryParse(datasetElement.Element(ns + "startDate")?.Value, out var startDate);
+                var dataset = new DwcVerbatimObservationDataset
+                {
+                    AccessRights = accessRights == null ? null : (AccessRights)accessRights,
+                    DataStewardship = datasetElement.Element(ns + "dataStewardship")?.Value,
+                    Description = datasetElement.Element(ns + "description")?.Value,
+                    DescriptionAccessRights = datasetElement.Element(ns + "descriptionAccessRights")?.Value,
+                    EndDate = endDateExists ? endDate : null,
+                    Identifier = datasetElement.Element(ns + "identifier")?.Value,
+                    Language = datasetElement.Element(ns + "language")?.Value,
+                    Metadatalanguage = datasetElement.Element(ns + "metadatalanguage")?.Value,
+                    ProgrammeArea = programmeArea == null ? null : (ProgrammeArea)programmeArea,
+                    Purpose = purpose == null ? null : (Purpose)purpose,
+                    Spatial = datasetElement.Element(ns + "spatial")?.Value,
+                    StartDate = startDateExists ? startDate : null,
+                    Title = datasetElement.Element(ns + "title")?.Value,
+                };
+
+                var assigner = datasetElement.Element(ns + "assigner");
+                if (assigner != null)
+                {
+                    dataset.Assigner = new Organisation
+                    {
+                        OrganisationCode = assigner.Element(ns + "organisationCode")?.Value,
+                        OrganisationID = assigner.Element(ns + "organisationID")?.Value
+                    };
+                }
+
+                var creator = datasetElement.Element(ns + "creator");
+                if (creator != null)
+                {
+                    dataset.Creator = new List<Organisation>();
+                    foreach (var organisation in creator.Elements())
+                    {
+                        dataset.Creator.Add(new Organisation
+                        {
+                            OrganisationCode = organisation.Element(ns + "organisationCode")?.Value,
+                            OrganisationID = organisation.Element(ns + "organisationID")?.Value
+                        });
+                    }
+                }
+
+                var eventIds = datasetElement.Element(ns + "eventIds");
+                if (eventIds != null)
+                {
+                    dataset.EventIds = new List<string>();
+                    foreach (var eventId in eventIds.Elements())
+                    {
+                        dataset.EventIds.Add(eventId.Value);
+                    }
+                }
+
+                var methodology = datasetElement.Element(ns + "methodology");
+                if (methodology != null)
+                {
+                    dataset.Methodology = new List<Methodology>();
+                    foreach (var method in methodology.Elements())
+                    {
+                        dataset.Methodology.Add(new Methodology
+                        {
+                            MethodologyDescription = method.Element(ns + "methodologyDescription")?.Value,
+                            MethodologyLink = method.Element(ns + "methodologyLink")?.Value,
+                            MethodologyName = method.Element(ns + "methodologyName")?.Value,
+                            SpeciesList = method.Element(ns + "speciesList")?.Value
+                        });
+                    }
+                }
+
+                var ownerinstitutionCode = datasetElement.Element(ns + "ownerinstitutionCode");
+                if (ownerinstitutionCode != null)
+                {
+                    dataset.OwnerinstitutionCode = new Organisation
+                    {
+                        OrganisationCode = ownerinstitutionCode.Element(ns + "organisationCode")?.Value,
+                        OrganisationID = ownerinstitutionCode.Element(ns + "organisationID")?.Value
+                    };
+                }
+
+                var projects = datasetElement.Element(ns + "project");
+                if (projects != null)
+                {
+                    dataset.Project = new List<Project>();
+                    foreach (var project in projects.Elements())
+                    {
+                        Enum.TryParse(typeof(ProjectType), project.Element(ns + "projectType")?.Value, out var projectType);
+                        dataset.Project.Add(new Project
+                        {
+                            ProjectCode = project.Element(ns + "projectCode")?.Value,
+                            ProjectId = project.Element(ns + "projectID")?.Value,
+                            ProjectType = projectType == null ? null : (ProjectType)projectType
+                        });
+                    }
+                }
+
+                var publisher = datasetElement.Element(ns + "publisher");
+                if (publisher != null)
+                {
+                    dataset.Publisher = new Organisation
+                    {
+                        OrganisationCode = publisher.Element(ns + "organisationCode")?.Value,
+                        OrganisationID = publisher.Element(ns + "organisationID")?.Value
+                    };
+                }
+                observationDatasets.Add(dataset);
+                id++;
+            }
+
+            return observationDatasets;
         }
 
         private Dictionary<string, DwcVerbatimObservationDataset> CreateEventObservationDatasetDictionary(IEnumerable<DwcVerbatimObservationDataset> observationDatasets)
