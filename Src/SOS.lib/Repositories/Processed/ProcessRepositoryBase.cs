@@ -128,25 +128,27 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         protected ProcessRepositoryBase(
-        bool toggleable,
-        IElasticClientManager elasticClientManager,
-        ICache<string, ProcessedConfiguration> processedConfigurationCache,
-        ElasticSearchConfiguration elasticConfiguration,
-        ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
-    )
+            bool toggleable,
+            IElasticClientManager elasticClientManager,
+            ICache<string, ProcessedConfiguration> processedConfigurationCache,
+            ElasticSearchConfiguration elasticConfiguration,
+            ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
+        )
         {
-            _toggleable = toggleable;
+            _toggleable = toggleable;            
             _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
             _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
-            _elasticSearchIndexConfiguration = elasticConfiguration.IndexSettings?.FirstOrDefault(i => i.Name.Equals(IndexHelper.GetInstanceName<TEntity>(), StringComparison.CurrentCultureIgnoreCase)) ?? 
-                throw new ArgumentNullException($"Settings for index {IndexHelper.GetInstanceName<TEntity>()} is missing");
-
+            _elasticSearchIndexConfiguration = elasticConfiguration.IndexSettings?.FirstOrDefault(i => i.Name.Equals(IndexHelper.GetInstanceName<TEntity>(), StringComparison.CurrentCultureIgnoreCase));
+            if (_elasticSearchIndexConfiguration == null)
+            {
+                logger.LogError($"Settings for index {IndexHelper.GetInstanceName<TEntity>()} is missing. Default settings is used.");
+                _elasticSearchIndexConfiguration = new ElasticSearchIndexConfiguration() { Name = IndexHelper.GetInstanceName<TEntity>() };
+            }
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
             // Default use non live instance
             LiveMode = false;
-        }
+        }        
 
         /// <summary>
         ///     Dispose
