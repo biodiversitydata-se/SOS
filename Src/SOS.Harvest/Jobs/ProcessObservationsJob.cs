@@ -262,8 +262,9 @@ namespace SOS.Harvest.Jobs
         }
 
         /// <summary>
-        /// Validate that no protected data is accessable (undiffusedgf) from public index
+        /// Validate that no protected data is accessable (undiffused) from public index
         /// </summary>
+        /// <param name="mode"></param>
         /// <returns></returns>
         private async Task<bool> ValidateIndexesAsync()
         {
@@ -306,11 +307,47 @@ namespace SOS.Harvest.Jobs
                 ValidateRandomObservationsAsync(),
                 ValidateRandomObservationsAsync(),
                 ValidateRandomObservationsAsync(),
-                ValidateRandomObservationsAsync()
+                ValidateRandomObservationsAsync(),
+                ValidateCountAsync()
             };
 
             // Make sure no protected observations exists in public index and vice versa
             return (await Task.WhenAll(validationTasks)).All(t => t);
+        }
+
+        private async Task<bool> ValidateCountAsync()
+        {
+            var liveMode = _processedObservationRepository.LiveMode;
+            var currentProcessInfo = await GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
+            _processedObservationRepository.LiveMode = !liveMode;
+            var otherProcessInfo = await GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
+            _processedObservationRepository.LiveMode = liveMode;
+
+            if (!(currentProcessInfo?.ProvidersInfo?.Any() ?? true) || !(otherProcessInfo?.ProvidersInfo?.Any() ?? true))
+            {
+                return true;
+            }
+            var success = true;
+            foreach(var currProvider in currentProcessInfo.ProvidersInfo)
+            {
+                var otherProvider = otherProcessInfo.ProvidersInfo.FirstOrDefault(p => p.DataProviderId.Equals(currProvider.DataProviderId));
+                
+                if (otherProvider != null)
+                {
+                    if (otherProvider.PublicProcessCount > 0 && currProvider.PublicProcessCount <= 0.99 * otherProvider.PublicProcessCount)
+                    {
+                        _logger.LogError($"Validation failed. Public observation count for {currProvider.DataProviderIdentifier} is less than 99% of last run");
+                        success = false;
+                    }
+
+                    if (otherProvider.ProtectedProcessCount < 0 && currProvider.ProtectedProcessCount <= 0.99 * otherProvider.ProtectedProcessCount)
+                    {
+                        _logger.LogError($"Validation failed. Protected observation count for {currProvider.DataProviderIdentifier} is less than 99% of last run");
+                        success = false;
+                    }
+                }
+            }
+            return success;
         }
 
         /// <summary>
@@ -534,7 +571,7 @@ namespace SOS.Harvest.Jobs
                         _logger.LogInformation($"Start validate indexes");
                         if (!await ValidateIndexesAsync())
                         {
-                            throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
+                            throw new Exception("Validation of processed indexes failed. Job stopped.");
                         }
 
                         // Add data stewardardship events & datasets

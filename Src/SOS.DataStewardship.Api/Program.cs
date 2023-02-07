@@ -31,7 +31,7 @@ try
     // This registration is needed to get Swagger enums to use strings instead of ints.
     builder.Services.Configure<JsonOptions>(options =>
     {
-        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
 #if DEBUG

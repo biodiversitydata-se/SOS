@@ -317,13 +317,13 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
 
             if ((verbatim.DecimalLongitude == 0 || verbatim.DecimalLatitude == 0) && !string.IsNullOrEmpty(verbatim.District))
             {
-                if (_communities.TryGetValue($"{verbatim.Province}-{verbatim.District}".ToLower(), out var parish))
+                if (_communities?.TryGetValue($"{verbatim.Province}-{verbatim.District}".ToLower(), out var parish) ?? false)
                 {
                     verbatim.DecimalLongitude = parish.longitude;
                     verbatim.DecimalLatitude = parish.latitude;
                     verbatim.CoordinatePrecision = parish.precision;
                 }
-                else if (_parishes.TryGetValue(verbatim.District.ToLower(), out var par))
+                else if (_parishes?.TryGetValue(verbatim.District.ToLower(), out var par) ?? false)
                 {
                     verbatim.DecimalLongitude = par.longitude;
                     verbatim.DecimalLatitude = par.latitude;
