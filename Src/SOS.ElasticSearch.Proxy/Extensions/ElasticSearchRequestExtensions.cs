@@ -1,4 +1,6 @@
-﻿namespace SOS.ElasticSearch.Proxy.Extensions
+﻿using SOS.Lib.Models.Processed.Observation;
+
+namespace SOS.ElasticSearch.Proxy.Extensions
 {
     public static class ElasticSearchRequestExtensions
     {
@@ -79,11 +81,23 @@
                 }
             }
 
-            // Add mandatory search parameters 
-            IDictionary<string, object> sightingTypeSearchGroupDictionary = new Dictionary<string, object>() {
-                { "artportalenInternal.sightingTypeSearchGroupId", new[] { 1, 4, 16, 32, 128 } }
-            };
-            filterList.Add(new Dictionary<string, object>() { { "terms", sightingTypeSearchGroupDictionary } });
+            ICollection<IDictionary<string, object>> sightingTypeQuery = new List<IDictionary<string, object>>();
+            // Only Artportalen observations with specified default sightingTypeSearchGroupId
+            sightingTypeQuery.Add(new Dictionary<string, object>() { { "terms", 
+                new Dictionary<string, object>() { { "artportalenInternal.sightingTypeSearchGroupId", 
+                    new[] { 1, 4, 16, 32, 128 } } } } }
+            );// Non AP observations don't have sightingTypeSearchGroupId, get them as well
+            sightingTypeQuery.Add(
+                new Dictionary<string, object>() { { "bool", 
+                    new Dictionary<string, object>() { { "must_not", 
+                            new Dictionary<string, object>() { { "exists", 
+                                new { field = "artportalenInternal.sightingTypeSearchGroupId" } } } } } } }
+            );
+            // Add OR query
+            filterList.Add(
+                new Dictionary<string, object>() { { "bool",
+                    new Dictionary<string, object>() { { "should", sightingTypeQuery } } } }
+            );
 
             boolDictionary.Add("filter", filterList);
             queryDictionary.Add("bool", boolDictionary);
