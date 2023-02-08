@@ -1,9 +1,14 @@
-﻿using System.Diagnostics;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.ElasticSearch.Proxy.Configuration;
+using SOS.ElasticSearch.Proxy.Extensions;
 using SOS.Lib.Extensions;
+using System.Diagnostics;
+using System.Dynamic;
+using System.Text;
+using System.Text.RegularExpressions;
+
 
 namespace SOS.ElasticSearch.Proxy.Middleware
 {
@@ -14,7 +19,33 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         private readonly ProxyConfiguration _proxyConfiguration;
         private readonly ILogger<RequestMiddleware> _logger;
 
-        private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri, string body)
+        /// <summary>
+        /// Build target uri
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private Uri? BuildTargetUri(HttpRequest request)
+        {
+            var uriParts = new HashSet<string>
+            {
+                _processedObservationRepository.PublicIndexName
+            };
+
+            if (request.Path.HasValue)
+            {
+                uriParts.Add(string.Join('/',
+                    request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries).Skip(1)));
+            }
+
+            if (request.QueryString.HasValue)
+            {
+                uriParts.Add(request.QueryString.Value ?? string.Empty);
+            }
+
+            return new Uri(_processedObservationRepository.HostUrl, string.Join('/', uriParts.Where(p => !string.IsNullOrEmpty(p))));
+        }
+
+        private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri, ref string body)
         {
             var requestMessage = new HttpRequestMessage();
             foreach (var header in context.Request.Headers)
@@ -30,6 +61,8 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 !HttpMethods.IsDelete(requestMessage.Method.Method) &&
                 !HttpMethods.IsTrace(requestMessage.Method.Method))
             {
+                body = RewriteBody(body);
+
                 var memStr = new MemoryStream(Encoding.UTF8.GetBytes(body));
                 var streamContent = new StreamContent(memStr);
 
@@ -75,30 +108,21 @@ namespace SOS.ElasticSearch.Proxy.Middleware
            return new HttpMethod(method);
         }
 
-        /// <summary>
-        /// Build target uri
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        private Uri? BuildTargetUri(HttpRequest request)
+        private string RewriteBody(string body)
         {
-            var uriParts = new HashSet<string>
+            if (string.IsNullOrEmpty(body))
             {
-                _processedObservationRepository.PublicIndexName
-            };
-
-            if (request.Path.HasValue)
-            {
-                uriParts.Add(string.Join('/',
-                    request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries).Skip(1)));
+                return body;
             }
 
-            if (request.QueryString.HasValue)
+            var bodyDictionary = (IDictionary<string, Object>)JsonConvert.DeserializeObject<ExpandoObject>(body, new ExpandoObjectConverter())!;
+            bodyDictionary.UpdateQuery();
+            if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
             {
-                uriParts.Add(request.QueryString.Value ?? string.Empty);
+               bodyDictionary.UpdateExclude(_proxyConfiguration.ExcludeFields!);
             }
-            
-            return new Uri(_processedObservationRepository.HostUrl, string.Join('/', uriParts.Where(p => !string.IsNullOrEmpty(p))));
+            bodyDictionary.UpdateSort();
+            return JsonConvert.SerializeObject(bodyDictionary);// jsonBody.ToString(); 
         }
 
         /// <summary>
@@ -137,33 +161,22 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 var targetUri = BuildTargetUri(context.Request);
 
                 context.Request.EnableBuffering();
-                var query = await new StreamReader(context.Request.Body).ReadToEndAsync();
+                var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
                 context.Request.Body.Position = 0;
                 if (_proxyConfiguration.LogOriginalQuery)
                 {
-                    _logger.LogInformation($"Original query: {query}");
+                    _logger.LogInformation($"Original body: {body}");
                 }
 
                 context.Items.Add("Requesting-System", "WFS");
 
                 if (targetUri != null)
                 {
-                    // Rewrite sort by _id to use sort by event.endDate
-                    query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"asc\"}}",
-                        "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
-                    query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"desc\"}}",
-                        "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
-
-                    if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
-                    {
-                        query = $"{{ {_proxyConfiguration.ExcludeFieldsQuery} {query.Substring(1, query.Length - 1)}";
-                    }
-
                     _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
-                    var targetRequestMessage = CreateTargetMessage(context, targetUri, query);
+                    var targetRequestMessage = CreateTargetMessage(context, targetUri, ref body);
                     if (_proxyConfiguration.LogRequest && targetRequestMessage.Content != null)
                     {
-                        _logger.LogInformation($"Request:\r\n{query}");
+                        _logger.LogInformation($"Request:\r\n{body}");
                     }
                     var httpClientHandler = new HttpClientHandler();
                     httpClientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;

@@ -368,7 +368,6 @@ namespace SOS.Lib
                     (int)SightingTypeSearchGroup.AssessmentChild,
                     (int)SightingTypeSearchGroup.ReplacementChild,
                     (int)SightingTypeSearchGroup.OwnBreedingAssessment },
-
                 SearchFilterBase.SightingTypeFilter.DoNotShowSightingsInMerged => new[] { // 1, 2, 4, 32, 128
                     (int)SightingTypeSearchGroup.Ordinary,
                     (int)SightingTypeSearchGroup.Assessment,

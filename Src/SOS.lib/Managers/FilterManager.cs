@@ -33,7 +33,7 @@ namespace SOS.Lib.Managers
         /// <summary>
         ///  Add extended authorization if any
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="authorityIdentity"></param>

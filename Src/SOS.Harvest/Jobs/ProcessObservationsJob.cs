@@ -73,7 +73,7 @@ namespace SOS.Harvest.Jobs
                 //----------------------------------------------------------------------
                 // Process taxa
                 //----------------------------------------------------------------------
-                _logger.LogInformation("Start processing taxonomy");
+                _logger.LogDebug("Start harvest taxonomy");
 
                 if (!await _processTaxaJob.RunAsync())
                 {
@@ -81,25 +81,25 @@ namespace SOS.Harvest.Jobs
                     return null!;
                 }
                 _taxonCache.Clear();
-                _logger.LogInformation("Finish processing taxonomy");
+                _logger.LogDebug("Finish harvest taxonomy");
             }
 
             //--------------------------------------
             // Get taxonomy
             //--------------------------------------
-            _logger.LogInformation("Start getting processed taxa");
+            _logger.LogDebug("Start getting taxa from cache");
 
             var taxa = await _taxonCache.GetAllAsync();
             if (!taxa?.Any() ?? true)
             {
-                _logger.LogWarning("Failed to get processed taxa");
+                _logger.LogError("Failed to get taxa");
                 return null!;
             }
 
             var taxaDictonary = new ConcurrentDictionary<int, Taxon>();
             taxa.ForEach(t => taxaDictonary.TryAdd(t.Id, t));
 
-            _logger.LogInformation($"Finish getting processed taxa ({taxaDictonary.Count})");
+            _logger.LogDebug($"Finish getting taxa from cache ({taxaDictonary.Count})");
 
             return taxaDictonary;
         }
@@ -113,7 +113,7 @@ namespace SOS.Harvest.Jobs
 
         private async Task InitializeElasticSearchAsync(JobRunModes mode)
         {
-            //Make sure we get latest info about current instance
+            // Make sure we get latest info about current instance
             _processedObservationRepository.ClearConfigurationCache();
 
             if (mode == JobRunModes.Full)
