@@ -27,7 +27,7 @@ namespace SOS.ElasticSearch.Proxy.Extensions
                     }
                 }
             }
-
+            
             bodyDictionary["_source"] = new { exclude = uniqueExcludeFields };
         }
 
@@ -48,12 +48,10 @@ namespace SOS.ElasticSearch.Proxy.Extensions
             if (bodyDictionary.TryGetValue("query", out var query))
             {
                 queryDictionary = (IDictionary<string, object>)query;
-                bodyDictionary.Remove("query"); // Remove query since we gone rebuild it later
 
                 if (queryDictionary.TryGetValue("bool", out var @bool))
                 {
                     boolDictionary = (IDictionary<string, object>)@bool!;
-                    queryDictionary.Remove("bool"); // Remove bool since we gone rebuild it later
 
                     if (boolDictionary.TryGetValue("filter", out var filter))
                     {
@@ -68,7 +66,6 @@ namespace SOS.ElasticSearch.Proxy.Extensions
                         {
                             filterList.Add((IDictionary<string, object>)filter);
                         }
-                        boolDictionary.Remove("filter"); // Remove filter since we gone rebuild it later
                     }
                 }
                 else // Leaf Query
@@ -99,9 +96,9 @@ namespace SOS.ElasticSearch.Proxy.Extensions
                     new Dictionary<string, object>() { { "should", sightingTypeQuery } } } }
             );
 
-            boolDictionary.Add("filter", filterList);
-            queryDictionary.Add("bool", boolDictionary);
-            bodyDictionary.Add("query", queryDictionary);
+            boolDictionary["filter"] = filterList;
+            queryDictionary["bool"] = boolDictionary;
+            bodyDictionary["query"] = queryDictionary;
         }
 
         /// <summary>

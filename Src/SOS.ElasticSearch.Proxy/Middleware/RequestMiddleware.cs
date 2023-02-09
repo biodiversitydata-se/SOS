@@ -9,7 +9,6 @@ using System.Dynamic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-
 namespace SOS.ElasticSearch.Proxy.Middleware
 {
     public class RequestMiddleware
