@@ -1,5 +1,4 @@
-﻿using SOS.Lib.Models.Processed.Observation;
-
+﻿
 namespace SOS.ElasticSearch.Proxy.Extensions
 {
     public static class ElasticSearchRequestExtensions

@@ -47,12 +47,12 @@ namespace SOS.Observations.Api.HealthChecks
         {
             try
             {
-                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
+                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.UniquePublicIndexName);
 
                 var apInfo = processInfo.ProvidersInfo.FirstOrDefault(pi => pi.DataProviderId.Equals(1));
 
                 var regex = new Regex(@"\d\d\d\d-\d\d-\d\d\s\d\d:\d\d:\d\d");
-                var match = regex.Match(apInfo.HarvestNotes);
+                var match = regex.Match(apInfo?.HarvestNotes ?? string.Empty);
                 if (!DateTime.TryParse(match.Value, out var restoreDate))
                 {
                     return new HealthCheckResult(HealthStatus.Unhealthy, "Failed to get latest database backup restore date");
@@ -66,7 +66,7 @@ namespace SOS.Observations.Api.HealthChecks
                 {
                     return new HealthCheckResult(
                            HealthStatus.Healthy,
-                           "Database backup up to date",
+                           $"Database backup up to date",
                            data: data
                      );
                 }
