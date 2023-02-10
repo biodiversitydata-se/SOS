@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Dapper;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -31,13 +31,14 @@ namespace SOS.Harvest.Services
         public ObservationDatabaseConfiguration Configuration { get; }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null)
+        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null!)
         {
             using var conn = Connection;
             conn.Open();
+         
             var transaction = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
 
-            IEnumerable<T> result = null;
+            IEnumerable<T> result = null!;
             try
             {
                 result = (await conn.QueryAsync<T>(

@@ -101,7 +101,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
                     cancellationToken?.ThrowIfCancellationRequested();
                     if (_iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        nrSightingsHarvested >= _iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested *100000)
+                        nrSightingsHarvested >= _iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
                         _logger.LogInformation("Max iNaturalist observations reached");
                         break;

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Data.SqlClient.Server;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Microsoft.SqlServer.Server;
 
 namespace SOS.Lib.Extensions
 {
