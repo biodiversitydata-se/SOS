@@ -95,14 +95,14 @@ namespace SOS.Harvest.Services
             }
             catch (Exception e)
             {
-                if (attempt < 3)
+                if (attempt < 5)
                 {
-                    _logger.LogWarning($"Failed to get data from iNaturalist, attempt: {attempt}", e);
-                    Thread.Sleep(attempt * 1000);
+                    _logger.LogWarning($"Failed to get data from iNaturalist ({fromDate.ToString("yyyy-MM-dd")}-{toDate.ToString("yyyy-MM-dd")}), attempt: {attempt}", e);
+                    Thread.Sleep(attempt * 5000);
                     return await GetAsync(fromDate, toDate, ++attempt);
                 }
 
-                _logger.LogError("Failed to get data from iNaturalist", e);
+                _logger.LogError($"Failed to get data from iNaturalist  ({fromDate.ToString("yyyy-MM-dd")}-{toDate.ToString("yyyy-MM-dd")})", e);
                 throw;
             }
         }
