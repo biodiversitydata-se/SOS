@@ -91,8 +91,12 @@ namespace SOS.Observations.Api.Managers
         public async Task<byte[]> GetEmlFileAsync(int providerId)
         {
             var eml = await _dataProviderCache.GetEmlAsync(providerId);
+            if (eml == null)
+            {
+                return Array.Empty<byte>();
+            }
 
-            return await eml?.ToBytesAsync() ?? Array.Empty<byte>();
+            return await eml?.ToBytesAsync();
         }
     }
 }
