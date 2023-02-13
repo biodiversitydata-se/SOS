@@ -46,6 +46,11 @@ namespace SOS.Observations.Api.ApplicationInsights
                         telemetry.Context.GlobalProperties.Add("Observation-count", obsCount.ToString());
                     }
                 }
+
+                if (platformContext.Request.ContentLength != null && !telemetry.Context.GlobalProperties.ContainsKey("Request-length"))
+                {
+                    telemetry.Context.GlobalProperties.Add("Request-length", platformContext.Request.ContentLength.ToString());
+                }
             }
 
             var nameidentifier = platformContext.User?.Claims?.FirstOrDefault(c => c.Type.Contains("nameidentifier", StringComparison.CurrentCultureIgnoreCase))?.Value;
@@ -74,6 +79,8 @@ namespace SOS.Observations.Api.ApplicationInsights
                 }
                 telemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
             }
+
+           
         }
 
         /// <summary>

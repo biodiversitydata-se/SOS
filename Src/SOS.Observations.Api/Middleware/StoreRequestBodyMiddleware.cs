@@ -18,7 +18,6 @@ namespace SOS.Observations.Api.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            
             try
             {
                 if (new[] { "post", "put" }.Contains(context.Request.Method, StringComparer.CurrentCultureIgnoreCase) &&
