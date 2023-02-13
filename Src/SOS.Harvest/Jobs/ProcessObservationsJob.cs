@@ -493,17 +493,20 @@ namespace SOS.Harvest.Jobs
                     // 4. Start DWC file writing
                     //------------------------------------------------------------------------
                     _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
-
-                    // Disable indexing for public and protected index
-                    await DisableIndexingAsync();
                 }
+
+                // Disable indexing for public and protected index
+                await DisableIndexingAsync();
 
                 //------------------------------------------------------------------------
                 // 5. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------                
-                var result = await ProcessVerbatimObservations(dataProvidersToProcess, mode, taxonById, cancellationToken);
+                var result = await ProcessVerbatimObservations(dataProvidersToProcess, mode, taxonById!, cancellationToken!);
                 var success = result.All(t => t.Value.Status == RunStatus.Success);
-                
+
+                // Enable indexing for public and protected index
+                await EnableIndexingAsync();
+
                 //---------------------------------
                 // 6. Create ElasticSearch index
                 //---------------------------------
@@ -514,9 +517,6 @@ namespace SOS.Harvest.Jobs
 
                     if (mode == JobRunModes.Full)
                     {
-                        // Enable indexing for public and protected index
-                        await EnableIndexingAsync();
-
                         var processCount = result.Sum(s => s.Value.PublicCount);
                         var docCount = await _processedObservationRepository.IndexCountAsync(false);
                         var iterations = 0;
