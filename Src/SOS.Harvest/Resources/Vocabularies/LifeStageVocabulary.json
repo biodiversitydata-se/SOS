@@ -1561,6 +1561,10 @@
               "SosId": 23
             },
             {
+              "Value": "ad",
+              "SosId": 23
+            },
+            {
               "Value": "adults",
               "SosId": 23
             },
@@ -1634,6 +1638,10 @@
             },
             {
               "Value": "imago/adult",
+              "SosId": 27
+            },
+            {
+              "Value": "imago",
               "SosId": 27
             },
             {

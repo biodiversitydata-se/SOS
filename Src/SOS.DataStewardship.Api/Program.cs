@@ -40,7 +40,8 @@ try
     var app = builder.Build();
     app.ConfigureExceptionHandler(logger, isDevelopment);
     app.MapEndpoints();
-    app.UseHttpsRedirection();    
+    app.UseHttpsRedirection();
+    
     app.UseSwagger();        
     app.UseSwaggerUI(options =>
     {            

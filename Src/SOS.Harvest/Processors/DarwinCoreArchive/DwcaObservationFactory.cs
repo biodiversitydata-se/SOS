@@ -185,6 +185,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             // Populate generic data
             PopulateGenericData(obs);
 
+            obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, obs.Taxon);            
             return obs;
         }        
 
@@ -400,8 +401,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
         private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatim, Lib.Models.Processed.Observation.Taxon taxon, AccessRightsId? accessRightsId)
         {
-            var processedOccurrence = new Occurrence();
-            processedOccurrence.BirdNestActivityId = taxon?.IsBird() ?? false ? 1000000 : 0;
+            var processedOccurrence = new Occurrence();            
             processedOccurrence.AssociatedMedia = verbatim.AssociatedMedia;
             processedOccurrence.AssociatedReferences = verbatim.AssociatedReferences;
             processedOccurrence.AssociatedSequences = verbatim.AssociatedSequences;
@@ -591,7 +591,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         }
 
         /// <summary>
-        ///     Get vocabulary mappings for Artportalen.
+        ///     Get vocabulary mappings.
         /// </summary>
         /// <param name="externalSystemId"></param>
         /// <param name="allVocabularies"></param>

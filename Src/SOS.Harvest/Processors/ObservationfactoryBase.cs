@@ -8,6 +8,7 @@ using SOS.Lib.Helpers;
 using System.Reflection;
 using System.Text.Json;
 using SOS.Lib.DataStructures;
+using SOS.Lib.Constants;
 
 namespace SOS.Harvest.Processors
 {
@@ -206,6 +207,26 @@ namespace SOS.Harvest.Processors
                     }
                 }
             }
+        }
+
+        protected int GetBirdNestActivityId(VocabularyValue activity, Lib.Models.Processed.Observation.Taxon taxon)
+        {
+            if (taxon == null)
+            {
+                return 0;
+            }
+
+            if (taxon.IsBird())
+            {
+                if (activity == null || activity.Id == VocabularyConstants.NoMappingFoundCustomValueIsUsedId)
+                {
+                    return 1000000;
+                }
+
+                return activity.Id;
+            }
+
+            return 0;
         }
     }
 }
