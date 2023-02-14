@@ -868,19 +868,19 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        public static SearchFilter ToSearchFilter(this SearchFilterBaseDto searchFilterDto, int userId, bool sensitiveObservations, string translationCultureCode)
+        public static SearchFilter ToSearchFilter(this SearchFilterBaseDto searchFilterDto, int userId, ProtectionFilterDto? protectionFilterDto, string translationCultureCode)
         {
-            return (SearchFilter)PopulateFilter(searchFilterDto, userId, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public, translationCultureCode);
+            return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
         }
 
-        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, int userId, bool sensitiveObservations, string translationCultureCode,
+        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, int userId, ProtectionFilterDto? protectionFilterDto, string translationCultureCode,
             string sortBy, SearchSortOrder sortOrder)
         {
-            var searchFilter = (SearchFilter)PopulateFilter(searchFilterDto, userId, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public, translationCultureCode);
+            var searchFilter = (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
 
             if (!string.IsNullOrEmpty(sortBy))
             {
-                searchFilter ??= new SearchFilter(userId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public);
+                searchFilter ??= new SearchFilter(userId, (ProtectionFilter)protectionFilterDto);
                 searchFilter.Output ??= new OutputFilter();
                 searchFilter.Output.SortOrders = new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } };
             }
@@ -888,13 +888,13 @@ namespace SOS.Observations.Api.Extensions
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalBaseDto searchFilterDto,
-            int userId, bool sensitiveObservations, string translationCultureCode)
+            int userId, string translationCultureCode)
         {
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter ?? (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public), translationCultureCode);
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter, translationCultureCode);
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalDto searchFilterDto,
-            int userId, bool sensitiveObservations, string translationCultureCode, string sortBy, SearchSortOrder sortOrder)
+            int userId, string translationCultureCode, string sortBy, SearchSortOrder sortOrder)
         {
             // User sort order passed the old way if not any other sort order is passed 
             if (!string.IsNullOrEmpty(sortBy) && (!searchFilterDto?.Output?.SortOrders?.Any() ?? true))
@@ -904,12 +904,12 @@ namespace SOS.Observations.Api.Extensions
                 searchFilterDto.Output.SortOrders = new[] { new SortOrderDto { SortBy = sortBy, SortOrder = sortOrder } };
             }
  
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter ?? (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public), translationCultureCode);
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter, translationCultureCode);
         }
 
-        public static SearchFilter ToSearchFilter(this SearchFilterAggregationDto searchFilterDto, int userId, bool sensitiveObservations, string translationCultureCode)
+        public static SearchFilter ToSearchFilter(this SearchFilterAggregationDto searchFilterDto, int userId, ProtectionFilterDto protectionFilterDto, string translationCultureCode)
         {
-            return (SearchFilter)PopulateFilter(searchFilterDto, userId, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public, translationCultureCode);
+            return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
         }
 
         public static TaxonFilter ToTaxonFilterFilter(this TaxonFilterDto taxonFilterDto)
@@ -917,14 +917,15 @@ namespace SOS.Observations.Api.Extensions
             return PopulateTaxa(taxonFilterDto);            
         }
 
-        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterAggregationInternalDto searchFilterDto, int userId, bool sensitiveObservations, string translationCultureCode)
+        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterAggregationInternalDto searchFilterDto, int userId, string translationCultureCode)
         {
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter ?? (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public), translationCultureCode);
+
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter, translationCultureCode);
         }
 
-        public static SearchFilter ToSearchFilter(this ExportFilterDto searchFilterDto, int userId, bool sensitiveObservations, string translationCultureCode)
+        public static SearchFilter ToSearchFilter(this ExportFilterDto searchFilterDto, int userId, ProtectionFilterDto protectionFilterDto, string translationCultureCode)
         {
-            return (SearchFilter)PopulateFilter(searchFilterDto, userId, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public, translationCultureCode);
+            return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
         }
 
         public static (SearchFilter, ChecklistSearchFilter) ToSearchFilters(this CalculateTrendFilterDto searchFilterDto)

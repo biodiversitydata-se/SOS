@@ -85,7 +85,8 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
+                CheckAuthorization(protectionFilter);
 
                 var searchFilter = new SearchFilterBaseDto { Geographics = filter };
                 var validationResult = Result.Combine(
@@ -98,7 +99,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var locations = await _locationManager.SearchAsync(roleId, authorizationApplicationIdentifier, searchFilter.ToSearchFilter(UserId, sensitiveObservations, "sv-SE"), skip, take);
+                var locations = await _locationManager.SearchAsync(roleId, authorizationApplicationIdentifier, searchFilter.ToSearchFilter(UserId, protectionFilter, "sv-SE"), skip, take);
 
                 return new OkObjectResult(locations);
             }

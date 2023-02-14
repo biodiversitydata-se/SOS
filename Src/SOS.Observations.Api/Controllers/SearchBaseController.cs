@@ -169,11 +169,11 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
-        protected Result ValidateEncryptPassword(string password, string confirmPassword, bool sensitiveObservations)
+        protected Result ValidateEncryptPassword(string password, string confirmPassword, ProtectionFilterDto protectionFilter)
         {
             var errors = new List<string>();
 
-            if (string.IsNullOrEmpty(password) && sensitiveObservations)
+            if (string.IsNullOrEmpty(password) && !protectionFilter.Equals(ProtectionFilterDto.Public))
             {
                 errors.Add("You need to state a encrypt password when you are requesting sensitive observations");
             }
