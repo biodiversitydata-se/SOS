@@ -88,7 +88,7 @@ namespace SOS.Harvest.Repositories.Source.ObservationsDatabase
 	                INNER JOIN Taxon AS t ON h.artnr = t.TaxonId
                     LEFT JOIN Socknar s ON h.fgnr = s.fgnr
                 WHERE
-	                h.ArtDataIDNR BETWEEN @StartId AND @EndId AND t.ProtectionLevel < 2 
+	                h.ArtDataIDNR BETWEEN @StartId AND @EndId
 	                AND (
 		                h.Forekomststatus = 'A' OR h.Forekomststatus = 'R' OR h.Forekomststatus = 'U' OR
 		                h.Forekomststatus = 'X1' OR h.Forekomststatus = 'X2'
