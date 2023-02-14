@@ -10,6 +10,10 @@ using SOS.Lib.Models.Verbatim.ObservationDatabase;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Collections.Concurrent;
 
 namespace SOS.Harvest.Processors.ObservationDatabase
 {
@@ -19,6 +23,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
     public class ObservationDatabaseObservationFactory : ObservationFactoryBase, IObservationFactory<ObservationDatabaseVerbatim>
     {
         private readonly IAreaHelper _areaHelper;
+        private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
 
         /// <summary>
         /// Constructor
@@ -29,13 +34,32 @@ namespace SOS.Harvest.Processors.ObservationDatabase
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ObservationDatabaseObservationFactory(DataProvider dataProvider, 
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager, 
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
         {
+            _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
+
+        public static async Task<ObservationDatabaseObservationFactory> CreateAsync(
+            DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IVocabularyRepository processedVocabularyRepository,
+            IAreaHelper areaHelper,
+            IProcessTimeManager processTimeManager,
+            ProcessConfiguration processConfiguration)
+        {
+            var vocabularies = await processedVocabularyRepository.GetAllAsync();
+            var vocabularyById = GetVocabulariesDictionary(
+                ExternalSystemId.DarwinCore,
+                vocabularies.ToArray(),
+                true);
+            return new ObservationDatabaseObservationFactory(dataProvider, taxa, vocabularyById, areaHelper, processTimeManager, processConfiguration);
+        }
+
 
         /// <summary>
         /// Cast verbatim observations to processed data model
@@ -85,7 +109,10 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                 Modified = verbatim.EditDate,
                 Occurrence = new Occurrence
                 {
-                    BirdNestActivityId = taxon?.IsBird() ?? false ? 1000000 : 0,
+                    LifeStage = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.LifeStage]),
+                    Activity = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.Activity]),
+                    Sex = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.Sex]),
+                    Behavior = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.Behavior]),                    
                     CatalogId = verbatim.Id,
                     CatalogNumber = verbatim.Id.ToString(),
                     IndividualCount = verbatim.IndividualCount?.Clean(),
@@ -105,7 +132,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                 RightsHolder = verbatim.SCI_name?.Clean(),
                 Taxon = taxon
             };
-
+                        
             obs.Occurrence.OrganismQuantity = obs.Occurrence.IndividualCount;
             if (int.TryParse(obs.Occurrence.OrganismQuantity, out var quantity))
             {
@@ -120,7 +147,76 @@ namespace SOS.Harvest.Processors.ObservationDatabase
             // Populate generic data
             PopulateGenericData(obs);
 
+            obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, taxon);
             return obs;
+        }
+
+        private VocabularyValue GetSosId(string val,
+            IDictionary<object, int> sosIdByValue,
+            int? defaultValue = null,
+            MappingNotFoundLogic mappingNotFoundLogic = MappingNotFoundLogic.UseSourceValue)
+        {
+            if (string.IsNullOrWhiteSpace(val) || sosIdByValue == null)
+            {
+                return defaultValue.HasValue ? new VocabularyValue { Id = defaultValue.Value } : null;
+            }
+
+            var lookupVal = val.ToLower();
+            if (sosIdByValue.TryGetValue(lookupVal, out var sosId))
+            {
+                return new VocabularyValue { Id = sosId };
+            }
+
+            if (mappingNotFoundLogic == MappingNotFoundLogic.UseDefaultValue && defaultValue.HasValue)
+            {
+                return new VocabularyValue { Id = defaultValue.Value };
+            }
+
+            return new VocabularyValue
+            { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val };
+        }
+
+        private enum MappingNotFoundLogic
+        {
+            UseSourceValue,
+            UseDefaultValue
+        }        
+
+        /// <summary>
+        ///     Get vocabulary mappings.
+        /// </summary>
+        /// <param name="externalSystemId"></param>
+        /// <param name="allVocabularies"></param>
+        /// <param name="convertValuesToLowercase"></param>
+        /// <returns></returns>
+        public static IDictionary<VocabularyId, IDictionary<object, int>> GetVocabulariesDictionary(
+            ExternalSystemId externalSystemId,
+            ICollection<Vocabulary> allVocabularies,
+            bool convertValuesToLowercase)
+        {
+            var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
+
+            foreach (var vocabulary in allVocabularies)
+            {
+                var vocabularies = vocabulary.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
+                if (vocabularies != null)
+                {
+                    var mapping = vocabularies.Mappings.Single();
+                    var sosIdByValue = mapping.GetIdByValueDictionary(convertValuesToLowercase);
+                    dic.Add(vocabulary.Id, sosIdByValue);
+                }
+            }
+
+            // Add missing entries. Initialize with empty dictionary.
+            foreach (VocabularyId vocabularyId in (VocabularyId[])Enum.GetValues(typeof(VocabularyId)))
+            {
+                if (!dic.ContainsKey(vocabularyId))
+                {
+                    dic.Add(vocabularyId, new Dictionary<object, int>());
+                }
+            }
+
+            return dic;
         }
     }
 }

@@ -11,6 +11,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.ObservationDatabase.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Harvest.Processors.ObservationDatabase
 {
@@ -21,6 +22,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
         IObservationDatabaseProcessor
     {
         private readonly IObservationDatabaseVerbatimRepository _observationDatabaseVerbatimRepository;
+        private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly IAreaHelper _areaHelper;
 
         /// <inheritdoc />
@@ -30,7 +32,8 @@ namespace SOS.Harvest.Processors.ObservationDatabase
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new ObservationDatabaseObservationFactory(dataProvider, taxa, _areaHelper, TimeManager, ProcessConfiguration);
+            var observationFactory = await ObservationDatabaseObservationFactory.CreateAsync(
+                dataProvider, taxa, _processedVocabularyRepository, _areaHelper, TimeManager, ProcessConfiguration);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,
@@ -57,6 +60,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
         /// <exception cref="ArgumentNullException"></exception>
         public ObservationDatabaseProcessor(IObservationDatabaseVerbatimRepository observationDatabaseVerbatimRepository,
             IProcessedObservationCoreRepository processedObservationRepository,
+            IVocabularyRepository processedVocabularyRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IDiffusionManager diffusionManager,
@@ -70,6 +74,8 @@ namespace SOS.Harvest.Processors.ObservationDatabase
         {
             _observationDatabaseVerbatimRepository = observationDatabaseVerbatimRepository ??
                                                      throw new ArgumentNullException(nameof(observationDatabaseVerbatimRepository));
+            _processedVocabularyRepository = processedVocabularyRepository ??
+                                               throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 

@@ -74,14 +74,14 @@ namespace SOS.Observations.Api.HealthChecks
                 {
                     return new HealthCheckResult(
                             HealthStatus.Degraded,
-                            "Database backup should have been updated",
+                            $"Database backup should have been updated. Restore date: {restoreDate}",
                             data: data
                         );
                 }
 
                 return new HealthCheckResult(
                             HealthStatus.Unhealthy,
-                            "Database backup to old",
+                            $"Database backup to old. Restore date: {restoreDate}",
                             data: data
                       );
             }

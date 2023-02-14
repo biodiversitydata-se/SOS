@@ -267,6 +267,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ObservationDatabaseVerbatimRepository(verbatimClient,
                     new NullLogger<ObservationDatabaseVerbatimRepository>()),
                 processedObservationRepository,
+                vocabularyRepository,
                 vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 diffusionManager,

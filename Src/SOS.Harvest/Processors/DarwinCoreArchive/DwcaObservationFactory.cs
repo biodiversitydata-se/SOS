@@ -15,7 +15,6 @@ using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -31,6 +30,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificNameAuthor;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymName;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymNameAuthor;
+        private string _englishDataproviderName;
 
         /// <summary>
         /// Constructor
@@ -68,6 +68,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     }
                 }
             }
+
+            _englishDataproviderName = dataProvider?.Names?.Translate("en-GB");
         }
 
         public static async Task<DwcaObservationFactory> CreateAsync(
@@ -99,21 +101,21 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 return null;
             }
 
-            var accessRights = GetSosId(verbatim.AccessRights, _vocabularyById[VocabularyId.AccessRights]);            
+            var accessRights = GetSosId(verbatim.AccessRights, _vocabularyById[VocabularyId.AccessRights]);
             var obs = new Observation
             {
                 AccessRights = accessRights,
                 DataProviderId = DataProvider.Id,
                 DiffusionStatus = DiffusionStatus.NotDiffused,
             };
-                        
+
             //AddVerbatimObservationAsJson(obs, verbatim); // todo - this could be used to store the original verbatim observation
 
             // Record level
             if (verbatim.ObservationMeasurementOrFacts.HasItems())
                 obs.MeasurementOrFacts = verbatim.ObservationMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
             else if (verbatim.ObservationExtendedMeasurementOrFacts.HasItems())
-                obs.MeasurementOrFacts = verbatim.ObservationExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();            
+                obs.MeasurementOrFacts = verbatim.ObservationExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
             obs.BasisOfRecord = GetSosId(verbatim.BasisOfRecord,
                 _vocabularyById[VocabularyId.BasisOfRecord]);
             obs.BibliographicCitation = verbatim.BibliographicCitation;
@@ -121,7 +123,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             obs.CollectionId = verbatim.CollectionID;
             obs.DataGeneralizations = verbatim.DataGeneralizations;
             obs.DatasetId = verbatim.DatasetID;
-            obs.DatasetName = verbatim.DatasetName;
+            obs.DatasetName = string.IsNullOrWhiteSpace(verbatim.DatasetName) ? _englishDataproviderName : verbatim.DatasetName;
             obs.DynamicProperties = verbatim.DynamicProperties;
             obs.InformationWithheld = verbatim.InformationWithheld;
             obs.InstitutionId = verbatim.InstitutionID;
@@ -135,7 +137,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             obs.RightsHolder = verbatim.RightsHolder;
             obs.Type = GetSosId(verbatim.Type,
                 _vocabularyById[VocabularyId.Type]);
-            obs.DataStewardshipDatasetId = verbatim.DataStewardshipDatasetId;            
+            obs.DataStewardshipDatasetId = verbatim.DataStewardshipDatasetId;
 
             // Event
             obs.Event = CreateProcessedEvent(verbatim);
@@ -155,13 +157,13 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             {
                 coordinateSystem = CoordinateSys.WGS84;
             }
-            AddPositionData(obs.Location, 
-                verbatim.DecimalLongitude.ParseDouble() ?? verbatim.VerbatimLongitude.ParseDouble(), 
+            AddPositionData(obs.Location,
+                verbatim.DecimalLongitude.ParseDouble() ?? verbatim.VerbatimLongitude.ParseDouble(),
                 verbatim.DecimalLatitude.ParseDouble() ?? verbatim.VerbatimLatitude.ParseDouble(),
-                coordinateSystem, 
-                verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, 
+                coordinateSystem,
+                verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters,
                 obs.Taxon?.Attributes?.DisturbanceRadius);
-           
+
             // MaterialSample
             obs.MaterialSample = CreateProcessedMaterialSample(verbatim);
 
@@ -183,8 +185,9 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             // Populate generic data
             PopulateGenericData(obs);
 
+            obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, obs.Taxon);            
             return obs;
-        }
+        }        
 
         private static void AddVerbatimObservationAsJson(Observation obs,
             DwcObservationVerbatim verbatim)
@@ -398,8 +401,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
         private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatim, Lib.Models.Processed.Observation.Taxon taxon, AccessRightsId? accessRightsId)
         {
-            var processedOccurrence = new Occurrence();
-            processedOccurrence.BirdNestActivityId = taxon?.IsBird() ?? false ? 1000000 : 0;
+            var processedOccurrence = new Occurrence();            
             processedOccurrence.AssociatedMedia = verbatim.AssociatedMedia;
             processedOccurrence.AssociatedReferences = verbatim.AssociatedReferences;
             processedOccurrence.AssociatedSequences = verbatim.AssociatedSequences;
@@ -589,7 +591,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         }
 
         /// <summary>
-        ///     Get vocabulary mappings for Artportalen.
+        ///     Get vocabulary mappings.
         /// </summary>
         /// <param name="externalSystemId"></param>
         /// <param name="allVocabularies"></param>
