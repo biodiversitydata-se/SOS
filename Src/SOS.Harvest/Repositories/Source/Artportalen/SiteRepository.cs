@@ -33,8 +33,8 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 FROM 
 	                Site s WITH (NOLOCK) 
                     {join}
-                    LEFT JOIN Site ps ON s.ParentId = ps.Id";
-
+                    LEFT JOIN Site ps ON s.ParentId = ps.Id
+                    LEFT JOIN Diffusion d ON s.DiffusionId = d.Id";
 
         /// <summary>
         /// Get sites by id's, Up to 3 attempts will be made if call fails
