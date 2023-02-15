@@ -10,10 +10,7 @@ using SOS.Lib.Models.Verbatim.ObservationDatabase;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using System.Collections.Concurrent;
 
 namespace SOS.Harvest.Processors.ObservationDatabase
 {
@@ -86,7 +83,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                     FieldNotes = verbatim.Origin?.Clean(), // Is there any better field for this?
                     Habitat = verbatim.Habitat?.Clean(),
                     // Substrate = verbatim.Substrate, Todo map 
-                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.StartDate.ToLocalTime(), verbatim.EndDate.ToLocalTime())
+                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.StartDate.HasValue ? verbatim.StartDate.Value.ToLocalTime() : null, verbatim.EndDate.HasValue ? verbatim.EndDate.Value.ToLocalTime() : null)
                 },
                 Identification = new Identification
                 {
@@ -126,7 +123,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                     //ProtectionLevel = verbatim.ProtectionLevel,
                     SensitivityCategory = verbatim.ProtectionLevel,
                     RecordedBy = verbatim.Observers,
-                    ReportedDate = verbatim.StartDate.ToUniversalTime()
+                    ReportedDate = verbatim.StartDate.HasValue ? verbatim.StartDate.Value.ToUniversalTime() : null
                 },
                 OwnerInstitutionCode = verbatim.SCI_code,
                 RightsHolder = verbatim.SCI_name?.Clean(),
@@ -158,7 +155,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
         {
             if (string.IsNullOrWhiteSpace(val) || sosIdByValue == null)
             {
-                return defaultValue.HasValue ? new VocabularyValue { Id = defaultValue.Value } : null;
+                return defaultValue.HasValue ? new VocabularyValue { Id = defaultValue.Value } : null!;
             }
 
             var lookupVal = val.ToLower();

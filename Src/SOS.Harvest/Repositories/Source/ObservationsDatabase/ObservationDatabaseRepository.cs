@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Entities.ObservationsDatabase;
 using SOS.Harvest.Repositories.Source.ObservationsDatabase.Interfaces;
 using SOS.Harvest.Services.Interfaces;
@@ -47,7 +43,8 @@ namespace SOS.Harvest.Repositories.Source.ObservationsDatabase
         {
             try
             {
-                var query = $@"SELECT 
+                var query = $@"
+                SELECT 
 	                h.ArtDataIDNR AS Id,
 	                h.artnr	AS TaxonId,
 	                h.datum1 AS StartDate, 
@@ -89,16 +86,7 @@ namespace SOS.Harvest.Repositories.Source.ObservationsDatabase
                     LEFT JOIN Socknar s ON h.fgnr = s.fgnr
                 WHERE
 	                h.ArtDataIDNR BETWEEN @StartId AND @EndId
-	                AND (
-		                h.Forekomststatus = 'A' OR h.Forekomststatus = 'R' OR h.Forekomststatus = 'U' OR
-		                h.Forekomststatus = 'X1' OR h.Forekomststatus = 'X2'
-	                )
-	                -- The following tests should be removed
-	                -- as soon as the database is corrected.
-	                AND h.datum1 IS NOT NULL
-	                AND h.datum2 IS NOT NULL
-	                AND h.rn1 IS NOT NULL
-	                AND h.rn2 IS NOT NULL";
+	                AND h.Forekomststatus IN('A', 'R', 'U', 'X1', 'X2')";
                 
                 return await QueryAsync<ObservationEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1});
             }
