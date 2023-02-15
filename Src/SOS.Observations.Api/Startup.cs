@@ -424,9 +424,10 @@ namespace SOS.Observations.Api
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedChecklistRepository, ProcessedChecklistRepository>();
-            services.AddScoped<IUserObservationRepository, UserObservationRepository>();
+            services.AddScoped<IUserObservationRepository, UserObservationRepository>();            
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedLocationRepository, ProcessedLocationRepository>();
+            services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>(); 
             services.AddScoped<IProcessedTaxonRepository, ProcessedTaxonRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
