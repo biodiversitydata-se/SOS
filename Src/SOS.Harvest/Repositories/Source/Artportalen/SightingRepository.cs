@@ -343,7 +343,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     ps.SightingId AS SightingId,
 	                ps.ProjectId AS ProjectId
                 FROM 
-	                ProjectSighting ps
+	                ProjectSighting ps WITH (NOLOCK)
                     INNER JOIN @tvp t ON ps.SightingId = t.Id 
                 ORDER BY 
                     ps.ProjectId DESC";

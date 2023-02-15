@@ -31,10 +31,9 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     ISNULL(ps.PresentationName, ps.Name) AS ParentSiteName,
                     d.Factor AS DiffusionFactor
                 FROM 
-	                Site s 
-                    LEFT JOIN Site ps ON s.ParentId = ps.Id
-                    LEFT JOIN Diffusion d ON s.DiffusionId = d.Id
-                    { join }";
+	                Site s WITH (NOLOCK) 
+                    {join}
+                    LEFT JOIN Site ps ON s.ParentId = ps.Id";
 
 
         /// <summary>
