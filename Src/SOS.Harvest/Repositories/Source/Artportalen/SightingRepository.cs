@@ -117,7 +117,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = s.SightingId AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
                     {triggerRuleFrom}
                     LEFT JOIN SightingDatasource sdc ON s.SightingId = sdc.SightingId
-                    LEFT JOIN (SELECT SightingId FROM SightingComment WITH(NOLOCK) GROUP BY SightingId) sic ON s.SightingId = sic.SightingId
+                    LEFT JOIN (SELECT SightingId FROM SightingComment GROUP BY SightingId) sic ON s.SightingId = sic.SightingId
                 WHERE
 	                {SightingWhereBasics}
                     {where} ";
@@ -343,10 +343,8 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     ps.SightingId AS SightingId,
 	                ps.ProjectId AS ProjectId
                 FROM 
-	                ProjectSighting ps WITH (NOLOCK)
-                    INNER JOIN @tvp t ON ps.SightingId = t.Id 
-                ORDER BY 
-                    ps.ProjectId DESC";
+	                ProjectSighting ps 
+                    INNER JOIN @tvp t ON ps.SightingId = t.Id";
 
                 return await QueryAsync<(int SightingId, int ProjectId)>(
                     query,
