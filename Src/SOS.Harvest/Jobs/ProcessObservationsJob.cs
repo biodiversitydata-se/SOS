@@ -334,15 +334,16 @@ namespace SOS.Harvest.Jobs
                 
                 if (otherProvider != null)
                 {
-                    if (otherProvider.PublicProcessCount > 0 && currProvider.PublicProcessCount <= 0.99 * otherProvider.PublicProcessCount)
+                    double percentLimit = _processConfiguration.MinPercentObservationCount / 100.0;
+                    if (otherProvider.PublicProcessCount > 0 && currProvider.PublicProcessCount <= percentLimit * otherProvider.PublicProcessCount)
                     {
-                        _logger.LogError($"Validation failed. Public observation count for {currProvider.DataProviderIdentifier} is less than 99% of last run");
+                        _logger.LogError($"Validation failed. Public observation count for {currProvider.DataProviderIdentifier} is less than {_processConfiguration.MinPercentObservationCount}% of last run. Count this time={currProvider.PublicProcessCount}. Count previous time={otherProvider.PublicProcessCount}.");
                         success = false;
                     }
 
-                    if (otherProvider.ProtectedProcessCount < 0 && currProvider.ProtectedProcessCount <= 0.99 * otherProvider.ProtectedProcessCount)
+                    if (otherProvider.ProtectedProcessCount < 0 && currProvider.ProtectedProcessCount <= percentLimit * otherProvider.ProtectedProcessCount)
                     {
-                        _logger.LogError($"Validation failed. Protected observation count for {currProvider.DataProviderIdentifier} is less than 99% of last run");
+                        _logger.LogError($"Validation failed. Protected observation count for {currProvider.DataProviderIdentifier} is less than {_processConfiguration.MinPercentObservationCount}% of last run. Count this time={currProvider.ProtectedProcessCount}. Count previous time={otherProvider.ProtectedProcessCount}.");
                         success = false;
                     }
                 }

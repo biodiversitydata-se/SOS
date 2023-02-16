@@ -70,5 +70,10 @@
         /// Minimum observations processed for switching active instance
         /// </summary>
         public long MinObservationCount { get; set; }
+
+        /// <summary>
+        /// Minimum percent observations processed compared to last processing for switching active instance
+        /// </summary>
+        public int MinPercentObservationCount { get; set; } = 99;
     }
 }

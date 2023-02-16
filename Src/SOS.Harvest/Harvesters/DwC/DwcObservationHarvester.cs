@@ -316,7 +316,7 @@ namespace SOS.Harvest.Harvesters.DwC
                 Status = RunStatus.Failed
             };
             XDocument emlDocument = null;
-            _logger.LogInformation($"Start harvesting sightings for {provider.Identifier} data provider. Status={harvestInfo.Status}");
+            _logger.LogInformation($"Start harvesting sightings for {provider.Identifier} data provider.");
 
             var downloadUrlEml = provider.DownloadUrls
                 ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.ObservationEml))?.Url;
@@ -335,7 +335,7 @@ namespace SOS.Harvest.Harvesters.DwC
                             out var pubDate))
                         {
                             // If dataset not has changed since last harvest and there exist observations in MongoDB, don't harvest again
-                            if (provider.SourceDate == pubDate.ToUniversalTime())
+                            if (provider.SourceDate == pubDate.ToUniversalTime() && !_dwcaConfiguration.ForceHarvestUnchangedDwca)
                             {
                                 var nrExistingObservations = await GetNumberOfObservationsInExistingCollectionAsync(provider);
                                 if (nrExistingObservations.GetValueOrDefault() > 0)
