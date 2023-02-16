@@ -498,6 +498,7 @@ namespace SOS.Harvest.Jobs
                 // Disable indexing for public and protected index
                 await DisableIndexingAsync();
 
+
                 //------------------------------------------------------------------------
                 // 5. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------                
