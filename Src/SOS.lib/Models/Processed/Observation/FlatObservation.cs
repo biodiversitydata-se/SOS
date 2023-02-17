@@ -384,18 +384,12 @@ namespace SOS.Lib.Models.Processed.Observation
             : string.Join(", ", _observation?.Taxon?.SecondaryParentDyntaxaTaxonIds);
         public object GetValue(PropertyFieldDescription propertyField)
         {
-            if (propertyField.PropertyName.Equals("Identification"))
-            {
-                var a = 1;
-            }
-
             return propertyField.PropertyPath.ToLower() switch
             {    
                 "occurrence.occurrenceid" => OccurrenceOccurrenceId,
                 "dataproviderid" => DataProviderId,
                 "datasetname" => DatasetName,
                 "modified" => Modified,
-               // "protected" => Protected,
                 "sensitive" => Sensitive,
                 "accessrights" => AccessRights,
                 "accessrights.id" => AccessRightsId,
@@ -410,6 +404,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "institutioncode.value" => InstitutionCodeValue,
                 "ownerinstitutioncode" => OwnerInstitutionCode,
                 "rightsholder" => RightsHolder,
+                "event" => "Please specify which event properties you need",
                 "event.startdate" => EventStartDate,
                 "event.enddate" => EventEndDate,
                 "event.plainstartdate" => EventPlainStartDate,
@@ -432,11 +427,8 @@ namespace SOS.Lib.Models.Processed.Observation
                 "event.fieldnumber" => EventFieldNumber,
                 "event.parenteventid" => EventParentEventId,
                 "event.verbatimeventdate" => EventVerbatimEventDate,
-               // "identification.validated" => IdentificationValidated,
+                "identification" => "Please specify which identification properties you need",
                 "identification.verified" => IdentificationVerified,
-               /* "identification.validationstatus" => IdentificationValidationStatus,
-                "identification.validationstatus.id" => IdentificationValidationStatusId,
-                "identification.validationstatus.value" => IdentificationValidationStatusValue,*/
                 "identification.verificationstatus" => IdentificationVerificationStatus,
                 "identification.verificationstatus.id" => IdentificationVerificationStatusId,
                 "identification.verificationstatus.value" => IdentificationVerificationStatusValue,
@@ -454,6 +446,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "identification.identificationid" => IdentificationIdentificationId,
                 "identification.identificationreferences" => IdentificationIdentificationReferences,
                 "identification.identificationremarks" => IdentificationIdentificationRemarks,
+                "location" => "Please specify which location properties you need",
                 "location.decimallatitude" => LocationDecimalLatitude,
                 "location.decimallongitude" => LocationDecimalLongitude,
                 "location.sweref99tmx" => LocationSweref99TmX,
@@ -513,6 +506,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "location.verbatimdepth" => LocationVerbatimDepth,
                 "location.verbatimelevation" => LocationVerbatimElevation,
                 "location.verbatimlocality" => LocationVerbatimLocality,
+                "occurrence" => "Please specify which occurrence properties you need",
                 "occurrence.recordedby" => OccurrenceRecordedBy,
                 "occurrence.reportedby" => OccurrenceReportedBy,
                 "occurrence.occurrencestatus" => OccurrenceOccurrenceStatus,
@@ -529,7 +523,6 @@ namespace SOS.Lib.Models.Processed.Observation
                 "occurrence.isnotrediscoveredobservation" => OccurrenceIsNotRediscoveredObservation,
                 "occurrence.ispositiveobservation" => OccurrenceIsPositiveObservation,
                 "occurrence.occurrenceremarks" => OccurrenceOccurrenceRemarks,
-               // "occurrence.protectionlevel" => OccurrenceProtectionLevel,
                 "occurrence.sensitivitycategory" => OccurrenceSensitivityCategory,
                 "occurrence.activity" => OccurrenceActivity,
                 "occurrence.activity.id" => OccurrenceActivityId,
@@ -569,7 +562,6 @@ namespace SOS.Lib.Models.Processed.Observation
                 "occurrence.catalognumber" => OccurrenceCatalogNumber,
                 "occurrence.catalogid" => OccurrenceCatalogId,
                 "occurrence.associatedreferences" => OccurrenceAssociatedReferences,
-               // "occurrence.individualid" => OccurrenceIndividualId,
                 "occurrence.media" => OccurrenceMedia,
                 "occurrence.preparations" => OccurrencePreparations,
                 "occurrence.recordnumber" => OccurrenceRecordNumber,
@@ -582,6 +574,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "occurrence.establishmentmeans.id" => OccurrenceEstablishmentMeansId,
                 "occurrence.establishmentmeans.value" => OccurrenceEstablishmentMeansValue,
                 "occurrence.othercatalognumbers" => OccurrenceOtherCatalogNumbers,
+                "taxon" => "Please specify which taxon properties you need",
                 "taxon.acceptednameusage" => TaxonAcceptedNameUsage,
                 "taxon.acceptednameusageid" => TaxonAcceptedNameUsageId,
                 "taxon.birddirective" => TaxonBirdDirective,
@@ -618,6 +611,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "taxon.taxonrank" => TaxonTaxonRank,
                 "taxon.taxonremarks" => TaxonTaxonRemarks,
                 "taxon.verbatimtaxonrank" => TaxonVerbatimTaxonRank,
+                "taxon.attributes" => "Please specify which taxon.attributes properties you need",
                 "taxon.attributes.actionplan" => TaxonAttributesActionPlan,
                 "taxon.attributes.disturbanceradius" => TaxonAttributesDisturbanceRadius,
                 "taxon.attributes.dyntaxataxonid" => TaxonAttributesDyntaxaTaxonId,
@@ -627,9 +621,6 @@ namespace SOS.Lib.Models.Processed.Observation
                 "taxon.attributes.organismgroup" => TaxonAttributesOrganismGroup,
                 "taxon.attributes.parentdyntaxataxonid" => TaxonAttributesParentDyntaxaTaxonId,
                 "taxon.attributes.protectedbylaw" => TaxonAttributesProtectedByLaw,
-               /* "taxon.attributes.protectionlevel" => TaxonAttributesProtectionLevel,
-                "taxon.attributes.protectionlevel.id" => TaxonAttributesProtectionLevelId,
-                "taxon.attributes.protectionlevel.value" => TaxonAttributesProtectionLevelValue,*/
                 "taxon.attributes.sensitivitycategory" => TaxonAttributesSensitivityCategory,
                 "taxon.attributes.sensitivitycategory.id" => TaxonAttributesSensitivityCategoryId,
                 "taxon.attributes.sensitivitycategory.value" => TaxonAttributesSensitivityCategoryValue,
@@ -664,6 +655,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "type.value" => TypeValue,
                 "measurementorfacts" => MeasurementOrFacts,
                 "projects" => Projects,
+                "geologicalcontext" => "Please specify which geologicalcontext properties you need",
                 "geologicalcontext.bed" => GeologicalContextBed,
                 "geologicalcontext.earliestageorloweststage" => GeologicalContextEarliestAgeOrLowestStage,
                 "geologicalcontext.earliesteonorlowesteonothem" => GeologicalContextEarliestEonOrLowestEonothem,
@@ -684,7 +676,9 @@ namespace SOS.Lib.Models.Processed.Observation
                 "geologicalcontext.lithostratigraphicterms" => GeologicalContextLithostratigraphicTerms,
                 "geologicalcontext.lowestbiostratigraphiczone" => GeologicalContextLowestBiostratigraphicZone,
                 "geologicalcontext.member" => GeologicalContextMember,
+                "materialsample" => MaterialSampleMaterialSampleId,
                 "materialsample.materialsampleid" => MaterialSampleMaterialSampleId,
+                "organism" => "Please specify which organism properties you need",
                 "organism.organismid" => OrganismOrganismId,
                 "organism.organismname" => OrganismOrganismName,
                 "organism.organismscope" => OrganismOrganismScope,
