@@ -26,5 +26,7 @@ namespace SOS.Lib.Configuration.Import
         /// Feature toggle for deciding if to use the new Dwca parser with support for datasets.
         /// </summary>
         public bool UseDwcaCollectionRepository { get; set; }
+
+        public bool ForceHarvestUnchangedDwca { get; set; } = false;
     }
 }
