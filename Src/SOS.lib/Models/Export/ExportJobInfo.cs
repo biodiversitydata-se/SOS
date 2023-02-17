@@ -22,6 +22,6 @@ namespace SOS.Lib.Models.Export
         [BsonRepresentation(BsonType.String)]
         public OutputFieldSet? OutputFieldSet { get; set; }
         public string PickUpUrl { get; set; }
-        public int LifetimeDays { get; set; }
+        public double LifetimeDays { get; set; }
     }
 }

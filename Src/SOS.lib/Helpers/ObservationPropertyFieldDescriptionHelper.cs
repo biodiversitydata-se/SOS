@@ -15,7 +15,6 @@ namespace SOS.Lib.Helpers
         public static readonly IEnumerable<PropertyFieldDescription> AllFields;
         public static readonly Dictionary<string, PropertyFieldDescription> FieldByPropertyPath;
         public static readonly Dictionary<OutputFieldSet, ICollection<PropertyFieldDescription>> FieldsByFieldSet;
-        public static readonly Dictionary<OutputFieldSet, IEnumerable<string>> OutputFieldsByFieldSet;
         public static readonly Dictionary<OutputFieldSet, HashSet<string>> JsonFormatDependencyByFieldSet;
         private static readonly Dictionary<string, string> ExportFormatFieldByJsonFormatField;
 
@@ -25,7 +24,6 @@ namespace SOS.Lib.Helpers
             InitDataTypeEnum(AllFields);
             FieldByPropertyPath = AllFields.ToDictionary(x => x.PropertyPath.ToLower(), x => x);
             FieldsByFieldSet = CreateFieldSetDictionary(AllFields);
-            OutputFieldsByFieldSet = CreateOutputFieldsDictionary(FieldsByFieldSet);
             JsonFormatDependencyByFieldSet = CreateJsonFormatDependencyDictionary(FieldsByFieldSet);
             ExportFormatFieldByJsonFormatField = CreateExportFormatFieldByJsonFormatFieldDictionary(AllFields);
         }
@@ -252,36 +250,6 @@ namespace SOS.Lib.Helpers
             }
 
             return jsonFormatDependencyByFieldSet;
-        }
-
-        private static Dictionary<OutputFieldSet, IEnumerable<string>> CreateOutputFieldsDictionary(
-            Dictionary<OutputFieldSet, ICollection<PropertyFieldDescription>> fieldsByFieldSet)
-        {
-            var outputfieldsByFieldSet = new Dictionary<OutputFieldSet, IEnumerable<string>>
-            {
-                {OutputFieldSet.Minimum, new List<string>()},
-                {OutputFieldSet.Extended, new List<string>()},
-                {OutputFieldSet.AllWithValues, new List<string>()},
-                {OutputFieldSet.All, new List<string>()}
-            };
-
-            foreach (var pair in fieldsByFieldSet)
-            {
-                if (pair.Key == OutputFieldSet.All || pair.Key == OutputFieldSet.AllWithValues)
-                {
-                    continue; // retrieve all fields from Elasticsearch
-                }
-
-                var outputFieldSet = new HashSet<string>();
-                foreach (var field in pair.Value)
-                {
-                    outputFieldSet.Add(field.DependsOn);
-                }
-
-                outputfieldsByFieldSet[pair.Key] = outputFieldSet.ToList();
-            }
-            
-            return outputfieldsByFieldSet;
         }
 
         private static IEnumerable<PropertyFieldDescription> LoadFieldDescriptionsFromJson()

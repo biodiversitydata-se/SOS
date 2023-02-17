@@ -384,8 +384,13 @@ namespace SOS.Lib.Models.Processed.Observation
             : string.Join(", ", _observation?.Taxon?.SecondaryParentDyntaxaTaxonIds);
         public object GetValue(PropertyFieldDescription propertyField)
         {
-            return propertyField.PropertyPath.ToLower() switch
+            if (propertyField.PropertyName.Equals("Identification"))
             {
+                var a = 1;
+            }
+
+            return propertyField.PropertyPath.ToLower() switch
+            {    
                 "occurrence.occurrenceid" => OccurrenceOccurrenceId,
                 "dataproviderid" => DataProviderId,
                 "datasetname" => DatasetName,
