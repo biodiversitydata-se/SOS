@@ -211,7 +211,7 @@ namespace SOS.Observations.Api.Controllers
             return Result.Failure($"Missing property ({ property }) used for { name }");
         }
 
-        protected virtual Result ValidateSearchFilter(SearchFilterBaseDto filter, bool bboxMandatory = false)
+        protected virtual Result ValidateSearchFilter(SearchFilterBaseDto filter, bool bboxMandatory = false, bool allowObjectInOutputFields = true)
         {
             var errors = new List<string>();
 
@@ -233,20 +233,20 @@ namespace SOS.Observations.Api.Controllers
             {
                 errors.Add("Modified from date can't be greater tha to date");
             }
-
+            
             if (searchFilter?.Output?.Fields?.Any() ?? false)
             {
                 errors.AddRange(searchFilter.Output.Fields
-                    .Where(of => !typeof(Observation).HasProperty(of))
-                    .Select(of => $"Output field doesn't exist ({of})"));
+                    .Where(of => !typeof(Observation).HasProperty(of, allowObjectInOutputFields))
+                    .Select(of => allowObjectInOutputFields ? $"Output field doesn't exist ({of})" : $"Output field doesn't exist ({of}), or if it's root object. Specify object properties"));
             }
 
             var searchFilterInternal = filter as SearchFilterInternalDto;
             if (searchFilterInternal?.Output?.Fields?.Any() ?? false)
             {
                 errors.AddRange(searchFilterInternal.Output.Fields
-                    .Where(of => !typeof(Observation).HasProperty(of))
-                    .Select(of => $"Output field doesn't exist ({of})"));
+                    .Where(of => !typeof(Observation).HasProperty(of, allowObjectInOutputFields))
+                    .Select(of => allowObjectInOutputFields ? $"Output field doesn't exist ({of})" : $"Output field doesn't exist ({of}), or if it's root object. Specify object properties"));
             }
 
             if (filter.Taxon?.RedListCategories?.Any() ?? false)
