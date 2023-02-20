@@ -53,7 +53,7 @@ namespace SOS.Export.Models.ZendTo
         /// <summary>
         /// Days file remains in ZendTo
         /// </summary>
-        public int LifetimeDays { get; set; }
+        public double LifetimeDays { get; set; }
 
         /// <summary>
         /// True if file only can be fetched one time

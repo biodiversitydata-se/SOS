@@ -1,4 +1,6 @@
+using HealthChecks.UI.Client;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using SOS.DataStewardship.Api.Extensions;
 using SOS.Lib.JsonConverters;
 using System.Text.Json.Serialization;
@@ -12,12 +14,13 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddMemoryCache();
-    
     builder.SetupUserSecrets();
     builder.SetupAuthentication();
     builder.SetupLogging();
     builder.SetupSwagger();
-    builder.SetupDependencies();
+    var processedDbConfiguration = builder.SetupDependencies();
+    builder.SetupHealthChecks(processedDbConfiguration);
+
     builder.RegisterModules();    
     builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
     {
@@ -38,10 +41,15 @@ try
     builder.Services.Configure<TelemetryConfiguration>(x => x.DisableTelemetry = true);
 #endif
     var app = builder.Build();
+   
     app.ConfigureExceptionHandler(logger, isDevelopment);
     app.MapEndpoints();
+    app.UseHealthChecks("/health", new HealthCheckOptions()
+    {
+        Predicate = _ => true,
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    });
     app.UseHttpsRedirection();
-    
     app.UseSwagger();        
     app.UseSwaggerUI(options =>
     {            

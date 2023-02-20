@@ -535,7 +535,6 @@ namespace SOS.Observations.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

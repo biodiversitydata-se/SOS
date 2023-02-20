@@ -27,6 +27,7 @@ using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -125,7 +126,7 @@ namespace SOS.Observations.Api.Controllers
             string confirmEncryptPassword)
         {
             var validationResults = Result.Combine(
-                validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
+                validateSearchFilter ? ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
                 ValidateEmail(email),
                 ValidateUserExport(userExport),
                 ValidateEncryptPassword(encryptPassword, confirmEncryptPassword, protectionFilter ?? ProtectionFilterDto.Public),
@@ -162,11 +163,11 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         private async Task<IActionResult> DownloadValidateAsync(SearchFilterBaseDto filter, bool validateSearchFilter, ProtectionFilterDto? protectionFilter)
         {
-            var validationResults = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
+            var validationResults = validateSearchFilter ? ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success();
 
             if (validationResults.IsFailure)
             {
-                return BadRequest(ValidateSearchFilter(filter).Error);
+                return BadRequest(validationResults);
             }
 
             var exportFilter = filter.ToSearchFilter(UserId, protectionFilter ?? ProtectionFilterDto.Public, "en-GB");
