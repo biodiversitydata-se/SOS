@@ -13,7 +13,7 @@ namespace SOS.DataStewardship.Api.Extensions;
 
 internal static class DependencyInjectionExtensions
 {
-    internal static WebApplicationBuilder SetupDependencies(this WebApplicationBuilder webApplicationBuilder)
+    internal static MongoDbConfiguration SetupDependencies(this WebApplicationBuilder webApplicationBuilder)
     {
         // Configuration
         var elasticConfiguration = webApplicationBuilder.Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
@@ -64,6 +64,6 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         webApplicationBuilder.Services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
-        return webApplicationBuilder;
+        return processedDbConfiguration;
     }
 }
