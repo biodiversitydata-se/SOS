@@ -28,7 +28,7 @@
 		<PackageReference Include="Microsoft.Azure.ApplicationInsights.Query" Version="1.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Rest.ClientRuntime.Azure.Authentication" Version="2.4.1" />
-		<PackageReference Include="MongoDB.Driver" Version="2.18.0" />
+		<PackageReference Include="MongoDB.Driver" Version="2.19.0" />
 		<PackageReference Include="NEST" Version="7.17.5" />
 		<PackageReference Include="NLog" Version="5.1.2" />
 		<PackageReference Include="NLog.Web.AspNetCore" Version="5.2.2" />
