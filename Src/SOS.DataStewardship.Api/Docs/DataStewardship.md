@@ -9,6 +9,7 @@
    - **sos-observationdataset**
    - **sos-observationevent**
    - **sos-observation**.
+
 ![Artportalen Dataflow](Diagrams/Artportalen-dataflow.png)
 
 
@@ -19,6 +20,7 @@
    - **sos-observationdataset**
    - **sos-observationevent**
    - **sos-observation**.
+
 ![Dwca Dataflow](Diagrams/Dwca-dataflow.png)
 
 
@@ -26,16 +28,19 @@
 
 ### Occurrence-sökning
 1. Sökningen liknar den i SOS Observations API, men med enklare modeller. Sökning görs mot Elasticsearch-indexet **sos-observation**.
+
 ![Occurrence Search](Diagrams/Occurrence-search.png)
 
 
 ### Event-sökning
 1. Eftersom Events inte lagrar TaxonId så görs först en aggregering mot indexet **sos-observation** för att få ut **EventId:n** för de observationer som matchar sökningen. Nu används `GetAggregationItemsAsync()`, men eventuellt ska `GetAllAggregationItemsAsync()` för att göra **Composite**-aggregering.
 2. En sökning görs mot indexet **sos-observationevent** med de **EventId:n** som returnerades i föregående steg.
+
 ![Event Search](Diagrams/Event-search.png)
 
 
 ### Dataset-sökning
 1. Eftersom Datasets inte lagrar TaxonId så görs först en aggregering mot indexet **sos-observation** för att få ut **DatasetId:n** för de observationer som matchar sökningen.
 2. En sökning görs mot indexet **sos-observationdataset** med de **DatasetId:n** som returnerades i föregående steg.
+
 ![Dataset Search](Diagrams/Dataset-search.png)
