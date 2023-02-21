@@ -11,7 +11,8 @@ namespace SOS.Observations.Api.Dtos.Filter
             ShowOnlyMerged,
             ShowBoth,
             DoNotShowSightingsInMerged,
-            DoNotShowMergedIncludeReplacementChilds
+            DoNotShowMergedIncludeReplacementChilds,
+            PrintObs
         }
 
         public enum SightingUnspontaneousFilterDto

@@ -383,6 +383,14 @@ namespace SOS.Lib
                     (int)SightingTypeSearchGroup.OwnBreedingAssessment },
                 SearchFilterBase.SightingTypeFilter.ShowOnlyMerged =>
                     new[] { (int)SightingTypeSearchGroup.Assessment }, // 2
+                SearchFilterBase.SightingTypeFilter.PrintObs => // 1, 4, 16, 32, 64, 128 
+                    new[] { 
+                    (int)SightingTypeSearchGroup.Ordinary,
+                    (int)SightingTypeSearchGroup.Aggregated,
+                    (int)SightingTypeSearchGroup.AssessmentChild,
+                    (int)SightingTypeSearchGroup.Replacement,
+                    (int)SightingTypeSearchGroup.ReplacementChild,
+                    (int)SightingTypeSearchGroup.OwnBreedingAssessment },
                 _ => new[] { // 1, 4, 16, 32, 128 Default DoNotShowMerged
                     (int)SightingTypeSearchGroup.Ordinary,
                     (int)SightingTypeSearchGroup.Aggregated,
