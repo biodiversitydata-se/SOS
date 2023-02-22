@@ -3,7 +3,6 @@ using SOS.Harvest.Managers;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Helpers;
-using SOS.Lib.Managers;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.DataStewardship.Api.IntegrationTests.Extensions;
@@ -15,13 +14,6 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Cache;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.TaxonListService;
-using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.Security.Interfaces;
-using SOS.Lib.Security;
-using SOS.Lib.Services.Interfaces;
-using SOS.Lib.Services;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Setup
 {
@@ -33,8 +25,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Setup
         public ProcessFixture? ProcessFixture { get; private set; }
         public HttpClient ApiClient => ApiFactory.CreateClient();
 
-        public TestFixture() 
-        { 
+        public TestFixture()
+        {
             ApiFactory = new ApiWebApplicationFactory();
             TestContainerFixture = new TestContainersFixture();
             TelemetryConfiguration.Active.DisableTelemetry = true;
@@ -42,7 +34,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Setup
 
         public async Task InitializeAsync()
         {
-            await TestContainerFixture.InitializeAsync();            
+            await TestContainerFixture.InitializeAsync();
             ServiceProvider = RegisterServices();
             ApiFactory.ServiceProvider = ServiceProvider;
             using var scope = ServiceProvider.CreateScope();
@@ -61,46 +53,30 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Setup
             var testContainersServiceCollection = TestContainerFixture.GetServiceCollection();
             var serviceProvider = ServiceProviderExtensions.RegisterServices(serviceCollection, testContainersServiceCollection);
             return serviceProvider;
-        }        
+        }
 
         public ServiceCollection GetServiceCollection()
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddLogging();
+            serviceCollection.AddSingleton<IAreaHelper, AreaHelper>();
+            serviceCollection.AddSingleton<IAreaRepository, AreaRepository>();
+            serviceCollection.AddSingleton<ProcessFixture>();
+            serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
+            serviceCollection.AddSingleton<ITaxonRepository, TaxonRepository>();
+            serviceCollection.AddSingleton<IProcessTimeManager, ProcessTimeManager>();
+            serviceCollection.AddSingleton<ProcessConfiguration>();
+
+            serviceCollection.AddSingleton<TelemetryClient>();
+            serviceCollection.AddSingleton<IElasticClientManager, ElasticClientTestManager>();
+            serviceCollection.AddSingleton<IObservationDatasetRepository, ObservationDatasetRepository>();
+            serviceCollection.AddSingleton<IObservationEventRepository, ObservationEventRepository>();
+            serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
 
             var elasticConfiguration = CreateElasticSearchConfiguration();
             serviceCollection.AddSingleton(elasticConfiguration);
-            serviceCollection.AddSingleton<ProcessConfiguration>();
-            serviceCollection.AddSingleton<UserServiceConfiguration>();
-
-            serviceCollection.AddSingleton<IAreaCache, AreaCache>();
-            serviceCollection.AddSingleton<IDataProviderCache, DataProviderCache>();
             serviceCollection.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
-            serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
-            serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
-
-            serviceCollection.AddSingleton<IAreaHelper, AreaHelper>();
-
-            serviceCollection.AddSingleton<IElasticClientManager, ElasticClientTestManager>();
-            serviceCollection.AddSingleton<IFilterManager, FilterManager>();
-            serviceCollection.AddSingleton<IProcessTimeManager, ProcessTimeManager>();
-            serviceCollection.AddSingleton<ITaxonManager, TaxonManager>();
-
-            serviceCollection.AddSingleton<IAreaRepository, AreaRepository>();
-            serviceCollection.AddSingleton<IDataProviderRepository, DataProviderRepository>();
-            serviceCollection.AddSingleton<IObservationDatasetRepository, ObservationDatasetRepository>();
-            serviceCollection.AddSingleton<IObservationEventRepository, ObservationEventRepository>();
             serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
-            serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
-            serviceCollection.AddSingleton<ITaxonListRepository, TaxonListRepository>();
-            serviceCollection.AddSingleton<ITaxonRepository, TaxonRepository>();
-            serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
-
-            serviceCollection.AddSingleton<IHttpClientService, HttpClientService>();
-
-            serviceCollection.AddSingleton<ProcessFixture>();
-            serviceCollection.AddSingleton<TelemetryClient>();
-            serviceCollection.AddSingleton<IAuthorizationProvider, CurrentUserAuthorization>();
 
             return serviceCollection;
         }
@@ -117,7 +93,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Setup
                         ReadBatchSize = 10000,
                         WriteBatchSize = 1000,
                         ScrollBatchSize = 5000,
-                        ScrollTimeout = "300s",                        
+                        ScrollTimeout = "300s",
                     },
                     new ElasticSearchIndexConfiguration
                     {
@@ -137,7 +113,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Setup
                     }
                 },
                 RequestTimeout = 300,
-                DebugMode = true,                
+                DebugMode = true,
                 IndexPrefix = "",
                 Clusters = null
                 //Clusters = new[]
