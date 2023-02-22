@@ -1777,7 +1777,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<List<EventOccurrenceAggregationItem>> GetEventOccurrenceItemsAsync(SearchFilter filter)
         {
             var indexName = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);            
+            var (query, excludeQuery) = GetCoreQueries(filter);  
             var occurrencesByEventId = new Dictionary<string, List<string>>();
             CompositeKey nextPageKey = null;
             var take = MaxNrElasticSearchAggregationBuckets;

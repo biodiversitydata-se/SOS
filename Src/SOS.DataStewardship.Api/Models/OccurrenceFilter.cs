@@ -1,5 +1,4 @@
 using System.Runtime.Serialization;
-using SOS.DataStewardship.Api.Models.Enums;
 
 namespace SOS.DataStewardship.Api.Models
 {
@@ -8,9 +7,9 @@ namespace SOS.DataStewardship.Api.Models
     /// </summary>
     [DataContract]
     public class OccurrenceFilter
-    {        
+    {
         /// <summary>
-        /// DatasetList
+        /// DatasetIds
         /// </summary>
         [DataMember(Name = "datasetIds")]
         public List<string> DatasetIds { get; set; }
@@ -25,7 +24,7 @@ namespace SOS.DataStewardship.Api.Models
         /// Datum
         /// </summary>
         [DataMember(Name="datum")]
-        public DateFilter Datum { get; set; }
+        public DateFilter DateFilter { get; set; }
 
         /// <summary>
         /// Taxon

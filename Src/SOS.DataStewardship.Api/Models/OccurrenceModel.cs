@@ -85,7 +85,7 @@ namespace SOS.DataStewardship.Api.Models
         /// Amount of organisms of a certain unit (given in the attribute unit).
         /// </summary>
         [DataMember(Name="quantity")]
-        public decimal? Quantity { get; set; }
+        public double? Quantity { get; set; }
 
         /// <summary>
         /// Unit for a certain amount of organisms (given in the attribute quantity).
@@ -109,7 +109,7 @@ namespace SOS.DataStewardship.Api.Models
         /// States the radius within which the actual observation was made from the most specific coordinates given, i.e. the coordinates for the site, subsite or observation point.
         /// </summary>
         [DataMember(Name="observationCertainty")]
-        public decimal? ObservationCertainty { get; set; }
+        public double? ObservationCertainty { get; set; }
 
         /// <summary>
         /// States the quality of a species observation, i.e. whether its verified by an expert or similar. Quality categories are chosen from a codelist.
@@ -135,6 +135,6 @@ namespace SOS.DataStewardship.Api.Models
         /// <remarks>
         /// Newly added property
         /// </remarks>
-        public string DatasetIdentifier { get; set; }
+        public EventDataset Dataset { get; set; }
     }
 }

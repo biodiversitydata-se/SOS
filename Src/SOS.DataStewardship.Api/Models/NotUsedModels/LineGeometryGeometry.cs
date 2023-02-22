@@ -37,6 +37,6 @@ namespace SOS.DataStewardship.Api.Models.NotUsedModels
         /// </summary>
         [Required]
         [DataMember(Name = "coordinates")]
-        public List<List<decimal?>> Coordinates { get; set; }
+        public List<List<double?>> Coordinates { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace SOS.DataStewardship.Api.Models
         [DataMember(Name = "province")]
         public Province? Province { get; set; }
 
-        [DataMember(Name = "area")]
-        public GeographicsFilterArea Area { get; set; }
+        [DataMember(Name = "geometry")]
+        public GeographicsFilterArea Geometry { get; set; }
     }
 }

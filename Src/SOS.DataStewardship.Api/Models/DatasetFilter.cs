@@ -16,16 +16,16 @@ namespace SOS.DataStewardship.Api.Models
         public ExportMode ExportMode { get; set; }
 
         /// <summary>
-        /// Gets or Sets DatasetList
+        /// Gets or Sets DatasetIds 
         /// </summary>
-        [DataMember(Name = "datasetList")]
-        public List<string> DatasetList { get; set; }
+        [DataMember(Name = "datasetIds")]
+        public List<string> DatasetIds { get; set; }
 
         /// <summary>
         /// Gets or Sets Datum
         /// </summary>
         [DataMember(Name = "datum")]
-        public DateFilter Datum { get; set; }
+        public DateFilter DateFilter { get; set; }
 
         /// <summary>
         /// Gets or Sets Taxon

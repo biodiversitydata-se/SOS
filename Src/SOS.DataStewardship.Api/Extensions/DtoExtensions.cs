@@ -251,9 +251,10 @@ namespace SOS.DataStewardship.Api.Extensions
             }
 
             occurrence.EventID = observation.Event.EventId;
-            occurrence.DatasetIdentifier = observation.DataStewardshipDatasetId;
+            occurrence.Dataset ??= new EventDataset();
+            occurrence.Dataset.Identifier = observation.DataStewardshipDatasetId;
             occurrence.IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas; // todo - implement when the value list is defined
-            occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDecimal(observation.Location.CoordinateUncertaintyInMeters);
+            occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
 
             if (observation?.Location?.Point?.Coordinates != null)
             {
@@ -284,7 +285,7 @@ namespace SOS.DataStewardship.Api.Extensions
             occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
             occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
             occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? OccurrenceStatus.Observerad : OccurrenceStatus.InteObserverad;
-            occurrence.Quantity = Convert.ToDecimal(observation.Occurrence.OrganismQuantityInt);
+            occurrence.Quantity = Convert.ToDouble(observation.Occurrence.OrganismQuantityInt);
             if (observation?.Occurrence?.OrganismQuantityUnit?.Id != null)
             {
                 occurrence.QuantityVariable = GetQuantityVariableEnum((UnitId)observation.Occurrence.OrganismQuantityUnit.Id);
@@ -404,7 +405,7 @@ namespace SOS.DataStewardship.Api.Extensions
             if (datasetFilter == null) return null;
 
             var filter = new SearchFilter(0);
-            filter.DataStewardshipDatasetIds = datasetFilter.DatasetList;
+            filter.DataStewardshipDatasetIds = datasetFilter.DatasetIds;
             filter.IsPartOfDataStewardshipDataset = true;
             if (datasetFilter.Taxon?.Ids != null && datasetFilter.Taxon.Ids.Any())
             {
@@ -415,13 +416,13 @@ namespace SOS.DataStewardship.Api.Extensions
                 };
             }
 
-            if (datasetFilter.Datum != null)
+            if (datasetFilter.DateFilter != null)
             {
                 filter.Date = new Lib.Models.Search.Filters.DateFilter
                 {
-                    StartDate = datasetFilter.Datum.StartDate,
-                    EndDate = datasetFilter.Datum.EndDate,
-                    DateFilterType = datasetFilter.Datum.DatumFilterType.ToDateRangeFilterType()
+                    StartDate = datasetFilter.DateFilter.StartDate,
+                    EndDate = datasetFilter.DateFilter.EndDate,
+                    DateFilterType = datasetFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
                 };
             }
 
@@ -435,9 +436,10 @@ namespace SOS.DataStewardship.Api.Extensions
             if (eventsFilter == null) return null;
 
             var filter = new SearchFilter(0);
-            filter.DataStewardshipDatasetIds = eventsFilter.DatasetList;
+            filter.DataStewardshipDatasetIds = eventsFilter.DatasetIds;
+            filter.EventIds = eventsFilter.EventIds;
             filter.IsPartOfDataStewardshipDataset = true;
-            if (eventsFilter.Taxon?.Ids != null && eventsFilter.Taxon.Ids.Any())
+            if (eventsFilter.Taxon?.Ids?.Any() ?? false)
             {
                 filter.Taxa = new Lib.Models.Search.Filters.TaxonFilter
                 {
@@ -446,13 +448,13 @@ namespace SOS.DataStewardship.Api.Extensions
                 };
             }
 
-            if (eventsFilter.Datum != null)
+            if (eventsFilter.DateFilter != null)
             {
                 filter.Date = new Lib.Models.Search.Filters.DateFilter
                 {
-                    StartDate = eventsFilter.Datum.StartDate,
-                    EndDate = eventsFilter.Datum.EndDate,
-                    DateFilterType = eventsFilter.Datum.DatumFilterType.ToDateRangeFilterType()
+                    StartDate = eventsFilter.DateFilter.StartDate,
+                    EndDate = eventsFilter.DateFilter.EndDate,
+                    DateFilterType = eventsFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
                 };
             }
 
@@ -478,13 +480,13 @@ namespace SOS.DataStewardship.Api.Extensions
                 };
             }
             
-            if (occurrenceFilter.Datum != null)
+            if (occurrenceFilter.DateFilter != null)
             {
                 filter.Date = new Lib.Models.Search.Filters.DateFilter
                 {
-                    StartDate = occurrenceFilter.Datum.StartDate,
-                    EndDate = occurrenceFilter.Datum.EndDate,
-                    DateFilterType = occurrenceFilter.Datum.DatumFilterType.ToDateRangeFilterType()
+                    StartDate = occurrenceFilter.DateFilter.StartDate,
+                    EndDate = occurrenceFilter.DateFilter.EndDate,
+                    DateFilterType = occurrenceFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
                 };                
             }
             
@@ -535,7 +537,7 @@ namespace SOS.DataStewardship.Api.Extensions
                 });
             }
 
-            locationFilter.Geometries = geographicsFilter.Area?.ToGeographicsFilter();
+            locationFilter.Geometries = geographicsFilter.Geometry?.ToGeographicsFilter();
             locationFilter.Areas = areaFilter;
             return locationFilter;
         }
@@ -554,17 +556,17 @@ namespace SOS.DataStewardship.Api.Extensions
         }
 
 
-        public static Lib.Models.Search.Filters.DateFilter.DateRangeFilterType ToDateRangeFilterType(this DatumFilterType datumFilterType)
+        public static Lib.Models.Search.Filters.DateFilter.DateRangeFilterType ToDateRangeFilterType(this DateFilterType dateFilterType)
         {
-            switch (datumFilterType)
+            switch (dateFilterType)
             {
-                case DatumFilterType.OnlyStartDate:
+                case DateFilterType.OnlyStartDate:
                     return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyStartDate;
-                case DatumFilterType.OnlyEndDate:
+                case DateFilterType.OnlyEndDate:
                     return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyEndDate;
-                case DatumFilterType.OverlappingStartDateAndEndDate:
+                case DateFilterType.OverlappingStartDateAndEndDate:
                     return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate;
-                case DatumFilterType.BetweenStartDateAndEndDate:
+                case DateFilterType.BetweenStartDateAndEndDate:
                     return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate;
                 default:
                     return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate;

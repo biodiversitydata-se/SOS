@@ -39,8 +39,8 @@ public class EventTests : TestBase
         await ProcessFixture.AddEventsToElasticsearchAsync(events);
         var observations = GetObservationTestData(eventId, datasetId);
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
-        var searchFilter = new EventsFilter { 
-            DatasetList = new List<string> { datasetId } 
+        var searchFilter = new EventsFilter {
+            DatasetIds = new List<string> { datasetId } 
         };
 
         // Act

@@ -23,9 +23,9 @@ namespace SOS.DataStewardship.Api.Models
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        /// DatumFilterType
+        /// DateFilterType
         /// </summary>
-        [DataMember(Name="datumFilterType")]
-        public DatumFilterType DatumFilterType { get; set; }
+        [DataMember(Name= "dateFilterType")]
+        public DateFilterType DateFilterType { get; set; }
     }
 }

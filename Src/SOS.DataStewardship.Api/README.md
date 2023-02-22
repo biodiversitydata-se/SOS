@@ -30,7 +30,7 @@ https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
 
 #### POST /datasets
 1. Använd filtret `DatasetList`. Använd `identifier` som specificeras ovan.
-2. Använd filtret `Datum`. Testa med olika kombinationer av `StartDate` och `EndDate` och `DatumFilterType`
+2. Använd filtret `Datum`. Testa med olika kombinationer av `StartDate` och `EndDate` och `DateFilterType`
 3. Använd filtret `Taxon` och ange olika TaxonId.
 4. Använd filtret `Area` med fördefinierade regioner (`County`, `Municipality`, `Parish`, `Province`).
 5. Använd filtret `GeographicArea` och ange en polygon i `GeoJSON`-format. Testa också att ange en punkt och `MaxDistanceFromGeometries`.
@@ -45,7 +45,7 @@ https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
 
 #### POST /events
 1. Använd filtret `DatasetList`. Använd `identifier` som specificeras ovan.
-2. Använd filtret `Datum`. Testa med olika kombinationer av `StartDate` och `EndDate` och `DatumFilterType`
+2. Använd filtret `Datum`. Testa med olika kombinationer av `StartDate` och `EndDate` och `DateFilterType`
 3. Använd filtret `Taxon` och ange olika TaxonId.
 4. Använd filtret `Area` med fördefinierade regioner (`County`, `Municipality`, `Parish`, `Province`).
 5. Använd filtret `GeographicArea` och ange en polygon i `GeoJSON`-format. Testa också att ange en punkt och `MaxDistanceFromGeometries`.
@@ -62,7 +62,7 @@ https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
 
 #### POST /occurrences
 1. Använd filtret `DatasetIds`. Använd `identifier` som specificeras ovan.
-2. Använd filtret `Datum`. Testa med olika kombinationer av `StartDate` och `EndDate` och `DatumFilterType`
+2. Använd filtret `Datum`. Testa med olika kombinationer av `StartDate` och `EndDate` och `DateFilterType`
 3. Använd filtret `Taxon` och ange olika TaxonId.
 4. Använd filtret `Area` med fördefinierade regioner (`County`, `Municipality`, `Parish`, `Province`).
 5. Använd filtret `GeographicArea` och ange en polygon i `GeoJSON`-format. Testa också att ange en punkt och `MaxDistanceFromGeometries`.
@@ -86,17 +86,6 @@ https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
 
 ---
 ## Förslag till förändringar i API-specifikationen
-
-### DatasetFilter, EventsFilter, OccurrenceFilter
-- `DatasetList` borde hellre heta `DatasetIds`? `OccurrenceFilter` använder namnet `DatasetIds` så det är inte konsekvent just nu.
-- `Datum` borde hellre heta `DateFilter` eller `Date`? `Date` är i vissa programmeringsspråk ett reserverat ord vilket gör att `DateFilter` kanske är ett bättre förslag?
-- `DatumFilterType` borde hellre heta `DateFilterType`?
-- `Area.Area` bord hellre heta `Area.Geometry`?
-- Lägg till `EventIds` property till `EventsFilter`?
-
-### OccurrenceModel, EventModel
-- Det finns en property `OccurrenceModel.DatasetIdentifier` av sträng-typ, sedan finns det `EventModel.Dataset`. `OccurrenceModel.DatasetIdentifier` borde kanske bytas till `OccurrenceModel.Dataset` och ha samma typ som `EventModel.Dataset`?
-- `decimal`-datatypen används för en del värden. Det borde väl räcka med `double`?
 
 ## Funktionalitet som återstår i Datavärdskap API
 - Optimeringar kring Elasticsearch projiceringar. Nu returneras alltid alla fält, men det skulle säkert kunna begränsas.

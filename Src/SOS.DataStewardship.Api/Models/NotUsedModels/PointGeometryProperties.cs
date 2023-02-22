@@ -15,13 +15,13 @@ namespace SOS.DataStewardship.Api.Models.NotUsedModels
         /// The estimated absolute positional accuracy of the (X,Y) coordinates of the building geometry, in the INSPIRE official Coordinate Reference System. Absolute positional accuracy is defined as the mean value of the positional uncertainties for a set of positions where the positional uncertainties are defined as the distance between a measured position and what is considered as the corresponding true position. (Source: INSPIRE). The positional accuracy is applied to all points within each object geometry, and if there are several points within an object with different positional accuracies, the greatest value for positional accuracy within the object is applied for the whole object geometry. Positional accuracy is given in metres.
         /// </summary>
         [DataMember(Name = "horizontalGeometryEstimatedAccuracy")]
-        public decimal? HorizontalGeometryEstimatedAccuracy { get; set; }
+        public double? HorizontalGeometryEstimatedAccuracy { get; set; }
 
         /// <summary>
         /// The estimated absolute positional accuracy of the Z coordinates of the building geometry, in the INSPIRE official Coordinate Reference System. Absolute positional accuracy is defined as the mean value of the positional uncertainties for a set of positions where the positional uncertainties are defined as the distance between a measured position and what is considered as the corresponding true position. (Source: INSPIRE) The positional accuracy is applied to all points within each object geometry, and if there are several points within an object with different positional accuracies, the greatest value for positional accuracy within the object is applied for the whole object geometry. Positional accuracy is given in metres.
         /// </summary>
         [DataMember(Name = "verticalGeometryEstimatedAccuracy")]
-        public decimal? VerticalGeometryEstimatedAccuracy { get; set; }
+        public double? VerticalGeometryEstimatedAccuracy { get; set; }
 
         /// <summary>
         /// Coordinate system for the (X, Y) coordinates of the geometry.

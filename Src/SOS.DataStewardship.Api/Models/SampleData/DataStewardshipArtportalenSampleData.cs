@@ -138,7 +138,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), // Ej obligatorisk, men kan sättas om StartDate och EndDate har samma värde. EventDate ger tiden för själva besöket (t.ex. från 8:10 på morgonen till 11:36 på förmiddagen. Occ under den tiden gjordes en obs av spillkråka kl 10:54. Det är den tiden (10:54) som är observationstidpunkt.
             BasisOfRecord = BasisOfRecord.MänskligObservation,
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Ovaliderad  // för värdelistan väntar vi på vad arbetsgruppen för verifieringsmodulen skulle ha som slutgiltig förslag på kategorier - vi bör fråga de om att få den listan         
-            ObservationCertainty = 200m,
+            ObservationCertainty = 200d,
             ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
             ObservationPointTest = new GeometryObject
             {
@@ -153,7 +153,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 LifeStage = null,
                 Sex = null
             },
-            Quantity = 2m,
+            Quantity = 2d,
             QuantityVariable = QuantityVariable.AntalIndivider,
             Unit = null, // Enhet för Quantity
             Taxon = new TaxonModel
@@ -175,7 +175,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), 
             BasisOfRecord = BasisOfRecord.MänskligObservation,            
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, 
-            ObservationCertainty = 200m,
+            ObservationCertainty = 200d,
             ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
             ObservationPointTest = new GeometryObject
             {
@@ -190,7 +190,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 LifeStage = null,
                 Sex = null
             },
-            Quantity = 1m,
+            Quantity = 1d,
             QuantityVariable = QuantityVariable.AntalIndivider,            
             Unit = null, 
             Taxon = new TaxonModel
@@ -212,7 +212,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             ObservationTime = new DateTime(2012, 3, 6, 8, 0, 0), // StartDate och EndDate verkar saknas i OccurrenceModel?
             BasisOfRecord = BasisOfRecord.MänskligObservation,
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
-            ObservationCertainty = 200m,
+            ObservationCertainty = 200d,
             ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
             ObservationPointTest = new GeometryObject
             {
@@ -227,7 +227,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 LifeStage = null,
                 Sex = null
             },
-            Quantity = 5m,
+            Quantity = 5d,
             QuantityVariable = QuantityVariable.AntalIndivider,
             Unit = null, // Vad är unit kopplat till för variabel?
             Taxon = new TaxonModel
@@ -303,7 +303,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             ObservationTime = new DateTime(2016, 7, 14), // StartDate och EndDate verkar saknas i OccurrenceModel?
             BasisOfRecord = BasisOfRecord.MänskligObservation,
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
-            ObservationCertainty = 5m,
+            ObservationCertainty = 5d,
             ObservationPoint = new PointGeoShape(new GeoCoordinate(58.52845, 14.52667)),
             ObservationPointTest = new GeometryObject
             {
@@ -318,7 +318,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 LifeStage = null,
                 Sex = null
             },
-            Quantity = 4m,
+            Quantity = 4d,
             QuantityVariable = QuantityVariable.AntalIndivider,
             Unit = null, // Vad är unit kopplat till för variabel?
             Taxon = new TaxonModel
@@ -340,7 +340,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             ObservationTime = new DateTime(2016, 7, 14), // StartDate och EndDate verkar saknas i OccurrenceModel?
             BasisOfRecord = BasisOfRecord.MänskligObservation,
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, // Godkänd baserat på observatörens uppgifter
-            ObservationCertainty = 5m,
+            ObservationCertainty = 5d,
             ObservationPointTest = new GeometryObject
             {
                 Type = "point",
@@ -354,7 +354,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 LifeStage = null,
                 Sex = null
             },
-            Quantity = 1m,
+            Quantity = 1d,
             QuantityVariable = QuantityVariable.AntalIndivider,
             Unit = null, // Vad är unit kopplat till för variabel?
             Taxon = new TaxonModel

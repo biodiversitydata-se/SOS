@@ -1,10 +1,4 @@
 ﻿using SOS.DataStewardship.Api.Models.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.IO.RecyclableMemoryStreamManager;
 
 namespace SOS.DataStewardship.Api.Models.SampleData
 {
@@ -136,7 +130,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             {
                 AirTemperature  = new WeatherMeasuring
                 {
-                    WeatherMeasure = 25.4m,
+                    WeatherMeasure = 25.4d,
                     Unit = Unit.GraderCelsius
                 }
             }
@@ -159,7 +153,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
             BasisOfRecord = BasisOfRecord.MänskligObservation,
             EventID = "EventId-1",
             IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas, 
-            ObservationCertainty = 25m, 
+            ObservationCertainty = 25d, 
             ObservationPoint = null,
             ObservationTime = new DateTime(2013,10,22),
             OccurrenceID = "OccurrenceId-1",
@@ -171,7 +165,7 @@ namespace SOS.DataStewardship.Api.Models.SampleData
                 LifeStage = LifeStage.ImagoAdult,
                 Sex = Sex.Hane
             },
-            Quantity = 1m,
+            Quantity = 1d,
             QuantityVariable = QuantityVariable.AntalIndivider,
             Unit = Unit.Styck,
             Taxon = new TaxonModel()

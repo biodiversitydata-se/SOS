@@ -1,6 +1,4 @@
-using System;
 using System.Runtime.Serialization;
-using System.Text;
 using SOS.DataStewardship.Api.Models.Enums;
 
 namespace SOS.DataStewardship.Api.Models
@@ -18,16 +16,22 @@ namespace SOS.DataStewardship.Api.Models
         public ExportMode ExportMode { get; set; }
 
         /// <summary>
-        /// Gets or Sets DatasetList
+        /// Gets or Sets DatasetIds
         /// </summary>        
-        [DataMember(Name = "datasetList")]
-        public List<string> DatasetList { get; set; }
+        [DataMember(Name = "datasetIds")]
+        public List<string> DatasetIds { get; set; }
+
+        /// <summary>
+        /// Gets or Sets EventIds
+        /// </summary>        
+        [DataMember(Name = "eventIds")]
+        public List<string> EventIds { get; set; }
 
         /// <summary>
         /// Datum
         /// </summary>
         [DataMember(Name="datum")]
-        public DateFilter Datum { get; set; }
+        public DateFilter DateFilter { get; set; }
 
         /// <summary>
         /// Taxon

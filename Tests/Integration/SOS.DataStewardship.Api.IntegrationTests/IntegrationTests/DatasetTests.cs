@@ -37,8 +37,8 @@ public class DatasetTests : TestBase
         await ProcessFixture.AddDatasetsToElasticsearchAsync(datasets);
         var observations = GetObservationTestData(identifier);
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
-        var searchFilter = new DatasetFilter { 
-            DatasetList = new List<string> { identifier } 
+        var searchFilter = new DatasetFilter {
+            DatasetIds = new List<string> { identifier } 
         };
 
         // Act

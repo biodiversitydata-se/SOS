@@ -42,12 +42,12 @@ public class DwcaImportTests : TestBase
 
         pageResultHallarod.Records.Should().AllSatisfy(m =>
         {
-            m.DatasetIdentifier.Should().Be("ArtportalenDataHost - Dataset Bats (Hallaröd)");
+            m.Dataset?.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Hallaröd)");
         });
 
         pageResultOther.Records.Should().AllSatisfy(m =>
         {
-            m.DatasetIdentifier.Should().Be("ArtportalenDataHost - Dataset Bats (Other)");
+            m.Dataset?.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Other)");
         });
     }
 
@@ -68,11 +68,11 @@ public class DwcaImportTests : TestBase
         var eventById2 = await ApiClient.GetFromJsonAsync<EventModel>($"datastewardship/events/test:bats:event:14009236676399444594", jsonSerializerOptions);
 
         // Get by search - Events with Dataset "Bats (Hallaröd)"
-        var searchFilter = new EventsFilter { DatasetList = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
+        var searchFilter = new EventsFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
         var pageResultHallarod = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
 
         // Get by search - Events with Dataset "Bats (Other)"
-        searchFilter = new EventsFilter { DatasetList = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
+        searchFilter = new EventsFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
         var pageResultOther = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
@@ -108,11 +108,11 @@ public class DwcaImportTests : TestBase
         var datasetById2 = await ApiClient.GetFromJsonAsync<Dataset>($"datastewardship/datasets/ArtportalenDataHost - Dataset Bats (Other)", jsonSerializerOptions);
 
         // Get by search - Events with Dataset "Bats (Hallaröd)"
-        var searchFilter = new DatasetFilter { DatasetList = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
+        var searchFilter = new DatasetFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
         var pageResultHallarod = await ApiClient.GetFromJsonPostAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
 
         // Get by search - Events with Dataset "Bats (Other)"
-        searchFilter = new DatasetFilter { DatasetList = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
+        searchFilter = new DatasetFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
         var pageResultOther = await ApiClient.GetFromJsonPostAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------

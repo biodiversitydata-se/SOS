@@ -263,7 +263,7 @@ namespace SOS.DataStewardship.Api.Extensions
                    occurrence.IdentificationVerificationStatus?.ToString(),
                    occurrence.AssociatedMedia?.Select(m => $"{m.AssociatedMediaName}/{m.AssociatedMediaType}/{m.AssociatedMediaLink}").Concat(),
                    occurrence.EventID,
-                   occurrence.DatasetIdentifier
+                   occurrence.Dataset?.Identifier
                 });
             }
 

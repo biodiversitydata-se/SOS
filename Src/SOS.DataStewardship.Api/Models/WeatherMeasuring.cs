@@ -17,7 +17,7 @@ namespace SOS.DataStewardship.Api.Models
         /// </summary>
         [Required]
         [DataMember(Name="weatherMeasure")]
-        public decimal? WeatherMeasure { get; set; }
+        public double? WeatherMeasure { get; set; }
 
         /// <summary>
         /// Unit for a reported measurement (given in the attribute "vädermått").

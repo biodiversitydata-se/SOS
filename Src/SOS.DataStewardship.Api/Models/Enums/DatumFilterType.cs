@@ -5,7 +5,7 @@ namespace SOS.DataStewardship.Api.Models.Enums
     /// <summary>
     /// Date filter type.
     /// </summary>
-    public enum DatumFilterType
+    public enum DateFilterType
     {
         /// <summary>
         /// Start OR EndDate of the event may be within the specified interval
