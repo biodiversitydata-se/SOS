@@ -29,7 +29,7 @@ namespace SOS.Observations.Api.Managers
         private readonly IFilterManager _filterManager;
         private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
         private readonly ILogger<TaxonSearchManager> _logger;
-        private readonly SemaphoreSlim _taxonSumAggregationSemaphore = new SemaphoreSlim(1, 1);
+        private static readonly SemaphoreSlim _taxonSumAggregationSemaphore = new SemaphoreSlim(1, 1);
 
         private async Task<Dictionary<int, TaxonSumAggregationItem>> GetCachedTaxonSumAggregation(int? userId)
         {
