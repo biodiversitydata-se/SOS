@@ -20,8 +20,6 @@ public class EventsNotFoundTests : TestBase
     // EventById_Returns_Http404NotFound_When_EventId_Doesnt_Exist_In_Database
     // EventById_ReturnsHttp404NotFound_GivenEventIdThatDoesntExist
 
-
-
     [Fact]
     public async Task EventById_ReturnsHttp404NotFound_GivenEventIdThatDoesntExist()
     {
