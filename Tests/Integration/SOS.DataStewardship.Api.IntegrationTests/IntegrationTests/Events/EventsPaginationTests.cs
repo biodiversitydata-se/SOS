@@ -30,7 +30,7 @@ public class EventsPaginationTests : TestBase
         // Act
         for (int skip=0; skip < observations.Count(); skip += take)
         {
-            var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>(
+            var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
                 $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
             eventModels.AddRange(pageResult.Records);
         }
@@ -55,7 +55,7 @@ public class EventsPaginationTests : TestBase
         int take = 2;
 
         // Act        
-        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
             $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
         
         // Assert
@@ -80,7 +80,7 @@ public class EventsPaginationTests : TestBase
         int take = 2;
 
         // Act
-        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
             $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
 
         // Assert

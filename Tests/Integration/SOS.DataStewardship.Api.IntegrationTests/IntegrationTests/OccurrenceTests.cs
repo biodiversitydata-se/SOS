@@ -42,7 +42,7 @@ public class OccurrenceTests : TestBase
         };
 
         // Act
-        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
             $"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
 
         // Assert        
