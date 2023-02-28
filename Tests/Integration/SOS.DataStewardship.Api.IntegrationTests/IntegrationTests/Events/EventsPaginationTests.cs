@@ -15,7 +15,7 @@ public class EventsPaginationTests : TestBase
     }
 
     [Fact]
-    public async Task EventsBySearch_ReturnsAllEvents_WhenPaginatingAllResultSet()
+    public async Task EventsBySearch_ReturnsAllEvents_WhenPaginatingAllRecords()
     {
         // Arrange                                
         var events = EventsTestData.GetEventTestData();

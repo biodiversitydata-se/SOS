@@ -55,7 +55,6 @@
 
   <ItemGroup>
     <Folder Include="IntegrationTests\Datasets\" />
-    <Folder Include="IntegrationTests\Occurrences\" />
   </ItemGroup>
 
 </Project>

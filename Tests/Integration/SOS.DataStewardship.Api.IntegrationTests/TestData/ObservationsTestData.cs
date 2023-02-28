@@ -18,6 +18,10 @@ namespace SOS.DataStewardship.Api.IntegrationTests.TestData
                         StartDate = DateTime.Now,
                         EndDate = DateTime.Now,
                     })
+                    .With(m => m.Occurrence = new Occurrence
+                    {
+                        OccurrenceId = DataHelper.RandomString(3)
+                    })                    
                     .With(m => m.DataStewardshipDatasetId = firstDatasetId)
                     .With(m => m.DataProviderId = 1)
                     .With(m => m.ArtportalenInternal = null)
@@ -28,6 +32,10 @@ namespace SOS.DataStewardship.Api.IntegrationTests.TestData
                         EventId = DataHelper.RandomString(3, new[] { firstEventKey }),
                         StartDate = DateTime.Now,
                         EndDate = DateTime.Now,
+                    })
+                    .With(m => m.Occurrence = new Occurrence
+                    {
+                        OccurrenceId = DataHelper.RandomString(3)
                     })
                     .With(m => m.DataStewardshipDatasetId = DataHelper.RandomString(3, new[] { firstDatasetId }))
                     .With(m => m.DataProviderId = 1)
