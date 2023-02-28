@@ -17,13 +17,11 @@ public class EventsPaginationTests : TestBase
     [Fact]
     public async Task EventsBySearch_ReturnsAllEvents_WhenPaginatingAllResultSet()
     {
-        // Arrange                        
-        string eventId = "Abc";
-        string datasetId = "Def";
-        var events = EventsTestData.GetEventTestData(eventId, datasetId);
+        // Arrange                                
+        var events = EventsTestData.GetEventTestData();
         var eventIds = events.Select(m => m.EventId);
         await ProcessFixture.AddEventsToElasticsearchAsync(events);
-        var observations = GetObservationTestData(eventIds,  eventId, datasetId);
+        var observations = GetObservationTestData(eventIds);
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
         var searchFilter = new EventsFilter();        
         int take = 2;
@@ -35,7 +33,6 @@ public class EventsPaginationTests : TestBase
             var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>(
                 $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
             eventModels.AddRange(pageResult.Records);
-            var uniqueEventIdsSubset = eventModels.Select(m => m.EventID).Distinct();
         }
 
         // Assert
@@ -47,24 +44,89 @@ public class EventsPaginationTests : TestBase
     [Fact]
     public async Task EventsBySearch_ReturnsCorrectPagingMetadata_GivenValidInput()
     {
-        // Arrange        
+        // Arrange                                
+        var events = EventsTestData.GetEventTestData();
+        var eventIds = events.Select(m => m.EventId);
+        await ProcessFixture.AddEventsToElasticsearchAsync(events);
+        var observations = GetObservationTestData(eventIds);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
+        var searchFilter = new EventsFilter();
+        int skip = 5;
+        int take = 2;
 
         // Act        
-
+        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>(
+            $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
+        
         // Assert
+        pageResult.TotalCount.Should().Be(events.Count());
+        pageResult.Take.Should().Be(take);
+        pageResult.Count.Should().Be(take);
+        pageResult.Skip.Should().Be(skip);
     }
     
 
     [Fact]
-    public async Task EventsBySearch_ReturnsExpectedTodo_GivenInvalidInput()
+    public async Task EventsBySearch_ReturnsNoRecords_GivenOutOfRangeSkipParameter()
     {
         // Arrange        
+        var events = EventsTestData.GetEventTestData();
+        var eventIds = events.Select(m => m.EventId);
+        await ProcessFixture.AddEventsToElasticsearchAsync(events);
+        var observations = GetObservationTestData(eventIds);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
+        var searchFilter = new EventsFilter();
+        int skip = events.Count();
+        int take = 2;
 
         // Act
+        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>(
+            $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
 
         // Assert
+        pageResult.TotalCount.Should().Be(events.Count());
+        pageResult.Take.Should().Be(take);
+        pageResult.Count.Should().Be(0);
+        pageResult.Skip.Should().Be(skip);
     }
 
+    [Fact]
+    public async Task EventsBySearch_ReturnsBadRequest_GivenInvalidSkipAndTake()
+    {
+        // Arrange        
+        var events = EventsTestData.GetEventTestData();
+        var eventIds = events.Select(m => m.EventId);
+        await ProcessFixture.AddEventsToElasticsearchAsync(events);
+        var observations = GetObservationTestData(eventIds);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
+        
+        var searchFilter = new EventsFilter();
+        int skipNegative = -1;
+        int skipTooLarge = 1000000;
+        int skip = 2;
+        int take = 2;
+        int takeNegative = -1;
+        int takeTooLarge = 1000000;
+
+        // Act
+        var responseSkipNegative = await ApiClient.PostAsJsonAsync(
+            $"datastewardship/events?skip={skipNegative}&take={take}", searchFilter, jsonSerializerOptions);
+
+        var responseSkipTooLarge = await ApiClient.PostAsJsonAsync(
+            $"datastewardship/events?skip={skipTooLarge}&take={take}", searchFilter, jsonSerializerOptions);
+
+        var responseTakeNegative = await ApiClient.PostAsJsonAsync(
+            $"datastewardship/events?skip={skip}&take={takeNegative}", searchFilter, jsonSerializerOptions);
+
+        var responseTakeTooLarge = await ApiClient.PostAsJsonAsync(
+            $"datastewardship/events?skip={skip}&take={takeTooLarge}", searchFilter, jsonSerializerOptions);
+
+        // Assert
+        responseSkipNegative.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        responseSkipTooLarge.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        responseTakeNegative.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        responseTakeTooLarge.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+    }
 
     private IEnumerable<ObservationEvent> GetEventTestData(string firstEventKey = null, string? firstDatasetKey = null)
     {
