@@ -107,7 +107,6 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                 Occurrence = new Occurrence
                 {
                     LifeStage = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.LifeStage]),
-                    Activity = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.Activity]),
                     Sex = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.Sex]),
                     Behavior = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.Behavior]),                    
                     CatalogId = verbatim.Id,
@@ -143,9 +142,34 @@ namespace SOS.Harvest.Processors.ObservationDatabase
 
             // Populate generic data
             PopulateGenericData(obs);
-
+            obs.Occurrence.Activity = GetActivityValue(verbatim, taxon);
             obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, taxon);
             return obs;
+        }
+
+        private VocabularyValue GetActivityValue(ObservationDatabaseVerbatim verbatim, Lib.Models.Processed.Observation.Taxon taxon)
+        {
+            if (taxon.IsBird())
+            {
+                if (!string.IsNullOrEmpty(verbatim.Stadium))
+                {
+                    switch (verbatim.Stadium.ToLowerInvariant())
+                    {
+                        case "säker häckning":
+                            return new VocabularyValue { Id = (int)ActivityId.NestBuilding }; // 12
+                        case "trolig häckning":
+                            return new VocabularyValue { Id = (int)ActivityId.PermanentTerritory }; // 17
+                        default:
+                            return new VocabularyValue { Id = (int)ActivityId.InNestingHabitat }; // 20
+                    }
+                }
+                else // No value
+                {
+                    return new VocabularyValue { Id = (int)ActivityId.InNestingHabitat }; // 20
+                }
+            }
+
+            return GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.Activity]);
         }
 
         private VocabularyValue GetSosId(string val,
