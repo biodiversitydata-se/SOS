@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SOS.Harvest.Entities.Artportalen;
+﻿using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Extensions;
 using SOS.Harvest.Factories.Vocabularies.Interfaces;
 using SOS.Lib.Constants;

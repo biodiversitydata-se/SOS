@@ -1162,7 +1162,10 @@ namespace SOS.Lib.Repositories.Processed
         {
             var searchIndex = GetCurrentIndex(filter);
 
-            var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchDescriptor<dynamic>()
+            // Retry policy by Polly
+            var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+            {
+                var queryResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchDescriptor<dynamic>()
                 .Index(searchIndex)
                 .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                     .Query(q => q
@@ -1172,6 +1175,11 @@ namespace SOS.Lib.Repositories.Processed
                     ),
                 pointInTimeId,
                 searchAfter);
+
+                queryResponse.ThrowIfInvalid();
+
+                return queryResponse;
+            });
 
             return new SearchAfterResult<T>
             {
