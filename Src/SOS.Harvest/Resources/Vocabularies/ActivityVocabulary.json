@@ -3715,47 +3715,7 @@
             {
               "Value": "visit possible nest?",
               "SosId": 15
-            },
-            {
-              "Value": "Möjlig häckning",
-              "SosId": 15
-            },
-            {
-              "Value": "Säker häckning",
-              "SosId": 15
-            },
-            {
-              "Value": "Trolig häckning",
-              "SosId": 15
-            },
-            {
-              "Value": "häckning",
-              "SosId": 15
-            },
-            {
-              "Value": "häckning/möjl.häckn.",
-              "SosId": 15
-            },
-            {
-              "Value": "häckning/trolig häckning",
-              "SosId": 15
-            },
-            {
-              "Value": "Reproduktion",
-              "SosId": 15
-            },
-            {
-              "Value": "häckning/trol häckning",
-              "SosId": 15
-            },
-            {
-              "Value": "ev.häckning",
-              "SosId": 15
-            },
-            {
-              "Value": "revirhävdande/möjlig häckning",
-              "SosId": 15
-            },
+            },            
             {
               "Value": "parning/parningsceremonier",
               "SosId": 16

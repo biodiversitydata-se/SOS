@@ -79,17 +79,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         private Dictionary<string, string> GetDwcMappingSynonyms()
         {
             return new Dictionary<string, string>
-            {
-                {"Möjlig häckning", "visit possible nest?"},
-                {"Säker häckning", "visit possible nest?"},
-                {"Trolig häckning", "visit possible nest?"},
-                {"häckning", "visit possible nest?"},
-                {"häckning/möjl.häckn.", "visit possible nest?"},
-                {"häckning/trolig häckning", "visit possible nest?"},
-                {"Reproduktion", "visit possible nest?"},
-                {"häckning/trol häckning", "visit possible nest?"},
-                {"ev.häckning", "visit possible nest?"},
-                {"revirhävdande/möjlig häckning", "visit possible nest?"}
+            {                
             };
         }
     }

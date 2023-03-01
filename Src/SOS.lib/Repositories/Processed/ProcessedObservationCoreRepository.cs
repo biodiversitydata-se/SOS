@@ -1603,8 +1603,8 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .Aggregations(a => a
-                    .Terms("termAggregation", t => t
-                        .Size(size)
+                    .Terms("termAggregation", t => t                        
+                        .Size(65536)
                         .Field(aggregationField)
                         .Aggregations(aa => aa
                             .Max("sort_agg", mi => mi

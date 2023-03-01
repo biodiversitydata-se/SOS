@@ -53,4 +53,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="IntegrationTests\Datasets\" />
+  </ItemGroup>
+
 </Project>

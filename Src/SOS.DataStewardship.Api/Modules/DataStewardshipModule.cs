@@ -153,8 +153,7 @@ public class DataStewardshipModule : IModule
     {
         try
         {
-            var eventModels = await dataStewardshipManager.GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));
-            if (!eventModels?.Records?.Any() ?? true) return Results.NotFound();
+            var eventModels = await dataStewardshipManager.GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));            
 
             return exportMode.Equals(ExportMode.Csv) ? Results.File(eventModels.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(eventModels);
         }

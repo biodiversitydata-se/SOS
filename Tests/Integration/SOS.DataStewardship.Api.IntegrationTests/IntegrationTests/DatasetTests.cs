@@ -42,7 +42,7 @@ public class DatasetTests : TestBase
         };
 
         // Act
-        var pageResult = await ApiClient.GetFromJsonPostAsync<PagedResult<Dataset>, DatasetFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
             $"datastewardship/datasets", searchFilter, jsonSerializerOptions);        
 
         // Assert        

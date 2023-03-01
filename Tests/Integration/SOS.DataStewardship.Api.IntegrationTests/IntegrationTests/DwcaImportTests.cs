@@ -28,11 +28,11 @@ public class DwcaImportTests : TestBase
 
         // Get by search - Observations with Dataset "Bats (Hallaröd)"
         var searchFilter = new OccurrenceFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
-        var pageResultHallarod = await ApiClient.GetFromJsonPostAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>($"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
+        var pageResultHallarod = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>($"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
 
         // Get by search - Observations with Dataset "Bats (Other)"
         searchFilter = new OccurrenceFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
-        var pageResultOther = await ApiClient.GetFromJsonPostAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>($"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
+        var pageResultOther = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>($"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
@@ -69,11 +69,11 @@ public class DwcaImportTests : TestBase
 
         // Get by search - Events with Dataset "Bats (Hallaröd)"
         var searchFilter = new EventsFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
-        var pageResultHallarod = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
+        var pageResultHallarod = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
 
         // Get by search - Events with Dataset "Bats (Other)"
         searchFilter = new EventsFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
-        var pageResultOther = await ApiClient.GetFromJsonPostAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
+        var pageResultOther = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
@@ -109,11 +109,11 @@ public class DwcaImportTests : TestBase
 
         // Get by search - Events with Dataset "Bats (Hallaröd)"
         var searchFilter = new DatasetFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
-        var pageResultHallarod = await ApiClient.GetFromJsonPostAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
+        var pageResultHallarod = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
 
         // Get by search - Events with Dataset "Bats (Other)"
         searchFilter = new DatasetFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
-        var pageResultOther = await ApiClient.GetFromJsonPostAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
+        var pageResultOther = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
