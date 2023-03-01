@@ -102,6 +102,25 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Setup
             output.WriteLine($"Processed datasets count= {processedDatasets.Count}");
         }
 
+        public async Task AddDataToElasticsearchAsync(
+            (List<ObservationDataset> datasets, List<ObservationEvent> events, List<Observation> observations) data,
+            bool protectedIndex = false,
+            bool clearExistingObservations = true)
+        {
+            await AddDatasetsToElasticsearchAsync(data.datasets, clearExistingObservations);
+            await AddEventsToElasticsearchAsync(data.events, clearExistingObservations);
+            await AddObservationsToElasticsearchAsync(data.observations, protectedIndex, clearExistingObservations);
+        }
+
+        public async Task AddDataToElasticsearchAsync(
+            (List<ObservationEvent> events, List<Observation> observations) data,
+            bool protectedIndex = false,
+            bool clearExistingObservations = true)
+        {
+            await AddEventsToElasticsearchAsync(data.events, clearExistingObservations);
+            await AddObservationsToElasticsearchAsync(data.observations, protectedIndex, clearExistingObservations);
+        }
+
         public async Task AddDatasetsToElasticsearchAsync(IEnumerable<ObservationDataset> datasets, bool clearExistingObservations = true)
         {
             if (clearExistingObservations)

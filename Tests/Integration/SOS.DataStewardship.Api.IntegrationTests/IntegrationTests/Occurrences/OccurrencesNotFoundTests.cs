@@ -1,10 +1,3 @@
-using SOS.DataStewardship.Api.IntegrationTests.Extensions;
-using SOS.DataStewardship.Api.IntegrationTests.Helpers;
-using SOS.DataStewardship.Api.IntegrationTests.TestData;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
-using SOS.Lib.Models.Processed.Observation;
-using Xunit.Abstractions;
-
 namespace SOS.DataStewardship.Api.IntegrationTests.IntegrationTests.Occurrences;
 
 [Collection(Constants.IntegrationTestsCollectionName)]
@@ -17,9 +10,9 @@ public class OccurrencesNotFoundTests : TestBase
     [Fact]
     public async Task OccurrenceById_ReturnsHttp404NotFound_GivenOccurrenceIdThatDoesntExist()
     {
-        // Arrange
+        // Arrange        
         string occurrenceId = "NonExistingOccurrenceId";
-        var occurrences = ObservationsTestData.GetObservationTestData();
+        var occurrences = TestData.GetTestData().observations;
         await ProcessFixture.AddObservationsToElasticsearchAsync(occurrences);
 
         // Act
@@ -33,7 +26,8 @@ public class OccurrencesNotFoundTests : TestBase
     public async Task OccurrencesBySearch_ReturnsEmptyCollection_GivenSearchCriteraWithNoHits()
     {
         // Arrange
-        await ProcessFixture.AddObservationsToElasticsearchAsync(ObservationsTestData.GetObservationTestData());
+        var occurrences = TestData.GetTestData().observations;
+        await ProcessFixture.AddObservationsToElasticsearchAsync(occurrences);
         var searchFilter = new OccurrenceFilter
         {
             DatasetIds = new List<string> { "NonExistingDatasetId" }
