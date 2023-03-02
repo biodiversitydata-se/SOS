@@ -68,6 +68,7 @@ namespace SOS.Lib.IO.GeoJson
             try
             {
                 var nrObservations = 0;
+                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var propertyFields =
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
                 JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
@@ -90,76 +91,15 @@ namespace SOS.Lib.IO.GeoJson
                 jsonWriter.WriteString("crs", "EPSG:4326");
                 jsonWriter.WritePropertyName("features");
                 jsonWriter.WriteStartArray();
-
-                var timer = DateTime.Now;
-                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync<dynamic>(filter, null);
-
-                while (scrollResult?.Records?.Any() ?? false)
-                {
-                    cancellationToken?.ThrowIfCancellationRequested();
-
-                    if (flatOut)
-                    {
-                        var processedObservations = CastDynamicsToObservations(scrollResult.Records);
-                        
-                        _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
-                        
-                        foreach (var observation in processedObservations)
-                        {
-                            var flatObservation = new FlatObservation(observation);
-                            await WriteFeature(propertyFields, flatObservation, propertyLabelType, excludeNullValues, jsonWriter, jsonSerializerOptions);
-                        }
-                    }
-                    else
-                    {
-                        var processedRecords = scrollResult.Records.Cast<IDictionary<string, object>>();
-                        
-                        _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
-                       
-                        LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);
-                        foreach (var record in processedRecords)
-                        {
-                            await WriteFeature(propertyFields, record, excludeNullValues, jsonWriter, jsonSerializerOptions);
-                        }
-                    }
-
-                    nrObservations += scrollResult.Records.Count();
-                    // Get next batch of observations.
-                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync<dynamic>(filter, scrollResult.ScrollId);
-                }
-
-                jsonWriter.WriteEndArray();
-                jsonWriter.WriteEndObject();
-                await jsonWriter.FlushAsync();
-                await jsonWriter.DisposeAsync();
-                fileStream.Close();
-
-
-
-
-
-
-
-
-                var scrollTime = DateTime.Now - timer;
-                observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "ObservationsSA.geojson");
-                await using var fileStreamSA = File.Create(observationsFilePath, 1048576);
-
-                await using var jsonWriterSA = new Utf8JsonWriter(fileStreamSA, jsonWriterOptions);
-                jsonWriterSA.WriteStartObject();
-                jsonWriterSA.WriteString("type", "FeatureCollection");
-                jsonWriterSA.WriteString("crs", "EPSG:4326");
-                jsonWriterSA.WritePropertyName("features");
-                jsonWriterSA.WriteStartArray();
                
-                timer = DateTime.Now;
-                var nrObservationsSA = 0;
                 var searchAfterResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);
 
                 while (searchAfterResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+                    nrObservations += searchAfterResult.Records.Count();
+                    // Start fetching next batch of observations.
+                    var searchAfterResultTask = _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchAfterResult.PointInTimeId, searchAfterResult.SearchAfter);
 
                     if (flatOut)
                     {
@@ -170,7 +110,7 @@ namespace SOS.Lib.IO.GeoJson
                         foreach (var observation in processedObservations)
                         {
                             var flatObservation = new FlatObservation(observation);
-                            await WriteFeature(propertyFields, flatObservation, propertyLabelType, excludeNullValues, jsonWriterSA, jsonSerializerOptions);
+                            await WriteFeature(propertyFields, flatObservation, propertyLabelType, excludeNullValues, jsonWriter, jsonSerializerOptions);
                         }
                     }
                     else
@@ -182,34 +122,19 @@ namespace SOS.Lib.IO.GeoJson
                         LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);
                         foreach (var record in processedRecords)
                         {
-                            await WriteFeature(propertyFields, record, excludeNullValues, jsonWriterSA, jsonSerializerOptions);
+                            await WriteFeature(propertyFields, record, excludeNullValues, jsonWriter, jsonSerializerOptions);
                         }
                     }
 
-                    nrObservationsSA += searchAfterResult.Records.Count();
-                    searchAfterResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchAfterResult.PointInTimeId, searchAfterResult.SearchAfter);
+                    // Get next batch of observations.
+                    searchAfterResult = await searchAfterResultTask;
                 }
-                var searchAfterTime = DateTime.Now - timer;
-                jsonWriterSA.WriteEndArray();
-                jsonWriterSA.WriteEndObject();
-                await jsonWriterSA.FlushAsync();
-                await jsonWriterSA.DisposeAsync();
-                fileStreamSA.Close();
-
-                observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "time.txt");
-                using (var outputFile = new StreamWriter(observationsFilePath))
-                {
-                    outputFile.WriteLine($"Scroll: {scrollTime}");
-                    outputFile.WriteLine($"Scroll: {nrObservations} observationer");
-                    outputFile.WriteLine($"Search after: {searchAfterTime}");
-                    outputFile.WriteLine($"Search after: {nrObservationsSA} observationer");
-                }
-
-
-
-
-
-
+                
+                jsonWriter.WriteEndArray();
+                jsonWriter.WriteEndObject();
+                await jsonWriter.FlushAsync();
+                await jsonWriter.DisposeAsync();
+                fileStream.Close();
 
                 // If less tha 99% of expected observations where fetched, something is wrong
                 if (nrObservations < expectedNoOfObservations * 0.99)
@@ -335,20 +260,14 @@ namespace SOS.Lib.IO.GeoJson
             Utf8JsonWriter jsonWriter,
             JsonSerializerOptions jsonSerializerOptions)
         {
-            if (id != null)
+            jsonWriter.WriteStartObject();
+            jsonWriter.WriteString("type", "Feature");
+            if (!string.IsNullOrEmpty(id))
             {
-                jsonWriter.WriteStartObject();
-                jsonWriter.WriteString("type", "Feature");
                 jsonWriter.WriteString("id", id);
-                jsonWriter.WritePropertyName("geometry");
             }
-            else
-            {
-                jsonWriter.WriteStartObject();
-                jsonWriter.WriteString("type", "Feature");
-                jsonWriter.WritePropertyName("geometry");
-            }
-
+            jsonWriter.WritePropertyName("geometry");
+            
             JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
             jsonWriter.WritePropertyName("properties");
             JsonSerializer.Serialize(jsonWriter, attributesTable, jsonSerializerOptions);

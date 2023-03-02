@@ -9,6 +9,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using Nest;
+using Org.BouncyCastle.Math.EC.Multiplier;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -1336,134 +1337,7 @@ namespace SOS.Lib.Repositories.Processed
                 return -1;
             }
         }
-
-        /// <inheritdoc />
-        public async Task<ScrollResult<ExtendedMeasurementOrFactRow>> ScrollMeasurementOrFactsAsync(
-            SearchFilterBase filter,
-            string scrollId = null)
-        {
-            ISearchResponse<dynamic> searchResponse;
-            if (string.IsNullOrEmpty(scrollId))
-            {
-                var indexNames = GetCurrentIndex(filter);
-                searchResponse = await Client.SearchAsync<dynamic>(s => s
-                    .Index(indexNames)
-                    .Source(source => source
-                        .Includes(fieldsDescriptor => fieldsDescriptor
-                            .Field("occurrence.occurrenceId")
-                            .Field("measurementOrFacts")))
-                    .Query(query => query
-                        .Bool(boolQueryDescriptor => boolQueryDescriptor
-                            .Filter(filter.ToMeasurementOrFactsQuery())
-                        )
-                    )
-                    .Sort(s => s.Ascending(new Field("_doc")))
-                    .Scroll(ScrollTimeout)
-                    .Size(ScrollBatchSize)
-                );
-            }
-            else
-            {
-                searchResponse = await Client
-                    .ScrollAsync<Observation>(ScrollTimeout, scrollId);
-            }
-
-            searchResponse.ThrowIfInvalid();
-            
-            return new ScrollResult<ExtendedMeasurementOrFactRow>
-            {
-                Records = searchResponse.Documents?.ToObservations()?.ToExtendedMeasurementOrFactRows(),
-                ScrollId = searchResponse.ScrollId,
-                TotalCount = searchResponse.HitsMetadata.Total.Value
-            };
-        }
-
-        /// <inheritdoc />
-        public async Task<ScrollResult<SimpleMultimediaRow>> ScrollMultimediaAsync(
-            SearchFilterBase filter,
-            string scrollId = null)
-        {
-            ISearchResponse<dynamic> searchResponse;
-            if (string.IsNullOrEmpty(scrollId))
-            {
-                var indexNames = GetCurrentIndex(filter);
-                searchResponse = await Client.SearchAsync<dynamic>(s => s
-                    .Index(indexNames)
-                    .Source(source => source
-                        .Includes(fieldsDescriptor => fieldsDescriptor
-                            .Field("occurrence.occurrenceId")
-                            .Field("media")))
-                    .Query(query => query
-                        .Bool(boolQueryDescriptor => boolQueryDescriptor
-                            .Filter(filter.ToMultimediaQuery())
-                        )
-                    )
-                    .Sort(s => s
-                        .Ascending(new Field("_doc"))
-                    )
-                    .Scroll(ScrollTimeout)
-                    .Size(ScrollBatchSize)
-                );
-            }
-            else
-            {
-                searchResponse = await Client
-                    .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
-            }
-
-            searchResponse.ThrowIfInvalid();
-    
-            return new ScrollResult<SimpleMultimediaRow>
-            {
-                Records = searchResponse.Documents?.ToObservations()?.ToSimpleMultimediaRows(),
-                ScrollId = searchResponse.ScrollId,
-                TotalCount = searchResponse.HitsMetadata.Total.Value
-            };
-        }
-
-        /// <inheritdoc />
-        public async Task<ScrollResult<T>> ScrollObservationsAsync<T>(
-            SearchFilterBase filter,
-            string scrollId)
-        {            
-            // Retry policy by Polly
-            var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
-            {
-                var queryResponse = string.IsNullOrEmpty(scrollId) ? await Client
-                    .SearchAsync<dynamic>(s => s
-                        .Index(GetCurrentIndex(filter))
-                        .Source(p => new SourceFilterDescriptor<dynamic>()
-                            .Excludes(e => e
-                                .Field("artportalenInternal")
-                                .Field("location.point")
-                                .Field("location.pointLocation")
-                                .Field("location.pointWithBuffer")
-                                .Field("location.pointWithDisturbanceBuffer")
-                            ))
-                        .Query(q => q
-                            .Bool(b => b
-                                .Filter(filter.ToQuery())
-                            )
-                        )
-                        .Sort(s => s.Ascending(new Field("_doc")))
-                        .Scroll(ScrollTimeout)
-                        .Size(ScrollBatchSize)
-                    ) :
-                     await Client
-                    .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
-                queryResponse.ThrowIfInvalid();
-
-                return queryResponse;
-            });
-
-            return new ScrollResult<T>
-            {
-                Records = (typeof(T) == typeof(Observation) ? CastDynamicsToObservations(searchResponse.Documents) : searchResponse.Documents) as IEnumerable<T>,
-                ScrollId = searchResponse.ScrollId,
-                TotalCount = searchResponse.HitsMetadata?.Total?.Value ?? 0
-            };
-        }
-
+       
         /// <inheritdoc />
         public async Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool protectedIndex, int maxReturnedItems)
         {
