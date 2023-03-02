@@ -91,6 +91,7 @@ namespace SOS.Lib.IO.GeoJson
                 jsonWriter.WritePropertyName("features");
                 jsonWriter.WriteStartArray();
 
+                var timer = DateTime.Now;
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var scrollResult = await _processedObservationRepository.ScrollObservationsAsync<dynamic>(filter, null);
 
@@ -127,11 +128,88 @@ namespace SOS.Lib.IO.GeoJson
                     // Get next batch of observations.
                     scrollResult = await _processedObservationRepository.ScrollObservationsAsync<dynamic>(filter, scrollResult.ScrollId);
                 }
+
                 jsonWriter.WriteEndArray();
                 jsonWriter.WriteEndObject();
                 await jsonWriter.FlushAsync();
                 await jsonWriter.DisposeAsync();
                 fileStream.Close();
+
+
+
+
+
+
+
+
+                var scrollTime = DateTime.Now - timer;
+                observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "ObservationsSA.geojson");
+                await using var fileStreamSA = File.Create(observationsFilePath, 1048576);
+
+                await using var jsonWriterSA = new Utf8JsonWriter(fileStreamSA, jsonWriterOptions);
+                jsonWriterSA.WriteStartObject();
+                jsonWriterSA.WriteString("type", "FeatureCollection");
+                jsonWriterSA.WriteString("crs", "EPSG:4326");
+                jsonWriterSA.WritePropertyName("features");
+                jsonWriterSA.WriteStartArray();
+               
+                timer = DateTime.Now;
+                var nrObservationsSA = 0;
+                var searchAfterResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);
+
+                while (searchAfterResult?.Records?.Any() ?? false)
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+
+                    if (flatOut)
+                    {
+                        var processedObservations = CastDynamicsToObservations(searchAfterResult.Records);
+
+                        _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
+
+                        foreach (var observation in processedObservations)
+                        {
+                            var flatObservation = new FlatObservation(observation);
+                            await WriteFeature(propertyFields, flatObservation, propertyLabelType, excludeNullValues, jsonWriterSA, jsonSerializerOptions);
+                        }
+                    }
+                    else
+                    {
+                        var processedRecords = searchAfterResult.Records.Cast<IDictionary<string, object>>();
+
+                        _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
+
+                        LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);
+                        foreach (var record in processedRecords)
+                        {
+                            await WriteFeature(propertyFields, record, excludeNullValues, jsonWriterSA, jsonSerializerOptions);
+                        }
+                    }
+
+                    nrObservationsSA += searchAfterResult.Records.Count();
+                    searchAfterResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchAfterResult.PointInTimeId, searchAfterResult.SearchAfter);
+                }
+                var searchAfterTime = DateTime.Now - timer;
+                jsonWriterSA.WriteEndArray();
+                jsonWriterSA.WriteEndObject();
+                await jsonWriterSA.FlushAsync();
+                await jsonWriterSA.DisposeAsync();
+                fileStreamSA.Close();
+
+                observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "time.txt");
+                using (var outputFile = new StreamWriter(observationsFilePath))
+                {
+                    outputFile.WriteLine($"Scroll: {scrollTime}");
+                    outputFile.WriteLine($"Scroll: {nrObservations} observationer");
+                    outputFile.WriteLine($"Search after: {searchAfterTime}");
+                    outputFile.WriteLine($"Search after: {nrObservationsSA} observationer");
+                }
+
+
+
+
+
+
 
                 // If less tha 99% of expected observations where fetched, something is wrong
                 if (nrObservations < expectedNoOfObservations * 0.99)

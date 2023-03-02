@@ -304,42 +304,31 @@ namespace SOS.DataStewardship.Api.Extensions
 
         public static BasisOfRecord GetBasisOfRecordEnum(BasisOfRecordId? basisOfRecordId)
         {
-            switch(basisOfRecordId)
-            {                
-                case BasisOfRecordId.HumanObservation:
-                    return BasisOfRecord.MänskligObservation;
-                case BasisOfRecordId.MachineObservation:
-                    return BasisOfRecord.MaskinellObservation;
-                case BasisOfRecordId.MaterialSample:
-                    return BasisOfRecord.FysisktProv;
-                default:
-                    return BasisOfRecord.Okänt;
-            }
+            return basisOfRecordId switch
+            {
+                BasisOfRecordId.HumanObservation => BasisOfRecord.MänskligObservation,
+                BasisOfRecordId.MachineObservation => BasisOfRecord.MaskinellObservation,
+                BasisOfRecordId.MaterialSample => BasisOfRecord.FysisktProv,
+                _ =>  BasisOfRecord.Okänt
+        };
         }
 
         public static QuantityVariable? GetQuantityVariableEnum(UnitId unitId)
         {
-            switch(unitId)
+            return unitId switch
             {
-                case UnitId.Individuals:
-                    return QuantityVariable.AntalIndivider;
-                case UnitId.Fruitbodies:
-                    return QuantityVariable.AntalFruktkroppar;
-                case UnitId.Capsules:
-                    return QuantityVariable.AntalKapslar;
-                case UnitId.Plants:
-                    return QuantityVariable.AntalPlantorTuvor;
-                case UnitId.Stems:
-                    return QuantityVariable.AntalStjälkarStrånSkott;
-                case UnitId.EggClusters:
-                    return QuantityVariable.AntalÄggklumpar;
-                //case UnitId.: // todo - add Täckningsgrad unit to SOS
+                UnitId.Individuals => QuantityVariable.AntalIndivider,
+                UnitId.Fruitbodies => QuantityVariable.AntalFruktkroppar,
+                UnitId.Capsules => QuantityVariable.AntalKapslar,
+                UnitId.Plants => QuantityVariable.AntalPlantorTuvor,
+                UnitId.Stems => QuantityVariable.AntalStjälkarStrånSkott,
+                UnitId.EggClusters => QuantityVariable.AntalÄggklumpar,
+                _ => null
+                // todo - add Täckningsgrad unit to SOS
                 //    return OccurrenceModel.QuantityVariableEnum.Täckningsgrad;
                 //case UnitId.: // todo - add Yttäckning unit to SOS
                 //    return OccurrenceModel.QuantityVariableEnum.Yttäckning;
-                default:
-                    return null;
-            }
+            };
         }
 
         public static TaxonModel ToTaxonModel(this Taxon taxon)
@@ -359,45 +348,130 @@ namespace SOS.DataStewardship.Api.Extensions
         {
             if (sexId == null) return null;
 
-            switch(sexId.Value)
+            return sexId.Value switch
             {
-                case SexId.Male:
-                    return Sex.Hane;
-                case SexId.Female:
-                    return Sex.Hona;
-                case SexId.InPair:
-                    return Sex.IPar;
-                default:
-                    return null;
-            }
+                SexId.Male => Sex.Hane,
+                SexId.Female => Sex.Hona,
+                SexId.InPair => Sex.IPar,
+               _ => null!
+            };
         }
 
         public static Activity? GetActivityEnum(ActivityId? activityId)
         {
             if (activityId == null) return null;
 
-            switch (activityId.Value)
+            return activityId.Value switch
             {
-                case ActivityId.FoundDead:
-                    return Activity.Död;
-                // todo - add mappings
-                default:
-                    return null;
-            }
+                ActivityId.AgitatedBehaviour => Activity.UpprördVarnande,
+                ActivityId.BreedingFailed => Activity.MisslyckadHäckning,
+                ActivityId.BuildingNestOrUsedNestOrNest => Activity.Bobygge,
+                ActivityId.Call => Activity.LockläteÖvrigaLäten,
+                ActivityId.CarryingFoodForYoung => Activity.FödaÅtUngar,
+                ActivityId.DeadCollidedWithAeroplane => Activity.Död,
+                ActivityId.DeadCollidedWithFence => Activity.Död,
+                ActivityId.DeadCollidedWithLighthouse => Activity.Död,
+                ActivityId.DeadCollidedWithPowerLine => Activity.Död,
+                ActivityId.DeadCollidedWithWindMill => Activity.Död,
+                ActivityId.DeadCollidedWithWindow => Activity.Död,
+                ActivityId.DeadDueToDiseaseOrStarvation => Activity.Död,
+                ActivityId.Display => Activity.SpelSång,
+                ActivityId.DisplayOrSong => Activity.SpelSång,
+                ActivityId.DisplayOrSongOutsideBreeding => Activity.SpelSångEjHäckning,
+                ActivityId.DisputeBetweenMales => Activity.Revirhävdande,
+                ActivityId.DistractionDisplay => Activity.AvledningsbeteendeEnum,
+                ActivityId.Dormant => Activity.Vilande,
+                ActivityId.EggLaying => Activity.Äggläggande,
+                ActivityId.EggShells => Activity.Äggskal,
+                ActivityId.FlyingOverhead => Activity.Förbiflygande,
+                ActivityId.Foraging => Activity.Födosökande,
+                ActivityId.FoundDead => Activity.Död,
+                ActivityId.Fragment => Activity.Fragment,
+                ActivityId.Freeflying => Activity.Friflygande,
+                ActivityId.FreshGnaw => Activity.FärskaGnagspår,
+                ActivityId.Gnaw => Activity.ÄldreGnagspår,
+                ActivityId.Incubating => Activity.Ruvande,
+                ActivityId.InNestingHabitat => Activity.ObsIHäcktidLämpligBiotop,
+                ActivityId.InWater => Activity.IVattenSimmande,
+                ActivityId.InWaterOrSwimming => Activity.IVattenSimmande,
+                ActivityId.KilledByElectricity => Activity.Död,
+                ActivityId.KilledByOil => Activity.Död,
+                ActivityId.KilledByPredator => Activity.Död,
+                ActivityId.MatingOrMatingCeremonies => Activity.Parning,
+                ActivityId.Migrating => Activity.Sträckande,
+                ActivityId.MigratingE => Activity.Sträckande,
+                ActivityId.MigratingFish => Activity.Sträckande,
+                ActivityId.MigratingN => Activity.Sträckande,
+                ActivityId.MigratingNE => Activity.Sträckande,
+                ActivityId.MigratingNW => Activity.Sträckande,
+                ActivityId.MigratingS => Activity.Sträckande,
+                ActivityId.MigratingSE => Activity.Sträckande,
+                ActivityId.MigratingSW => Activity.Sträckande,
+                ActivityId.MigratingW => Activity.Sträckande,
+                ActivityId.NestBuilding => Activity.Bobygge,
+                ActivityId.NestWithChickHeard => Activity.BoHördaUngar,
+                ActivityId.NestWithEgg => Activity.BoÄggUngar,
+                ActivityId.OldNest => Activity.AnväntBo,
+                ActivityId.PairInSuitableHabitat => Activity.ParILämpligHäckbiotop,
+                ActivityId.PermanentTerritory => Activity.PermanentRevir,
+                ActivityId.PregnantFemale => Activity.DräktigHona,
+                ActivityId.RecentlyFledgedYoung => Activity.PulliNyligenFlyggaUngar,
+                ActivityId.RecentlyUsedNest => Activity.AnväntBo,
+                ActivityId.RoadKill => Activity.Död,
+                ActivityId.RunningOrCrawling => Activity.FrispringandeKrypande,
+                ActivityId.ShotOrKilled => Activity.Död,
+                ActivityId.SignsOfGnawing => Activity.FärskaGnagspår,
+                ActivityId.Staging => Activity.Rastande,
+                ActivityId.Stationary => Activity.Stationär,
+                ActivityId.Territorial => Activity.Revirhävdande,
+                ActivityId.TerritoryOutsideBreeding => Activity.Revirhävdande,
+                ActivityId.VisitingOccupiedNest => Activity.BesökerBebottBo,
+                ActivityId.VisitPossibleNest => Activity.Bobesök,
+                ActivityId.WinterHabitat => Activity.PåÖvervintringsplats,
+                _ => null
+            };
         }
 
         public static LifeStage? GetLifeStageEnum(LifeStageId? lifeStageId)
         {
             if (lifeStageId == null) return null;
 
-            switch (lifeStageId.Value)
+            return lifeStageId switch
             {
-                case LifeStageId.Adult:
-                    return LifeStage.Adult;
-                // todo - add mappings
-                default:
-                    return null;
-            }
+                LifeStageId.Adult => LifeStage.Adult,
+                LifeStageId.AtLeast1StCalendarYear => LifeStage._1KPlus,
+                LifeStageId.AtLeast2NdCalendarYear => LifeStage._2KPlus,
+                LifeStageId.AtLeast3RdCalendarYear => LifeStage._3KPlus,
+                LifeStageId.AtLeast4ThCalendarYear => LifeStage._4KPlus,
+                LifeStageId.BudBurst => LifeStage.Knoppbristning,
+                LifeStageId.Cub => LifeStage.Årsunge,
+                LifeStageId.Egg => LifeStage.Ägg,
+                LifeStageId.FirstCalendarYear => LifeStage._1K,
+                LifeStageId.Flowering => LifeStage.Blomning,
+                LifeStageId.FourthCalendarYear => LifeStage._4K,
+                LifeStageId.FourthCalendarYearOrYounger => LifeStage._4KMinus,
+                LifeStageId.FullyDevelopedLeaf => LifeStage.FulltUtveckladeBlad,
+                LifeStageId.ImagoOrAdult => LifeStage.ImagoAdult,
+                LifeStageId.Juvenile => LifeStage.Juvenil,
+                LifeStageId.Larvae => LifeStage.Larv,
+                LifeStageId.LarvaOrNymph => LifeStage.LarvNymf,
+                LifeStageId.LeafCutting => LifeStage.GulnadeLövBlad,
+                LifeStageId.Nestling => LifeStage.Pulli,
+                LifeStageId.OnePlus => LifeStage._1KPlus,
+                LifeStageId.Overblown => LifeStage.Överblommad,
+                LifeStageId.Pupa => LifeStage.Puppa,
+                LifeStageId.Rest => LifeStage.Vilstadium,
+                LifeStageId.SecondCalendarYear => LifeStage._2K,
+                LifeStageId.Sprout => LifeStage.MedGroddkorn,
+                LifeStageId.ThirdCalendarYear => LifeStage._3K,
+                LifeStageId.ThirdCalendarYearOrYounger => LifeStage._3KMinus,
+                LifeStageId.WithCapsule => LifeStage.MedKapsel,
+                LifeStageId.WithFemaleParts => LifeStage.MedHonorgan,
+                LifeStageId.WithoutCapsule => LifeStage.UtanKapsel,
+                LifeStageId.YellowingLeaves => LifeStage.GulnadeLövBlad,
+                LifeStageId.ZeroPlus => LifeStage.Årsyngel,
+                _ => null
+            };
         }
 
         public static SearchFilter ToSearchFilter(this DatasetFilter datasetFilter)
@@ -558,19 +632,14 @@ namespace SOS.DataStewardship.Api.Extensions
 
         public static Lib.Models.Search.Filters.DateFilter.DateRangeFilterType ToDateRangeFilterType(this DateFilterType dateFilterType)
         {
-            switch (dateFilterType)
+            return dateFilterType switch
             {
-                case DateFilterType.OnlyStartDate:
-                    return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyStartDate;
-                case DateFilterType.OnlyEndDate:
-                    return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyEndDate;
-                case DateFilterType.OverlappingStartDateAndEndDate:
-                    return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate;
-                case DateFilterType.BetweenStartDateAndEndDate:
-                    return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate;
-                default:
-                    return Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate;
-            }
+                DateFilterType.OnlyStartDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyStartDate,
+                DateFilterType.OnlyEndDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyEndDate,
+                DateFilterType.OverlappingStartDateAndEndDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate,
+                DateFilterType.BetweenStartDateAndEndDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate,
+                _ =>  Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate
+            };
         }
     }
 }

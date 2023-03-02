@@ -88,13 +88,12 @@ https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
 ## Förslag till förändringar i API-specifikationen
 
 ## Funktionalitet som återstår i Datavärdskap API
-- Optimeringar kring Elasticsearch projiceringar. Nu returneras alltid alla fält, men det skulle säkert kunna begränsas.
 - Intern Health check
 - Publik Health check
 - Hantera skyddade observationer
 - Hantera skyddade event. Hantera `Event.LocationProtected`.
 - Går det att ta bort `[DataMember]` attribut? 
-- Kolla upp: Mappas `Sex`, `LifeStage`, `Activity` korrekt?
+- Kolla upp: Mappas `LifeStage`, `Activity` korrekt?
 - Kolla upp: Mappas `Unit` korrekt?
 - Kolla upp: Mappas `QuantityVariable` korrekt?
 - Rensa bort properties som troligtvis inte ska finnas med, t.ex. `ObservationPointTest`.
