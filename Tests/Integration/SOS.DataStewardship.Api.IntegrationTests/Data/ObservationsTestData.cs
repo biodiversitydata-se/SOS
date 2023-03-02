@@ -6,47 +6,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
 {
     internal static class ObservationsTestData
     {
-        public static IEnumerable<Observation> GetObservationTestData(string firstEventKey = null, string firstDatasetId = null)
-        {
-            firstEventKey ??= DataHelper.RandomString(3);
-            firstDatasetId ??= DataHelper.RandomString(3);
-
-            var observations = Builder<Observation>.CreateListOfSize(10)
-                 .TheFirst(1)
-                    .With(m => m.Event = new Event
-                    {
-                        EventId = firstEventKey,
-                        StartDate = DateTime.Now,
-                        EndDate = DateTime.Now,
-                    })
-                    .With(m => m.Occurrence = new Occurrence
-                    {
-                        OccurrenceId = DataHelper.RandomString(3)
-                    })                    
-                    .With(m => m.DataStewardshipDatasetId = firstDatasetId)
-                    .With(m => m.DataProviderId = 1)
-                    .With(m => m.ArtportalenInternal = null)
-                    .With(m => m.Sensitive = false)
-                .TheNext(9)
-                    .With(m => m.Event = new Event
-                    {
-                        EventId = DataHelper.RandomString(3, new[] { firstEventKey }),
-                        StartDate = DateTime.Now,
-                        EndDate = DateTime.Now,
-                    })
-                    .With(m => m.Occurrence = new Occurrence
-                    {
-                        OccurrenceId = DataHelper.RandomString(3)
-                    })
-                    .With(m => m.DataStewardshipDatasetId = DataHelper.RandomString(3, new[] { firstDatasetId }))
-                    .With(m => m.DataProviderId = 1)
-                    .With(m => m.ArtportalenInternal = null)
-                    .With(m => m.Sensitive = false)
-                .Build();
-
-            return observations;
-        }
-
+        private static Bogus.Faker _faker = new Bogus.Faker("sv");
 
         public static IOperable<Observation> GetObservationTestDataBuilder(int size)
         {
@@ -65,8 +25,12 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
                     .With(m => m.DataStewardshipDatasetId = DataHelper.RandomString(8))
                     .With(m => m.DataProviderId = 1)
                     .With(m => m.ArtportalenInternal = null)
-                    .With(m => m.Sensitive = false);
-
+                    .With(m => m.Sensitive = false)
+                    .With(m => m.Taxon = new Taxon
+                    {
+                        Id = _faker.Random.Int(0, 10000)
+                    });
+            
             return observationsBuilder;
         }
 
