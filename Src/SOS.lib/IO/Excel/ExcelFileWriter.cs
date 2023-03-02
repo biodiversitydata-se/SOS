@@ -98,7 +98,7 @@ namespace SOS.Lib.IO.Excel
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var stopwatch = Stopwatch.StartNew();
                 _logger.LogDebug($"Excel export. Begin ES Scroll call for file: {fileName}");
-                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync<Observation>(filter, null);
+                var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
                 stopwatch.Stop();
                 _logger.LogDebug($"Excel export. End ES Scroll call for file: {fileName}. Elapsed: {stopwatch.ElapsedMilliseconds/1000}s");
                 var fileCount = 0;
@@ -108,12 +108,14 @@ namespace SOS.Lib.IO.Excel
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 var packageSaveTasks = new List<Task>();
 
-                while (scrollResult?.Records?.Any() ?? false)
+                while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+                    // Start fetching next batch of observations.
+                    var searchResultTask = _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
 
                     // Fetch observations from ElasticSearch.
-                    var processedObservations = scrollResult.Records.ToArray();
+                    var processedObservations = searchResult.Records.ToArray();
                     
                     // Resolve vocabulary values.
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
@@ -159,7 +161,7 @@ namespace SOS.Lib.IO.Excel
                     // Get next batch of observations.
                     stopwatch.Restart();
                     _logger.LogDebug($"Excel export. Begin ES Scroll call for file: {fileName}");
-                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync<Observation>(filter, scrollResult.ScrollId);
+                    searchResult = await searchResultTask;
                     stopwatch.Stop();
                     _logger.LogDebug($"Excel export. End ES Scroll call for file: {fileName}. Elapsed: {stopwatch.ElapsedMilliseconds / 1000}s");
                 }
@@ -238,32 +240,14 @@ namespace SOS.Lib.IO.Excel
             // Format columns
             foreach (var fieldDescription in propertyFields)
             {
-                string format;
-                switch (fieldDescription.DataType)
+                var format = fieldDescription.DataType switch
                 {
-                    // Text format: "@"
-                    // General format: "General"
-                    // Date format 1: "yyyy-mm-dd"
-                    // Date format 2: "yyyy-MM-dd"
-
-                    case "DateTime":
-                        // Since Excel doesn't handle dates before 1900 we can't set date format
-                        format = "";
-                        break;
-                    case "Double":
-                        format = "General";
-                        //format = "#.###############";
-
-                        break;
-                    case "Int32":
-                    case "Int64":
-                        format = "0";
-                        break;
-                    default:
-                        format = "General";
-                        break;
-                }
-
+                    "DateTime" => "",  // Since Excel doesn't handle dates before 1900 we can't set date format
+                    //"Double" => "#.###############",
+                    "Int32" or "Int64" => "0",
+                    _ => "General"
+                };
+                
                 worksheet.Cells[firstDataRow, columnIndex, 500000+1, columnIndex].Style.Numberformat.Format = format;
                 columnIndex++;
             }

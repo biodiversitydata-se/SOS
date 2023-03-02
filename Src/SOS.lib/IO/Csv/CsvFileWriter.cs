@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
 using SOS.Lib.Enums;
 using SOS.Lib.IO.Excel.Interfaces;
 using SOS.Lib.Helpers;
@@ -81,14 +78,16 @@ namespace SOS.Lib.IO.Excel
                 csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
 
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync<Observation>(filter, null);
+                var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
 
-                while (scrollResult?.Records?.Any() ?? false)
+                while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-
+                    // Start fetching next batch of observations.
+                    var searchResultTask = _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    
                     // Fetch observations from ElasticSearch.
-                    var processedObservations = scrollResult.Records.ToArray();
+                    var processedObservations = searchResult.Records.ToArray();
 
                     // Resolve vocabulary values.
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
@@ -119,7 +118,7 @@ namespace SOS.Lib.IO.Excel
                     nrObservations += processedObservations.Length;
                     
                     // Get next batch of observations.
-                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync<Observation>(filter, scrollResult.ScrollId);
+                    searchResult = await searchResultTask;
                 }
 
                 csvFileHelper.FinishWrite();
@@ -159,69 +158,6 @@ namespace SOS.Lib.IO.Excel
             finally
             {
                 _fileService.DeleteFolder(temporaryZipExportFolderPath);
-            }
-        }
-
-        private void WriteHeader(ExcelWorksheet sheet, List<PropertyFieldDescription> propertyFields, PropertyLabelType propertyLabelType)
-        {
-            if (!propertyFields?.Any() ?? true)
-            {
-                return;
-            }
-
-            int columnIndex = 1;
-            foreach (var propertyField in propertyFields)
-            {
-                string title =
-                    ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(propertyField, propertyLabelType);
-                sheet.Cells[1, columnIndex].Value = title;
-                sheet.Cells[1, columnIndex].Style.Font.Bold = true;
-                sheet.Cells[1, columnIndex].Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));
-                sheet.Cells[1, columnIndex].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                sheet.Cells[1, columnIndex].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
-                sheet.Column(columnIndex).AutoFit();
-                columnIndex++;
-            }
-        }
-        
-        private void FormatColumns(ExcelWorksheet worksheet, List<PropertyFieldDescription> propertyFields)
-        {
-            const int firstDataRow = 2;
-            //// ObservationId
-            //worksheet.Cells[firstDataRow, 1, lastDataRow, 1].Style.Numberformat.Format = "0";
-
-            int columnIndex = 1;
-            // Format columns
-            foreach (var fieldDescription in propertyFields)
-            {
-                string format;
-                switch (fieldDescription.DataType)
-                {
-                    // Text format: "@"
-                    // General format: "General"
-                    // Date format 1: "yyyy-mm-dd"
-                    // Date format 2: "yyyy-MM-dd"
-
-                    case "DateTime":
-                        // Since Excel doesn't handle dates before 1900 we can't set date format
-                        format = "";
-                        break;
-                    case "Double":
-                        format = "General";
-                        //format = "#.###############";
-
-                        break;
-                    case "Int32":
-                    case "Int64":
-                        format = "0";
-                        break;
-                    default:
-                        format = "General";
-                        break;
-                }
-
-                worksheet.Cells[firstDataRow, columnIndex, 500000+1, columnIndex].Style.Numberformat.Format = format;
-                columnIndex++;
             }
         }
     }

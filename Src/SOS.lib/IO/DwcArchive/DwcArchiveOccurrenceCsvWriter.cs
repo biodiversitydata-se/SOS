@@ -292,7 +292,7 @@ namespace SOS.Lib.IO.DwcArchive
                 var csvWritingStopwatch = new Stopwatch();
                 int nrObservations = 0;
                 elasticRetrievalStopwatch.Start();
-                var scrollResult = await processedObservationRepository.ScrollObservationsAsync<Observation>(filter, null);
+                var searchResult = await processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
                 elasticRetrievalStopwatch.Stop();
 
                 var fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
@@ -300,13 +300,14 @@ namespace SOS.Lib.IO.DwcArchive
                 csvFileHelper.InitializeWrite(stream, "\t", leaveStreamOpen);
                 WriteHeaderRow(csvFileHelper, fieldDescriptions);
 
-                while (scrollResult?.Records?.Any() ?? false)
+                while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-
-                    // Fetch observations from ElasticSearch.
+                    // Start fetching next batch of observations.
+                    var searchResultTask = processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    
                     elasticRetrievalStopwatch.Start();
-                    var processedObservations = scrollResult.Records.ToArray();
+                    var processedObservations = searchResult.Records.ToArray();
                     elasticRetrievalStopwatch.Stop();
 
                     // Convert observations to DwC format.
@@ -326,7 +327,7 @@ namespace SOS.Lib.IO.DwcArchive
 
                     // Get next batch of observations.
                     elasticRetrievalStopwatch.Start();
-                    scrollResult = await processedObservationRepository.ScrollObservationsAsync<Observation>(filter, scrollResult.ScrollId);
+                    searchResult = await searchResultTask;
                     elasticRetrievalStopwatch.Stop();
                 }
                 csvFileHelper.FinishWrite();
