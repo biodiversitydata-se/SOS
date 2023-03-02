@@ -97,5 +97,29 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
 
             return operable;
         }
+
+        public static IOperable<Observation> WithDate(this IOperable<Observation> operable, DateTime date)
+        {
+            var builder = ((IDeclaration<Observation>)operable).ObjectBuilder;            
+            builder.With((obs, index) =>
+            {                
+                obs.Event.StartDate = date;
+                obs.Event.EndDate = date;
+            });
+
+            return operable;
+        }
+
+        public static IOperable<Observation> WithDates(this IOperable<Observation> operable, DateTime startDate, DateTime endDate)
+        {
+            var builder = ((IDeclaration<Observation>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.Event.StartDate = startDate;
+                obs.Event.EndDate = endDate;
+            });
+
+            return operable;
+        }
     }
 }
