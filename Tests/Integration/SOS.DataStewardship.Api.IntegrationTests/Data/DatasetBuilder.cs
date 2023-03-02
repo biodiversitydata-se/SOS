@@ -1,4 +1,6 @@
-﻿namespace SOS.DataStewardship.Api.IntegrationTests.Data
+﻿using SOS.DataStewardship.Api.IntegrationTests.Core.Helpers;
+
+namespace SOS.DataStewardship.Api.IntegrationTests.Data
 {
     internal class DatasetBuilder
     {       

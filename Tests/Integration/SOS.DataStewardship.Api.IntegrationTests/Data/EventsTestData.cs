@@ -1,4 +1,5 @@
 ﻿using FizzWare.NBuilder.Implementation;
+using SOS.DataStewardship.Api.IntegrationTests.Core.Helpers;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Data

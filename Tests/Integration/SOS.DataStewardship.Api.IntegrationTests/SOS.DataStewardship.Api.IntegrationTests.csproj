@@ -45,10 +45,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\dwca-datastewardship-bats-taxalists.zip">
+    <None Update="Data\Resources\dwca-datastewardship-bats-taxalists.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\mongodb-sos-dev.gz">
+    <None Update="Data\Resources\mongodb-sos-dev.gz">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
