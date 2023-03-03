@@ -11,7 +11,7 @@ public class OccurrencesTaxonFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsExpectedOccurrences_GivenExistingDatasetId()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(10);
+        var testDataSet = TestData.Create(10);
         int taxonId = testDataSet.Observations.First().Taxon.Id = -5000; // Unique TaxonId
         await ProcessFixture.AddObservationsToElasticsearchAsync(testDataSet.Observations);
         var searchFilter = new OccurrenceFilter() {

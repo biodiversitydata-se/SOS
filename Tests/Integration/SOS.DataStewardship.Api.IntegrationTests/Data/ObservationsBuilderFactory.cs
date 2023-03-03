@@ -4,11 +4,11 @@ using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Data
 {
-    internal static class ObservationsTestData
+    internal static class ObservationsBuilderFactory
     {
         private static Bogus.Faker _faker = new Bogus.Faker("sv");
 
-        public static IOperable<Observation> GetObservationTestDataBuilder(int size)
+        public static IOperable<Observation> Create(int size)
         {
             var observationsBuilder = Builder<Observation>.CreateListOfSize(size)
                 .All()

@@ -13,7 +13,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsExpectedOccurrences_GivenUppsalaMunicipalityFilter()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(10);
+        var testDataSet = TestData.Create(10);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithMunicipality(MunicipalityId.Uppsala)
              .TheNext(9).WithMunicipality(MunicipalityId.Knivsta)
@@ -38,7 +38,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsExpectedOccurrences_GivenUppsalaCountyFilter()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(10);
+        var testDataSet = TestData.Create(10);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithCounty(CountyId.Uppsala)
              .TheNext(9).WithCounty(CountyId.Stockholm)
@@ -63,7 +63,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsExpectedOccurrences_GivenUpplandProvinceFilter()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(10);
+        var testDataSet = TestData.Create(10);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithProvince(ProvinceIds.Uppland)
              .TheNext(9).WithProvince(ProvinceIds.Småland)
@@ -88,7 +88,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsExpectedOccurrences_GivenUppsalaParishFilter()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(10);
+        var testDataSet = TestData.Create(10);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithParish(ParishId.Uppsala)
              .TheNext(9).WithParish(ParishId.Säby)
@@ -113,7 +113,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsExpectedOccurrences_GivenPolygonFilter()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(10);
+        var testDataSet = TestData.Create(10);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithPosition(58.0, 14.0)
              .TheNext(9).WithPosition(65.0, 20.0)
@@ -138,7 +138,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsExpectedOccurrences_GivenPointFilter()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(10);
+        var testDataSet = TestData.Create(10);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithPosition(58.0, 14.0)
              .TheNext(9).WithPosition(65.0, 20.0)

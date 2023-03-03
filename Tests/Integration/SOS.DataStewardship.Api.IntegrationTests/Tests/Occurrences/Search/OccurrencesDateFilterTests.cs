@@ -13,7 +13,7 @@ public class OccurrencesDateFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsOccurrencesInDateRange_GivenOverlappingStartDateAndEndDateFilterType()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(8);
+        var testDataSet = TestData.Create(8);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithDates(new DateTime(2021, 02, 02), new DateTime(2021, 02, 03)) // hit
              .TheNext(1).WithDates(new DateTime(2021, 02, 03), new DateTime(2021, 02, 04)) // hit
@@ -45,7 +45,7 @@ public class OccurrencesDateFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsOccurrencesInDateRange_GivenBetweenStartDateAndEndDateFilterType()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(6);
+        var testDataSet = TestData.Create(6);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithDates(new DateTime(2021, 02, 02), new DateTime(2021, 02, 03)) // hit
              .TheNext(1).WithDates(new DateTime(2021, 02, 03), new DateTime(2021, 02, 04)) // hit
@@ -77,7 +77,7 @@ public class OccurrencesDateFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsOccurrencesInDateRange_GivenOnlyStartDateFilterType()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(3);
+        var testDataSet = TestData.Create(3);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithDates(new DateTime(2021, 02, 02), new DateTime(2021, 02, 20)) // hit
              .TheNext(1).WithDates(new DateTime(2021, 02, 03), new DateTime(2021, 02, 20)) // hit
@@ -106,7 +106,7 @@ public class OccurrencesDateFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsOccurrencesInDateRange_GivenOnlyEndDateFilterType()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(3);
+        var testDataSet = TestData.Create(3);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithDates(new DateTime(2021, 01, 20), new DateTime(2021, 02, 02)) // hit
              .TheNext(1).WithDates(new DateTime(2021, 01, 20), new DateTime(2021, 02, 03)) // hit

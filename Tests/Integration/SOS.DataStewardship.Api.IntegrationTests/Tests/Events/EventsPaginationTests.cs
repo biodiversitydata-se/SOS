@@ -11,14 +11,14 @@ public class EventsPaginationTests : TestBase
     public async Task EventsBySearch_ReturnsAllEvents_WhenPaginatingAllRecords()
     {
         // Arrange
-        var testData = TestData.GetTestData();
-        await ProcessFixture.AddDataToElasticsearchAsync((testData.events, testData.observations));
+        var testDataSet = TestData.Create(10);
+        await ProcessFixture.AddDataToElasticsearchAsync((testDataSet.Events, testDataSet.Observations));
         var searchFilter = new EventsFilter();
         var eventModels = new List<EventModel>();
         int take = 2;
 
         // Act
-        for (int skip = 0; skip < testData.events.Count(); skip += take)
+        for (int skip = 0; skip < testDataSet.Events.Count(); skip += take)
         {
             var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
                 $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
@@ -26,7 +26,7 @@ public class EventsPaginationTests : TestBase
         }
 
         // Assert
-        var eventIds = testData.events.Select(m => m.EventId);
+        var eventIds = testDataSet.Events.Select(m => m.EventId);
         var uniqueEventIds = eventModels.Select(m => m.EventID).Distinct();
         uniqueEventIds.Should().BeEquivalentTo(eventIds);
     }
@@ -36,8 +36,8 @@ public class EventsPaginationTests : TestBase
     public async Task EventsBySearch_ReturnsCorrectPagingMetadata_GivenValidInput()
     {
         // Arrange
-        var testData = TestData.GetTestData();
-        await ProcessFixture.AddDataToElasticsearchAsync((testData.events, testData.observations));
+        var testDataSet = TestData.Create(10);
+        await ProcessFixture.AddDataToElasticsearchAsync((testDataSet.Events, testDataSet.Observations));
         var searchFilter = new EventsFilter();
         int skip = 5;
         int take = 2;
@@ -47,7 +47,7 @@ public class EventsPaginationTests : TestBase
             $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
 
         // Assert
-        pageResult.TotalCount.Should().Be(testData.events.Count());
+        pageResult.TotalCount.Should().Be(testDataSet.Events.Count());
         pageResult.Take.Should().Be(take);
         pageResult.Count.Should().Be(take);
         pageResult.Skip.Should().Be(skip);
@@ -58,10 +58,10 @@ public class EventsPaginationTests : TestBase
     public async Task EventsBySearch_ReturnsNoRecords_GivenOutOfRangeSkipParameter()
     {
         // Arrange
-        var testData = TestData.GetTestData();
-        await ProcessFixture.AddDataToElasticsearchAsync((testData.events, testData.observations));
+        var testDataSet = TestData.Create(10);
+        await ProcessFixture.AddDataToElasticsearchAsync((testDataSet.Events, testDataSet.Observations));
         var searchFilter = new EventsFilter();
-        int skip = testData.events.Count();
+        int skip = testDataSet.Events.Count();
         int take = 2;
 
         // Act
@@ -69,7 +69,7 @@ public class EventsPaginationTests : TestBase
             $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
 
         // Assert
-        pageResult.TotalCount.Should().Be(testData.events.Count());
+        pageResult.TotalCount.Should().Be(testDataSet.Events.Count());
         pageResult.Take.Should().Be(take);
         pageResult.Count.Should().Be(0);
         pageResult.Skip.Should().Be(skip);
@@ -79,8 +79,8 @@ public class EventsPaginationTests : TestBase
     public async Task EventsBySearch_ReturnsBadRequest_GivenInvalidSkipAndTake()
     {
         // Arrange
-        var testData = TestData.GetTestData();
-        await ProcessFixture.AddDataToElasticsearchAsync((testData.events, testData.observations));
+        var testDataSet = TestData.Create(10);
+        await ProcessFixture.AddDataToElasticsearchAsync((testDataSet.Events, testDataSet.Observations));
 
         var searchFilter = new EventsFilter();
         int skipNegative = -1;

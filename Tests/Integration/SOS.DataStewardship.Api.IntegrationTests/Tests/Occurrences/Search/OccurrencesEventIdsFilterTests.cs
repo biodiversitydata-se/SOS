@@ -11,7 +11,7 @@ public class OccurrencesEventIdsFilterTests : TestBase
     public async Task OccurrencesBySearch_ReturnsExpectedOccurrences_GivenExistingEventId()
     {
         // Arrange
-        var testDataSet = TestData.GetTestDataSet(10);
+        var testDataSet = TestData.Create(10);
         string eventId = testDataSet.Observations.First().Event.EventId = Guid.NewGuid().ToString();
         await ProcessFixture.AddObservationsToElasticsearchAsync(testDataSet.Observations);
         var searchFilter = new OccurrenceFilter() {

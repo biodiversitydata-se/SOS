@@ -11,7 +11,7 @@ public class OccurrencesPaginationTests : TestBase
     public async Task OccurrencesBySearch_ReturnsAllOccurrences_WhenPaginatingAllRecords()
     {
         // Arrange
-        var observations = TestData.GetTestData().observations;
+        var observations = TestData.Create(10).Observations;
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
         var searchFilter = new OccurrenceFilter();
         int take = 2;
@@ -35,8 +35,8 @@ public class OccurrencesPaginationTests : TestBase
     [Fact]
     public async Task OccurrencesBySearch_ReturnsCorrectPagingMetadata_GivenValidInput()
     {
-        // Arrange
-        var observations = TestData.GetTestData().observations;
+        // Arrange        
+        var observations = TestData.Create(10).Observations;
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
         var searchFilter = new OccurrenceFilter();
         int skip = 5;
@@ -58,7 +58,7 @@ public class OccurrencesPaginationTests : TestBase
     public async Task OccurrencesBySearch_ReturnsNoRecords_GivenOutOfRangeSkipParameter()
     {
         // Arrange
-        var observations = TestData.GetTestData().observations;
+        var observations = TestData.Create(10).Observations;
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
         var searchFilter = new OccurrenceFilter();
         int skip = observations.Count();
@@ -80,7 +80,7 @@ public class OccurrencesPaginationTests : TestBase
     public async Task OccurrencesBySearch_ReturnsBadRequest_GivenInvalidSkipAndTake()
     {
         // Arrange
-        var observations = TestData.GetTestData().observations;
+        var observations = TestData.Create(10).Observations;
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
 
         var searchFilter = new OccurrenceFilter();
