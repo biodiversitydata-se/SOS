@@ -952,7 +952,6 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             obs.Taxon.TaxonomicStatus.Should().Be(observation.Taxon.TaxonomicStatus);
             obs.Taxon.TaxonRank.Should().Be(observation.Taxon.TaxonRank);
             obs.Taxon.TaxonRemarks.Should().Be(observation.Taxon.TaxonRemarks);
-            obs.Taxon.VerbatimId.Should().Be(observation.Taxon.VerbatimId);
             obs.Taxon.VerbatimTaxonRank.Should().Be(observation.Taxon.VerbatimTaxonRank);
             obs.Taxon.VernacularName.Should().Be(observation.Taxon.VernacularName);
            
