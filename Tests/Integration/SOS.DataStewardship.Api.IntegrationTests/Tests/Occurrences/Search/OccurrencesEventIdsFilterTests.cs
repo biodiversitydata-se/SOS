@@ -12,7 +12,9 @@ public class OccurrencesEventIdsFilterTests : TestBase
     {
         // Arrange
         var testDataSet = TestData.Create(10);
-        string eventId = testDataSet.Observations.First().Event.EventId = Guid.NewGuid().ToString();
+        string eventId 
+            = testDataSet.Observations.First().Event.EventId 
+            = Guid.NewGuid().ToString();
         await ProcessFixture.AddObservationsToElasticsearchAsync(testDataSet.Observations);
         var searchFilter = new OccurrenceFilter() {
             EventIds = new List<string>() { eventId }            

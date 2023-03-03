@@ -12,7 +12,9 @@ public class OccurrencesDatasetIdsFilterTests : TestBase
     {
         // Arrange
         var testDataSet = TestData.Create(10);
-        string datasetId = testDataSet.Observations.First().DataStewardshipDatasetId = Guid.NewGuid().ToString();
+        string datasetId 
+            = testDataSet.Observations.First().DataStewardshipDatasetId 
+            = Guid.NewGuid().ToString();
         await ProcessFixture.AddObservationsToElasticsearchAsync(testDataSet.Observations);
         var searchFilter = new OccurrenceFilter() {
             DatasetIds = new List<string>() { datasetId }

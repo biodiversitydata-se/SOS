@@ -14,7 +14,8 @@ public class EventsEventIdsFilterTests : TestBase
         var testDataSet = TestData.Create(10);
         string eventId
             = testDataSet.Observations.First().Event.EventId
-            = testDataSet.Events.First().EventId = Guid.NewGuid().ToString();
+            = testDataSet.Events.First().EventId 
+            = Guid.NewGuid().ToString();
         await ProcessFixture.AddDataToElasticsearchAsync(testDataSet.Events, testDataSet.Observations);
         var searchFilter = new EventsFilter() {
             EventIds = new List<string>() { eventId }
