@@ -1,13 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using SOS.Lib.Models.Interfaces;
-using static SOS.Lib.Models.Processed.DataStewardship.Dataset.ObservationDataset;
-using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 
@@ -150,5 +143,10 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Event
         /// A list of unique identities of the occurances made during an event
         /// </summary>
         public List<string> OccurrenceIds { get; set; }
+
+        public override string ToString()
+        {
+            return $"EventId: {EventId}, DatasetId: {Dataset?.Identifier}";
+        }
     }
 }

@@ -1489,7 +1489,7 @@ namespace SOS.Lib.Repositories.Processed
                                     .Descending("sort_agg")
                                 )
                                 .From(skip)
-                                .Size(take)
+                                .Size(Math.Max(take, 1))
                             )
                         )
                     )
@@ -1507,7 +1507,8 @@ namespace SOS.Lib.Repositories.Processed
             IEnumerable<AggregationItem> records = searchResponse.Aggregations
                 .Terms("termAggregation")
                 .Buckets
-                .Select(b => new AggregationItem { AggregationKey = b.Key, DocCount = (int)(b.DocCount ?? 0) });
+                .Select(b => new AggregationItem { AggregationKey = b.Key, DocCount = (int)(b.DocCount ?? 0) })                
+                .Take(take);
             var totalCount = Convert.ToInt32(searchResponse.Aggregations.Cardinality("cardinalityAggregation").Value);
             var result = new PagedResult<AggregationItem>()
             {

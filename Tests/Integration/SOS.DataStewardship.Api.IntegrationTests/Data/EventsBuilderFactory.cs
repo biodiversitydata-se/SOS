@@ -10,6 +10,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
             var eventsBuilder = Builder<ObservationEvent>.CreateListOfSize(size)
                  .All()
                     .With(m => m.EventId = DataHelper.RandomString(8))
+                    .With(m => m.StartDate = DateTime.Now)
+                    .With(m => m.EndDate = DateTime.Now)                        
                     .With(m => m.Dataset = new Lib.Models.Processed.DataStewardship.Event.EventDataset
                     {
                         Identifier = DataHelper.RandomString(8)

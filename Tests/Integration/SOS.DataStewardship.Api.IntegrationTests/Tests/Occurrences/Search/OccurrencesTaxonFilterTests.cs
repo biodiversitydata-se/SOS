@@ -8,7 +8,7 @@ public class OccurrencesTaxonFilterTests : TestBase
     }
 
     [Fact]
-    public async Task OccurrencesBySearch_ReturnsExpectedOccurrences_GivenExistingDatasetId()
+    public async Task OccurrencesBySearch_ReturnsExpectedOccurrences_GivenExistingTaxonId()
     {
         // Arrange
         var testDataSet = TestData.Create(10);

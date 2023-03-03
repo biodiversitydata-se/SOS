@@ -116,5 +116,10 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         /// A list of unique identites for surveys that is part of the dataset.
         /// </summary>
         public List<string> EventIds { get; set; }
+
+        public override string ToString()
+        {
+            return $"DatasetId: {Identifier}";
+        }
     }
 }

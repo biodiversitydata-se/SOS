@@ -130,6 +130,15 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             await AddObservationsToElasticsearchAsync(data.observations, protectedIndex, clearExistingObservations);
         }
 
+        public async Task AddDataToElasticsearchAsync(IEnumerable<ObservationEvent> events, IEnumerable<Observation> observations,
+            bool protectedIndex = false,
+            bool clearExistingObservations = true)
+        {
+            await AddEventsToElasticsearchAsync(events, clearExistingObservations);
+            await AddObservationsToElasticsearchAsync(observations, protectedIndex, clearExistingObservations);
+        }
+
+
         public async Task AddDatasetsToElasticsearchAsync(IEnumerable<ObservationDataset> datasets, bool clearExistingObservations = true)
         {
             if (clearExistingObservations)

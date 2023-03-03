@@ -156,7 +156,7 @@ public class DataStewardshipModule : IModule
 
             return exportMode.Equals(ExportMode.Csv) ? Results.File(eventModels.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(eventModels);
         }
-        catch
+        catch (Exception ex)
         {
             return Results.BadRequest("Failed");
         }

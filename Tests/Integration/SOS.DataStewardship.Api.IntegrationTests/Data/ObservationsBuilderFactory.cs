@@ -147,5 +147,16 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
 
             return operable;
         }
+
+        public static IOperable<Observation> WithEventId(this IOperable<Observation> operable, string eventId)
+        {
+            var builder = ((IDeclaration<Observation>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.Event.EventId = eventId;
+            });
+
+            return operable;
+        }
     }
 }
