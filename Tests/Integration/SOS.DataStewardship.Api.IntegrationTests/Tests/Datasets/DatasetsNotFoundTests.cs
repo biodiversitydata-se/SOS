@@ -12,7 +12,7 @@ public class DatasetsNotFoundTests : TestBase
     {
         // Arrange
         string datasetId = "NonExistingDatasetId";
-        var datasets = TestData.GetTestData().datasets;
+        var datasets = TestData.Create(10).Datasets;
         await ProcessFixture.AddDatasetsToElasticsearchAsync(datasets);
 
         // Act
@@ -25,11 +25,10 @@ public class DatasetsNotFoundTests : TestBase
     [Fact]
     public async Task DatasetsBySearch_ReturnsEmptyCollection_GivenSearchCriteraWithNoHits()
     {
-        // Arrange
-        var testData = TestData.GetTestData();
-        await ProcessFixture.AddDataToElasticsearchAsync(testData);
-        var searchFilter = new DatasetFilter
-        {
+        // Arrange        
+        var testDataSet = TestData.Create(10);
+        await ProcessFixture.AddDataToElasticsearchAsync(testDataSet);
+        var searchFilter = new DatasetFilter {
             DatasetIds = new List<string> { "NonExistingDatasetId" }
         };
 

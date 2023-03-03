@@ -1,6 +1,6 @@
 ﻿namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup;
 
-[CollectionDefinition(Constants.IntegrationTestsCollectionName)]
+[CollectionDefinition(Constants.IntegrationTestsCollectionName, DisableParallelization = true)]
 public class TestCollection : ICollectionFixture<TestFixture>
 {
 

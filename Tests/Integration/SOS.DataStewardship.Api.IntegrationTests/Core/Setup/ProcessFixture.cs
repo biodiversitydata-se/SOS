@@ -112,6 +112,16 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         }
 
         public async Task AddDataToElasticsearchAsync(
+            TestData.TestDataSet testDataSet,
+            bool protectedIndex = false,
+            bool clearExistingObservations = true)
+        {
+            await AddDatasetsToElasticsearchAsync(testDataSet.Datasets, clearExistingObservations);
+            await AddEventsToElasticsearchAsync(testDataSet.Events, clearExistingObservations);
+            await AddObservationsToElasticsearchAsync(testDataSet.Observations, protectedIndex, clearExistingObservations);
+        }
+
+        public async Task AddDataToElasticsearchAsync(
             (List<ObservationEvent> events, List<Observation> observations) data,
             bool protectedIndex = false,
             bool clearExistingObservations = true)
@@ -119,6 +129,15 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             await AddEventsToElasticsearchAsync(data.events, clearExistingObservations);
             await AddObservationsToElasticsearchAsync(data.observations, protectedIndex, clearExistingObservations);
         }
+
+        public async Task AddDataToElasticsearchAsync(IEnumerable<ObservationEvent> events, IEnumerable<Observation> observations,
+            bool protectedIndex = false,
+            bool clearExistingObservations = true)
+        {
+            await AddEventsToElasticsearchAsync(events, clearExistingObservations);
+            await AddObservationsToElasticsearchAsync(observations, protectedIndex, clearExistingObservations);
+        }
+
 
         public async Task AddDatasetsToElasticsearchAsync(IEnumerable<ObservationDataset> datasets, bool clearExistingObservations = true)
         {

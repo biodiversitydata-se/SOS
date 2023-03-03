@@ -11,8 +11,8 @@ public class OccurrencesNotFoundTests : TestBase
     public async Task OccurrenceById_ReturnsHttp404NotFound_GivenOccurrenceIdThatDoesntExist()
     {
         // Arrange        
-        string occurrenceId = "NonExistingOccurrenceId";
-        var occurrences = TestData.GetTestData().observations;
+        string occurrenceId = "NonExistingOccurrenceId";        
+        var occurrences = TestData.Create(10).Observations;
         await ProcessFixture.AddObservationsToElasticsearchAsync(occurrences);
 
         // Act
@@ -26,10 +26,9 @@ public class OccurrencesNotFoundTests : TestBase
     public async Task OccurrencesBySearch_ReturnsEmptyCollection_GivenSearchCriteraWithNoHits()
     {
         // Arrange
-        var occurrences = TestData.GetTestData().observations;
+        var occurrences = TestData.Create(10).Observations;
         await ProcessFixture.AddObservationsToElasticsearchAsync(occurrences);
-        var searchFilter = new OccurrenceFilter
-        {
+        var searchFilter = new OccurrenceFilter {
             DatasetIds = new List<string> { "NonExistingDatasetId" }
         };
 

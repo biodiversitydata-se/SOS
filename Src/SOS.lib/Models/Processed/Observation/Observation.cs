@@ -326,5 +326,10 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime Created { get; set; }
 
         public DataQuality DataQuality { get; set; }
+
+        public override string ToString()
+        {
+            return $"OccurrenceId: {Occurrence?.OccurrenceId},  EventId: {Event?.EventId}, DatasetId: {DataStewardshipDatasetId}";
+        }
     }
 }

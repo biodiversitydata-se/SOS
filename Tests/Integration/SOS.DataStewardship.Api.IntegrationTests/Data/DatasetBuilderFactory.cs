@@ -1,10 +1,8 @@
-﻿using SOS.DataStewardship.Api.IntegrationTests.Core.Helpers;
-
-namespace SOS.DataStewardship.Api.IntegrationTests.Data
+﻿namespace SOS.DataStewardship.Api.IntegrationTests.Data
 {
-    internal class DatasetBuilder
+    internal class DatasetBuilderFactory
     {       
-        public static IOperable<ObservationDataset> GetDatasetTestDataBuilder(int size = 10)
+        public static IOperable<ObservationDataset> Create(int size = 10)
         {
             var datasetBuilder = Builder<ObservationDataset>.CreateListOfSize(size)
                 .All()

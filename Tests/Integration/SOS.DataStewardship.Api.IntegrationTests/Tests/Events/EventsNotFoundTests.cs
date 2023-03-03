@@ -12,7 +12,7 @@ public class EventsNotFoundTests : TestBase
     {
         // Arrange
         string eventId = "NonExistingEventId";
-        var events = TestData.GetTestData().events;
+        var events = TestData.Create(10).Events;
         await ProcessFixture.AddEventsToElasticsearchAsync(events);
 
         // Act
@@ -26,10 +26,9 @@ public class EventsNotFoundTests : TestBase
     public async Task EventsBySearch_ReturnsEmptyCollection_GivenSearchCriteraWithNoHits()
     {
         // Arrange
-        var testData = TestData.GetTestData();
-        await ProcessFixture.AddDataToElasticsearchAsync((testData.events, testData.observations));
-        var searchFilter = new EventsFilter
-        {
+        var testDataSet = TestData.Create(10);
+        await ProcessFixture.AddDataToElasticsearchAsync((testDataSet.Events, testDataSet.Observations));
+        var searchFilter = new EventsFilter {
             DatasetIds = new List<string> { "NonExistingDatasetId" }
         };
 
