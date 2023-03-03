@@ -1,5 +1,5 @@
 ﻿using FizzWare.NBuilder.Implementation;
-using SOS.DataStewardship.Api.IntegrationTests.Core.Helpers;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Data
@@ -29,6 +29,10 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
                     .With(m => m.Taxon = new Taxon
                     {
                         Id = _faker.Random.Int(0, 10000)
+                    })
+                    .With(m => m.Location = new Lib.Models.Processed.Observation.Location
+                    {
+
                     });
             
             return observationsBuilder;
@@ -81,6 +85,64 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
             {
                 obs.Event.StartDate = startDate;
                 obs.Event.EndDate = endDate;
+            });
+
+            return operable;
+        }
+
+        public static IOperable<Observation> WithPosition(this IOperable<Observation> operable, double latitude, double longitude)
+        {
+            var builder = ((IDeclaration<Observation>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.Location.DecimalLatitude = latitude;
+                obs.Location.DecimalLongitude = longitude;
+                obs.Location.PointLocation = new GeoLocation(latitude, longitude);
+                obs.Location.Point = new PointGeoShape(new GeoCoordinate(latitude, longitude));
+            });
+
+            return operable;
+        }
+
+        public static IOperable<Observation> WithMunicipality(this IOperable<Observation> operable, MunicipalityId municipalityId)
+        {
+            var builder = ((IDeclaration<Observation>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.Location.Municipality = new Area { FeatureId = ((int)municipalityId).ToString() };
+            });
+
+            return operable;
+        }
+
+        public static IOperable<Observation> WithCounty(this IOperable<Observation> operable, string countyId)
+        {
+            var builder = ((IDeclaration<Observation>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.Location.County = new Area { FeatureId = countyId };
+            });
+
+            return operable;
+        }
+
+        public static IOperable<Observation> WithProvince(this IOperable<Observation> operable, string provinceId)
+        {
+            var builder = ((IDeclaration<Observation>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.Location.Province = new Area { FeatureId = provinceId };
+            });
+
+            return operable;
+        }
+
+        public static IOperable<Observation> WithParish(this IOperable<Observation> operable, string parishId)
+        {
+            var builder = ((IDeclaration<Observation>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.Location.Parish = new Area { FeatureId = parishId };
             });
 
             return operable;

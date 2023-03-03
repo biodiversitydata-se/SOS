@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Processed.DataStewardship.Event;
+﻿using NetTopologySuite.Geometries;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Data
@@ -22,22 +23,6 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
 
             return (datasets, events, observations);
         }
-
-        //public static (List<ObservationDataset> datasets, List<ObservationEvent> events, IOperable<Observation> observationsBuilder) GetTestDataObservationsBuilder(int size = 10)
-        //{
-        //    var datasetBuilder = DatasetBuilder.GetDatasetTestDataBuilder(size);
-        //    var datasets = datasetBuilder.Build().ToList();
-
-        //    var eventsBuilder = EventsTestData.GetEventTestDataBuilder(size);
-        //    eventsBuilder.All().HaveDatasetIds(datasets.Select(m => m.Identifier));
-        //    var events = eventsBuilder.Build().ToList();
-
-        //    IOperable<Observation> observationsBuilder = ObservationsTestData.GetObservationTestDataBuilder(size);
-        //    observationsBuilder.All().HaveDatasetIds(datasets.Select(m => m.Identifier));
-        //    observationsBuilder.All().HaveEventIds(events.Select(m => m.EventId));            
-
-        //    return (datasets, events, observationsBuilder);
-        //}
 
         public static TestDataSet GetTestDataSet(int size = 10)
         {
@@ -63,7 +48,35 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
                 ObservationsBuilder = observationsBuilder
             };
         }
+        
+        public static GeographicsFilterArea CreatePolygonFilterFromBbox(double minLon, double minLat, double maxLon, double maxLat)
+        {
+            var filter = new GeographicsFilterArea
+            {
+                GeographicArea = new PolygonGeoShape(new List<List<GeoCoordinate>> { new List<GeoCoordinate>
+                        {
+                            new GeoCoordinate(minLat, maxLon),
+                            new GeoCoordinate(maxLat, maxLon),
+                            new GeoCoordinate(maxLat, minLon),
+                            new GeoCoordinate(minLat, minLon),
+                            new GeoCoordinate(minLat, maxLon)
+                        }
+                    })
+            };
 
+            return filter;
+        }
+
+        public static GeographicsFilterArea CreateCircleFilterFromPoint(double lat, double lon, double distance)
+        {
+            var filter = new GeographicsFilterArea 
+            {
+                GeographicArea = new PointGeoShape(new GeoCoordinate(lat, lon)),
+                MaxDistanceFromGeometries = distance
+            };
+
+            return filter;
+        }
 
         internal class TestDataSet
         {
