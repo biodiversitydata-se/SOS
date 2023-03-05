@@ -39,6 +39,7 @@ public static class SwaggerExtensions
                 options.CustomSchemaIds(type => schemaHelper.GetSchemaId(type));
                 //options.CustomSchemaIds(type => type.ToString());
                 //options.CustomSchemaIds(type => type.FullName);
+                options.DescribeAllParametersInCamelCase();
                 options.EnableAnnotations();
             });
 

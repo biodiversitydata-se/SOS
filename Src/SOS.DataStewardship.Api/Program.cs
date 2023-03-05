@@ -1,3 +1,4 @@
+using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -36,12 +37,14 @@ try
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+    
+    builder.Services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton);
 
 #if DEBUG
     builder.Services.Configure<TelemetryConfiguration>(x => x.DisableTelemetry = true);
 #endif
-    var app = builder.Build();
-   
+    var app = builder.Build();    
+
     app.ConfigureExceptionHandler(logger, isDevelopment);
     app.MapEndpoints();
     app.UseHealthChecks("/health", new HealthCheckOptions()

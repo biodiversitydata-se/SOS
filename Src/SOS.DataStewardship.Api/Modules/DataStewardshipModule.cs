@@ -5,6 +5,8 @@ using Swashbuckle.AspNetCore.Annotations;
 using SOS.DataStewardship.Api.Managers.Interfaces;
 using SOS.DataStewardship.Api.Models.Enums;
 using SOS.DataStewardship.Api.Extensions;
+using SOS.DataStewardship.Api.Filters;
+using FluentValidation.Results;
 
 namespace SOS.DataStewardship.Api.Modules;
 
@@ -21,16 +23,18 @@ public class DataStewardshipModule : IModule
             .WithName("GetDatasetById")
             .WithTags("DataStewardship")
             .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get dataset by id. Example: ArtportalenDataHost - Dataset Bats"));
-            
+
 
         application.MapPost("/datastewardship/datasets", GetDatasetsBySearchAsync)
+            .AddEndpointFilter<ValidatorFilter<DatasetFilter>>()
+            .AddEndpointFilter<ValidatorFilter<PagingParameters>>()
             .Produces<Models.PagedResult<Dataset>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest)
+            .Produces<List<ValidationFailure>>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
             .WithName("GetDatasetsBySearch")
             .WithTags("DataStewardship")
             .WithMetadata(new SwaggerOperationAttribute(summary: "", description: "Get datasets by search."));
-
+            
 
         application.MapGet("/datastewardship/events/{id}", GetEventByIdAsync)
             .Produces<EventModel>(StatusCodes.Status200OK)
@@ -98,14 +102,18 @@ public class DataStewardshipModule : IModule
     /// <param name="take">Number of items to return. 1000 items is the max to return in one call.</param>
     /// <returns></returns>
     internal async Task<IResult> GetDatasetsBySearchAsync(IDataStewardshipManager dataStewardshipManager, 
-        [FromBody] DatasetFilter filter, 
-        [FromQuery] int? skip, 
-        [FromQuery] int? take,
+        [FromBody] DatasetFilter filter,
+        [AsParameters] PagingParameters pagingParameters,
+        //[FromQuery] int? skip,
+        //[FromQuery] int? take,
         [FromQuery] ExportMode exportMode = ExportMode.Json)
     {
         try
         {
-            var datasets = await dataStewardshipManager.GetDatasetsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));            
+            var datasets = await dataStewardshipManager.GetDatasetsBySearchAsync(filter, pagingParameters.Skip.GetValueOrDefault(0), pagingParameters.Take.GetValueOrDefault(20));
+            //var datasets = await dataStewardshipManager.GetDatasetsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));            
+            //SkipTakeParameters skipTakeParameters = new SkipTakeParameters() { Skip = skip, Take = take };
+
 
             return exportMode.Equals(ExportMode.Csv) ? Results.File(datasets.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(datasets);
         }
@@ -113,7 +121,7 @@ public class DataStewardshipModule : IModule
         {
             return Results.BadRequest("Failed");
         }
-    }
+    }    
 
     /// <summary>
     /// Get event by ID
@@ -210,5 +218,5 @@ public class DataStewardshipModule : IModule
         {
             return Results.BadRequest("Failed");
         }
-    }
+    }    
 }
