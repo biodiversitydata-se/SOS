@@ -122,3 +122,7 @@ https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
 ## Referenser
 - [Open API Specification (Lund)](https://github.com/Lund-University-Biodiversity-data/datahost-api/blob/main/api/openapi.yaml)
 - [Open API Specification template (Lund)](https://github.com/Lund-University-Biodiversity-data/datahost-api/blob/main/api/templateOpenapi.yaml)
+
+
+# Länkar
+- https://github.com/domaindrivendev/Swashbuckle.AspNetCore#enrich-operation-metadata
