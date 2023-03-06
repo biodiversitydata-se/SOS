@@ -5,6 +5,7 @@ using SOS.DataStewardship.Api.Models.Enums;
 using SOS.DataStewardship.Api.Models;
 using SOS.DataStewardship.Api.Extensions;
 using SOS.DataStewardship.Api.Filters;
+using SOS.DataStewardship.Api.Validators;
 
 namespace SOS.DataStewardship.Api.Endpoints.DataStewardship;
 
@@ -16,18 +17,15 @@ public class GetOccurrencesBySearchEndpoint : IEndpointDefinition
             .Produces<Models.PagedResult<OccurrenceModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError);
-            //.AddEndpointFilter<ValidatorFilter<OccurrenceFilter>>();
-            //.AddEndpointFilter<ValidatorFilter<PagingParameters>>();
+            .Produces(StatusCodes.Status500InternalServerError)
+            .AddEndpointFilter<ValidatorFilter<OccurrenceFilter>>()
+            .AddEndpointFilter(async (context, next) =>
+            {
+                var pagingParameters = new PagingParameters { Skip = context.GetArgument<int?>(2), Take = context.GetArgument<int?>(3) };
+                return await new PagingValidator().ValidateAsync(pagingParameters, context, next);
+            });            
     }
-
-    /// <summary>
-    /// Get occurrences by search.
-    /// </summary>
-    /// <param name="filter">Filter used to limit the search.</param>
-    /// <param name="skip">Start index.</param>
-    /// <param name="take">Number of items to return. 1000 items is the max to return in one call.</param>
-    /// <returns></returns>
+    
     [SwaggerOperation(
         Description = "Get occurrences by search.",
         OperationId = "GetOccurrencesBySearch",

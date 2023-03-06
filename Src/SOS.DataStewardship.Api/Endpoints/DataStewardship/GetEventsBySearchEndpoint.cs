@@ -5,6 +5,7 @@ using SOS.DataStewardship.Api.Models.Enums;
 using SOS.DataStewardship.Api.Models;
 using SOS.DataStewardship.Api.Extensions;
 using SOS.DataStewardship.Api.Filters;
+using SOS.DataStewardship.Api.Validators;
 
 namespace SOS.DataStewardship.Api.Endpoints.DataStewardship;
 
@@ -16,8 +17,8 @@ public class GetEventsBySearchEndpoint : IEndpointDefinition
             .Produces<Models.PagedResult<EventModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError);
-            //.AddEndpointFilter<ValidatorFilter<EventsFilter>>();
+            .Produces(StatusCodes.Status500InternalServerError)
+            .AddEndpointFilter<ValidatorFilter<EventsFilter>>();
             //.AddEndpointFilter<ValidatorFilter<PagingParameters>>();
     }
    
@@ -33,6 +34,12 @@ public class GetEventsBySearchEndpoint : IEndpointDefinition
     {
         try
         {
+            var pagingValidationResult = await new PagingParameters { Skip = skip, Take = take }.ValidateAsync();
+            if (!pagingValidationResult.IsValid)
+            {
+                return Results.BadRequest(pagingValidationResult.Errors);
+            }
+
             var eventModels = await dataStewardshipManager.GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));
 
             return exportMode.Equals(ExportMode.Csv) ? Results.File(eventModels.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(eventModels);
