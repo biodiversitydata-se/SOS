@@ -23,8 +23,7 @@ try
     var processedDbConfiguration = builder.SetupDependencies();
     builder.SetupHealthChecks(processedDbConfiguration);
 
-    builder.Services.AddEndpointDefinitions(typeof(IAssemblyMarker));
-    //builder.RegisterModules();    
+    builder.Services.AddEndpointDefinitions(typeof(IEndpointDefinition));    
     builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
     {
         options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
@@ -48,8 +47,7 @@ try
     var app = builder.Build();    
 
     app.ConfigureExceptionHandler(logger, isDevelopment);
-    app.UseEndpointDefinitions();
-    //app.MapEndpoints();
+    app.UseEndpointDefinitions();    
     app.UseHealthChecks("/health", new HealthCheckOptions()
     {
         Predicate = _ => true,

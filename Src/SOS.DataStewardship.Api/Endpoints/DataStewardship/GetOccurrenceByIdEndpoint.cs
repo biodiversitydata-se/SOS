@@ -18,30 +18,18 @@ public class GetOccurrenceByIdEndpoint : IEndpointDefinition
             //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
     }
-
-    /// <summary>
-    /// Get occurrence by ID
-    /// </summary>
-    /// <param name="id">OccurrenceId of the occurrence to get.</param>
-    /// <returns></returns>
+    
     [SwaggerOperation(
         Description = "Get occurrence by Id. Example: urn:lsid:artportalen.se:sighting:98571689",
         OperationId = "GetOccurrenceById",
         Tags = new[] { "DataStewardship" })]
-    internal async Task<IResult> GetOccurrenceByIdAsync(IDataStewardshipManager dataStewardshipManager,
+    private async Task<IResult> GetOccurrenceByIdAsync(IDataStewardshipManager dataStewardshipManager,
         [FromRoute, SwaggerParameter("The occurrence id", Required = true)] string id,
         [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json,
         [FromQuery, SwaggerParameter("The response coordinate system")] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
-        try
-        {
-            var occurrenceModel = await dataStewardshipManager.GetOccurrenceByIdAsync(id, responseCoordinateSystem);
-            if (occurrenceModel == null) return Results.NotFound();
-            return exportMode.Equals(ExportMode.Csv) ? Results.File(occurrenceModel.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(occurrenceModel);
-        }
-        catch
-        {
-            return Results.BadRequest("Failed");
-        }
+        var occurrenceModel = await dataStewardshipManager.GetOccurrenceByIdAsync(id, responseCoordinateSystem);
+        if (occurrenceModel == null) return Results.NotFound();
+        return exportMode.Equals(ExportMode.Csv) ? Results.File(occurrenceModel.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(occurrenceModel);
     }
 }

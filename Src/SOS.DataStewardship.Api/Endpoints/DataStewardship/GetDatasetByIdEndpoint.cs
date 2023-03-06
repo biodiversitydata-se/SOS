@@ -21,31 +21,21 @@ public class GetDatasetByIdEndpoint : IEndpointDefinition
             //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
     }
-
-    /// <summary>
-    /// Get Dataset by id.
-    /// </summary>
-    /// <param name="id">The dataset id.</param>
-    /// <returns></returns>
+    
     [SwaggerOperation(        
         Description = "Get dataset by id. Example: Artportalen - Fladdermöss",
         OperationId = "GetDatasetById",            
         Tags = new[] { "DataStewardship" })]
     [SwaggerResponse(404, "Not Found - The requested dataset doesn't exist")]
-    internal async Task<IResult> GetDatasetByIdAsync(IDataStewardshipManager dataStewardshipManager,
+    private async Task<IResult> GetDatasetByIdAsync(IDataStewardshipManager dataStewardshipManager,
         [FromRoute, SwaggerParameter("The dataset id", Required = true)][Required] string id,
         [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json)
     {
-        try
-        {
-            var dataset = await dataStewardshipManager.GetDatasetByIdAsync(id);
-            if (dataset == null) return Results.NotFound();
-
-            return exportMode.Equals(ExportMode.Csv) ? Results.File(dataset.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(dataset);
-        }
-        catch
-        {
-            return Results.BadRequest("Failed");
-        }
+        var dataset = await dataStewardshipManager.GetDatasetByIdAsync(id);
+        if (dataset == null) return Results.NotFound();
+        
+        return exportMode.Equals(ExportMode.Csv) ? 
+            Results.File(dataset.ToCsv(), "text/tab-separated-values", "dataset.csv") : 
+            Results.Ok(dataset);        
     }
 }

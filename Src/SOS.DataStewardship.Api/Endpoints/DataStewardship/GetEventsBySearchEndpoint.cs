@@ -18,35 +18,31 @@ public class GetEventsBySearchEndpoint : IEndpointDefinition
             .Produces(StatusCodes.Status400BadRequest)
             //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
-            .AddEndpointFilter<ValidatorFilter<EventsFilter>>();
-            //.AddEndpointFilter<ValidatorFilter<PagingParameters>>();
+            .AddEndpointFilter<ValidatorFilter<EventsFilter>>()
+            .AddEndpointFilter(ValidatePagingParametersAsync);        
     }
    
     [SwaggerOperation(
         Description = "Get events by search.",
         OperationId = "GetEventsBySearch",
         Tags = new[] { "DataStewardship" })]
-    internal async Task<IResult> GetEventsBySearchAsync(IDataStewardshipManager dataStewardshipManager,
+    private async Task<IResult> GetEventsBySearchAsync(IDataStewardshipManager dataStewardshipManager,
         [FromBody, SwaggerRequestBody("The search filter")] EventsFilter filter,
         [FromQuery, SwaggerParameter("Pagination start index.")] int? skip,
         [FromQuery, SwaggerParameter("Number of items to return. 1000 items is the max to return in one call.")] int? take,
         [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json)
+    {                
+        var eventModels = await dataStewardshipManager
+            .GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));
+
+        return exportMode.Equals(ExportMode.Csv) ? 
+            Results.File(eventModels.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : 
+            Results.Ok(eventModels);        
+    }
+
+    private async ValueTask<object> ValidatePagingParametersAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
-        try
-        {
-            var pagingValidationResult = await new PagingParameters { Skip = skip, Take = take }.ValidateAsync();
-            if (!pagingValidationResult.IsValid)
-            {
-                return Results.BadRequest(pagingValidationResult.Errors);
-            }
-
-            var eventModels = await dataStewardshipManager.GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20));
-
-            return exportMode.Equals(ExportMode.Csv) ? Results.File(eventModels.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(eventModels);
-        }
-        catch (Exception ex)
-        {
-            return Results.BadRequest("Failed");
-        }
+        var pagingParameters = new PagingParameters { Skip = context.GetArgument<int?>(2), Take = context.GetArgument<int?>(3) };
+        return await new PagingValidator().ValidateAsync(pagingParameters, context, next);
     }
 }

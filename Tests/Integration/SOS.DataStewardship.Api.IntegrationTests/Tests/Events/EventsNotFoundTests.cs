@@ -27,7 +27,7 @@ public class EventsNotFoundTests : TestBase
     {
         // Arrange
         var testDataSet = TestData.Create(10);
-        await ProcessFixture.AddDataToElasticsearchAsync((testDataSet.Events, testDataSet.Observations));
+        await ProcessFixture.AddDataToElasticsearchAsync(testDataSet.Events, testDataSet.Observations);
         var searchFilter = new EventsFilter {
             DatasetIds = new List<string> { "NonExistingDatasetId" }
         };

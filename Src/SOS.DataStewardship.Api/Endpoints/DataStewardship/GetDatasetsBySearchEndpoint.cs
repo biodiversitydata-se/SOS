@@ -20,34 +20,21 @@ public class GetDatasetsBySearchEndpoint : IEndpointDefinition
             .AddEndpointFilter<ValidatorFilter<DatasetFilter>>()
             .AddEndpointFilter<ValidatorFilter<PagingParameters>>();
     }
-
-    /// <summary>
-    /// Get datasets by search
-    /// </summary>
-    /// <param name="filter">Filter used to limit the search.</param>
-    /// <param name="skip">Start index.</param>
-    /// <param name="take">Number of items to return. 1000 items is the max to return in one call.</param>
-    /// <returns></returns>
+    
     [SwaggerOperation(
         Description = "Get datasets by search.",
         OperationId = "GetDatasetsBySearch",
         Tags = new[] { "DataStewardship" })]
-    internal async Task<IResult> GetDatasetsBySearchAsync(IDataStewardshipManager dataStewardshipManager,
+    private async Task<IResult> GetDatasetsBySearchAsync(IDataStewardshipManager dataStewardshipManager,
         [FromBody, SwaggerRequestBody("The search filter")] DatasetFilter filter,
-        [AsParameters] PagingParameters pagingParameters,
-        //[FromQuery] int? skip,
-        //[FromQuery] int? take,
+        [AsParameters] PagingParameters pagingParameters,        
         [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json)
-    {
-        try
-        {
-            var datasets = await dataStewardshipManager.GetDatasetsBySearchAsync(filter, pagingParameters.Skip.GetValueOrDefault(0), pagingParameters.Take.GetValueOrDefault(20));
-            
-            return exportMode.Equals(ExportMode.Csv) ? Results.File(datasets.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(datasets);
-        }
-        catch
-        {
-            return Results.BadRequest("Failed");
-        }
+    {        
+        var datasets = await dataStewardshipManager
+            .GetDatasetsBySearchAsync(filter, pagingParameters.Skip.GetValueOrDefault(0), pagingParameters.Take.GetValueOrDefault(20));            
+        
+        return exportMode.Equals(ExportMode.Csv) ? 
+            Results.File(datasets.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : 
+            Results.Ok(datasets);        
     }
 }

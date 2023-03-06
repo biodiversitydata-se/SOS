@@ -19,11 +19,7 @@ public class GetOccurrencesBySearchEndpoint : IEndpointDefinition
             //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
             .AddEndpointFilter<ValidatorFilter<OccurrenceFilter>>()
-            .AddEndpointFilter(async (context, next) =>
-            {
-                var pagingParameters = new PagingParameters { Skip = context.GetArgument<int?>(2), Take = context.GetArgument<int?>(3) };
-                return await new PagingValidator().ValidateAsync(pagingParameters, context, next);
-            });            
+            .AddEndpointFilter(ValidatePagingParametersAsync);
     }
     
     [SwaggerOperation(
@@ -37,17 +33,17 @@ public class GetOccurrencesBySearchEndpoint : IEndpointDefinition
         [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json,
         [FromQuery, SwaggerParameter("The response coordinate system")] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
-        try
-        {
-            var occurrences = await dataStewardshipManager.GetOccurrencesBySearchAsync(filter,
-                skip.GetValueOrDefault(0),
-                take.GetValueOrDefault(20),
-                responseCoordinateSystem);
-            return occurrences.Equals(ExportMode.Csv) ? Results.File(occurrences.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(occurrences);
-        }
-        catch
-        {
-            return Results.BadRequest("Failed");
-        }
+        var occurrences = await dataStewardshipManager.GetOccurrencesBySearchAsync(filter,
+            skip.GetValueOrDefault(0),
+            take.GetValueOrDefault(20),
+            responseCoordinateSystem);
+        
+        return occurrences.Equals(ExportMode.Csv) ? Results.File(occurrences.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(occurrences);
+    }
+
+    private async ValueTask<object> ValidatePagingParametersAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+    {
+        var pagingParameters = new PagingParameters { Skip = context.GetArgument<int?>(2), Take = context.GetArgument<int?>(3) };
+        return await new PagingValidator().ValidateAsync(pagingParameters, context, next);
     }
 }
