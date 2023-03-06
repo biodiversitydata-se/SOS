@@ -1,3 +1,5 @@
+using SOS.DataStewardship.Api.Contracts.Models;
+
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.DwcaImport;
 
 [Collection(Constants.IntegrationTestsCollectionName)]

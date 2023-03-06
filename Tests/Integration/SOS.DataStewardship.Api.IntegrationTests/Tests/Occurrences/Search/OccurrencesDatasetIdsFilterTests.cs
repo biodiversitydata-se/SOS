@@ -1,3 +1,5 @@
+using SOS.DataStewardship.Api.Contracts.Models;
+
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.Occurrences.Search;
 
 [Collection(Constants.IntegrationTestsCollectionName)]

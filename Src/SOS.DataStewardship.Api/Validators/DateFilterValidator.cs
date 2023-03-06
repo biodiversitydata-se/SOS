@@ -2,7 +2,7 @@
 
 namespace SOS.DataStewardship.Api.Validators
 {
-    public class DateFilterValidator : AbstractValidator<Models.DateFilter>
+    public class DateFilterValidator : AbstractValidator<Contracts.Models.DateFilter>
     {
         public DateFilterValidator()
         {

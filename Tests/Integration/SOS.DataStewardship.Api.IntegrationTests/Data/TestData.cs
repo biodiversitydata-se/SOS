@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Processed.DataStewardship.Event;
+﻿using SOS.DataStewardship.Api.Contracts.Models;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Data

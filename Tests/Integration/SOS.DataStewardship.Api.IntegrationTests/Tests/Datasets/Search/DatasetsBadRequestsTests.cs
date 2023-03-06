@@ -1,4 +1,5 @@
-using FluentValidation.Results;
+using SOS.DataStewardship.Api.Contracts.Enums;
+using SOS.DataStewardship.Api.Contracts.Models;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.Datasets.Search;
 
@@ -19,7 +20,7 @@ public class DatasetsBadRequestsTests : TestBase
             {
                 StartDate = DateTime.Now,
                 EndDate = DateTime.Now - TimeSpan.FromDays(1),
-                DateFilterType = Models.Enums.DateFilterType.OverlappingStartDateAndEndDate
+                DateFilterType = DateFilterType.OverlappingStartDateAndEndDate
             }
         };
         

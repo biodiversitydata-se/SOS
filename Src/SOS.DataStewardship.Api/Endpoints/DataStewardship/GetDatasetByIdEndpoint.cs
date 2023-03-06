@@ -1,11 +1,10 @@
-﻿using SOS.DataStewardship.Api.Interfaces;
-using Swashbuckle.AspNetCore.Annotations;
-using SOS.DataStewardship.Api.Managers.Interfaces;
-using SOS.DataStewardship.Api.Models.Enums;
+﻿using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
-using SOS.DataStewardship.Api.Models;
 using SOS.DataStewardship.Api.Extensions;
 using Newtonsoft.Json;
+using SOS.DataStewardship.Api.Application.Managers.Interfaces;
+using SOS.DataStewardship.Api.Contracts.Enums;
+using SOS.DataStewardship.Api.Contracts.Models;
 
 namespace SOS.DataStewardship.Api.Endpoints.DataStewardship;
 

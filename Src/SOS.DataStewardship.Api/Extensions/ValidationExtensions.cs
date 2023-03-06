@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using SOS.DataStewardship.Api.Models;
+using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.DataStewardship.Api.Validators;
 
 namespace SOS.DataStewardship.Api.Extensions

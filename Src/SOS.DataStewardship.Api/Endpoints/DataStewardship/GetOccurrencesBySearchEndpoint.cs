@@ -1,11 +1,10 @@
-﻿using SOS.DataStewardship.Api.Interfaces;
-using Swashbuckle.AspNetCore.Annotations;
-using SOS.DataStewardship.Api.Managers.Interfaces;
-using SOS.DataStewardship.Api.Models.Enums;
-using SOS.DataStewardship.Api.Models;
+﻿using Swashbuckle.AspNetCore.Annotations;
 using SOS.DataStewardship.Api.Extensions;
 using SOS.DataStewardship.Api.Filters;
 using SOS.DataStewardship.Api.Validators;
+using SOS.DataStewardship.Api.Application.Managers.Interfaces;
+using SOS.DataStewardship.Api.Contracts.Enums;
+using SOS.DataStewardship.Api.Contracts.Models;
 
 namespace SOS.DataStewardship.Api.Endpoints.DataStewardship;
 
@@ -14,7 +13,7 @@ public class GetOccurrencesBySearchEndpoint : IEndpointDefinition
     public void DefineEndpoint(WebApplication app)
     {
         app.MapPost("/datastewardship/occurrences", GetOccurrencesBySearchAsync)
-            .Produces<Models.PagedResult<OccurrenceModel>>(StatusCodes.Status200OK)
+            .Produces<Contracts.Models.PagedResult<OccurrenceModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)

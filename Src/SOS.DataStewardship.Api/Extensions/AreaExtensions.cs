@@ -1,4 +1,4 @@
-﻿using SOS.DataStewardship.Api.Models.Enums;
+﻿using SOS.DataStewardship.Api.Contracts.Enums;
 
 namespace SOS.DataStewardship.Api.Extensions
 {

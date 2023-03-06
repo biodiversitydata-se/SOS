@@ -9,9 +9,13 @@
 
   <ItemGroup>
     <Compile Remove="Dtos\**" />
+    <Compile Remove="Repositories\**" />
     <Content Remove="Dtos\**" />
+    <Content Remove="Repositories\**" />
     <EmbeddedResource Remove="Dtos\**" />
+    <EmbeddedResource Remove="Repositories\**" />
     <None Remove="Dtos\**" />
+    <None Remove="Repositories\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,10 +34,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SOS.lib\SOS.Lib.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Repositories\Interfaces\" />
   </ItemGroup>
 
 </Project>

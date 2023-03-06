@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using SOS.DataStewardship.Api.Helpers;
+﻿using SOS.DataStewardship.Api.Application.Helpers;
 
 namespace SOS.DataStewardship.Api.Extensions;
 

@@ -2,8 +2,8 @@ using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using SOS.DataStewardship.Api.Endpoints;
 using SOS.DataStewardship.Api.Extensions;
-using SOS.DataStewardship.Api.Interfaces;
 using SOS.Lib.JsonConverters;
 using System.Text.Json.Serialization;
 

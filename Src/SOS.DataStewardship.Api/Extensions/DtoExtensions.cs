@@ -1,6 +1,6 @@
 ﻿using NetTopologySuite.Geometries;
-using SOS.DataStewardship.Api.Models;
-using SOS.DataStewardship.Api.Models.Enums;
+using SOS.DataStewardship.Api.Contracts.Enums;
+using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.Lib.Enums.VocabularyValues;
 using System.Data;
 using ProcessedDataStewardship = SOS.Lib.Models.Processed.DataStewardship;
@@ -44,10 +44,10 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static Models.Project ToProject(this ProcessedDataStewardship.Common.Project project)
+        public static Contracts.Models.Project ToProject(this ProcessedDataStewardship.Common.Project project)
         {
             if (project == null) return null;
-            return new Models.Project
+            return new Contracts.Models.Project
             {
                 ProjectCode= project.ProjectCode,
                 ProjectID = project.ProjectId,
@@ -180,14 +180,14 @@ namespace SOS.DataStewardship.Api.Extensions
             return ev;
         }
 
-        public static Models.Location ToLocation(this Lib.Models.Processed.Observation.Location location)
+        public static Contracts.Models.Location ToLocation(this Lib.Models.Processed.Observation.Location location)
         {
             County? county = location?.County?.FeatureId?.GetCounty();
             Municipality? municipality = location?.Municipality?.FeatureId?.GetMunicipality();
             Parish? parish = location?.Parish?.FeatureId?.GetParish();
             Province? province = location?.Province?.FeatureId?.GetProvince();
 
-            return new Models.Location()
+            return new Contracts.Models.Location()
             {
                 County = county.Value,
                 Province = province.Value,
@@ -569,7 +569,7 @@ namespace SOS.DataStewardship.Api.Extensions
             return filter;
         }
 
-        public static LocationFilter ToLocationFilter(this SOS.DataStewardship.Api.Models.GeographicsFilter geographicsFilter)
+        public static LocationFilter ToLocationFilter(this Contracts.Models.GeographicsFilter geographicsFilter)
         {
             if (geographicsFilter == null) return null;
             var locationFilter = new LocationFilter();
@@ -616,7 +616,7 @@ namespace SOS.DataStewardship.Api.Extensions
             return locationFilter;
         }
 
-        public static SOS.Lib.Models.Search.Filters.GeographicsFilter ToGeographicsFilter(this SOS.DataStewardship.Api.Models.GeographicsFilterArea geographicsFilterArea)
+        public static SOS.Lib.Models.Search.Filters.GeographicsFilter ToGeographicsFilter(this GeographicsFilterArea geographicsFilterArea)
         {
             if (geographicsFilterArea == null) return null;
             var geographicsFilter = new SOS.Lib.Models.Search.Filters.GeographicsFilter();

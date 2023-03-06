@@ -1,4 +1,4 @@
-﻿using SOS.DataStewardship.Api.Interfaces;
+﻿using SOS.DataStewardship.Api.Endpoints;
 
 namespace SOS.DataStewardship.Api.Extensions;
 
