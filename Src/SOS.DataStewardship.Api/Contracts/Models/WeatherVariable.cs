@@ -7,33 +7,11 @@ namespace SOS.DataStewardship.Api.Contracts.Models
     /// Weather variable
     /// </summary>
     public class WeatherVariable
-    {
+    {        
         /// <summary>
         /// States the snow conditions on the ground during the survey event.
         /// </summary>
-        public enum SnowCoverEnum
-        {
-            /// <summary>
-            /// barmark
-            /// </summary>
-            [EnumMember(Value = "barmark")]
-            Barmark = 0,
-            /// <summary>
-            /// snötäckt mark
-            /// </summary>
-            [EnumMember(Value = "snötäckt mark")]
-            SnötäcktMark = 1,
-            /// <summary>
-            /// mycket tunt snötäcke eller fläckvis snötäcke
-            /// </summary>
-            [EnumMember(Value = "mycket tunt snötäcke eller fläckvis snötäcke")]
-            MycketTuntSnötäckeEllerFläckvisSnötäcke = 2
-        }
-
-        /// <summary>
-        /// States the snow conditions on the ground during the survey event.
-        /// </summary>
-        public SnowCoverEnum? SnowCover { get; set; }
+        public Enums.SnowCover? SnowCover { get; set; }
 
         /// <summary>
         /// States the amount of sunshine during the survey event.
