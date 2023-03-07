@@ -1,41 +1,23 @@
-using System.Runtime.Serialization;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
 {
-    /// <summary>
-    /// Search filter.
-    /// </summary>
-    [DataContract]
+    [SwaggerSchema("Occurrence search filter.")]
     public class OccurrenceFilter
-    {
-        /// <summary>
-        /// DatasetIds
-        /// </summary>
-        [DataMember(Name = "datasetIds")]
+    {        
+        [SwaggerSchema("DatasetIds filter.")]
         public List<string> DatasetIds { get; set; }
-
-        /// <summary>
-        /// EventIds
-        /// </summary>
-        [DataMember(Name = "eventIds")]
+        
+        [SwaggerSchema("EventIds filter.")]
         public List<string> EventIds { get; set; }
-
-        /// <summary>
-        /// Datum
-        /// </summary>
-        [DataMember(Name = "datum")]
+        
+        [SwaggerSchema("Date filter.")]
         public DateFilter DateFilter { get; set; }
-
-        /// <summary>
-        /// Taxon
-        /// </summary>
-        [DataMember(Name = "taxon")]
+        
+        [SwaggerSchema("Taxon filter.")]
         public TaxonFilter Taxon { get; set; }
-
-        /// <summary>
-        /// Area
-        /// </summary>
-        [DataMember(Name = "area")]
+        
+        [SwaggerSchema("Area filter.")]
         public GeographicsFilter Area { get; set; }
     }
 }

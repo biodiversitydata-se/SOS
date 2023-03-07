@@ -1,48 +1,27 @@
-using System.Runtime.Serialization;
 using SOS.DataStewardship.Api.Contracts.Enums;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
-{
-    /// <summary>
-    /// Search filter.
-    /// </summary>
-    [DataContract]
+{    
+    [SwaggerSchema("Events search filter")]
     public class EventsFilter
-    {
-        /// <summary>
-        /// Gets or Sets ExportMode
-        /// </summary>
-        [DataMember(Name = "exportMode")]
+    {        
+        [SwaggerSchema("Export mode")]
         public ExportMode ExportMode { get; set; }
-
-        /// <summary>
-        /// Gets or Sets DatasetIds
-        /// </summary>        
-        [DataMember(Name = "datasetIds")]
+        
+        [SwaggerSchema("DatasetIds filter")]
         public List<string> DatasetIds { get; set; }
 
-        /// <summary>
-        /// Gets or Sets EventIds
-        /// </summary>        
-        [DataMember(Name = "eventIds")]
+        [SwaggerSchema("EventIds filter")]
         public List<string> EventIds { get; set; }
 
-        /// <summary>
-        /// Datum
-        /// </summary>
-        [DataMember(Name = "datum")]
+        [SwaggerSchema("Date filter")]
         public DateFilter DateFilter { get; set; }
 
-        /// <summary>
-        /// Taxon
-        /// </summary>
-        [DataMember(Name = "taxon")]
+        [SwaggerSchema("Taxon filter")]
         public TaxonFilter Taxon { get; set; }
 
-        /// <summary>
-        /// Area
-        /// </summary>
-        [DataMember(Name = "area")]
+        [SwaggerSchema("Area filter")]
         public GeographicsFilter Area { get; set; }
     }
 }

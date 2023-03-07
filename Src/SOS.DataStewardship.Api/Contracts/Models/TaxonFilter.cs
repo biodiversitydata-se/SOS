@@ -9,14 +9,11 @@ namespace SOS.DataStewardship.Api.Contracts.Models
     /// <summary>
     /// Taxon filter.
     /// </summary>
-    [DataContract]
     public class TaxonFilter
     {
         /// <summary>
         /// Dyntaxa taxon ids to match.
         /// </summary>
-
-        [DataMember(Name = "ids")]
         public List<int> Ids { get; set; }
     }
 }

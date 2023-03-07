@@ -1,45 +1,26 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
 {
-    /// <summary>
-    /// Associated media
-    /// </summary>
-    [DataContract]
+    [SwaggerSchema("Associate Media", Required = new[] { "License" })]
     public class AssociatedMedia
-    {
-        /// <summary>
-        /// Name of attachment.
-        /// </summary>
-
-        [DataMember(Name = "associatedMediaName")]
+    {        
+        [SwaggerSchema("Name of attachment.")]
         public string AssociatedMediaName { get; set; }
-
-        /// <summary>
-        /// Format of attachment, e.g. image, video, sound, pdf etc.
-        /// </summary>
-        [DataMember(Name = "associatedMediaType")]
+        
+        [SwaggerSchema("Format of attachment, e.g. image, video, sound, pdf etc.")]
         public AssociatedMediaType? AssociatedMediaType { get; set; }
 
-        /// <summary>
-        /// Link to attachment.
-        /// </summary>
-        [DataMember(Name = "associatedMediaLink")]
+        [SwaggerSchema("Link to attachment.")]
         public string AssociatedMediaLink { get; set; }
 
-        /// <summary>
-        /// States which Creative Commons license that is applied to the attachment.
-        /// </summary>
         [Required]
-        [DataMember(Name = "license")]
+        [SwaggerSchema("States which Creative Commons license that is applied to the attachment.")]
         public string License { get; set; }
 
-        /// <summary>
-        /// States who the creator of the attachment is.
-        /// </summary>
-        [DataMember(Name = "rightsHolder")]
+        [SwaggerSchema("States who the creator of the attachment is.")]
         public string RightsHolder { get; set; }
     }
 }

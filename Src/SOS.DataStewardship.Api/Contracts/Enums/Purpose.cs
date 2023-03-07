@@ -21,6 +21,6 @@ namespace SOS.DataStewardship.Api.Contracts.Enums
         /// Biogeografisk uppföljning
         /// </summary>
         [EnumMember(Value = "biogeografisk uppföljning")]
-        biogeografiskUppföljning = 2
+        BiogeografiskUppföljning = 2
     }
 }

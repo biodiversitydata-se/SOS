@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using Swashbuckle.AspNetCore.Annotations;
+using System.Runtime.Serialization;
 
 namespace SOS.DataStewardship.Api.Contracts.Enums
 {
@@ -10,7 +11,7 @@ namespace SOS.DataStewardship.Api.Contracts.Enums
         /// <summary>
         /// bild
         /// </summary>
-        [EnumMember(Value = "bild")]
+        [EnumMember(Value = "bild")]        
         Bild = 0,
         /// <summary>
         /// film

@@ -197,12 +197,7 @@ namespace SOS.DataStewardship.Api.Extensions
                 LocationID = location?.LocationId,
                 LocationRemarks = location.LocationRemarks,
                 //LocationType = // ? todo - add location type to models.
-                Emplacement = location?.Point, // todo - decide if to use Point or PointWithBuffer
-                EmplacementTest = new GeometryObject
-                {
-                    Type = "point",
-                    Coordinates = new double[] { location.Point.Coordinates.Longitude, location.Point.Coordinates.Latitude }
-                }
+                Emplacement = location?.Point, // todo - decide if to use Point or PointWithBuffer                
             };
         }
 
@@ -272,11 +267,6 @@ namespace SOS.DataStewardship.Api.Extensions
                 point = point.Transform(CoordinateSys.WGS84, targetCoordinateSys);
 
                 occurrence.ObservationPoint = point.ToGeoShape();
-                occurrence.ObservationPointTest = new GeometryObject
-                {
-                    Type = "point",
-                    Coordinates = new double[] { point.X, point.Y }
-                };
             }
 
             occurrence.EventStartDate = observation.Event.StartDate;
@@ -616,7 +606,7 @@ namespace SOS.DataStewardship.Api.Extensions
             return locationFilter;
         }
 
-        public static SOS.Lib.Models.Search.Filters.GeographicsFilter ToGeographicsFilter(this GeographicsFilterArea geographicsFilterArea)
+        public static SOS.Lib.Models.Search.Filters.GeographicsFilter ToGeographicsFilter(this GeometryFilter geographicsFilterArea)
         {
             if (geographicsFilterArea == null) return null;
             var geographicsFilter = new SOS.Lib.Models.Search.Filters.GeographicsFilter();

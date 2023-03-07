@@ -1,27 +1,14 @@
-using System;
-using System.Runtime.Serialization;
-using System.Text;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
 {
-    /// <summary>
-    /// Event dataset
-    /// </summary>
-    [DataContract]
+    [SwaggerSchema("Event dataset.")]
     public class EventDataset
-    {
-        /// <summary>
-        /// Identifier
-        /// </summary>
-
-        [DataMember(Name = "identifier")]
+    {        
+        [SwaggerSchema("Identifier")]
         public string Identifier { get; set; }
-
-        /// <summary>
-        /// Title
-        /// </summary>
-
-        [DataMember(Name = "title")]
+        
+        [SwaggerSchema("Title")]
         public string Title { get; set; }
     }
 }

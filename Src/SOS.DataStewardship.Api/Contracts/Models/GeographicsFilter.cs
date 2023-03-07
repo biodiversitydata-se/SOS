@@ -1,27 +1,24 @@
-using System.Runtime.Serialization;
 using SOS.DataStewardship.Api.Contracts.Enums;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
-{
-    /// <summary>
-    /// Geometry filter.
-    /// </summary>
-    [DataContract]
+{    
+    [SwaggerSchema("Geographics filter")]
     public class GeographicsFilter
-    {
-        [DataMember(Name = "county")]
+    {        
+        [SwaggerSchema("County filter")]
         public County? County { get; set; }
 
-        [DataMember(Name = "municipality")]
+        [SwaggerSchema("Municipality filter")]
         public Municipality? Municipality { get; set; }
 
-        [DataMember(Name = "parish")]
+        [SwaggerSchema("Parish filter")]
         public Parish? Parish { get; set; }
 
-        [DataMember(Name = "province")]
+        [SwaggerSchema("Province filter")]
         public Province? Province { get; set; }
 
-        [DataMember(Name = "geometry")]
-        public GeographicsFilterArea Geometry { get; set; }
+        [SwaggerSchema("Geometry filter")]
+        public GeometryFilter Geometry { get; set; }
     }
 }
