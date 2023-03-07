@@ -2,7 +2,6 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.Lib.Enums.VocabularyValues;
-using SOS.Lib.Models.Processed.Observation;
 using System.Data;
 using ProcessedDataStewardship = SOS.Lib.Models.Processed.DataStewardship;
 
@@ -111,14 +110,14 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.ParentEventID = observationEvent.ParentEventId;
             ev.EventRemarks = observationEvent.EventRemarks;
             ev.AssociatedMedia = observationEvent.Media.ToAssociatedMedias();
-            ev.Dataset = observationEvent?.Dataset.ToEventDataset();            
+            ev.Dataset = observationEvent?.Dataset.ToDatasetInfo();            
             ev.EventStartDate = observationEvent.StartDate;
             ev.EventEndDate = observationEvent.EndDate;
             ev.SamplingProtocol = observationEvent.SamplingProtocol;
             ev.SurveyLocation = observationEvent?.Location?.ToLocation(responseCoordinateSystem);
-            //ev.LocationProtected = ?
-            //ev.EventType = ?
-            //ev.Weather = ?
+            ev.EventType = observationEvent?.EventType;
+            ev.LocationProtected = observationEvent?.LocationProtected;
+            ev.Weather = observationEvent?.Weather?.ToWeatherVariable();
             ev.RecorderCode = observationEvent.RecorderCode;
             ev.RecorderOrganisation = observationEvent?.RecorderOrganisation?.Select(m => m.ToOrganisation()).ToList();
 
@@ -126,9 +125,75 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
 
             return ev;
-        }       
+        }
 
-        public static DatasetInfo ToEventDataset(this ProcessedDataStewardship.Event.DatasetInfo source)
+        public static WeatherVariable ToWeatherVariable(this ProcessedDataStewardship.Event.WeatherVariable source)
+        {            
+            if (source == null) return null;
+
+            return new WeatherVariable
+            {
+
+                SnowCover = source.SnowCover?.ToSnowCover(),
+                Sunshine = source.Sunshine?.ToWeatherMeasuring(),
+                AirTemperature = source.AirTemperature?.ToWeatherMeasuring(),
+                WindDirectionCompass = source.WindDirectionCompass?.ToWindDirectionCompass(),
+                WindDirectionDegrees = source.WindDirectionDegrees?.ToWeatherMeasuring(),
+                WindSpeed = source.WindDirectionDegrees?.ToWeatherMeasuring(),
+                WindStrength = source.WindStrength?.ToWindStrength(),
+                Precipitation = source.Precipitation?.ToPrecipitation(),
+                Visibility = source.Visibility?.ToVisibility(),
+                Cloudiness = source.Cloudiness?.ToCloudiness()
+            };
+        }
+
+        private static Cloudiness ToCloudiness(this ProcessedDataStewardship.Enums.Cloudiness source)
+        {
+            return (Cloudiness)source;
+        }
+
+        private static Visibility ToVisibility(this ProcessedDataStewardship.Enums.Visibility source)
+        {
+            return (Visibility)source;
+        }
+
+        private static Precipitation ToPrecipitation(this ProcessedDataStewardship.Enums.Precipitation source)
+        {
+            return (Precipitation)source;
+        }
+
+        private static WindStrength ToWindStrength(this ProcessedDataStewardship.Enums.WindStrength source)
+        {
+            return (WindStrength)source;
+        }
+
+        private static WindDirectionCompass ToWindDirectionCompass(this ProcessedDataStewardship.Enums.WindDirectionCompass source)
+        {
+            return (WindDirectionCompass)source;
+        }        
+
+        private static Unit ToUnit(this ProcessedDataStewardship.Enums.Unit source)
+        {
+            return (Unit)source;
+        }
+
+        private static SnowCover ToSnowCover(this ProcessedDataStewardship.Enums.SnowCover source)
+        {            
+            return (SnowCover)source;
+        }
+
+        public static WeatherMeasuring ToWeatherMeasuring(this ProcessedDataStewardship.Event.WeatherMeasuring source)
+        {
+            if (source == null) return null;
+
+            return new WeatherMeasuring
+            {
+                Unit = source.Unit?.ToUnit(),
+                WeatherMeasure = source.WeatherMeasure
+            };
+        }
+
+        public static DatasetInfo ToDatasetInfo(this ProcessedDataStewardship.Event.DatasetInfo source)
         {
             if (source == null) return null;
             return new DatasetInfo
@@ -155,7 +220,7 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.EventStartDate = observation.Event.StartDate;
             ev.EventEndDate = observation.Event.EndDate;
             ev.SamplingProtocol = observation.Event.SamplingProtocol;
-            ev.SurveyLocation = observation.Location.ToLocation(responseCoordinateSystem);
+            ev.SurveyLocation = observation.Location.ToLocation(responseCoordinateSystem);            
             //ev.LocationProtected = ?
             //ev.EventType = ?
             //ev.Weather = ?
