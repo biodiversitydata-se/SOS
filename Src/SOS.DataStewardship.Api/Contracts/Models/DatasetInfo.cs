@@ -2,8 +2,8 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
 {
-    [SwaggerSchema("Event dataset.")]
-    public class EventDataset
+    [SwaggerSchema("Dataset info")]
+    public class DatasetInfo
     {        
         [SwaggerSchema("Identifier")]
         public string Identifier { get; set; }

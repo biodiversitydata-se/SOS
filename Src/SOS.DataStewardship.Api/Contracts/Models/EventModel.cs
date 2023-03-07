@@ -52,7 +52,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         public List<AssociatedMedia> AssociatedMedia { get; set; }
         
         [SwaggerSchema("Dataset")]
-        public EventDataset Dataset { get; set; }
+        public DatasetInfo Dataset { get; set; }
 
         [SwaggerSchema("A list of unique identities of the occurances made during an event")]
         public List<string> OccurrenceIds { get; set; }

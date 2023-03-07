@@ -71,7 +71,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 processedEvent.SamplingProtocol = verbatim.SamplingProtocol;
                 processedEvent.OccurrenceIds = verbatim.OccurrenceIds?.ToList();
                 processedEvent.Location = CreateLocation(verbatim);
-                processedEvent.Dataset = new EventDataset
+                processedEvent.Dataset = new DatasetInfo
                 {
                     Identifier = verbatim.DataStewardshipDatasetId
                     //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event

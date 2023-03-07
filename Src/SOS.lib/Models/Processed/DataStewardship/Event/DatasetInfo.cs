@@ -1,6 +1,6 @@
 ﻿namespace SOS.Lib.Models.Processed.DataStewardship.Event
 {
-    public class EventDataset
+    public class DatasetInfo
     {
         /// <summary>
         /// Identifier

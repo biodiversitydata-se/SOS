@@ -128,10 +128,10 @@ namespace SOS.DataStewardship.Api.Extensions
             return ev;
         }       
 
-        public static EventDataset ToEventDataset(this SOS.Lib.Models.Processed.DataStewardship.Event.EventDataset source)
+        public static DatasetInfo ToEventDataset(this ProcessedDataStewardship.Event.DatasetInfo source)
         {
             if (source == null) return null;
-            return new EventDataset
+            return new DatasetInfo
             {
                 Identifier = source.Identifier,
                 Title = source.Title,
@@ -146,7 +146,7 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.ParentEventID = observation.Event.ParentEventId;
             ev.EventRemarks = observation.Event.EventRemarks;
             ev.AssociatedMedia = observation.Event.Media.ToAssociatedMedias();
-            ev.Dataset = new EventDataset
+            ev.Dataset = new DatasetInfo
             {
                 Identifier = observation.DataStewardshipDatasetId,
                 //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event
@@ -266,7 +266,7 @@ namespace SOS.DataStewardship.Api.Extensions
             }
 
             occurrence.EventID = observation.Event.EventId;
-            occurrence.Dataset ??= new EventDataset();
+            occurrence.Dataset ??= new DatasetInfo();
             occurrence.Dataset.Identifier = observation.DataStewardshipDatasetId;
             occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
             occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);

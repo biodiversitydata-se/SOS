@@ -101,6 +101,6 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// <summary>
         /// Data stewardship dataset identifier.
         /// </summary>        
-        public EventDataset Dataset { get; set; }
+        public DatasetInfo Dataset { get; set; }
     }
 }

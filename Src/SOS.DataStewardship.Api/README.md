@@ -73,31 +73,20 @@ https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
 
 ---
 
-## Eventuellt ändra
-
-### Dataset
-1. När man söker dataset `POST Datasets` med filtret `DatasetList` så görs sökningen först mot observationer som har den `DatasetIdentifiern`. Sökningen borde göras direkt mot `Dataset-indexet` i Elasticsearch?
-2. När man söker dataset `POST Datasets` med filtret `Datum` så görs sökningen först mot observationer. Oklart om det ska vara så eller om sökningen först ska gå direkt mot `Dataset-indexet` i Elasticsearch?
-
-### Event
-1. När man söker events `POST Events` med filtret `DatasetList` så görs sökningen först mot observationer som har den `DatasetIdentifiern`. Sökningen borde göras direkt mot `Events-indexet` i Elasticsearch?
-2. När man söker events `POST Events` med filtret `Datum` så görs sökningen först mot observationer. Oklart om det ska vara så eller om sökningen först ska gå direkt mot `Events-indexet` i Elasticsearch?
-3. När man söker events `POST Events` med filtret `Area` så görs sökningen först mot observationer. Oklart om det ska vara så eller om sökningen först ska gå direkt mot `Events-indexet` i Elasticsearch?
-
----
-## Förslag till förändringar i API-specifikationen
+## API diff (DatasetFilter, EventsFilter, OccurrenceFilter)
+- `DatasetList` heter `DatasetIds`.
+- `Datum` heter `DateFilter`
+- `Area.Area` heter `Area.Geometry`
+- `EventDataset` heter `DatasetInfo`
 
 ## Funktionalitet som återstår i Datavärdskap API
 - Intern Health check
 - Publik Health check
 - Hantera skyddade observationer
 - Hantera skyddade event. Hantera `Event.LocationProtected`.
-- Går det att ta bort `[DataMember]` attribut? 
 - Kolla upp: Mappas `LifeStage`, `Activity` korrekt?
 - Kolla upp: Mappas `Unit` korrekt?
 - Kolla upp: Mappas `QuantityVariable` korrekt?
-- Rensa bort properties som troligtvis inte ska finnas med, t.ex. `ObservationPointTest`.
-
 
 ## Funktionalitet som återstår i SOS Hangfire skördning
 - Lägg till alla dataset som ska in i Artportalens databas
