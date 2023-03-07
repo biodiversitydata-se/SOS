@@ -2,6 +2,7 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Models.Processed.Observation;
 using System.Data;
 using ProcessedDataStewardship = SOS.Lib.Models.Processed.DataStewardship;
 
@@ -101,7 +102,7 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static EventModel ToEventModel(this ProcessedDataStewardship.Event.ObservationEvent observationEvent)
+        public static EventModel ToEventModel(this ProcessedDataStewardship.Event.ObservationEvent observationEvent, CoordinateSystem responseCoordinateSystem)
         {
             if (observationEvent == null) return null;
 
@@ -114,7 +115,7 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.EventStartDate = observationEvent.StartDate;
             ev.EventEndDate = observationEvent.EndDate;
             ev.SamplingProtocol = observationEvent.SamplingProtocol;
-            ev.SurveyLocation = observationEvent?.Location?.ToLocation();
+            ev.SurveyLocation = observationEvent?.Location?.ToLocation(responseCoordinateSystem);
             //ev.LocationProtected = ?
             //ev.EventType = ?
             //ev.Weather = ?
@@ -137,7 +138,7 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static EventModel ToEventModel(this Observation observation, IEnumerable<string> occurrenceIds)
+        public static EventModel ToEventModel(this Observation observation, IEnumerable<string> occurrenceIds, CoordinateSystem responseCoordinateSystem)
         {
             if (observation == null) return null;            
             var ev = new EventModel();
@@ -154,7 +155,7 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.EventStartDate = observation.Event.StartDate;
             ev.EventEndDate = observation.Event.EndDate;
             ev.SamplingProtocol = observation.Event.SamplingProtocol;
-            ev.SurveyLocation = observation.Location.ToLocation();
+            ev.SurveyLocation = observation.Location.ToLocation(responseCoordinateSystem);
             //ev.LocationProtected = ?
             //ev.EventType = ?
             //ev.Weather = ?
@@ -180,7 +181,7 @@ namespace SOS.DataStewardship.Api.Extensions
             return ev;
         }
 
-        public static Contracts.Models.Location ToLocation(this Lib.Models.Processed.Observation.Location location)
+        public static Contracts.Models.Location ToLocation(this Lib.Models.Processed.Observation.Location location, CoordinateSystem responseCoordinateSystem)
         {
             County? county = location?.County?.FeatureId?.GetCounty();
             Municipality? municipality = location?.Municipality?.FeatureId?.GetMunicipality();
@@ -197,8 +198,27 @@ namespace SOS.DataStewardship.Api.Extensions
                 LocationID = location?.LocationId,
                 LocationRemarks = location.LocationRemarks,
                 //LocationType = // ? todo - add location type to models.
-                Emplacement = location?.Point, // todo - decide if to use Point or PointWithBuffer                
+                Emplacement = location?.Point.ConvertCoordinateSystem(responseCoordinateSystem), // todo - decide if to use Point or PointWithBuffer                
             };
+        }
+
+        public static IGeoShape ConvertCoordinateSystem(this PointGeoShape point, CoordinateSystem responseCoordinateSystem)
+        {
+            if (point == null) return null;
+
+            var pointToTransform = new Point(point.Coordinates.Longitude, point.Coordinates.Latitude);            
+            var targetCoordinateSys = responseCoordinateSystem switch
+            {
+                CoordinateSystem.EPSG3006 => CoordinateSys.SWEREF99_TM,
+                CoordinateSystem.EPSG3857 => CoordinateSys.WebMercator,
+                CoordinateSystem.EPSG4258 => CoordinateSys.ETRS89,
+                CoordinateSystem.EPSG4326 => CoordinateSys.WGS84,
+                CoordinateSystem.EPSG4619 => CoordinateSys.SWEREF99,
+                _ => throw new Exception($"Not handled coordinate system {responseCoordinateSystem}")
+            };
+            
+            var transformedPoint = pointToTransform.Transform(CoordinateSys.WGS84, targetCoordinateSys);
+            return transformedPoint.ToGeoShape();            
         }
 
         public static List<AssociatedMedia> ToAssociatedMedias(this IEnumerable<Multimedia> multimedias)
@@ -250,25 +270,7 @@ namespace SOS.DataStewardship.Api.Extensions
             occurrence.Dataset.Identifier = observation.DataStewardshipDatasetId;
             occurrence.IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas; // todo - implement when the value list is defined
             occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
-
-            if (observation?.Location?.Point?.Coordinates != null)
-            {
-                var point = new Point(observation.Location.Point.Coordinates.Longitude, observation.Location.Point.Coordinates.Latitude);
-
-                var targetCoordinateSys = responseCoordinateSystem switch
-                {
-                    CoordinateSystem.EPSG3006 => CoordinateSys.SWEREF99_TM,
-                    CoordinateSystem.EPSG3857 => CoordinateSys.WebMercator,
-                    CoordinateSystem.EPSG4258 => CoordinateSys.ETRS89,
-                    CoordinateSystem.EPSG4326 => CoordinateSys.WGS84,
-                    CoordinateSystem.EPSG4619 => CoordinateSys.SWEREF99,
-                    _ => throw new Exception($"Not handled coordinate system {responseCoordinateSystem}") 
-                };
-                point = point.Transform(CoordinateSys.WGS84, targetCoordinateSys);
-
-                occurrence.ObservationPoint = point.ToGeoShape();
-            }
-
+            occurrence.ObservationPoint = observation?.Location?.Point.ConvertCoordinateSystem(responseCoordinateSystem);
             occurrence.EventStartDate = observation.Event.StartDate;
             occurrence.EventEndDate = observation.Event.EndDate;
             occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;            

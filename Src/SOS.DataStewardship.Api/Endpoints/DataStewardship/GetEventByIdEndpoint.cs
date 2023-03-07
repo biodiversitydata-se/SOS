@@ -25,9 +25,10 @@ public class GetEventByIdEndpoint : IEndpointDefinition
     [SwaggerResponse(404, "Not Found - The requested event doesn't exist")]    
     private async Task<IResult> GetEventByIdAsync(IDataStewardshipManager dataStewardshipManager,
         [FromRoute, SwaggerParameter("The event id", Required = true)] string id,
-        [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json)
+        [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json,
+        [FromQuery, SwaggerParameter("The response coordinate system")] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {        
-        var eventModel = await dataStewardshipManager.GetEventByIdAsync(id);
+        var eventModel = await dataStewardshipManager.GetEventByIdAsync(id, responseCoordinateSystem);
         if (eventModel == null) return Results.NotFound();
 
         return exportMode.Equals(ExportMode.Csv) ? Results.File(eventModel.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(eventModel);       
