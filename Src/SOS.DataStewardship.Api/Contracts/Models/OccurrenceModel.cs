@@ -84,7 +84,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         public double? ObservationCertainty { get; set; }
 
         /// <summary>
-        /// States the quality of a species observation, i.e. whether its verified by an expert or similar. Quality categories are chosen from a codelist.
+        /// States the quality of a species observation, i.e. whether its verified by an expert or similar.
         /// </summary>
         public string IdentificationVerificationStatus { get; set; }
 
