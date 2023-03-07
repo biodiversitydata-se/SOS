@@ -9,6 +9,9 @@ namespace SOS.DataStewardship.Api.Validators
         {            
             RuleFor(m => m.DateFilter).SetValidator(new DateFilterValidator())
                 .When(m => m.DateFilter != null);
+
+            RuleFor(m => m.Area).SetValidator(new GeographicsFilterValidator())
+                .When(m => m.Area != null);
         }
     }
 }
