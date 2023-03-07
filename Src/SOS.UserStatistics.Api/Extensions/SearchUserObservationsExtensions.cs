@@ -47,7 +47,8 @@ public static class SearchUserObservationsExtensions
         query.TryAddTermCriteria("event.startYear", filter.Year); // todo
         query.TryAddTermCriteria("taxon.id", filter.TaxonId);
         query.TryAddTermCriteria("taxon.attributes.speciesGroup", filter.SpeciesGroup); // todo
-        query.AddSightingTypeFilters(SearchFilterBase.SightingTypeFilter.DoNotShowMerged);
+        
+        query.AddSightingTypeFilters(SearchFilterBase.SightingTypeFilter.DoNotShowMerged, null);
 
         if (filter.AreaType.HasValue)
         {
