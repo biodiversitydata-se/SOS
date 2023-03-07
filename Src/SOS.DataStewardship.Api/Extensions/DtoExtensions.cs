@@ -268,7 +268,7 @@ namespace SOS.DataStewardship.Api.Extensions
             occurrence.EventID = observation.Event.EventId;
             occurrence.Dataset ??= new EventDataset();
             occurrence.Dataset.Identifier = observation.DataStewardshipDatasetId;
-            occurrence.IdentificationVerificationStatus = IdentificationVerificationStatus.VärdelistaSaknas; // todo - implement when the value list is defined
+            occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
             occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
             occurrence.ObservationPoint = observation?.Location?.Point.ConvertCoordinateSystem(responseCoordinateSystem);
             occurrence.EventStartDate = observation.Event.StartDate;

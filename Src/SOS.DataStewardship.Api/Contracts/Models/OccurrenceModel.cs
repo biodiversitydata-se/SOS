@@ -86,7 +86,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// <summary>
         /// States the quality of a species observation, i.e. whether its verified by an expert or similar. Quality categories are chosen from a codelist.
         /// </summary>
-        public IdentificationVerificationStatus? IdentificationVerificationStatus { get; set; }
+        public string IdentificationVerificationStatus { get; set; }
 
         /// <summary>
         /// Attached information about the species observation, e.g. media files like images, sound recordings etc. Can also be collected physical samples that can be referenced.
