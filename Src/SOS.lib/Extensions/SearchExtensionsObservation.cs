@@ -400,7 +400,7 @@ namespace SOS.Lib
             sightingTypeQuery.TryAddTermsCriteria("artportalenInternal.sightingTypeSearchGroupId", sightingTypeSearchGroupFilter);
 
             // If not only Assessment is selected
-            if (!((sightingTypeSearchGroupIds?.Count().Equals(1) ?? false) && sightingTypeSearchGroupIds.First().Equals(2))) 
+            if (!(sightingTypeSearchGroupFilter.Count().Equals(1) && sightingTypeSearchGroupFilter.First().Equals(2))) 
             {
                 // Get observations from other than Artportalen too
                 sightingTypeQuery.AddNotExistsCriteria("artportalenInternal.sightingTypeSearchGroupId");
