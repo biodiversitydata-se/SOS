@@ -90,7 +90,6 @@ namespace SOS.Harvest.DarwinCore
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-
         public async Task<List<DwcVerbatimObservationDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
         {
             var reader = CreateDwcReader(archiveReader.CoreFile.FileMetaData.RowType);
