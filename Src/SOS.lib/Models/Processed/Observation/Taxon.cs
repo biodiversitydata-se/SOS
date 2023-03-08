@@ -294,10 +294,13 @@ namespace SOS.Lib.Models.Processed.Observation
         public string VernacularName { get; set; }
 
         /// <summary>
-        /// Verbatim id used only in validation
+        /// Verbatim id 
         /// </summary>
-        [JsonIgnore]
-        [SwaggerExclude]
         public string VerbatimId { get; set; }
+
+        /// <summary>
+        /// Verbatim name 
+        /// </summary>
+        public string VerbatimName { get; set; }
     }
 }

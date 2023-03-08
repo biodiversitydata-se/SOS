@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using SOS.Lib.Constants;
-using SOS.Lib.DataStructures;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
@@ -26,10 +25,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
-        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificName;
-        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificNameAuthor;
-        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymName;
-        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymNameAuthor;
+       
         private string _englishDataproviderName;
 
         /// <summary>
@@ -51,25 +47,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-            _taxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
-            _taxonByScientificNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
-            _taxonBySynonymName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
-            _taxonBySynonymNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
-            foreach (var processedTaxon in taxa.Values)
-            {
-                _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
-                _taxonByScientificNameAuthor.Add(processedTaxon.ScientificName.ToLower() + " " + processedTaxon.ScientificNameAuthorship.ToLower(), processedTaxon);
-                if (processedTaxon.Attributes?.Synonyms != null)
-                {
-                    foreach (var synonyme in processedTaxon.Attributes.Synonyms)
-                    {
-                        _taxonBySynonymName.Add(synonyme.Name.ToLower(), processedTaxon);
-                        _taxonBySynonymNameAuthor.Add(synonyme.Name.ToLower() + " " + synonyme.Author.ToLower(), processedTaxon);
-                    }
-                }
-            }
-
-            _englishDataproviderName = dataProvider?.Names?.Translate("en-GB");
+            _englishDataproviderName = dataProvider?.Names?.Translate("en-GB")!;
         }
 
         public static async Task<DwcaObservationFactory> CreateAsync(
@@ -454,12 +432,12 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         }
 
         private Lib.Models.Processed.Observation.Taxon CreateProcessedTaxon(DwcObservationVerbatim verbatim)
-        {            
+        {
+            var parsedTaxonId = -1;
+
             // If dataprovider uses Dyntaxa Taxon Id, try parse TaxonId.
             if (!string.IsNullOrEmpty(verbatim.TaxonID))
             {
-                var parsedTaxonId = -1;
-
                 // Biologg fix. They should use urn:lsid:dyntaxa prefix.
                 if (DataProvider.Identifier == "Biologg")
                 {
@@ -477,73 +455,13 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                         parsedTaxonId = -1;
                     }
                 }                
-
-                if (parsedTaxonId != -1)
-                {
-                    var taxon = GetTaxon(parsedTaxonId);
-
-                    if ((taxon?.Id ?? -1) != -1)
-                    {
-                        return taxon;
-                    }
-                }
             }
 
-            // Get by scientific name
-            if (_taxonByScientificName.TryGetValues(verbatim.ScientificName?.ToLower(), out var taxa))
+            return GetTaxon(parsedTaxonId, new[]
             {
-                if (taxa.Count == 1)
-                {
-                    return taxa.First();
-                }
-            }
-
-            // Get by scientific name + author
-            if (_taxonByScientificNameAuthor.TryGetValues(verbatim.ScientificName?.ToLower(), out taxa))
-            {
-                if (taxa.Count == 1)
-                {
-                    return taxa.First();
-                }
-            }
-
-            // Get by species
-            if (_taxonByScientificName.TryGetValues(verbatim.Species?.ToLower(), out taxa))
-            {
-                if (taxa.Count == 1)
-                {
-                    return taxa.First();
-                }
-            }
-
-            // Get by synonyme
-            if (_taxonBySynonymName.TryGetValues(verbatim.ScientificName?.ToLower(), out taxa))
-            {
-                if (taxa.Count == 1)
-                {
-                    return taxa.First();
-                }
-            }
-
-            // Get by synonyme + author
-            if (_taxonBySynonymNameAuthor.TryGetValues(verbatim.ScientificName?.ToLower(), out taxa))
-            {
-                if (taxa.Count == 1)
-                {
-                    return taxa.First();
-                }
-            }
-
-            // Get by species (synonyme)
-            if (_taxonBySynonymName.TryGetValues(verbatim.Species?.ToLower(), out taxa))
-            {
-                if (taxa.Count == 1)
-                {
-                    return taxa.First();
-                }
-            }
-
-            return new Lib.Models.Processed.Observation.Taxon { Id = -1, VerbatimId = verbatim.TaxonID };
+                verbatim.ScientificName,
+                verbatim.Species
+            }, true, verbatim.TaxonID);
         }
 
         private VocabularyValue GetSosId(string val,
@@ -572,14 +490,14 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         }
 
 
-        private Lib.Models.Processed.Observation.ProjectParameter CreateProcessedProjectParameter(Lib.Models.Verbatim.Artportalen.ProjectParameter projectParameter)
+        private ProjectParameter CreateProcessedProjectParameter(Lib.Models.Verbatim.Artportalen.ProjectParameter projectParameter)
         {
             if (projectParameter == null)
             {
                 return null;
             }
 
-            return new Lib.Models.Processed.Observation.ProjectParameter
+            return new ProjectParameter
             {
                 Value = projectParameter.Value,
                 DataType = projectParameter.DataType,

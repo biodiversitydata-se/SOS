@@ -57,10 +57,6 @@ namespace SOS.DataStewardship.Api.Models
         [DataMember(Name="observationPoint")]
         public IGeoShape ObservationPoint { get; set; }
 
-        // Decide if to observationPoint should use IGeoShape or GeometryObject data type.
-        [DataMember(Name = "observationPointTest")]
-        public GeometryObject ObservationPointTest { get; set; }
-
         /// <summary>
         /// Taxonomic information about the observation. States which species (or subspecies, species aggregation, genus, family etc) was observed and identified.
         /// </summary>
