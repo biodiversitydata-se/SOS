@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AgileObjects.AgileMapper.Extensions;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -169,7 +170,7 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static T Clone<T>(this T original) where T : class
         {
-            return FastDeepCloner.DeepCloner.Clone(original);
+            return original.DeepClone();
         }
 
         public static dynamic ToDynamic(this object value)

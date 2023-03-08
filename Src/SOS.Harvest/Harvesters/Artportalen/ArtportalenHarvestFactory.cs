@@ -298,7 +298,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
 
             var projectParameterEntities = (await _projectRepository.GetSightingProjectParametersAsync(sightingIds))?.ToArray();
-
             if (projectParameterEntities?.Any() ?? false)
             {
                 for (var i = 0; i < projectParameterEntities.Length; i++)

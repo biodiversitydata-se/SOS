@@ -51,6 +51,50 @@ namespace SOS.Harvest.Processors
 
         private string GetAreaKey(AreaType areatype, string? featureId) => $"{areatype}-{featureId}";
 
+        private Lib.Models.Processed.Observation.Taxon GetTaxonByName(string name, bool ignoreDuplicates = false)
+        {
+            if (string.IsNullOrEmpty(name)) return null!;
+            name = name.ToLower();
+
+            // Get by scientific name
+            if (_taxonByScientificName.TryGetValues(name, out var taxa))
+            {
+                if (taxa.Count == 1 || ignoreDuplicates)
+                {
+                    return taxa.First();
+                }
+            }
+
+            // Get by scientific name + author
+            if (_taxonByScientificNameAuthor.TryGetValues(name, out taxa))
+            {
+                if (taxa.Count == 1 || ignoreDuplicates)
+                {
+                    return taxa.First();
+                }
+            }
+
+            // Get by synonyme
+            if (_taxonBySynonymName.TryGetValues(name, out taxa))
+            {
+                if (taxa.Count == 1 || ignoreDuplicates)
+                {
+                    return taxa.First();
+                }
+            }
+
+            // Get by synonyme + author
+            if (_taxonBySynonymNameAuthor.TryGetValues(name, out taxa))
+            {
+                if (taxa.Count == 1 || ignoreDuplicates)
+                {
+                    return taxa.First();
+                }
+            }
+
+            return null!;
+        }
+
         private IDictionary<int, HashSet<string>> LoadTaxonProtection()
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -102,70 +146,47 @@ namespace SOS.Harvest.Processors
 
             _protectedTaxa = LoadTaxonProtection();
         }
-        
+
         /// <summary>
-        /// Get taxon
+        ///  Get taxon
         /// </summary>
         /// <param name="taxonId"></param>
+        /// <param name="names"></param>
+        /// <param name="ignoreDuplicates">If false and taxon not is found by id and name search finds more than one match, no taxon is returned</param>
+        /// <param name="verbatimId"></param>
+        /// <param name="verbatimName"></param>
         /// <returns></returns>
-        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!, bool ignoreDuplicates = false)
+        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!, bool ignoreDuplicates = false, string? verbatimId = null, string? verbatimName = null)
         {
-            var taxonFound = Taxa.TryGetValue(taxonId, out var taxon);
+            Lib.Models.Processed.Observation.Taxon? taxon = null;
+            var taxonFound = taxonId < 0 ? false : Taxa.TryGetValue(taxonId, out taxon);
             if ((!taxonFound || taxonId == 0) && (names?.Any() ?? false))
             {
-                // If we can't find taxon by id or taxon id is biota, try by scientific name if passed
+                // If we can't find taxon by id or taxon id is 0 (biota), try by name/s if passed
                 foreach (var name in names)
                 {
                     taxon = GetTaxonByName(name, ignoreDuplicates);
-                    if (taxon != null) break;
+                    if (taxon != null)
+                    { 
+                        break;
+                    }
                 }
             }
 
-            return taxon ?? new Lib.Models.Processed.Observation.Taxon { Id = -1, VerbatimId = taxonId.ToString() };
-        }
-
-        protected Lib.Models.Processed.Observation.Taxon GetTaxonByName(string name, bool ignoreDuplicates = false)
-        {
-            if (string.IsNullOrEmpty(name)) return null;
-            name = name.ToLower();
-
-            // Get by scientific name
-            if (_taxonByScientificName.TryGetValues(name, out var taxa))
-            {                
-                if (taxa.Count == 1 || ignoreDuplicates)
-                {
-                    return taxa.First();
-                }
-            }
-
-            // Get by scientific name + author
-            if (_taxonByScientificNameAuthor.TryGetValues(name, out taxa))
+            if (taxon != null)
             {
-                if (taxa.Count == 1 || ignoreDuplicates)
-                {
-                    return taxa.First();
-                }
+                taxon = taxon.Clone();
+                taxon.VerbatimId = verbatimId ?? taxonId.ToString();
+                taxon.VerbatimName = verbatimName ?? names?.FirstOrDefault(n => !string.IsNullOrEmpty(n));
+
+                return taxon;
             }
 
-            // Get by synonyme
-            if (_taxonBySynonymName.TryGetValues(name, out taxa))
-            {
-                if (taxa.Count == 1 || ignoreDuplicates)
-                {
-                    return taxa.First();
-                }
-            }
-
-            // Get by synonyme + author
-            if (_taxonBySynonymNameAuthor.TryGetValues(name, out taxa))
-            {
-                if (taxa.Count == 1 || ignoreDuplicates )
-                {
-                    return taxa.First();
-                }
-            }
-
-            return null;
+            return new Lib.Models.Processed.Observation.Taxon { 
+                Id = -1, 
+                VerbatimId = verbatimId ?? taxonId.ToString(),
+                VerbatimName = verbatimName ?? names?.FirstOrDefault(n => !string.IsNullOrEmpty(n))
+            };
         }
 
         /// <summary>
@@ -202,7 +223,8 @@ namespace SOS.Harvest.Processors
                         )
                     )
                     {
-                        observation.Taxon = observation.Taxon.Clone();
+                        // observation.taxon should already be cloned to a unique object
+                        //observation.Taxon = observation.Taxon.Clone();
                         observation.Taxon.Attributes.ProtectedByLaw = false;
                     }
                 }

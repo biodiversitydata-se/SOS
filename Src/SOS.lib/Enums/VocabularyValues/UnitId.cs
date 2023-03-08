@@ -135,6 +135,18 @@
         ///     Registrations.
         ///     (Registreringar)
         /// </summary>
-        Registrations = 21
+        Registrations = 21,
+
+        /// <summary>
+        ///     Covering.
+        ///     (Täckningsgrad)
+        /// </summary>
+        Covering = 100,
+
+        /// <summary>
+        ///     Area Covering.
+        ///     (Yttäckning)
+        /// </summary>
+        AreaCovering = 101
     }
 }

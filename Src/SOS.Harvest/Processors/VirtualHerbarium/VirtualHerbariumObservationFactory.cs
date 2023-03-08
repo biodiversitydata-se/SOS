@@ -265,7 +265,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         {
             if (verbatim == null)
             {
-                return null;
+                return null!;
             }
 
             var taxon = GetTaxon(verbatim.DyntaxaId, new[] { verbatim.ScientificName }, true);

@@ -374,6 +374,8 @@ namespace SOS.DataStewardship.Api.Extensions
         {
             return unitId switch
             {
+                UnitId.AreaCovering => QuantityVariable.Yttäckning,
+                UnitId.Covering => QuantityVariable.Täckningsgrad,
                 UnitId.Individuals => QuantityVariable.AntalIndivider,
                 UnitId.Fruitbodies => QuantityVariable.AntalFruktkroppar,
                 UnitId.Capsules => QuantityVariable.AntalKapslar,
@@ -381,10 +383,6 @@ namespace SOS.DataStewardship.Api.Extensions
                 UnitId.Stems => QuantityVariable.AntalStjälkarStrånSkott,
                 UnitId.EggClusters => QuantityVariable.AntalÄggklumpar,
                 _ => null
-                // todo - add Täckningsgrad unit to SOS
-                //    return OccurrenceModel.QuantityVariableEnum.Täckningsgrad;
-                //case UnitId.: // todo - add Yttäckning unit to SOS
-                //    return OccurrenceModel.QuantityVariableEnum.Yttäckning;
             };
         }
 
@@ -395,9 +393,9 @@ namespace SOS.DataStewardship.Api.Extensions
                 ScientificName = taxon.ScientificName,
                 TaxonID = taxon.Id.ToString(),
                 TaxonRank = taxon.TaxonRank,
-                VernacularName = taxon.VernacularName
-                //VerbatimName = ? // todo - add support in SOS
-                //VerbatimTaxonID = ?, todo - add support in SOS
+                VernacularName = taxon.VernacularName,
+                VerbatimTaxonID = taxon.VerbatimId,
+                VerbatimName = taxon.VerbatimName
             };
         }
 
