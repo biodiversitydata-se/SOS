@@ -57,7 +57,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Name(nm => nm.Location)
                             .Properties(ps => ps.GetMapping())
                         )
-                        .Object<EventDataset>(l => l
+                        .Object<DatasetInfo>(l => l
                             .AutoMap()
                             .Name(nm => nm.Dataset)
                             .Properties(ps => ps

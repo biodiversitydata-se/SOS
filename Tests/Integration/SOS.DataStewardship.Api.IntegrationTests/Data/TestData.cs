@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Processed.DataStewardship.Event;
+﻿using SOS.DataStewardship.Api.Contracts.Models;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Data
@@ -30,9 +31,9 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
             };
         }
         
-        public static GeographicsFilterArea CreatePolygonFilterFromBbox(double minLon, double minLat, double maxLon, double maxLat)
+        public static GeometryFilter CreatePolygonFilterFromBbox(double minLon, double minLat, double maxLon, double maxLat)
         {
-            var filter = new GeographicsFilterArea
+            var filter = new GeometryFilter
             {
                 GeographicArea = new PolygonGeoShape(new List<List<GeoCoordinate>> { new List<GeoCoordinate>
                         {
@@ -48,9 +49,9 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
             return filter;
         }
 
-        public static GeographicsFilterArea CreateCircleFilterFromPoint(double lat, double lon, double distance)
+        public static GeometryFilter CreateCircleFilterFromPoint(double lat, double lon, double distance)
         {
-            var filter = new GeographicsFilterArea 
+            var filter = new GeometryFilter 
             {
                 GeographicArea = new PointGeoShape(new GeoCoordinate(lat, lon)),
                 MaxDistanceFromGeometries = distance

@@ -1,4 +1,4 @@
-﻿using SOS.DataStewardship.Api.Models;
+﻿using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.Lib.Helpers;
 using System.Data;
 

@@ -23,6 +23,7 @@ namespace SOS.Lib.Extensions
                 Purpose = apDataset.DatasetPurpose?.ToPurpose(),
                 Assigner = apDataset.Assigner?.ToOrganisation(),
                 Creator = apDataset.Creators?.Select(m => m.ToOrganisation()).ToList(),
+                Methodology = apDataset.Methodologies?.Select(m => m.ToMethodology()).ToList(),
                 OwnerinstitutionCode = apDataset.OwnerInstitution?.ToOrganisation(),
                 Publisher = apDataset.Publisher?.ToOrganisation(),
                 DataStewardship = apDataset.DataStewardship,
@@ -66,6 +67,17 @@ namespace SOS.Lib.Extensions
                 default:
                     throw new ArgumentOutOfRangeException($"ToPurpose() don't have support for value {purpose.Id}");
             }
+        }
+
+        public static Methodology ToMethodology(this ArtportalenDatasetMetadata.Methodology apMethodology)
+        {
+            return new Methodology
+            {                
+                MethodologyName = apMethodology.Name,
+                MethodologyDescription = apMethodology.Description,
+                MethodologyLink = apMethodology.Link,
+                SpeciesList = apMethodology.SpeciesList
+            };
         }
 
         public static SOS.Lib.Models.Processed.DataStewardship.Common.Organisation ToOrganisation(this ArtportalenDatasetMetadata.Organisation apOrganisation)

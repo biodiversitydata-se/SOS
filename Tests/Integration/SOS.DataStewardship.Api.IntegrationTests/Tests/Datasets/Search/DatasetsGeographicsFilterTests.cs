@@ -1,3 +1,5 @@
+using SOS.DataStewardship.Api.Contracts.Enums;
+using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.Lib.Enums.VocabularyValues;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.Datasets.Search;
@@ -22,7 +24,7 @@ public class DatasetsGeographicsFilterTests : TestBase
 
         var searchFilter = new DatasetFilter {
             Area = new GeographicsFilter {
-                Municipality = Models.Enums.Municipality.Uppsala
+                Municipality = Municipality.Uppsala
             }
         };
 
@@ -47,7 +49,7 @@ public class DatasetsGeographicsFilterTests : TestBase
 
         var searchFilter = new DatasetFilter {
             Area = new GeographicsFilter {
-                County = Models.Enums.County.UppsalaLän
+                County = County.UppsalaLän
             }
         };
 
@@ -72,7 +74,7 @@ public class DatasetsGeographicsFilterTests : TestBase
 
         var searchFilter = new DatasetFilter {
             Area = new GeographicsFilter {
-                Province = Models.Enums.Province.Uppland
+                Province = Province.Uppland
             }
         };
 
@@ -97,7 +99,7 @@ public class DatasetsGeographicsFilterTests : TestBase
 
         var searchFilter = new DatasetFilter {
             Area = new GeographicsFilter {
-                Parish = Models.Enums.Parish.Uppsala
+                Parish = Parish.Uppsala
             }
         };
 

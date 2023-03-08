@@ -1,3 +1,6 @@
+using SOS.DataStewardship.Api.Contracts.Enums;
+using SOS.DataStewardship.Api.Contracts.Models;
+
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.Datasets.Search;
 
 [Collection(Constants.IntegrationTestsCollectionName)]
@@ -28,7 +31,7 @@ public class DatasetsDateFilterTests : TestBase
             DateFilter = new DateFilter {
                 StartDate = new DateTime(2021, 02, 02, 0, 0, 0),
                 EndDate = new DateTime(2021, 02, 04, 23, 59, 59),
-                DateFilterType = Models.Enums.DateFilterType.OverlappingStartDateAndEndDate
+                DateFilterType = DateFilterType.OverlappingStartDateAndEndDate
             }
         };
 
@@ -58,7 +61,7 @@ public class DatasetsDateFilterTests : TestBase
             DateFilter = new DateFilter {
                 StartDate = new DateTime(2021, 02, 02, 0, 0, 0),
                 EndDate = new DateTime(2021, 02, 04, 23, 59, 59),
-                DateFilterType = Models.Enums.DateFilterType.BetweenStartDateAndEndDate
+                DateFilterType = DateFilterType.BetweenStartDateAndEndDate
             }
         };
 
@@ -85,7 +88,7 @@ public class DatasetsDateFilterTests : TestBase
             DateFilter = new DateFilter {
                 StartDate = new DateTime(2021, 02, 02, 0, 0, 0),
                 EndDate = new DateTime(2021, 02, 03, 23, 59, 59),
-                DateFilterType = Models.Enums.DateFilterType.OnlyStartDate
+                DateFilterType = DateFilterType.OnlyStartDate
             }
         };
 
@@ -112,7 +115,7 @@ public class DatasetsDateFilterTests : TestBase
             DateFilter = new DateFilter {
                 StartDate = new DateTime(2021, 02, 02, 0, 0, 0),
                 EndDate = new DateTime(2021, 02, 03, 23, 59, 59),
-                DateFilterType = Models.Enums.DateFilterType.OnlyEndDate
+                DateFilterType = DateFilterType.OnlyEndDate
             }
         };
 

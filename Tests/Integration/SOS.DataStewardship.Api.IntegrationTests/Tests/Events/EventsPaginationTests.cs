@@ -1,3 +1,5 @@
+using SOS.DataStewardship.Api.Contracts.Models;
+
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.Events;
 
 [Collection(Constants.IntegrationTestsCollectionName)]
@@ -12,7 +14,7 @@ public class EventsPaginationTests : TestBase
     {
         // Arrange
         var testDataSet = TestData.Create(10);
-        await ProcessFixture.AddDataToElasticsearchAsync((testDataSet.Events, testDataSet.Observations));
+        await ProcessFixture.AddDataToElasticsearchAsync(testDataSet.Events, testDataSet.Observations);
         var searchFilter = new EventsFilter();
         var eventModels = new List<EventModel>();
         int take = 2;
@@ -37,7 +39,7 @@ public class EventsPaginationTests : TestBase
     {
         // Arrange
         var testDataSet = TestData.Create(10);
-        await ProcessFixture.AddDataToElasticsearchAsync((testDataSet.Events, testDataSet.Observations));
+        await ProcessFixture.AddDataToElasticsearchAsync(testDataSet.Events, testDataSet.Observations);
         var searchFilter = new EventsFilter();
         int skip = 5;
         int take = 2;
@@ -59,7 +61,7 @@ public class EventsPaginationTests : TestBase
     {
         // Arrange
         var testDataSet = TestData.Create(10);
-        await ProcessFixture.AddDataToElasticsearchAsync((testDataSet.Events, testDataSet.Observations));
+        await ProcessFixture.AddDataToElasticsearchAsync(testDataSet.Events, testDataSet.Observations);
         var searchFilter = new EventsFilter();
         int skip = testDataSet.Events.Count();
         int take = 2;
@@ -80,7 +82,7 @@ public class EventsPaginationTests : TestBase
     {
         // Arrange
         var testDataSet = TestData.Create(10);
-        await ProcessFixture.AddDataToElasticsearchAsync((testDataSet.Events, testDataSet.Observations));
+        await ProcessFixture.AddDataToElasticsearchAsync(testDataSet.Events, testDataSet.Observations);
 
         var searchFilter = new EventsFilter();
         int skipNegative = -1;

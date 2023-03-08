@@ -1,13 +1,13 @@
 ﻿using Microsoft.ApplicationInsights.Extensibility;
-using SOS.DataStewardship.Api.ApplicationInsights;
-using SOS.DataStewardship.Api.Managers;
-using SOS.DataStewardship.Api.Managers.Interfaces;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Services;
+using SOS.DataStewardship.Api.Application.Infrastructure.ApplicationInsights;
+using SOS.DataStewardship.Api.Application.Managers.Interfaces;
+using SOS.DataStewardship.Api.Application.Managers;
 
 namespace SOS.DataStewardship.Api.Extensions;
 
