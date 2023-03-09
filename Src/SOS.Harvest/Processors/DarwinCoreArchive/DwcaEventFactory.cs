@@ -14,6 +14,8 @@ using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
+using Amazon.Runtime.Internal.Util;
+using Microsoft.Extensions.Logging;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -25,6 +27,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
+        public ILogger<DwcaEventProcessor> Logger { get; set; }
 
         /// <summary>
         /// Constructor
@@ -48,6 +51,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {
             try
             {
+                if (Logger != null) { Logger.LogDebug($"Start Processing Event: {verbatim.EventID}"); }
                 DwcParser.TryParseEventDate(
                 verbatim.EventDate,
                 verbatim.Year,
@@ -83,7 +87,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 AddPositionData(processedEvent.Location, verbatim.DecimalLongitude.ParseDouble(), verbatim.DecimalLatitude.ParseDouble(),
                     coordinateSystem, verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, 0);
                 _areaHelper.AddAreaDataToProcessedLocation(processedEvent.Location);
-
+                if (Logger != null) { Logger.LogDebug($"Finish Processing Event: {verbatim.EventID}"); }
                 return processedEvent;
             }
             catch (Exception e)
