@@ -177,17 +177,10 @@ namespace SOS.Harvest.Harvesters.DwC
                 await dwcCollectionRepository.DeleteCollectionsAsync();
 
                 // Read datasets
+                List<Lib.Models.Processed.DataStewardship.Dataset.DwcVerbatimObservationDataset> datasets = null;
                 try
                 {
-                    var datasets = await _dwcArchiveReader.ReadDatasetsAsync(dwcCollectionArchiveReaderContext);
-                    if (datasets != null && datasets.Any())
-                    {
-                        _logger.LogDebug($"Start storing DwC-A datasets for {dataProvider.Identifier}");
-                        await dwcCollectionRepository.DatasetRepository.AddCollectionAsync();
-                        await dwcCollectionRepository.DatasetRepository.AddManyAsync(datasets);
-                        await dwcCollectionRepository.DatasetRepository.PermanentizeCollectionAsync();
-                        _logger.LogDebug($"Finish storing DwC-A datasets for {dataProvider.Identifier}");
-                    }
+                    datasets = await _dwcArchiveReader.ReadDatasetsAsync(dwcCollectionArchiveReaderContext);
                 } 
                 catch (Exception ex)
                 {
@@ -239,9 +232,24 @@ namespace SOS.Harvest.Harvesters.DwC
                     _logger.LogError(ex, "Error reading DwC-A events");
                 }
 
-                dwcCollectionRepository.EndTempMode();                
-                // END
+                // Save datasets lasts, since DataSet.EventIds could been changed after reading Events
+                try
+                {                    
+                    if (datasets != null && datasets.Any())
+                    {
+                        _logger.LogDebug($"Start storing DwC-A datasets for {dataProvider.Identifier}");
+                        await dwcCollectionRepository.DatasetRepository.AddCollectionAsync();
+                        await dwcCollectionRepository.DatasetRepository.AddManyAsync(datasets);
+                        await dwcCollectionRepository.DatasetRepository.PermanentizeCollectionAsync();
+                        _logger.LogDebug($"Finish storing DwC-A datasets for {dataProvider.Identifier}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error reading DwC-A datasets");
+                }
 
+                dwcCollectionRepository.EndTempMode();
 
                 if (dataProvider.UseVerbatimFileInExport)
                 {
