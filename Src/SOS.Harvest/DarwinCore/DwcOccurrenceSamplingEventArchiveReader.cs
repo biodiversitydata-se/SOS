@@ -901,6 +901,11 @@ namespace SOS.Harvest.DarwinCore
                     ev.DataStewardshipDatasetId = defaultDataset.Identifier;
                 }
             }
+
+            if (defaultDataset != null && (defaultDataset.EventIds == null || !defaultDataset.EventIds.Any()))
+            {
+                defaultDataset.EventIds = events.Select(e => e.EventID).ToList();
+            }
         }
 
         public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(

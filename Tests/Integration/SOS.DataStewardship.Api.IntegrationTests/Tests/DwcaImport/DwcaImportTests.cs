@@ -44,9 +44,11 @@ public class DwcaImportTests : TestBase
 
         datasetsBySearchPageResult.TotalCount.Should().Be(1, "because the DwC-A file contains 1 datasets");
         datasetsBySearchPageResult.Records.First().Identifier.Should().Be(exptectedDataset);
+        datasetsBySearchPageResult.Records.First().EventIds.Should().NotBeEmpty("because the dataset have events");
 
         eventsBySearchPageResult.TotalCount.Should().Be(7, "because the DwC-A file contains 7 events");
         eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().Be(exptectedDataset));
+        eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.OccurrenceIds.Should().NotBeEmpty(), "because the event have occurrences");
 
         occurrencesBySearchPageResult.TotalCount.Should().Be(15, "because the DwC-A file contains 15 occurrences");
         occurrencesBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().Be(exptectedDataset));
@@ -88,10 +90,12 @@ public class DwcaImportTests : TestBase
         };
         
         datasetsBySearchPageResult.TotalCount.Should().Be(2, "because the DwC-A file contains 2 datasets");
-        datasetsBySearchPageResult.Records.Select(m => m.Identifier).Should().BeEquivalentTo(exptectedDatasets);       
+        datasetsBySearchPageResult.Records.Select(m => m.Identifier).Should().BeEquivalentTo(exptectedDatasets);
+        datasetsBySearchPageResult.Records.Should().AllSatisfy(m => m.EventIds.Should().NotBeEmpty(), "because the datasets have events");
 
         eventsBySearchPageResult.TotalCount.Should().Be(7, "because the DwC-A file contains 7 events");
         eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().BeOneOf(exptectedDatasets));
+        eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.OccurrenceIds.Should().NotBeEmpty(), "because the events have occurrences");
 
         occurrencesBySearchPageResult.TotalCount.Should().Be(15, "because the DwC-A file contains 15 occurrences");
         occurrencesBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().BeOneOf(exptectedDatasets));
