@@ -11,11 +11,11 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         /// <summary>
         ///     Unique id.
         /// </summary>        
-        public string Id
-        {
-            get => Identifier;
-            set { }
-        }
+        public string Id { get; set; }
+        //{
+        //    get => Identifier;
+        //    set { }
+        //}
 
         /// <summary>
         /// The dataset id-number within the metadata catalogue administered by the authority that is responsible for the information.

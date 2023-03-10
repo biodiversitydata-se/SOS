@@ -39,7 +39,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Map<Dataset>(m => m
                     .AutoMap<Dataset>()
                     .Properties(ps => ps
-                        .KeyWordLowerCase(kwlc => kwlc.Id)
+                        .KeyWordLowerCase(kwlc => kwlc.Id, false)
                         .KeyWordLowerCase(kwlc => kwlc.Identifier)                        
                         .KeyWordLowerCase(kwlc => kwlc.DataStewardship)
                         .KeyWordLowerCase(kwlc => kwlc.Title, false)
@@ -173,8 +173,8 @@ namespace SOS.Lib.Repositories.Processed
                     // number of items per bulk request
                     .Size(WriteBatchSize)
                     .DroppedDocumentCallback((r, o) =>
-                    {
-                        Logger.LogError($"Dataset id: {o?.Id}, Error: {r?.Error?.Reason}");
+                    {                        
+                        Logger.LogError($"Dataset identifier: {o?.Identifier}, Error: {r?.Error?.Reason}");
                     })
                 )
                 .Wait(TimeSpan.FromDays(1),

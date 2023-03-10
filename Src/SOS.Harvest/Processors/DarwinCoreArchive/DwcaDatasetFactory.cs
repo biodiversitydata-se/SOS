@@ -31,12 +31,9 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 {
                     return null;
                 }
-
-                var id = $"urn:lsid:{DataProvider.ChecklistIdentifier}:Dataset:{verbatimDataset.Identifier}";
                 
                 var observationDataset = new Dataset
-                {
-                    Id = id, // verbatimDataset.Identifier,
+                {                    
                     AccessRights = verbatimDataset.AccessRights,
                     Assigner = verbatimDataset.Assigner,
                     Creator = verbatimDataset.Creator,
@@ -45,6 +42,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     EndDate = verbatimDataset.EndDate,
                     EventIds = verbatimDataset.EventIds,                    
                     Identifier = verbatimDataset.Identifier,
+                    //Identifier = $"urn:lsid:{DataProvider.Identifier}:Dataset:{verbatimDataset.Identifier}",
                     Language = verbatimDataset.Language,
                     Metadatalanguage = verbatimDataset.Metadatalanguage,
                     Methodology = verbatimDataset.Methodology,

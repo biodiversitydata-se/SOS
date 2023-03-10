@@ -1,5 +1,6 @@
 using SOS.DataStewardship.Api.Contracts.Models;
-using SOS.DataStewardship.Api.IntegrationTests.Core.Extensions;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.DwcaImport;
 
@@ -16,7 +17,8 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
-        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-single-dataset.zip", Output);
+        var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
+        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-single-dataset.zip", dataProvider, Output);
 
         //-----------------------------------------------------------------------------------------------------------
         // Act
@@ -24,7 +26,7 @@ public class DwcaImportTests : TestBase
 
         // Get all datasets
         var datasetSearchFilter = new DatasetFilter {  };
-        var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
+        var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Contracts.Models.Dataset>, DatasetFilter>(
             $"datastewardship/datasets", datasetSearchFilter, jsonSerializerOptions);
 
         // Get all events
@@ -60,7 +62,8 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
-        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-multiple-datasets.zip", Output);
+        var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
+        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-multiple-datasets.zip", dataProvider, Output);
 
         //-----------------------------------------------------------------------------------------------------------
         // Act
@@ -68,7 +71,7 @@ public class DwcaImportTests : TestBase
 
         // Get all datasets
         var datasetSearchFilter = new DatasetFilter { };
-        var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
+        var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Contracts.Models.Dataset>, DatasetFilter>(
             $"datastewardship/datasets", datasetSearchFilter, jsonSerializerOptions);
 
         // Get all events
@@ -98,6 +101,58 @@ public class DwcaImportTests : TestBase
         eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.OccurrenceIds.Should().NotBeEmpty(), "because the events have occurrences");
 
         occurrencesBySearchPageResult.TotalCount.Should().Be(15, "because the DwC-A file contains 15 occurrences");
+        occurrencesBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().BeOneOf(exptectedDatasets));
+    }
+
+    [Fact]
+    public async Task ImportMultipleDwcaFiles_ShouldHaveExpectedRecords_WhenImportingDwcaContainingMultipleDatasets()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------        
+        var files = new List<(string filePath, DataProvider dataProvider)>()
+        {
+            (@"data\resources\dwca-datastewardship-single-dataset.zip", new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA }),
+            (@"data\resources\dwca-datastewardship-single-dataset-with-other-dataset-identifier.zip", new DataProvider { Id = 106, Identifier = "TestDataStewardshipBats (other name)", Type = DataProviderType.DwcA })
+        };
+        await ProcessFixture.ImportDwcaFilesAsync(files, Output);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+
+        // Get all datasets
+        var datasetSearchFilter = new DatasetFilter { };
+        var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Contracts.Models.Dataset>, DatasetFilter>(
+            $"datastewardship/datasets", datasetSearchFilter, jsonSerializerOptions);
+
+        // Get all events
+        var eventsSearchFilter = new EventsFilter { };
+        var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+            $"datastewardship/events", eventsSearchFilter, jsonSerializerOptions);
+
+        // Get all occurrences
+        var occurrenceSearchFilter = new OccurrenceFilter { };
+        var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+            $"datastewardship/occurrences", occurrenceSearchFilter, jsonSerializerOptions);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        string[] exptectedDatasets = new[] {
+            "ArtportalenDataHost - Dataset Bats (Hallaröd)",
+            "Dataset Bats (Hallaröd)"
+        };
+
+        datasetsBySearchPageResult.TotalCount.Should().Be(2, "because each DwC-A file contains 1 datasets");
+        datasetsBySearchPageResult.Records.Select(m => m.Identifier).Should().BeEquivalentTo(exptectedDatasets);
+        datasetsBySearchPageResult.Records.Should().AllSatisfy(m => m.EventIds.Should().NotBeEmpty(), "because the datasets have events");
+
+        eventsBySearchPageResult.TotalCount.Should().Be(14, "because each DwC-A file contains 7 events");
+        eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().BeOneOf(exptectedDatasets));
+        eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.OccurrenceIds.Should().NotBeEmpty(), "because the events have occurrences");
+
+        occurrencesBySearchPageResult.TotalCount.Should().Be(30, "because each DwC-A file contains 15 occurrences");
         occurrencesBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().BeOneOf(exptectedDatasets));
     }
 }

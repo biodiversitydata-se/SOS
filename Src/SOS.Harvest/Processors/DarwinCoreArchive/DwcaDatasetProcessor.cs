@@ -104,7 +104,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     }
 
                     // Add dataset
-                    datasets.TryAdd(dataset.Id.ToString(), dataset);
+                    datasets.TryAdd(dataset.Identifier.ToString(), dataset);
                 }
 
                 await GetDatasetEvents(datasets);

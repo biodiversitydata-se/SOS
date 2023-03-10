@@ -57,7 +57,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {
             using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, Logger);
             DwcaEventFactory dwcaEventFactory = await DwcaEventFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager, ProcessConfiguration);
-            dwcaEventFactory.Logger = Logger;
 
             return await base.ProcessEventsAsync(
                 dataProvider,

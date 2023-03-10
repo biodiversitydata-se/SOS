@@ -114,9 +114,9 @@ namespace SOS.Harvest.Processors
                 {
                     var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
                     if (processedEvent == null) continue;
-                    processedEvents.TryAdd(processedEvent.Id, processedEvent);
+                    processedEvents.TryAdd(processedEvent.EventId, processedEvent);
                 }
-               
+
                 Logger.LogDebug($"Event - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 return await ValidateAndStoreEvents(dataProvider, processedEvents.Values, $"{startId}-{endId}");
             }
