@@ -4,16 +4,17 @@ using SOS.Lib.Models.Processed.Observation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Event = SOS.Lib.Models.Processed.DataStewardship.Event.Event;
 
 namespace SOS.Lib.Extensions
 {
     public static class ObservationEventExtensions
     {
-        public static Event ToObservationEvent(this Observation observation, IEnumerable<string> occurrenceIds, int dataProviderId)
+        public static Event ToEvent(this Observation observation, IEnumerable<string> occurrenceIds, int dataProviderId)
         {
             if (observation == null) return null;
             
-            var ev = new Models.Processed.DataStewardship.Event.Event();
+            var ev = new Event();
             ev.EventId = observation.Event.EventId;
             ev.ParentEventId = observation.Event.ParentEventId;
             ev.EventRemarks = observation.Event.EventRemarks;

@@ -88,7 +88,7 @@ namespace SOS.Harvest.Processors.Artportalen
                         string eventId = observation.Event.EventId.ToLower();
                         if (occurrenceIdsByEventId.TryGetValue(eventId, out var occurrenceIds))
                         {
-                            var eventModel = observation.ToObservationEvent(occurrenceIds, dataProvider.Id);
+                            var eventModel = observation.ToEvent(occurrenceIds, dataProvider.Id);
                             events.Add(eventModel);
                         }
                         else
