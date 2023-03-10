@@ -1,6 +1,7 @@
 ﻿using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,7 +9,7 @@ namespace SOS.Lib.Extensions
 {
     public static class ObservationEventExtensions
     {
-        public static Models.Processed.DataStewardship.Event.Event ToObservationEvent(this Observation observation, IEnumerable<string> occurrenceIds)
+        public static Event ToObservationEvent(this Observation observation, IEnumerable<string> occurrenceIds, int dataProviderId)
         {
             if (observation == null) return null;
             
@@ -24,6 +25,8 @@ namespace SOS.Lib.Extensions
                 //Title = // need to lookup this from Dataset index or store this information in Observation/Event
             };
 
+            ev.Created = DateTime.Now;
+            ev.DataProviderId = dataProviderId;
             ev.StartDate = observation.Event.StartDate;
             ev.EndDate = observation.Event.EndDate;
             ev.SamplingProtocol = observation.Event.SamplingProtocol;

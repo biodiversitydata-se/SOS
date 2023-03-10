@@ -284,9 +284,9 @@ namespace SOS.Harvest.Jobs
             }
 
             var protectedCount = (int)await _processedObservationRepository.IndexCountAsync(true);
-            if (protectedCount < 1)
+            if (protectedCount < _processConfiguration.MinObservationProtectedCount)
             {
-                _logger.LogError($"Validation failed. Only {protectedCount} protected observations processed");
+                _logger.LogError($"Validation failed. Only {protectedCount} protected observations processed. It should be at least {_processConfiguration.MinObservationProtectedCount}");
                 // No protected observations found. Something is wrong
                 return false;
             }

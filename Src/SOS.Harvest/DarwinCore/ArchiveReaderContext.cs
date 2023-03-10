@@ -2,6 +2,7 @@
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using System.Collections.Generic;
 
 namespace SOS.Harvest.DarwinCore
 {
@@ -17,6 +18,7 @@ namespace SOS.Harvest.DarwinCore
         public ArchiveReader ArchiveReader { get; set; }
         public Dictionary<string, DwcVerbatimDataset> DatasetByEventId { get; set; }
         public Dictionary<string, List<string>> OccurrenceIdsByEventId { get; set; }
+        public List<DwcVerbatimDataset> Datasets { get; set; }
         public IIdIdentifierTuple DataProvider { get; set; }
         public int MaxNrObservationsToReturn { get; set; } = int.MaxValue;
         public int BatchSize { get; set; } = 100000;

@@ -1,5 +1,6 @@
 using SOS.DataStewardship.Api.Contracts.Models;
-using Dataset = SOS.DataStewardship.Api.Contracts.Models.Dataset;
+using SOS.DataStewardship.Api.IntegrationTests.Core.Extensions;
+
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.DwcaImport;
 
 [Collection(Constants.IntegrationTestsCollectionName)]
@@ -10,124 +11,93 @@ public class DwcaImportTests : TestBase
     }
 
     [Fact]
-    public async Task Import_dwca_file_and_verify_observations()
-    {
-        //-----------------------------------------------------------------------------------------------------------
-        // Arrange
-        //-----------------------------------------------------------------------------------------------------------
-        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-bats-taxalists.zip", Output);
-
-        //-----------------------------------------------------------------------------------------------------------
-        // Act
-        //-----------------------------------------------------------------------------------------------------------
-
-        // Get by id
-        var observationById1 = await ApiClient.GetFromJsonAsync<OccurrenceModel>($"datastewardship/occurrences/test:bats:sighting:98571703", jsonSerializerOptions);
-        var observationById2 = await ApiClient.GetFromJsonAsync<OccurrenceModel>($"datastewardship/occurrences/test:bats:sighting:98571253", jsonSerializerOptions);
-
-        // Get by search - Observations with Dataset "Bats (Hallaröd)"
-        var searchFilter = new OccurrenceFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
-        var pageResultHallarod = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>($"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
-
-        // Get by search - Observations with Dataset "Bats (Other)"
-        searchFilter = new OccurrenceFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
-        var pageResultOther = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>($"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
-
-        //-----------------------------------------------------------------------------------------------------------
-        // Assert
-        //-----------------------------------------------------------------------------------------------------------
-        observationById1.Should().NotBeNull();
-        observationById2.Should().NotBeNull();
-
-        pageResultHallarod.Records.Should().AllSatisfy(m =>
-        {
-            m.Dataset?.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Hallaröd)");
-        });
-
-        pageResultOther.Records.Should().AllSatisfy(m =>
-        {
-            m.Dataset?.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Other)");
-        });
-    }
-
-    [Fact]
-    public async Task Import_dwca_file_and_verify_events()
+    public async Task ImportDwcaFile_ShouldHaveExpectedRecords_WhenImportingDwcaContainingSingleDataset()
     {
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
-        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-bats-taxalists.zip", Output);
+        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-single-dataset.zip", Output);
 
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
 
-        // Get by id
-        var eventById1 = await ApiClient.GetFromJsonAsync<EventModel>($"datastewardship/events/test:bats:event:12581041667877196608", jsonSerializerOptions);
-        var eventById2 = await ApiClient.GetFromJsonAsync<EventModel>($"datastewardship/events/test:bats:event:14009236676399444594", jsonSerializerOptions);
+        // Get all datasets
+        var datasetSearchFilter = new DatasetFilter {  };
+        var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
+            $"datastewardship/datasets", datasetSearchFilter, jsonSerializerOptions);
 
-        // Get by search - Events with Dataset "Bats (Hallaröd)"
-        var searchFilter = new EventsFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
-        var pageResultHallarod = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
+        // Get all events
+        var eventsSearchFilter = new EventsFilter { };
+        var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+            $"datastewardship/events", eventsSearchFilter, jsonSerializerOptions);
 
-        // Get by search - Events with Dataset "Bats (Other)"
-        searchFilter = new EventsFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
-        var pageResultOther = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>($"datastewardship/events", searchFilter, jsonSerializerOptions);
+        // Get all occurrences
+        var occurrenceSearchFilter = new OccurrenceFilter { };
+        var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+            $"datastewardship/occurrences", occurrenceSearchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        eventById1.Should().NotBeNull();
-        eventById2.Should().NotBeNull();
+        string exptectedDataset = "ArtportalenDataHost - Dataset Bats (Hallaröd)";
 
-        pageResultHallarod.Records.Should().AllSatisfy(m =>
-        {
-            m.Dataset.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Hallaröd)");
-        });
+        datasetsBySearchPageResult.TotalCount.Should().Be(1, "because the DwC-A file contains 1 datasets");
+        datasetsBySearchPageResult.Records.First().Identifier.Should().Be(exptectedDataset);
+        datasetsBySearchPageResult.Records.First().EventIds.Should().NotBeEmpty("because the dataset have events");
 
-        pageResultOther.Records.Should().AllSatisfy(m =>
-        {
-            m.Dataset.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Other)");
-        });
+        eventsBySearchPageResult.TotalCount.Should().Be(7, "because the DwC-A file contains 7 events");
+        eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().Be(exptectedDataset));
+        eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.OccurrenceIds.Should().NotBeEmpty(), "because the event have occurrences");
+
+        occurrencesBySearchPageResult.TotalCount.Should().Be(15, "because the DwC-A file contains 15 occurrences");
+        occurrencesBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().Be(exptectedDataset));
     }
 
     [Fact]
-    public async Task Import_dwca_file_and_verify_datasets()
+    public async Task ImportDwcaFile_ShouldHaveExpectedRecords_WhenImportingDwcaContainingMultipleDatasets()
     {
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
-        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-bats-taxalists.zip", Output);
+        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-multiple-datasets.zip", Output);
 
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
-        // Get by id        
-        var datasetById1 = await ApiClient.GetFromJsonAsync<Dataset>($"datastewardship/datasets/ArtportalenDataHost - Dataset Bats (Hallaröd)", jsonSerializerOptions);
-        var datasetById2 = await ApiClient.GetFromJsonAsync<Dataset>($"datastewardship/datasets/ArtportalenDataHost - Dataset Bats (Other)", jsonSerializerOptions);
 
-        // Get by search - Events with Dataset "Bats (Hallaröd)"
-        var searchFilter = new DatasetFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Hallaröd)" } };
-        var pageResultHallarod = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
+        // Get all datasets
+        var datasetSearchFilter = new DatasetFilter { };
+        var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
+            $"datastewardship/datasets", datasetSearchFilter, jsonSerializerOptions);
 
-        // Get by search - Events with Dataset "Bats (Other)"
-        searchFilter = new DatasetFilter { DatasetIds = new List<string> { "ArtportalenDataHost - Dataset Bats (Other)" } };
-        var pageResultOther = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>($"datastewardship/datasets", searchFilter, jsonSerializerOptions);
+        // Get all events
+        var eventsSearchFilter = new EventsFilter { };
+        var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+            $"datastewardship/events", eventsSearchFilter, jsonSerializerOptions);
+
+        // Get all occurrences
+        var occurrenceSearchFilter = new OccurrenceFilter { };
+        var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+            $"datastewardship/occurrences", occurrenceSearchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        datasetById1.Should().NotBeNull();
-        datasetById2.Should().NotBeNull();
+        string[] exptectedDatasets = new[] { 
+            "ArtportalenDataHost - Dataset Bats (Hallaröd)", 
+            "ArtportalenDataHost - Dataset Bats (Other)" 
+        };
+        
+        datasetsBySearchPageResult.TotalCount.Should().Be(2, "because the DwC-A file contains 2 datasets");
+        datasetsBySearchPageResult.Records.Select(m => m.Identifier).Should().BeEquivalentTo(exptectedDatasets);
+        datasetsBySearchPageResult.Records.Should().AllSatisfy(m => m.EventIds.Should().NotBeEmpty(), "because the datasets have events");
 
-        pageResultHallarod.Records.Should().AllSatisfy(m =>
-        {
-            m.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Hallaröd)");
-        });
+        eventsBySearchPageResult.TotalCount.Should().Be(7, "because the DwC-A file contains 7 events");
+        eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().BeOneOf(exptectedDatasets));
+        eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.OccurrenceIds.Should().NotBeEmpty(), "because the events have occurrences");
 
-        pageResultOther.Records.Should().AllSatisfy(m =>
-        {
-            m.Identifier.Should().Be("ArtportalenDataHost - Dataset Bats (Other)");
-        });
+        occurrencesBySearchPageResult.TotalCount.Should().Be(15, "because the DwC-A file contains 15 occurrences");
+        occurrencesBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().BeOneOf(exptectedDatasets));
     }
 }

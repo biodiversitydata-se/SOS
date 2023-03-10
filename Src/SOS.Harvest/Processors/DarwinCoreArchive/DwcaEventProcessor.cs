@@ -57,6 +57,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {
             using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, Logger);
             DwcaEventFactory dwcaEventFactory = await DwcaEventFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager, ProcessConfiguration);
+            dwcaEventFactory.Logger = Logger;
 
             return await base.ProcessEventsAsync(
                 dataProvider,
@@ -79,18 +80,26 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 Logger.LogDebug($"Event - Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
                 var verbatimEventsBatch = await eventVerbatimRepository.GetBatchAsync(startId, endId);
                 Logger.LogDebug($"Event - Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
-                if (!verbatimEventsBatch?.Any() ?? true) return 0;
+                if (verbatimEventsBatch == null || verbatimEventsBatch.Count() == 0)
+                {
+                    Logger.LogError($"Event batch is Empty, {dataProvider.Identifier} batch ({startId}-{endId})");
+                    return 0;
+                }
 
                 Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 var processedEvents = new ConcurrentDictionary<string, Event>();
                 foreach (var verbatimEvent in verbatimEventsBatch)
                 {
                     var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
-                    if (processedEvent == null) continue;
+                    if (processedEvent == null)
+                    {                        
+                        Logger.LogInformation($"Processed event is null, EventId: {verbatimEvent.EventID})");
+                        continue;
+                    }
                     processedEvents.TryAdd(processedEvent.EventId, processedEvent);
                 }
 
-                await GetEventObservations(processedEvents);
+                await GetEventObservations(processedEvents, dataProvider);
                 Logger.LogDebug($"Event - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 return await ValidateAndStoreEvents(dataProvider, processedEvents.Values, $"{startId}-{endId}");
             }
@@ -110,7 +119,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
         }
 
-        private async Task GetEventObservations(ConcurrentDictionary<string, Event> processedEvents)
+        private async Task GetEventObservations(ConcurrentDictionary<string, Event> processedEvents, DataProvider dataProvider)
         {
             var filter = new SearchFilter(0);
             //filter.IsPartOfDataStewardshipDataset = true;
@@ -118,17 +127,17 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
             var occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId.ToLower(), m => m.OccurrenceIds);
             foreach (var eventPair in processedEvents)
-            {
+            {                
                 if (occurrenceIdsByEventId.TryGetValue(eventPair.Key.ToLower(), out var occurrenceIds))
                 {
                     if (occurrenceIds != null && eventPair.Value.OccurrenceIds != null && occurrenceIds.Count != eventPair.Value.OccurrenceIds.Count)
-                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed={occurrenceIds.Count}, EventId={eventPair.Key}");
+                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed={occurrenceIds.Count}, EventId={eventPair.Key}, DataProvider={dataProvider}");
                     eventPair.Value.OccurrenceIds = occurrenceIds;
                 }
                 else
                 {
                     if (eventPair.Value.OccurrenceIds != null && eventPair.Value.OccurrenceIds.Count > 0)
-                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed=0, EventId={eventPair.Key}");
+                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed=0, EventId={eventPair.Key}, DataProvider={dataProvider}");
                     eventPair.Value.OccurrenceIds = null;
                 }
             }
