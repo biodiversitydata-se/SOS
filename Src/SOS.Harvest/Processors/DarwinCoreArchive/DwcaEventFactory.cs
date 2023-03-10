@@ -26,8 +26,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     {
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
-        private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
-        public ILogger<DwcaEventProcessor> Logger { get; set; }
+        private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;        
 
         /// <summary>
         /// Constructor
@@ -50,8 +49,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         public Lib.Models.Processed.DataStewardship.Event.Event CreateEventObservation(DwcEventOccurrenceVerbatim verbatim)
         {
             try
-            {
-                if (Logger != null) { Logger.LogDebug($"Start Processing Event: {verbatim.EventID}"); }
+            {                
                 DwcParser.TryParseEventDate(
                 verbatim.EventDate,
                 verbatim.Year,
@@ -62,7 +60,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 out var endDate);
 
                 var processedEvent = new Lib.Models.Processed.DataStewardship.Event.Event();
-                processedEvent.Id = verbatim.Id.ToString();
                 processedEvent.Created = DateTime.Now;
                 processedEvent.DataProviderId = DataProvider.Id;
                 processedEvent.StartDate = startDate;
@@ -86,10 +83,11 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 {
                     coordinateSystem = CoordinateSys.WGS84;
                 }
+                
                 AddPositionData(processedEvent.Location, verbatim.DecimalLongitude.ParseDouble(), verbatim.DecimalLatitude.ParseDouble(),
                     coordinateSystem, verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, 0);
                 _areaHelper.AddAreaDataToProcessedLocation(processedEvent.Location);
-                if (Logger != null) { Logger.LogDebug($"Finish Processing Event: {verbatim.EventID}"); }
+
                 return processedEvent;
             }
             catch (Exception e)

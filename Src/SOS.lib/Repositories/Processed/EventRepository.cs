@@ -40,7 +40,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Map<Event>(m => m
                     .AutoMap<Event>()
                     .Properties(ps => ps
-                        .KeyWordLowerCase(kwlc => kwlc.Id)
+                        .KeyWordLowerCase(kwlc => kwlc.Id, false)
                         .KeyWordLowerCase(kwlc => kwlc.EventId)
                         .KeyWordLowerCase(kwlc => kwlc.ParentEventId, false)
                         .KeyWordLowerCase(kwlc => kwlc.EventType, false)
@@ -213,7 +213,7 @@ namespace SOS.Lib.Repositories.Processed
                     .Size(WriteBatchSize)
                     .DroppedDocumentCallback((r, o) =>
                     {
-                        Logger.LogError($"EventId: {o?.Id}, Error: {r?.Error?.Reason}");
+                        Logger.LogError($"EventId: {o?.EventId}, Error: {r?.Error?.Reason}");
                     })
                 )
                 .Wait(TimeSpan.FromDays(1),

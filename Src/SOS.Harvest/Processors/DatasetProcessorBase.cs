@@ -122,7 +122,7 @@ namespace SOS.Harvest.Processors
                     }
 
                     // Add dataset
-                    datasets.TryAdd(dataset.Id.ToString(), dataset);
+                    datasets.TryAdd(dataset.Identifier.ToString(), dataset);
                 }
 
                 Logger.LogDebug($"Dataset - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
