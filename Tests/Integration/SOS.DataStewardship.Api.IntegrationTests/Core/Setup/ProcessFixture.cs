@@ -1,10 +1,8 @@
-﻿using SOS.DataStewardship.Api.IntegrationTests.Core.Helpers;
-using SOS.Harvest.Managers.Interfaces;
+﻿using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -73,12 +71,13 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             await _processedObservationCoreRepository.ClearCollectionAsync(true);
         }
 
-        public async Task ImportDwcaFileAsync(string filePath, ITestOutputHelper output)
-        {
-            var parsedDwcaFile = await DwcaHelper.ReadDwcaFileAsync(filePath);
+        public async Task ImportDwcaFileAsync(string filePath, DataProvider dataProvider, ITestOutputHelper output)
+        {            
+            var parsedDwcaFile = await DwcaHelper.ReadDwcaFileAsync(filePath, dataProvider);
             var observationFactory = GetDwcaObservationFactory(true);
             var eventFactory = GetDwcaEventFactory(true);
             var datasetFactory = GetDwcaDatasetFactory();
+
             var processedObservations = parsedDwcaFile
                 .Occurrences
                 .Select(m => observationFactory.CreateProcessedObservation(m, false))
@@ -100,6 +99,41 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             await AddDatasetsToElasticsearchAsync(processedDatasets);
             output.WriteLine($"Processed datasets count= {processedDatasets.Count}");
         }
+
+        public async Task ImportDwcaFilesAsync(IEnumerable<(string filePath, DataProvider dataProvider)> files, ITestOutputHelper output)
+        {
+            bool clearExistingRecords = true;
+            foreach(var file in files)
+            {
+                var parsedDwcaFile = await DwcaHelper.ReadDwcaFileAsync(file.filePath, file.dataProvider);
+                var observationFactory = GetDwcaObservationFactory(true);
+                var eventFactory = GetDwcaEventFactory(true);
+                var datasetFactory = GetDwcaDatasetFactory();
+
+                var processedObservations = parsedDwcaFile
+                    .Occurrences
+                    .Select(m => observationFactory.CreateProcessedObservation(m, false))
+                    .ToList();
+                await AddObservationsToElasticsearchAsync(processedObservations, false, clearExistingRecords);
+                output.WriteLine($"Processed observations count= {processedObservations.Count}");
+
+                var processedEvents = parsedDwcaFile
+                    .Events
+                    .Select(m => eventFactory.CreateEventObservation(m))
+                    .ToList();
+                await AddEventsToElasticsearchAsync(processedEvents, clearExistingRecords);
+                output.WriteLine($"Processed events count= {processedEvents.Count}");
+
+                var processedDatasets = parsedDwcaFile
+                    .Datasets
+                    .Select(m => datasetFactory.CreateProcessedDataset(m))
+                    .ToList();
+                await AddDatasetsToElasticsearchAsync(processedDatasets, clearExistingRecords);
+                output.WriteLine($"Processed datasets count= {processedDatasets.Count}");
+                clearExistingRecords = false;
+            }
+        }
+
 
         public async Task AddDataToElasticsearchAsync(
             List<Dataset> datasets, 

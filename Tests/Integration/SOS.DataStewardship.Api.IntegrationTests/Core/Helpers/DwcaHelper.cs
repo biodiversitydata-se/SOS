@@ -2,18 +2,15 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.DarwinCore;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.DataStewardship.Api.IntegrationTests.Core.Extensions;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Helpers
 {
     internal static class DwcaHelper
     {
-        public static async Task<DwcaComposite> ReadDwcaFileAsync(string filePath)
+        public static async Task<DwcaComposite> ReadDwcaFileAsync(string filePath, DataProvider dataProvider)
         {
-            filePath = filePath.GetAbsoluteFilePath();
-            var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
+            filePath = filePath.GetAbsoluteFilePath();            
             IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
             string outputPath = Path.GetTempPath();
             using var archiveReader = new ArchiveReader(filePath, outputPath); // @"C:\Temp\DwcaImport");
