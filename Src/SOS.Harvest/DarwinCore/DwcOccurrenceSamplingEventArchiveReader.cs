@@ -863,7 +863,7 @@ namespace SOS.Harvest.DarwinCore
 
         private void AddDatasetInformation(List<DwcObservationVerbatim> occurrenceRecords, 
             Dictionary<string, DwcVerbatimDataset> observationDatasetByEventId, 
-            DwcVerbatimObservationDataset defaultDataset)
+            DwcVerbatimDataset defaultDataset)
         {
             if (observationDatasetByEventId == null && defaultDataset == null) return;
             
@@ -884,7 +884,7 @@ namespace SOS.Harvest.DarwinCore
 
         private void AddDatasetInformation(List<DwcEventOccurrenceVerbatim> events,
             Dictionary<string, DwcVerbatimDataset> observationDatasetByEventId,
-            DwcVerbatimObservationDataset defaultDataset)
+            DwcVerbatimDataset defaultDataset)
         {
             if (observationDatasetByEventId == null && defaultDataset == null) return;
 
@@ -957,7 +957,7 @@ namespace SOS.Harvest.DarwinCore
         public async Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
         {            
             var datasets = await GetDatasetsFromJsonOrXmlAsync(archiveReaderContext.ArchiveReader.OutputPath);
-            archiveReaderContext.ObservationDatasetByEventId = CreateEventDatasetDictionary(datasets);
+            archiveReaderContext.DatasetByEventId = CreateEventDatasetDictionary(datasets);
             archiveReaderContext.Datasets = datasets;
             return datasets;
         }

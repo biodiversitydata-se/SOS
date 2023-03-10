@@ -177,7 +177,7 @@ namespace SOS.Harvest.Harvesters.DwC
                 await dwcCollectionRepository.DeleteCollectionsAsync();
 
                 // Read datasets
-                List<Lib.Models.Processed.DataStewardship.Dataset.DwcVerbatimObservationDataset> datasets = null;
+                List<Lib.Models.Processed.DataStewardship.Dataset.DwcVerbatimDataset> datasets = null!;
                 try
                 {
                     datasets = await _dwcArchiveReader.ReadDatasetsAsync(dwcCollectionArchiveReaderContext);

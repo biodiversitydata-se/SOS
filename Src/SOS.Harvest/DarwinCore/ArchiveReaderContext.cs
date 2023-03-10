@@ -2,7 +2,6 @@
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using System.Collections.Generic;
 
 namespace SOS.Harvest.DarwinCore
 {
