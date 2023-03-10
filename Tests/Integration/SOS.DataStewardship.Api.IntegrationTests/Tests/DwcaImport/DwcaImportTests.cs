@@ -24,7 +24,7 @@ public class DwcaImportTests : TestBase
 
         // Get all datasets
         var datasetSearchFilter = new DatasetFilter {  };
-        var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
+        var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Contracts.Models.Dataset>, DatasetFilter>(
             $"datastewardship/datasets", datasetSearchFilter, jsonSerializerOptions);
 
         // Get all events
@@ -68,7 +68,7 @@ public class DwcaImportTests : TestBase
 
         // Get all datasets
         var datasetSearchFilter = new DatasetFilter { };
-        var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
+        var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Contracts.Models.Dataset>, DatasetFilter>(
             $"datastewardship/datasets", datasetSearchFilter, jsonSerializerOptions);
 
         // Get all events

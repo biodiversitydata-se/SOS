@@ -10,8 +10,8 @@ namespace SOS.DataStewardship.Api.Application.Managers;
 
 public class DataStewardshipManager : IDataStewardshipManager
 {
-    private readonly IObservationDatasetRepository _observationDatasetRepository;
-    private readonly IObservationEventRepository _observationEventRepository;
+    private readonly IDatasetRepository _observationDatasetRepository;
+    private readonly IEventRepository _observationEventRepository;
     private readonly IProcessedObservationCoreRepository _processedObservationCoreRepository;
     private readonly IFilterManager _filterManager;
     private readonly ILogger<DataStewardshipManager> _logger;
@@ -175,9 +175,9 @@ public class DataStewardshipManager : IDataStewardshipManager
         };
     }
 
-    public DataStewardshipManager(IObservationDatasetRepository observationDatasetRepository,
+    public DataStewardshipManager(IDatasetRepository observationDatasetRepository,
         IProcessedObservationCoreRepository processedObservationCoreRepository,
-        IObservationEventRepository observationEventRepository,
+        IEventRepository observationEventRepository,
         IFilterManager filterManager,
         ILogger<DataStewardshipManager> logger)
     {

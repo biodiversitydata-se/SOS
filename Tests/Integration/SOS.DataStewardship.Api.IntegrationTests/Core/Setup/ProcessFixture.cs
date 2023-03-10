@@ -28,8 +28,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
         private List<Taxon> _taxa;
 
-        private IObservationDatasetRepository _observationDatasetRepository;
-        private IObservationEventRepository _observationEventRepository;
+        private IDatasetRepository _observationDatasetRepository;
+        private IEventRepository _observationEventRepository;
         private IProcessedObservationCoreRepository _processedObservationCoreRepository;
 
 
@@ -40,8 +40,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
 
-            IObservationDatasetRepository observationDatasetRepository,
-            IObservationEventRepository observationEventRepository,
+            IDatasetRepository observationDatasetRepository,
+            IEventRepository observationEventRepository,
             IProcessedObservationCoreRepository processedObservationCoreRepository
             )
         {
