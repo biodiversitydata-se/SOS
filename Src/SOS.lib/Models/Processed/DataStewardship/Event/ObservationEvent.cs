@@ -32,6 +32,16 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Event
         public DatasetInfo Dataset { get; set; }
 
         /// <summary>
+        ///     Data provider id.
+        /// </summary>
+        public int DataProviderId { get; set; }
+
+        /// <summary>
+        /// The date the observation was created (UTC).
+        /// </summary>
+        public DateTime Created { get; set; }
+
+        /// <summary>
         /// A unique id that groups several related visits, e.g. all visits to the different subparts within a survey location, or all visits to all survey locations that were made during a season. Example: EventID for a survey event at a location becomes the parentID for all the visits to the different subparts. EventID for a season becomes the parentID for all the visits to all locations within the survey programme.
         /// </summary>        
         public string ParentEventId { get; set; }

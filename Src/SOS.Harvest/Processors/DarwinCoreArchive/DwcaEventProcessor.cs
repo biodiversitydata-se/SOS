@@ -91,7 +91,11 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 foreach (var verbatimEvent in verbatimEventsBatch)
                 {
                     var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
-                    if (processedEvent == null) continue;
+                    if (processedEvent == null)
+                    {                        
+                        Logger.LogInformation($"Processed event is null, EventId: {verbatimEvent.EventID})");
+                        continue;
+                    }
                     processedEvents.TryAdd(processedEvent.EventId, processedEvent);
                 }
 

@@ -63,6 +63,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
                 var processedEvent = new ObservationEvent();
                 processedEvent.Id = verbatim.Id.ToString();
+                processedEvent.Created = DateTime.Now;
+                processedEvent.DataProviderId = DataProvider.Id;
                 processedEvent.StartDate = startDate;
                 processedEvent.EndDate = endDate;
                 processedEvent.EventId = verbatim.EventID;
