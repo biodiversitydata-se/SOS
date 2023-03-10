@@ -111,32 +111,32 @@ namespace SOS.Observations.Api.Controllers
                        }
                     )
                 );
-                var processInfo = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
-                var processingEnd = processInfo?.End.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss");
-                entries.Add("Latest Full harvest", new HealthReportEntry(
-                    (processInfo?.End ?? DateTime.MinValue).ToLocalTime() > DateTime.Now.AddDays(-1) ? HealthStatus.Healthy : HealthStatus.Unhealthy,
-                    processingEnd,
-                    TimeSpan.FromTicks(0),
-                    null,
-                    new Dictionary<string, object>()
-                       {
-                           { "ProcessingEnd", processingEnd }
-                       }
-                    )
-                );
-                var apProvider = processInfo?.ProvidersInfo.Where(p => p.DataProviderId.Equals(1)).FirstOrDefault();
-                var apIncrementalEnd = apProvider?.LatestIncrementalEnd.HasValue ?? false ? apProvider?.LatestIncrementalEnd.Value.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss") : "";
-                entries.Add("Latest Artportalen incremental harvest", new HealthReportEntry(
-                    (apProvider?.LatestIncrementalEnd.HasValue ?? false) && apProvider?.LatestIncrementalEnd.Value.ToLocalTime() > DateTime.Now.AddMinutes(-10) ? HealthStatus.Healthy : HealthStatus.Unhealthy,
-                    apIncrementalEnd,
-                    TimeSpan.FromTicks(0),
-                    null,
-                    new Dictionary<string, object>()
-                       {
-                           { "IncrementalEnd", apIncrementalEnd }
-                       }
-                    )
-                );
+                //var processInfo = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
+                //var processingEnd = processInfo?.End.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss");
+                //entries.Add("Latest Full harvest", new HealthReportEntry(
+                //    (processInfo?.End ?? DateTime.MinValue).ToLocalTime() > DateTime.Now.AddDays(-30) ? HealthStatus.Healthy : HealthStatus.Unhealthy,
+                //    processingEnd,
+                //    TimeSpan.FromTicks(0),
+                //    null,
+                //    new Dictionary<string, object>()
+                //       {
+                //           { "ProcessingEnd", processingEnd }
+                //       }
+                //    )
+                //);
+                //var apProvider = processInfo?.ProvidersInfo.Where(p => p.DataProviderId.Equals(1)).FirstOrDefault();
+                //var apIncrementalEnd = apProvider?.LatestIncrementalEnd.HasValue ?? false ? apProvider?.LatestIncrementalEnd.Value.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss") : "";
+                //entries.Add("Latest Artportalen incremental harvest", new HealthReportEntry(
+                //    (apProvider?.LatestIncrementalEnd.HasValue ?? false) && apProvider?.LatestIncrementalEnd.Value.ToLocalTime() > DateTime.Now.AddMinutes(-10) ? HealthStatus.Healthy : HealthStatus.Unhealthy,
+                //    apIncrementalEnd,
+                //    TimeSpan.FromTicks(0),
+                //    null,
+                //    new Dictionary<string, object>()
+                //       {
+                //           { "IncrementalEnd", apIncrementalEnd }
+                //       }
+                //    )
+                //);
 
                 return new OkObjectResult(new HealthReport(entries, DateTime.Now - start));
             }
