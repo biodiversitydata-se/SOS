@@ -62,11 +62,11 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
 
         public class TestDataSet
         {
-            public List<ObservationDataset> Datasets { get; set; }
-            public List<ObservationEvent> Events { get; set; }
+            public List<Lib.Models.Processed.DataStewardship.Dataset.Dataset> Datasets { get; set; }
+            public List<Lib.Models.Processed.DataStewardship.Event.Event> Events { get; set; }
             public List<Observation> Observations { get; set; }
-            public IOperable<ObservationDataset> DatasetsBuilder { get; set; }
-            public IOperable<ObservationEvent> EventsBuilder { get; set; }
+            public IOperable<Lib.Models.Processed.DataStewardship.Dataset.Dataset> DatasetsBuilder { get; set; }
+            public IOperable<Lib.Models.Processed.DataStewardship.Event.Event> EventsBuilder { get; set; }
             public IOperable<Observation> ObservationsBuilder { get; set; }
         }
     }

@@ -44,7 +44,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
-        public ObservationEvent CreateEventObservation(DwcEventOccurrenceVerbatim verbatim)
+        public Lib.Models.Processed.DataStewardship.Event.Event CreateEventObservation(DwcEventOccurrenceVerbatim verbatim)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 out var startDate,
                 out var endDate);
 
-                var processedEvent = new ObservationEvent();
+                var processedEvent = new Lib.Models.Processed.DataStewardship.Event.Event();
                 processedEvent.Id = verbatim.Id.ToString();
                 processedEvent.StartDate = startDate;
                 processedEvent.EndDate = endDate;
@@ -74,7 +74,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 processedEvent.Dataset = new DatasetInfo
                 {
                     Identifier = verbatim.DataStewardshipDatasetId
-                    //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event
+                    //Title = // need to lookup this from Dataset index or store this information in Observation/Event
                 };
                 if (!GISExtensions.TryParseCoordinateSystem(verbatim.GeodeticDatum, out var coordinateSystem))
                 {

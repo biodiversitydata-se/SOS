@@ -5,9 +5,9 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
 {
     internal static class EventsBuilderFactory
     {        
-        public static IOperable<ObservationEvent> Create(int size)            
+        public static IOperable<Event> Create(int size)            
         {            
-            var eventsBuilder = Builder<ObservationEvent>.CreateListOfSize(size)
+            var eventsBuilder = Builder<Event>.CreateListOfSize(size)
                  .All()
                     .With(m => m.EventId = DataHelper.RandomString(8))
                     .With(m => m.StartDate = DateTime.Now)
@@ -20,9 +20,9 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
             return eventsBuilder;
         }
 
-        public static IOperable<ObservationEvent> HaveDatasetIds(this IOperable<ObservationEvent> operable, IEnumerable<string> datasetIds)
+        public static IOperable<Event> HaveDatasetIds(this IOperable<Event> operable, IEnumerable<string> datasetIds)
         {
-            var builder = ((IDeclaration<ObservationEvent>)operable).ObjectBuilder;
+            var builder = ((IDeclaration<Event>)operable).ObjectBuilder;
             var datasetsIdsList = datasetIds.ToList();
             builder.With((ev, index) =>
             {

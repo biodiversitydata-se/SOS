@@ -9,7 +9,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     /// <summary>
     ///     DwC-A dataset factory.
     /// </summary>
-    public class DwcaDatasetFactory : DatasetFactoryBase, IDatasetFactory<DwcVerbatimObservationDataset>
+    public class DwcaDatasetFactory : DatasetFactoryBase, IDatasetFactory<DwcVerbatimDataset>
     {        
         /// <summary>
         /// Constructor
@@ -23,7 +23,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             
         }
 
-        public ObservationDataset CreateProcessedDataset(DwcVerbatimObservationDataset verbatimDataset)
+        public Dataset CreateProcessedDataset(DwcVerbatimDataset verbatimDataset)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
                 var id = $"urn:lsid:{DataProvider.ChecklistIdentifier}:Dataset:{verbatimDataset.Identifier}";
                 
-                var observationDataset = new ObservationDataset
+                var observationDataset = new Dataset
                 {
                     Id = id, // verbatimDataset.Identifier,
                     AccessRights = verbatimDataset.AccessRights,

@@ -8,11 +8,11 @@ namespace SOS.Lib.Extensions
 {
     public static class ObservationEventExtensions
     {
-        public static ObservationEvent ToObservationEvent(this Observation observation, IEnumerable<string> occurrenceIds)
+        public static Models.Processed.DataStewardship.Event.Event ToObservationEvent(this Observation observation, IEnumerable<string> occurrenceIds)
         {
             if (observation == null) return null;
             
-            var ev = new ObservationEvent();
+            var ev = new Models.Processed.DataStewardship.Event.Event();
             ev.EventId = observation.Event.EventId;
             ev.ParentEventId = observation.Event.ParentEventId;
             ev.EventRemarks = observation.Event.EventRemarks;
@@ -21,7 +21,7 @@ namespace SOS.Lib.Extensions
             ev.Dataset = new DatasetInfo
             {
                 Identifier = observation.DataStewardshipDatasetId,
-                //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event
+                //Title = // need to lookup this from Dataset index or store this information in Observation/Event
             };
 
             ev.StartDate = observation.Event.StartDate;

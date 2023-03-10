@@ -6,7 +6,7 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 
 namespace SOS.Lib.Models.Processed.DataStewardship.Event
 {
-    public class ObservationEvent : IEntity<string>
+    public class Event : IEntity<string>
     {
         /// <summary>
         ///     Unique id.

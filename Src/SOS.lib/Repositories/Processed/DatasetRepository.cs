@@ -20,8 +20,8 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Dataset observation repository.
     /// </summary>
-    public class ObservationDatasetRepository : ProcessRepositoryBase<ObservationDataset, string>,
-        IObservationDatasetRepository
+    public class DatasetRepository : ProcessRepositoryBase<Dataset, string>,
+        IDatasetRepository
     {
         /// <summary>
         /// Add the collection
@@ -36,8 +36,8 @@ namespace SOS.Lib.Repositories.Processed
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
                 )
-                .Map<ObservationDataset>(m => m
-                    .AutoMap<ObservationDataset>()
+                .Map<Dataset>(m => m
+                    .AutoMap<Dataset>()
                     .Properties(ps => ps
                         .KeyWordLowerCase(kwlc => kwlc.Id)
                         .KeyWordLowerCase(kwlc => kwlc.Identifier)                        
@@ -93,16 +93,16 @@ namespace SOS.Lib.Repositories.Processed
                 )
             );
             
-            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationDataset index. Error: {createIndexResponse.DebugInformation}");
+            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create Dataset index. Error: {createIndexResponse.DebugInformation}");
         }
 
-        public async Task<List<ObservationDataset>> GetDatasetsByIds(IEnumerable<string> ids)
+        public async Task<List<Dataset>> GetDatasetsByIds(IEnumerable<string> ids)
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
 
-            var query = new List<Func<QueryContainerDescriptor<ObservationDataset>, QueryContainer>>();
+            var query = new List<Func<QueryContainerDescriptor<Dataset>, QueryContainer>>();
             query.TryAddTermsCriteria("identifier", ids);
-            var searchResponse = await Client.SearchAsync<ObservationDataset>(s => s
+            var searchResponse = await Client.SearchAsync<Dataset>(s => s
                 .Index(IndexName)
                 .Query(q => q
                     .Bool(b => b
@@ -133,7 +133,7 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        private BulkAllObserver WriteToElastic(IEnumerable<ObservationDataset> items)
+        private BulkAllObserver WriteToElastic(IEnumerable<Dataset> items)
         {
             if (!items.Any())
             {
@@ -188,23 +188,23 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="logger"></param>
-        public ObservationDatasetRepository(
+        public DatasetRepository(
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ILogger<ObservationDatasetRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
+            ILogger<DatasetRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             LiveMode = true;
             _id = nameof(Models.Processed.Observation.Observation); // The active instance should be the same as the ProcessedObservationRepository which uses the Observation type.
         }
 
         /// <inheritdoc />
-        public async Task<int> AddManyAsync(IEnumerable<ObservationDataset> items)
+        public async Task<int> AddManyAsync(IEnumerable<Dataset> items)
         {
             // Save valid processed data
-            Logger.LogDebug($"Start indexing ObservationDataset batch for searching with {items.Count()} items");
+            Logger.LogDebug($"Start indexing Dataset batch for searching with {items.Count()} items");
             var indexResult = WriteToElastic(items);
-            Logger.LogDebug("Finished indexing ObservationDataset batch for searching");
+            Logger.LogDebug("Finished indexing Dataset batch for searching");
             if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
             return items.Count();
         }
@@ -213,7 +213,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                var res = await Client.DeleteByQueryAsync<ObservationDataset>(q => q
+                var res = await Client.DeleteByQueryAsync<Dataset>(q => q
                     .Index(IndexName)
                     .Query(q => q.MatchAll())
                 );
@@ -252,7 +252,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public string UniqueIndexName => IndexHelper.GetIndexName<ObservationDataset>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
+        public string UniqueIndexName => IndexHelper.GetIndexName<Dataset>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
 
         /// <inheritdoc />
         public async Task<bool> VerifyCollectionAsync()

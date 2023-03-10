@@ -9,7 +9,7 @@
 //    /// <summary>
 //    ///     Artportalen dataset factory.
 //    /// </summary>
-//    public class ArtportalenDatasetFactory : DatasetFactoryBase, IDatasetFactory<DwcVerbatimObservationDataset>
+//    public class ArtportalenDatasetFactory : DatasetFactoryBase, IDatasetFactory<DwcVerbatimDataset>
 //    {        
 //        /// <summary>
 //        /// Constructor
@@ -23,7 +23,7 @@
             
 //        }
 
-//        public ObservationDataset CreateProcessedDataset(DwcVerbatimObservationDataset verbatimDataset)
+//        public Dataset CreateProcessedDataset(DwcVerbatimDataset verbatimDataset)
 //        {
 //            try
 //            {
@@ -34,7 +34,7 @@
 
 //                var id = $"urn:lsid:{DataProvider.ChecklistIdentifier}:Dataset:{verbatimDataset.Identifier}";
                 
-//                var observationDataset = new ObservationDataset
+//                var observationDataset = new Dataset
 //                {
 //                    Id = id, // verbatimDataset.Identifier,
 //                    AccessRights = verbatimDataset.AccessRights,

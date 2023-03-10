@@ -14,14 +14,15 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using Event = SOS.Lib.Models.Processed.DataStewardship.Event.Event;
 
 namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Observation event repository.
     /// </summary>
-    public class ObservationEventRepository : ProcessRepositoryBase<ObservationEvent, string>,
-        IObservationEventRepository
+    public class EventRepository : ProcessRepositoryBase<Event, string>,
+        IEventRepository
     {
         /// <summary>
         /// Add the collection
@@ -36,8 +37,8 @@ namespace SOS.Lib.Repositories.Processed
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
                 )
-                .Map<ObservationEvent>(m => m
-                    .AutoMap<ObservationEvent>()
+                .Map<Event>(m => m
+                    .AutoMap<Event>()
                     .Properties(ps => ps
                         .KeyWordLowerCase(kwlc => kwlc.Id)
                         .KeyWordLowerCase(kwlc => kwlc.EventId)
@@ -134,13 +135,13 @@ namespace SOS.Lib.Repositories.Processed
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationEvent index. Error: {createIndexResponse.DebugInformation}");
         }
 
-        public async Task<List<ObservationEvent>> GetEventsByIds(IEnumerable<string> ids)
+        public async Task<List<Event>> GetEventsByIds(IEnumerable<string> ids)
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
 
-            var query = new List<Func<QueryContainerDescriptor<ObservationEvent>, QueryContainer>>();
+            var query = new List<Func<QueryContainerDescriptor<Models.Processed.DataStewardship.Event.Event>, QueryContainer>>();
             query.TryAddTermsCriteria("eventId", ids);
-            var searchResponse = await Client.SearchAsync<ObservationEvent>(s => s
+            var searchResponse = await Client.SearchAsync<Event>(s => s
                 .Index(IndexName)
                 .Query(q => q
                     .Bool(b => b
@@ -171,7 +172,7 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        private BulkAllObserver WriteToElastic(IEnumerable<ObservationEvent> items)
+        private BulkAllObserver WriteToElastic(IEnumerable<Event> items)
         {
             if (!items.Any())
             {
@@ -226,18 +227,18 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="logger"></param>
-        public ObservationEventRepository(
+        public EventRepository(
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ILogger<ObservationEventRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
+            ILogger<EventRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             LiveMode = true;
             _id = nameof(Observation); // The active instance should be the same as the ProcessedObservationRepository which uses the Observation type.
         }
 
         /// <inheritdoc />
-        public async Task<int> AddManyAsync(IEnumerable<ObservationEvent> items)
+        public async Task<int> AddManyAsync(IEnumerable<Event> items)
         {
             // Save valid processed data
             Logger.LogDebug($"Start indexing ObservationEvent batch for searching with {items.Count()} items");
@@ -251,7 +252,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                var res = await Client.DeleteByQueryAsync<ObservationEvent>(q => q
+                var res = await Client.DeleteByQueryAsync<Event>(q => q
                     .Index(IndexName)
                     .Query(q => q.MatchAll())
                 );
@@ -290,7 +291,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public string UniqueIndexName => IndexHelper.GetIndexName<ObservationEvent>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
+        public string UniqueIndexName => IndexHelper.GetIndexName<Event>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
 
         /// <inheritdoc />
         public async Task<bool> VerifyCollectionAsync()

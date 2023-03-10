@@ -15,7 +15,7 @@ namespace SOS.Harvest.DarwinCore
     public class ArchiveReaderContext
     {
         public ArchiveReader ArchiveReader { get; set; }
-        public Dictionary<string, DwcVerbatimObservationDataset> ObservationDatasetByEventId { get; set; }
+        public Dictionary<string, DwcVerbatimDataset> DatasetByEventId { get; set; }
         public Dictionary<string, List<string>> OccurrenceIdsByEventId { get; set; }
         public IIdIdentifierTuple DataProvider { get; set; }
         public int MaxNrObservationsToReturn { get; set; } = int.MaxValue;

@@ -6,7 +6,7 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 
 namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
 {
-    public class DwcVerbatimObservationDataset : IEntity<int>
+    public class DwcVerbatimDataset : IEntity<int>
     {        
         /// <summary>
         ///     MongoDb Id. // todo - should we use Id, RecordId or occurrenceID as Id field?

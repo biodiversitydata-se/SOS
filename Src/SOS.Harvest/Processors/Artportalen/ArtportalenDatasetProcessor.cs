@@ -19,7 +19,7 @@ namespace SOS.Harvest.Processors.Artportalen
     /// <summary>
     ///     Artportalen dataset processor.
     /// </summary>
-    public class ArtportalenDatasetProcessor : DatasetProcessorBase<ArtportalenDatasetProcessor, DwcVerbatimObservationDataset, IVerbatimRepositoryBase<DwcVerbatimObservationDataset, int>>,
+    public class ArtportalenDatasetProcessor : DatasetProcessorBase<ArtportalenDatasetProcessor, DwcVerbatimDataset, IVerbatimRepositoryBase<DwcVerbatimDataset, int>>,
         IArtportalenDatasetProcessor
     {        
         private readonly IArtportalenDatasetMetadataRepository _datasetRepository;
@@ -37,7 +37,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <exception cref="ArgumentNullException"></exception>
         public ArtportalenDatasetProcessor(            
             IProcessedObservationCoreRepository processedObservationRepository,            
-            IObservationDatasetRepository processedDatasetsRepository,
+            IDatasetRepository processedDatasetsRepository,
             IArtportalenDatasetMetadataRepository datasetRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
@@ -55,23 +55,23 @@ namespace SOS.Harvest.Processors.Artportalen
             IJobCancellationToken cancellationToken)
         {
             var verbatimDatasets = await _datasetRepository.GetAllAsync();
-            int nrAddedDatasets = await AddObservationDatasetsAsync(dataProvider, verbatimDatasets);
+            int nrAddedDatasets = await AddDatasetsAsync(dataProvider, verbatimDatasets);
             return nrAddedDatasets;
         }
 
-        private async Task<int> AddObservationDatasetsAsync(DataProvider dataProvider, List<Lib.Models.Processed.Observation.ArtportalenDatasetMetadata> verbatimDatasets)
+        private async Task<int> AddDatasetsAsync(DataProvider dataProvider, List<Lib.Models.Processed.Observation.ArtportalenDatasetMetadata> verbatimDatasets)
         {
             try
             {                
-                Logger.LogInformation("Start AddObservationDatasetsAsync()");
-                var datasets = verbatimDatasets.Select(m => m.ToObservationDataset()).ToList();
+                Logger.LogInformation("Start AddDatasetsAsync()");
+                var datasets = verbatimDatasets.Select(m => m.ToDataset()).ToList();
                 foreach (var dataset in datasets)
                 {
                     dataset.EventIds = await GetEventIdsAsync(dataset.Identifier);
                 }
                 
                 int datasetCount = await ValidateAndStoreDatasets(dataProvider, datasets, "");                
-                Logger.LogInformation("End AddObservationDatasetsAsync()");
+                Logger.LogInformation("End AddDatasetsAsync()");
                 return datasetCount;
             }
             catch (Exception e)

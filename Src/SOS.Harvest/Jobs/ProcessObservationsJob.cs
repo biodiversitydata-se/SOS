@@ -52,8 +52,8 @@ namespace SOS.Harvest.Jobs
         private readonly ILogger<ProcessObservationsJob> _logger;
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IUserObservationRepository _userObservationRepository;
-        private readonly IObservationDatasetRepository _observationDatasetRepository;
-        private readonly IObservationEventRepository _observationEventRepository;
+        private readonly IDatasetRepository _observationDatasetRepository;
+        private readonly IEventRepository _observationEventRepository;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly Dictionary<DataProviderType, IObservationProcessor> _processorByType;
@@ -163,7 +163,7 @@ namespace SOS.Harvest.Jobs
 
         private async Task InitializeElasticSearchDatasetAsync()
         {
-            if (!_processConfiguration.ProcessObservationDataset) return;
+            if (!_processConfiguration.ProcessDataset) return;
             _logger.LogInformation($"ProcessedConfiguration.ActiveIndex is {_processedObservationRepository.ActiveInstance}");
             _logger.LogInformation($"_observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");            
             _observationDatasetRepository.LiveMode = _processedObservationRepository.LiveMode;
@@ -175,7 +175,7 @@ namespace SOS.Harvest.Jobs
 
         private async Task InitializeElasticSearchEventAsync()
         {
-            if (!_processConfiguration.ProcessObservationDataset) return;
+            if (!_processConfiguration.ProcessDataset) return;
             _logger.LogInformation($"ProcessedConfiguration.ActiveIndex is {_processedObservationRepository.ActiveInstance}");
             _logger.LogInformation($"_observationEventRepository.LiveMode={_observationEventRepository.LiveMode}");
             _observationEventRepository.LiveMode = _processedObservationRepository.LiveMode;
@@ -209,7 +209,7 @@ namespace SOS.Harvest.Jobs
 
         private async Task DisableEsDatasetIndexingAsync()
         {
-            if (!_processConfiguration.ProcessObservationDataset) return;
+            if (!_processConfiguration.ProcessDataset) return;
             _logger.LogInformation($"Start disable indexing ({_observationDatasetRepository.UniqueIndexName})");
             await _observationDatasetRepository.DisableIndexingAsync();
             _logger.LogInformation($"Finish disable indexing ({_observationDatasetRepository.UniqueIndexName})");
@@ -217,7 +217,7 @@ namespace SOS.Harvest.Jobs
 
         private async Task DisableEsEventIndexingAsync()
         {
-            if (!_processConfiguration.ProcessObservationDataset) return;
+            if (!_processConfiguration.ProcessDataset) return;
             _logger.LogInformation($"Start disable indexing ({_observationEventRepository.UniqueIndexName})");
             await _observationEventRepository.DisableIndexingAsync();
             _logger.LogInformation($"Finish disable indexing ({_observationEventRepository.UniqueIndexName})");
@@ -247,7 +247,7 @@ namespace SOS.Harvest.Jobs
 
         private async Task EnableEsDatasetIndexingAsync()
         {
-            if (!_processConfiguration.ProcessObservationDataset) return;
+            if (!_processConfiguration.ProcessDataset) return;
             _logger.LogInformation($"Start enable indexing ({_observationDatasetRepository.UniqueIndexName})");
             await _observationDatasetRepository.EnableIndexingAsync();
             _logger.LogInformation($"Finish enable indexing ({_observationDatasetRepository.UniqueIndexName})");
@@ -255,7 +255,7 @@ namespace SOS.Harvest.Jobs
 
         private async Task EnableEsEventIndexingAsync()
         {
-            if (!_processConfiguration.ProcessObservationDataset) return;
+            if (!_processConfiguration.ProcessDataset) return;
             _logger.LogInformation($"Start enable indexing ({_observationEventRepository.UniqueIndexName})");
             await _observationEventRepository.EnableIndexingAsync();
             _logger.LogInformation($"Finish enable indexing ({_observationEventRepository.UniqueIndexName})");
@@ -577,7 +577,7 @@ namespace SOS.Harvest.Jobs
                         }
 
                         // Add data stewardardship events & datasets
-                        if (_processConfiguration.ProcessObservationDataset)
+                        if (_processConfiguration.ProcessDataset)
                         {
                             // Process Events
                             await InitializeElasticSearchEventAsync();
@@ -747,7 +747,7 @@ namespace SOS.Harvest.Jobs
                     await EnableIndexingAsync();                    
                     
                     // Add data stewardardship datasets
-                    if (_processConfiguration.ProcessObservationDataset && mode == JobRunModes.Full)
+                    if (_processConfiguration.ProcessDataset && mode == JobRunModes.Full)
                     {                        
                         // Process Events
                         await InitializeElasticSearchEventAsync();
@@ -1085,8 +1085,8 @@ namespace SOS.Harvest.Jobs
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             ProcessConfiguration processConfiguration,
             IUserObservationRepository userObservationRepository,            
-            IObservationDatasetRepository observationDatasetRepository,
-            IObservationEventRepository observationEventRepository,
+            IDatasetRepository observationDatasetRepository,
+            IEventRepository observationEventRepository,
             IDwcaDatasetProcessor dwcaDatasetProcessor,
             IArtportalenDatasetProcessor artportalenDatasetProcessor,
             IArtportalenEventProcessor artportalenEventProcessor,

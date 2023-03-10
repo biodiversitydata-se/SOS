@@ -19,7 +19,7 @@ namespace SOS.Harvest.Processors
         where TVerbatim : IEntity<int>
         where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int> 
     {
-        protected readonly IObservationEventRepository ObservationEventRepository;
+        protected readonly IEventRepository ObservationEventRepository;
         public abstract DataProviderType Type { get; }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace SOS.Harvest.Processors
         /// <param name="processManager"></param>
         /// <param name="logger"></param>
         protected EventProcessorBase(
-            IObservationEventRepository observationEventRepository,
+            IEventRepository observationEventRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
@@ -109,7 +109,7 @@ namespace SOS.Harvest.Processors
                 if (!verbatimEventsBatch?.Any() ?? true) return 0;                
 
                 Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
-                var processedEvents = new ConcurrentDictionary<string, ObservationEvent>();
+                var processedEvents = new ConcurrentDictionary<string, Event>();
                 foreach (var verbatimEvent in verbatimEventsBatch)
                 {
                     var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
@@ -146,7 +146,7 @@ namespace SOS.Harvest.Processors
         /// <returns></returns>
         private async Task<int> CommitBatchAsync(
             DataProvider dataProvider,
-            ICollection<ObservationEvent> processedEvents,
+            ICollection<Event> processedEvents,
             string batchId,
             byte attempt = 1)
         {
@@ -209,7 +209,7 @@ namespace SOS.Harvest.Processors
             return processBatchTasks.Sum(t => t.Result);
         }
 
-        protected async Task<int> ValidateAndStoreEvents(DataProvider dataProvider, ICollection<ObservationEvent> events, string batchId)
+        protected async Task<int> ValidateAndStoreEvents(DataProvider dataProvider, ICollection<Event> events, string batchId)
         {
             if (!events?.Any() ?? true) return 0;
             var processedCount = await CommitBatchAsync(dataProvider, events, batchId);

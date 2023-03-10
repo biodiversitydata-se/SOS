@@ -243,7 +243,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<SightingRepository>().As<ISightingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ApiUsageStatisticsRepository>().As<IApiUsageStatisticsRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SiteRepository>().As<ISiteRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<DatasetRepository>().As<IDatasetRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<Repositories.Source.Artportalen.DatasetRepository>().As<Repositories.Source.Artportalen.Interfaces.IDatasetRepository>().InstancePerLifetimeScope();
             builder.RegisterType<PersonRepository>().As<IPersonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingRelationRepository>().As<ISightingRelationRepository>()
                 .InstancePerLifetimeScope();
@@ -258,6 +258,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<ProjectInfoRepository>().As<IProjectInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenDatasetMetadataRepository>().As<IArtportalenDatasetMetadataRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedConfigurationRepository>().As<IProcessedConfigurationRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ReportRepository>().As<IReportRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonRepository>().As<ITaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonListRepository>().As<ITaxonListRepository>().InstancePerLifetimeScope();
@@ -290,9 +291,9 @@ namespace SOS.Harvest.IoC.Modules
             // Repositories processed 
             builder.RegisterType<UserObservationRepository>().As<IUserObservationRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<ObservationDatasetRepository>().As<IObservationDatasetRepository>()
+            builder.RegisterType<Lib.Repositories.Processed.DatasetRepository>().As<Lib.Repositories.Processed.Interfaces.IDatasetRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<ObservationEventRepository>().As<IObservationEventRepository>()
+            builder.RegisterType<EventRepository>().As<IEventRepository>()
                             .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedChecklistRepository>().As<IProcessedChecklistRepository>()
                 .InstancePerLifetimeScope();
@@ -435,8 +436,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
             builder.RegisterType<AreasHarvestJob>().As<IAreasHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ApiUsageStatisticsHarvestJob>().As<IApiUsageStatisticsHarvestJob>().InstancePerLifetimeScope();
-            
-            
+            builder.RegisterType<ChecklistsHarvestJob>().As<IChecklistsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ClearCacheJob>().As<IClearCacheJob>().InstancePerLifetimeScope();
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
             builder.RegisterType<CreateDwcaDataValidationReportJob>().As<ICreateDwcaDataValidationReportJob>().InstancePerLifetimeScope();

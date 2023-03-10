@@ -12,7 +12,6 @@ using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Harvesters.DwC;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
-using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;

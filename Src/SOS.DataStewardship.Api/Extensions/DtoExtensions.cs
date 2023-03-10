@@ -9,13 +9,13 @@ namespace SOS.DataStewardship.Api.Extensions
 {
     public static class DtoExtensions
     {
-        public static List<Dataset> ToDatasets(this IEnumerable<ProcessedDataStewardship.Dataset.ObservationDataset> datasets)
+        public static List<Dataset> ToDatasets(this IEnumerable<ProcessedDataStewardship.Dataset.Dataset> datasets)
         {
             if (datasets == null || !datasets.Any()) return null;             
             return datasets.Select(m => m.ToDataset()).ToList();
         }
 
-        public static Dataset ToDataset(this ProcessedDataStewardship.Dataset.ObservationDataset dataset)
+        public static Dataset ToDataset(this ProcessedDataStewardship.Dataset.Dataset dataset)
         {
             if (dataset == null) return null;
                             
@@ -101,7 +101,7 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static EventModel ToEventModel(this ProcessedDataStewardship.Event.ObservationEvent observationEvent, CoordinateSystem responseCoordinateSystem)
+        public static EventModel ToEventModel(this ProcessedDataStewardship.Event.Event observationEvent, CoordinateSystem responseCoordinateSystem)
         {
             if (observationEvent == null) return null;
 
@@ -367,9 +367,9 @@ namespace SOS.DataStewardship.Api.Extensions
                 BasisOfRecordId.MachineObservation => BasisOfRecord.MaskinellObservation,
                 BasisOfRecordId.MaterialSample => BasisOfRecord.FysisktProv,
                 _ =>  BasisOfRecord.Okänt
-        };
+            };
         }
-
+        
         public static QuantityVariable? GetQuantityVariableEnum(UnitId unitId)
         {
             return unitId switch

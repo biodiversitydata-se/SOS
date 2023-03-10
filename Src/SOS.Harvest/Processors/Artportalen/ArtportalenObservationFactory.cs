@@ -456,7 +456,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 // Populate generic data
                 PopulateGenericData(obs);
                 
-                if (ProcessConfiguration.ProcessObservationDataset)
+                if (ProcessConfiguration.ProcessDataset)
                 {
                     obs.DataStewardshipDatasetId = GetDataStewardshipDatasetId(obs);
                 }

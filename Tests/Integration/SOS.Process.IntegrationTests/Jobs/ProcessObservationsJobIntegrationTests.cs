@@ -94,8 +94,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository = new Mock<IProcessedObservationCoreRepository>().Object;
             }
             IUserObservationRepository userObservationRepository = new Mock<IUserObservationRepository>().Object;
-            IObservationDatasetRepository observationDatasetRepository = new Mock<IObservationDatasetRepository>().Object;
-            IObservationEventRepository observationEventRepository = new Mock<IObservationEventRepository>().Object;
+            IDatasetRepository observationDatasetRepository = new Mock<IDatasetRepository>().Object;
+            IEventRepository observationEventRepository = new Mock<IEventRepository>().Object;
             IDwcaDatasetProcessor dwcaDatasetProcessor = new Mock<IDwcaDatasetProcessor>().Object;
             IArtportalenDatasetProcessor artportalenDatasetProcessor = new Mock<IArtportalenDatasetProcessor>().Object;
             IArtportalenEventProcessor artportalenEventProcessor = new Mock<IArtportalenEventProcessor>().Object;

@@ -38,7 +38,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             //IArtportalenVerbatimRepository artportalenVerbatimRepository // observation verbatim repository
             IVerbatimClient verbatimClient,
             IProcessedObservationCoreRepository processedObservationRepository,
-            IObservationEventRepository observationEventRepository,
+            IEventRepository observationEventRepository,
             IAreaHelper areaHelper,
             IVocabularyRepository vocabularyRepository,
             IProcessManager processManager,
@@ -82,7 +82,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 if (!verbatimEventsBatch?.Any() ?? true) return 0;
 
                 Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
-                var processedEvents = new ConcurrentDictionary<string, ObservationEvent>();
+                var processedEvents = new ConcurrentDictionary<string, Event>();
                 foreach (var verbatimEvent in verbatimEventsBatch)
                 {
                     var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
@@ -110,7 +110,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
         }
 
-        private async Task GetEventObservations(ConcurrentDictionary<string, ObservationEvent> processedEvents)
+        private async Task GetEventObservations(ConcurrentDictionary<string, Event> processedEvents)
         {
             var filter = new SearchFilter(0);
             //filter.IsPartOfDataStewardshipDataset = true;

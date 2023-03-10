@@ -4,8 +4,8 @@ using System.Linq;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
-using static SOS.Lib.Models.Processed.DataStewardship.Dataset.ObservationDataset;
-using static SOS.Lib.Models.Processed.DataStewardship.Event.ObservationEvent;
+using static SOS.Lib.Models.Processed.DataStewardship.Dataset.Dataset;
+using static SOS.Lib.Models.Processed.DataStewardship.Event.Event;
 
 namespace SOS.Lib.Extensions
 {

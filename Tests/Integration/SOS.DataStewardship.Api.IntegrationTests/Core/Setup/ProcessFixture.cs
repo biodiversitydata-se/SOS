@@ -102,8 +102,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         }
 
         public async Task AddDataToElasticsearchAsync(
-            List<ObservationDataset> datasets, 
-            List<ObservationEvent> events, 
+            List<Dataset> datasets, 
+            List<Lib.Models.Processed.DataStewardship.Event.Event> events, 
             List<Observation> observations,
             bool protectedIndex = false,
             bool clearExistingObservations = true)
@@ -126,7 +126,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         }        
 
         public async Task AddDataToElasticsearchAsync(
-            IEnumerable<ObservationEvent> events, 
+            IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, 
             IEnumerable<Observation> observations,
             bool protectedIndex = false,
             bool clearExistingObservations = true)
@@ -137,7 +137,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         }
 
 
-        public async Task AddDatasetsToElasticsearchAsync(IEnumerable<ObservationDataset> datasets, bool clearExistingObservations = true, int delayInMs = 1000)
+        public async Task AddDatasetsToElasticsearchAsync(IEnumerable<Dataset> datasets, bool clearExistingObservations = true, int delayInMs = 1000)
         {
             if (clearExistingObservations)
             {
@@ -149,7 +149,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             await Task.Delay(delayInMs);
         }
 
-        public async Task AddEventsToElasticsearchAsync(IEnumerable<ObservationEvent> events, bool clearExistingObservations = true, int delayInMs = 1000)
+        public async Task AddEventsToElasticsearchAsync(IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, bool clearExistingObservations = true, int delayInMs = 1000)
         {
             if (clearExistingObservations)
             {

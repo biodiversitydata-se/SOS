@@ -21,11 +21,11 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     /// <summary>
     ///     DwC-A dataset processor.
     /// </summary>
-    public class DwcaDatasetProcessor : DatasetProcessorBase<DwcaDatasetProcessor, DwcVerbatimObservationDataset, IVerbatimRepositoryBase<DwcVerbatimObservationDataset, int>>,
+    public class DwcaDatasetProcessor : DatasetProcessorBase<DwcaDatasetProcessor, DwcVerbatimDataset, IVerbatimRepositoryBase<DwcVerbatimDataset, int>>,
         IDwcaDatasetProcessor
     {
         private readonly IVerbatimClient _verbatimClient;
-        private readonly IObservationEventRepository _observationEventRepository;
+        private readonly IEventRepository _observationEventRepository;
 
         public override DataProviderType Type => DataProviderType.DwcA;
 
@@ -41,8 +41,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// <exception cref="ArgumentNullException"></exception>
         public DwcaDatasetProcessor(
             IVerbatimClient verbatimClient,
-            IObservationEventRepository observationEventRepository,
-            IObservationDatasetRepository processedDatasetsRepository,
+            IEventRepository observationEventRepository,
+            IDatasetRepository processedDatasetsRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,            
             ProcessConfiguration processConfiguration,
@@ -75,8 +75,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         protected override async Task<int> ProcessBatchAsync(
             DataProvider dataProvider, 
             int startId, 
-            int endId, IDatasetFactory<DwcVerbatimObservationDataset> datasetFactory, 
-            IVerbatimRepositoryBase<DwcVerbatimObservationDataset, int> datasetVerbatimRepository, 
+            int endId, IDatasetFactory<DwcVerbatimDataset> datasetFactory, 
+            IVerbatimRepositoryBase<DwcVerbatimDataset, int> datasetVerbatimRepository, 
             IJobCancellationToken cancellationToken)
         {
             try
@@ -92,7 +92,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 }
 
                 Logger.LogDebug($"Dataset - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
-                var datasets = new ConcurrentDictionary<string, ObservationDataset>();
+                var datasets = new ConcurrentDictionary<string, Dataset>();
 
                 foreach (var verbatimDataset in datasetsBatch)
                 {
@@ -128,7 +128,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
         }
 
-        private async Task GetDatasetEvents(ConcurrentDictionary<string, ObservationDataset> processedDatasets)
+        private async Task GetDatasetEvents(ConcurrentDictionary<string, Dataset> processedDatasets)
         {
             // todo get events.
             // implement ProcessedObservationCoreRepository.GetAllAggregationItemsListAsync() in ObservationEventRepository

@@ -11,9 +11,9 @@ namespace SOS.Lib.Extensions
 {
     public static class DatasetExtensions
     {
-        public static ObservationDataset ToObservationDataset(this ArtportalenDatasetMetadata apDataset)
+        public static Dataset ToDataset(this ArtportalenDatasetMetadata apDataset)
         {
-            var dataset = new ObservationDataset()
+            var dataset = new Dataset()
             {
                 Identifier = apDataset.Identifier,
                 Metadatalanguage = apDataset.Metadatalanguage,

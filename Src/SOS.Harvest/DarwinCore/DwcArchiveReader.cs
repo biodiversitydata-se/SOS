@@ -91,14 +91,14 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="archiveReader"></param>
         /// <returns></returns>
 
-        public async Task<List<DwcVerbatimObservationDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
+        public async Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
         {
             var reader = CreateDwcReader(archiveReader.CoreFile.FileMetaData.RowType);
             var datasets = await reader.ReadDatasetsAsync(archiveReader);
             return datasets;
         }
 
-        public async Task<List<DwcVerbatimObservationDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
+        public async Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
         {
             var reader = CreateDwcReader(archiveReaderContext.ArchiveReader.CoreFile.FileMetaData.RowType);
             var datasets = await reader.ReadDatasetsAsync(archiveReaderContext);

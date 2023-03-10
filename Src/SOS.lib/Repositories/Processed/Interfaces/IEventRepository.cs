@@ -6,14 +6,14 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IObservationEventRepository : IProcessRepositoryBase<ObservationEvent, string>
+    public interface IEventRepository : IProcessRepositoryBase<Event, string>
     {
         /// <summary>
         ///  Add many items
         /// </summary>
         /// <param name="datasets"></param>
         /// <returns></returns>
-        Task<int> AddManyAsync(IEnumerable<ObservationEvent> datasets);
+        Task<int> AddManyAsync(IEnumerable<Event> datasets);
 
         /// <summary>
         /// Clear the collection
@@ -49,7 +49,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync();
 
-        Task<List<ObservationEvent>> GetEventsByIds(IEnumerable<string> ids);
+        Task<List<Event>> GetEventsByIds(IEnumerable<string> ids);
 
         Task<bool> DeleteAllDocumentsAsync();
     }

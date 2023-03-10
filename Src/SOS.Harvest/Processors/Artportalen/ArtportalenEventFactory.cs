@@ -78,19 +78,19 @@
 //        }
 
 
-//        //private async Task AddObservationDatasetsAsync()
+//        //private async Task AddDatasetsAsync()
 //        //{
 //        //    try
 //        //    {
-//        //        _logger.LogInformation("Start AddObservationDatasetsAsync()");
+//        //        _logger.LogInformation("Start AddDatasetsAsync()");
 //        //        await InitializeElasticSearchDatasetAsync();
 //        //        await DisableEsDatasetIndexingAsync();
-//        //        List<ObservationDataset> datasets = new List<ObservationDataset>();
+//        //        List<Dataset> datasets = new List<Dataset>();
 //        //        var batDataset = GetSampleBatDataset();
 //        //        batDataset.EndDate = DateTime.Now;
 
 //        //        // Determine which events that belongs to this dataset. Aggregate unique EventIds with filter: ProjectIds in [3606]
-//        //        _logger.LogInformation($"AddObservationDatasetsAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
+//        //        _logger.LogInformation($"AddDatasetsAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
 //        //        var searchFilter = new SearchFilter(0);
 //        //        searchFilter.DataStewardshipDatasetIds = new List<string> { batDataset.Identifier };
 //        //        var eventIds = await _processedObservationRepository.GetAllAggregationItemsAsync(searchFilter, "event.eventId");
@@ -98,7 +98,7 @@
 //        //        datasets.Add(batDataset);
 //        //        await _observationDatasetRepository.AddManyAsync(datasets);
 //        //        await EnableEsDatasetIndexingAsync();
-//        //        _logger.LogInformation("End AddObservationDatasetsAsync()");
+//        //        _logger.LogInformation("End AddDatasetsAsync()");
 //        //    }
 //        //    catch (Exception e)
 //        //    {

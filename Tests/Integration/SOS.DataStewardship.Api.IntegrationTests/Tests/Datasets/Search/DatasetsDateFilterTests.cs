@@ -1,5 +1,6 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.DataStewardship.Api.Contracts.Models;
+using Dataset = SOS.DataStewardship.Api.Contracts.Models.Dataset;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.Datasets.Search;
 

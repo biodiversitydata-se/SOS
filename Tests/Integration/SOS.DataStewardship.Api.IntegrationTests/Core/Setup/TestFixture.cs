@@ -69,8 +69,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 
             serviceCollection.AddSingleton<TelemetryClient>();
             serviceCollection.AddSingleton<IElasticClientManager, ElasticClientTestManager>();
-            serviceCollection.AddSingleton<IObservationDatasetRepository, ObservationDatasetRepository>();
-            serviceCollection.AddSingleton<IObservationEventRepository, ObservationEventRepository>();
+            serviceCollection.AddSingleton<IObservationDatasetRepository, DatasetRepository>();
+            serviceCollection.AddSingleton<IObservationEventRepository, EventRepository>();
             serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
 
             var elasticConfiguration = CreateElasticSearchConfiguration();

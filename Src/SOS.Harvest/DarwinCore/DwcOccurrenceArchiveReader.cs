@@ -239,12 +239,12 @@ namespace SOS.Harvest.DarwinCore
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        public async Task<List<DwcVerbatimObservationDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
+        public async Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
         {
             return null;
         }
 
-        public async Task<List<DwcVerbatimObservationDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
+        public async Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
         {
             return null;
         }

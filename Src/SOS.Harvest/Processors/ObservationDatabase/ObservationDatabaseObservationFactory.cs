@@ -153,15 +153,12 @@ namespace SOS.Harvest.Processors.ObservationDatabase
             {
                 if (!string.IsNullOrEmpty(verbatim.Stadium))
                 {
-                    switch (verbatim.Stadium.ToLowerInvariant())
+                    return verbatim.Stadium.ToLowerInvariant() switch
                     {
-                        case "säker häckning":
-                            return new VocabularyValue { Id = (int)ActivityId.NestBuilding }; // 12
-                        case "trolig häckning":
-                            return new VocabularyValue { Id = (int)ActivityId.PermanentTerritory }; // 17
-                        default:
-                            return new VocabularyValue { Id = (int)ActivityId.InNestingHabitat }; // 20
-                    }
+                        "säker häckning" => new VocabularyValue { Id = (int)ActivityId.NestBuilding }, // 12
+                        "trolig häckning" => new VocabularyValue { Id = (int)ActivityId.PermanentTerritory }, // 17
+                        _ => new VocabularyValue { Id = (int)ActivityId.InNestingHabitat } // 20
+                    };
                 }
                 else // No value
                 {

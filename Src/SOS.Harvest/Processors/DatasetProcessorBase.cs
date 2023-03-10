@@ -21,7 +21,7 @@ namespace SOS.Harvest.Processors
         where TVerbatim : IEntity<int>
         where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int> 
     {        
-        protected IObservationDatasetRepository ObservationDatasetRepository;
+        protected IDatasetRepository DatasetRepository;
 
         /// <summary>
         /// Constructor
@@ -30,13 +30,13 @@ namespace SOS.Harvest.Processors
         /// <param name="processManager"></param>
         /// <param name="logger"></param>
         protected DatasetProcessorBase(
-            IObservationDatasetRepository observationDatasetRepository,
+            IDatasetRepository observationDatasetRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<TClass> logger) : base(processManager, processTimeManager, processConfiguration, logger)
         {
-            ObservationDatasetRepository = observationDatasetRepository ??
+            DatasetRepository = observationDatasetRepository ??
                                            throw new ArgumentNullException(nameof(observationDatasetRepository));
         }
 
@@ -50,14 +50,14 @@ namespace SOS.Harvest.Processors
         /// <returns></returns>
         private async Task<int> CommitBatchAsync(
             DataProvider dataProvider,
-            ICollection<ObservationDataset> processedDatasets,
+            ICollection<Dataset> processedDatasets,
             string batchId,
             byte attempt = 1)
         {
             try
             {
                 Logger.LogDebug($"Datasets - Start storing {dataProvider.Identifier} batch: {batchId}");
-                var processedCount = await ObservationDatasetRepository.AddManyAsync(processedDatasets);                
+                var processedCount = await DatasetRepository.AddManyAsync(processedDatasets);                
                 Logger.LogDebug($"Datasets - Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
 
                 return processedCount;
@@ -110,7 +110,7 @@ namespace SOS.Harvest.Processors
 
                 Logger.LogDebug($"Dataset - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
 
-                var datasets = new ConcurrentDictionary<string, ObservationDataset>();
+                var datasets = new ConcurrentDictionary<string, Dataset>();
 
                 foreach (var verbatimDataset in datasetsBatch)
                 {
@@ -193,7 +193,7 @@ namespace SOS.Harvest.Processors
             return processBatchTasks.Sum(t => t.Result);
         }
 
-        protected async Task<int> ValidateAndStoreDatasets(DataProvider dataProvider, ICollection<ObservationDataset> datasets, string batchId)
+        protected async Task<int> ValidateAndStoreDatasets(DataProvider dataProvider, ICollection<Dataset> datasets, string batchId)
         {
             if (!datasets?.Any() ?? true)
             {

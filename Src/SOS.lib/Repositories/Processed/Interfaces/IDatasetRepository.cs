@@ -1,27 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Models.Statistics;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IObservationDatasetRepository : IProcessRepositoryBase<ObservationDataset, string>
+    public interface IDatasetRepository : IProcessRepositoryBase<Dataset, string>
     {
         /// <summary>
         ///  Add many items
         /// </summary>
         /// <param name="datasets"></param>
         /// <returns></returns>
-        Task<int> AddManyAsync(IEnumerable<ObservationDataset> datasets);
+        Task<int> AddManyAsync(IEnumerable<Dataset> datasets);
 
         /// <summary>
         /// Clear the collection
@@ -57,7 +49,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync();
 
-        Task<List<ObservationDataset>> GetDatasetsByIds(IEnumerable<string> ids);
+        Task<List<Dataset>> GetDatasetsByIds(IEnumerable<string> ids);
 
         Task<bool> DeleteAllDocumentsAsync();
     }

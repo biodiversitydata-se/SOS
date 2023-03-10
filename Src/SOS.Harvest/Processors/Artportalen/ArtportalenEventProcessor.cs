@@ -37,7 +37,7 @@ namespace SOS.Harvest.Processors.Artportalen
             //IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int> artportalenVerbatimRepository,
             //IArtportalenVerbatimRepository artportalenVerbatimRepository // observation verbatim repository
             IProcessedObservationCoreRepository processedObservationRepository,            
-            IObservationEventRepository observationEventRepository,
+            IEventRepository observationEventRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
@@ -82,7 +82,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     Dictionary<string, string> eventIdByOccurrenceId = CreateEventIdByOccurrenceIdDictionary(occurrenceIdsByEventId);
                     var firstOccurrenceIdInEvents = occurrenceIdsByEventId.Select(m => m.Value.First());
                     var observations = await _processedObservationRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
-                    var events = new List<ObservationEvent>();
+                    var events = new List<Event>();
                     foreach (var observation in observations)
                     {
                         string eventId = observation.Event.EventId.ToLower();

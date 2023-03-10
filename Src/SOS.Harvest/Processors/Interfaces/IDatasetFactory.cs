@@ -14,6 +14,6 @@ namespace SOS.Harvest.Processors.Interfaces
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        ObservationDataset CreateProcessedDataset(TEntity verbatim);
+        Dataset CreateProcessedDataset(TEntity verbatim);
     }
 }

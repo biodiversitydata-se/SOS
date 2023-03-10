@@ -33,7 +33,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Helpers
 
         public class DwcaComposite
         {
-            public List<DwcVerbatimObservationDataset> Datasets { get; set; }
+            public List<DwcVerbatimDataset> Datasets { get; set; }
             public IEnumerable<Lib.Models.Verbatim.DarwinCore.DwcEventOccurrenceVerbatim> Events { get; set; }
             public IEnumerable<Lib.Models.Verbatim.DarwinCore.DwcObservationVerbatim> Occurrences { get; set; }
         }

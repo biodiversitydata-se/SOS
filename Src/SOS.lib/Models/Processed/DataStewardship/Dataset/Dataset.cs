@@ -6,7 +6,7 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 
 namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
 {
-    public class ObservationDataset : IEntity<string>
+    public class Dataset : IEntity<string>
     {
         /// <summary>
         ///     Unique id.

@@ -14,6 +14,6 @@ namespace SOS.Harvest.Processors.Interfaces
         /// </summary>
         /// <param name="verbatim"></param>        
         /// <returns></returns>
-        ObservationEvent CreateEventObservation(TEntity verbatim);
+        Lib.Models.Processed.DataStewardship.Event.Event CreateEventObservation(TEntity verbatim);
     }
 }

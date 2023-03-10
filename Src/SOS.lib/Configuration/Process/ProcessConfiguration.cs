@@ -28,7 +28,7 @@
         /// <summary>
         /// True if observation dataset Elasticsearch index should be created.
         /// </summary>
-        public bool ProcessObservationDataset { get; set; }
+        public bool ProcessDataset { get; set; }
 
         /// <summary>
         ///     No of threads to run in parallel
