@@ -98,8 +98,6 @@ https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
 - Kolla upp: Mappas `Sex`, `LifeStage`, `Activity` korrekt?
 - Kolla upp: Mappas `Unit` korrekt?
 - Kolla upp: Mappas `QuantityVariable` korrekt?
-- Byt namn på klass och tillhörande ES-index `ObservationEvent`?
-- Byt namn på klass och tillhörande ES-index `ObservationDataset`?
 
 ## Övrigt som återstår
 - Publicera API på Azure API och koppla ihop med interna API:et.

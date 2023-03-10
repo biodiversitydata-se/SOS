@@ -72,6 +72,7 @@ using SOS.Lib.Swagger;
 using SOS.Observations.Api.ApplicationInsights;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.HealthChecks;
+using SOS.Observations.Api.HealthChecks.Custom;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
@@ -357,6 +358,12 @@ namespace SOS.Observations.Api
             services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
             services.AddSingleton(Configuration);
 
+            services.AddSingleton<IHealthCheckPublisher, HealthReportCachePublisher>();
+            services.Configure<HealthCheckPublisherOptions>(options =>
+            {
+                options.Period = TimeSpan.FromSeconds(90); // Create new health check every 90 sek and cache reult
+                options.Timeout = TimeSpan.FromSeconds(60);
+            });
             var healthChecks = services.AddHealthChecks()
                 .AddDiskStorageHealthCheck(
                     x => x.AddDrive("C:\\", (long)(healthCheckConfiguration.MinimumLocalDiskStorage * 1000)),
@@ -540,15 +547,16 @@ namespace SOS.Observations.Api
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health", new HealthCheckOptions()
                 {
-                    Predicate = _ => true,
-                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                    Predicate = _ => false,
+                    ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.Latest) 
                 });
                 endpoints.MapHealthChecks("/health-json", new HealthCheckOptions()
                 {
-                    Predicate = _ => true,
-                    ResponseWriter = async (context, report) =>
+                    Predicate = _ => false,
+                    ResponseWriter = async (context, _) =>
                     {
-                        var result = JsonConvert.SerializeObject(
+                        var report = HealthReportCachePublisher.Latest;
+                        var result = report == null ? "{}" :JsonConvert.SerializeObject(
                             new
                             {
                                 status = report.Status.ToString(),
