@@ -155,6 +155,8 @@ namespace SOS.Lib.Models.Search.Filters
 
         public IEnumerable<int> TriggeredObservationRuleReproductionIds { get; set; }
 
+        public IEnumerable<int> SightingTypeSearchGroupIds { get; set; }
+
         public IEnumerable<int> SiteIds { get; set; }
 
         public IEnumerable<int> SiteProjectIds { get; set; }

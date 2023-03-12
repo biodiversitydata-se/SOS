@@ -112,13 +112,14 @@ namespace SOS.Lib
             );  
         }
 
+
         /// <summary>
         /// Add internal filters to query
         /// </summary>
-        /// <param name="filter"></param>
         /// <param name="query"></param>
+        /// <param name="filter"></param>
         /// <returns></returns>
-        private static void AddInternalFilters(this
+        private static IEnumerable<int> AddInternalFilters(this
             ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             var internalFilter = filter as SearchFilterInternal;
@@ -340,6 +341,8 @@ namespace SOS.Lib
                             }}
                         ");
             }
+
+            return internalFilter.SightingTypeSearchGroupIds;
         }
 
         /// <summary>
@@ -356,13 +359,18 @@ namespace SOS.Lib
             excludeQuery.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.ExcludeVerificationStatusIds);
         }
 
-        public static void AddSightingTypeFilters<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, SearchFilterBase.SightingTypeFilter sightingTypeFilter) where TQueryContainer : class
+
+        public static void AddSightingTypeFilters<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query,
+            SearchFilterBase.SightingTypeFilter sightingTypeFilter,
+            IEnumerable<int> sightingTypeSearchGroupIds) where TQueryContainer : class
         {
             var sightingTypeQuery = new List<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>>();
-
-            var sightingTypeSearchGroupFilter = sightingTypeFilter switch
-            {
-                SearchFilterBase.SightingTypeFilter.DoNotShowMergedIncludeReplacementChilds => new[] { // 1, 4, 16, 64, 128
+            var sightingTypeSearchGroupFilter = sightingTypeSearchGroupIds?.Any() ?? false ?
+                sightingTypeSearchGroupIds
+                :
+                sightingTypeFilter switch
+                {
+                    SearchFilterBase.SightingTypeFilter.DoNotShowMergedIncludeReplacementChilds => new[] { // 1, 4, 16, 64, 128
                     (int)SightingTypeSearchGroup.Ordinary,
                     (int)SightingTypeSearchGroup.Aggregated,
                     (int)SightingTypeSearchGroup.AssessmentChild,
@@ -394,7 +402,8 @@ namespace SOS.Lib
 
             sightingTypeQuery.TryAddTermsCriteria("artportalenInternal.sightingTypeSearchGroupId", sightingTypeSearchGroupFilter);
 
-            if (sightingTypeFilter != SearchFilterBase.SightingTypeFilter.ShowOnlyMerged)
+            // If not only Assessment is selected
+            if (!(sightingTypeSearchGroupFilter.Count().Equals(1) && sightingTypeSearchGroupFilter.First().Equals(2)))
             {
                 // Get observations from other than Artportalen too
                 sightingTypeQuery.AddNotExistsCriteria("artportalenInternal.sightingTypeSearchGroupId");
@@ -738,12 +747,7 @@ namespace SOS.Lib
                 query.AddAuthorizationFilters(filter.ExtendedAuthorization);
             }
 
-            query.TryAddTermsCriteria("occurrence.sensitivityCategory", filter.SensitivityCategories);
-
-            if (!skipSightingTypeFilters)
-            {
-                query.AddSightingTypeFilters(filter.TypeFilter);
-            }
+            query.TryAddTermsCriteria("occurrence.sensitivityCategory", filter.SensitivityCategories);    
 
             // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
             if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
@@ -777,9 +781,15 @@ namespace SOS.Lib
             query.TryAddTermsCriteria("taxon.scientificName", filter.Taxa?.ScientificNames);
             query.TryAddTermsCriteria("license", filter.Licenses);
 
+            IEnumerable<int> sightingTypeSearchGroupIds = null!;
             if (filter is SearchFilterInternal)
             {
-                query.AddInternalFilters(filter);
+                sightingTypeSearchGroupIds = query.AddInternalFilters(filter);
+            }
+
+            if (!skipSightingTypeFilters || (sightingTypeSearchGroupIds?.Any() ?? false))
+            {
+                query.AddSightingTypeFilters(filter.TypeFilter, sightingTypeSearchGroupIds);
             }
 
             return query;

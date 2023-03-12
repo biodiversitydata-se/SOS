@@ -164,5 +164,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         public IEnumerable<int> Years { get; set; }
 
         public DateFilterComparisonDto YearsComparison { get; set; } = DateFilterComparisonDto.StartDate;
+
+        public IEnumerable<int> SightingTypeSearchGroupIds { get; set; }
     }
 }
