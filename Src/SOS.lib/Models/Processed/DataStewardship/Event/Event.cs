@@ -130,7 +130,7 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Event
         public string EventRemarks { get; set; }
 
         /// <summary>
-        /// States whether any of the sought after organisms were observed during the survey event or not. \&quot;Sant\&quot; (i.e. True) means that none of the sought after organisms were observed at all.
+        /// States whether any of the sought after organisms were observed during the survey event or not. "Sant" (i.e. True) means that none of the sought after organisms were observed at all.
         /// </summary>
         public bool NoObservations { get; set; }
 

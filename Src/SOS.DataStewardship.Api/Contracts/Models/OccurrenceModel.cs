@@ -48,7 +48,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         public TaxonModel Taxon { get; set; }
 
         /// <summary>
-        /// States whether a specific taxon was observed or not. Observations with \&quot;Förekomst\&quot; &#x3D; \&quot;inte observerad\&quot; are so called zero observations.
+        /// States whether a specific taxon was observed or not. Observations with "Förekomst" = "inte observerad" are so called zero observations.
         /// </summary>
         [Required]
         public OccurrenceStatus? OccurrenceStatus { get; set; }
