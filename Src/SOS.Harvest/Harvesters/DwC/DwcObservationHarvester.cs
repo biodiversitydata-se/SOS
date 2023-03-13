@@ -3,8 +3,6 @@ using DwC_A;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Nest;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
@@ -16,7 +14,6 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
-using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Harvest.Harvesters.DwC
@@ -212,15 +209,31 @@ namespace SOS.Harvest.Harvesters.DwC
                 // Read events
                 try
                 { 
-                    var events = await _dwcArchiveReader.ReadEventsAsync(dwcCollectionArchiveReaderContext);
+                    var events = (await _dwcArchiveReader.ReadEventsAsync(dwcCollectionArchiveReaderContext))?.ToList();
                     if (events != null && events.Any())
                     {
-                        _logger.LogDebug($"Start storing DwC-A events for {dataProvider.Identifier}");
-                        foreach (var ev in events)
+                        // Create and store absent obervations
+                        _logger.LogDebug($"Start storing absent DwC-A occurrences for {dataProvider.Identifier}");
+                        var absentObservations = new List<DwcObservationVerbatim>();
+                        dwcCollectionRepository.OccurrenceRepository.TempMode = false;
+                        for (int i = 0; i < events.Count; i++)
                         {
+                            DwcEventOccurrenceVerbatim? ev = events[i];
                             ev.Observations = null; // todo - handle this logic in the DwC-A parser.
-                        }
+                            absentObservations.AddRange(ev.CreateAbsentObservations());
 
+                            // store batch of absent observations if this is the last iterated event or batch is larger than 10 000.
+                            if (i == events.Count - 1 || absentObservations.Count > 10000) 
+                            {
+                                observationCount += absentObservations.Count();                                
+                                await dwcCollectionRepository.OccurrenceRepository.AddManyAsync(absentObservations);
+                                absentObservations.Clear();
+                            }
+                        }                        
+                        dwcCollectionRepository.OccurrenceRepository.TempMode = true;
+                        _logger.LogDebug($"Finish storing absent DwC-A occurrences for {dataProvider.Identifier}");
+
+                        _logger.LogDebug($"Start storing DwC-A events for {dataProvider.Identifier}");
                         await dwcCollectionRepository.EventRepository.AddCollectionAsync();
                         await dwcCollectionRepository.EventRepository.AddManyAsync(events);
                         await dwcCollectionRepository.EventRepository.PermanentizeCollectionAsync();
