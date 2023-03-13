@@ -56,6 +56,9 @@
     <None Update="Data\Resources\dwca-datastewardship-single-dataset-with-other-dataset-identifier.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\Resources\dwca-datastewardship-single-dataset-with-taxalist.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\Resources\dwca-datastewardship-single-dataset.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

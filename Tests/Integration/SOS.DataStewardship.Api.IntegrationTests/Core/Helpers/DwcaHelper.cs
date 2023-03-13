@@ -17,8 +17,10 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Helpers
             var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
 
             var datasets = await dwcArchiveReader.ReadDatasetsAsync(archiveReaderContext);
-            var occurrences = await dwcArchiveReader.ReadOccurrencesAsync(archiveReaderContext);
+            var occurrences = (await dwcArchiveReader.ReadOccurrencesAsync(archiveReaderContext)).ToList();
             var events = await dwcArchiveReader.ReadEventsAsync(archiveReaderContext);
+            var absentOccurrences = events.SelectMany(m => m.CreateAbsentObservations()).ToList();
+            occurrences.AddRange(absentOccurrences);
 
             return new DwcaComposite
             {

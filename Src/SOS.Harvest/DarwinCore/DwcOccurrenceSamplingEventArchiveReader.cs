@@ -1030,9 +1030,8 @@ namespace SOS.Harvest.DarwinCore
             await AddDataFromExtensionsAsync(archiveReaderContext, events);
             AddDatasetInformation(events, archiveReaderContext.DatasetByEventId, archiveReaderContext.Datasets.FirstOrDefault());
             foreach (var eve in events)
-            {
-                //eve.Observations = null;
-                eve.NotFoundTaxa = eve.Taxa?.Where(t => !(eve.Observations?.Any(o => t.TaxonID.Equals(o.TaxonID)) ?? false)).ToList();
+            {                
+                eve.NotFoundTaxa = GetNotFoundTaxa(eve.Taxa, eve.Observations);                
                 eve.NotFoundTaxonIds = eve?.NotFoundTaxa?.Select(m => m.TaxonID).ToList();
             }
 
@@ -1043,6 +1042,42 @@ namespace SOS.Harvest.DarwinCore
 
             return events;
         }      
+
+        private List<DwcTaxon>? GetNotFoundTaxa(ICollection<DwcTaxon> taxaList, ICollection<DwcObservationVerbatim> observations)
+        {
+            if (taxaList == null || taxaList.Count == 0) return null;
+            if (observations == null || observations.Count == 0) return taxaList.ToList();
+
+            var notFoundTaxa = new List<DwcTaxon>();
+            foreach (var taxon in taxaList)
+            {
+                if (!observations.Any(m => IsTaxonMatch(taxon, m)))
+                {
+                    notFoundTaxa.Add(taxon);
+                }
+            }
+
+            if (notFoundTaxa.Count == 0) return null;
+            return notFoundTaxa;
+        }
+
+        private bool IsTaxonMatch(DwcTaxon taxon, DwcObservationVerbatim observation)
+        {
+            if (!string.IsNullOrEmpty(observation.TaxonID) 
+             && observation.TaxonID.Equals(taxon.TaxonID,StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (!string.IsNullOrEmpty(observation.ScientificName)
+             && observation.ScientificName.Equals(taxon.ScientificName, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
 
         private class SamplingEventTaxonList
         {
