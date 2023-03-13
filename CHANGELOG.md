@@ -1,5 +1,32 @@
 # Changelog
 
+
+## [1.5.3] - Hotfix
+**Prod**: 2023-03-12
+### `Added`
+ - `SearchFilterInternal.SightingTypeSearchGroupIds` filter.
+
+### `Changed`
+ - Deprecated properties removed.
+ - Artportalen harvest SQL query optimization.
+ - Set `datasetName` to english data provider name (if missing)
+
+ ### `Fixed`
+ - ETRS89 was using wrong EPSG code
+ - Taxon sum aggregation cache conccurrency issue.
+
+
+## [1.5.3]
+**Prod**: 2023-01-31
+### `Changed`
+ - Deprecated properties removed.
+ - Added Elasticsearch shard replication
+
+ ### `Fixed`
+ - Taxon cache validation issue.
+ - ETRS89 was using wrong EPSG code
+
+
 ## [1.5.2]
 **Prod**: 2022-11-17
 ### `Changed`
