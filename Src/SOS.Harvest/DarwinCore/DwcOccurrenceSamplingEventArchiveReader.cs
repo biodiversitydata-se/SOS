@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Linq;
@@ -433,11 +432,16 @@ namespace SOS.Harvest.DarwinCore
                             taxonList = new HashSet<DwcTaxon>();
                             taxonLists.Add(listId, taxonList);
                         }
-
-                        var taxonId = taxonElement.Element(ns + "taxonID").Value;
-                        var scientificName = taxonElement.Element(ns + "scientificName").Value;
-                        var taxonRank = taxonElement.Element(ns + "taxonRank").Value;
-                        var kingdom = taxonElement.Element(ns + "kingdom").Value;
+                        
+                        var taxonId = taxonElement.Elements()
+                            .Single(x => x.Name.LocalName.Equals($"{ns}taxonId", StringComparison.OrdinalIgnoreCase)).Value;
+                        var scientificName = taxonElement.Elements()
+                            .Single(x => x.Name.LocalName.Equals($"{ns}scientificName", StringComparison.OrdinalIgnoreCase)).Value;
+                        var taxonRank = taxonElement.Elements()
+                            .Single(x => x.Name.LocalName.Equals($"{ns}taxonRank", StringComparison.OrdinalIgnoreCase)).Value;
+                        var kingdom = taxonElement.Elements()
+                            .Single(x => x.Name.LocalName.Equals($"{ns}kingdom", StringComparison.OrdinalIgnoreCase)).Value;
+                        
                         taxonList.Add(new DwcTaxon
                         {
                             TaxonID = taxonId,
