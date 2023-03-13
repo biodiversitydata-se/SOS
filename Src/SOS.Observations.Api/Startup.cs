@@ -361,6 +361,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IHealthCheckPublisher, HealthReportCachePublisher>();
             services.Configure<HealthCheckPublisherOptions>(options =>
             {
+                options.Delay = TimeSpan.FromSeconds(10);
                 options.Period = TimeSpan.FromSeconds(90); // Create new health check every 90 sek and cache reult
                 options.Timeout = TimeSpan.FromSeconds(60);
             });
