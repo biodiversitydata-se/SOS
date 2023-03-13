@@ -277,11 +277,11 @@ namespace SOS.Harvest.Harvesters.DwC
             try
             {                
                 _logger.LogDebug($"Start storing absent DwC-A occurrences for {dataProvider.Identifier}");
+                dwcCollectionRepository.OccurrenceRepository.TempMode = false;
                 int observationCount = 0;
                 var batchAbsentObservations = new List<DwcObservationVerbatim>();
                 var id = await dwcCollectionRepository.OccurrenceRepository.GetMaxIdAsync();
-                _logger.LogDebug($"MaxId={id} before adding absent observations");
-                dwcCollectionRepository.OccurrenceRepository.TempMode = false;
+                _logger.LogDebug($"MaxId={id} before adding absent observations");                
                 for (int i = 0; i < events.Count; i++)
                 {
                     DwcEventOccurrenceVerbatim? ev = events[i];
