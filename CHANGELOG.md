@@ -2,18 +2,17 @@
 
 
 ## [1.5.3] - Hotfix
-**Prod**: 2023-03-12
+**Prod**: 2023-03-14
 ### `Added`
  - `SearchFilterInternal.SightingTypeSearchGroupIds` filter.
 
 ### `Changed`
- - Deprecated properties removed.
  - Artportalen harvest SQL query optimization.
  - Set `datasetName` to english data provider name (if missing)
 
  ### `Fixed`
- - ETRS89 was using wrong EPSG code
  - Taxon sum aggregation cache conccurrency issue.
+ - Sweden area bug.
 
 
 ## [1.5.3]
