@@ -1,4 +1,4 @@
-﻿[
+[
     {
       "Id": 1,
       "Identifier": "Artportalen",
@@ -179,7 +179,7 @@
           "path": [ "Miljödata MVM", "MVM" ]
         }
       ],
-      "Url": "http://miljodata.slu.se/mvm/",
+      "Url": "https://miljodata.slu.se/mvm/",
       "ContactPerson": {
         "FirstName": "Lars",
         "LastName": "Sonesten",
@@ -242,7 +242,7 @@
           "path": [ "Institutionen för akvatiska resurser", "Sjöprovfiskedatabasen" ]
         }
       ],
-      "Url": "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/",
+      "Url": "https://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/",
       "ContactPerson": {
         "FirstName": "Anders",
         "LastName": "Kinnerbäck",
@@ -252,69 +252,69 @@
       "SupportDatasets": false,
       "SupportEvents": false
     },
-    {
-      "Id": 6,
-      "Identifier": "SERS",
-      "IsActive": true,
-      "IncludeInScheduledHarvest": true,
-      "IncludeInHealthCheck": true,
-      "IncludeInSearchByDefault": true,
-      "SupportIncrementalHarvest": false,
-      "SupportDynamicEml": false,
-      "HarvestFailPreventProcessing": false,
-      "UseVerbatimFileInExport": false,
-      "CoordinateUncertaintyInMeters": 5000,
-      "Type": "SersObservations",
-      "Names": [
-        {
-          "CultureCode": "en-GB",
-          "Value": "The Database for electrofishing in streams (SERS)"
-        },
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Elfiskeregistret SERS"
-        }
-      ],
-      "Descriptions": [
-        {
-          "CultureCode": "en-GB",
-          "Value": "The database called SERS contains data from experimental fishing with electricity in Swedish rivers and streams."
-        },
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Innehåller data från provfiske med elaggregat i svenska vattendrag. Administrerades tidigare av Fiskeriverket, numera av Institutionen för akvatiska resurser vid SLU."
-        }
-      ],
-      "Organizations": [
-        {
-          "CultureCode": "en-GB",
-          "Value": "Department of Aquatic Resources, SLU"
-        },
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Institutionen för akvatiska resurser, SLU"
-        }
-      ],
-      "Paths": [
-        {
-          "CultureCode": "en-GB",
-          "path": [ "Department of Aquatic Resources", "The Database for electrofishing in streams" ]
-        },
-        {
-          "CultureCode": "sv-SE",
-          "path": [ "Institutionen för akvatiska resurser", "Elfiskeregistret" ]
-        }
-      ],
-      "Url": "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/database-for-testfishing-in-streams/",
-      "ContactPerson": {
-        "FirstName": "Berit",
-        "LastName": "Sers",
-        "Email": "berit.sers@slu.se"
+  {
+    "Id": 6,
+    "Identifier": "SERS",
+    "IsActive": true,
+    "IncludeInScheduledHarvest": true,
+    "IncludeInHealthCheck": true,
+    "IncludeInSearchByDefault": true,
+    "SupportIncrementalHarvest": false,
+    "SupportDynamicEml": false,
+    "HarvestFailPreventProcessing": false,
+    "UseVerbatimFileInExport": false,
+    "CoordinateUncertaintyInMeters": 5000,
+    "Type": "SersObservations",
+    "Names": [
+      {
+        "CultureCode": "en-GB",
+        "Value": "The Database for electrofishing in streams (SERS)"
       },
-      "HarvestSchedule": "* * * * *",
-      "SupportDatasets": false,
-      "SupportEvents": false
+      {
+        "CultureCode": "sv-SE",
+        "Value": "Elfiskeregistret SERS"
+      }
+    ],
+    "Descriptions": [
+      {
+        "CultureCode": "en-GB",
+        "Value": "The database called SERS contains data from experimental fishing with electricity in Swedish rivers and streams."
+      },
+      {
+        "CultureCode": "sv-SE",
+        "Value": "Innehåller data från provfiske med elaggregat i svenska vattendrag. Administrerades tidigare av Fiskeriverket, numera av Institutionen för akvatiska resurser vid SLU."
+      }
+    ],
+    "Organizations": [
+      {
+        "CultureCode": "en-GB",
+        "Value": "Department of Aquatic Resources, SLU"
+      },
+      {
+        "CultureCode": "sv-SE",
+        "Value": "Institutionen för akvatiska resurser, SLU"
+      }
+    ],
+    "Paths": [
+      {
+        "CultureCode": "en-GB",
+        "path": [ "Department of Aquatic Resources", "The Database for electrofishing in streams" ]
+      },
+      {
+        "CultureCode": "sv-SE",
+        "path": [ "Institutionen för akvatiska resurser", "Elfiskeregistret" ]
+      }
+    ],
+    "Url": "https://www.slu.se/en/departments/aquatic-resources1/databases/database-for-testfishing-in-streams/",
+    "ContactPerson": {
+      "FirstName": "Erik",
+      "LastName": "Myrstener",
+      "Email": "SERS@slu.se"
     },
+    "HarvestSchedule": "* * * * *",
+    "SupportDatasets": false,
+    "SupportEvents": false
+  },
     {
       "Id": 7,
       "Identifier": "VirtualHerbarium",
@@ -431,7 +431,7 @@
           "path": [ "SMHI", "Shark" ]
         }
       ],
-      "Url": "http://sharkweb.smhi.se/",
+      "Url": "https://sharkweb.smhi.se/",
       "ContactPerson": {
         "FirstName": "Patrik",
         "LastName": "Strömberg",
@@ -494,7 +494,7 @@
           "path": [ "Naturhistoriska riksmuseet", "Ringmärkningscentralen" ]
         }
       ],
-      "Url": "http://www.nrm.se/forskningochsamlingar/miljoforskningochovervakning/ringmarkningscentralen.214.html",
+      "Url": "https://www.nrm.se/forskningochsamlingar/miljoforskningochovervakning/ringmarkningscentralen.214.html",
       "ContactPerson": {
         "FirstName": "",
         "LastName": "",
@@ -503,11 +503,11 @@
       "DownloadUrls": [
         {
           "type": "Observations",
-          "url": "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds"
+          "url": "https://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds"
         },
         {
           "type": "ObservationEml",
-          "url": "http://www.gbif.se/ipt/eml.do?r=nrm-ringedbirds"
+          "url": "https://www.gbif.se/ipt/eml.do?r=nrm-ringedbirds"
         }
       ],
       "HarvestSchedule": "* * * * *",
@@ -567,7 +567,7 @@
           "path": [ "Naturhistoriska riksmuseet", "Entomologiska samlingarna" ]
         }
       ],
-      "Url": "http://www.gbif.org/dataset/9940af5a-3271-4e6a-ad71-ced986b9a9a5",
+      "Url": "https://www.gbif.org/dataset/9940af5a-3271-4e6a-ad71-ced986b9a9a5",
       "ContactPerson": {
         "FirstName": "",
         "LastName": "",
@@ -576,11 +576,11 @@
       "DownloadUrls": [
         {
           "type": "Observations",
-          "url": "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm"
+          "url": "https://www.gbif.se/ipt/archive.do?r=nhrs-nrm"
         },
         {
           "type": "ObservationEml",
-          "url": "http://www.gbif.se/ipt/eml.do?r=nhrs-nrm"
+          "url": "https://www.gbif.se/ipt/eml.do?r=nhrs-nrm"
         }
       ],
       "HarvestSchedule": "* * * * *",
@@ -640,7 +640,7 @@
           "path": [ "Stiftelsen Station Linné", "Svenska Malaisefälle projektet" ]
         }
       ],
-      "Url": "http://www.gbif.org/dataset/38c1351d-9cfe-42c0-97da-02d2c8be141c",
+      "Url": "https://www.gbif.org/dataset/38c1351d-9cfe-42c0-97da-02d2c8be141c",
       "ContactPerson": {
         "FirstName": "",
         "LastName": "",
@@ -649,11 +649,11 @@
       "DownloadUrls": [
         {
           "type": "Observations",
-          "url": "http://www.gbif.se/ipt/archive.do?r=smtp-nrm"
+          "url": "https://www.gbif.se/ipt/archive.do?r=smtp-nrm"
         },
         {
           "type": "ObservationEml",
-          "url": "http://www.gbif.se/ipt/eml.do?r=smtp-nrm"
+          "url": "https://www.gbif.se/ipt/eml.do?r=smtp-nrm"
         }
       ],
       "HarvestSchedule": "* * * * *",
@@ -713,7 +713,7 @@
           "path": [ "Naturhistoriska riksmuseet", "Tumlare" ]
         }
       ],
-      "Url": "http://www.gbif.org/dataset/6aa7c400-0c66-11dd-84d2-b8a03c50a862",
+      "Url": "https://www.gbif.org/dataset/6aa7c400-0c66-11dd-84d2-b8a03c50a862",
       "ContactPerson": {
         "FirstName": "",
         "LastName": "",
@@ -722,11 +722,11 @@
       "DownloadUrls": [
         {
           "type": "Observations",
-          "url": "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises"
+          "url": "https://www.gbif.se/ipt/archive.do?r=nrm-porpoises"
         },
         {
           "type": "ObservationEml",
-          "url": "http://www.gbif.se/ipt/eml.do?r=nrm-porpoises"
+          "url": "https://www.gbif.se/ipt/eml.do?r=nrm-porpoises"
         }
       ],
       "HarvestSchedule": "* * * * *",
@@ -791,11 +791,11 @@
       "DownloadUrls": [
         {
           "type": "Observations",
-          "url": "http://www.gbif.se/ipt/archive.do?r=lu_sebms"
+          "url": "https://www.gbif.se/ipt/archive.do?r=lu_sebms"
         },
         {
           "type": "ObservationEml",
-          "url": "http://www.gbif.se/ipt/eml.do?r=lu_sebms"
+          "url": "https://www.gbif.se/ipt/eml.do?r=lu_sebms"
         }
       ],
       "HarvestSchedule": "* * * * *",
@@ -855,7 +855,7 @@
           "path": [ "SMHI", "SHARK - Nationell zooplankton övervakning i Sverige sedan 1979" ]
         }
       ],
-      "Url": "http://sharkdata.se/",
+      "Url": "https://sharkdata.se/",
       "ContactPerson": {
         "FirstName": "Lisa",
         "LastName": "Sundqvist",
@@ -1044,7 +1044,7 @@
           "path": [ "SLU Artdatabanken", "Observationsdatabasen" ]
         }
       ],
-      "Url": "http://www.artdatabanken.se/verksamhet-och-uppdrag/arter-kunskapsinsamling/fynd-av-arter/soeka-och-goera-uttag-av-fynddata/?st=uttag+av+fynddata",
+      "Url": "https://www.artdatabanken.se/det-har-gor-vi/fynddata/insamling-och-lagring-av-fynduppgifter/",
       "ContactPerson": {
         "FirstName": "Jan",
         "LastName": "Edelsjö",
@@ -1170,11 +1170,11 @@
           "path": [ "Kustlaboratoriet, Institutionen för akvatiska resurser", "Kustfiskdatabasen" ]
         }
       ],
-      "Url": "https://https://www.inaturalist.se/",
+      "Url": "https://www.inaturalist.se/",
       "ContactPerson": {
-        "FirstName": "Placeholder",
-        "LastName": "Placeholder",
-        "Email": "Placeholder@slu.se"
+        "FirstName": "inaturalist",
+        "LastName": "slu",
+        "Email": "artdatabanken@slu.se"
       },
       "HarvestSchedule": "* * * * *",
       "SupportDatasets": false,
@@ -1298,7 +1298,7 @@
           "path": [ "Lunds universitet", "Fågeltaxeringen: Sommarpunktrutterna" ]
         }
       ],
-      "Url": "http://www.fageltaxering.lu.se/inventera/metoder/punktrutter",
+      "Url": "https://www.fageltaxering.lu.se/inventera/metoder/punktrutter",
       "ContactPerson": {
         "FirstName": "Åke",
         "LastName": "Lindström",
@@ -1367,7 +1367,7 @@
           "path": [ "Lunds universitet", "Fågeltaxeringen: Standardrutterna" ]
         }
       ],
-      "Url": "http://www.fageltaxering.lu.se/inventera/metoder/standardrutter",
+      "Url": "https://www.fageltaxering.lu.se/inventera/metoder/standardrutter",
       "ContactPerson": {
         "FirstName": "Åke",
         "LastName": "Lindström",
