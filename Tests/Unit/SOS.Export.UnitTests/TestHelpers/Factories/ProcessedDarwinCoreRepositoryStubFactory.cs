@@ -3,13 +3,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using Moq;
-using Newtonsoft.Json;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Export.UnitTests.TestHelpers.Factories
 {
@@ -49,12 +49,12 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
             var str = File.ReadAllText(filePath, Encoding.UTF8);
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> {new ObjectIdConverter()}
-            };
 
-            var observations = JsonConvert.DeserializeObject<List<Observation>>(str, serializerSettings);
+            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true, };
+            serializeOptions.Converters.Add(new ObjectIdConverter());
+
+            var observations = JsonSerializer.Deserialize<List<Observation>>(str, serializeOptions);
+
             return observations;
         }
     }

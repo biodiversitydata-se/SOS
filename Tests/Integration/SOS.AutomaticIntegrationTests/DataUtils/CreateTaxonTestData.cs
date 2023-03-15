@@ -1,11 +1,6 @@
 ﻿using SOS.AutomaticIntegrationTests.TestFixtures;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.TestHelpers.JsonConverters;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using SOS.Lib.Enums.VocabularyValues;
 using Xunit;
 using System.IO.Compression;

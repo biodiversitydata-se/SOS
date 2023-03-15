@@ -9,17 +9,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Newtonsoft.Json;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Enums.Artportalen;
+using MongoDB.Driver.GeoJsonObjectModel;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 {
     public static class ArtportalenObservationBuilder
     {
         private static Bogus.Faker _faker = new Bogus.Faker();
-        private static Bogus.DataSets.Lorem _lorem = new Bogus.DataSets.Lorem("sv");
         private const int ArtportalenDataSourceId = 1;
         private static (int Value, float Probability)[] _verifiersProbability = new[] {
             (0, 0.50f), // 50% probability of getting zero verifiers
@@ -38,15 +39,14 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 var filePath = System.IO.Path.Combine(assemblyPath, string.Format($@"Resources\{(sensitive ? "ArtportalenVerbatimProtectedObservations_1000" : "ArtportalenVerbatimObservations_1000")}.json") );                    
                 string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
-                var serializerSettings = new JsonSerializerSettings
-                {
-                    Converters = new List<JsonConverter> { 
-                        new TestHelpers.JsonConverters.ObjectIdConverter(),
-                        new NewtonsoftGeoJsonGeometryConverter()                            
-                    }
-                };
+                var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true, PropertyNameCaseInsensitive = true, IncludeFields = false };
+                serializeOptions.Converters.Add(new ObjectIdConverter());
+                serializeOptions.Converters.Add(new JsonStringEnumConverter());
+                serializeOptions.Converters.Add(new GeoJsonConverter());
 
-                _verbatimArtportalenObservationsFromJsonFile = JsonConvert.DeserializeObject<List<ArtportalenObservationVerbatim>>(str, serializerSettings);
+                _verbatimArtportalenObservationsFromJsonFile = JsonSerializer.Deserialize<List<ArtportalenObservationVerbatim>>(str, serializeOptions);
+
+               // _verbatimArtportalenObservationsFromJsonFile = JsonConvert.DeserializeObject<List<ArtportalenObservationVerbatim>>(str, serializerSettings);
                 _sensitiveLoaded = sensitive;
             }
 
@@ -115,51 +115,47 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                     Name = "Lerbäck"
                 },
                 PresentationNameParishRegion = "Isåsen, Lerbäck[[Shared_ParishName_Abbrevation]], Nrk",
-                Point = new GeoJsonGeometry
-                {
-                    Type = "Point",
-                    Coordinates = new System.Collections.ArrayList { 15.124, 58.8233 }
-                },
-                PointWithBuffer = new GeoJsonGeometry
-                {
-                    Type = "Polygon",
-                    Coordinates = new System.Collections.ArrayList { new double[][] { // todo - generate automatic from coordinates and accuracy.
-                            new double[] {15.124460958527196, 58.82325882868679},
-                            new double[] {15.124460958527196, 58.82325882868679},
-                            new double[] {15.124452622831287, 58.823302641640886},
-                            new double[] {15.124427936079675, 58.82334477088773},
-                            new double[] {15.124387846970382, 58.82338359742399},
-                            new double[] {15.124333896105398, 58.82341762916765},
-                            new double[] {15.124268156786204, 58.823445558297884},
-                            new double[] {15.124193155337974, 58.82346631151389},
-                            new double[] {15.124111774024298, 58.8234790912812},
-                            new double[] {15.124027140283424, 58.823483406480534},
-                            new double[] {15.12394250654255, 58.8234790912812},
-                            new double[] {15.123861125228874, 58.82346631151389},
-                            new double[] {15.123786123780643, 58.823445558297884},
-                            new double[] {15.12372038446145, 58.82341762916765},
-                            new double[] {15.123666433596465, 58.82338359742399},
-                            new double[] {15.123626344487173, 58.82334477088773},
-                            new double[] {15.123601657735561, 58.823302641640886},
-                            new double[] {15.123593322039651, 58.82325882868679},
-                            new double[] {15.123601657735561, 58.82321501573269},
-                            new double[] {15.123626344487173, 58.82317288648585},
-                            new double[] {15.123666433596465, 58.82313405994959},
-                            new double[] {15.12372038446145, 58.82310002820593},
-                            new double[] {15.123786123780643, 58.823072099075695},
-                            new double[] {15.123861125228874, 58.82305134585969},
-                            new double[] {15.12394250654255, 58.82303856609238},
-                            new double[] {15.124027140283424, 58.823034250893045},
-                            new double[] {15.124111774024298, 58.82303856609238},
-                            new double[] {15.124193155337974, 58.82305134585969},
-                            new double[] {15.124268156786204, 58.823072099075695},
-                            new double[] {15.124333896105398, 58.82310002820593},
-                            new double[] {15.124387846970382, 58.82313405994959},
-                            new double[] {15.124427936079675, 58.82317288648585},
-                            new double[] {15.124452622831287, 58.82321501573269},
-                            new double[] {15.124460958527196, 58.82325882868679}}
-                        }
-                },
+                Point = new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(15.124, 58.8233)),
+                PointWithBuffer = new GeoJsonPolygon<GeoJson2DCoordinates>(
+                    new GeoJsonPolygonCoordinates<GeoJson2DCoordinates>(
+                        new GeoJsonLinearRingCoordinates<GeoJson2DCoordinates>(new []
+                        {
+                            new GeoJson2DCoordinates(15.124460958527196, 58.82325882868679),
+                            new GeoJson2DCoordinates(15.124452622831287, 58.823302641640886),
+                            new GeoJson2DCoordinates(15.124427936079675, 58.82334477088773),
+                            new GeoJson2DCoordinates(15.124387846970382, 58.82338359742399),
+                            new GeoJson2DCoordinates(15.124333896105398, 58.82341762916765),
+                            new GeoJson2DCoordinates(15.124268156786204, 58.823445558297884),
+                            new GeoJson2DCoordinates(15.124193155337974, 58.82346631151389),
+                            new GeoJson2DCoordinates(15.124111774024298, 58.8234790912812),
+                            new GeoJson2DCoordinates(15.124027140283424, 58.823483406480534),
+                            new GeoJson2DCoordinates(15.12394250654255, 58.8234790912812),
+                            new GeoJson2DCoordinates(15.123861125228874, 58.82346631151389),
+                            new GeoJson2DCoordinates(15.123786123780643, 58.823445558297884),
+                            new GeoJson2DCoordinates(15.12372038446145, 58.82341762916765),
+                            new GeoJson2DCoordinates(15.123666433596465, 58.82338359742399),
+                            new GeoJson2DCoordinates(15.123626344487173, 58.82334477088773),
+                            new GeoJson2DCoordinates(15.123601657735561, 58.823302641640886),
+                            new GeoJson2DCoordinates(15.123593322039651, 58.82325882868679),
+                            new GeoJson2DCoordinates(15.123601657735561, 58.82321501573269),
+                            new GeoJson2DCoordinates(15.123626344487173, 58.82317288648585),
+                            new GeoJson2DCoordinates(15.123666433596465, 58.82313405994959),
+                            new GeoJson2DCoordinates(15.12372038446145, 58.82310002820593),
+                            new GeoJson2DCoordinates(15.123786123780643, 58.823072099075695),
+                            new GeoJson2DCoordinates(15.123861125228874, 58.82305134585969),
+                            new GeoJson2DCoordinates(15.12394250654255, 58.82303856609238),
+                            new GeoJson2DCoordinates(15.124027140283424, 58.823034250893045),
+                            new GeoJson2DCoordinates(15.124111774024298, 58.82303856609238),
+                            new GeoJson2DCoordinates(15.124193155337974, 58.82305134585969),
+                            new GeoJson2DCoordinates(15.124268156786204, 58.823072099075695),
+                            new GeoJson2DCoordinates(15.124333896105398, 58.82310002820593),
+                            new GeoJson2DCoordinates(15.124387846970382, 58.82313405994959),
+                            new GeoJson2DCoordinates(15.124427936079675, 58.82317288648585),
+                            new GeoJson2DCoordinates(15.124452622831287, 58.82321501573269),
+                            new GeoJson2DCoordinates(15.124460958527196, 58.82325882868679),
+                        })
+                    )
+                ),
                 Province = new GeographicalArea
                 {
                     FeatureId = "10",

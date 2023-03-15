@@ -177,8 +177,8 @@ namespace SOS.Observations.Api.Controllers
                            { "PublicCount", provider.PublicProcessCount },
                            { "ProtectedCount", provider.ProtectedProcessCount },
                            { "InvalidCount", provider.ProcessFailCount },
-                           { "HarvestDate", provider.HarvestStart.HasValue ? provider.HarvestStart.Value.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss") : "N/A" },
-                           { "IncrementalHarvestDate", provider.LatestIncrementalStart.HasValue ? provider.LatestIncrementalStart.Value.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss") : "N/A" },
+                           { "HarvestDate", provider.HarvestStart.HasValue ? provider.HarvestStart.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") : "N/A" },
+                           { "IncrementalHarvestDate", provider.LatestIncrementalStart.HasValue ? provider.LatestIncrementalStart.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") : "N/A" },
                            { "IncrementalHarvestPublicCount", provider.LatestIncrementalPublicCount },
                            { "IncrementalHarvestProtetcedCount", provider.LatestIncrementalProtectedCount }
                        },

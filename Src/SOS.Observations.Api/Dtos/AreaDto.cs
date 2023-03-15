@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Models.Shared;
+﻿using MongoDB.Driver.GeoJsonObjectModel;
 
 namespace SOS.Observations.Api.Dtos
 {
@@ -10,6 +10,6 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         ///     Area geometry
         /// </summary>
-        public GeoJsonGeometry Geometry { get; set; }
+        public GeoJsonGeometry<GeoJson2DCoordinates> Geometry { get; set; }
     }
 }

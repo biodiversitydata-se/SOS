@@ -29,21 +29,21 @@
 		<PackageReference Include="AspNetCore.HealthChecks.System" Version="6.0.5" />
 		<PackageReference Include="AspNetCore.HealthChecks.SystemMemory" Version="1.0.1" />
 		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.5" />
-		<PackageReference Include="Azure.Storage.Blobs" Version="12.14.1" />
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.15.0" />
 		<PackageReference Include="Elastic.Apm.NLog" Version="1.5.3" />
 		<PackageReference Include="Elastic.CommonSchema.NLog" Version="1.5.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
-		<PackageReference Include="CSharpFunctionalExtensions" Version="2.37.0" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="2.38.0" />
 		<PackageReference Include="HangFire" Version="1.7.33" />
 		<PackageReference Include="HangFire.Autofac" Version="2.3.1" />
 		<PackageReference Include="HangFire.Mongo" Version="1.9.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.3" />
-		<PackageReference Include="Microsoft.OpenApi" Version="1.6.1" />
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.4" />
+		<PackageReference Include="Microsoft.OpenApi" Version="1.6.3" />
 		<PackageReference Include="MongoDB.Driver" Version="2.19.0" />
 		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.19.0" />
 		<PackageReference Include="NGeoHash" Version="1.2.0" />

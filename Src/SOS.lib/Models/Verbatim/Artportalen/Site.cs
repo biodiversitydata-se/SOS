@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-
+using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
 {
@@ -38,12 +37,12 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Diffused Point (WGS84)
         /// </summary>
-        public GeoJsonGeometry DiffusedPoint { get; set; }
+        public GeoJsonGeometry<GeoJson2DCoordinates> DiffusedPoint { get; set; }
 
         /// <summary>
         ///   Diffused Point with accuracy buffer (WGS84)
         /// </summary>
-        public GeoJsonGeometry DiffusedPointWithBuffer { get; set; }
+        public GeoJsonGeometry<GeoJson2DCoordinates> DiffusedPointWithBuffer { get; set; }
 
         /// <summary>
         ///     Id of diffusion, 0 if no diffusion
@@ -98,12 +97,12 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Point (WGS84)
         /// </summary>
-        public GeoJsonGeometry Point { get; set; }
+        public GeoJsonGeometry<GeoJson2DCoordinates> Point { get; set; }
 
         /// <summary>
         ///     Point with accuracy buffer (WGS84)
         /// </summary>
-        public GeoJsonGeometry PointWithBuffer { get; set; }
+        public GeoJsonGeometry<GeoJson2DCoordinates> PointWithBuffer { get; set; }
 
         /// <summary>
         ///     Protected Nature

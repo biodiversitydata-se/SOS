@@ -1,13 +1,12 @@
-﻿using LinqStatistics;
-using SOS.AutomaticIntegrationTests.TestFixtures;
+﻿using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.TestHelpers.JsonConverters;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -58,15 +57,14 @@ namespace SOS.AutomaticIntegrationTests.DataUtils
 
             // Write observations to JSON
 
-            // Serialize using Newtonsoft.Json.JsonConvert
-            var serializerSettings = new Newtonsoft.Json.JsonSerializerSettings
-            {
-                Converters = new List<Newtonsoft.Json.JsonConverter> { new ObjectIdConverter() }
-            };
-            var strJson = Newtonsoft.Json.JsonConvert.SerializeObject(verbatimObservations, serializerSettings);
+            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+            serializeOptions.Converters.Add(new ObjectIdConverter());
+            serializeOptions.Converters.Add(new JsonStringEnumConverter());
+
+            var strJson = JsonSerializer.Serialize(verbatimObservations, serializeOptions);
             System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimObservations10000_1.json", strJson, Encoding.UTF8);
-            System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimObservations1000_1.json", Newtonsoft.Json.JsonConvert.SerializeObject(verbatimObservations.Take(1000), serializerSettings), Encoding.UTF8);
-            System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimObservations5000_1.json", Newtonsoft.Json.JsonConvert.SerializeObject(verbatimObservations.Take(5000), serializerSettings), Encoding.UTF8);
+            System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimObservations1000_1.json", JsonSerializer.Serialize(verbatimObservations.Take(1000), serializeOptions), Encoding.UTF8);
+            System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimObservations5000_1.json", JsonSerializer.Serialize(verbatimObservations.Take(5000), serializeOptions), Encoding.UTF8);
             //var observations1 = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ArtportalenObservationVerbatim>>(strJson, serializerSettings);
 
             // Serialize using System.Text.Json.JsonSerializer
@@ -75,8 +73,8 @@ namespace SOS.AutomaticIntegrationTests.DataUtils
             jsonSerializerOptions.Converters.Add(new GeoLocationConverter());
             var strJson2 = System.Text.Json.JsonSerializer.Serialize(verbatimObservations, jsonSerializerOptions);
             System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimObservations10000_2.json", strJson2, Encoding.UTF8);
-            System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimObservations1000_2.json", System.Text.Json.JsonSerializer.Serialize(verbatimObservations.Take(1000), jsonSerializerOptions), Encoding.UTF8);
-            System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimObservations5000_2.json", System.Text.Json.JsonSerializer.Serialize(verbatimObservations.Take(5000), jsonSerializerOptions), Encoding.UTF8);
+            System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimObservations1000_2.json", JsonSerializer.Serialize(verbatimObservations.Take(1000), serializeOptions), Encoding.UTF8);
+            System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimObservations5000_2.json", JsonSerializer.Serialize(verbatimObservations.Take(5000), serializeOptions), Encoding.UTF8);
             //var observations2 = System.Text.Json.JsonSerializer.Deserialize<List<ArtportalenObservationVerbatim>>(strJson2, jsonSerializerOptions);            
         }
 
@@ -111,19 +109,16 @@ namespace SOS.AutomaticIntegrationTests.DataUtils
 
             // Write observations to JSON
 
-            // Serialize using Newtonsoft.Json.JsonConvert
-            var serializerSettings = new Newtonsoft.Json.JsonSerializerSettings
-            {
-                Converters = new List<Newtonsoft.Json.JsonConverter> { new ObjectIdConverter() }
-            };
-            var strJson = Newtonsoft.Json.JsonConvert.SerializeObject(verbatimChecklists, serializerSettings);
+            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true, PropertyNameCaseInsensitive = true };
+            serializeOptions.Converters.Add(new ObjectIdConverter());
+            serializeOptions.Converters.Add(new JsonStringEnumConverter());
+            serializeOptions.Converters.Add(new GeoShapeConverter());
+            serializeOptions.Converters.Add(new GeoLocationConverter());
+
+            var strJson = JsonSerializer.Serialize(verbatimChecklists, serializeOptions);
             System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimChecklists1000.json", strJson, Encoding.UTF8);
 
-            // Serialize using System.Text.Json.JsonSerializer
-            var jsonSerializerOptions = new System.Text.Json.JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-            jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
-            jsonSerializerOptions.Converters.Add(new GeoLocationConverter());
-            var strJson2 = System.Text.Json.JsonSerializer.Serialize(verbatimChecklists, jsonSerializerOptions);
+            var strJson2 = JsonSerializer.Serialize(verbatimChecklists, serializeOptions);
             System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimChecklists1000_2.json", strJson2, Encoding.UTF8);            
         }
 

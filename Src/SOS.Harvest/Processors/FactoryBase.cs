@@ -10,6 +10,7 @@ using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 using SOS.Lib.Configuration.Process;
+using MongoDB.Driver.GeoJsonObjectModel;
 
 namespace SOS.Harvest.Processors
 {
@@ -143,7 +144,7 @@ namespace SOS.Harvest.Processors
         /// <param name="taxonDisturbanceRadius"></param>
         protected void AddPositionData(Location location, double? verbatimLongitude,
             double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point,
-            GeoJsonGeometry pointWithBuffer, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
+            GeoJsonGeometry<GeoJson2DCoordinates> pointWithBuffer, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
         {
             if ((coordinateUncertaintyInMeters ?? 0) == 0)
             {

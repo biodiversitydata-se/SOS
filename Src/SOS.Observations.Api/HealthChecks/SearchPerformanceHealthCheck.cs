@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Observations.Api.Managers.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
