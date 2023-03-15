@@ -112,6 +112,7 @@ namespace SOS.Lib
             );  
         }
 
+
         /// <summary>
         /// Add internal filters to query
         /// </summary>
@@ -744,7 +745,7 @@ namespace SOS.Lib
                 query.AddAuthorizationFilters(filter.ExtendedAuthorization);
             }
 
-            query.TryAddTermsCriteria("occurrence.sensitivityCategory", filter.SensitivityCategories);
+            query.TryAddTermsCriteria("occurrence.sensitivityCategory", filter.SensitivityCategories);    
 
             // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
             if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))

@@ -1,10 +1,10 @@
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
-         xmlns:dc="http://purl.org/dc/terms/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:dc="https://purl.org/dc/terms/"
+         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
 		 xmlns:sos="https://sos-search.artdata.slu.se/"
-         xmlns:gbif="http://gbif.org/"
+         xmlns:gbif="https://gbif.org/"
          xmlns:snd="https://snd.gu.se/"
-         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
          packageId="5f501df0-0c61-11dd-84ce-b8a03c50a862" system="https://sos-search.artdata.slu.se/" scope="system"
          xml:lang="eng">
 
@@ -66,11 +66,11 @@
 		</abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
-			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
 		</keywordSet>
 		<keywordSet>
 			<keyword>Observation</keyword>
-			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
 		</keywordSet>
 		<keywordSet>
 			<keyword>Sweden</keyword>
@@ -82,28 +82,28 @@
 		</keywordSet>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
-			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
 		</keywordSet>
 		<intellectualRights>
 			<para>
-				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="https://creativecommons.org/publicdomain/zero/1.0/legalcode">
 					<citetitle>Public Domain (CC0 1.0)</citetitle>
 				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
 			</para>
 		</intellectualRights>
 		<distribution scope="document">
 			<online>
-				<url function="information">http://www.slu.se/en/departments/aquatic-resources/databases/national-register-of-survey-test-fishing-nors/</url>
+				<url function="information">https://www.slu.se/en/departments/aquatic-resources/databases/national-register-of-survey-test-fishing-nors/</url>
 			</online>
 		</distribution>
 		<coverage>
 			<geographicCoverage>
 				<geographicDescription>Sweden</geographicDescription>
 				<boundingCoordinates>
-					<westBoundingCoordinate>10.92</westBoundingCoordinate>
-					<eastBoundingCoordinate>24.18</eastBoundingCoordinate>
-					<northBoundingCoordinate>69.08</northBoundingCoordinate>
-					<southBoundingCoordinate>55.31</southBoundingCoordinate>
+					<westBoundingCoordinate>10.03</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.17</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.07</northBoundingCoordinate>
+					<southBoundingCoordinate>54.96</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
 			<taxonomicCoverage>
@@ -142,7 +142,7 @@
 			<gbif>
 				<dateStamp>2015-07-15T02:11:55.647+02:00</dateStamp>
 				<hierarchyLevel>dataset</hierarchyLevel>
-				<citation>National Register of Survey test-fishing - NORS. yyyy. Swedish University of Agricultural Sciences, Department of Aquatic Resources.  http://www.slu.se/sjoprovfiskedatabasen [yyyy-mm-dd].</citation>
+				<citation>National Register of Survey test-fishing - NORS. yyyy. Swedish University of Agricultural Sciences, Department of Aquatic Resources.  https://www.slu.se/sjoprovfiskedatabasen [yyyy-mm-dd].</citation>
 				<formationPeriod>1952-current</formationPeriod>
 				<livingTimePeriod>1952-current</livingTimePeriod>				
 			</gbif>

@@ -1,10 +1,10 @@
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
-         xmlns:dc="http://purl.org/dc/terms/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:dc="https://purl.org/dc/terms/"
+         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
 		 xmlns:sos="https://sos-search.artdata.slu.se/"
-		 xmlns:gbif="http://gbif.org/"
+		 xmlns:gbif="https://gbif.org/"
          xmlns:snd="https://snd.gu.se/"
-         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
          packageId="1b7e83a0-0c61-11dd-84ce-b8a03c50a862" system="https://sos-search.artdata.slu.se/" scope="system"
          xml:lang="eng">
 
@@ -57,15 +57,15 @@
 		</pubDate>
 		<language>eng</language>
 		<abstract>
-			<para>The Department of Aquatic Resources (SLU Aqua) at the Swedish University of Agricultural Sciences is responsible of collecting and checking test-fishing data generated in national and regional environmental programs on behalf of the Swedish Agency for Marine and Water Management. The test fishing is performed with standardized methods. SLU Aqua also collect test-fishing data from several other types of investigations (e g recipient monitoring). The purpose is to facilitate obtaining data of high quality for research, national investigations and reports. The database also serves as a reference for local and regional investigations. Data is available for the public on http://www.slu.se/kul.</para>
+			<para>The Department of Aquatic Resources (SLU Aqua) at the Swedish University of Agricultural Sciences is responsible of collecting and checking test-fishing data generated in national and regional environmental programs on behalf of the Swedish Agency for Marine and Water Management. The test fishing is performed with standardized methods. SLU Aqua also collect test-fishing data from several other types of investigations (e g recipient monitoring). The purpose is to facilitate obtaining data of high quality for research, national investigations and reports. The database also serves as a reference for local and regional investigations. Data is available for the public on https://www.slu.se/kul.</para>
 		</abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
-			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
 		</keywordSet>
 		<keywordSet>
 			<keyword>Observation</keyword>
-			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
 		</keywordSet>
 		<keywordSet>
 			<keyword>Sweden</keyword>
@@ -75,18 +75,18 @@
 		</keywordSet>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
-			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
 		</keywordSet>
 		<intellectualRights>
 			<para>
-				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="https://creativecommons.org/publicdomain/zero/1.0/legalcode">
 					<citetitle>Public Domain (CC0 1.0)</citetitle>
 				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
 			</para>
 		</intellectualRights>
 		<distribution scope="document">
 			<online>
-				<url function="information">http://www.slu.se/en/departments/aquatic-resources/databases/database-for-coastal-fish-kul/</url>
+				<url function="information">https://www.slu.se/en/departments/aquatic-resources/databases/database-for-coastal-fish-kul/</url>
 			</online>
 		</distribution>
 		<coverage>
@@ -136,7 +136,7 @@
 			<gbif>
 				<dateStamp>2015-09-14T04:49:23.027+02:00</dateStamp>
 				<hierarchyLevel>dataset</hierarchyLevel>
-				<citation>Database for Coastal Fish - KUL. yyyy. Swedish University of Agricultural Sciences, Department of Aquatic Resources. http://slu.se/kul [yyyy-mm-dd].</citation>
+				<citation>Database for Coastal Fish - KUL. yyyy. Swedish University of Agricultural Sciences, Department of Aquatic Resources. https://slu.se/kul [yyyy-mm-dd].</citation>
 				<formationPeriod>1987-current</formationPeriod>
 				<livingTimePeriod>1987-current</livingTimePeriod>				
 			</gbif>

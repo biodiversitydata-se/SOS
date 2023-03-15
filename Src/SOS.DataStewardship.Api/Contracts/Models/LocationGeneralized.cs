@@ -8,7 +8,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
     public class LocationGeneralized
     {        
         [Required]
-        [SwaggerSchema("A unique id-number for a place, e.g. a survey site or a subsite. Should be the id-number from \\&quot;Stationsregistret\\&quot; where relevant.")]        
+        [SwaggerSchema("A unique id-number for a place, e.g. a survey site or a subsite. Should be the id-number from \"Stationsregistret\" where relevant.")]        
         public string LocationID { get; set; }
         
         [SwaggerSchema("The name of a survey site or a subsite.")]

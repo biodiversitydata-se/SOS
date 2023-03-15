@@ -85,13 +85,13 @@ namespace SOS.Lib.Repositories
             {
                 if (attempt < 3)
                 {
-                    Logger.LogWarning($"Add batch to mongodb ({nameof(TEntity)}) attempt {attempt} failed. Tries again...");
+                    Logger.LogWarning($"Add batch to mongodb collection ({MongoCollection}). Attempt {attempt} failed. Tries again...");
                     Thread.Sleep(attempt * 1000);
                     attempt++;
                     return await AddBatchAsync(items, mongoCollection, attempt);
                 }
 
-                Logger.LogError("Failed to add batch",e);
+                Logger.LogError(e, $"Failed to add batch to mongodb collection ({MongoCollection})");
                 throw;
             }
         }
