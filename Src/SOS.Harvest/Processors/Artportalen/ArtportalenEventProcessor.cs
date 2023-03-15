@@ -13,6 +13,7 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Extensions;
 using System.Text.Json;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -40,27 +41,21 @@ namespace SOS.Harvest.Processors.Artportalen
             IEventRepository observationEventRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
+            IValidationManager validationManager,
             ProcessConfiguration processConfiguration,
             ILogger<ArtportalenEventProcessor> logger) :
-                base(observationEventRepository, processManager, processTimeManager, processConfiguration, logger)
+                base(observationEventRepository, processManager, processTimeManager, validationManager, processConfiguration, logger)
         {
             _processedObservationRepository = processedObservationRepository;            
         }
 
-        protected override async Task<int> ProcessEventsAsync(DataProvider dataProvider, IJobCancellationToken cancellationToken)
+        protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessEventsAsync(DataProvider dataProvider, IJobCancellationToken cancellationToken)
         {            
-            int nrAddedEvents = await AddObservationEventsAsync(dataProvider);
-            return nrAddedEvents;
-
-            //var eventFactory = new ArtportalenEventFactory(dataProvider, TimeManager, ProcessConfiguration);
-            //return await base.ProcessEventsAsync(
-            //    dataProvider,
-            //    eventFactory,
-            //    null, //IArtportalenVerbatimRepository artportalenVerbatimRepository
-            //    cancellationToken);
+            var processCount = await AddObservationEventsAsync(dataProvider);
+            return processCount;
         }
 
-        private async Task<int> AddObservationEventsAsync(DataProvider dataProvider)
+        private async Task<(int publicCount, int protectedCount, int failedCount)> AddObservationEventsAsync(DataProvider dataProvider)
         {
             try
             {
@@ -73,7 +68,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
                 Dictionary<string, List<string>> totalOccurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId.ToLower(), m => m.OccurrenceIds, StringComparer.OrdinalIgnoreCase);
                 var chunks = totalOccurrenceIdsByEventId.Chunk(batchSize);
-                int eventCount = 0;
+                (int publicCount, int protectedCount, int failedCount) eventCountSum = new(0, 0, 0);
 
                 foreach (KeyValuePair<string, List<string>>[] chunk in chunks) // todo - do this step in parallel
                 {
@@ -108,16 +103,19 @@ namespace SOS.Harvest.Processors.Artportalen
                     }
 
                     // write to ES
-                    eventCount += await ValidateAndStoreEvents(dataProvider, events, "");
+                    var eventCount = await ValidateAndStoreEvents(dataProvider, events, "");                    
+                    eventCountSum.publicCount += eventCount.publicCount;
+                    eventCountSum.protectedCount += eventCount.protectedCount;
+                    eventCountSum.failedCount += eventCount.failedCount;
                 }
 
                 Logger.LogInformation("End AddObservationEventsAsync()");
-                return eventCount;                
+                return eventCountSum;
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Add data stewardship events failed.");
-                return 0;
+                return (0, 0, 0);
             }
         }
 

@@ -16,17 +16,20 @@ namespace SOS.Lib.Managers
     public class ValidationManager : IValidationManager
     {
         private readonly IInvalidObservationRepository _invalidObservationRepository;
+        private readonly IInvalidEventRepository _invalidEventRepository;
         private readonly ILogger<ValidationManager> _logger;
 
         /// <summary>
         /// Constructor
-        /// </summary>
-        /// <param name="invalidObservationRepository"></param>
-        /// <param name="logger"></param>
-        public ValidationManager(IInvalidObservationRepository invalidObservationRepository, ILogger<ValidationManager> logger)
+        /// </summary>        
+        public ValidationManager(IInvalidObservationRepository invalidObservationRepository,
+            IInvalidEventRepository invalidEventRepository,
+            ILogger<ValidationManager> logger)
         {
             _invalidObservationRepository = invalidObservationRepository ??
                                             throw new ArgumentNullException(nameof(invalidObservationRepository));
+            _invalidEventRepository = invalidEventRepository ??
+                                            throw new ArgumentNullException(nameof(invalidEventRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -183,6 +186,132 @@ namespace SOS.Lib.Managers
             if (collectionCreated)
             {
                 await _invalidObservationRepository.CreateIndexAsync();
+            }
+        }
+
+        public async Task<bool> AddInvalidEventsToDb(ICollection<InvalidEvent> invalidEvents)
+        {
+            try
+            {
+                if (invalidEvents == null || invalidEvents.Count == 0) return false;
+
+                await _invalidEventRepository.AddManyAsync(invalidEvents);
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Write invalid events failed");
+                return false;
+            }
+        }
+
+        public ICollection<InvalidEvent> ValidateEvents(ref ICollection<Models.Processed.DataStewardship.Event.Event> events, DataProvider dataProvider)
+        {
+            var validItems = new List<Models.Processed.DataStewardship.Event.Event>();
+            var invalidItems = new List<InvalidEvent>();
+            foreach (var ev in events)
+            {
+                var eventValidation = ValidateEvent(ev, dataProvider);
+
+                if (eventValidation.IsInvalid)
+                {
+                    invalidItems.Add(eventValidation);
+                }
+                else
+                {
+                    validItems.Add(ev);
+                }
+            }
+
+            events = validItems;
+            return invalidItems.Any() ? invalidItems : null;
+        }
+
+        public InvalidEvent ValidateEvent(Models.Processed.DataStewardship.Event.Event ev, DataProvider dataProvider)
+        {
+            var eventValidation = new InvalidEvent(ev.DataProviderId.ToString(), dataProvider.Names.Translate("en-GB"), ev.EventId);
+
+            if (ev.StartDate == null || ev.EndDate == null)
+            {
+                eventValidation.Defects.Add(new EventDefect(
+                    EventDefect.EventDefectType.MissingMandatoryField,
+                    "Event StartDate and/or EndDate is missing")
+                );
+            }
+            else
+            {
+                if (ev.StartDate > ev.EndDate)
+                {
+                    eventValidation.Defects.Add(new EventDefect(
+                        EventDefect.EventDefectType.LogicError,
+                        "Event StartDate is greater than EndDate")
+                    );
+                }
+            }
+
+
+            if ((ev.Location?.CoordinateUncertaintyInMeters ?? 0) > 100000)
+            {
+                eventValidation.Defects.Add(new EventDefect(
+                    EventDefect.EventDefectType.ValueOutOfRange,
+                    $"CoordinateUncertaintyInMeters exceeds max value 100 km ({ev.Location?.CoordinateUncertaintyInMeters ?? 0}m)")
+                );
+            }
+
+            if (ev.Location == null || !ev.Location.DecimalLatitude.HasValue ||
+                !ev.Location.DecimalLongitude.HasValue)
+            {
+                eventValidation.Defects.Add(new EventDefect(EventDefect.EventDefectType.MissingMandatoryField, "Coordinates are missing")
+                );
+            }
+            else if (!ev.Location.IsInEconomicZoneOfSweden)
+            {
+                eventValidation.Defects.Add(new EventDefect(
+                    EventDefect.EventDefectType.LocationOutsideOfSweden,
+                    $"Sighting outside Swedish economic zone (lon: {ev.Location?.DecimalLongitude}, lat:{ev.Location?.DecimalLatitude})")
+                );
+            }
+
+            if (ev.Location?.Point == null)
+            {
+                eventValidation.Defects.Add(new EventDefect(
+                    EventDefect.EventDefectType.MissingMandatoryField,
+                    "Location point is missing")
+                );
+            }
+
+            if (ev.Location?.PointLocation == null)
+            {
+                eventValidation.Defects.Add(new EventDefect(EventDefect.EventDefectType.MissingMandatoryField, "Point location is missing")
+                );
+            }
+
+            if (ev.Location?.PointWithBuffer == null)
+            {
+                eventValidation.Defects.Add(new EventDefect(EventDefect.EventDefectType.MissingMandatoryField, "Location point with buffer is missing")
+                );
+            }
+
+            return eventValidation;
+        }
+
+        public async Task VerifyEventCollectionAsync(JobRunModes mode)
+        {
+            var collectionCreated = false;
+            if (mode == JobRunModes.Full)
+            {
+                // Make sure invalid collection is empty 
+                await _invalidEventRepository.DeleteCollectionAsync();
+                await _invalidEventRepository.AddCollectionAsync();
+            }
+            else
+            {
+                collectionCreated = await _invalidEventRepository.VerifyCollectionAsync();
+            }
+
+            if (collectionCreated)
+            {
+                await _invalidEventRepository.CreateIndexAsync();
             }
         }
     }

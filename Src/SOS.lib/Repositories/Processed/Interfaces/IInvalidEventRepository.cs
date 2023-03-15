@@ -5,9 +5,9 @@ using SOS.Lib.Models.Processed.Validation;
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
     /// <summary>
-    ///     Invalid observation repository
+    ///     Invalid event repository
     /// </summary>
-    public interface IInvalidObservationRepository : IMongoDbProcessedRepositoryBase<InvalidObservation, ObjectId>
+    public interface IInvalidEventRepository : IMongoDbProcessedRepositoryBase<InvalidEvent, ObjectId>
     {
         /// <summary>
         ///     Create index

@@ -97,7 +97,9 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 new NullLogger<DarwinCoreArchiveVerbatimRepository>());
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
-            var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
+            var invalidEventRepository =
+                new InvalidEventRepository(processClient, new NullLogger<InvalidEventRepository>());
+            var validationManager = new ValidationManager(invalidObservationRepository, invalidEventRepository, new NullLogger<ValidationManager>());
             IProcessedObservationCoreRepository processedObservationRepository;
             if (storeProcessedObservations)
             {

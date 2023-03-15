@@ -255,6 +255,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<InvalidObservationRepository>().As<IInvalidObservationRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<InvalidEventRepository>().As<IInvalidEventRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectInfoRepository>().As<IProjectInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenDatasetMetadataRepository>().As<IArtportalenDatasetMetadataRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedConfigurationRepository>().As<IProcessedConfigurationRepository>().InstancePerLifetimeScope();
