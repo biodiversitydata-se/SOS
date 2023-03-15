@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -7,9 +6,8 @@ using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
-using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Repositories.Resource;
-using SOS.TestHelpers.JsonConverters;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.TestDataTools

@@ -2,11 +2,9 @@
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.TestHelpers.JsonConverters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 

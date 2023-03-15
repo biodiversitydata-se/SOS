@@ -40,7 +40,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 var filePath = System.IO.Path.Combine(assemblyPath, string.Format($@"Resources\{(sensitive ? "ArtportalenVerbatimProtectedObservations_1000" : "ArtportalenVerbatimObservations_1000")}.json") );                    
                 string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
                 var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true, PropertyNameCaseInsensitive = true, IncludeFields = false };
-                serializeOptions.Converters.Add(new TestHelpers.JsonConverters.ObjectIdConverter());
+                serializeOptions.Converters.Add(new ObjectIdConverter());
                 serializeOptions.Converters.Add(new JsonStringEnumConverter());
                 serializeOptions.Converters.Add(new GeoJsonConverter());
 

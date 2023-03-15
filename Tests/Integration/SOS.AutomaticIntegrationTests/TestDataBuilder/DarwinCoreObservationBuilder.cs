@@ -2,6 +2,7 @@
 using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
 using SOS.Lib.Helpers;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                     var filePath = System.IO.Path.Combine(assemblyPath, @"Resources\DarwinCoreObservations_1000.json");
                     string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
                     var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
-                    serializeOptions.Converters.Add(new TestHelpers.JsonConverters.ObjectIdConverter());
+                    serializeOptions.Converters.Add(new ObjectIdConverter());
 
                     _verbatimDarwinCoreObservationsFromJsonFile = JsonSerializer.Deserialize<List<DwcObservationVerbatim>>(str, serializeOptions);
                 }

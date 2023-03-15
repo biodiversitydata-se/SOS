@@ -4,8 +4,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.DarwinCore;
-using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Import.IntegrationTests.TestHelpers.Factories
 {

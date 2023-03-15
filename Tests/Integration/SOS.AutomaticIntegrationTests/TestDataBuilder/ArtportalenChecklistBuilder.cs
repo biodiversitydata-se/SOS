@@ -1,6 +1,7 @@
 ﻿using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
 using SOS.Lib.Extensions;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using System.Collections.Generic;
 using System.Reflection;
@@ -25,8 +26,8 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                     string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
 
                     var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
-                    serializeOptions.Converters.Add(new TestHelpers.JsonConverters.ObjectIdConverter());
-                    serializeOptions.Converters.Add(new Lib.JsonConverters.GeoJsonConverter());
+                    serializeOptions.Converters.Add(new ObjectIdConverter());
+                    serializeOptions.Converters.Add(new GeoJsonConverter());
                     _verbatimArtportalenChecklistsFromJsonFile = JsonSerializer.Deserialize<List<ArtportalenChecklistVerbatim>>(str, serializeOptions);  
                 }
 

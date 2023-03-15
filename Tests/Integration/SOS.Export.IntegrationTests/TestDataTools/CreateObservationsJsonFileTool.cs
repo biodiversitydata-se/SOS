@@ -8,12 +8,12 @@ using Moq;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
-using SOS.TestHelpers.JsonConverters;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.TestDataTools

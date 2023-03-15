@@ -6,8 +6,8 @@ using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Repositories.Resource;
-using SOS.TestHelpers.JsonConverters;
 using Xunit;
 
 namespace SOS.Process.IntegrationTests.TestDataTools

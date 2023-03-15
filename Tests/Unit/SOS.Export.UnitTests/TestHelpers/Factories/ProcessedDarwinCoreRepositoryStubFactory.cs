@@ -5,11 +5,11 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Moq;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Export.UnitTests.TestHelpers.Factories
 {
