@@ -2,8 +2,8 @@
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using Moq;
-using Newtonsoft.Json;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
@@ -32,12 +32,11 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
             var str = File.ReadAllText(filePath, Encoding.UTF8);
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> {new ObjectIdConverter()}
-            };
+            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+            serializeOptions.Converters.Add(new ObjectIdConverter());
 
-            var observations = JsonConvert.DeserializeObject<List<Observation>>(str, serializerSettings);
+            var observations = JsonSerializer.Deserialize<List<Observation>>(str, serializeOptions);
+
             return new SearchAfterResult<Observation> {Records = observations};
         }
     }

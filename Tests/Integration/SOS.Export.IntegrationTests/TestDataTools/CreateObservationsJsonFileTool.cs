@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Newtonsoft.Json;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Managers;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
@@ -51,11 +49,11 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             var observations = await processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(new SearchFilter(0));
 
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> {new ObjectIdConverter()}
-            };
-            var strJson = JsonConvert.SerializeObject(observations, serializerSettings);
+            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+            serializeOptions.Converters.Add(new ObjectIdConverter());
+
+            var strJson = JsonSerializer.Serialize(observations, serializeOptions);
+
             File.WriteAllText(filePath, strJson, Encoding.UTF8);
         }
     }

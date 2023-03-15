@@ -10,6 +10,7 @@ using SOS.AutomaticIntegrationTests.Extensions;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos;
+using MongoDB.Driver.GeoJsonObjectModel;
 
 namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.GeoGridAggregationTestEndpoint
 {
@@ -39,31 +40,31 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                     .With(p => p.Site.County = new GeographicalArea { FeatureId = "6" })
                     .With(p => p.Site.XCoord = 1599118)
                     .With(p => p.Site.YCoord = 7940868)
-                    .With(p => p.Site.Point = new Lib.Models.Shared.GeoJsonGeometry { Coordinates = new System.Collections.ArrayList { 14.36512140510641, 57.87386951383448 }, Type = "Point" })
+                    .With(p => p.Site.Point = new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(14.36512140510641, 57.87386951383448)))
                 .TheNext(20)
                     .With(p => p.TaxonId = 100013)
                     .With(p => p.Site.County = new GeographicalArea { FeatureId = "6" })
                     .With(p => p.Site.XCoord = 1563368)
                     .With(p => p.Site.YCoord = 7793523)
-                    .With(p => p.Site.Point = new Lib.Models.Shared.GeoJsonGeometry { Coordinates = new System.Collections.ArrayList { 14.043973691033681, 57.163074572716816 }, Type = "Point" })
+                    .With(p => p.Site.Point = new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(14.043973691033681, 57.163074572716816)))
                 .TheNext(20)
                     .With(p => p.TaxonId = 100012)
                     .With(p => p.Site.County = new GeographicalArea { FeatureId = "6" })
                     .With(p => p.Site.XCoord = 1596541)
                     .With(p => p.Site.YCoord = 7941260)
-                    .With(p => p.Site.Point = new Lib.Models.Shared.GeoJsonGeometry { Coordinates = new System.Collections.ArrayList { 14.341971820234647, 57.87574209015208 }, Type = "Point" })
+                    .With(p => p.Site.Point = new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(14.341971820234647, 57.87574209015208)))
                 .TheNext(20)
                     .With(p => p.TaxonId = 100012)
                     .With(p => p.Site.County = new GeographicalArea { FeatureId = "7" })
                     .With(p => p.Site.XCoord = 1535521)
                     .With(p => p.Site.YCoord = 7764346)
-                    .With(p => p.Site.Point = new Lib.Models.Shared.GeoJsonGeometry { Coordinates = new System.Collections.ArrayList { 13.793819833864916, 57.02067677016201 }, Type = "Point" })
+                    .With(p => p.Site.Point = new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(13.793819833864916, 57.02067677016201)))
                 .TheLast(20)
                     .With(p => p.TaxonId = 100011)
                     .With(p => p.Site.County = new GeographicalArea { FeatureId = "6" })
                     .With(p => p.Site.XCoord = 1599118)
                     .With(p => p.Site.YCoord = 7940868)
-                    .With(p => p.Site.Point = new Lib.Models.Shared.GeoJsonGeometry { Coordinates = new System.Collections.ArrayList { 14.36512140510641, 57.87386951383448 }, Type = "Point" })
+                    .With(p => p.Site.Point = new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(14.36512140510641, 57.87386951383448)))
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);

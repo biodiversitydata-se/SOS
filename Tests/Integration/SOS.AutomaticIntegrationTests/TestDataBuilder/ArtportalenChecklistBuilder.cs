@@ -1,18 +1,11 @@
 ﻿using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
-using NetTopologySuite.Geometries;
-using SOS.Lib.JsonConverters;
-using SOS.Lib.Models.Shared;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using Newtonsoft.Json;
-using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
-using SOS.Lib.Enums.Artportalen;
+using System.Text.Json;
 
 namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 {
@@ -30,15 +23,11 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                     var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     var filePath = System.IO.Path.Combine(assemblyPath, @"Resources\ArtportalenVerbatimChecklists_1000.json");                    
                     string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
-                    var serializerSettings = new JsonSerializerSettings
-                    {
-                        Converters = new List<JsonConverter> { 
-                            new TestHelpers.JsonConverters.ObjectIdConverter(),
-                            new NewtonsoftGeoJsonGeometryConverter()                            
-                        }
-                    };
 
-                    _verbatimArtportalenChecklistsFromJsonFile = JsonConvert.DeserializeObject<List<ArtportalenChecklistVerbatim>>(str, serializerSettings);
+                    var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+                    serializeOptions.Converters.Add(new TestHelpers.JsonConverters.ObjectIdConverter());
+                    serializeOptions.Converters.Add(new Lib.JsonConverters.GeoJsonConverter());
+                    _verbatimArtportalenChecklistsFromJsonFile = JsonSerializer.Deserialize<List<ArtportalenChecklistVerbatim>>(str, serializeOptions);  
                 }
 
                 return _verbatimArtportalenChecklistsFromJsonFile;
@@ -52,7 +41,6 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             builder.With((checklist, index) =>
             {
                 var sourceChecklist = Pick<ArtportalenChecklistVerbatim>.RandomItemFrom(VerbatimArtportalenChecklistsFromJsonFile).Clone();
-                checklist.Id = sourceChecklist.Id;
                 checklist.Id = _faker.IndexVariable++;
                 checklist.ControllingUser = sourceChecklist.ControllingUser;
                 checklist.ControllingUserId = sourceChecklist.ControllingUserId;

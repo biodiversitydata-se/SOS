@@ -6,6 +6,14 @@
     public class MetadataWithCategory : Metadata
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public MetadataWithCategory() : base(0)
+        {
+
+        }
+
+        /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="id"></param>

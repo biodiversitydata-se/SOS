@@ -1,10 +1,12 @@
 ﻿using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.TestHelpers.JsonConverters;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -74,16 +76,12 @@ namespace SOS.AutomaticIntegrationTests.DataUtils
                 }
             }
 
-
             // Write observations to JSON
+            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+            serializeOptions.Converters.Add(new ObjectIdConverter());
 
-            // Serialize using Newtonsoft.Json.JsonConvert
-            var serializerSettings = new Newtonsoft.Json.JsonSerializerSettings
-            {
-                Converters = new List<Newtonsoft.Json.JsonConverter> { new ObjectIdConverter() }
-            };
-            var strJson = Newtonsoft.Json.JsonConvert.SerializeObject(verbatimObservations, serializerSettings);            
-            System.IO.File.WriteAllText(@"C:\Temp\DarwinCoreObservations_1000.json", Newtonsoft.Json.JsonConvert.SerializeObject(verbatimObservations.Take(1000), serializerSettings), Encoding.UTF8);            
+            var strJson = JsonSerializer.Serialize(verbatimObservations.Take(1000), serializeOptions);
+            System.IO.File.WriteAllText(@"C:\Temp\DarwinCoreObservations_1000.json", strJson, Encoding.UTF8);  
         }
 
         private bool IsObservationOk(DwcObservationVerbatim obs)

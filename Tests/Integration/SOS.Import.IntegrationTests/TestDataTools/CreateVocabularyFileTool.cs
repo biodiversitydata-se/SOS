@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json;
 using SOS.Lib.Database;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource;
 using SOS.TestHelpers.JsonConverters;
 using Xunit;
@@ -40,11 +41,11 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var processedVocabularies = await vocabularyRepository.GetAllAsync();
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> {new ObjectIdConverter()}
-            };
-            var strJson = JsonConvert.SerializeObject(processedVocabularies, serializerSettings);
+            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true, };
+            serializeOptions.Converters.Add(new ObjectIdConverter());
+
+            var strJson = JsonSerializer.Serialize(processedVocabularies, serializeOptions);
+
             File.WriteAllText(filePath, strJson, Encoding.UTF8);
         }
 

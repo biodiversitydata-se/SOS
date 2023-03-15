@@ -1,4 +1,4 @@
-﻿using AgileObjects.AgileMapper.Extensions;
+﻿using Force.DeepCloner;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -168,7 +168,7 @@ namespace SOS.Lib.Extensions
         /// <typeparam name="T">Object type.</typeparam>
         /// <param name="original">Object to copy.</param>
         /// <returns></returns>
-        public static T Clone<T>(this T original) where T : class
+        public static T Clone<T>(this T original) where T : class, new()
         {
             return original.DeepClone();
         }

@@ -1,16 +1,13 @@
-﻿using FizzWare.NBuilder;
+﻿using DotNetCore.Mapping;
+using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
 using SOS.Lib.Helpers;
-using SOS.Lib.JsonConverters;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 {
@@ -29,14 +26,10 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                     var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     var filePath = System.IO.Path.Combine(assemblyPath, @"Resources\DarwinCoreObservations_1000.json");
                     string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
-                    var serializerSettings = new Newtonsoft.Json.JsonSerializerSettings
-                    {
-                        Converters = new List<Newtonsoft.Json.JsonConverter> {
-                            new TestHelpers.JsonConverters.ObjectIdConverter()
-                        }
-                    };
+                    var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+                    serializeOptions.Converters.Add(new TestHelpers.JsonConverters.ObjectIdConverter());
 
-                    _verbatimDarwinCoreObservationsFromJsonFile = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DwcObservationVerbatim>>(str, serializerSettings);
+                    _verbatimDarwinCoreObservationsFromJsonFile = JsonSerializer.Deserialize<List<DwcObservationVerbatim>>(str, serializeOptions);
                 }
 
                 return _verbatimDarwinCoreObservationsFromJsonFile;
@@ -276,7 +269,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             var builder = ((IDeclaration<DwcObservationVerbatim>)operable).ObjectBuilder;
             builder.With((obs, index) =>
             {
-                var sourceObservation = Pick<DwcObservationVerbatim>.RandomItemFrom(VerbatimDarwinCoreObservationsFromJsonFile);
+                var sourceObservation = Pick<DwcObservationVerbatim>.RandomItemFrom(VerbatimDarwinCoreObservationsFromJsonFile).Clone();
                 int sightingId = _faker.IndexVariable++;
                 string occurrenceID = $"urn:lsid:artportalen.se:sighting:{sightingId}";
 
