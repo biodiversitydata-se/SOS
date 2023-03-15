@@ -99,8 +99,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     }
                     processedEvents.TryAdd(processedEvent.EventId, processedEvent);
                 }
-
-                await GetEventObservations(processedEvents, dataProvider);
+                await UpdateEventOccurrencesAsync(processedEvents, dataProvider);                
                 Logger.LogDebug($"Event - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 return await ValidateAndStoreEvents(dataProvider, processedEvents.Values, $"{startId}-{endId}");
             }
@@ -120,13 +119,26 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
         }
 
-        private async Task GetEventObservations(ConcurrentDictionary<string, Event> processedEvents, DataProvider dataProvider)
+        private async Task UpdateEventOccurrencesAsync(ConcurrentDictionary<string, Event> processedEvents, DataProvider dataProvider)
+        {
+            var processedOccurrencesByEventId = await GetEventObservationsDictionary(processedEvents, dataProvider);
+            foreach (var eventPair in processedEvents)
+            {
+                if (processedOccurrencesByEventId.TryGetValue(eventPair.Key.ToLower(), out var occurrenceIds))
+                {
+                    eventPair.Value.VerbatimOccurrenceIds = eventPair.Value.OccurrenceIds;
+                    eventPair.Value.OccurrenceIds = occurrenceIds;
+                }
+            }
+        }
+
+        private async Task<Dictionary<string, List<string>>> GetEventObservationsDictionary(ConcurrentDictionary<string, Event> processedEvents, DataProvider dataProvider)
         {
             var filter = new SearchFilter(0);
             //filter.IsPartOfDataStewardshipDataset = true;
             filter.EventIds = processedEvents.Keys.ToList();
-            var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
-            var occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId.ToLower(), m => m.OccurrenceIds);
+            List<Lib.Models.Search.Result.EventOccurrenceAggregationItem> eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
+            Dictionary<string, List<string>> occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId.ToLower(), m => m.OccurrenceIds);
             foreach (var eventPair in processedEvents)
             {                
                 if (occurrenceIdsByEventId.TryGetValue(eventPair.Key.ToLower(), out var occurrenceIds))
@@ -137,11 +149,14 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 }
                 else
                 {
+                    occurrenceIdsByEventId.Add(eventPair.Key, new List<string>());
                     if (eventPair.Value.OccurrenceIds != null && eventPair.Value.OccurrenceIds.Count > 0)
                         Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed=0, EventId={eventPair.Key}, DataProvider={dataProvider}");
                     eventPair.Value.OccurrenceIds = null;
                 }
             }
+
+            return occurrenceIdsByEventId;
         }
     }
 }

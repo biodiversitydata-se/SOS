@@ -150,9 +150,14 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Event
         public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
 
         /// <summary>
-        /// A list of unique identities of the occurances made during an event
+        /// A list of unique identities of the occurrences made during an event
         /// </summary>
         public List<string> OccurrenceIds { get; set; }
+
+        /// <summary>
+        /// A list of unique identities of the occurrences made during an event (before occurrence validation).
+        /// </summary>
+        public List<string> VerbatimOccurrenceIds { get; set; }
 
         public override string ToString()
         {
