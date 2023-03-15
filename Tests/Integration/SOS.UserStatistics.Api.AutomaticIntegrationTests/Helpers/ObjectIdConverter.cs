@@ -1,32 +1,28 @@
-﻿namespace SOS.UserStatistics.Api.AutomaticIntegrationTests.Helpers;
+﻿using System.Text.Json;
 
-public class ObjectIdConverter : JsonConverter
+namespace SOS.UserStatistics.Api.AutomaticIntegrationTests.Helpers;
+
+public class ObjectIdConverter : System.Text.Json.Serialization.JsonConverter<ObjectId>
 {
-    public override bool CanConvert(Type objectType)
+    public override bool CanConvert(Type type)
     {
-        return objectType == typeof(ObjectId);
+        return type == typeof(ObjectId);
     }
 
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
-        JsonSerializer serializer)
+    public override ObjectId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType != JsonToken.String)
+        if (reader.TokenType != JsonTokenType.String)
+        {
             throw new Exception($"Unexpected token parsing ObjectId. Expected String, got {reader.TokenType}.");
+        }
+        reader.Read();
 
-        var value = (string)reader.Value;
+        var value = reader.GetString();
         return string.IsNullOrEmpty(value) ? ObjectId.Empty : new ObjectId(value);
     }
 
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void Write(Utf8JsonWriter writer, ObjectId value, JsonSerializerOptions options)
     {
-        if (value is ObjectId)
-        {
-            var objectId = (ObjectId)value;
-            writer.WriteValue(objectId != ObjectId.Empty ? objectId.ToString() : string.Empty);
-        }
-        else
-        {
-            throw new Exception("Expected ObjectId value.");
-        }
+        writer.WriteStringValue(value != ObjectId.Empty ? value.ToString() : string.Empty);
     }
 }
