@@ -9,19 +9,19 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
-    ///     Invalid observation repository
+    ///     Invalid event repository
     /// </summary>
-    public class InvalidObservationRepository : MongoDbProcessedRepositoryBase<InvalidObservation, ObjectId>,
-        IInvalidObservationRepository
+    public class InvalidEventRepository : MongoDbProcessedRepositoryBase<InvalidEvent, ObjectId>,
+        IInvalidEventRepository
     {
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
-        public InvalidObservationRepository(
+        public InvalidEventRepository(
             IProcessClient client,
-            ILogger<InvalidObservationRepository> logger
+            ILogger<InvalidEventRepository> logger
         ) : base(client, true, logger)
         {
         }
@@ -31,13 +31,13 @@ namespace SOS.Lib.Repositories.Processed
         {
             var indexModels = new []
             {
-                new CreateIndexModel<InvalidObservation>(
-                    Builders<InvalidObservation>.IndexKeys.Ascending(io => io.DatasetName)),
-                new CreateIndexModel<InvalidObservation>(
-                    Builders<InvalidObservation>.IndexKeys.Ascending(io => io.OccurrenceID))
+                new CreateIndexModel<InvalidEvent>(
+                    Builders<InvalidEvent>.IndexKeys.Ascending(io => io.DatasetName)),
+                new CreateIndexModel<InvalidEvent>(
+                    Builders<InvalidEvent>.IndexKeys.Ascending(io => io.EventID))
             };
 
-            Logger.LogDebug("Creating InvalidObservation indexes");
+            Logger.LogDebug("Creating InvalidEvent indexes");
             await MongoCollection.Indexes.CreateManyAsync(indexModels);
         }
     }

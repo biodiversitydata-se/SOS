@@ -12,6 +12,7 @@ using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Harvest.Processors
 {
@@ -20,6 +21,7 @@ namespace SOS.Harvest.Processors
         where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int> 
     {
         protected readonly IEventRepository ObservationEventRepository;
+        protected readonly IValidationManager ValidationManager;
         public abstract DataProviderType Type { get; }
 
         /// <summary>
@@ -28,7 +30,7 @@ namespace SOS.Harvest.Processors
         /// <param name="dataProvider"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected abstract Task<int> ProcessEventsAsync(
+        protected abstract Task<(int publicCount, int protectedCount, int failedCount)> ProcessEventsAsync(
             DataProvider dataProvider,
             IJobCancellationToken cancellationToken);
 
@@ -42,11 +44,13 @@ namespace SOS.Harvest.Processors
             IEventRepository observationEventRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
+            IValidationManager validationManager,
             ProcessConfiguration processConfiguration,
             ILogger<TClass> logger) : base(processManager, processTimeManager, processConfiguration, logger)
         {
             ObservationEventRepository = observationEventRepository ??
                                            throw new ArgumentNullException(nameof(observationEventRepository));
+            ValidationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
         }
 
         /// <summary>
@@ -67,8 +71,9 @@ namespace SOS.Harvest.Processors
             {
                 Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} events");
                 var processCount = await ProcessEventsAsync(dataProvider, cancellationToken);
-                Logger.LogInformation($"Event - Finish processing {dataProvider.Identifier} events.");
-                return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount, 0, 0);
+                Logger.LogInformation($"Event - Finish processing {dataProvider.Identifier} events. publicCount={processCount.publicCount}, protectedCount={processCount.protectedCount}, failedCount={processCount.failedCount}");
+                
+                return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount, processCount.failedCount);
             }
             catch (JobAbortedException)
             {
@@ -92,7 +97,7 @@ namespace SOS.Harvest.Processors
         /// <param name="eventVerbatimRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected virtual async Task<int> ProcessBatchAsync(
+        protected virtual async Task<(int publicCount, int protectedCount, int failedCount)> ProcessBatchAsync(
             DataProvider dataProvider,
             int startId,
             int endId,
@@ -106,7 +111,7 @@ namespace SOS.Harvest.Processors
                 Logger.LogDebug($"Event - Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
                 var verbatimEventsBatch = await eventVerbatimRepository.GetBatchAsync(startId, endId);
                 Logger.LogDebug($"Event - Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
-                if (!verbatimEventsBatch?.Any() ?? true) return 0;                
+                if (!verbatimEventsBatch?.Any() ?? true) return (0, 0, 0);                
 
                 Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 var processedEvents = new ConcurrentDictionary<string, Event>();
@@ -180,7 +185,7 @@ namespace SOS.Harvest.Processors
         /// <param name="eventVerbatimRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected async Task<int> ProcessEventsAsync(
+        protected async Task<(int publicCount, int protectedCount, int failedCount)> ProcessEventsAsync(
             DataProvider dataProvider,
             IEventFactory<TVerbatim> eventFactory,
             TVerbatimRepository eventVerbatimRepository,
@@ -188,7 +193,7 @@ namespace SOS.Harvest.Processors
         {
             var startId = 1;
             var maxId = await eventVerbatimRepository.GetMaxIdAsync();
-            var processBatchTasks = new List<Task<int>>();
+            var processBatchTasks = new List<Task<(int publicCount, int protectedCount, int failedCount)>>();
 
             while (startId <= maxId)
             {
@@ -206,14 +211,42 @@ namespace SOS.Harvest.Processors
             }
 
             await Task.WhenAll(processBatchTasks);
-            return processBatchTasks.Sum(t => t.Result);
+            return (processBatchTasks.Sum(t => t.Result.publicCount), 0, processBatchTasks.Sum(t => t.Result.failedCount));
         }
 
-        protected async Task<int> ValidateAndStoreEvents(DataProvider dataProvider, ICollection<Event> events, string batchId)
+        protected async Task<(int publicCount, int protectedCount, int failedCount)> ValidateAndStoreEvents(DataProvider dataProvider, ICollection<Event> events, string batchId)
         {
-            if (!events?.Any() ?? true) return 0;
+            if (!events?.Any() ?? true) return (0, 0, 0);
+
+            var preValidationCount = events!.Count;
+            events = await ValidateAndRemoveInvalidEvents(dataProvider, events, batchId);
+
+            if (!events?.Any() ?? true)
+            {
+                return (0, 0, preValidationCount);
+            }
+
             var processedCount = await CommitBatchAsync(dataProvider, events, batchId);
-            return processedCount;
-        }   
+
+            events!.Clear();
+            return (processedCount, 0, preValidationCount - processedCount);
+        }
+
+
+
+        protected async Task<ICollection<Event>> ValidateAndRemoveInvalidEvents(
+            DataProvider dataProvider,
+            ICollection<Event> events,
+            string batchId)
+        {
+            Logger.LogDebug($"Start events validation {dataProvider.Identifier} batch: {batchId}");
+            
+            var invalidEvents = ValidationManager.ValidateEvents(ref events, dataProvider);            
+            await ValidationManager.AddInvalidEventsToDb(invalidEvents);
+            
+            Logger.LogDebug($"End events validation {dataProvider.Identifier} batch: {batchId}");
+
+            return events;
+        }
     }
 }

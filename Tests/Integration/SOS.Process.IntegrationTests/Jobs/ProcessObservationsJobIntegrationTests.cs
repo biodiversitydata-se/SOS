@@ -77,10 +77,12 @@ namespace SOS.Process.IntegrationTests.Jobs
             var taxonCache = new TaxonCache(taxonProcessedRepository);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
+            var invalidEventRepository =
+                new InvalidEventRepository(processClient, new NullLogger<InvalidEventRepository>());
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var processManager = new ProcessManager(processConfiguration);
             var processTimeManager = new ProcessTimeManager(processConfiguration);
-            var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
+            var validationManager = new ValidationManager(invalidObservationRepository, invalidEventRepository, new NullLogger<ValidationManager>());
             IProcessedObservationCoreRepository processedObservationRepository;
             if (storeProcessed)
             {

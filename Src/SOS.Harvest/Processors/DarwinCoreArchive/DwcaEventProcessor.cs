@@ -18,6 +18,7 @@ using Hangfire.Server;
 using SOS.Harvest.Processors.Interfaces;
 using System.Collections.Concurrent;
 using MongoDB.Driver;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -43,9 +44,10 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             IVocabularyRepository vocabularyRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
+            IValidationManager validationManager,
             ProcessConfiguration processConfiguration,
             ILogger<DwcaEventProcessor> logger) :
-                base(observationEventRepository, processManager, processTimeManager, processConfiguration, logger)
+                base(observationEventRepository, processManager, processTimeManager, validationManager, processConfiguration, logger)
         {
             _verbatimClient = verbatimClient;
             _processedObservationRepository = processedObservationRepository;
@@ -53,7 +55,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             _vocabularyRepository = vocabularyRepository;
         }
 
-        protected override async Task<int> ProcessEventsAsync(DataProvider dataProvider, IJobCancellationToken cancellationToken)
+        protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessEventsAsync(DataProvider dataProvider, IJobCancellationToken cancellationToken)
         {
             using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, Logger);
             DwcaEventFactory dwcaEventFactory = await DwcaEventFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager, ProcessConfiguration);
@@ -65,7 +67,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 cancellationToken);
         }
 
-        protected override async Task<int> ProcessBatchAsync(
+        protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessBatchAsync(
             DataProvider dataProvider,
             int startId,
             int endId,
@@ -82,7 +84,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 if (verbatimEventsBatch == null || verbatimEventsBatch.Count() == 0)
                 {
                     Logger.LogError($"Event batch is Empty, {dataProvider.Identifier} batch ({startId}-{endId})");
-                    return 0;
+                    return (0, 0, 0);
                 }
 
                 Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");

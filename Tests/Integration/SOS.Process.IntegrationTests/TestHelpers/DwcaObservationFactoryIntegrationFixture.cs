@@ -36,7 +36,10 @@ namespace SOS.Process.IntegrationTests.TestHelpers
         private ValidationManager CreateValidationManager()
         {
             var invalidObservationRepositoryMock = new Mock<IInvalidObservationRepository>();
-            ValidationManager validationManager = new ValidationManager(invalidObservationRepositoryMock.Object, new NullLogger<ValidationManager>());
+            var invalidEventRepositoryMock = new Mock<IInvalidEventRepository>();
+            ValidationManager validationManager = new ValidationManager(invalidObservationRepositoryMock.Object,
+                invalidEventRepositoryMock.Object,
+                new NullLogger<ValidationManager>());
             return validationManager;
         }
 

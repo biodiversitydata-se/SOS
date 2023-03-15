@@ -125,9 +125,10 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processDbConfiguration.WriteBatchSize);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
-            
+            var invalidEventRepository =
+                new InvalidEventRepository(processClient, new NullLogger<InvalidEventRepository>());
             var processManager = new ProcessManager(processConfiguration);
-            var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
+            var validationManager = new ValidationManager(invalidObservationRepository, invalidEventRepository, new NullLogger<ValidationManager>());
             var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var processTimeManager = new ProcessTimeManager(processConfiguration);
