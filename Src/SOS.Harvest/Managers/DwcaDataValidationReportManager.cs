@@ -23,7 +23,7 @@ namespace SOS.Harvest.Managers
     /// <summary>
     /// DwC-A data validation manager.
     /// </summary>
-    public class DwcaDataValidationReportManager : Interfaces.IDwcaDataValidationReportManager
+    public class DwcaDataValidationReportManager : IDwcaDataValidationReportManager
     {
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly IDwcArchiveReader _dwcArchiveReader;
@@ -332,8 +332,8 @@ namespace SOS.Harvest.Managers
 
         private void UpdateTaxaStatistics(TaxaStatistics taxaStatistics, Observation processedObservation)
         {
-            if (processedObservation.Taxon == null) return;
-            var taxon = _taxonById[processedObservation.Taxon.Id];
+            if (processedObservation.Taxon == null || !_taxonById.TryGetValue(processedObservation.Taxon.Id, out var taxon)) return;
+            
             taxaStatistics.TaxaSet.Add(taxon.Id);
 
             if (taxon.Attributes.ProtectedByLaw)
