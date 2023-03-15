@@ -99,7 +99,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     }
                     processedEvents.TryAdd(processedEvent.EventId, processedEvent);
                 }
-                await UpdateEventOccurrencesAsync(processedEvents, dataProvider);                
+
+                await UpdateEventOccurrencesAsync(processedEvents, dataProvider);
                 Logger.LogDebug($"Event - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 return await ValidateAndStoreEvents(dataProvider, processedEvents.Values, $"{startId}-{endId}");
             }
@@ -121,7 +122,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
         private async Task UpdateEventOccurrencesAsync(ConcurrentDictionary<string, Event> processedEvents, DataProvider dataProvider)
         {
-            var processedOccurrencesByEventId = await GetEventObservationsDictionary(processedEvents, dataProvider);
+            var processedOccurrencesByEventId = await GetEventObservationsDictionaryAsync(processedEvents, dataProvider);
             foreach (var eventPair in processedEvents)
             {
                 if (processedOccurrencesByEventId.TryGetValue(eventPair.Key.ToLower(), out var occurrenceIds))
@@ -132,7 +133,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
         }
 
-        private async Task<Dictionary<string, List<string>>> GetEventObservationsDictionary(ConcurrentDictionary<string, Event> processedEvents, DataProvider dataProvider)
+        private async Task<Dictionary<string, List<string>>> GetEventObservationsDictionaryAsync(ConcurrentDictionary<string, Event> processedEvents, DataProvider dataProvider)
         {
             var filter = new SearchFilter(0);
             //filter.IsPartOfDataStewardshipDataset = true;
