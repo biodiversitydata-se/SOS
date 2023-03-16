@@ -13,6 +13,8 @@ using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using Event = SOS.Lib.Models.Processed.DataStewardship.Event.Event;
 
@@ -139,7 +141,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
 
-            var query = new List<Func<QueryContainerDescriptor<Models.Processed.DataStewardship.Event.Event>, QueryContainer>>();
+            var query = new List<Func<QueryContainerDescriptor<Event>, QueryContainer>>();
             query.TryAddTermsCriteria("eventId", ids);
             var searchResponse = await Client.SearchAsync<Event>(s => s
                 .Index(IndexName)
@@ -305,5 +307,149 @@ namespace SOS.Lib.Repositories.Processed
 
             return !response.Exists;
         }
+
+        public async Task<List<AggregationItemList<TKey, TValue>>> GetAllAggregationItemsListAsync<TKey, TValue>(EventSearchFilter filter, string aggregationFieldKey, string aggregationFieldList)
+        {
+            var indexName = IndexName;
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            var aggregationDictionary = new Dictionary<TKey, List<TValue>>();
+            CompositeKey nextPageKey = null;            
+            do
+            {
+                var searchResponse = await PageAggregationItemListAsync(indexName, aggregationFieldKey, aggregationFieldList, query, excludeQuery, nextPageKey, MaxNrElasticSearchAggregationBuckets);
+                var compositeAgg = searchResponse.Aggregations.Composite("compositeAggregation");
+                foreach (var bucket in compositeAgg.Buckets)
+                {
+                    TKey keyValue = (TKey)bucket.Key[aggregationFieldKey];
+                    TValue listValue = (TValue)bucket.Key[aggregationFieldList];
+                    if (!aggregationDictionary.ContainsKey(keyValue))
+                        aggregationDictionary[keyValue] = new List<TValue>();
+                    aggregationDictionary[keyValue].Add(listValue);
+                }
+
+                nextPageKey = compositeAgg.Buckets.Count >= MaxNrElasticSearchAggregationBuckets ? compositeAgg.AfterKey : null;
+            } while (nextPageKey != null);
+
+            var items = aggregationDictionary.Select(m => new AggregationItemList<TKey, TValue> { AggregationKey = m.Key, Items = m.Value }).ToList();
+            return items;
+        }
+
+        private async Task<ISearchResponse<dynamic>> PageAggregationItemListAsync(
+            string indexName,
+            string aggregationFieldKey,
+            string aggregationFieldList,
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            CompositeKey nextPage,
+            int take)
+        {
+            ISearchResponse<dynamic> searchResponse;
+
+            searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Composite("compositeAggregation", g => g
+                        .After(nextPage ?? null)
+                        .Size(take)
+                        .Sources(src => src
+                            .Terms(aggregationFieldKey, tt => tt
+                                .Field(aggregationFieldKey)
+                                .Order(SortOrder.Descending)
+                            )
+                            .Terms(aggregationFieldList, tt => tt
+                                .Field(aggregationFieldList)
+                            )
+                        )
+                    )
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+
+            searchResponse.ThrowIfInvalid();
+            return searchResponse;
+        }
+
+        public async Task<List<AggregationItem>> GetAllAggregationItemsAsync(EventSearchFilter filter, string aggregationField)
+        {
+            var indexName = IndexName;
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            var items = new List<AggregationItem>();
+            CompositeKey nextPageKey = null;
+            var take = MaxNrElasticSearchAggregationBuckets;
+            do
+            {
+                var searchResponse = await PageAggregationItemAsync(indexName, aggregationField, query, excludeQuery, nextPageKey, take);
+                var compositeAgg = searchResponse.Aggregations.Composite("compositeAggregation");
+                foreach (var bucket in compositeAgg.Buckets)
+                {
+                    items.Add(new AggregationItem
+                    {
+                        AggregationKey = bucket.Key["termAggregation"].ToString(),
+                        DocCount = Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0))
+                    });
+                }
+
+                nextPageKey = compositeAgg.Buckets.Count >= take ? compositeAgg.AfterKey : null;
+            } while (nextPageKey != null);
+
+            return items;
+        }
+
+        private async Task<ISearchResponse<dynamic>> PageAggregationItemAsync(
+            string indexName,
+            string aggregationField,
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            CompositeKey nextPage,
+            int take)
+        {
+            ISearchResponse<dynamic> searchResponse;
+
+            searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Composite("compositeAggregation", g => g
+                        .After(nextPage ?? null)
+                        .Size(take)
+                        .Sources(src => src
+                            .Terms("termAggregation", tt => tt
+                                .Field(aggregationField)
+                            )
+                        )
+                    )
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            return searchResponse;
+        }
+
+        protected (ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>)
+            GetCoreQueries(EventSearchFilter filter)
+        {            
+            var query = filter.ToQuery<dynamic>();
+            var excludeQuery = filter.ToExcludeQuery();
+
+            return (query, excludeQuery);
+        }
+
     }
 }

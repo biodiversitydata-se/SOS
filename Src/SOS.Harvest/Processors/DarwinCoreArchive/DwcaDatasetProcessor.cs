@@ -13,7 +13,6 @@ using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Harvest.Processors.Interfaces;
 using Hangfire.Server;
 using System.Collections.Concurrent;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
@@ -25,7 +24,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         IDwcaDatasetProcessor
     {
         private readonly IVerbatimClient _verbatimClient;
-        private readonly IEventRepository _observationEventRepository;
+        private readonly IEventRepository _eventRepository;        
 
         public override DataProviderType Type => DataProviderType.DwcA;
 
@@ -50,7 +49,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 base(processedDatasetsRepository, processManager, processTimeManager, processConfiguration, logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
-            _observationEventRepository = observationEventRepository ?? throw new ArgumentNullException(nameof(observationEventRepository));
+            _eventRepository = observationEventRepository ?? throw new ArgumentNullException(nameof(observationEventRepository));
         }
 
         /// <inheritdoc />
@@ -107,8 +106,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     datasets.TryAdd(dataset.Identifier.ToString(), dataset);
                 }
 
-                await GetDatasetEvents(datasets);
-
+                await UpdateDatasetEventsAsync(datasets, dataProvider);                
                 Logger.LogDebug($"Dataset - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 return await ValidateAndStoreDatasets(dataProvider, datasets.Values, $"{startId}-{endId}");
             }
@@ -128,34 +126,44 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
         }
 
-        private async Task GetDatasetEvents(ConcurrentDictionary<string, Dataset> processedDatasets)
+        private async Task UpdateDatasetEventsAsync(ConcurrentDictionary<string, Dataset> processedDatasets, DataProvider dataProvider)
         {
-            // todo get events.
-            // implement ProcessedObservationCoreRepository.GetAllAggregationItemsListAsync() in ObservationEventRepository
+            var processedEventsByDatasetId = await GetDatasetEventsDictionaryAsync(processedDatasets, dataProvider);
+            foreach (var datasetPair in processedDatasets)
+            {
+                if (processedEventsByDatasetId.TryGetValue(datasetPair.Key.ToLower(), out var eventIds))
+                {
+                    datasetPair.Value.VerbatimEventIds = datasetPair.Value.EventIds;
+                    datasetPair.Value.EventIds = eventIds;
+                }
+            }
+        }
 
+        private async Task<Dictionary<string, List<string>>> GetDatasetEventsDictionaryAsync(ConcurrentDictionary<string, Dataset> processedDatasets, DataProvider dataProvider)
+        {            
+            var filter = new EventSearchFilter();
+            filter.DatasetIds = processedDatasets.Keys.ToList();
+            var datasetEventIds = await _eventRepository.GetAllAggregationItemsListAsync<string, string>(filter, "dataset.identifier", "eventId");
+            Dictionary<string, List<string>> eventIdsByDatasetId = datasetEventIds.ToDictionary(m => m.AggregationKey.ToLower(), m => m.Items);
 
-            //var filter = new SearchFilter(0);
-            //filter.DataStewardshipDatasetIds = processedDatasets.Keys.ToList();
-            //var eventIds = await _observationEventRepository.GetAllAggregationItemsAsync(filter, "event.eventId");
-            ////return eventIds?.Select(m => m.AggregationKey).ToList();
+            foreach (var eventPair in processedDatasets)
+            {
+                if (eventIdsByDatasetId.TryGetValue(eventPair.Key.ToLower(), out var eventIds))
+                {
+                    if (eventIds != null && eventPair.Value.EventIds != null && eventIds.Count != eventPair.Value.EventIds.Count)
+                        Logger.LogInformation($"Dataset.EventIds differs. #Verbatim={eventPair.Value.EventIds.Count}, #Processed={eventIds.Count}, DatasetId={eventPair.Key}, DataProvider={dataProvider}");
+                    eventPair.Value.EventIds = eventIds;
+                }
+                else
+                {
+                    eventIdsByDatasetId.Add(eventPair.Key, new List<string>());
+                    if (eventPair.Value.EventIds != null && eventPair.Value.EventIds.Count > 0)
+                        Logger.LogInformation($"Dataset.EventIds differs. #Verbatim={eventPair.Value.EventIds.Count}, #Processed=0, DatasetId={eventPair.Key}, DataProvider={dataProvider}");
+                    eventPair.Value.EventIds = null;
+                }
+            }
 
-            //var eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
-            //var occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
-            //foreach (var eventPair in processedDatasets)
-            //{
-            //    if (occurrenceIdsByEventId.TryGetValue(eventPair.Key, out var occurrenceIds))
-            //    {
-            //        if (occurrenceIds != null && eventPair.Value.OccurrenceIds != null && occurrenceIds.Count != eventPair.Value.OccurrenceIds.Count)
-            //            Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed={occurrenceIds.Count}");
-            //        eventPair.Value.OccurrenceIds = occurrenceIds;
-            //    }
-            //    else
-            //    {
-            //        if (eventPair.Value.OccurrenceIds != null && eventPair.Value.OccurrenceIds.Count > 0)
-            //            Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed=0");
-            //        eventPair.Value.OccurrenceIds = null;
-            //    }
-            //}
+            return eventIdsByDatasetId;
         }
     }
 }

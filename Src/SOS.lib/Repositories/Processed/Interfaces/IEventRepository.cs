@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
@@ -52,5 +54,9 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<List<Event>> GetEventsByIds(IEnumerable<string> ids);
 
         Task<bool> DeleteAllDocumentsAsync();
+
+        Task<List<AggregationItemList<TKey, TValue>>> GetAllAggregationItemsListAsync<TKey, TValue>(EventSearchFilter filter, string aggregationFieldKey, string aggregationFieldList);
+        
+        Task<List<AggregationItem>> GetAllAggregationItemsAsync(EventSearchFilter filter, string aggregationField);
     }
 }

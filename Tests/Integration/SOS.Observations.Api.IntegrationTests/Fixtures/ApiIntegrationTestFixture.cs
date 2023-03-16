@@ -45,6 +45,7 @@ using SOS.Observations.Api.IntegrationTests.Repositories.Interfaces;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using SOS.Observations.Api.IntegrationTests.Repositories;
 using SOS.Observations.Api.Services.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Observations.Api.IntegrationTests.Fixtures
 {
@@ -61,6 +62,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public DataProvidersController DataProvidersController { get; private set; }
         public AreasController AreasController { get; private set; }
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
+        public IEventRepository EventRepository { get; set; }
         public IProcessedObservationRepositoryTest ProcessedObservationRepositoryTest { get; set; }
         public IProcessedObservationRepository CustomProcessedObservationRepository { get; set; }
         public ObservationsController CustomObservationsController { get; private set; }
@@ -194,6 +196,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var taxonManager = CreateTaxonManager(processClient, TaxonRepository, memoryCache);
             var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
             ProcessedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processedConfigurationCache, processClient, memoryCache);
+            EventRepository = new EventRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<EventRepository>());
             var processedTaxonRepository = CreateProcessedTaxonRepository(elasticConfiguration, elasticClientManager, processClient, taxonManager);
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);
