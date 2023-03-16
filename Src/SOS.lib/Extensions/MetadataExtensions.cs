@@ -12,7 +12,7 @@ namespace SOS.Lib.Extensions
         /// <param name="metadata"></param>
         /// <param name="cultures">In preferred order. Return value on first match</param>
         /// <returns></returns>
-        public static string Translate(this Metadata metadata, params string[] cultures)
+        public static string Translate<T>(this Metadata<T> metadata, params string[] cultures)
         {
             if (!(metadata?.Translations?.Any() ?? false) || !(cultures?.Any() ?? false))
             {

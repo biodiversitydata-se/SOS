@@ -1,6 +1,9 @@
 ﻿using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
+using Amazon.Auth.AccessControlPolicy;
 using DnsClient.Internal;
 using Microsoft.Extensions.Logging;
+using Nest;
 using SOS.Harvest.Containers.Interfaces;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
@@ -10,7 +13,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Harvest.Containers
 {
-    public class ArtportalenMetadataContainer: IArtportalenMetadataContainer
+    public class ArtportalenMetadataContainer : IArtportalenMetadataContainer
     {
         private readonly IMetadataRepository _metadataRepository;
         private readonly IPersonRepository _personRepository;
@@ -20,19 +23,20 @@ namespace SOS.Harvest.Containers
 
         private bool _initilazionInProgress;
 
-        private ConcurrentDictionary<int, MetadataWithCategory> _activities;
-        private ConcurrentDictionary<int, Metadata> _biotopes;
-        private ConcurrentDictionary<int, Metadata> _determinationMethods;
-        private ConcurrentDictionary<int, Metadata> _discoveryMethods;
-        private ConcurrentDictionary<int, Metadata> _genders;
-        private ConcurrentDictionary<int, Metadata> _organizations;
+        private ConcurrentDictionary<int, MetadataWithCategory<int>> _activities;
+        private ConcurrentDictionary<int, Metadata<int>> _biotopes;
+        private ConcurrentDictionary<int, Metadata<int>> _determinationMethods;
+        private ConcurrentDictionary<int, Metadata<int>> _discoveryMethods;
+        private ConcurrentDictionary<int, Metadata<int>> _genders;
+        private ConcurrentDictionary<int, Metadata<int>> _organizations;
         private ConcurrentDictionary<int, Person> _personsByUserId;
         private ConcurrentDictionary<int, Project> _projects;
-        private ConcurrentDictionary<int, Metadata> _stages;
-        private ConcurrentDictionary<int, Metadata> _substrates;
+        private ConcurrentDictionary<string, Metadata<string>> _sharedLabels;
+        private ConcurrentDictionary<int, Metadata<int>> _stages;
+        private ConcurrentDictionary<int, Metadata<int>> _substrates;
         private ConcurrentDictionary<int, int?> _taxonSpeciesGroups;
-        private ConcurrentDictionary<int, Metadata> _units;
-        private ConcurrentDictionary<int, Metadata> _validationStatus;
+        private ConcurrentDictionary<int, Metadata<int>> _units;
+        private ConcurrentDictionary<int, Metadata<int>> _validationStatus;
 
         #region Metadata
         /// <summary>
@@ -40,19 +44,19 @@ namespace SOS.Harvest.Containers
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private IEnumerable<Metadata> CastMetdataEntitiesToVerbatims(IEnumerable<MetadataEntity> entities)
+        private IEnumerable<Metadata<T>> CastMetdataEntitiesToVerbatims<T>(IEnumerable<MetadataEntity<T>> entities)
         {
             if (!entities?.Any() ?? true)
             {
                 return null;
             }
 
-            var metadataItems = new Dictionary<int, Metadata>();
+            var metadataItems = new Dictionary<T, Metadata<T>>();
             foreach (var entity in entities)
             {
                 if (!metadataItems.ContainsKey(entity.Id))
                 {
-                    metadataItems.Add(entity.Id, new Metadata(entity.Id));
+                    metadataItems.Add(entity.Id, new Metadata<T>(entity.Id));
                 }
 
                 metadataItems[entity.Id].Translations.Add(new MetadataTranslation
@@ -67,20 +71,20 @@ namespace SOS.Harvest.Containers
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private IEnumerable<MetadataWithCategory> CastMetdataWithCategoryEntityToVerbatim(
-            IEnumerable<MetadataWithCategoryEntity> entities)
+        private IEnumerable<MetadataWithCategory<T>> CastMetdataWithCategoryEntityToVerbatim<T>(
+            IEnumerable<MetadataWithCategoryEntity<T>> entities)
         {
             if (!entities?.Any() ?? true)
             {
-                return null;
+                return null!;
             }
 
-            var metadataItems = new Dictionary<int, MetadataWithCategory>();
+            var metadataItems = new Dictionary<T, MetadataWithCategory<T>>();
             foreach (var entity in entities)
             {
                 if (!metadataItems.ContainsKey(entity.Id))
                 {
-                    metadataItems.Add(entity.Id, new MetadataWithCategory(entity.Id, entity.CategoryId));
+                    metadataItems.Add(entity.Id, new MetadataWithCategory<T>(entity.Id, entity.CategoryId));
                 }
 
                 var metadata = metadataItems[entity.Id];
@@ -144,13 +148,13 @@ namespace SOS.Harvest.Containers
             }
 
             return new Person
-                   {
-                       Id = entitiy.Id,
-                       UserId = entitiy.UserId,
-                       FirstName = entitiy.FirstName,
-                       LastName = entitiy.LastName,
-                       Alias = entitiy.Alias,
-                       UserServiceUserId = entitiy.UserServiceUserId
+            {
+                Id = entitiy.Id,
+                UserId = entitiy.UserId,
+                FirstName = entitiy.FirstName,
+                LastName = entitiy.LastName,
+                Alias = entitiy.Alias,
+                UserServiceUserId = entitiy.UserServiceUserId
             };
         }
         #endregion Person
@@ -242,7 +246,7 @@ namespace SOS.Harvest.Containers
                     }
                     return;
                 }
-                
+
                 _initilazionInProgress = true;
 
                 _logger.LogDebug("Start getting meta data");
@@ -250,22 +254,20 @@ namespace SOS.Harvest.Containers
                 var activitiesTask = _metadataRepository.GetActivitiesAsync();
                 var metaDataTasks = new[]
                 {
-                _metadataRepository.GetBiotopesAsync(),
-                _metadataRepository.GetDeterminationMethodsAsync(),
-                _metadataRepository.GetDiscoveryMethodsAsync(),
-                _metadataRepository.GetGendersAsync(),
-                _metadataRepository.GetOrganizationsAsync(),
-                _metadataRepository.GetStagesAsync(),
-                _metadataRepository.GetSubstratesAsync(),
-                _metadataRepository.GetUnitsAsync(),
-                _metadataRepository.GetValidationStatusAsync()
-            };
+                    _metadataRepository.GetBiotopesAsync(),
+                    _metadataRepository.GetDeterminationMethodsAsync(),
+                    _metadataRepository.GetDiscoveryMethodsAsync(),
+                    _metadataRepository.GetGendersAsync(),
+                    _metadataRepository.GetOrganizationsAsync(),
+                    _metadataRepository.GetStagesAsync(),
+                    _metadataRepository.GetSubstratesAsync(),
+                    _metadataRepository.GetUnitsAsync(),
+                    _metadataRepository.GetValidationStatusAsync()
+                };
                 var personsTask = _personRepository.GetAsync();
                 var projectsTask = _projectRepository.GetProjectsAsync();
                 var taxaTask = _taxonRepository.GetAsync();
-
-                await activitiesTask;
-                var activities = activitiesTask.Result;
+                var sharedLabelsTask = _metadataRepository.GetResourcesAsync("Shared_");
 
                 await Task.WhenAll(metaDataTasks);
                 var biotopes = metaDataTasks[0].Result;
@@ -278,28 +280,26 @@ namespace SOS.Harvest.Containers
                 var units = metaDataTasks[7].Result;
                 var validationStatus = metaDataTasks[8].Result;
 
-                await personsTask;
-                var persons = personsTask.Result;
+                var activities = await activitiesTask;
+                var persons = await personsTask;
+                var projects = await projectsTask;
+                var taxa = await taxaTask;
+                var sharedLabels = await sharedLabelsTask;
 
-                await projectsTask;
-                var projects = projectsTask.Result;
-
-                await taxaTask;
-                var taxa = taxaTask.Result;
-
-                _activities = CastMetdataWithCategoryEntityToVerbatim(activities)?.ToConcurrentDictionary(a => a.Id, a => a) ?? new ConcurrentDictionary<int, MetadataWithCategory>();
-                _biotopes = CastMetdataEntitiesToVerbatims(biotopes)?.ToConcurrentDictionary(b => b.Id, b => b) ?? new ConcurrentDictionary<int, Metadata>();
-                _determinationMethods = CastMetdataEntitiesToVerbatims(determinationMethods)?.ToConcurrentDictionary(dm => dm.Id, dm => dm) ?? new ConcurrentDictionary<int, Metadata>();
-                _discoveryMethods = CastMetdataEntitiesToVerbatims(discoveryMethods)?.ToConcurrentDictionary(dm => dm.Id, dm => dm) ?? new ConcurrentDictionary<int, Metadata>();
-                _genders = CastMetdataEntitiesToVerbatims(genders)?.ToConcurrentDictionary(g => g.Id, g => g) ?? new ConcurrentDictionary<int, Metadata>();
-                _organizations = CastMetdataEntitiesToVerbatims(organizations)?.ToConcurrentDictionary(o => o.Id, o => o) ?? new ConcurrentDictionary<int, Metadata>();
+                _activities = CastMetdataWithCategoryEntityToVerbatim(activities)?.ToConcurrentDictionary(a => a.Id, a => a) ?? new ConcurrentDictionary<int, MetadataWithCategory<int>>();
+                _biotopes = CastMetdataEntitiesToVerbatims(biotopes)?.ToConcurrentDictionary(b => b.Id, b => b) ?? new ConcurrentDictionary<int, Metadata<int>>();
+                _determinationMethods = CastMetdataEntitiesToVerbatims(determinationMethods)?.ToConcurrentDictionary(dm => dm.Id, dm => dm) ?? new ConcurrentDictionary<int, Metadata<int>>();
+                _discoveryMethods = CastMetdataEntitiesToVerbatims(discoveryMethods)?.ToConcurrentDictionary(dm => dm.Id, dm => dm) ?? new ConcurrentDictionary<int, Metadata<int>>();
+                _genders = CastMetdataEntitiesToVerbatims(genders)?.ToConcurrentDictionary(g => g.Id, g => g) ?? new ConcurrentDictionary<int, Metadata<int>>();
+                _organizations = CastMetdataEntitiesToVerbatims(organizations)?.ToConcurrentDictionary(o => o.Id, o => o) ?? new ConcurrentDictionary<int, Metadata<int>>();
                 _personsByUserId = CastPersonEntitiesToVerbatims(persons)?.ToConcurrentDictionary(p => p.UserId, p => p) ?? new ConcurrentDictionary<int, Person>();
                 _projects = CastProjectEntitiesToVerbatim(projects).ToConcurrentDictionary(p => p.Id, p => p) ?? new ConcurrentDictionary<int, Project>();
-                _stages = CastMetdataEntitiesToVerbatims(stages)?.ToConcurrentDictionary(s => s.Id, s => s) ?? new ConcurrentDictionary<int, Metadata>();
-                _substrates = CastMetdataEntitiesToVerbatims(substrates)?.ToConcurrentDictionary(s => s.Id, s => s) ?? new ConcurrentDictionary<int, Metadata>();
+                _sharedLabels = CastMetdataEntitiesToVerbatims(sharedLabels)?.ToConcurrentDictionary(g => g.Id, g => g) ?? new ConcurrentDictionary<string, Metadata<string>>();
+                _stages = CastMetdataEntitiesToVerbatims(stages)?.ToConcurrentDictionary(s => s.Id, s => s) ?? new ConcurrentDictionary<int, Metadata<int>>();
+                _substrates = CastMetdataEntitiesToVerbatims(substrates)?.ToConcurrentDictionary(s => s.Id, s => s) ?? new ConcurrentDictionary<int, Metadata<int>>();
                 _taxonSpeciesGroups = taxa.ToConcurrentDictionary(t => t.Id, t => t.SpeciesGroupId) ?? new ConcurrentDictionary<int, int?>();
-                _units = CastMetdataEntitiesToVerbatims(units)?.ToConcurrentDictionary(u => u.Id, u => u) ?? new ConcurrentDictionary<int, Metadata>();
-                _validationStatus = CastMetdataEntitiesToVerbatims(validationStatus)?.ToConcurrentDictionary(vs => vs.Id, vs => vs) ?? new ConcurrentDictionary<int, Metadata>();
+                _units = CastMetdataEntitiesToVerbatims(units)?.ToConcurrentDictionary(u => u.Id, u => u) ?? new ConcurrentDictionary<int, Metadata<int>>();
+                _validationStatus = CastMetdataEntitiesToVerbatims<int>(validationStatus)?.ToConcurrentDictionary(vs => vs.Id, vs => vs) ?? new ConcurrentDictionary<int, Metadata<int>>();
 
                 IsInitialized = true;
 
@@ -311,8 +311,10 @@ namespace SOS.Harvest.Containers
             }
         }
 
-        public bool Live {
-            set {
+        public bool Live
+        {
+            set
+            {
                 _metadataRepository.Live = value;
                 _personRepository.Live = value;
                 _projectRepository.Live = value;
@@ -321,13 +323,13 @@ namespace SOS.Harvest.Containers
         }
 
         /// <inheritdoc />
-        public IDictionary<int, Metadata> Organizations => _organizations;
+        public IDictionary<int, Metadata<int>> Organizations => _organizations;
 
         /// <inheritdoc />
         public IDictionary<int, Person> PersonsByUserId => _personsByUserId;
 
         /// <inheritdoc />
-        public MetadataWithCategory TryGetActivity(int? id)
+        public MetadataWithCategory<int> TryGetActivity(int? id)
         {
             if (id == null)
             {
@@ -339,7 +341,7 @@ namespace SOS.Harvest.Containers
         }
 
         /// <inheritdoc />
-        public Metadata TryGetBiotope(int? id)
+        public Metadata<int> TryGetBiotope(int? id)
         {
             if (id == null)
             {
@@ -350,8 +352,8 @@ namespace SOS.Harvest.Containers
             return biotope!;
         }
 
-    /// <inheritdoc />
-        public Metadata TryGetDeterminationMethod(int? id)
+        /// <inheritdoc />
+        public Metadata<int> TryGetDeterminationMethod(int? id)
         {
             if (id == null)
             {
@@ -363,7 +365,7 @@ namespace SOS.Harvest.Containers
         }
 
         /// <inheritdoc />
-        public Metadata TryGetDiscoveryMethod(int? id)
+        public Metadata<int> TryGetDiscoveryMethod(int? id)
         {
             if (id == null)
             {
@@ -375,7 +377,7 @@ namespace SOS.Harvest.Containers
         }
 
         /// <inheritdoc />
-        public Metadata TryGetGender(int? id)
+        public Metadata<int> TryGetGender(int? id)
         {
             if (id == null)
             {
@@ -387,7 +389,7 @@ namespace SOS.Harvest.Containers
         }
 
         /// <inheritdoc />
-        public Metadata TryGetOrganization(int? id)
+        public Metadata<int> TryGetOrganization(int? id)
         {
             if (id == null)
             {
@@ -405,7 +407,8 @@ namespace SOS.Harvest.Containers
             {
                 return null!;
             }
-            if(!_personsByUserId.TryGetValue(id ?? 0, out var person)) {
+            if (!_personsByUserId.TryGetValue(id ?? 0, out var person))
+            {
                 var personEntity = await _personRepository.GetByUserIdAsync(id ?? 0);
                 if (personEntity != null)
                 {
@@ -413,7 +416,7 @@ namespace SOS.Harvest.Containers
 
                     _personsByUserId.TryAdd(person.Id, person);
                 }
-                
+
             }
 
             return person!;
@@ -442,7 +445,7 @@ namespace SOS.Harvest.Containers
         }
 
         /// <inheritdoc />
-        public Metadata TryGetStage(int? id)
+        public Metadata<int> TryGetStage(int? id)
         {
             if (id == null)
             {
@@ -454,7 +457,7 @@ namespace SOS.Harvest.Containers
         }
 
         /// <inheritdoc />
-        public Metadata TryGetSubstrate(int? id)
+        public Metadata<int> TryGetSubstrate(int? id)
         {
             if (id == null)
             {
@@ -463,6 +466,30 @@ namespace SOS.Harvest.Containers
             _substrates.TryGetValue(id ?? 0, out var substrate);
 
             return substrate!;
+        }
+
+        public string TryGetSummary(string source, bool FreeTextSummary)
+        {
+            if (FreeTextSummary || string.IsNullOrEmpty(source))
+            {
+                return source!;
+            }
+
+            var regex = new Regex("\\[[^\\]]*\\]\\]");
+            var matches = regex.Matches(source);
+
+            for (var i = 0; i < matches.Count; i++)
+            {
+                var match = matches[i].Value;
+
+                if (_sharedLabels.TryGetValue(match.Replace("[", "").Replace("]", ""), out var label))
+                {
+                    var value = label.Translate("sv-SE", "en-GB");
+                    source = source.Replace(match, value);
+                }
+            }
+
+            return source!;
         }
 
         /// <inheritdoc />
@@ -478,7 +505,7 @@ namespace SOS.Harvest.Containers
         }
 
         /// <inheritdoc />
-        public Metadata TryGetUnit(int? id)
+        public Metadata<int> TryGetUnit(int? id)
         {
             if (id == null)
             {
@@ -490,7 +517,7 @@ namespace SOS.Harvest.Containers
         }
 
         /// <inheritdoc />
-        public Metadata TryGetValidationStatus(int? id)
+        public Metadata<int> TryGetValidationStatus(int? id)
         {
             if (id == null)
             {

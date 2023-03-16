@@ -3,12 +3,12 @@
     /// <summary>
     ///     Represents metadata item with category
     /// </summary>
-    public class MetadataWithCategory : Metadata
+    public class MetadataWithCategory<T> : Metadata<T>
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        public MetadataWithCategory() : base(0)
+        public MetadataWithCategory() : base(default)
         {
 
         }
@@ -18,14 +18,14 @@
         /// </summary>
         /// <param name="id"></param>
         /// <param name="categoryId"></param>
-        public MetadataWithCategory(int id, int categoryId) : base(id)
+        public MetadataWithCategory(T id, int categoryId) : base(id)
         {
-            Category = new Metadata(categoryId);
+            Category = new Metadata<int>(categoryId);
         }
 
         /// <summary>
         ///     Category of item
         /// </summary>
-        public Metadata Category { get; set; }
+        public Metadata<int> Category { get; set; }
     }
 }

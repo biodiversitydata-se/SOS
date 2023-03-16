@@ -95,6 +95,11 @@
         public int Id { get; set; }
 
         /// <summary>
+        /// True if free text summary
+        /// </summary>
+        public bool IsFreeTextSummary { get; set; }
+
+        /// <summary>
         ///     Taxon length
         /// </summary>
         public int? Length { get; set; }
@@ -217,6 +222,11 @@
         ///     Substrate taxon id
         /// </summary>
         public int? SubstrateSpeciesId { get; set; }
+
+        /// <summary>
+        /// Sighting summary
+        /// </summary>
+        public string Summary { get; set; }
 
         /// <summary>
         ///     Id of taxon

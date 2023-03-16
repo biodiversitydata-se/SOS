@@ -31,7 +31,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected abstract Task<ICollection<VocabularyValueInfo>> GetVocabularyValues();
 
         protected virtual ICollection<VocabularyValueInfo> ConvertToLocalizedVocabularyValues(
-            ICollection<MetadataEntity> metadataEntities)
+            ICollection<MetadataEntity<int>> metadataEntities)
         {
             metadataEntities.TrimValues();
             var vocabularyValues = new List<VocabularyValueInfo>(metadataEntities.Count());
@@ -64,7 +64,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         }
 
         protected virtual ICollection<VocabularyValueInfo> ConvertToNonLocalizedVocabularyValues(
-            ICollection<MetadataEntity> metadataEntities)
+            ICollection<MetadataEntity<int>> metadataEntities)
         {
             metadataEntities.TrimValues();
             var vocabularyValues = new List<VocabularyValueInfo>(metadataEntities.Count());
@@ -83,7 +83,7 @@ namespace SOS.Harvest.Factories.Vocabularies
 
 
         protected virtual ICollection<VocabularyValueInfo> ConvertToVocabularyValuesWithCategory(
-            ICollection<MetadataWithCategoryEntity> metadataWithCategoryEntities)
+            ICollection<MetadataWithCategoryEntity<int>> metadataWithCategoryEntities)
         {
             metadataWithCategoryEntities.TrimValues();
             var vocabularyValues = new List<VocabularyValueInfo>(metadataWithCategoryEntities.Count());

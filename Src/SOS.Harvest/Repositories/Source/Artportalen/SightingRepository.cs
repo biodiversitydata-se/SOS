@@ -29,7 +29,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             }
 
             var triggerRuleSelect = "svr.RegionalSightingStateId";
-            var triggerRuleFrom = @"LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = ss.SightingId 
+            var triggerRuleFrom = @"LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = si.Id 
                     LEFT JOIN StatusValidationRule svr ON svr.Id = tvr.StatusValidationRuleId ";
             
             if (DataService.Configuration?.UseTriggeredObservationRule ?? false)
@@ -37,7 +37,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 triggerRuleSelect = @"tor.FrequencyId AS TriggeredObservationRuleFrequencyId,
                 tor.ReproductionId AS TriggeredObservationRuleReproductionId,
                 tor.Unspontaneous AS TriggeredObservationRuleUnspontaneous";
-                triggerRuleFrom = @"LEFT JOIN TriggeredObservationRule tor ON tor.SightingId = s.SightingId";
+                triggerRuleFrom = @"LEFT JOIN TriggeredObservationRule tor ON tor.SightingId = si.Id";
             }
 
             var query = $@"
@@ -93,31 +93,34 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     s.SightingTypeId,
                     s.SightingTypeSearchGroupId,
                     s.FieldDiaryGroupId,
+                    ssu.Summary,
+                    ISNULL(ssu.FreeTextSummary, 0) AS IsFreeTextSummary,
 	                srDeterminer.UserId AS DeterminerUserId,
 	                srDeterminer.DeterminationYear AS DeterminationYear,
 	                srConfirmator.UserId AS ConfirmatorUserId,
 	                srConfirmator.DeterminationYear AS ConfirmationYear,
 	                {triggerRuleSelect},
-                    (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = s.SightingId group by SightingId) AS SightingPublishTypeIds,
+                    (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = si.Id group by SightingId) AS SightingPublishTypeIds,
                     (select string_agg(SpeciesFactId , ',') from SpeciesFactTaxon sft where sft.TaxonId = s.TaxonId AND sft.IsSearchFilter = 1 group by sft.TaxonId) AS SpeciesFactsIds,
                     sdc.DatasourceId
                 FROM
 	                {SightingsFromBasics}
                     {join}
 					INNER JOIN Sighting si ON s.SightingId = si.Id
-	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId                                   
-	                LEFT JOIN SightingBarcode sb ON s.SightingId = sb.SightingId
+	                LEFT JOIN SightingCommentPublic scp ON si.Id = scp.SightingId                                   
+	                LEFT JOIN SightingBarcode sb ON si.Id = sb.SightingId
                     LEFT JOIN [User] u ON s.OwnerUserId = u.Id 
 	                LEFT JOIN Person p ON u.PersonId = p.Id
-                    LEFT JOIN MigrateSightingid msi ON s.SightingId = msi.Id
+                    LEFT JOIN MigrateSightingid msi ON si.Id = msi.Id
 					LEFT JOIN SightingDescription sdb ON si.SightingBiotopeDescriptionId = sdb.Id 
 					LEFT JOIN SightingDescription sds ON si.SightingSubstrateDescriptionId = sds.Id 
 					LEFT JOIN SightingDescription sdss ON si.SightingSubstrateSpeciesDescriptionId = sdss.Id
-                    LEFT JOIN SightingRelation srDeterminer ON srDeterminer.SightingId = s.SightingId AND srDeterminer.IsPublic = 1 AND srDeterminer.SightingRelationTypeId = 3
-                    LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = s.SightingId AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
+                    LEFT JOIN SightingRelation srDeterminer ON srDeterminer.SightingId = si.Id AND srDeterminer.IsPublic = 1 AND srDeterminer.SightingRelationTypeId = 3
+                    LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = si.Id AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
+                    LEFT JOIN SightingSummary ssu ON si.Id = ssu.Id
                     {triggerRuleFrom}
-                    LEFT JOIN SightingDatasource sdc ON s.SightingId = sdc.SightingId
-                    LEFT JOIN (SELECT SightingId FROM SightingComment GROUP BY SightingId) sic ON s.SightingId = sic.SightingId
+                    LEFT JOIN SightingDatasource sdc ON si.Id = sdc.SightingId
+                    LEFT JOIN (SELECT SightingId FROM SightingComment GROUP BY SightingId) sic ON si.Id = sic.SightingId
                 WHERE
 	                {SightingWhereBasics}
                     {where} ";
@@ -141,7 +144,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         {
             try
             {
-                var query = GetSightingQuery(0, "AND s.SightingId BETWEEN @StartId AND @EndId");
+                var query = GetSightingQuery(0, "AND si.Id BETWEEN @StartId AND @EndId");
 
                 var result = (await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}))?.ToArray();
                 if ((result?.Count() ?? 0) == 0)
@@ -164,7 +167,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         {
             try
             {
-                var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON s.SightingId = t.Id", null);
+                var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON si.Id = t.Id", null);
 
                 var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();                
                 if ((result?.Count() ?? 0) == 0)

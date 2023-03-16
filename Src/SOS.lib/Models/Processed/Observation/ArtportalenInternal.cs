@@ -199,14 +199,19 @@ namespace SOS.Lib.Models.Processed.Observation
         public bool IncrementalHarvested { get; set; }
 
         /// <summary>
+        /// Second hand information flag
+        /// </summary>
+        public bool SecondHandInformation { get; set; }
+
+        /// <summary>
         ///  Sighting barcode url
         /// </summary>
         public string SightingBarcodeURL { get; set; }
 
         /// <summary>
-        /// Second hand information flag
+        /// Sighting summary
         /// </summary>
-        public bool SecondHandInformation { get; set; }
+        public string Summary { get; set; }
 
         /// <summary>
         /// Triggered observation rule frequency id

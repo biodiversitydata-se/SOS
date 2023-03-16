@@ -12,7 +12,7 @@ namespace SOS.Harvest.Factories
         public static Dictionary<int, PersonSighting>? CreatePersonSightingDictionary(
             ISet<int> sightingIds,
             IDictionary<int, Person> personsByUserId,
-            IDictionary<int, Metadata> organizations,
+            IDictionary<int, Metadata<int>> organizations,
             IDictionary<int, ICollection<SpeciesCollectionItemEntity>> speciesCollectionItemsBySightingId,
             IEnumerable<SightingRelation>? sightingRelations)
         {
@@ -137,7 +137,7 @@ namespace SOS.Harvest.Factories
 
         private static Dictionary<int, string> CreateSpeciesCollectionDictionary(
             IDictionary<int, Person> personsByUserId,
-            IDictionary<int, Metadata> organizations,
+            IDictionary<int, Metadata<int>> organizations,
             IDictionary<int, ICollection<SpeciesCollectionItemEntity>> speciesCollectionItemsBySightingId)
         {
             var speciesCollectionBySightingId = new Dictionary<int, string>();

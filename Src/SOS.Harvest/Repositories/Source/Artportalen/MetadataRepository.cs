@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Amazon.Auth.AccessControlPolicy;
 using Microsoft.Extensions.Logging;
+using Nest;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Enums;
+using System.Transactions;
+using System;
 
 namespace SOS.Harvest.Repositories.Source.Artportalen
 {
@@ -23,7 +23,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataWithCategoryEntity>> GetActivitiesAsync()
+        public async Task<IEnumerable<MetadataWithCategoryEntity<int>>> GetActivitiesAsync()
         {
             try
             {
@@ -48,7 +48,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 					a.Id,
 					gc.CultureCode";
 
-                return await QueryAsync<MetadataWithCategoryEntity>(query);
+                return await QueryAsync<MetadataWithCategoryEntity<int>>(query);
             }
             catch (Exception e)
             {
@@ -58,7 +58,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity>> GetBiotopesAsync()
+        public async Task<IEnumerable<MetadataEntity<int>>> GetBiotopesAsync()
         {
             try
             {
@@ -78,7 +78,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 						b.Id,
 						gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataEntity<int>>(query);
             }
             catch (Exception e)
             {
@@ -88,7 +88,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity>> GetGendersAsync()
+        public async Task<IEnumerable<MetadataEntity<int>>> GetGendersAsync()
         {
             try
             {
@@ -108,7 +108,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 						g.Id,
 						gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataEntity<int>>(query);
             }
             catch (Exception e)
             {
@@ -118,7 +118,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity>> GetOrganizationsAsync()
+        public async Task<IEnumerable<MetadataEntity<int>>> GetOrganizationsAsync()
         {
             try
             {
@@ -130,7 +130,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     FROM 
                       Organization";
 
-                return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataEntity<int>>(query);
             }
             catch (Exception e)
             {
@@ -140,7 +140,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity>> GetStagesAsync()
+        public async Task<IEnumerable<MetadataEntity<int>>> GetStagesAsync()
         {
             try
             {
@@ -160,7 +160,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 					s.Id,
 					gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataEntity<int>>(query);
             }
             catch (Exception e)
             {
@@ -170,7 +170,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity>> GetSubstratesAsync()
+        public async Task<IEnumerable<MetadataEntity<int>>> GetSubstratesAsync()
         {
             try
             {
@@ -190,7 +190,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 						s.Id,
 						gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataEntity<int>>(query);
             }
             catch (Exception e)
             {
@@ -200,7 +200,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity>> GetUnitsAsync()
+        public async Task<IEnumerable<MetadataEntity<int>>> GetUnitsAsync()
         {
             try
             {
@@ -220,7 +220,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 						u.Id,
 						gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataEntity<int>>(query);
             }
             catch (Exception e)
             {
@@ -230,7 +230,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity>> GetValidationStatusAsync()
+        public async Task<IEnumerable<MetadataEntity<int>>> GetValidationStatusAsync()
         {
             try
             {
@@ -250,7 +250,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 						vs.Id,
 						gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataEntity<int>>(query);
             }
             catch (Exception e)
             {
@@ -260,7 +260,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity>> GetAreaTypesAsync()
+        public async Task<IEnumerable<MetadataEntity<int>>> GetAreaTypesAsync()
         {
             try
             {
@@ -284,7 +284,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                         CountryIsoCode = 752 AND Id IN @AreaTypes";
 
                 var areaTypes = (int[]) Enum.GetValues(typeof(AreaType));
-                return await QueryAsync<MetadataEntity>(query, new {AreaTypes = areaTypes});
+                return await QueryAsync<MetadataEntity<int>>(query, new {AreaTypes = areaTypes});
             }
             catch (Exception e)
             {
@@ -294,7 +294,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity>> GetDiscoveryMethodsAsync()
+        public async Task<IEnumerable<MetadataEntity<int>>> GetDiscoveryMethodsAsync()
         {
             try
             {
@@ -314,7 +314,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                    dm.Id,
 	                    gc.CultureCode";
                 
-                return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataEntity<int>>(query);
             }
             catch (Exception e)
             {
@@ -324,7 +324,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity>> GetDeterminationMethodsAsync()
+        public async Task<IEnumerable<MetadataEntity<int>>> GetDeterminationMethodsAsync()
         {
             try
             {
@@ -344,7 +344,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                    dm.Id,
 	                    gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataEntity<int>>(query);
             }
             catch (Exception e)
             {
@@ -353,6 +353,36 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             }
         }
 
+        public async Task<IEnumerable<MetadataEntity<string>>> GetResourcesAsync(string prefix)
+        {
+            try
+            {
+                string query = @$"
+                    SELECT
+                        r.Label AS Id,
+                        t.Value AS Translation,
+                        gc.CultureCode
+                    FROM
+                        Resource r
+                        INNER JOIN Translation t ON r.Id = t.ResourceId
+                        INNER JOIN GlobalizationCulture gc ON t.GlobalizationCultureId = gc.Id
+                    WHERE
+                        r.Label LIKE '{prefix}%'
+                        AND gc.Id IN (49, 175)
+                    ORDER BY
+	                    r.Label,
+	                    gc.CultureCode";
+
+                return await QueryAsync<MetadataEntity<string>>(query);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting resources");
+                throw;
+            }
+        }
+
+        
 
         /// <inheritdoc />
         public async Task<DateTime?> GetLastBackupDateAsync()

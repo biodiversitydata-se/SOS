@@ -24,7 +24,7 @@ namespace SOS.Import.UnitTests.Managers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var sightingIds = new HashSet<int> { 1 };
-            var organizations = new Dictionary<int, Metadata>();
+            var organizations = new Dictionary<int, Metadata<int>>();
             var speciesCollectionItemsBySightingId = new Dictionary<int, ICollection<SpeciesCollectionItemEntity>>();
             var sightingRelations = new List<SightingRelation>()
             {

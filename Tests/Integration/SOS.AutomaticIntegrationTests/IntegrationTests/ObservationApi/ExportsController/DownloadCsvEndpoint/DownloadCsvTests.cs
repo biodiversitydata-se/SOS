@@ -89,7 +89,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
                     .With(m => m.SightingId = sightingId)
                     .With(m => m.DatasourceId = 1)
                     .With(m => m.Observers = "Tom Volgers")
-                    .With(m => m.Activity = new MetadataWithCategory((int)ActivityId.Incubating, 1))
+                    .With(m => m.Activity = new MetadataWithCategory<int>((int)ActivityId.Incubating, 1))
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
