@@ -484,7 +484,7 @@ namespace SOS.Harvest.Containers
 
                 if (_sharedLabels.TryGetValue(match.Replace("[", "").Replace("]", ""), out var label))
                 {
-                    var value = label.Translate("sv-SE", "en-GB");
+                    var value = label.Translate("sv-SE");
                     source = source.Replace(match, value);
                 }
             }
