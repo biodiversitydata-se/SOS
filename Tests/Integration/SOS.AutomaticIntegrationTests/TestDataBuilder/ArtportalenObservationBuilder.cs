@@ -187,15 +187,15 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 
                 obs.Id = _faker.IndexVariable++;
                 obs.DatasourceId = ArtportalenDataSourceId;
-                obs.DiscoveryMethod = new Metadata(0); // todo
-                obs.DeterminationMethod = new Metadata(0); // todo
+                obs.DiscoveryMethod = new Metadata<int>(0); // todo
+                obs.DeterminationMethod = new Metadata<int>(0); // todo
                 obs.EditDate = editDate;
                 obs.ReportedDate = reportedDate;
                 obs.StartDate = startDate;
                 obs.EndDate = endDate;
                 obs.StartTime = startDate.TimeOfDay;
                 obs.EndTime = endDate.TimeOfDay;
-                obs.Gender = new Metadata(0);
+                obs.Gender = new Metadata<int>(0);
                 obs.HasImages = false; // todo
                 obs.FirstImageId = 0; // todo
                 obs.HasTriggeredValidationRules = _faker.Random.Bool(); // todo
@@ -212,12 +212,12 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.Observers = observers;
                 obs.Site = GetTestSite(); // todo
                 obs.SpeciesGroupId = 1; // todo
-                obs.Stage = new Metadata(0); // todo
+                obs.Stage = new Metadata<int>(0); // todo
                 obs.TaxonId = 231326; // todo
-                obs.Unit = new Metadata(0); // todo
+                obs.Unit = new Metadata<int>(0); // todo
                 obs.Unspontaneous = false; // todo?
                 obs.UnsureDetermination = false; // todo?
-                obs.ValidationStatus = new Metadata(10); // todo
+                obs.ValidationStatus = new Metadata<int>(10); // todo
                 obs.ReportedBy = reportedByInternal.UserAlias; // todo
                 obs.ReportedByUserId = reportedByInternal.Id;
                 obs.ReportedByUserServiceUserId = reportedByInternal.UserServiceUserId;

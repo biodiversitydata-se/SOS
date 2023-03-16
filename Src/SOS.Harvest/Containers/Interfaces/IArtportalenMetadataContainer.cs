@@ -1,5 +1,4 @@
-﻿using SOS.Harvest.Entities.Artportalen;
-using SOS.Lib.Models.Shared;
+﻿using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Harvest.Containers.Interfaces
@@ -24,7 +23,7 @@ namespace SOS.Harvest.Containers.Interfaces
         /// <summary>
         /// All organizations
         /// </summary>
-        IDictionary<int, Metadata> Organizations { get; }
+        IDictionary<int, Metadata<int>> Organizations { get; }
 
         /// <summary>
         /// All persons
@@ -36,42 +35,42 @@ namespace SOS.Harvest.Containers.Interfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        MetadataWithCategory TryGetActivity(int? id);
+        MetadataWithCategory<int> TryGetActivity(int? id);
 
         /// <summary>
         /// Try to get a xxx by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Metadata TryGetBiotope(int? id);
+        Metadata<int> TryGetBiotope(int? id);
 
         /// <summary>
         /// Try to get a xxx by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Metadata TryGetDeterminationMethod(int? id);
+        Metadata<int> TryGetDeterminationMethod(int? id);
 
         /// <summary>
         /// Try to get a xxx by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Metadata TryGetDiscoveryMethod(int? id);
+        Metadata<int> TryGetDiscoveryMethod(int? id);
 
         /// <summary>
         /// Try to get a xxx by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Metadata TryGetGender(int? id);
+        Metadata<int> TryGetGender(int? id);
 
         /// <summary>
         /// Try to get a xxx by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Metadata TryGetOrganization(int? id);
+        Metadata<int> TryGetOrganization(int? id);
 
         /// <summary>
         /// Try get person by id
@@ -92,14 +91,22 @@ namespace SOS.Harvest.Containers.Interfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Metadata TryGetStage(int? id);
+        Metadata<int> TryGetStage(int? id);
 
         /// <summary>
         /// Try get substrate by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Metadata TryGetSubstrate(int? id);
+        Metadata<int> TryGetSubstrate(int? id);
+
+        /// <summary>
+        /// Try get summary
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="FreeTextSummary"></param>
+        /// <returns></returns>
+        string TryGetSummary(string source, bool FreeTextSummary);
 
         /// <summary>
         /// Try to get a xxx by id
@@ -113,13 +120,13 @@ namespace SOS.Harvest.Containers.Interfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Metadata TryGetUnit(int? id);
+        Metadata<int> TryGetUnit(int? id);
 
         /// <summary>
         /// Try to get a xxx by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Metadata TryGetValidationStatus(int? id);
+        Metadata<int> TryGetValidationStatus(int? id);
     }
 }

@@ -5,13 +5,13 @@ namespace SOS.Lib.Models.Shared
     /// <summary>
     ///     Represents different metadata items
     /// </summary>
-    public class Metadata
+    public class Metadata<T>
     {
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="id"></param>
-        public Metadata(int id)
+        public Metadata(T id)
         {
             Id = id;
             Translations = new List<MetadataTranslation>();
@@ -20,7 +20,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         ///     Id of item
         /// </summary>
-        public int Id { get; set; }
+        public T Id { get; set; }
 
         /// <summary>
         ///     Name of item

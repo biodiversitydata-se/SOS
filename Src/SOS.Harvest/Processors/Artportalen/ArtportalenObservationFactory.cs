@@ -326,7 +326,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 {
                     Taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out substrateTaxon);
                 }
-
+               
                 obs.Occurrence.Substrate = new Substrate
                 {
                     Description = GetSubstrateDescription(verbatimObservation, substrateTaxon!)?.Clean(),
@@ -404,6 +404,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     (obs.Occurrence.RecordedBy?.StartsWith("Via", StringComparison.CurrentCultureIgnoreCase) ?? false) &&
                     ((verbatimObservation.ObserversInternal == null || verbatimObservation.ObserversInternal.Count() == 0) ||
                     (verbatimObservation.ObserversInternal?.Any(oi => oi.Id == verbatimObservation.ReportedByUserId) ?? false));
+                obs.ArtportalenInternal.Summary = verbatimObservation.Summary;
                 obs.ArtportalenInternal.TriggeredObservationRuleFrequencyId = verbatimObservation.TriggeredObservationRuleFrequencyId;
                 obs.ArtportalenInternal.TriggeredObservationRuleReproductionId = verbatimObservation.TriggeredObservationRuleReproductionId;
                 obs.ArtportalenInternal.TriggeredObservationRuleUnspontaneous = verbatimObservation.TriggeredObservationRuleUnspontaneous;
@@ -599,7 +600,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="setValueToNullIfNoMappingFound"></param>
         /// <returns></returns>
         public VocabularyValue GetSosIdFromMetadata(
-            Metadata metadata,
+            Metadata<int> metadata,
             VocabularyId vocabularyId,
             int? defaultId = null,
             bool setValueToNullIfNoMappingFound = false)

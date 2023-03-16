@@ -96,6 +96,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.SubstrateDescription = entity.SubstrateDescription;
                 observation.SubstrateSpeciesDescription = entity.SubstrateSpeciesDescription;
                 observation.SubstrateSpeciesId = entity.SubstrateSpeciesId;
+                observation.Summary = _artportalenMetadataContainer.TryGetSummary(entity.Summary, entity.IsFreeTextSummary);
                 observation.TaxonId = entity.TaxonId;
                 observation.TriggeredObservationRuleFrequencyId = entity.TriggeredObservationRuleFrequencyId;
                 observation.TriggeredObservationRuleReproductionId = entity.TriggeredObservationRuleReproductionId;

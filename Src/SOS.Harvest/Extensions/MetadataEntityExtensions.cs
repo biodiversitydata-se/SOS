@@ -6,7 +6,7 @@ namespace SOS.Harvest.Extensions
 {
     public static class MetadataEntityExtensions
     {
-        public static void TrimValues(this IEnumerable<MetadataEntity> metadataEntities)
+        public static void TrimValues(this IEnumerable<MetadataEntity<int>> metadataEntities)
         {
             foreach (var metadataEntity in metadataEntities)
             {
@@ -14,7 +14,7 @@ namespace SOS.Harvest.Extensions
             }
         }
 
-        public static void TrimValue(this MetadataEntity metadataEntity)
+        public static void TrimValue(this MetadataEntity<int> metadataEntity)
         {
             metadataEntity.Translation = metadataEntity.Translation?.Trim();
         }

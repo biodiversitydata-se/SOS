@@ -13,12 +13,12 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Id of activity
         /// </summary>
-        public MetadataWithCategory Activity { get; set; }
+        public MetadataWithCategory<int> Activity { get; set; }
 
         /// <summary>
         ///     Biotope
         /// </summary>
-        public Metadata Biotope { get; set; }
+        public Metadata<int> Biotope { get; set; }
 
         /// <summary>
         ///     Description of bioptpe
@@ -48,12 +48,12 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     DiscoveryMethod
         /// </summary>
-        public Metadata DiscoveryMethod { get; set; }
+        public Metadata<int> DiscoveryMethod { get; set; }
 
         /// <summary>
         ///     DeterminationMethod
         /// </summary>
-        public Metadata DeterminationMethod { get; set; }
+        public Metadata<int> DeterminationMethod { get; set; }
 
         /// <summary>
         /// Sighting Edit date
@@ -78,7 +78,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Taxon gender id
         /// </summary>
-        public Metadata Gender { get; set; }
+        public Metadata<int> Gender { get; set; }
 
         /// <summary>
         ///     Has sighting images
@@ -169,7 +169,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Owner organization
         /// </summary>
-        public Metadata OwnerOrganization { get; set; }
+        public Metadata<int> OwnerOrganization { get; set; }
 
         /// <summary>
         ///     Protected by system flag
@@ -234,7 +234,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Taxon stage id
         /// </summary>
-        public Metadata Stage { get; set; }
+        public Metadata<int> Stage { get; set; }
 
         /// <summary>
         ///     Sighting start date
@@ -249,7 +249,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Substrate
         /// </summary>
-        public Metadata Substrate { get; set; }
+        public Metadata<int> Substrate { get; set; }
 
         /// <summary>
         ///     Description of substrate
@@ -267,6 +267,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int? SubstrateSpeciesId { get; set; }
 
         /// <summary>
+        /// Sighting summary
+        /// </summary>
+        public string Summary { get; set; }
+
+        /// <summary>
         ///     Taxon Id
         /// </summary>
         public int? TaxonId { get; set; }
@@ -274,7 +279,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Id of unit
         /// </summary>
-        public Metadata Unit { get; set; }
+        public Metadata<int> Unit { get; set; }
 
         /// <summary>
         ///     Un spontaneous flag
@@ -299,7 +304,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Validation status
         /// </summary>
-        public Metadata ValidationStatus { get; set; }
+        public Metadata<int> ValidationStatus { get; set; }
 
         public string VerifiedBy { get; set; }
         public IEnumerable<UserInternal> VerifiedByInternal { get; set; }
@@ -311,7 +316,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string ReportedByUserAlias { get; set; }
         public string SpeciesCollection { get; set; }
 
-        public Metadata PublicCollection { get; set; }
+        public Metadata<int> PublicCollection { get; set; }
         public string PrivateCollection { get; set; }
 
 

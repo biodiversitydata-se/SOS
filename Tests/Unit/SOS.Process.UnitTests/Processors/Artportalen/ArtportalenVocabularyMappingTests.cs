@@ -25,7 +25,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var activity = new Metadata((int)ValidationStatusId.DialogueWithReporter);
+            var activity = new Metadata<int>((int)ValidationStatusId.DialogueWithReporter);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -44,7 +44,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var ownerOrganization = new Metadata(-1)
+            var ownerOrganization = new Metadata<int>(-1)
             {
                 Translations = new List<MetadataTranslation>
                 {
@@ -70,7 +70,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var activity = new Metadata((int)ActivityId.BroodPatch);
+            var activity = new Metadata<int>((int)ActivityId.BroodPatch);
             
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -89,7 +89,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var activity = new Metadata((int) ActivityId.NestBuilding);
+            var activity = new Metadata<int>((int) ActivityId.NestBuilding);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -108,7 +108,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var activity = new Metadata((int)ActivityId.DisplayOrSong);
+            var activity = new Metadata<int>((int)ActivityId.DisplayOrSong);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -127,7 +127,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var activity = new Metadata((int)ActivityId.BroodPatch);
+            var activity = new Metadata<int>((int)ActivityId.BroodPatch);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

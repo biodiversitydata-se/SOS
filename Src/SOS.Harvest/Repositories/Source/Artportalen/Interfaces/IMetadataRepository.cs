@@ -11,67 +11,74 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         ///     Get all activities
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataWithCategoryEntity>> GetActivitiesAsync();
+        Task<IEnumerable<MetadataWithCategoryEntity<int>>> GetActivitiesAsync();
 
         /// <summary>
         ///     Get all bioptopes
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataEntity>> GetBiotopesAsync();
+        Task<IEnumerable<MetadataEntity<int>>> GetBiotopesAsync();
 
         /// <summary>
         ///     Get all genders
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataEntity>> GetGendersAsync();
+        Task<IEnumerable<MetadataEntity<int>>> GetGendersAsync();
 
         /// <summary>
         ///     Get all organizations
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataEntity>> GetOrganizationsAsync();
+        Task<IEnumerable<MetadataEntity<int>>> GetOrganizationsAsync();
 
         /// <summary>
         ///     Get all stages
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataEntity>> GetStagesAsync();
+        Task<IEnumerable<MetadataEntity<int>>> GetStagesAsync();
 
         /// <summary>
         ///     Get all substrates
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataEntity>> GetSubstratesAsync();
+        Task<IEnumerable<MetadataEntity<int>>> GetSubstratesAsync();
 
         /// <summary>
         ///     Get all units
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataEntity>> GetUnitsAsync();
+        Task<IEnumerable<MetadataEntity<int>>> GetUnitsAsync();
 
         /// <summary>
         ///     Get all validation status items
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataEntity>> GetValidationStatusAsync();
+        Task<IEnumerable<MetadataEntity<int>>> GetValidationStatusAsync();
 
         /// <summary>
         ///     Gets all area types
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataEntity>> GetAreaTypesAsync();
+        Task<IEnumerable<MetadataEntity<int>>> GetAreaTypesAsync();
         
         /// <summary>
         ///     Gets all discovery methods
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataEntity>> GetDiscoveryMethodsAsync();
+        Task<IEnumerable<MetadataEntity<int>>> GetDiscoveryMethodsAsync();
 
         /// <summary>
         ///     Gets all determination methods
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataEntity>> GetDeterminationMethodsAsync();
+        Task<IEnumerable<MetadataEntity<int>>> GetDeterminationMethodsAsync();
+
+        /// <summary>
+        /// Get resources
+        /// </summary>
+        /// <param name="prefix"></param>
+        /// <returns></returns>
+        Task<IEnumerable<MetadataEntity<string>>> GetResourcesAsync(string prefix);
 
         /// <summary>
         /// Get date backup was taken

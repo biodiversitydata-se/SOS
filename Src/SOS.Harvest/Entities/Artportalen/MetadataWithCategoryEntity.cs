@@ -3,7 +3,7 @@
     /// <summary>
     ///     Represents metadata item with category
     /// </summary>
-    public class MetadataWithCategoryEntity : MetadataEntity
+    public class MetadataWithCategoryEntity<T> : MetadataEntity<T>
     {
         /// <summary>
         ///     Id of category
@@ -13,6 +13,6 @@
         /// <summary>
         ///     Name of category
         /// </summary>
-        public string CategoryName { get; set; }
+        public string? CategoryName { get; set; }
     }
 }
