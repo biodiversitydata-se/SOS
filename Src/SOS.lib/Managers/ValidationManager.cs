@@ -107,15 +107,7 @@ namespace SOS.Lib.Managers
                     ObservationDefect.ObservationDefectType.TaxonNotFound,
                     $"Taxon not found ({observation.Taxon?.VerbatimId})")
                 );
-            }
-
-            if ((observation.Location?.CoordinateUncertaintyInMeters ?? 0) > 100000)
-            {
-                observationValidation.Defects.Add(new ObservationDefect(
-                    ObservationDefect.ObservationDefectType.ValueOutOfRange,
-                    $"CoordinateUncertaintyInMeters exceeds max value 100 km ({observation.Location?.CoordinateUncertaintyInMeters ?? 0}m)")
-                );
-            }
+            }            
 
             if (observation.Location == null || !observation.Location.DecimalLatitude.HasValue ||
                 !observation.Location.DecimalLongitude.HasValue)
