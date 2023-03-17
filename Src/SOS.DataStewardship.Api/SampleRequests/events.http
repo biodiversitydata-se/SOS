@@ -1,0 +1,110 @@
+﻿#Local
+#@baseUrl = https://localhost:5001/datastewardship/
+
+#Dev
+#@baseUrl = https://sos-datastewardship-dev.artdata.slu.se/datastewardship
+
+#ST
+@baseUrl = https://sos-datastewardship-st.artdata.slu.se/datastewardship
+
+#Prod
+#@baseUrl = https://sos-datastewardship.artdata.slu.se/datastewardship
+
+
+############################################################################
+#
+# Events requests
+#
+############################################################################
+
+# Get event by Id
+GET {{baseUrl}}/events/urn:lsid:swedishlifewatch.se:dataprovider:artportalen:event:10003985154952080918
+
+###
+
+# Search events. Filter by datasetIds
+POST {{baseUrl}}/events?skip=0&take=2
+Content-Type: application/json
+
+{
+    "datasetIds": [
+        "Artportalen - Fladdermöss"
+    ]
+}
+
+###
+
+# Search events. Filter by eventIds
+POST {{baseUrl}}/events?skip=0&take=2
+Content-Type: application/json
+
+{
+    "eventIds": [
+        "urn:lsid:swedishlifewatch.se:dataprovider:artportalen:event:10003985154952080918"
+    ]
+}
+
+###
+
+# Search events. Filter by date
+POST {{baseUrl}}/events?skip=0&take=2
+Content-Type: application/json
+
+{
+    "dateFilter": {
+        "startDate": "2021-06-16T20:00:00Z",
+        "endDate": "2021-06-17T03:00:00Z",
+        "datumFilterType": "OverlappingStartDateAndEndDate"
+    }
+}
+
+###
+
+# Search events. Filter by taxon ids
+POST {{baseUrl}}/events?skip=0&take=2
+Content-Type: application/json
+
+{
+    "taxon": {
+        "ids": [
+            205995
+        ]
+    }
+}
+
+###
+
+# Search events. Filter by county
+POST {{baseUrl}}/events?skip=0&take=2
+Content-Type: application/json
+
+{
+    "area": {
+        "county": "JönköpingsLän"
+    }
+}
+
+###
+
+# Search events. Filter by geometry
+POST {{baseUrl}}/events?skip=0&take=2
+Content-Type: application/json
+
+{
+    "area": {
+        "geometry": {
+            "geographicArea": {
+                "type": "polygon",
+                "coordinates": [
+                    [
+                        [16.07063,56.92573],
+                        [15.0051,58.16108],
+                        [14.58003,58.10148],
+                        [14.64143,57.93294],
+                        [16.07063,56.92573]
+                    ]
+                ]
+            }
+        }
+    }
+}
