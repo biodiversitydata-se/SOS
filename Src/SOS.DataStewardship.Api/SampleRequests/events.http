@@ -86,7 +86,7 @@ Content-Type: application/json
 
 ###
 
-# Search events. Filter by geometry
+# Search events. Filter by geometry polygon
 POST {{baseUrl}}/events?skip=0&take=2
 Content-Type: application/json
 
@@ -105,6 +105,24 @@ Content-Type: application/json
                     ]
                 ]
             }
+        }
+    }
+}
+
+###
+
+# Search occurrences. Filter by geometry circle
+POST {{baseUrl}}/occurrences?skip=0&take=2
+Content-Type: application/json
+
+{
+    "area": {
+        "geometry": {
+            "geographicArea": {
+                "type": "point",
+                "coordinates": [15.23648, 57.7594]
+            },
+            "maxDistanceFromGeometries": 500
         }
     }
 }
