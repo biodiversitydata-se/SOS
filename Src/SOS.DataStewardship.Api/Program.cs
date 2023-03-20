@@ -23,9 +23,8 @@ try
     builder.SetupSwagger();    
     var processedDbConfiguration = builder.SetupDependencies();
     builder.SetupHealthChecks(processedDbConfiguration);
-
+    //builder.Services.Configure<RouteHandlerOptions>(o => o.ThrowOnBadRequest = true); // uncomment to debug bad requests
     builder.Services.AddEndpointDefinitions(typeof(IEndpointDefinition));
-
     builder.SetupJsonSerialization();
 
     // This registration is needed to get Swagger enums to use strings instead of ints.

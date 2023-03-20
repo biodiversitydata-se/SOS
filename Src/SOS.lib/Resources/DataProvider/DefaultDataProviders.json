@@ -389,7 +389,7 @@
     "SupportDynamicEml": false,
     "HarvestFailPreventProcessing": false,
     "UseVerbatimFileInExport": false,
-    "CoordinateUncertaintyInMeters": 5000,
+    "CoordinateUncertaintyInMeters": 1200,
     "Type": "SharkObservations",
     "Names": [
       {
@@ -1191,7 +1191,7 @@
     "SupportDynamicEml": true,
     "HarvestFailPreventProcessing": false,
     "UseVerbatimFileInExport": false,
-    "CoordinateUncertaintyInMeters": 5000,
+    "CoordinateUncertaintyInMeters": 3500,
     "Type": "DwcA",
     "Names": [
       {
@@ -1260,7 +1260,7 @@
     "SupportDynamicEml": true,
     "HarvestFailPreventProcessing": false,
     "UseVerbatimFileInExport": false,
-    "CoordinateUncertaintyInMeters": 5000,
+    "CoordinateUncertaintyInMeters": 17700,
     "Type": "DwcA",
     "Names": [
       {
@@ -1329,7 +1329,7 @@
     "SupportDynamicEml": true,
     "HarvestFailPreventProcessing": false,
     "UseVerbatimFileInExport": false,
-    "CoordinateUncertaintyInMeters": 5000,
+    "CoordinateUncertaintyInMeters": 17700,
     "Type": "DwcA",
     "Names": [
       {
@@ -1398,7 +1398,7 @@
     "SupportDynamicEml": true,
     "HarvestFailPreventProcessing": false,
     "UseVerbatimFileInExport": false,
-    "CoordinateUncertaintyInMeters": 5000,
+    "CoordinateUncertaintyInMeters": 1400,
     "Type": "DwcA",
     "Names": [
       {

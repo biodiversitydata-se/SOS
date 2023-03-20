@@ -63,6 +63,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public AreasController AreasController { get; private set; }
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
         public IEventRepository EventRepository { get; set; }
+        public IInvalidObservationRepository InvalidObservationRepository { get; set; }
         public IProcessedObservationRepositoryTest ProcessedObservationRepositoryTest { get; set; }
         public IProcessedObservationRepository CustomProcessedObservationRepository { get; set; }
         public ObservationsController CustomObservationsController { get; private set; }
@@ -197,6 +198,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
             ProcessedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processedConfigurationCache, processClient, memoryCache);
             EventRepository = new EventRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<EventRepository>());
+            InvalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var processedTaxonRepository = CreateProcessedTaxonRepository(elasticConfiguration, elasticClientManager, processClient, taxonManager);
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);

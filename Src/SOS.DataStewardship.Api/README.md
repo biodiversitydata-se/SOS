@@ -6,7 +6,7 @@
 https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
 
 ### Testdata från Artportalen
-- Observationer och event skördas in i testmiljön från 2016-01-01 och framåt.
+- Observationer och event skördas in i testmiljön från 2017-01-01 och framåt.
 - `identifier` kan användas för att söka fram dataset. Dataset innehåller `eventId:n`. `Event` innehåller `occurrenceId:n`. De `project` (id:n) som specificeras nedan kan användas i Artportalen för att leta reda på observationer som också har skördats till Data Stewardship API.
 ```json
 [
@@ -17,6 +17,9 @@ https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
   {
     "identifier": "Artportalen - Fladdermöss",
     "project": [3606]
+  },
+  {
+    "identifier": "Nils Fjäll 2003-2020"    
   }
 ]
 ```
@@ -92,7 +95,6 @@ https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
 - Lägg till alla dataset som ska in i Artportalens databas
 - Bygg stöd för att skörda publika datavärdskapsdata från Lund
 - Bygg stöd för att skörda skyddade datavärdskapsdata från Lund
-- Testa att importera DwC-A från SLU Umeå - NILS
 - Verifiera Event precis som vi verifierar observationer? Då måste Dataset.EventIds enbart ta med godkända events.
 - Bygg stöd för propertyn `Event.Weather`.
 - Kolla upp: Mappas `Sex`, `LifeStage`, `Activity` korrekt?
