@@ -18,20 +18,15 @@ try
     builder.Services.AddMemoryCache();
     builder.SetupUserSecrets();
     builder.SetupAuthentication();
+  
     builder.SetupLogging();
     builder.SetupSwagger();    
     var processedDbConfiguration = builder.SetupDependencies();
     builder.SetupHealthChecks(processedDbConfiguration);
 
-    builder.Services.AddEndpointDefinitions(typeof(IEndpointDefinition));    
-    builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
-    {
-        options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-        options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        options.SerializerOptions.Converters.Add(new GeoShapeConverter());
-        options.SerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
-        options.SerializerOptions.PropertyNameCaseInsensitive = true;
-    });
+    builder.Services.AddEndpointDefinitions(typeof(IEndpointDefinition));
+
+    builder.SetupJsonSerialization();
 
     // This registration is needed to get Swagger enums to use strings instead of ints.
     builder.Services.Configure<JsonOptions>(options =>

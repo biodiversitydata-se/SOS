@@ -46,14 +46,14 @@ namespace SOS.Harvest.Services
 
        
         /// <inheritdoc />
-        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null, bool live = false)
+        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null!, bool live = false)
         {
-            using var conn = Connection(live);
-            conn.Open();
-            var transaction = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
-
             try
             {
+                using var conn = Connection(live);
+                conn.Open();
+                using var transaction = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
+
                 var result = (await conn.QueryAsync<T>(
                     new CommandDefinition(
                         query,
@@ -71,7 +71,6 @@ namespace SOS.Harvest.Services
             catch (Exception e)
             {
                 _logger.LogError(e, "Error when executing QueryAsync(...)");
-                transaction.Rollback();
                 throw;
             }
         }

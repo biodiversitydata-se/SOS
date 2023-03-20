@@ -534,7 +534,7 @@ namespace SOS.DataStewardship.Api.Extensions
             if (datasetFilter == null) return null;
 
             var filter = new SearchFilter(0);
-            filter.DataStewardshipDatasetIds = datasetFilter.DatasetIds;
+            filter.DataStewardshipDatasetIds = datasetFilter.DatasetIds ?? datasetFilter.DatasetList;
             filter.IsPartOfDataStewardshipDataset = true;
             if (datasetFilter.Taxon?.Ids != null && datasetFilter.Taxon.Ids.Any())
             {
@@ -554,6 +554,15 @@ namespace SOS.DataStewardship.Api.Extensions
                     DateFilterType = datasetFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
                 };
             }
+            else if (datasetFilter.Datum != null)
+            {
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
+                {
+                    StartDate = datasetFilter.Datum.StartDate,
+                    EndDate = datasetFilter.Datum.EndDate,
+                    DateFilterType = datasetFilter.Datum.DateFilterType.ToDateRangeFilterType()
+                };
+            }
 
             filter.Location = datasetFilter.Area?.ToLocationFilter();
 
@@ -565,7 +574,7 @@ namespace SOS.DataStewardship.Api.Extensions
             if (eventsFilter == null) return null;
 
             var filter = new SearchFilter(0);
-            filter.DataStewardshipDatasetIds = eventsFilter.DatasetIds;
+            filter.DataStewardshipDatasetIds = eventsFilter.DatasetIds ?? eventsFilter.DatasetList;
             filter.EventIds = eventsFilter.EventIds;
             filter.IsPartOfDataStewardshipDataset = true;
             if (eventsFilter.Taxon?.Ids?.Any() ?? false)
@@ -586,7 +595,16 @@ namespace SOS.DataStewardship.Api.Extensions
                     DateFilterType = eventsFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
                 };
             }
-
+            else if (eventsFilter.Datum != null)
+            {
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
+                {
+                    StartDate = eventsFilter.Datum.StartDate,
+                    EndDate = eventsFilter.Datum.EndDate,
+                    DateFilterType = eventsFilter.Datum.DateFilterType.ToDateRangeFilterType()
+                };
+            }
+           
             filter.Location = eventsFilter.Area?.ToLocationFilter();
 
             return filter;
@@ -598,7 +616,7 @@ namespace SOS.DataStewardship.Api.Extensions
 
             var filter = new SearchFilter(0);
             filter.EventIds = occurrenceFilter.EventIds;
-            filter.DataStewardshipDatasetIds = occurrenceFilter.DatasetIds;
+            filter.DataStewardshipDatasetIds = occurrenceFilter.DatasetIds ?? occurrenceFilter.DatasetList;
             filter.IsPartOfDataStewardshipDataset = true;
             if (occurrenceFilter.Taxon?.Ids != null && occurrenceFilter.Taxon.Ids.Any())
             {
@@ -618,7 +636,16 @@ namespace SOS.DataStewardship.Api.Extensions
                     DateFilterType = occurrenceFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
                 };                
             }
-            
+            else if (occurrenceFilter.Datum != null)
+            {
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
+                {
+                    StartDate = occurrenceFilter.Datum.StartDate,
+                    EndDate = occurrenceFilter.Datum.EndDate,
+                    DateFilterType = occurrenceFilter.Datum.DateFilterType.ToDateRangeFilterType()
+                };
+            }
+
             filter.Location = occurrenceFilter.Area?.ToLocationFilter();
 
             return filter;
@@ -666,7 +693,7 @@ namespace SOS.DataStewardship.Api.Extensions
                 });
             }
 
-            locationFilter.Geometries = geographicsFilter.Geometry?.ToGeographicsFilter();
+            locationFilter.Geometries = geographicsFilter.Geometry?.ToGeographicsFilter() ?? geographicsFilter.Area?.ToGeographicsFilter();
             locationFilter.Areas = areaFilter;
             return locationFilter;
         }

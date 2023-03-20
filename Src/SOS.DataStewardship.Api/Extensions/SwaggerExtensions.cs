@@ -1,4 +1,4 @@
-﻿using SOS.DataStewardship.Api.Application.Helpers;
+﻿using SOS.Lib.Swagger;
 
 namespace SOS.DataStewardship.Api.Extensions;
 
@@ -42,9 +42,12 @@ public static class SwaggerExtensions
                 options.EnableAnnotations();
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+                options.SchemaFilter<SwaggerIgnoreFilter>();
             });
 
         webApplicationBuilder.Services.AddEndpointsApiExplorer();
+
         return webApplicationBuilder;
     }
 }
