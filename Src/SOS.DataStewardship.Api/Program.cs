@@ -22,7 +22,7 @@ try
     builder.SetupSwagger();    
     var processedDbConfiguration = builder.SetupDependencies();
     builder.SetupHealthChecks(processedDbConfiguration);
-
+    //builder.Services.Configure<RouteHandlerOptions>(o => o.ThrowOnBadRequest = true); // uncomment to debug bad requests
     builder.Services.AddEndpointDefinitions(typeof(IEndpointDefinition));    
     builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
     {
@@ -30,7 +30,7 @@ try
         options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         options.SerializerOptions.Converters.Add(new GeoShapeConverter());
         options.SerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
-        options.SerializerOptions.PropertyNameCaseInsensitive = true;
+        options.SerializerOptions.PropertyNameCaseInsensitive = true;        
     });
 
     // This registration is needed to get Swagger enums to use strings instead of ints.
