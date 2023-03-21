@@ -1466,7 +1466,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
-            int size = Math.Min(skip + take, 100000);
+            int size = Math.Max(1, Math.Min(65536, skip + take));
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -1478,24 +1478,13 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Aggregations(a => a
                     .Terms("termAggregation", t => t                        
-                        .Size(65536)
-                        .Field(aggregationField)
-                        .Aggregations(aa => aa
-                            .Max("sort_agg", mi => mi
-                                .Field(numericSortField)
-                            )
-                            .BucketSort("bucketsort", bs => bs
-                                .Sort(s => s
-                                    .Descending("sort_agg")
-                                )
-                                .From(skip)
-                                .Size(Math.Max(take, 1))
-                            )
-                        )
+                        .Size(size)
+                        .Field(aggregationField)                        
+                        .Order(o => o.KeyAscending())
                     )
                     .Cardinality("cardinalityAggregation", t => t
                         .Field(aggregationField)
-                        .PrecisionThreshold(40000)
+                        .PrecisionThreshold(40000)                        
                     )
                 )                
                 .Size(0)
@@ -1507,7 +1496,8 @@ namespace SOS.Lib.Repositories.Processed
             IEnumerable<AggregationItem> records = searchResponse.Aggregations
                 .Terms("termAggregation")
                 .Buckets
-                .Select(b => new AggregationItem { AggregationKey = b.Key, DocCount = (int)(b.DocCount ?? 0) })                
+                .Select(b => new AggregationItem { AggregationKey = b.Key, DocCount = (int)(b.DocCount ?? 0) })
+                .Skip(skip)
                 .Take(take);
             var totalCount = Convert.ToInt32(searchResponse.Aggregations.Cardinality("cardinalityAggregation").Value);
             var result = new PagedResult<AggregationItem>()
