@@ -43,7 +43,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <returns></returns>
         private static Area CastToArea(GeographicalArea area)
         {
-            if (area == null)
+            if (string.IsNullOrEmpty(area?.FeatureId))
             {
                 return null!;
             }

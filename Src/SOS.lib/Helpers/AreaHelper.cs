@@ -58,14 +58,14 @@ namespace SOS.Lib.Helpers
                 return;
             }
 
-            var positionLocation = GetPositionLocation(processedLocation.DecimalLongitude.Value,
+            var positionLocations = GetPositionLocations(processedLocation.DecimalLongitude.Value,
                 processedLocation.DecimalLatitude.Value);
-            processedLocation.CountryRegion = positionLocation?.CountryRegion;
-            processedLocation.County = positionLocation?.County;
-            processedLocation.Municipality = positionLocation?.Municipality;
-            processedLocation.Parish = positionLocation?.Parish;
-            processedLocation.Province = positionLocation?.Province;
-            processedLocation.IsInEconomicZoneOfSweden = positionLocation?.EconomicZoneOfSweden ?? false;
+            processedLocation.CountryRegion = positionLocations?.CountryRegion;
+            processedLocation.County = positionLocations?.County;
+            processedLocation.Municipality = positionLocations?.Municipality;
+            processedLocation.Parish = positionLocations?.Parish;
+            processedLocation.Province = positionLocations?.Province;
+            processedLocation.IsInEconomicZoneOfSweden = positionLocations?.EconomicZoneOfSweden ?? false;
 
             processedLocation.Attributes.ProvincePartIdByCoordinate =
                 GetProvincePartIdByCoordinate(processedLocation.Province?.FeatureId);
@@ -197,7 +197,7 @@ namespace SOS.Lib.Helpers
             return featuresContainingPoint;
         }
 
-        private PositionLocation GetPositionLocation(double decimalLongitude, double decimalLatitude)
+        private PositionLocation GetPositionLocations(double decimalLongitude, double decimalLatitude)
         {
             // Round coordinates to 5 decimals (roughly 1m)
             var key = $"{Math.Round(decimalLongitude, 5)}-{Math.Round(decimalLatitude, 5)}";
@@ -207,7 +207,6 @@ namespace SOS.Lib.Helpers
             {
                 lock (_lockObject)
                 {
-                    if (_featureCache.TryGetValue(key, out var calculatedPositionLocation)) return calculatedPositionLocation;
                     var features = GetPointFeatures(decimalLongitude, decimalLatitude);
                     positionLocation = new PositionLocation();
 
@@ -218,9 +217,10 @@ namespace SOS.Lib.Helpers
                             if (Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
                                 out var areaType))
                             {
-                                var area = new Area
+                                var featureId = feature.Attributes.GetOptionalValue("featureId")?.ToString();
+                                var area = string.IsNullOrEmpty(featureId) ? null! : new Area
                                 {
-                                    FeatureId = feature.Attributes.GetOptionalValue("featureId")?.ToString(),
+                                    FeatureId = featureId,
                                     Name = feature.Attributes.GetOptionalValue("name")?.ToString()
                                 };
                                 switch ((AreaType)areaType)
