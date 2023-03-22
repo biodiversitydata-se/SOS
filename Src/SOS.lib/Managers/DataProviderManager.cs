@@ -82,6 +82,34 @@ namespace SOS.Lib.Managers
             return Result.Success(returnDescription);
         }
 
+        public async Task<Result<string>> InitDefaultDataProvider(string dataProviderIdOrIdentifier)
+        {
+            if (string.IsNullOrWhiteSpace(dataProviderIdOrIdentifier)) return Result.Failure<string>("dataProviderIdOrIdentifier is empty");
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var filePath = Path.Combine(assemblyPath, @"Resources\DataProvider\DefaultDataProviders.json");
+            var dataProviders =
+                JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
+
+            DataProvider dataProvider = null;
+            if (int.TryParse(dataProviderIdOrIdentifier, out var providerId))
+            {
+                dataProvider = dataProviders.FirstOrDefault(m => m.Id == providerId);
+            }
+            else
+            {
+                dataProvider = dataProviders.FirstOrDefault(m => m.Identifier == dataProviderIdOrIdentifier);
+            }
+
+            if (dataProvider == null) return Result.Failure<string>($"DataProvider information doesn't exist for {dataProviderIdOrIdentifier}");
+            var existingProvider = await _dataProviderRepository.GetAsync(dataProvider.Id);
+            if (existingProvider != null)
+            {
+                await _dataProviderRepository.DeleteAsync(dataProvider.Id);
+            }
+            
+            return Result.Success($"DataProvider {dataProvider.Identifier} was added");
+        }
+
         /// <inheritdoc />
         public async Task<Result<string>> InitDefaultEml(IEnumerable<int> datproviderIds)
         {
