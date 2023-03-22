@@ -106,7 +106,8 @@ namespace SOS.Lib.Managers
             {
                 await _dataProviderRepository.DeleteAsync(dataProvider.Id);
             }
-            
+            await _dataProviderRepository.AddAsync(dataProvider);
+
             return Result.Success($"DataProvider {dataProvider.Identifier} was added");
         }
 
