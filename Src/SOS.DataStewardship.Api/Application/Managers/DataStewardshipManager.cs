@@ -283,14 +283,11 @@ public class DataStewardshipManager : IDataStewardshipManager
     public async Task<Contracts.Models.PagedResult<EventModel>> GetEventsBySearchAsync(EventsFilter eventsFilter, 
         int skip, 
         int take, 
-        CoordinateSystem responseCoordinateSystem,
-        bool sortByDate = false)
-    {        
-        //  var resFromObs = await GetEventsBySearchFromObservationIndexAsync(eventsFilter, skip, take);
-        if (!sortByDate)
-            return await GetEventsBySearchFromEventIndexAsync(eventsFilter, skip, take, responseCoordinateSystem);
-        else
-            return await GetEventsBySearchFromEventIndexSortByDateAsync(eventsFilter, skip, take, responseCoordinateSystem);
+        CoordinateSystem responseCoordinateSystem)
+    {
+        return await GetEventsBySearchFromEventIndexSortByDateAsync(eventsFilter, skip, take, responseCoordinateSystem);
+        // return await GetEventsBySearchFromEventIndexAsync(eventsFilter, skip, take, responseCoordinateSystem);
+        // return await GetEventsBySearchFromObservationIndexAsync(eventsFilter, skip, take);
     }
 
     public async Task<OccurrenceModel> GetOccurrenceByIdAsync(string id, CoordinateSystem responseCoordinateSystem)
