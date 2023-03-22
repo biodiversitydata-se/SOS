@@ -12,10 +12,9 @@ public class GetOccurrenceByIdEndpoint : IEndpointDefinition
     {
         app.MapGet("/datastewardship/occurrences/{id}", GetOccurrenceByIdAsync)
             .Produces<OccurrenceModel>(StatusCodes.Status200OK, "application/json")
-            .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status400BadRequest)
-            //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError);
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
+            .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
     }
     
     [SwaggerOperation(
@@ -28,7 +27,16 @@ public class GetOccurrenceByIdEndpoint : IEndpointDefinition
         [FromQuery, SwaggerParameter("The response coordinate system")] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
         var occurrenceModel = await dataStewardshipManager.GetOccurrenceByIdAsync(id, responseCoordinateSystem);
-        if (occurrenceModel == null) return Results.NotFound();
+        if (occurrenceModel == null) return NotFoundResult(id);
         return exportMode.Equals(ExportMode.Csv) ? Results.File(occurrenceModel.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(occurrenceModel);
+    }
+
+    private IResult NotFoundResult(string id)
+    {
+        return Results.Problem(
+            type: "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.4",
+            title: "Resource not found",
+            detail: $"Occurrence with occurrenceId={id} was not found.",
+            statusCode: StatusCodes.Status404NotFound);
     }
 }

@@ -14,9 +14,8 @@ public class GetEventsBySearchEndpoint : IEndpointDefinition
     {
         app.MapPost("/datastewardship/events", GetEventsBySearchAsync)
             .Produces<Contracts.Models.PagedResult<EventModel>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest)
-            //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError)
+            .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
             .AddEndpointFilter<ValidatorFilter<EventsFilter>>()
             .AddEndpointFilter(ValidatePagingParametersAsync);        
     }

@@ -4,7 +4,6 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using SOS.DataStewardship.Api.Endpoints;
 using SOS.DataStewardship.Api.Extensions;
-using SOS.Lib.JsonConverters;
 using System.Text.Json.Serialization;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -13,7 +12,7 @@ var logger = NLogBuilder.ConfigureNLog($"nlog.{env}.config").GetCurrentClassLogg
 logger.Info("Starting application...");
 
 try
-{
+{    
     var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddMemoryCache();
     builder.SetupUserSecrets();
@@ -38,8 +37,8 @@ try
 #if DEBUG
     builder.Services.Configure<TelemetryConfiguration>(x => x.DisableTelemetry = true);
 #endif
-    var app = builder.Build();    
-
+    var app = builder.Build();
+    
     app.ConfigureExceptionHandler(logger, isDevelopment);
     app.UseEndpointDefinitions();    
     app.UseHealthChecks("/health", new HealthCheckOptions()

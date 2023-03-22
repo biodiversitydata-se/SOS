@@ -17,15 +17,15 @@ public class ValidatorFilter<T> : IEndpointFilter where T : class
             .FirstOrDefault(v => v.GetType() == typeof(T)) as T;        
 
         if (validatable is null)
-        {
-            return Results.BadRequest();
+        {            
+            return Results.ValidationProblem(new Dictionary<string, string[]>());
         }
 
         var validationResult = await _validator.ValidateAsync(validatable);
 
         if (!validationResult.IsValid)
-        {
-            return Results.BadRequest(validationResult.Errors);
+        {            
+            return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
         return await next(context);

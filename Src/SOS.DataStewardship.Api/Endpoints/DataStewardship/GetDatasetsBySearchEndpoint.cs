@@ -13,9 +13,8 @@ public class GetDatasetsBySearchEndpoint : IEndpointDefinition
     {
         app.MapPost("/datastewardship/datasets", GetDatasetsBySearchAsync)            
             .Produces<Contracts.Models.PagedResult<Dataset>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest)
-            //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError)
+            .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)            
+            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
             .AddEndpointFilter<ValidatorFilter<DatasetFilter>>()
             .AddEndpointFilter<ValidatorFilter<PagingParameters>>();
     }
@@ -28,7 +27,7 @@ public class GetDatasetsBySearchEndpoint : IEndpointDefinition
         [FromBody, SwaggerRequestBody("The search filter")] DatasetFilter filter,
         [AsParameters] PagingParameters pagingParameters,        
         [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json)
-    {        
+    {                
         var datasets = await dataStewardshipManager
             .GetDatasetsBySearchAsync(filter, pagingParameters.Skip.GetValueOrDefault(0), pagingParameters.Take.GetValueOrDefault(20));            
         

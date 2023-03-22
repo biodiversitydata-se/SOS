@@ -16,14 +16,18 @@ internal static class ExceptionMiddlewareExtension
                     context.Response.ContentType = "application/json";
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     errorAsString = exception.Message;
+                    logger.Error(exception, errorAsString);
                 }
                 else
                 {
                     errorAsString = "An error occurred";
                 }
-
-                logger.Error(errorAsString);
-                await context.Response.WriteAsync(isDevelopment ? errorAsString : string.Empty);
+                                                
+                await Results.Problem(
+                    title: "An error occurred while processing your request.",
+                    detail: isDevelopment ? errorAsString : string.Empty,
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+                    statusCode: 500).ExecuteAsync(context);
             });
         });
     }

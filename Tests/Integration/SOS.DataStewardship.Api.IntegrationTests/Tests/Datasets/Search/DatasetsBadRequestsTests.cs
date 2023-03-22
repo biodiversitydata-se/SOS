@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.DataStewardship.Api.Contracts.Models;
 
@@ -18,7 +19,7 @@ public class DatasetsBadRequestsTests : TestBase
         {
             DateFilter = new DateFilter
             {
-                StartDate = DateTime.Now,
+                StartDate = DateTime.Now,                
                 EndDate = DateTime.Now - TimeSpan.FromDays(1),
                 DateFilterType = DateFilterType.OverlappingStartDateAndEndDate
             }
@@ -27,10 +28,11 @@ public class DatasetsBadRequestsTests : TestBase
         // Act
         var response = await ApiClient.PostAsJsonAsync<DatasetFilter>(
             $"datastewardship/datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
-        //var errors = await response.Content.ReadFromJsonAsync<List<ValidationFailure>>(jsonSerializerOptions);
-        //var str = await response.Content.ReadAsStringAsync();
+        var errors = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>(jsonSerializerOptions);        
 
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        errors.Status.Should().Be(400);
+        errors.Title.Should().NotBeEmpty();
     }
 }
