@@ -30,10 +30,11 @@ public class GetEventsBySearchEndpoint : IEndpointDefinition
         [FromQuery, SwaggerParameter("Pagination start index.")] int? skip,
         [FromQuery, SwaggerParameter("Number of items to return. 1000 items is the max to return in one call.")] int? take,
         [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json,
-        [FromQuery, SwaggerParameter("The response coordinate system")] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
+        [FromQuery, SwaggerParameter("The response coordinate system")] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326,
+        [FromQuery, SwaggerParameter("Temporarily added to try another aggregation (and pagination) strategy for Events")] bool sortByDate = false)
     {                
         var eventModels = await dataStewardshipManager
-            .GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20), responseCoordinateSystem);
+            .GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20), responseCoordinateSystem, sortByDate);
 
         return exportMode.Equals(ExportMode.Csv) ? 
             Results.File(eventModels.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : 
