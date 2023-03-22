@@ -12,6 +12,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Search.Filters;
 //using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
@@ -96,10 +97,11 @@ namespace SOS.Lib.Repositories.Processed
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create Dataset index. Error: {createIndexResponse.DebugInformation}");
         }
 
-        public async Task<List<Dataset>> GetDatasetsByIds(IEnumerable<string> ids)
+        public async Task<List<Dataset>> GetDatasetsByIds(IEnumerable<string> ids, IEnumerable<SortOrderFilter> sortOrders = null)
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
 
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Dataset>(IndexName, sortOrders);
             var query = new List<Func<QueryContainerDescriptor<Dataset>, QueryContainer>>();
             query.TryAddTermsCriteria("identifier", ids);
             var searchResponse = await Client.SearchAsync<Dataset>(s => s
@@ -109,7 +111,8 @@ namespace SOS.Lib.Repositories.Processed
                         .Filter(query)
                     )
                 )
-                .Size(ids?.Count() ?? 0)                
+                .Size(ids?.Count() ?? 0)
+                .Sort(sort => sortDescriptor)
                 .TrackTotalHits(false)
             );
 

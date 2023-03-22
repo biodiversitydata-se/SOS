@@ -1442,7 +1442,7 @@ namespace SOS.Lib.Repositories.Processed
                     .Terms("termAggregation", t => t
                         .Size(65536)
                         .Field(aggregationField)
-                    )
+                    )                    
                 )
                 .Size(0)
                 .Source(s => s.ExcludeAll())

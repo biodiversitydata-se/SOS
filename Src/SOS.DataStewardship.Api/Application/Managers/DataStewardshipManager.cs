@@ -160,7 +160,12 @@ public class DataStewardshipManager : IDataStewardshipManager
         var records = Enumerable.Empty<EventModel>();
         if (eventIdPageResult.Records.Any())
         {
-            var observationEvents = await _observationEventRepository.GetEventsByIds(eventIdPageResult.Records.Select(m => m.AggregationKey));
+            var sortOrders = new List<SortOrderFilter>
+            {
+                new SortOrderFilter { SortBy = "eventId", SortOrder = SearchSortOrder.Asc }
+            };
+
+            var observationEvents = await _observationEventRepository.GetEventsByIds(eventIdPageResult.Records.Select(m => m.AggregationKey), sortOrders);
             var events = observationEvents.Select(m => m.ToEventModel(responseCoordinateSystem)).ToList();
             records = events;
         }        
@@ -241,9 +246,10 @@ public class DataStewardshipManager : IDataStewardshipManager
     public async Task<Contracts.Models.PagedResult<Dataset>> GetDatasetsBySearchAsync(DatasetFilter datasetFilter, int skip, int take)
     {
         var filter = datasetFilter.ToSearchFilter();
-        await _filterManager.PrepareFilterAsync(null, null, filter);
-        var datasetIdAggregationItems = await _processedObservationCoreRepository.GetAllAggregationItemsAsync(filter, "dataStewardshipDatasetId");
-        var datasetIdItems = datasetIdAggregationItems
+        await _filterManager.PrepareFilterAsync(null, null, filter);        
+        var datasetIdAggregationItems = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "dataStewardshipDatasetId");
+
+        var datasetIdItems = datasetIdAggregationItems            
             .Skip(skip)
             .Take(take);
 
@@ -252,7 +258,12 @@ public class DataStewardshipManager : IDataStewardshipManager
         var records = Enumerable.Empty<Dataset>();
         if (datasetIdItems.Any())
         {
-            var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(datasetIdItems.Select(m => m.AggregationKey));
+            var sortOrders = new List<SortOrderFilter>
+            {
+                new SortOrderFilter { SortBy = "identifier", SortOrder = SearchSortOrder.Asc }                
+            };
+
+            var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(datasetIdItems.Select(m => m.AggregationKey), sortOrders);            
             records = observationDatasets.Select(m => m.ToDataset()).ToList();
         }
 
@@ -267,9 +278,7 @@ public class DataStewardshipManager : IDataStewardshipManager
     }
 
     public async Task<EventModel> GetEventByIdAsync(string id, CoordinateSystem responseCoordinateSystem)
-    {
-        // todo - decide if the observation or event index should be used.
-        //var evnt = await GetEventByIdFromObservationIndexAsync(id);
+    {        
         var evnt = await GetEventByIdFromEventIndexAsync(id, responseCoordinateSystem);
 
         if (evnt == null)
@@ -285,8 +294,8 @@ public class DataStewardshipManager : IDataStewardshipManager
         int take, 
         CoordinateSystem responseCoordinateSystem)
     {
-        return await GetEventsBySearchFromEventIndexSortByDateAsync(eventsFilter, skip, take, responseCoordinateSystem);
-        // return await GetEventsBySearchFromEventIndexAsync(eventsFilter, skip, take, responseCoordinateSystem);
+        //return await GetEventsBySearchFromEventIndexSortByDateAsync(eventsFilter, skip, take, responseCoordinateSystem);
+         return await GetEventsBySearchFromEventIndexAsync(eventsFilter, skip, take, responseCoordinateSystem);
         // return await GetEventsBySearchFromObservationIndexAsync(eventsFilter, skip, take);
     }
 

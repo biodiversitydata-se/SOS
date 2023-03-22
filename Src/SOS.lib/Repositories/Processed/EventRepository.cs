@@ -142,10 +142,11 @@ namespace SOS.Lib.Repositories.Processed
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationEvent index. Error: {createIndexResponse.DebugInformation}");
         }
 
-        public async Task<List<Event>> GetEventsByIds(IEnumerable<string> ids)
+        public async Task<List<Event>> GetEventsByIds(IEnumerable<string> ids, IEnumerable<SortOrderFilter> sortOrders = null)
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
 
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(IndexName, sortOrders);
             var query = new List<Func<QueryContainerDescriptor<Event>, QueryContainer>>();
             query.TryAddTermsCriteria("eventId", ids);
             var searchResponse = await Client.SearchAsync<Event>(s => s
@@ -156,6 +157,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .Size(ids?.Count() ?? 0)
+                .Sort(sort => sortDescriptor)
                 .TrackTotalHits(false)
             );
 

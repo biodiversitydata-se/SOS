@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
@@ -49,7 +50,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync();
 
-        Task<List<Dataset>> GetDatasetsByIds(IEnumerable<string> ids);
+        Task<List<Dataset>> GetDatasetsByIds(IEnumerable<string> ids, IEnumerable<SortOrderFilter> sortOrders = null);
 
         Task<bool> DeleteAllDocumentsAsync();
     }
