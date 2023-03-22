@@ -154,7 +154,11 @@ public class DataStewardshipManager : IDataStewardshipManager
     {        
         var filter = eventsFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);
-        var eventIdPageResult = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "event.eventId", "event.startDate", skip, take);
+        var eventIdPageResult = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, 
+            "event.eventId", 
+            skip, 
+            take,
+            Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);
         int count = eventIdPageResult.Records.Count();
         int totalCount = Convert.ToInt32(eventIdPageResult.TotalCount);
         var records = Enumerable.Empty<EventModel>();
@@ -247,23 +251,22 @@ public class DataStewardshipManager : IDataStewardshipManager
     {
         var filter = datasetFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);        
-        var datasetIdAggregationItems = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "dataStewardshipDatasetId");
-
-        var datasetIdItems = datasetIdAggregationItems            
-            .Skip(skip)
-            .Take(take);
-
-        int count = datasetIdItems.Count();
-        int totalCount = datasetIdAggregationItems.Count();
+        var aggregationResult = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, 
+            "dataStewardshipDatasetId",
+            skip,
+            take,            
+            Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);        
+        int count = aggregationResult.Records.Count();
+        int totalCount = Convert.ToInt32(aggregationResult.TotalCount);
         var records = Enumerable.Empty<Dataset>();
-        if (datasetIdItems.Any())
+        if (aggregationResult.Records.Any())
         {
             var sortOrders = new List<SortOrderFilter>
             {
                 new SortOrderFilter { SortBy = "identifier", SortOrder = SearchSortOrder.Asc }                
             };
 
-            var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(datasetIdItems.Select(m => m.AggregationKey), sortOrders);            
+            var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(aggregationResult.Records.Select(m => m.AggregationKey), sortOrders);
             records = observationDatasets.Select(m => m.ToDataset()).ToList();
         }
 

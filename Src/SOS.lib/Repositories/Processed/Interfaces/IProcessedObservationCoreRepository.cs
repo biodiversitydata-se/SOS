@@ -7,6 +7,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
@@ -267,12 +268,21 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync(bool protectedIndex);
         
-        Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, string aggregationField);
-        Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
+        Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
+            string aggregationField, 
+            int size = 65536, 
+            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
+
+        Task<AggregationResult<AggregationItem>> GetAggregationItemsIncludeTotalCountAsync(SearchFilter filter,
             string aggregationField,
-            string numericSortField,
+            int size = 65536,
+            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
+
+        Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
+            string aggregationField,            
             int skip,
-            int take);
+            int take,
+            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
 
         /// <summary>
         /// Aggregate by a field and return the number of documents for each value.

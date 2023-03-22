@@ -9,7 +9,6 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using Nest;
-using Org.BouncyCastle.Math.EC.Multiplier;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -22,6 +21,7 @@ using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
@@ -1425,10 +1425,15 @@ namespace SOS.Lib.Repositories.Processed
             return !response.Exists;
         }        
 
-        public async Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, string aggregationField)
+        public async Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
+            string aggregationField, 
+            int size = 65536, 
+            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
+            var termsOrder = sortOrder.GetTermsOrder<dynamic>();
+            size = Math.Max(1, size);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -1440,9 +1445,14 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Aggregations(a => a
                     .Terms("termAggregation", t => t
-                        .Size(65536)
+                        .Size(size)
                         .Field(aggregationField)
-                    )                    
+                        .Order(termsOrder)
+                    )
+                    .Cardinality("cardinalityAggregation", t => t
+                        .Field(aggregationField)
+                        .PrecisionThreshold(40000)
+                    )
                 )
                 .Size(0)
                 .Source(s => s.ExcludeAll())
@@ -1457,16 +1467,65 @@ namespace SOS.Lib.Repositories.Processed
 
             return result;
         }
-        
-        public async Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
+
+        public async Task<AggregationResult<AggregationItem>> GetAggregationItemsIncludeTotalCountAsync(SearchFilter filter,
             string aggregationField,
-            string numericSortField,
+            int size = 65536,
+            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            var termsOrder = sortOrder.GetTermsOrder<dynamic>();
+            size = Math.Max(1, size);
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Terms("termAggregation", t => t
+                        .Size(size)
+                        .Field(aggregationField)
+                        .Order(termsOrder)
+                    )
+                    .Cardinality("cardinalityAggregation", t => t
+                        .Field(aggregationField)
+                        .PrecisionThreshold(40000)
+                    )
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+
+            searchResponse.ThrowIfInvalid();
+            IEnumerable<AggregationItem> records = searchResponse.Aggregations
+                .Terms("termAggregation")
+                .Buckets
+                .Select(b => new AggregationItem { AggregationKey = b.Key, DocCount = (int)(b.DocCount ?? 0) });
+
+            return new AggregationResult<AggregationItem>
+            {
+                TotalCount = Convert.ToInt32(searchResponse.Aggregations.Cardinality("cardinalityAggregation").Value),
+                Records = records
+            };
+        }
+
+
+        public async Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
+            string aggregationField,            
             int skip, 
-            int take)
+            int take,
+            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             int size = Math.Max(1, Math.Min(65536, skip + take));
+            var termsOrder = sortOrder.GetTermsOrder<dynamic>();
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -1479,8 +1538,8 @@ namespace SOS.Lib.Repositories.Processed
                 .Aggregations(a => a
                     .Terms("termAggregation", t => t                        
                         .Size(size)
-                        .Field(aggregationField)                        
-                        .Order(o => o.KeyAscending())
+                        .Field(aggregationField)
+                        .Order(termsOrder)                        
                     )
                     .Cardinality("cardinalityAggregation", t => t
                         .Field(aggregationField)
