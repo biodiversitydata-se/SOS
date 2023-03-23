@@ -892,5 +892,25 @@ namespace SOS.Lib
 
             return p => projection;
         }
+
+        /// <summary>
+        /// Build a projection string
+        /// </summary>        
+        public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> includes, IEnumerable<string> excludes = null)
+        {
+            var projection = new SourceFilterDescriptor<dynamic>();
+
+            if (includes?.Any() ?? false)
+            {
+                projection.Includes(i => i.Fields(includes.Select(p => p.ToField())));
+            }
+
+            if (excludes?.Any() ?? false)
+            {
+                projection.Excludes(i => i.Fields(excludes.Select(p => p.ToField())));
+            }
+
+            return p => projection;
+        }
     }
 }

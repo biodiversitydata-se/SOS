@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using SOS.DataStewardship.Api.Contracts.Models;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.Occurrences;
@@ -18,10 +19,13 @@ public class OccurrencesNotFoundTests : TestBase
         await ProcessFixture.AddObservationsToElasticsearchAsync(occurrences);
 
         // Act
-        var result = await ApiClient.GetAsync($"datastewardship/occurrences/{occurrenceId}");
+        var response = await ApiClient.GetAsync($"datastewardship/occurrences/{occurrenceId}");
+        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions);
 
         // Assert
-        result.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        problemDetails.Status.Should().Be((int)System.Net.HttpStatusCode.NotFound);
+        problemDetails.Detail.Should().Be($"Occurrence with occurrenceId={occurrenceId} was not found.");
     }
 
     [Fact]

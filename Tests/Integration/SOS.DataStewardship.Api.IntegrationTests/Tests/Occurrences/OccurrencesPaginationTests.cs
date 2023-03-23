@@ -18,8 +18,9 @@ public class OccurrencesPaginationTests : TestBase
         var searchFilter = new OccurrenceFilter();
         int take = 2;
         var occurrenceModels = new List<OccurrenceModel>();
+        var allOccurrenceModels = new List<OccurrenceModel>();
 
-        // Act
+        // Act - Get all by pagination
         for (int skip = 0; skip < observations.Count(); skip += take)
         {
             var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
@@ -27,10 +28,17 @@ public class OccurrencesPaginationTests : TestBase
             occurrenceModels.AddRange(pageResult.Records);
         }
 
+        // Act - Get all in one request
+        var pageResultAll = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+                $"datastewardship/occurrences?skip=0&take={observations.Count()}", searchFilter, jsonSerializerOptions);
+        allOccurrenceModels.AddRange(pageResultAll.Records);
+
         // Assert
         var occurrenceIds = observations.Select(m => m.Occurrence.OccurrenceId);
         var uniqueOccurrenceIds = occurrenceModels.Select(m => m.OccurrenceID).Distinct();
         uniqueOccurrenceIds.Should().BeEquivalentTo(occurrenceIds);
+        occurrenceModels.Select(m => m.OccurrenceID).Should()
+            .Equal(allOccurrenceModels.Select(m => m.OccurrenceID), "the order should be the same");
     }
 
 

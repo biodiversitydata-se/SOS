@@ -141,7 +141,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // Exclude sensitive species.
                 var publicObservations = processedObservations
                     .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
-                await _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(publicObservations, filePathByFilePart, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters);
+                await _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters);
                 return true;
             }
             catch (Exception e)

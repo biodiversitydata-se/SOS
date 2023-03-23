@@ -17,20 +17,28 @@ public class EventsPaginationTests : TestBase
         await ProcessFixture.AddDataToElasticsearchAsync(testDataSet.Events, testDataSet.Observations);
         var searchFilter = new EventsFilter();
         var eventModels = new List<EventModel>();
+        var allEventModels = new List<EventModel>();
         int take = 2;
 
-        // Act
+        // Act - Get all by pagination
         for (int skip = 0; skip < testDataSet.Events.Count(); skip += take)
         {
             var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
                 $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
             eventModels.AddRange(pageResult.Records);
         }
+        
+        // Act - Get all in one request
+        var pageResultAll = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+                $"datastewardship/events?skip=0&take={testDataSet.Events.Count()}", searchFilter, jsonSerializerOptions);
+        allEventModels.AddRange(pageResultAll.Records);
 
         // Assert
         var eventIds = testDataSet.Events.Select(m => m.EventId);
         var uniqueEventIds = eventModels.Select(m => m.EventID).Distinct();
         uniqueEventIds.Should().BeEquivalentTo(eventIds);
+        eventModels.Select(m => m.EventID).Should()
+            .Equal(allEventModels.Select(m => m.EventID), "the order should be the same");
     }
 
 

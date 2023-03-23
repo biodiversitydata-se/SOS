@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using SOS.DataStewardship.Api.Contracts.Models;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.Events;
@@ -18,10 +20,13 @@ public class EventsNotFoundTests : TestBase
         await ProcessFixture.AddEventsToElasticsearchAsync(events);
 
         // Act
-        var result = await ApiClient.GetAsync($"datastewardship/events/{eventId}");
-
+        var response = await ApiClient.GetAsync($"datastewardship/events/{eventId}");
+        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions);
+        
         // Assert
-        result.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        problemDetails.Status.Should().Be((int)System.Net.HttpStatusCode.NotFound);
+        problemDetails.Detail.Should().Be($"Event with eventId={eventId} was not found.");
     }
 
     [Fact]

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
@@ -8,6 +10,7 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
@@ -26,6 +29,8 @@ namespace SOS.Lib.Repositories.Processed
     public class EventRepository : ProcessRepositoryBase<Event, string>,
         IEventRepository
     {
+        private const int ElasticSearchMaxRecords = 10000;
+
         /// <summary>
         /// Add the collection
         /// </summary>
@@ -137,10 +142,11 @@ namespace SOS.Lib.Repositories.Processed
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationEvent index. Error: {createIndexResponse.DebugInformation}");
         }
 
-        public async Task<List<Event>> GetEventsByIds(IEnumerable<string> ids)
+        public async Task<List<Event>> GetEventsByIds(IEnumerable<string> ids, IEnumerable<SortOrderFilter> sortOrders = null)
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
 
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(IndexName, sortOrders);
             var query = new List<Func<QueryContainerDescriptor<Event>, QueryContainer>>();
             query.TryAddTermsCriteria("eventId", ids);
             var searchResponse = await Client.SearchAsync<Event>(s => s
@@ -151,6 +157,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .Size(ids?.Count() ?? 0)
+                .Sort(sort => sortDescriptor)
                 .TrackTotalHits(false)
             );
 
@@ -441,6 +448,56 @@ namespace SOS.Lib.Repositories.Processed
 
             return searchResponse;
         }
+                
+        public async Task<PagedResult<dynamic>> GetChunkAsync(EventSearchFilter filter, int skip, int take, bool getAllFields = false)
+        {
+            string indexName = IndexName;            
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(indexName, filter.SortOrders);
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Source(getAllFields ? p => new SourceFilterDescriptor<dynamic>() : filter.OutputIncludeFields.ToProjection(filter.OutputExcludeFields))
+                .From(skip)
+                .Size(take)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Sort(sort => sortDescriptor)
+            );
+
+            searchResponse.ThrowIfInvalid();
+            var totalCount = searchResponse.HitsMetadata.Total.Value;
+            var includeRealCount = totalCount >= ElasticSearchMaxRecords;            
+
+            if (includeRealCount)
+            {
+                var countResponse = await Client.CountAsync<dynamic>(s => s
+                    .Index(indexName)
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    )
+                );
+                countResponse.ThrowIfInvalid();
+                totalCount = countResponse.Count;
+            }
+
+            var records = CastDynamicsToEvents(searchResponse.Documents);
+
+            return new PagedResult<dynamic>
+            {
+                Records = searchResponse.Documents,                
+                Skip = skip,
+                Take = take,
+                TotalCount = totalCount
+            };
+        }        
 
         protected (ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>)
             GetCoreQueries(EventSearchFilter filter)
@@ -451,5 +508,28 @@ namespace SOS.Lib.Repositories.Processed
             return (query, excludeQuery);
         }
 
+        /// <summary>
+        /// Cast dynamic to observation
+        /// </summary>
+        /// <param name="dynamicObjects"></param>
+        /// <returns></returns>
+        public static List<Event> CastDynamicsToEvents(IEnumerable<dynamic> dynamicObjects)
+        {
+            if (dynamicObjects == null) return null;            
+
+            return JsonSerializer.Deserialize<List<Event>>(
+                JsonSerializer.Serialize(dynamicObjects, jsonSerializerOptions), jsonSerializerOptions);
+        }
+
+        protected readonly static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNameCaseInsensitive = true,
+            Converters = {
+                new JsonStringEnumConverter(),
+                new GeoShapeConverter(),
+                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+            }
+        };
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.Extensions
@@ -197,6 +198,24 @@ namespace SOS.Lib.Extensions
                 )
             );
         }
+
+        public static Func<TermsOrderDescriptor<T>, IPromise<IList<TermsOrder>>> GetTermsOrder<T>(this AggregationSortOrder sortOrder) where T : class
+        {
+            switch(sortOrder)
+            {
+                case AggregationSortOrder.CountDescending:
+                    return m => m.CountDescending();
+                case AggregationSortOrder.CountAscending:
+                    return m => m.CountAscending();
+                case AggregationSortOrder.KeyDescending:
+                    return m => m.KeyDescending();
+                case AggregationSortOrder.KeyAscending:
+                    return m => m.KeyAscending();
+                default:                
+                    return m => m.CountDescending();
+            }
+        }
+
 
         /// <summary>
         /// Get sort descriptor

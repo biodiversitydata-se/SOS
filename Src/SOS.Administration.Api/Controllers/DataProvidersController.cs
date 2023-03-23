@@ -68,6 +68,44 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <summary>
+        ///     Initialize the MongoDB DataProvider collection with default data provider.
+        /// </summary>
+        /// <param name="forceOverwriteIfCollectionExist">
+        ///     If the DataProvider already exists, set
+        ///     forceOverwriteIfCollectionExist to true if you want to overwrite this record with default data.
+        /// </param>
+        /// <returns></returns>
+        [HttpPost("ImportDefaultDataProvider")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ImportDefaultDataproviderAsync(
+            [FromQuery] string dataProviderIdOrIdentifier,
+            [FromQuery] bool forceOverwriteIfCollectionExist = false)
+        {
+            try
+            {
+                var dataProvider =
+                        await _dataProviderManager.GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier);
+                if (dataProvider != null && !forceOverwriteIfCollectionExist)
+                {
+                    return new BadRequestObjectResult(
+                        $"Data provider already exist and forceOverwriteIfCollectionExist=false");
+                }
+
+                var result = await _dataProviderManager.InitDefaultDataProvider(dataProviderIdOrIdentifier);
+                if (result.IsFailure) return BadRequest(result.Error);
+                return Ok(result.Value);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+
+        /// <summary>
         ///  Initialize the MongoDB DataProvider eml collection with default eml files for passed providers (No id's passed = all)
         /// </summary>
         /// <param name="datproviderIds"></param>

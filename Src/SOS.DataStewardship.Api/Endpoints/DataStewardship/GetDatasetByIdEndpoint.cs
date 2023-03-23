@@ -15,10 +15,9 @@ public class GetDatasetByIdEndpoint : IEndpointDefinition
         app.MapGet("/datastewardship/datasets/{id}", GetDatasetByIdAsync)
             .Produces<Dataset>(StatusCodes.Status200OK, "application/json")
             .Produces<Dataset>(StatusCodes.Status200OK, "text/csv")
-            .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status400BadRequest)
-            //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError);
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
+            .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
     }
     
     [SwaggerOperation(        
@@ -31,10 +30,19 @@ public class GetDatasetByIdEndpoint : IEndpointDefinition
         [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json)
     {
         var dataset = await dataStewardshipManager.GetDatasetByIdAsync(id);
-        if (dataset == null) return Results.NotFound();
-        
+        if (dataset == null) return NotFoundResult(id);
+
         return exportMode.Equals(ExportMode.Csv) ? 
             Results.File(dataset.ToCsv(), "text/tab-separated-values", "dataset.csv") : 
             Results.Ok(dataset);        
+    }
+
+    private IResult NotFoundResult(string id)
+    {
+        return Results.Problem(
+            type: "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.4",
+            title: "Resource not found",
+            detail: $"Dataset with identifier={id} was not found.",
+            statusCode: StatusCodes.Status404NotFound);
     }
 }

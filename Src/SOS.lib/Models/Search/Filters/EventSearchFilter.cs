@@ -17,6 +17,9 @@ namespace SOS.Lib.Models.Search.Filters
         /// </summary>
         public List<int> DataProviderIds { get; set; }
 
+        public List<SortOrderFilter> SortOrders { get; set; }
+        public List<string> OutputIncludeFields { get; set; }
+        public List<string> OutputExcludeFields { get; set; }
         // Todo - the commented filters could possibly be added later.
 
         ///// <summary>

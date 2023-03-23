@@ -12,10 +12,9 @@ public class GetEventByIdEndpoint : IEndpointDefinition
     {
         app.MapGet("/datastewardship/events/{id}", GetEventByIdAsync)
             .Produces<EventModel>(StatusCodes.Status200OK, "application/json")
-            .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status400BadRequest)
-            //.Produces<List<FluentValidation.Results.ValidationFailure>>(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status500InternalServerError);
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
+            .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
     }
     
     [SwaggerOperation(
@@ -29,8 +28,17 @@ public class GetEventByIdEndpoint : IEndpointDefinition
         [FromQuery, SwaggerParameter("The response coordinate system")] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {        
         var eventModel = await dataStewardshipManager.GetEventByIdAsync(id, responseCoordinateSystem);
-        if (eventModel == null) return Results.NotFound();
+        if (eventModel == null) return NotFoundResult(id);
 
         return exportMode.Equals(ExportMode.Csv) ? Results.File(eventModel.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(eventModel);       
+    }
+
+    private IResult NotFoundResult(string id)
+    {
+        return Results.Problem(
+            type: "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.4",
+            title: "Resource not found",
+            detail: $"Event with eventId={id} was not found.",
+            statusCode: StatusCodes.Status404NotFound);
     }
 }

@@ -18,9 +18,10 @@ public class DatasetsPaginationTests : TestBase
         await ProcessFixture.AddDataToElasticsearchAsync(testDataSet);
         var searchFilter = new DatasetFilter();
         var datasetModels = new List<Dataset>();
+        var allDatasetModels = new List<Dataset>();        
         int take = 2;
 
-        // Act
+        // Act - Get all by pagination
         for (int skip = 0; skip < testDataSet.Datasets.Count(); skip += take)
         {
             var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
@@ -28,10 +29,17 @@ public class DatasetsPaginationTests : TestBase
             datasetModels.AddRange(pageResult.Records);
         }
 
+        // Act - Get all in one request
+        var pageResultAll = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
+                $"datastewardship/datasets?skip=0&take={testDataSet.Datasets.Count()}", searchFilter, jsonSerializerOptions);
+        allDatasetModels.AddRange(pageResultAll.Records);
+
         // Assert
         var datasetIds = testDataSet.Datasets.Select(m => m.Identifier).ToList();
         var uniqueDatasetIds = datasetModels.Select(m => m.Identifier).Distinct();
         uniqueDatasetIds.Should().BeEquivalentTo(datasetIds);
+        datasetModels.Select(m => m.Identifier).Should()
+            .Equal(allDatasetModels.Select(m => m.Identifier), "the order should be the same");
     }
 
     [Fact]

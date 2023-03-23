@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using SOS.DataStewardship.Api.Contracts.Models;
 using Dataset = SOS.DataStewardship.Api.Contracts.Models.Dataset;
 
@@ -19,10 +20,13 @@ public class DatasetsNotFoundTests : TestBase
         await ProcessFixture.AddDatasetsToElasticsearchAsync(datasets);
 
         // Act
-        var result = await ApiClient.GetAsync($"datastewardship/datasets/{datasetId}");
+        var response = await ApiClient.GetAsync($"datastewardship/datasets/{datasetId}");
+        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions);
 
         // Assert
-        result.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        problemDetails.Status.Should().Be((int)System.Net.HttpStatusCode.NotFound);
+        problemDetails.Detail.Should().Be($"Dataset with identifier={datasetId} was not found.");
     }
 
     [Fact]
