@@ -63,11 +63,13 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <summary>
         /// Write part of DwC-A CSV files to disk.
         /// </summary>
+        /// <param name="dataProvider"></param>
         /// <param name="dwcObservations"></param>
         /// <param name="filePathByFilePart"></param>
         /// <param name="checkForIllegalCharacters"></param>
         /// <returns></returns>
         Task WriteHeaderlessDwcaFiles(
+            DataProvider dataProvider,
             ICollection<Observation> dwcObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart,
             bool checkForIllegalCharacters = false);
