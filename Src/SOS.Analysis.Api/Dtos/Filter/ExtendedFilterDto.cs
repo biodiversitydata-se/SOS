@@ -197,6 +197,11 @@
         public IEnumerable<int>? SexIds { get; set; }
 
         /// <summary>
+        /// Sighting type search group id's
+        /// </summary>
+        public IEnumerable<int> SightingTypeSearchGroupIds { get; set; }
+
+        /// <summary>
         /// Site id filter
         /// </summary>
         public IEnumerable<int>? SiteIds { get; set; }

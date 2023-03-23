@@ -190,13 +190,11 @@ namespace SOS.Lib.Models.Search.Filters
         /// <returns></returns>
         public bool HasTaxonFilter()
         {
-            if (Taxa == null) return false;
-            if (Taxa.Ids != null && Taxa.Ids.Any()) return true;
-            if (Taxa.TaxonCategories != null && Taxa.TaxonCategories.Any()) return true;
-            if (Taxa.IncludeUnderlyingTaxa) return true;
-            if (Taxa.ListIds != null && Taxa.ListIds.Any()) return true;
-            if (Taxa.RedListCategories != null && Taxa.RedListCategories.Any()) return true;
-            return false;
+            return (Taxa?.Ids?.Any() ?? false)
+                || (Taxa?.TaxonCategories?.Any() ?? false)
+                || (Taxa?.IncludeUnderlyingTaxa ?? false)
+                || (Taxa?.ListIds?.Any() ?? false)
+                || (Taxa?.RedListCategories?.Any() ?? false);
         }
     }
 }
