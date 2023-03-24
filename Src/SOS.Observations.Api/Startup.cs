@@ -208,7 +208,7 @@ namespace SOS.Observations.Api
                 {
                     swagger.UseInlineDefinitionsForEnums();
                     foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
-                    {                        
+                    {
                         swagger.SwaggerDoc(
                             $"{InternalApiName}{description.GroupName}",
                             new OpenApiInfo()
@@ -376,7 +376,7 @@ namespace SOS.Observations.Api
                     name: $"Primary disk: min {healthCheckConfiguration.MinimumLocalDiskStorage}GB free - warning",
                     failureStatus: HealthStatus.Degraded,
                     tags: new[] { "disk" })
-                .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new [] { "database", "mongodb" })
+                .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" })
                 .AddHangfire(a => a.MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
                 .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
                 .AddCheck<SearchDataProvidersHealthCheck>("Search data providers", tags: new[] { "database", "elasticsearch", "query" })
@@ -391,9 +391,9 @@ namespace SOS.Observations.Api
 
             if (CurrentEnvironment.IsEnvironment("prod"))
             {
-                healthChecks.AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] {"dwca", "export"});
-                healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] {"application insights", "harvest"});
-                healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] {"wfs"}); // add this to ST environment when we have a GeoServer test environment.
+                healthChecks.AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
+                healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
+                healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] { "wfs" }); // add this to ST environment when we have a GeoServer test environment.
             }
 
             // Add security
@@ -406,7 +406,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
             services.AddSingleton<ICache<int, TaxonList>, TaxonListCache>();
-            services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();            
+            services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             var taxonSumAggregationCache = new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions())) { CacheDuration = TimeSpan.FromHours(12) };
@@ -437,7 +437,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedChecklistRepository, ProcessedChecklistRepository>();
-            services.AddScoped<IUserObservationRepository, UserObservationRepository>();            
+            services.AddScoped<IUserObservationRepository, UserObservationRepository>();
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedLocationRepository, ProcessedLocationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
@@ -487,11 +487,11 @@ namespace SOS.Observations.Api
         /// <param name="observationApiConfiguration"></param>
         /// <param name="protectedLogRepository"></param>
         public void Configure(
-            IApplicationBuilder app, 
-            IWebHostEnvironment env, 
-            IApiVersionDescriptionProvider apiVersionDescriptionProvider, 
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IApiVersionDescriptionProvider apiVersionDescriptionProvider,
             TelemetryConfiguration configuration,
-            Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration, 
+            Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration,
             ObservationApiConfiguration observationApiConfiguration,
             IProtectedLogRepository protectedLogRepository)
         {
@@ -516,7 +516,7 @@ namespace SOS.Observations.Api
             {
                 app.UseMiddleware<EnableRequestBufferingMiddelware>();
                 app.UseMiddleware<StoreRequestBodyMiddleware>();
-            }            
+            }
 
             app.UseHangfireDashboard();
 
@@ -537,11 +537,11 @@ namespace SOS.Observations.Api
                         $"/swagger/{PublicApiName}{description.GroupName}/swagger.json",
                         $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}");
 
-                    options.DisplayOperationId();                    
+                    options.DisplayOperationId();
                     options.DocExpansion(DocExpansion.None);
                 }
             });
-         
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
@@ -554,7 +554,7 @@ namespace SOS.Observations.Api
                 endpoints.MapHealthChecks("/health", new HealthCheckOptions()
                 {
                     Predicate = _ => false,
-                    ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.Latest) 
+                    ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.Latest)
                 });
                 endpoints.MapHealthChecks("/health-json", new HealthCheckOptions()
                 {
@@ -562,7 +562,7 @@ namespace SOS.Observations.Api
                     ResponseWriter = async (context, _) =>
                     {
                         var report = HealthReportCachePublisher.Latest;
-                        var result = report == null ? "{}" :JsonConvert.SerializeObject(
+                        var result = report == null ? "{}" : JsonConvert.SerializeObject(
                             new
                             {
                                 status = report.Status.ToString(),
@@ -595,11 +595,12 @@ namespace SOS.Observations.Api
 
             var serviceProvider = app.ApplicationServices;
             var taxonSearchManager = serviceProvider.GetService<ITaxonSearchManager>();
-            Task.Run(() => {
-                taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { 0 });                
-            }); 
+            Task.Run(() =>
+            {
+                taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { 0 });
+            });
         }
-        
+
         private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
         {
             var actionApiVersionModel = apiDescription.ActionDescriptor
