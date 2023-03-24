@@ -350,16 +350,16 @@ namespace SOS.Harvest.Processors.Artportalen
                     {
                         Comments = m.Comments?.Select(c => new MultimediaComment
                         {
-                            Comment = c.Comment,
-                            CommentBy = c.CommentBy,
+                            Comment = c.Comment?.Clean(),
+                            CommentBy = c.CommentBy?.Clean(),
                             Created = c.CommentCreated
                         }),
                         Created = m.UploadDateTime?.ToShortDateString(),
-                        Format = (m.FileUri?.LastIndexOf('.') ?? -1) > 0 ? m.FileUri.Substring(m.FileUri.LastIndexOf('.')): string.Empty,
-                        Identifier = GetMediaUrl(m.FileUri),
+                        Format = (m.FileUri?.LastIndexOf('.') ?? -1) > 0 ? m.FileUri.Substring(m.FileUri.LastIndexOf('.'))?.Clean(): string.Empty,
+                        Identifier = GetMediaUrl(m.FileUri)?.Clean(),
                         License = string.IsNullOrEmpty(m.CopyrightText) ? "© all rights reserved" : m.CopyrightText?.Clean(),
                         References = $"{_artPortalenUrl}/Image/{m.Id}",
-                        RightsHolder = m.RightsHolder,
+                        RightsHolder = m.RightsHolder?.Clean(),
                         Type = m.FileType
                     }).ToList();
                 }
