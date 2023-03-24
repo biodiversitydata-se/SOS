@@ -125,7 +125,7 @@ namespace SOS.Observations.Api.Repositories
 
             var observationCountByTaxonId = new Dictionary<int, (int, DateTime?, DateTime?)>();
             CompositeKey nextPageKey = null;
-            var take = taxonCount < MaxNrElasticSearchAggregationBuckets ? taxonCount : MaxNrElasticSearchAggregationBuckets;
+            var take = taxonCount > 0 && taxonCount < MaxNrElasticSearchAggregationBuckets ? taxonCount : MaxNrElasticSearchAggregationBuckets;
             do
             {
                 var searchResponse = await PageTaxaCompositeAggregationAsync(indexName, query, excludeQuery, nextPageKey, take);
@@ -175,7 +175,7 @@ namespace SOS.Observations.Api.Repositories
             // If IncludeUnderlyingTaxa = true, underlying taxa are allready added. If false we need to add it here to get observations for them to use in calculation
             if (!filter.Taxa?.IncludeUnderlyingTaxa ?? true)
             {
-                filter.Taxa.Ids = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(filter.Taxa.Ids, true);
+                filter.Taxa.Ids = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(filter.Taxa?.Ids, true);
             }
 
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -397,7 +397,7 @@ namespace SOS.Observations.Api.Repositories
                 )
                 .Aggregations(a => a
                     .Composite("taxonComposite", g => g
-                        .After(nextPage ?? new CompositeKey(new Dictionary<string, object>() { { "taxonId", 0 } }))
+                        .After(nextPage)
                         .Size(take)
                         .Sources(src => src
                             .Terms("taxonId", tt => tt
