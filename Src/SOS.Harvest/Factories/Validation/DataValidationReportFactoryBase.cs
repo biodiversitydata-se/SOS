@@ -18,6 +18,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 using SOS.Lib.Configuration.Process;
+using SOS.Harvest.Managers;
 
 namespace SOS.Harvest.Factories.Validation
 {
@@ -50,6 +51,7 @@ namespace SOS.Harvest.Factories.Validation
             _processedVocabularyRepository = processedVocabularyRepository ?? throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
+            _processTimeManager = processTimeManager;
             ProcessConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
             Task.Run(InitializeAsync).Wait();
         }
