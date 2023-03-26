@@ -134,7 +134,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             obs.Modified = DwcParser.ParseDate(verbatim.Modified)?.ToUniversalTime();
             obs.OwnerInstitutionCode = verbatim.OwnerInstitutionCode;
             obs.References = verbatim.References;
-            obs.RightsHolder = verbatim.RightsHolder;
+            obs.RightsHolder = verbatim.RightsHolder?.Clean();
             obs.Type = GetSosId(verbatim.Type,
                 _vocabularyById[VocabularyId.Type]);
             obs.DataStewardshipDatasetId = verbatim.DataStewardshipDatasetId;
@@ -288,7 +288,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedEvent.SampleSizeValue = verbatim.SampleSizeValue;
             processedEvent.SamplingEffort = verbatim.SamplingEffort;
             processedEvent.SamplingProtocol = verbatim.SamplingProtocol;
-            processedEvent.VerbatimEventDate = verbatim.VerbatimEventDate;
+            processedEvent.VerbatimEventDate = verbatim.VerbatimEventDate?.Clean();
 
             processedEvent.Media = CreateProcessedMultimedia(
                 verbatim.EventMultimedia,
@@ -430,7 +430,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedOccurrence.OrganismQuantityUnit = GetSosId(verbatim.OrganismQuantityType, _vocabularyById[VocabularyId.Unit]);
             processedOccurrence.OtherCatalogNumbers = verbatim.OtherCatalogNumbers;
             processedOccurrence.Preparations = verbatim.Preparations;
-            processedOccurrence.RecordedBy = verbatim.RecordedBy;
+            processedOccurrence.RecordedBy = verbatim.RecordedBy?.Clean();
             processedOccurrence.RecordNumber = verbatim.RecordNumber;
             processedOccurrence.Activity = GetSosId(
                 verbatim.ReproductiveCondition,
