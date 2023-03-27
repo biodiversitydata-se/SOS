@@ -109,7 +109,8 @@ namespace SOS.Harvest.Processors
         /// <param name="taxonDisturbanceRadius"></param>
         protected void AddPositionData(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
         {
-            Point point = null!;
+            const int maxCoordinateUncertaintyInMeters = 500000; // 500 km
+            Point point = null!;            
             if (verbatimLongitude.HasValue && verbatimLongitude.Value > 0 && verbatimLatitude.HasValue && verbatimLatitude > 0)
             {
                 point = new Point(verbatimLongitude.Value, verbatimLatitude.Value);
@@ -123,6 +124,10 @@ namespace SOS.Harvest.Processors
             if (!coordinateUncertaintyInMeters.HasValue || coordinateUncertaintyInMeters.Value <= 0)
             {
                 coordinateUncertaintyInMeters = DataProvider.CoordinateUncertaintyInMeters;
+            }
+            if (coordinateUncertaintyInMeters.Value > maxCoordinateUncertaintyInMeters)
+            {
+                coordinateUncertaintyInMeters = maxCoordinateUncertaintyInMeters;
             }
 
             var pointWithBuffer = point.ToCircle(coordinateUncertaintyInMeters!.Value);
