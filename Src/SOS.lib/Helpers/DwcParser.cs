@@ -354,6 +354,12 @@ namespace SOS.Lib.Helpers
                 return false;
             }
 
+            if (string.IsNullOrWhiteSpace(strEndDate))
+            {
+                endDate = startDate;
+                return true;
+            }
+
             endDate = ParseDate(strEndDate, "dd");
             if (endDate.HasValue) // end date is specified as a day
             {
