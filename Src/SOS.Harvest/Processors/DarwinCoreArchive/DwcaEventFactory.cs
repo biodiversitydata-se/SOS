@@ -60,10 +60,10 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 out var endDate);
 
                 var processedEvent = new Lib.Models.Processed.DataStewardship.Event.Event();
-                processedEvent.Created = DateTime.Now;
+                processedEvent.Created = DateTime.Now.ToUniversalTime();
                 processedEvent.DataProviderId = DataProvider.Id;
-                processedEvent.StartDate = startDate;
-                processedEvent.EndDate = endDate;
+                processedEvent.StartDate = startDate.HasValue ? startDate.Value.ToUniversalTime() : null; 
+                processedEvent.EndDate = endDate.HasValue ? endDate.Value.ToUniversalTime() : null;
                 processedEvent.EventId = verbatim.EventID;
                 processedEvent.ParentEventId = verbatim.ParentEventID;
                 processedEvent.EventRemarks = verbatim.EventRemarks;

@@ -39,7 +39,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     Creator = verbatimDataset.Creator,
                     DataStewardship = verbatimDataset.DataStewardship,
                     Description = verbatimDataset.Description,
-                    EndDate = verbatimDataset.EndDate,
+                    EndDate = verbatimDataset.EndDate.HasValue ? verbatimDataset.EndDate.Value.ToUniversalTime() : null,
                     EventIds = verbatimDataset.EventIds,                    
                     Identifier = verbatimDataset.Identifier,
                     //Identifier = $"urn:lsid:{DataProvider.Identifier}:Dataset:{verbatimDataset.Identifier}",
@@ -51,7 +51,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     Publisher = verbatimDataset.Publisher,
                     Purpose = verbatimDataset.Purpose,
                     Spatial = verbatimDataset.Spatial,
-                    StartDate = verbatimDataset.StartDate,
+                    StartDate = verbatimDataset.StartDate.HasValue ? verbatimDataset.StartDate.Value.ToUniversalTime() : null,
                     Title = verbatimDataset.Title
                 };
 

@@ -20,7 +20,7 @@
 //            IProcessTimeManager processTimeManager,
 //            ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
 //        {
-            
+
 //        }
 
 //        public Dataset CreateProcessedDataset(DwcVerbatimDataset verbatimDataset)
@@ -33,7 +33,7 @@
 //                }
 
 //                var id = $"urn:lsid:{DataProvider.ChecklistIdentifier}:Dataset:{verbatimDataset.Identifier}";
-                
+
 //                var observationDataset = new Dataset
 //                {
 //                    Id = id, // verbatimDataset.Identifier,
@@ -42,7 +42,7 @@
 //                    Creator = verbatimDataset.Creator,
 //                    DataStewardship = verbatimDataset.DataStewardship,
 //                    Description = verbatimDataset.Description,
-//                    EndDate = verbatimDataset.EndDate,
+//                    EndDate = verbatimDataset.EndDate.HasValue ? verbatimDataset.EndDate.Value.ToUniversalTime() : null,
 //                    EventIds = verbatimDataset.EventIds,                    
 //                    Identifier = verbatimDataset.Identifier,
 //                    Language = verbatimDataset.Language,
@@ -54,7 +54,7 @@
 //                    Publisher = verbatimDataset.Publisher,
 //                    Purpose = verbatimDataset.Purpose,
 //                    Spatial = verbatimDataset.Spatial,
-//                    StartDate = verbatimDataset.StartDate,
+//                    StartDate = verbatimDataset.StartDate.HasValue ? verbatimDataset.StartDate.Value.ToUniversalTime() : null,
 //                    Title = verbatimDataset.Title
 //                };
 
