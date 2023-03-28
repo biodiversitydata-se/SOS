@@ -51,7 +51,7 @@ namespace SOS.Harvest.Processors.Artportalen
             return new Area
             {
                 FeatureId = area.FeatureId,
-                Name = area.Name
+                Name = string.IsNullOrEmpty(area.Name) ? null : area.Name // Make sure name equals null if empty. To prevent empty string and null to be handled different when aggregation on the field
             };
         }
 

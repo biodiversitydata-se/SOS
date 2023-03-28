@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
@@ -218,10 +219,11 @@ namespace SOS.Lib.Helpers
                                 out var areaType))
                             {
                                 var featureId = feature.Attributes.GetOptionalValue("featureId")?.ToString();
+                                var name = feature.Attributes.GetOptionalValue("name")?.ToString();
                                 var area = string.IsNullOrEmpty(featureId) ? null! : new Area
                                 {
                                     FeatureId = featureId,
-                                    Name = feature.Attributes.GetOptionalValue("name")?.ToString()
+                                    Name =  string.IsNullOrEmpty(name) ? null : name // Make sure name equals null if empty. To prevent empty string and null to be handled different when aggregation on the field
                                 };
                                 switch ((AreaType)areaType)
                                 {

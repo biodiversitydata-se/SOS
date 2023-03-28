@@ -304,7 +304,9 @@ public class DataStewardshipManager : IDataStewardshipManager
 
     public async Task<OccurrenceModel> GetOccurrenceByIdAsync(string id, CoordinateSystem responseCoordinateSystem)
     {
-        var filter = new SearchFilter(0);
+        var filter = new SearchFilter(0) {
+            IsPartOfDataStewardshipDataset = true
+        };
         filter.Output.Fields = _observationOccurrenceOutputFields;
 
         IEnumerable<dynamic> observations = await _processedObservationCoreRepository.GetObservationAsync(id, filter, true);
@@ -324,6 +326,7 @@ public class DataStewardshipManager : IDataStewardshipManager
     public async Task<Contracts.Models.PagedResult<OccurrenceModel>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take, CoordinateSystem responseCoordinateSystem)
     {
         var filter = occurrenceFilter.ToSearchFilter();
+        filter.IsPartOfDataStewardshipDataset = true;
         filter.Output.Fields = _observationOccurrenceOutputFields;
         await _filterManager.PrepareFilterAsync(null, null, filter);
         var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, skip, take, true);
