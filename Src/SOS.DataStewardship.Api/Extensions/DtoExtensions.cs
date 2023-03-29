@@ -374,8 +374,8 @@ namespace SOS.DataStewardship.Api.Extensions
         {
             return unitId switch
             {
-                UnitId.AreaCovering => QuantityVariable.Yttäckning,
-                UnitId.Covering => QuantityVariable.Täckningsgrad,
+                UnitId.CoverClass => QuantityVariable.Yttäckning,
+                UnitId.CoverPercentage => QuantityVariable.Täckningsgrad,
                 UnitId.Individuals => QuantityVariable.AntalIndivider,
                 UnitId.Fruitbodies => QuantityVariable.AntalFruktkroppar,
                 UnitId.Capsules => QuantityVariable.AntalKapslar,
