@@ -138,7 +138,7 @@ namespace SOS.Harvest.Processors.Artportalen
             "occurrence",
             "location",
             "event",
-            "dataStewardshipDatasetId",
+            "dataStewardship",
             "institutionCode",
         };
     }

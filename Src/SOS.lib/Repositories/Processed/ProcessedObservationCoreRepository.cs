@@ -64,8 +64,7 @@ namespace SOS.Lib.Repositories.Processed
                         .KeyWordLowerCase(kwlc => kwlc.CollectionId, false)
                         .KeyWordLowerCase(kwlc => kwlc.CollectionCode, false)
                         .KeyWordLowerCase(kwlc => kwlc.DataGeneralizations, false)
-                        .KeyWordLowerCase(kwlc => kwlc.DatasetId, false)
-                        .KeyWordLowerCase(kwlc => kwlc.DataStewardshipDatasetId)
+                        .KeyWordLowerCase(kwlc => kwlc.DatasetId, false)                        
                         .KeyWordLowerCase(kwlc => kwlc.DatasetName) // WFS
                         .KeyWordLowerCase(kwlc => kwlc.InstitutionId)
                         .KeyWordLowerCase(kwlc => kwlc.Language, false)
@@ -116,6 +115,13 @@ namespace SOS.Lib.Repositories.Processed
                         .Object<VocabularyValue>(c => c
                             .Name(nm => nm.AccessRights)
                             .Properties(ps => ps.GetMapping())
+                        )
+                        .Object<SOS.Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo>(d => d
+                            .Name(nm => nm.DataStewardship)
+                            .Properties(ps => ps
+                                .KeyWordLowerCase(kwlc => kwlc.DatasetIdentifier)
+                                .KeyWordLowerCase(kwlc => kwlc.DatasetTitle)
+                            )
                         )
                         .Object<ArtportalenInternal>(t => t
                             .AutoMap()

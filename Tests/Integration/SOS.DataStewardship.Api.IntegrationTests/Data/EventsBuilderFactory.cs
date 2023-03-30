@@ -1,4 +1,5 @@
 ﻿using FizzWare.NBuilder.Implementation;
+using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Data
@@ -12,9 +13,9 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
                     .With(m => m.EventId = DataHelper.RandomString(8))
                     .With(m => m.StartDate = DateTime.Now)
                     .With(m => m.EndDate = DateTime.Now)                        
-                    .With(m => m.Dataset = new DatasetInfo
+                    .With(m => m.DataStewardship = new DataStewardshipInfo
                     {
-                        Identifier = DataHelper.RandomString(8)
+                        DatasetIdentifier = DataHelper.RandomString(8)
                     });
 
             return eventsBuilder;
@@ -28,7 +29,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
             {
                 var datasetIdsIndex = index % datasetsIdsList.Count;
                 var datasetId = datasetsIdsList[datasetIdsIndex];
-                ev.Dataset.Identifier = datasetId;
+                ev.DataStewardship.DatasetIdentifier = datasetId;
             });
 
             return operable;

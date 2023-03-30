@@ -31,6 +31,6 @@ public class DatasetsTaxonFilterTests : TestBase
 
         // Assert
         pageResult.TotalCount.Should().Be(1);
-        pageResult.Records.First().Identifier.Should().Be(testDataSet.Observations.First().DataStewardshipDatasetId);
+        pageResult.Records.First().Identifier.Should().Be(testDataSet.Observations.First().DataStewardship.DatasetIdentifier);
     }
 }

@@ -15,7 +15,7 @@ public class OccurrencesDatasetIdsFilterTests : TestBase
         // Arrange
         var testDataSet = TestData.Create(10);
         string datasetId 
-            = testDataSet.Observations.First().DataStewardshipDatasetId 
+            = testDataSet.Observations.First().DataStewardship.DatasetIdentifier 
             = Guid.NewGuid().ToString();
         await ProcessFixture.AddObservationsToElasticsearchAsync(testDataSet.Observations);
         var searchFilter = new OccurrenceFilter() {

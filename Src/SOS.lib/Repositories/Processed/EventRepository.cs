@@ -65,12 +65,12 @@ namespace SOS.Lib.Repositories.Processed
                             .Name(nm => nm.Location)
                             .Properties(ps => ps.GetMapping())
                         )
-                        .Object<DatasetInfo>(l => l
+                        .Object<DataStewardshipInfo>(l => l
                             .AutoMap()
-                            .Name(nm => nm.Dataset)
+                            .Name(nm => nm.DataStewardship)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.Identifier)
-                                .KeyWordLowerCase(kwlc => kwlc.Title)
+                                .KeyWordLowerCase(kwlc => kwlc.DatasetIdentifier)
+                                .KeyWordLowerCase(kwlc => kwlc.DatasetTitle)
                             )
                         )
                         .Object<VocabularyValue>(t => t

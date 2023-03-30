@@ -29,7 +29,7 @@ public class DataStewardshipManager : IDataStewardshipManager
 
     private readonly ICollection<string> _observationEventOutputFields = new[]
        {
-            "dataStewardshipDatasetId",
+            "dataStewardship",
             "event.eventId",
             "event.parentEventId",
             "event.eventRemarks",
@@ -46,7 +46,7 @@ public class DataStewardshipManager : IDataStewardshipManager
     private readonly ICollection<string> _observationOccurrenceOutputFields = new[]
     {
         "basisOfRecord",
-        "dataStewardshipDatasetId",
+        "dataStewardship",
         "event.endDate",
         "event.eventId",
         "event.startDate",
@@ -252,7 +252,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         var filter = datasetFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);        
         var aggregationResult = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, 
-            "dataStewardshipDatasetId",
+            "dataStewardship.datasetIdentifier",
             skip,
             take,            
             Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);        

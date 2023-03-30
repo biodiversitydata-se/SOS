@@ -20,9 +20,9 @@ namespace SOS.Lib.Extensions
             ev.EventRemarks = observation.Event.EventRemarks;
             ev.Media = observation.Event.Media;
             //ev.AssociatedMedia = observation.Event.Media.ToAssociatedMedias(); // todo
-            ev.Dataset = new DatasetInfo
+            ev.DataStewardship = new DataStewardshipInfo
             {
-                Identifier = observation.DataStewardshipDatasetId,
+                DatasetIdentifier = observation.DataStewardship?.DatasetIdentifier
                 //Title = // need to lookup this from Dataset index or store this information in Observation/Event
             };
 
