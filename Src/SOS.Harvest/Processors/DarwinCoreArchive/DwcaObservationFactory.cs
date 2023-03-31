@@ -113,9 +113,14 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             obs.OwnerInstitutionCode = verbatim.OwnerInstitutionCode;
             obs.References = verbatim.References;
             obs.RightsHolder = verbatim.RightsHolder?.Clean();
-            obs.Type = GetSosId(verbatim.Type,
-                _vocabularyById[VocabularyId.Type]);
-            obs.DataStewardshipDatasetId = verbatim.DataStewardshipDatasetId;
+            obs.Type = GetSosId(verbatim.Type, _vocabularyById[VocabularyId.Type]);
+            if (!string.IsNullOrEmpty(verbatim.DataStewardshipDatasetId))
+            {
+                obs.DataStewardship = new Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo
+                {
+                    DatasetIdentifier = verbatim.DataStewardshipDatasetId
+                };
+            }
 
             // Event
             obs.Event = CreateProcessedEvent(verbatim);

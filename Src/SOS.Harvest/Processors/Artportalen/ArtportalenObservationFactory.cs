@@ -537,7 +537,14 @@ namespace SOS.Harvest.Processors.Artportalen
                 
                 if (ProcessConfiguration.ProcessDataset)
                 {
-                    obs.DataStewardshipDatasetId = GetDataStewardshipDatasetId(obs);
+                    string? dataStewardshipDatasetId = GetDataStewardshipDatasetId(obs);
+                    if (dataStewardshipDatasetId != null)
+                    {
+                        obs.DataStewardship = new Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo
+                        {
+                            DatasetIdentifier = dataStewardshipDatasetId
+                        };
+                    }                    
                 }
 
                 if (obs.ShallBeProtected())

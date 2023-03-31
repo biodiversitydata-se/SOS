@@ -27,9 +27,9 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Event
         public string EventType { get; set; }
 
         /// <summary>
-        /// Dataset
+        /// Data Stewardship
         /// </summary>
-        public DatasetInfo Dataset { get; set; }
+        public DataStewardshipInfo DataStewardship { get; set; }
 
         /// <summary>
         ///     Data provider id.
@@ -161,7 +161,7 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Event
 
         public override string ToString()
         {
-            return $"EventId: {EventId}, DatasetId: {Dataset?.Identifier}";
+            return $"EventId: {EventId}, DatasetId: {DataStewardship?.DatasetIdentifier}";
         }
     }
 }

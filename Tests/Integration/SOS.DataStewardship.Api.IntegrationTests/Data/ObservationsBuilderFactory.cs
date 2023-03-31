@@ -21,8 +21,11 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
                     .With(m => m.Occurrence = new Occurrence
                     {
                         OccurrenceId = DataHelper.RandomString(8)
+                    })                    
+                    .With(m => m.DataStewardship = new Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo
+                    {
+                        DatasetIdentifier = DataHelper.RandomString(8)
                     })
-                    .With(m => m.DataStewardshipDatasetId = DataHelper.RandomString(8))
                     .With(m => m.DataProviderId = 1)
                     .With(m => m.ArtportalenInternal = null)
                     .With(m => m.Sensitive = false)
@@ -46,7 +49,10 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
             {
                 var datasetIdsIndex = index % datasetsIdsList.Count;
                 var datasetId = datasetsIdsList[datasetIdsIndex];
-                obs.DataStewardshipDatasetId = datasetId;
+                obs.DataStewardship = new Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo
+                {
+                    DatasetIdentifier = datasetId
+                };
             });
 
             return operable;

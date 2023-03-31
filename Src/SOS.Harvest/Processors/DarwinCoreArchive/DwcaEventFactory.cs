@@ -5,7 +5,6 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
@@ -13,9 +12,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
-using Amazon.Runtime.Internal.Util;
-using Microsoft.Extensions.Logging;
+using SOS.Lib.Models.Processed.DataStewardship.Common;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -74,9 +71,9 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 processedEvent.SamplingProtocol = verbatim.SamplingProtocol;
                 processedEvent.OccurrenceIds = verbatim.OccurrenceIds?.ToList();
                 processedEvent.Location = CreateLocation(verbatim);
-                processedEvent.Dataset = new DatasetInfo
+                processedEvent.DataStewardship = new DataStewardshipInfo
                 {
-                    Identifier = verbatim.DataStewardshipDatasetId
+                    DatasetIdentifier = verbatim.DataStewardshipDatasetId
                     //Title = // need to lookup this from Dataset index or store this information in Observation/Event
                 };
                 if (!GISExtensions.TryParseCoordinateSystem(verbatim.GeodeticDatum, out var coordinateSystem))

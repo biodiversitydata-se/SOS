@@ -142,5 +142,38 @@ namespace SOS.Harvest.Harvesters.Shark
         {
             throw new NotImplementedException("Not implemented for this provider");
         }
+
+        public async Task<List<string>> GetDatasetsToHarvestAsync()
+        {
+            List<string> datasets = new List<string>();
+            var dataSetsInfo = await _sharkObservationService.GetDataSetsAsync();
+            var datasetNameIndex = -1;
+            foreach (var header in dataSetsInfo.Header)
+            {
+                datasetNameIndex++;
+
+                if (header.Equals("dataset_name", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    break;
+                }
+            }
+
+            var rows = dataSetsInfo.Rows.Where(r => r != null).Select(r => r.ToArray());
+
+            foreach (var row in rows)
+            {
+                var dataSetName = row[datasetNameIndex];
+
+                if (_sharkServiceConfiguration.ValidDataTypes.Count(vt =>
+                    dataSetName.IndexOf(vt, StringComparison.CurrentCultureIgnoreCase) != -1) == 0)
+                {
+                    continue;
+                }
+
+                datasets.Add(dataSetName);
+            }
+
+            return datasets;
+        }
     }
 }

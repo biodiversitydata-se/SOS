@@ -2,6 +2,7 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Models.Processed.DataStewardship.Common;
 using System.Data;
 using ProcessedDataStewardship = SOS.Lib.Models.Processed.DataStewardship;
 
@@ -73,10 +74,10 @@ namespace SOS.DataStewardship.Api.Extensions
             return (AccessRights)accessRightsEnum;
         }
 
-        public static Organisation ToOrganisation(this ProcessedDataStewardship.Common.Organisation organisation)
+        public static SOS.DataStewardship.Api.Contracts.Models.Organisation ToOrganisation(this ProcessedDataStewardship.Common.Organisation organisation)
         {
             if (organisation == null) return null;
-            return new Organisation
+            return new SOS.DataStewardship.Api.Contracts.Models.Organisation
             {
                 OrganisationID = organisation.OrganisationID,
                 OrganisationCode = organisation.OrganisationCode
@@ -110,7 +111,7 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.ParentEventID = observationEvent.ParentEventId;
             ev.EventRemarks = observationEvent.EventRemarks;
             ev.AssociatedMedia = observationEvent.Media.ToAssociatedMedias();
-            ev.Dataset = observationEvent?.Dataset.ToDatasetInfo();            
+            ev.Dataset = observationEvent?.DataStewardship.ToDatasetInfo();            
             ev.EventStartDate = observationEvent.StartDate;
             ev.EventEndDate = observationEvent.EndDate;
             ev.SamplingProtocol = observationEvent.SamplingProtocol;
@@ -193,13 +194,13 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static DatasetInfo ToDatasetInfo(this ProcessedDataStewardship.Event.DatasetInfo source)
+        public static DatasetInfo ToDatasetInfo(this DataStewardshipInfo source)
         {
             if (source == null) return null;
             return new DatasetInfo
             {
-                Identifier = source.Identifier,
-                Title = source.Title,
+                Identifier = source.DatasetIdentifier,
+                Title = source.DatasetTitle,
             };
         }
 
@@ -213,7 +214,7 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.AssociatedMedia = observation.Event.Media.ToAssociatedMedias();
             ev.Dataset = new DatasetInfo
             {
-                Identifier = observation.DataStewardshipDatasetId,
+                Identifier = observation.DataStewardship?.DatasetIdentifier
                 //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event
             };
 
@@ -230,9 +231,9 @@ namespace SOS.DataStewardship.Api.Extensions
             };
             if (observation?.InstitutionCode?.Value != null || !string.IsNullOrEmpty(observation.InstitutionId))
             {
-                ev.RecorderOrganisation = new List<Organisation>
+                ev.RecorderOrganisation = new List<SOS.DataStewardship.Api.Contracts.Models.Organisation>
                 {
-                    new Organisation
+                    new SOS.DataStewardship.Api.Contracts.Models.Organisation
                     {
                         OrganisationID = observation?.InstitutionId,
                         OrganisationCode = observation?.InstitutionCode?.Value
@@ -332,7 +333,7 @@ namespace SOS.DataStewardship.Api.Extensions
 
             occurrence.EventID = observation.Event.EventId;
             occurrence.Dataset ??= new DatasetInfo();
-            occurrence.Dataset.Identifier = observation.DataStewardshipDatasetId;
+            occurrence.Dataset.Identifier = observation?.DataStewardship?.DatasetIdentifier;
             occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
             occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
             occurrence.ObservationPoint = observation?.Location?.Point.ConvertCoordinateSystem(responseCoordinateSystem);

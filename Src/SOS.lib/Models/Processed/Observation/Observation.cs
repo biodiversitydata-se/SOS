@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
@@ -54,11 +55,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     action that occurs at a place and during a period of time).
         /// </summary>
         public Event Event { get; set; }
-
+                
         /// <summary>
-        /// Data stewardship dataset id.
+        /// Data stewardship.
         /// </summary>
-        public string DataStewardshipDatasetId { get; set; }
+        public DataStewardshipInfo DataStewardship { get; set; }
 
         /// <summary>
         ///     Geological information, such as stratigraphy, that qualifies a region or place.
@@ -329,7 +330,7 @@ namespace SOS.Lib.Models.Processed.Observation
 
         public override string ToString()
         {
-            return $"OccurrenceId: {Occurrence?.OccurrenceId},  EventId: {Event?.EventId}, DatasetId: {DataStewardshipDatasetId}";
+            return $"OccurrenceId: {Occurrence?.OccurrenceId},  EventId: {Event?.EventId}, DatasetId: {DataStewardship?.DatasetIdentifier}";
         }
     }
 }

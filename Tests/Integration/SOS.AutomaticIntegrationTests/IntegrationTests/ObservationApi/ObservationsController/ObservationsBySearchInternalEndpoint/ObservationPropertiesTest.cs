@@ -109,7 +109,11 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 DataQuality = new DataQuality { UniqueKey = "UK" },
                 DatasetId = "DSId",
                 DatasetName = "Test",
-                DataStewardshipDatasetId = "DSD",
+                DataStewardship = new Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo
+                {
+                    DatasetIdentifier = "DSD",
+                    DatasetTitle = "TTL"
+                },                
                 DiffusionStatus = DiffusionStatus.NotDiffused,
                 DynamicProperties = "DP",
                 Event = new Event
@@ -602,7 +606,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             obs.DataProviderId.Should().Be(observation.DataProviderId);
             obs.DatasetId.Should().Be(observation.DatasetId);
             obs.DatasetName.Should().Be(observation.DatasetName);
-            obs.DataStewardshipDatasetId.Should().Be(observation.DataStewardshipDatasetId);
+            obs.DataStewardship.DatasetIdentifier.Should().Be(observation.DataStewardship.DatasetIdentifier);
             obs.DiffusionStatus.Should().Be(observation.DiffusionStatus);
             obs.DynamicProperties.Should().Be(observation.DynamicProperties);
             
