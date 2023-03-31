@@ -48,6 +48,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new ArtportalenVerbatimRepository(importClient, new Mock<ILogger<ArtportalenVerbatimRepository>>().Object);
             var mediadataRepository =
                 new MediaRepository(artportalenDataService, new Mock<ILogger<MediaRepository>>().Object);
+            var diaryEntryRepository =
+                new DiaryEntryRepository(artportalenDataService, new Mock<ILogger<DiaryEntryRepository>>().Object);
             var metadataRepository =
                 new MetadataRepository(artportalenDataService, new Mock<ILogger<MetadataRepository>>().Object);
             var projectRepository =
@@ -83,7 +85,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 processedObservationRepository,
-                new ArtportalenMetadataContainer(metadataRepository, personRepository, projectRepository, taxonRepository, new Mock<ILogger<ArtportalenMetadataContainer>>().Object),
+                new ArtportalenMetadataContainer(diaryEntryRepository, metadataRepository, personRepository, projectRepository, taxonRepository, new Mock<ILogger<ArtportalenMetadataContainer>>().Object),
                 areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
@@ -112,6 +114,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var sightingVerbatimRepositoryMock = new Mock<IArtportalenVerbatimRepository>();
             var mediadataRepository =
                 new MediaRepository(artportalenDataService, new Mock<ILogger<MediaRepository>>().Object);
+            var diaryEntryRepository =
+                new DiaryEntryRepository(artportalenDataService, new Mock<ILogger<DiaryEntryRepository>>().Object);
             IMetadataRepository metadataRepository =
                 new MetadataRepository(artportalenDataService, new Mock<ILogger<MetadataRepository>>().Object);
             IProjectRepository projectRepository =
@@ -145,7 +149,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 processedObservationRepository,
-                new ArtportalenMetadataContainer(metadataRepository, personRepository, projectRepository, taxonRepositoryMock, new Mock<ILogger<ArtportalenMetadataContainer>>().Object),
+                new ArtportalenMetadataContainer(diaryEntryRepository, metadataRepository, personRepository, projectRepository, taxonRepositoryMock, new Mock<ILogger<ArtportalenMetadataContainer>>().Object),
                 areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 

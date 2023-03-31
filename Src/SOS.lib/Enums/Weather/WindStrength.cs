@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace SOS.DataStewardship.Api.Contracts.Enums
+namespace SOS.Lib.Enums.Weather
 {
     /// <summary>
     /// States the strength of the wind during the survey event.
@@ -76,32 +76,32 @@ namespace SOS.DataStewardship.Api.Contracts.Enums
         ///  vindstilla, <1 m/s
         /// </summary>
         [EnumMember(Value = "vindstilla, <1 m/s")]
-        Vindstilla1Ms = 100,
+        Calm1Ms = 100,
         /// <summary>
         ///  svag vind, 1-3 m/s
         /// </summary>
         [EnumMember(Value = "svag vind, 1-3 m/s")]
-        SvagVind1Till3Ms = 101,
+        LightBreezeUpTo3Ms = 101,
         /// <summary>
         ///  måttlig vind, 4-7 m/s
         /// </summary>
         [EnumMember(Value = "måttlig vind, 4-7 m/s")]
-        MåttligVind4Till7Ms = 102,
+        ModerateBreeze4To7Ms = 102,
         /// <summary>
         ///  frisk vind, 8-13 m/s
         /// </summary>
         [EnumMember(Value = "frisk vind, 8-13 m/s")]
-        FriskVind8Till13Ms = 103,
+        FreshBreeze8Till13Ms = 103,
         /// <summary>
         ///  hård vind, 14-19 m/s
         /// </summary>
         [EnumMember(Value = "hård vind, 14-19 m/s")]
-        HårdVind14Till19Ms = 104,
+        NearGale14To19Ms = 104,
         /// <summary>
         ///  mycket hård vind, 20-24 m/s
         /// </summary>
         [EnumMember(Value = "mycket hård vind, 20-24 m/s")]
-        MycketHårdVind20Till24Ms = 105,
+        StrongGale20To24Ms = 105,
         /// <summary>
         ///  storm, 25-32 m/s
         /// </summary>
@@ -111,6 +111,7 @@ namespace SOS.DataStewardship.Api.Contracts.Enums
         ///  orkan, ≥33 m/s
         /// </summary>
         [EnumMember(Value = "orkan, ≥33 m/s")]
-        Orkan33Ms = 107
+        Hurricane33Ms = 107
+
     }
 }

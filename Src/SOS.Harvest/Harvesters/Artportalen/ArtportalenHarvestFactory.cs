@@ -141,6 +141,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     observation.ReportedByUserId = personSighting.ReportedByUserId;
                     observation.ReportedByUserServiceUserId = personSighting.ReportedByUserServiceUserId;
                     observation.ReportedByUserAlias = personSighting.ReportedByUserAlias;
+
+                    observation.DiaryEntry = _artportalenMetadataContainer.TryGetDiaryEntry(projects?.Select(p => p.Id)!, entity.StartDate, entity.StartTime, personSighting?.ReportedByUserId ?? 0, entity.SiteId, personSighting!.ReportedByUserId);
                 }
 
                 observation.HasImages = entity.HasImages;
