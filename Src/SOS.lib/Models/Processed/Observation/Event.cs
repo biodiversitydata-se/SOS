@@ -184,6 +184,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Habitat { get; set; }
 
         /// <summary>
+        ///     Multimedia associated with the event.
+        /// </summary>
+        public ICollection<Multimedia> Media { get; set; }
+
+        /// <summary>
+        ///     Measurement or facts associated with the event.
+        /// </summary>
+        public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
+
+        /// <summary>
         /// An identifier for the broader Event that groups this and potentially other Events.
         /// </summary>
         /// <example>
@@ -228,13 +238,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public string VerbatimEventDate { get; set; }
 
         /// <summary>
-        ///     Multimedia associated with the event.
+        /// Weather during event
         /// </summary>
-        public ICollection<Multimedia> Media { get; set; }
-
-        /// <summary>
-        ///     Measurement or facts associated with the event.
-        /// </summary>
-        public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
+        public Weather Weather { get; set; }
     }
 }

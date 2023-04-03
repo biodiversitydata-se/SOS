@@ -236,6 +236,7 @@ namespace SOS.Harvest.IoC.Modules
             // Repositories source
             builder.RegisterType<Repositories.Source.Artportalen.AreaRepository>().As<Repositories.Source.Artportalen.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ChecklistRepository>().As<IChecklistRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<DiaryEntryRepository>().As<IDiaryEntryRepository>().InstancePerLifetimeScope();
             builder.RegisterType<MediaRepository>().As<IMediaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<MetadataRepository>().As<IMetadataRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationDatabaseRepository>().As<IObservationDatabaseRepository>().InstancePerLifetimeScope();

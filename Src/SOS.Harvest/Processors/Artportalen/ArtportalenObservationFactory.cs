@@ -5,6 +5,7 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Enums.Weather;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
@@ -98,6 +99,82 @@ namespace SOS.Harvest.Processors.Artportalen
             }
 
             return null!;
+        }
+
+        private Weather TryGetWeather(DiaryEntry diaryEntry)
+        {
+            return diaryEntry == null ? null! : new Weather
+            {
+                AirTemperature = new Measuring
+                {
+                    Unit = Unit.GraderCelsius,
+                    Value = diaryEntry.Temperature
+                },
+                Cloudiness = diaryEntry.CloudinessId.HasValue ? diaryEntry.CloudinessId.Value switch
+                {
+                    1 => Cloudiness.Clear0Of8,
+                    2 => Cloudiness.AlmostClear1To2Av8,
+                    3 => Cloudiness.PartlyClear3To5Av8,
+                    4 => Cloudiness.Cloudy6To7Of8,
+                    5 => Cloudiness.Overcast8Of8,
+                    6 => Cloudiness.EverChanging0Till8Av8,
+                    _ => null
+                } : null,
+                Precipitation = diaryEntry.PrecipitationId.HasValue ? diaryEntry.PrecipitationId.Value switch
+                {
+                    1 => Precipitation.DryWeather,
+                    2 => Precipitation.LightRain,
+                    3 => Precipitation.ModerateRain,
+                    4 => Precipitation.HeavyRain,
+                    5 => Precipitation.Showers,
+                    6 => Precipitation.LightSnowfall,
+                    7 => Precipitation.ModerateSnowfall,
+                    8 => Precipitation.HeavySnowfall,
+                    9 => Precipitation.Snowflurries,
+                    10 => Precipitation.HailShowers,
+                    _ => null
+                } : null,
+                SnowCover = diaryEntry.SnowcoverId.HasValue ? diaryEntry.SnowcoverId.Value switch
+                {
+                    1 => SnowCover.SnowFreeGround,
+                    2 => SnowCover.ThinOrPartialSnowCoveredGround,
+                    3 or 4 or 5 or 6 or 7 or 8 or 9 => SnowCover.SnowCoveredGround,
+                    _ => null
+                } : null,
+                Visibility = diaryEntry.VisibilityId.HasValue ? diaryEntry.VisibilityId.Value switch
+                {
+                    1 => Visibility.VeryGood20Km,
+                    2 => Visibility.Good10To20Km,
+                    3 => Visibility.Moderate4To10Km,
+                    4 => Visibility.Haze1To4Km,
+                    5 => Visibility.Fog1Km,
+                    _ => null
+                } : null,
+                WindDirection = diaryEntry.WindId.HasValue ? diaryEntry.WindId.Value switch
+                {
+                    1 => CompassDirection.North,
+                    2 => CompassDirection.Northeast,
+                    3 => CompassDirection.East,
+                    4 => CompassDirection.Southeast,
+                    5 => CompassDirection.South,
+                    6 => CompassDirection.Southwest,
+                    7 => CompassDirection.West,
+                    8 => CompassDirection.Northwest,
+                    _ => null
+                } : null,
+                WindStrength = diaryEntry.WindStrengthId.HasValue ? diaryEntry.WindStrengthId.Value switch
+                {
+                    1 => WindStrength.Calm1Ms,
+                    2 => WindStrength.LightBreezeUpTo3Ms,
+                    3 => WindStrength.ModerateBreeze4To7Ms,
+                    4 => WindStrength.FreshBreeze8Till13Ms,
+                    5 => WindStrength.NearGale14To19Ms,
+                    6 => WindStrength.StrongGale20To24Ms,
+                    7 => WindStrength.Storm25Till32Ms,
+                    8 => WindStrength.Hurricane33Ms,
+                    _ => null
+                } : null
+            };
         }
 
         /// <summary>
@@ -239,7 +316,8 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Event.EventId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}:event:{eventId}";
                 obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation.DiscoveryMethod, VocabularyId.DiscoveryMethod);
                 obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation);
-                
+                obs.Event.Weather = TryGetWeather(verbatimObservation.DiaryEntry);
+
                 // Identification
                 obs.Identification = new Identification();
                 obs.Identification.ConfirmedBy = verbatimObservation.ConfirmedBy?.Clean();

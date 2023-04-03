@@ -1,41 +1,38 @@
-using SOS.DataStewardship.Api.Contracts.Enums;
+﻿using SOS.Lib.Enums.Weather;
 
-namespace SOS.DataStewardship.Api.Contracts.Models
+namespace SOS.Lib.Models.Processed.Observation
 {
-    /// <summary>
-    /// Weather variable
-    /// </summary>
-    public class WeatherVariable
-    {        
+    public class Weather
+    {
         /// <summary>
         /// States the snow conditions on the ground during the survey event.
         /// </summary>
-        public Enums.SnowCover? SnowCover { get; set; }
+        public SnowCover? SnowCover { get; set; }
 
         /// <summary>
         /// States the amount of sunshine during the survey event.
         /// </summary>
-        public WeatherMeasuring Sunshine { get; set; }
+        public Measuring Sunshine { get; set; }
 
         /// <summary>
         /// States the air temperature during the survey event.
         /// </summary>
-        public WeatherMeasuring AirTemperature { get; set; }
+        public Measuring AirTemperature { get; set; }
 
         /// <summary>
         /// States the wind direction during the survey event as a compass direction.
         /// </summary>
-        public WindDirectionCompass? WindDirectionCompass { get; set; }
+        public Enums.CompassDirection? WindDirection { get; set; }
 
         /// <summary>
         /// States the wind direction during the survey event as a number of degrees.
         /// </summary>
-        public WeatherMeasuring WindDirectionDegrees { get; set; }
+        public Measuring WindDirectionDegrees { get; set; }
 
         /// <summary>
         /// WindSpeed
         /// </summary>
-        public WeatherMeasuring WindSpeed { get; set; }
+        public Measuring WindSpeed { get; set; }
 
         /// <summary>
         /// States the strength of the wind during the survey event.

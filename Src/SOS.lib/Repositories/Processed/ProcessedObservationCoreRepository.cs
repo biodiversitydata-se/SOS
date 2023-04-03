@@ -1168,6 +1168,7 @@ namespace SOS.Lib.Repositories.Processed
             IEnumerable<object> searchAfter = null) 
         {
             var searchIndex = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
 
             // Retry policy by Polly
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
@@ -1177,7 +1178,8 @@ namespace SOS.Lib.Repositories.Processed
                 .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                     .Query(q => q
                         .Bool(b => b
-                            .Filter(filter.ToQuery())
+                            .Filter(query)
+                            .MustNot(excludeQuery)
                         )
                     ),
                 pointInTimeId,

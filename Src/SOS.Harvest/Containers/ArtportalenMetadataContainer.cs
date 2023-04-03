@@ -1,9 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
-using Amazon.Auth.AccessControlPolicy;
 using DnsClient.Internal;
 using Microsoft.Extensions.Logging;
-using Nest;
 using SOS.Harvest.Containers.Interfaces;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
@@ -15,6 +13,7 @@ namespace SOS.Harvest.Containers
 {
     public class ArtportalenMetadataContainer : IArtportalenMetadataContainer
     {
+        private readonly IDiaryEntryRepository _diaryEntryRepository;
         private readonly IMetadataRepository _metadataRepository;
         private readonly IPersonRepository _personRepository;
         private readonly IProjectRepository _projectRepository;
@@ -26,6 +25,7 @@ namespace SOS.Harvest.Containers
         private ConcurrentDictionary<int, MetadataWithCategory<int>> _activities;
         private ConcurrentDictionary<int, Metadata<int>> _biotopes;
         private ConcurrentDictionary<int, Metadata<int>> _determinationMethods;
+        private ConcurrentDictionary<(DateTime, int, int), ICollection<DiaryEntry>> _diaryEntries;
         private ConcurrentDictionary<int, Metadata<int>> _discoveryMethods;
         private ConcurrentDictionary<int, Metadata<int>> _genders;
         private ConcurrentDictionary<int, Metadata<int>> _organizations;
@@ -38,6 +38,42 @@ namespace SOS.Harvest.Containers
         private ConcurrentDictionary<int, Metadata<int>> _units;
         private ConcurrentDictionary<int, Metadata<int>> _validationStatus;
 
+        #region Diary Entries
+        private async Task PopulateWeatherAsync() 
+        {
+            _diaryEntries = new ConcurrentDictionary<(DateTime, int, int), ICollection<DiaryEntry>>();
+            var diaryEntries = await _diaryEntryRepository.GetAsync();
+
+            foreach(var diaryEntry in diaryEntries)
+            {
+                if (!_diaryEntries.TryGetValue((diaryEntry.IssueDate, diaryEntry.ProjectId, diaryEntry.UserId), out var dateDiaryEntries))
+                {
+                    dateDiaryEntries = new List<DiaryEntry>();
+                    _diaryEntries.TryAdd((diaryEntry.IssueDate.Date, diaryEntry.ProjectId, diaryEntry.UserId), dateDiaryEntries);
+                }
+
+                dateDiaryEntries.Add(new DiaryEntry
+                {
+                    CloudinessId = diaryEntry.CloudinessId,
+                    ControlingOrganisationId = diaryEntry.ControlingOrganisationId,
+                    EndTime = diaryEntry.EndTime,
+                    IssueDate = diaryEntry.IssueDate,
+                    OrganizationId = diaryEntry.OrganizationId,
+                    PrecipitationId = diaryEntry.PrecipitationId,
+                    ProjectId = diaryEntry.ProjectId,
+                    SiteId = diaryEntry.SiteId,
+                    SnowcoverId = diaryEntry.SnowcoverId,
+                    StartTime = diaryEntry.StartTime,
+                    Temperature = diaryEntry.Temperature,
+                    UserId = diaryEntry.UserId,
+                    VisibilityId = diaryEntry.VisibilityId,
+                    WindId = diaryEntry.WindId,
+                    WindStrengthId = diaryEntry.WindStrengthId
+                });
+            }
+        }
+        #endregion Diary Entries
+
         #region Metadata
         /// <summary>
         ///     Cast multiple sightings entities to models
@@ -48,7 +84,7 @@ namespace SOS.Harvest.Containers
         {
             if (!entities?.Any() ?? true)
             {
-                return null;
+                return null!;
             }
 
             var metadataItems = new Dictionary<T, Metadata<T>>();
@@ -209,6 +245,7 @@ namespace SOS.Harvest.Containers
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="diaryEntryRepository"></param>
         /// <param name="metadataRepository"></param>
         /// <param name="personRepository"></param>
         /// <param name="projectRepository"></param>
@@ -216,12 +253,14 @@ namespace SOS.Harvest.Containers
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ArtportalenMetadataContainer(
+            IDiaryEntryRepository diaryEntryRepository,
             IMetadataRepository metadataRepository,
             IPersonRepository personRepository,
             IProjectRepository projectRepository,
             ITaxonRepository taxonRepository,
             ILogger<ArtportalenMetadataContainer> logger)
         {
+            _diaryEntryRepository = diaryEntryRepository ?? throw new ArgumentNullException(nameof(diaryEntryRepository));
             _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _personRepository = personRepository ?? throw new ArgumentNullException(nameof(personRepository));
             _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
@@ -301,6 +340,8 @@ namespace SOS.Harvest.Containers
                 _units = CastMetdataEntitiesToVerbatims(units)?.ToConcurrentDictionary(u => u.Id, u => u) ?? new ConcurrentDictionary<int, Metadata<int>>();
                 _validationStatus = CastMetdataEntitiesToVerbatims<int>(validationStatus)?.ToConcurrentDictionary(vs => vs.Id, vs => vs) ?? new ConcurrentDictionary<int, Metadata<int>>();
 
+                await PopulateWeatherAsync();
+
                 IsInitialized = true;
 
                 _logger.LogDebug("Finish getting meta data");
@@ -362,6 +403,51 @@ namespace SOS.Harvest.Containers
             _determinationMethods.TryGetValue(id ?? 0, out var determinationMethod);
 
             return determinationMethod!;
+        }
+
+        /// <inheritdoc />
+        public DiaryEntry TryGetDiaryEntry(IEnumerable<int> projectIds, DateTime? startDate, TimeSpan? startTime, int userId, int? siteId, int? controlingOrganisationId)
+        {
+            if (!projectIds?.Any() ?? true || !startDate.HasValue)
+            {
+                return null!;
+            }
+
+            DiaryEntry diaryEntry = null!;
+            foreach (var projectId in projectIds!)
+            {
+                if (_diaryEntries.TryGetValue((startDate!.Value, projectId, userId), out var dateDiaryEntries))
+                {
+                    var matchLevel = -1;
+                    foreach (var dateDiaryEntry in dateDiaryEntries)
+                    {
+                        // We have found weather data for project/user the requested date. Set weather to make sure we have something to return if we not find any better option
+                        if (matchLevel.Equals(-1))
+                        {
+                            diaryEntry = dateDiaryEntry;
+                            matchLevel = 0;
+                        }
+
+                        var matchCount = (startTime >= dateDiaryEntry.StartTime ? 1 : 0) +
+                            (startTime <= dateDiaryEntry.EndTime ? 1 : 0) +
+                            (siteId == dateDiaryEntry.SiteId ? 1 : 0) +
+                            (controlingOrganisationId == dateDiaryEntry.ControlingOrganisationId ? 1 : 0);
+
+                        if (matchCount.Equals(4) || dateDiaryEntries.Count().Equals(1))
+                        {
+                            return dateDiaryEntry; // Perfect match no reason to go on
+                        }
+
+                        if (matchCount > matchLevel)
+                        {
+                            diaryEntry = dateDiaryEntry; // We found a "better" match, use it 
+                            matchLevel = matchCount;
+                        }
+                    }
+                }
+            }
+
+            return diaryEntry!;
         }
 
         /// <inheritdoc />

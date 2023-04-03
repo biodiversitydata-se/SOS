@@ -46,6 +46,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int? DatasourceId { get; set; }
 
         /// <summary>
+        /// Diary entries
+        /// </summary>
+        public DiaryEntry DiaryEntry { get; set; }
+
+        /// <summary>
         ///     DiscoveryMethod
         /// </summary>
         public Metadata<int> DiscoveryMethod { get; set; }

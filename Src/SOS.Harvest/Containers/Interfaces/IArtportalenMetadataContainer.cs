@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Shared;
+﻿
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Harvest.Containers.Interfaces
@@ -50,6 +51,18 @@ namespace SOS.Harvest.Containers.Interfaces
         /// <param name="id"></param>
         /// <returns></returns>
         Metadata<int> TryGetDeterminationMethod(int? id);
+
+        /// <summary>
+        /// Try get diary entry
+        /// </summary>
+        /// <param name="projectIds"></param>
+        /// <param name="startDate"></param>
+        /// <param name="startTime"></param>
+        /// <param name="userId"></param>
+        /// <param name="siteId"></param>
+        /// <param name="controlingOrganisationId"></param>
+        /// <returns></returns>
+        DiaryEntry TryGetDiaryEntry(IEnumerable<int> projectIds, DateTime? startDate, TimeSpan? startTime, int userId, int? siteId, int? controlingOrganisationId);
 
         /// <summary>
         /// Try to get a xxx by id
