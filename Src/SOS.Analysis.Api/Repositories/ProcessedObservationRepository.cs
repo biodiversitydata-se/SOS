@@ -43,14 +43,26 @@ namespace SOS.Analysis.Api.Repositories
                         .Filter(query)
                     )
                 )
+                .RuntimeFields(rf => rf // Since missing field seems replaced by MissingBucket in Nest implementation, we need to make a script field to handle empty string and null the same way
+                    .RuntimeField("scriptField", FieldType.Keyword, s => s
+                            .Script(@$"
+                            if (!doc['{aggregationField}'].empty){{  
+                                String value = '' + doc['{aggregationField}'].value; 
+                                if (value != '') {{ 
+                                    emit(value); 
+                                }} 
+                            }}"
+                         )
+                    )
+                )
                 .Aggregations(a => a
                     .Composite("aggregation", c => c
                         .After(string.IsNullOrEmpty(afterKey) ? null : new CompositeKey(new Dictionary<string, object>() { { "termAggregation", afterKey } }))
                         .Size(take)
                         .Sources(s => s
                             .Terms("termAggregation", t => t
-                                .Field(aggregationField)
-                                .MissingBucket(true)
+                                .Field("scriptField")
+                                .MissingBucket(true) 
                             )
                         )
                         .Aggregations(a => a
