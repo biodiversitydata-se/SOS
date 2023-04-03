@@ -273,11 +273,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             int size = 65536, 
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
 
-        Task<AggregationResult<AggregationItem>> GetAggregationItemsIncludeTotalCountAsync(SearchFilter filter,
-            string aggregationField,
-            int size = 65536,
-            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
-
         Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
             string aggregationField,            
             int skip,

@@ -53,7 +53,6 @@ namespace SOS.Lib.Repositories.Processed
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
                 )
-
                 .Map<Observation>(m => m
                     .AutoMap<Observation>()
                     .Properties(ps => ps
@@ -1475,54 +1474,6 @@ namespace SOS.Lib.Repositories.Processed
 
             return result;
         }
-
-        public async Task<AggregationResult<AggregationItem>> GetAggregationItemsIncludeTotalCountAsync(SearchFilter filter,
-            string aggregationField,
-            int size = 65536,
-            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
-        {
-            var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
-            var termsOrder = sortOrder.GetTermsOrder<dynamic>();
-            size = Math.Max(1, size);
-
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-                .Aggregations(a => a
-                    .Terms("termAggregation", t => t
-                        .Size(size)
-                        .Field(aggregationField)
-                        .Order(termsOrder)
-                    )
-                    .Cardinality("cardinalityAggregation", t => t
-                        .Field(aggregationField)
-                        .PrecisionThreshold(40000)
-                    )
-                )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
-            );
-
-            searchResponse.ThrowIfInvalid();
-            IEnumerable<AggregationItem> records = searchResponse.Aggregations
-                .Terms("termAggregation")
-                .Buckets
-                .Select(b => new AggregationItem { AggregationKey = b.Key, DocCount = (int)(b.DocCount ?? 0) });
-
-            return new AggregationResult<AggregationItem>
-            {
-                TotalCount = Convert.ToInt32(searchResponse.Aggregations.Cardinality("cardinalityAggregation").Value),
-                Records = records
-            };
-        }
-
 
         public async Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
             string aggregationField,            
