@@ -116,6 +116,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     SELECT [Id]
                           ,[Description]
                           ,[Link]
+                          ,[Name]
                           ,[SpeciesList]                          
                     FROM [dbo].[DS_Methodology]";
 
