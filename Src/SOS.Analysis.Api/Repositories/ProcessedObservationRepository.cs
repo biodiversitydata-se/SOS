@@ -62,7 +62,7 @@ namespace SOS.Analysis.Api.Repositories
                         .Sources(s => s
                             .Terms("termAggregation", t => t
                                 .Field("scriptField")
-                                .MissingBucket(true) 
+                                .MissingBucket(true)
                             )
                         )
                         .Aggregations(a => a
