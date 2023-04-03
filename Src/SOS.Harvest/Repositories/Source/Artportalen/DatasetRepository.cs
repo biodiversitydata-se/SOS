@@ -49,8 +49,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                           ,[Language]
                           ,[AccessRightsId]
                           ,[PurposeId]
-                          ,[AssignerId]
-                          ,[CreatorId]
+                          ,[AssignerId]                          
                           ,[OwnerinstitutionId]
                           ,[PublisherId]
                           ,[DataStewardship]
@@ -117,6 +116,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     SELECT [Id]
                           ,[Description]
                           ,[Link]
+                          ,[Name]
                           ,[SpeciesList]                          
                     FROM [dbo].[DS_Methodology]";
 

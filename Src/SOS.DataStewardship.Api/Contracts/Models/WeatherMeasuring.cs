@@ -20,6 +20,6 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// Unit for a reported measurement (given in the attribute "vädermått").
         /// </summary>
         [Required]
-        public Unit? Unit { get; set; }
+        public Enums.Unit? Unit { get; set; }
     }
 }

@@ -66,7 +66,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// <summary>
         /// Unit for a certain amount of organisms (given in the attribute quantity).
         /// </summary>
-        public Unit? Unit { get; set; }
+        public Enums.Unit? Unit { get; set; }
 
         /// <summary>
         /// Organism

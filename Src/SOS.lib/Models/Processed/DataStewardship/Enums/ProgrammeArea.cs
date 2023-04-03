@@ -36,6 +36,11 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Enums
         /// Skog
         /// </summary>
         [EnumMember(Value = "Skog")]
-        Skog = 5
+        Skog = 5,
+        /// <summary>
+        /// Skog
+        /// </summary>
+        [EnumMember(Value = "Våtmark")]
+        Våtmark = 6
     }
 }
