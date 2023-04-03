@@ -173,9 +173,9 @@ namespace SOS.DataStewardship.Api.Extensions
             return (WindDirectionCompass)source;
         }        
 
-        private static Unit ToUnit(this ProcessedDataStewardship.Enums.Unit source)
+        private static Contracts.Enums.Unit ToUnit(this ProcessedDataStewardship.Enums.Unit source)
         {
-            return (Unit)source;
+            return (Contracts.Enums.Unit)source;
         }
 
         private static SnowCover ToSnowCover(this ProcessedDataStewardship.Enums.SnowCover source)
