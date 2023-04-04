@@ -20,6 +20,8 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 using System.Diagnostics;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace SOS.Lib.IO.Excel
 {
@@ -58,11 +60,14 @@ namespace SOS.Lib.IO.Excel
         /// <param name="processedObservationRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
+        /// <param name="telemetry"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ExcelFileWriter(IProcessedObservationCoreRepository processedObservationRepository, 
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
-            ILogger<ExcelFileWriter> logger)
+            TelemetryClient telemetry,
+            ILogger<ExcelFileWriter> logger) : base(telemetry)
         {
             _processedObservationRepository = processedObservationRepository ??
                                                     throw new ArgumentNullException(
@@ -85,6 +90,9 @@ namespace SOS.Lib.IO.Excel
 
             try
             {
+                using var operation = _telemetry.StartOperation<DependencyTelemetry>("Create_xls-File");
+                operation.Telemetry.Properties["Filter"] = filter.ToString();
+
                 string excelFilePath = null;
                 int nrObservations = 0;
                 var propertyFields =
@@ -171,6 +179,8 @@ namespace SOS.Lib.IO.Excel
                 {
                     throw new Exception($"Excel export expected {expectedNoOfObservations} but only got {nrObservations}");
                 }
+
+                operation.Telemetry.Metrics["Observation-count"] = nrObservations;
 
                 packageSaveTasks.Add(TrySavePackageAync(package));
                 await Task.WhenAll(packageSaveTasks);

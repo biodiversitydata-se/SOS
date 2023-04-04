@@ -301,14 +301,15 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, processedObservationRepository, new NullLogger<DataProviderManager>());
             var fileService = new FileService();
             _vocabularyValueResolver = new VocabularyValueResolver(_vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
+            var telemetryClient = new TelemetryClient();
             var csvFileWriter = new CsvFileWriter(processedObservationRepository, fileService,
-                _vocabularyValueResolver, new NullLogger<CsvFileWriter>());
+                _vocabularyValueResolver, telemetryClient, new NullLogger<CsvFileWriter>());
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(_vocabularyValueResolver, _processClient);
             var dwcArchiveEventFileWriter = CreateDwcArchiveEventFileWriter(_vocabularyValueResolver, _processClient);
             var excelFileWriter = new ExcelFileWriter(processedObservationRepository, fileService,
-                _vocabularyValueResolver, new NullLogger<ExcelFileWriter>());
+                _vocabularyValueResolver, telemetryClient, new NullLogger<ExcelFileWriter>());
             var geojsonFileWriter = new GeoJsonFileWriter(processedObservationRepository, fileService,
-                _vocabularyValueResolver, new NullLogger<GeoJsonFileWriter>());
+                _vocabularyValueResolver, telemetryClient, new NullLogger<GeoJsonFileWriter>());
             var areaRepository = new AreaRepository(_processClient, new NullLogger<AreaRepository>());
             var areaCache = new AreaCache(areaRepository);
             _userService = CreateUserService();
@@ -402,6 +403,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(), new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new TelemetryClient(),
                 new NullLogger<DwcArchiveFileWriter>());
 
             return dwcArchiveFileWriter;

@@ -46,6 +46,7 @@ using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using SOS.Observations.Api.IntegrationTests.Repositories;
 using SOS.Observations.Api.Services.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using Microsoft.IdentityModel.Abstractions;
 
 namespace SOS.Observations.Api.IntegrationTests.Fixtures
 {
@@ -209,14 +210,15 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, ProcessedObservationRepository, new NullLogger<DataProviderManager>());
             var fileService = new FileService();
             VocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
+            var telemetryClient = new TelemetryClient();
             var csvFileWriter = new CsvFileWriter(ProcessedObservationRepository, fileService,
-                VocabularyValueResolver, new NullLogger<CsvFileWriter>());
+                VocabularyValueResolver, telemetryClient, new NullLogger<CsvFileWriter>());
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(VocabularyValueResolver, processClient);
             var dwcArchiveEventFileWriter = CreateDwcArchiveEventFileWriter(VocabularyValueResolver, processClient);
             var excelFileWriter = new ExcelFileWriter(ProcessedObservationRepository, fileService,
-                VocabularyValueResolver, new NullLogger<ExcelFileWriter>());
+                VocabularyValueResolver, telemetryClient, new NullLogger<ExcelFileWriter>());
             var geojsonFileWriter = new GeoJsonFileWriter(ProcessedObservationRepository, fileService,
-                VocabularyValueResolver, new NullLogger<GeoJsonFileWriter>());
+                VocabularyValueResolver, telemetryClient, new NullLogger<GeoJsonFileWriter>());
             var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
             var areaCache = new AreaCache(areaRepository);
             var userService = CreateUserService();
@@ -284,6 +286,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(), new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new TelemetryClient(),
                 new NullLogger<DwcArchiveFileWriter>());
 
             return dwcArchiveFileWriter;

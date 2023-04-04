@@ -49,6 +49,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new TelemetryClient(),
                 new Mock<ILogger<DwcArchiveFileWriter>>().Object);
             return dwcArchiveFileWriter;
         }

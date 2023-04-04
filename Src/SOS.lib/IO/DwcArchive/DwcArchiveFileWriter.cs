@@ -24,11 +24,13 @@ using SOS.Lib.Factories;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Repositories.Processed;
+using Microsoft.ApplicationInsights.Channel;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace SOS.Lib.IO.DwcArchive
 {
-    public class DwcArchiveFileWriter : IDwcArchiveFileWriter
+    public class DwcArchiveFileWriter : FileWriterBase, IDwcArchiveFileWriter
     {
         private readonly IDwcArchiveOccurrenceCsvWriter _dwcArchiveOccurrenceCsvWriter;
         private readonly IExtendedMeasurementOrFactCsvWriter _extendedMeasurementOrFactCsvWriter;
@@ -38,20 +40,23 @@ namespace SOS.Lib.IO.DwcArchive
         private readonly ILogger<DwcArchiveFileWriter> _logger;
 
         /// <summary>
-        /// Constructor.
+        /// Constructor
         /// </summary>
         /// <param name="dwcArchiveOccurrenceCsvWriter"></param>
         /// <param name="extendedMeasurementOrFactCsvWriter"></param>
         /// <param name="simpleMultimediaCsvWriter"></param>
         /// <param name="fileService"></param>
         /// <param name="dataProviderRepository"></param>
+        /// <param name="telemetry"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DwcArchiveFileWriter(IDwcArchiveOccurrenceCsvWriter dwcArchiveOccurrenceCsvWriter,
             IExtendedMeasurementOrFactCsvWriter extendedMeasurementOrFactCsvWriter,
             ISimpleMultimediaCsvWriter simpleMultimediaCsvWriter,
             IFileService fileService,
             IDataProviderRepository dataProviderRepository,
-            ILogger<DwcArchiveFileWriter> logger)
+            TelemetryClient telemetry,
+            ILogger<DwcArchiveFileWriter> logger) : base(telemetry)
         {
             _dwcArchiveOccurrenceCsvWriter = dwcArchiveOccurrenceCsvWriter ??
                                              throw new ArgumentNullException(nameof(dwcArchiveOccurrenceCsvWriter));
@@ -103,6 +108,9 @@ namespace SOS.Lib.IO.DwcArchive
 
             try
             {
+                using var operation = _telemetry.StartOperation<DependencyTelemetry>("Create_DwC-File");
+                operation.Telemetry.Properties["Filter"] = filter.ToString();
+
                 temporaryZipExportFolderPath = Path.Combine(exportFolderPath, fileName);
                 _fileService.CreateFolder(temporaryZipExportFolderPath);
                 var occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.txt");
@@ -185,6 +193,8 @@ namespace SOS.Lib.IO.DwcArchive
                     DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
                     processInfoFileStream.Close();
                 }
+
+                operation.Telemetry.Metrics["Observation-count"] = nrObservations;
 
                 var zipFilePath = _fileService.CompressFolder(exportFolderPath, fileName);
                 _fileService.DeleteFolder(temporaryZipExportFolderPath);

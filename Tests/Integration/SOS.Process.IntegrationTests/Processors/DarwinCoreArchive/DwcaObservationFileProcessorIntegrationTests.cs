@@ -33,6 +33,7 @@ using Xunit;
 using Xunit.Abstractions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Configuration.Import;
+using Microsoft.ApplicationInsights;
 
 namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 {
@@ -119,6 +120,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new TelemetryClient(),
                 new NullLogger<DwcArchiveFileWriter>()
             ), new FileService(), dataProviderRepository, importClient, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
             var dwcaConfiguration = new DwcaConfiguration()

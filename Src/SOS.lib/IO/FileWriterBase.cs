@@ -1,14 +1,22 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.IO
 {
     public class FileWriterBase
     {
+        protected readonly TelemetryClient _telemetry;
+     
+        protected FileWriterBase(TelemetryClient telemetry)
+        {
+            _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
+        }
         /// <summary>
         /// Store filter in folder o zip
         /// </summary>

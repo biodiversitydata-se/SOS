@@ -1041,8 +1041,19 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<IEnumerable<Observation>> GetObservationsAsync(IEnumerable<string> occurrenceIds, bool protectedIndex)
         {
+            return await GetObservationsAsync(occurrenceIds, new[] { "occurrence", "location" }, protectedIndex);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<Observation>> GetObservationsAsync(
+            IEnumerable<string> occurrenceIds,
+            IEnumerable<string> outputFields,
+            bool protectedIndex)
+        {
             try
             {
+                using var operation = _telemetry.StartOperation<DependencyTelemetry>("GetObservationsAsync");
+
                 var searchResponse = await Client.SearchAsync<Observation>(s => s
                     .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
                     .Query(q => q
@@ -1052,13 +1063,20 @@ namespace SOS.Lib.Repositories.Processed
                         )
                     )
                     .Size(occurrenceIds?.Count() ?? 0)
-                    .Source(s => s
-                        .Includes(i => i.Fields(f => f.Occurrence, f => f.Location))
+                    .Source(p => p
+                        .Includes(i => i
+                            .Fields(outputFields
+                                .Select(f => new Field(f))
+                            )
+                        )
                     )
                     .TrackTotalHits(false)
                 );
+
                 searchResponse.ThrowIfInvalid();
-                
+
+                operation.Telemetry.Metrics["Observation-count"] = searchResponse.Documents.Count;
+
                 return searchResponse.Documents;
             }
             catch (Exception e)
@@ -1066,36 +1084,6 @@ namespace SOS.Lib.Repositories.Processed
                 Logger.LogError(e.ToString());
                 return null;
             }
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<Observation>> GetObservationsAsync(
-            IEnumerable<string> occurrenceIds,
-            IEnumerable<string> outputFields,
-            bool protectedIndex)
-        {
-            var searchResponse = await Client.SearchAsync<Observation>(s => s
-                .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
-                .Query(q => q
-                    .Terms(t => t
-                        .Field(f => f.Occurrence.OccurrenceId)
-                        .Terms(occurrenceIds)
-                    )
-                )
-                .Size(occurrenceIds?.Count() ?? 0)
-                .Source(p => p
-                    .Includes(i => i
-                        .Fields(outputFields
-                            .Select(f => new Field(f))
-                        )
-                    )
-                )
-                .TrackTotalHits(false)
-            );
-
-            searchResponse.ThrowIfInvalid();
-
-            return searchResponse.Documents;
         }
 
         /// <inheritdoc />
@@ -1206,7 +1194,7 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries(filter);
             
             var sortDescriptor = await Client.GetSortDescriptorAsync<dynamic>(indexNames, filter?.Output?.SortOrders);
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Scroll");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
            
@@ -1234,7 +1222,7 @@ namespace SOS.Lib.Repositories.Processed
                 return queryResponse;
             });
 
-            operation.Telemetry.Metrics["SpeciesObservationCount"] = searchResponse.Documents.Count;
+            operation.Telemetry.Metrics["Observation-count"] = searchResponse.Documents.Count;
 
             // Optional: explicitly send telemetry item:
             _telemetry.StopOperation(operation);
@@ -1787,7 +1775,7 @@ namespace SOS.Lib.Repositories.Processed
                 totalCount = countResponse.Count;
             }
 
-            operation.Telemetry.Metrics["SpeciesObservationCount"] = searchResponse.Documents.Count;
+            operation.Telemetry.Metrics["Observation-count"] = searchResponse.Documents.Count;
 
             // Optional: explicitly send telemetry item:
             _telemetry.StopOperation(operation);
@@ -1825,6 +1813,8 @@ namespace SOS.Lib.Repositories.Processed
             );
 
             searchResponse.ThrowIfInvalid();
+
+            operation.Telemetry.Metrics["Observation-count"] = searchResponse.Documents.Count;
 
             // Optional: explicitly send telemetry item:
             _telemetry.StopOperation(operation);

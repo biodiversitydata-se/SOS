@@ -31,6 +31,7 @@ using Xunit;
 using SOS.Lib.Managers.Interfaces;
 using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
 using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
+using Microsoft.ApplicationInsights;
 
 namespace SOS.Process.IntegrationTests.Processors.Artportalen
 {
@@ -178,6 +179,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new TelemetryClient(),
                 new NullLogger<DwcArchiveFileWriter>()
             ), new FileService(), dataProviderRepository,
                 verbatimClient,
