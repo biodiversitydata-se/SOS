@@ -374,7 +374,6 @@ namespace SOS.Observations.Api.Controllers
                         gzip,
                         JobCancellationToken.Null);
 
-                HttpContext.LogObservationCount(fileExportResult.NrObservations);
                 if (gzip)
                     return GetFile(fileExportResult.FilePath, "Observations_Csv.zip", "application/zip");
                 else
@@ -441,7 +440,6 @@ namespace SOS.Observations.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
-                HttpContext.LogObservationCount(fileExportResult.NrObservations);
                 return GetFile(fileExportResult.FilePath, "Observations_DwC.zip", "application/zip");
             }
             catch (AuthenticationRequiredException e)
@@ -507,7 +505,6 @@ namespace SOS.Observations.Api.Controllers
                         gzip,
                         JobCancellationToken.Null);
 
-                HttpContext.LogObservationCount(fileExportResult.NrObservations);
                 if (gzip)
                     return GetFile(fileExportResult.FilePath, "Observations_Excel.zip", "application/zip");
                 else
@@ -578,7 +575,6 @@ namespace SOS.Observations.Api.Controllers
                         gzip,
                         JobCancellationToken.Null);
 
-                HttpContext.LogObservationCount(fileExportResult?.NrObservations ?? 0);
                 if (gzip)                
                     return GetFile(fileExportResult.FilePath, "Observations_GeoJson.zip", "application/zip");
                 else                
@@ -925,7 +921,6 @@ namespace SOS.Observations.Api.Controllers
                         gzip,
                         JobCancellationToken.Null);
 
-                HttpContext.LogObservationCount(fileExportResult.NrObservations);
                 if (gzip)
                     return GetFile(fileExportResult.FilePath, "Observations_Csv.zip", "application/zip");
                 else
@@ -987,7 +982,6 @@ namespace SOS.Observations.Api.Controllers
                         true,
                         JobCancellationToken.Null);
 
-                HttpContext.LogObservationCount(fileExportResult.NrObservations);
                 return GetFile(fileExportResult.FilePath, "Observations_DwC.zip", "application/zip");
             }
             catch (AuthenticationRequiredException e)
@@ -1053,7 +1047,6 @@ namespace SOS.Observations.Api.Controllers
                         gzip,
                         JobCancellationToken.Null);
 
-                HttpContext.LogObservationCount(fileExportResult.NrObservations);
                 if (gzip)
                     return GetFile(fileExportResult.FilePath, "Observations_Excel.zip", "application/zip");
                 else
@@ -1124,7 +1117,6 @@ namespace SOS.Observations.Api.Controllers
                         gzip,
                         JobCancellationToken.Null);
 
-                HttpContext.LogObservationCount(fileExportResult?.NrObservations ?? 0);
                 if (gzip)
                     return GetFile(fileExportResult.FilePath, "Observations_GeoJson.zip", "application/zip");
                 else

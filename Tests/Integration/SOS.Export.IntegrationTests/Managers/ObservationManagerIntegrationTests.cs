@@ -55,6 +55,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()), 
                 new FileService(),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new TelemetryClient(),
                 new NullLogger<DwcArchiveFileWriter>());
 
             var dwcArchiveEventFileWriter = new DwcArchiveEventFileWriter(
@@ -71,20 +72,20 @@ namespace SOS.Export.IntegrationTests.Managers
 
             var processedConfigurationRepository = new ProcessedConfigurationRepository(processClient,
                 new NullLogger<ProcessedConfigurationRepository>());
-
+            var telemetryClient = new TelemetryClient();
             var processedObservationRepository = new ProcessedObservationCoreRepository(
                 elasticClientManager,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(processedConfigurationRepository),
-                new TelemetryClient(),
+                telemetryClient,
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
 
             var excelWriter = new ExcelFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
-                new NullLogger<ExcelFileWriter>());
+                telemetryClient, new NullLogger<ExcelFileWriter>());
             var geoJsonlWriter = new GeoJsonFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
-                new NullLogger<GeoJsonFileWriter>());
+                telemetryClient, new NullLogger<GeoJsonFileWriter>());
             var csvWriter = new CsvFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
-                new NullLogger<CsvFileWriter>());
+                telemetryClient, new NullLogger<CsvFileWriter>());
 
             var filterManager = new Mock<IFilterManager>();
             filterManager

@@ -7,6 +7,8 @@ using System.Text.Json;
 using System.Text.Unicode;
 using System.Threading.Tasks;
 using Hangfire;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -36,11 +38,14 @@ namespace SOS.Lib.IO.GeoJson
         /// <param name="processedObservationRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
+        /// <param name="telemetry"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public GeoJsonFileWriter(IProcessedObservationCoreRepository processedObservationRepository,
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
-            ILogger<GeoJsonFileWriter> logger)
+            TelemetryClient telemetry,
+            ILogger<GeoJsonFileWriter> logger) : base(telemetry)
         {
             _processedObservationRepository = processedObservationRepository ??
                                                     throw new ArgumentNullException(
@@ -67,6 +72,9 @@ namespace SOS.Lib.IO.GeoJson
 
             try
             {
+                using var operation = _telemetry.StartOperation<DependencyTelemetry>("Create_GeoJson-File");
+                operation.Telemetry.Properties["Filter"] = filter.ToString();
+
                 var nrObservations = 0;
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var propertyFields =
@@ -141,6 +149,8 @@ namespace SOS.Lib.IO.GeoJson
                 {
                     throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
                 }
+
+                operation.Telemetry.Metrics["Observation-count"] = nrObservations;
 
                 if (gzip)
                 {

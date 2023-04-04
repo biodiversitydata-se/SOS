@@ -197,7 +197,6 @@ namespace SOS.Observations.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
-                HttpContext.LogObservationCount(1);
                 return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
@@ -519,7 +518,6 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 SearchFilter searchFilter = filter.ToSearchFilter(UserId, protectionFilter, translationCultureCode, sortBy, sortOrder);
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
-                HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
                 PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -660,8 +658,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
-                HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
-                
                 var dtos = result?.Records?.ToObservations().Select(o => o.ToDto());
                 return new OkObjectResult(dtos);
             }
@@ -721,8 +717,6 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
-
-                HttpContext.LogObservationCount(1);
 
                 var dto = new[] { observation }.ToObservations().Select(o => o.ToDto()).FirstOrDefault();
                 return new OkObjectResult(dto);
@@ -877,7 +871,6 @@ namespace SOS.Observations.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
-                HttpContext.LogObservationCount(1);
                 return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
@@ -1453,7 +1446,6 @@ namespace SOS.Observations.Api.Controllers
                     }
                 }
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(UserId, translationCultureCode, sortBy, sortOrder), skip, take);
-                HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 return new OkObjectResult(dto);
             }
@@ -1669,7 +1661,7 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return BadRequest($"Scroll total count limit is maxTotalCount. Your result is {result.TotalCount}. Try use a more specific filter.");
                 }
-                HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
+
                 ScrollResultDto<dynamic> dto = result.ToScrollResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
