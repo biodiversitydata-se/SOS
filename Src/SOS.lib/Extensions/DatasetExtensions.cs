@@ -49,13 +49,13 @@ namespace SOS.Lib.Extensions
             return new Methodology
             {                
                 MethodologyName = apMethodology.Name,
-                MethodologyDescription = apMethodology.Description,
+                MethodologyDescription = apMethodology.Description?.Clean(),
                 MethodologyLink = apMethodology.Link,
-                SpeciesList = apMethodology.SpeciesList
+                SpeciesList = apMethodology.SpeciesList?.Clean()
             };
         }
 
-        public static SOS.Lib.Models.Processed.DataStewardship.Common.Organisation ToOrganisation(this ArtportalenDatasetMetadata.Organisation apOrganisation)
+        public static Models.Processed.DataStewardship.Common.Organisation ToOrganisation(this ArtportalenDatasetMetadata.Organisation apOrganisation)
         {
             return new Models.Processed.DataStewardship.Common.Organisation
             {
@@ -64,7 +64,7 @@ namespace SOS.Lib.Extensions
             };
         }
 
-        public static SOS.Lib.Models.Processed.DataStewardship.Common.Project ToProject(this ArtportalenDatasetMetadata.Project apProject)
+        public static Models.Processed.DataStewardship.Common.Project ToProject(this ArtportalenDatasetMetadata.Project apProject)
         {
             return new Models.Processed.DataStewardship.Common.Project
             {

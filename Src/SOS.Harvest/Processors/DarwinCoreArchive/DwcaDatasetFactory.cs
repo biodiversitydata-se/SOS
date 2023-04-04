@@ -53,7 +53,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     Purpose = verbatimDataset.Purpose,
                     Spatial = verbatimDataset.Spatial?.Clean(),
                     StartDate = verbatimDataset.StartDate.HasValue ? verbatimDataset.StartDate.Value.ToUniversalTime() : null,
-                    Title = verbatimDataset.Title?.Clean()
+                    Title = verbatimDataset.Title?.Clean(),
+                    DescriptionAccessRights = verbatimDataset.DescriptionAccessRights?.Clean(),
                 };
 
                 return observationDataset;
