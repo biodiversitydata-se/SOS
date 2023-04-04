@@ -1,11 +1,6 @@
-﻿using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+﻿using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Extensions
 {
@@ -16,10 +11,10 @@ namespace SOS.Lib.Extensions
             var dataset = new Dataset()
             {
                 Identifier = apDataset.Identifier,
-                Metadatalanguage = apDataset.Metadatalanguage,
-                Language = apDataset.Language,
+                Metadatalanguage = apDataset.Metadatalanguage?.Clean(),
+                Language = apDataset.Language?.Clean(),
                 AccessRights = apDataset.DatasetAccessRights?.ToAccessRights(),
-                DescriptionAccessRights = apDataset.DescriptionAccessRights,
+                DescriptionAccessRights = apDataset.DescriptionAccessRights?.Clean(),
                 Purpose = apDataset.DatasetPurpose?.ToPurpose(),
                 Assigner = apDataset.Assigner?.ToOrganisation(),
                 Creator = apDataset.Creators?.Select(m => m.ToOrganisation()).ToList(),
@@ -29,9 +24,9 @@ namespace SOS.Lib.Extensions
                 DataStewardship = apDataset.DataStewardship,
                 StartDate = apDataset.StartDate,
                 EndDate = apDataset.EndDate,
-                Description = apDataset.Description,
-                Title = apDataset.Title,
-                Spatial = apDataset.Spatial,
+                Description = apDataset.Description?.Clean(),
+                Title = apDataset.Title?.Clean(),
+                Spatial = apDataset.Spatial?.Clean(),
                 ProgrammeArea = apDataset.DatasetProgrammeArea?.ToProgrammeArea(),
                 Project = apDataset.Projects?.Select(m => m.ToProject()).ToList()
             };
@@ -41,32 +36,12 @@ namespace SOS.Lib.Extensions
 
         public static Models.Processed.DataStewardship.Enums.AccessRights ToAccessRights(this ArtportalenDatasetMetadata.AccessRights accessRights)
         {
-            switch (accessRights.Id)
-            {
-                case 0:
-                    return Models.Processed.DataStewardship.Enums.AccessRights.Publik;
-                case 1:
-                    return Models.Processed.DataStewardship.Enums.AccessRights.Begränsad;
-                case 2:
-                    return Models.Processed.DataStewardship.Enums.AccessRights.EjOffentlig;
-                default:
-                    throw new ArgumentOutOfRangeException($"ToAccessRights() don't have support for value {accessRights.Id}");
-            }
+            return accessRights.Id.ToEnum<Models.Processed.DataStewardship.Enums.AccessRights>();
         }
 
         public static Models.Processed.DataStewardship.Enums.Purpose ToPurpose(this ArtportalenDatasetMetadata.Purpose purpose)
         {
-            switch (purpose.Id)
-            {
-                case 0:
-                    return Models.Processed.DataStewardship.Enums.Purpose.NationellMiljöövervakning;
-                case 1:
-                    return Models.Processed.DataStewardship.Enums.Purpose.RegionalMiljöövervakning;
-                case 2:
-                    return Models.Processed.DataStewardship.Enums.Purpose.BiogeografiskUppföljning;
-                default:
-                    throw new ArgumentOutOfRangeException($"ToPurpose() don't have support for value {purpose.Id}");
-            }
+            return purpose.Id.ToEnum<Models.Processed.DataStewardship.Enums.Purpose>();
         }
 
         public static Methodology ToMethodology(this ArtportalenDatasetMetadata.Methodology apMethodology)
@@ -74,13 +49,13 @@ namespace SOS.Lib.Extensions
             return new Methodology
             {                
                 MethodologyName = apMethodology.Name,
-                MethodologyDescription = apMethodology.Description,
+                MethodologyDescription = apMethodology.Description?.Clean(),
                 MethodologyLink = apMethodology.Link,
-                SpeciesList = apMethodology.SpeciesList
+                SpeciesList = apMethodology.SpeciesList?.Clean()
             };
         }
 
-        public static SOS.Lib.Models.Processed.DataStewardship.Common.Organisation ToOrganisation(this ArtportalenDatasetMetadata.Organisation apOrganisation)
+        public static Models.Processed.DataStewardship.Common.Organisation ToOrganisation(this ArtportalenDatasetMetadata.Organisation apOrganisation)
         {
             return new Models.Processed.DataStewardship.Common.Organisation
             {
@@ -89,7 +64,7 @@ namespace SOS.Lib.Extensions
             };
         }
 
-        public static SOS.Lib.Models.Processed.DataStewardship.Common.Project ToProject(this ArtportalenDatasetMetadata.Project apProject)
+        public static Models.Processed.DataStewardship.Common.Project ToProject(this ArtportalenDatasetMetadata.Project apProject)
         {
             return new Models.Processed.DataStewardship.Common.Project
             {
@@ -101,40 +76,12 @@ namespace SOS.Lib.Extensions
 
         public static Models.Processed.DataStewardship.Enums.ProgrammeArea ToProgrammeArea(this ArtportalenDatasetMetadata.ProgrammeArea programmeArea)
         {
-            switch (programmeArea.Id)
-            {
-                case 0:
-                    return Models.Processed.DataStewardship.Enums.ProgrammeArea.BiogeografiskUppföljningAvNaturtyperOchArter;
-                case 1:
-                    return Models.Processed.DataStewardship.Enums.ProgrammeArea.Fjäll;
-                case 2:
-                    return Models.Processed.DataStewardship.Enums.ProgrammeArea.Jordbruksmark;
-                case 3:
-                    return Models.Processed.DataStewardship.Enums.ProgrammeArea.KustOchHav;
-                case 4:
-                    return Models.Processed.DataStewardship.Enums.ProgrammeArea.Landskap;
-                case 5:
-                    return Models.Processed.DataStewardship.Enums.ProgrammeArea.Skog;
-                default:
-                    throw new ArgumentOutOfRangeException($"ToProgrammeArea() don't have support for value {programmeArea.Id}");
-            }
+            return programmeArea.Id.ToEnum<Models.Processed.DataStewardship.Enums.ProgrammeArea>();            
         }
 
         public static Models.Processed.DataStewardship.Enums.ProjectType ToProjectType(this ArtportalenDatasetMetadata.ProjectType projectType)
         {
-            switch (projectType.Id)
-            {
-                case 0:
-                    return Models.Processed.DataStewardship.Enums.ProjectType.Artportalenprojekt;
-                case 1:
-                    return Models.Processed.DataStewardship.Enums.ProjectType.Delprogram;
-                case 2:
-                    return Models.Processed.DataStewardship.Enums.ProjectType.Delsystem;
-                case 3:
-                    return Models.Processed.DataStewardship.Enums.ProjectType.GemensamtDelprogram;                
-                default:
-                    throw new ArgumentOutOfRangeException($"ToProjectType() don't have support for value {projectType.Id}");
-            }
+            return projectType.Id.ToEnum<Models.Processed.DataStewardship.Enums.ProjectType>();
         }
     }
 }
