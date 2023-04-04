@@ -11,10 +11,10 @@ namespace SOS.Lib.Extensions
             var dataset = new Dataset()
             {
                 Identifier = apDataset.Identifier,
-                Metadatalanguage = apDataset.Metadatalanguage,
-                Language = apDataset.Language,
+                Metadatalanguage = apDataset.Metadatalanguage?.Clean(),
+                Language = apDataset.Language?.Clean(),
                 AccessRights = apDataset.DatasetAccessRights?.ToAccessRights(),
-                DescriptionAccessRights = apDataset.DescriptionAccessRights,
+                DescriptionAccessRights = apDataset.DescriptionAccessRights?.Clean(),
                 Purpose = apDataset.DatasetPurpose?.ToPurpose(),
                 Assigner = apDataset.Assigner?.ToOrganisation(),
                 Creator = apDataset.Creators?.Select(m => m.ToOrganisation()).ToList(),
@@ -24,9 +24,9 @@ namespace SOS.Lib.Extensions
                 DataStewardship = apDataset.DataStewardship,
                 StartDate = apDataset.StartDate,
                 EndDate = apDataset.EndDate,
-                Description = apDataset.Description,
-                Title = apDataset.Title,
-                Spatial = apDataset.Spatial,
+                Description = apDataset.Description?.Clean(),
+                Title = apDataset.Title?.Clean(),
+                Spatial = apDataset.Spatial?.Clean(),
                 ProgrammeArea = apDataset.DatasetProgrammeArea?.ToProgrammeArea(),
                 Project = apDataset.Projects?.Select(m => m.ToProject()).ToList()
             };

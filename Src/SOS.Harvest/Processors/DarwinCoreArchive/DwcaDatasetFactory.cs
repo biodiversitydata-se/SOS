@@ -3,6 +3,7 @@ using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Extensions;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -37,22 +38,22 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     AccessRights = verbatimDataset.AccessRights,
                     Assigner = verbatimDataset.Assigner,
                     Creator = verbatimDataset.Creator,
-                    DataStewardship = verbatimDataset.DataStewardship,
-                    Description = verbatimDataset.Description,
+                    DataStewardship = verbatimDataset.DataStewardship?.Clean(),
+                    Description = verbatimDataset.Description?.Clean(),
                     EndDate = verbatimDataset.EndDate.HasValue ? verbatimDataset.EndDate.Value.ToUniversalTime() : null,
                     EventIds = verbatimDataset.EventIds,                    
                     Identifier = verbatimDataset.Identifier,
                     //Identifier = $"urn:lsid:{DataProvider.Identifier}:Dataset:{verbatimDataset.Identifier}",
-                    Language = verbatimDataset.Language,
-                    Metadatalanguage = verbatimDataset.Metadatalanguage,
+                    Language = verbatimDataset.Language?.Clean(),
+                    Metadatalanguage = verbatimDataset.Metadatalanguage?.Clean(),
                     Methodology = verbatimDataset.Methodology,
                     OwnerinstitutionCode = verbatimDataset.OwnerinstitutionCode,
                     Project = verbatimDataset.Project,                    
                     Publisher = verbatimDataset.Publisher,
                     Purpose = verbatimDataset.Purpose,
-                    Spatial = verbatimDataset.Spatial,
+                    Spatial = verbatimDataset.Spatial?.Clean(),
                     StartDate = verbatimDataset.StartDate.HasValue ? verbatimDataset.StartDate.Value.ToUniversalTime() : null,
-                    Title = verbatimDataset.Title
+                    Title = verbatimDataset.Title?.Clean()
                 };
 
                 return observationDataset;
