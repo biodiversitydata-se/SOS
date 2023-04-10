@@ -14,5 +14,6 @@
 
         public string ApiKey { get; set; }
         public string ApplicationId { get; set; }
+        public string InstrumentationKey { get; set; }
     }
 }
