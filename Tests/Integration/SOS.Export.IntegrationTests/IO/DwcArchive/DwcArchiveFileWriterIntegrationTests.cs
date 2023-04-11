@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.ApplicationInsights;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -21,7 +20,6 @@ using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Services;
 using Xunit;
-using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Export.IntegrationTests.IO.DwcArchive
 {
@@ -49,7 +47,6 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
-                new TelemetryClient(),
                 new Mock<ILogger<DwcArchiveFileWriter>>().Object);
             return dwcArchiveFileWriter;
         }
@@ -68,7 +65,6 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                 new ElasticClientManager(elasticConfiguration),
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
-                new TelemetryClient(),
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
             return processedObservationRepository;
 

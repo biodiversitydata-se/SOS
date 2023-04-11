@@ -27,7 +27,7 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="excludeNullValues"></param>
         /// <param name="sensitiveObservations"></param>
         /// <param name="sendMailFromZendTo"></param>
-        /// <param name="encryptPassword"></param>
+        /// <param name="encryptedPassword"></param>
         /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -47,7 +47,7 @@ namespace SOS.Lib.Jobs.Export
             bool excludeNullValues,
             bool sensitiveObservations,
             bool sendMailFromZendTo,
-            string encryptPassword,
+            string encryptedPassword,
             PerformContext context,
             IJobCancellationToken cancellationToken);
     }

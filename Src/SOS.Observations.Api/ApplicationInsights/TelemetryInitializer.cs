@@ -15,7 +15,6 @@ namespace SOS.Observations.Api.ApplicationInsights
     {
         private readonly bool _loggRequestBody;
         private readonly bool _loggSearchResponseCount;
-
         /// <summary>
         /// Initialize event
         /// </summary>
@@ -35,17 +34,18 @@ namespace SOS.Observations.Api.ApplicationInsights
                 {
                     if (!telemetry.Context.GlobalProperties.ContainsKey("Request-body"))
                     {
-                        telemetry.Context.GlobalProperties.Add("Request-body", requestBody?.ToString());
+                        var body = requestBody?.ToString();
+                        telemetry.Context.GlobalProperties.Add("Request-body", body);
                     }
                 }
 
-               /* if (_loggSearchResponseCount && platformContext.Items.TryGetValue("Observation-count", out var observationCount))
+                if (_loggSearchResponseCount && platformContext.Items.TryGetValue("Observation-count", out var observationCount))
                 {
                     if (int.TryParse(observationCount?.ToString(), out var obsCount) && !telemetry.Context.GlobalProperties.ContainsKey("Observation-count"))
                     {
                         telemetry.Context.GlobalProperties.Add("Observation-count", obsCount.ToString());
                     }
-                }*/
+                }
 
                 if (platformContext.Request.ContentLength != null && !telemetry.Context.GlobalProperties.ContainsKey("Request-length"))
                 {

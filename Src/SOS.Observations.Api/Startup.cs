@@ -336,6 +336,8 @@ namespace SOS.Observations.Api
                         })
             );
 
+            services.AddSingleton(Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>());
+
             //setup the elastic search configuration
             var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
             services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(elasticConfiguration));
@@ -453,6 +455,7 @@ namespace SOS.Observations.Api
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();
+            services.AddSingleton<ICryptoService, CryptoService>();
             services.AddSingleton<IDevOpsService, DevOpsService>();
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IHttpClientService, HttpClientService>();

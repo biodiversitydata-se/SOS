@@ -196,7 +196,7 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
-
+                LogObservationCount(1);
                 return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
@@ -246,14 +246,15 @@ namespace SOS.Observations.Api.Controllers
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 CheckAuthorization(protectionFilter);
                 filter = await InitializeSearchFilterAsync(filter);
-
+                
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success());
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, "sv-SE");
                 var matchCount = await ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
-
+                
+                LogObservationCount(matchCount);
                 return new OkObjectResult(matchCount);
             }
             catch (AuthenticationRequiredException e)
@@ -519,6 +520,7 @@ namespace SOS.Observations.Api.Controllers
                 SearchFilter searchFilter = filter.ToSearchFilter(UserId, protectionFilter, translationCultureCode, sortBy, sortOrder);
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
+                LogObservationCount(dto?.TotalCount ?? 0);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -659,6 +661,8 @@ namespace SOS.Observations.Api.Controllers
 
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 var dtos = result?.Records?.ToObservations().Select(o => o.ToDto());
+
+                LogObservationCount(dtos?.Count() ?? 0);
                 return new OkObjectResult(dtos);
             }
             catch (AuthenticationRequiredException e)
@@ -719,6 +723,8 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var dto = new[] { observation }.ToObservations().Select(o => o.ToDto()).FirstOrDefault();
+
+                LogObservationCount(dto == null ? 0 : 1);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -870,7 +876,7 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
-
+                LogObservationCount(1);
                 return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
@@ -928,7 +934,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var searchFilter = filter.ToSearchFilterInternal(UserId, "sv-SE");
                 var matchCount = await ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
-
+                LogObservationCount(matchCount);
                 return new OkObjectResult(matchCount);
             }
             catch (AuthenticationRequiredException e)
@@ -969,7 +975,7 @@ namespace SOS.Observations.Api.Controllers
                 var result = await _taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { taxonId });
                 if (!result.Any())
                     return NoContent();
-
+                LogObservationCount(result.First()?.ObservationCount ?? 0);
                 return new OkObjectResult(result.First());
             }
             catch (Exception e)
@@ -999,6 +1005,7 @@ namespace SOS.Observations.Api.Controllers
                 if (!result.Any())
                     return NoContent();
 
+                LogObservationCount(result?.Count() ?? 0);
                 return new OkObjectResult(result);
             }
             catch (Exception e)
@@ -1447,6 +1454,7 @@ namespace SOS.Observations.Api.Controllers
                 }
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(UserId, translationCultureCode, sortBy, sortOrder), skip, take);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
+                LogObservationCount(dto?.TotalCount ?? 0);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -1663,6 +1671,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 ScrollResultDto<dynamic> dto = result.ToScrollResultDto(result.Records);
+                LogObservationCount(dto?.TotalCount ?? 0);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)

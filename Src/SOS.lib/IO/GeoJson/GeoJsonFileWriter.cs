@@ -38,14 +38,12 @@ namespace SOS.Lib.IO.GeoJson
         /// <param name="processedObservationRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
-        /// <param name="telemetry"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public GeoJsonFileWriter(IProcessedObservationCoreRepository processedObservationRepository,
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
-            TelemetryClient telemetry,
-            ILogger<GeoJsonFileWriter> logger) : base(telemetry)
+            ILogger<GeoJsonFileWriter> logger) 
         {
             _processedObservationRepository = processedObservationRepository ??
                                                     throw new ArgumentNullException(
@@ -72,9 +70,6 @@ namespace SOS.Lib.IO.GeoJson
 
             try
             {
-                using var operation = _telemetry.StartOperation<DependencyTelemetry>("Create_GeoJson-File");
-                operation.Telemetry.Properties["Filter"] = filter.ToString();
-
                 var nrObservations = 0;
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var propertyFields =
@@ -149,8 +144,6 @@ namespace SOS.Lib.IO.GeoJson
                 {
                     throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
                 }
-
-                operation.Telemetry.Metrics["Observation-count"] = nrObservations;
 
                 if (gzip)
                 {

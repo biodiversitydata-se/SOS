@@ -47,7 +47,6 @@ namespace SOS.Lib.IO.DwcArchive
         /// <param name="simpleMultimediaCsvWriter"></param>
         /// <param name="fileService"></param>
         /// <param name="dataProviderRepository"></param>
-        /// <param name="telemetry"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public DwcArchiveFileWriter(IDwcArchiveOccurrenceCsvWriter dwcArchiveOccurrenceCsvWriter,
@@ -55,8 +54,7 @@ namespace SOS.Lib.IO.DwcArchive
             ISimpleMultimediaCsvWriter simpleMultimediaCsvWriter,
             IFileService fileService,
             IDataProviderRepository dataProviderRepository,
-            TelemetryClient telemetry,
-            ILogger<DwcArchiveFileWriter> logger) : base(telemetry)
+            ILogger<DwcArchiveFileWriter> logger) 
         {
             _dwcArchiveOccurrenceCsvWriter = dwcArchiveOccurrenceCsvWriter ??
                                              throw new ArgumentNullException(nameof(dwcArchiveOccurrenceCsvWriter));
@@ -108,9 +106,6 @@ namespace SOS.Lib.IO.DwcArchive
 
             try
             {
-                using var operation = _telemetry.StartOperation<DependencyTelemetry>("Create_DwC-File");
-                operation.Telemetry.Properties["Filter"] = filter.ToString();
-
                 temporaryZipExportFolderPath = Path.Combine(exportFolderPath, fileName);
                 _fileService.CreateFolder(temporaryZipExportFolderPath);
                 var occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.txt");
@@ -193,8 +188,6 @@ namespace SOS.Lib.IO.DwcArchive
                     DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
                     processInfoFileStream.Close();
                 }
-
-                operation.Telemetry.Metrics["Observation-count"] = nrObservations;
 
                 var zipFilePath = _fileService.CompressFolder(exportFolderPath, fileName);
                 _fileService.DeleteFolder(temporaryZipExportFolderPath);

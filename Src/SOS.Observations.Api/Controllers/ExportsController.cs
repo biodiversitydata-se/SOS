@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
@@ -27,7 +26,7 @@ using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.ApplicationInsights;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -39,6 +38,7 @@ namespace SOS.Observations.Api.Controllers
     public class ExportsController : ObservationBaseController, IExportsController
     {
         private readonly IBlobStorageManager _blobStorageManager;
+        private readonly ICryptoService _cryptoService;
         private readonly IExportManager _exportManager;
         private readonly IFileService _fileService;
         private readonly IUserExportRepository _userExportRepository;
@@ -150,7 +150,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 return (Result: BadRequest($"Query exceeds limit of {_orderExportObservationsLimit} observations."), Count: matchCount);
             }
-
+            LogObservationCount(matchCount);
             return (Result: new OkObjectResult(exportFilter), Count: matchCount);            
         }
 
@@ -182,7 +182,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 return BadRequest($"Query exceeds limit of {_downloadExportObservationsLimit} observations.");
             }
-
+            LogObservationCount(matchCount);
             return new OkObjectResult(exportFilter);
         }
 
@@ -223,15 +223,18 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="areaManager"></param>
         /// <param name="taxonManager"></param>
         /// <param name="exportManager"></param>
+        /// <param name="cryptoService"></param>
         /// <param name="fileService"></param>
         /// <param name="userExportRepository"></param>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ExportsController(IObservationManager observationManager,
             IBlobStorageManager blobStorageManager,
             IAreaManager areaManager,
             ITaxonManager taxonManager,
             IExportManager exportManager,
+            ICryptoService cryptoService,
             IFileService fileService,
             IUserExportRepository userExportRepository,
             ObservationApiConfiguration configuration,
@@ -239,6 +242,7 @@ namespace SOS.Observations.Api.Controllers
         {
             _blobStorageManager = blobStorageManager ?? throw new ArgumentNullException(nameof(blobStorageManager));
             _exportManager = exportManager ?? throw new ArgumentNullException(nameof(exportManager));
+            _cryptoService = cryptoService ?? throw new ArgumentNullException(nameof(cryptoService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _userExportRepository =
                 userExportRepository ?? throw new ArgumentNullException(nameof(userExportRepository));
@@ -632,11 +636,11 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return validateResult.Result;
                 }
-
+                var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Csv, cultureCode, false,
-                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -699,10 +703,11 @@ namespace SOS.Observations.Api.Controllers
                     return validateResult.Result;
                 }
 
+                var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
-                        PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+                        PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -769,10 +774,11 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
+                var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
 
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Excel, cultureCode, false,
-                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -841,10 +847,11 @@ namespace SOS.Observations.Api.Controllers
                     return validateResult.Result;
                 }
 
+                var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.GeoJson, cultureCode,
-                        flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+                        flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -1175,10 +1182,11 @@ namespace SOS.Observations.Api.Controllers
                     return validateResult.Result;
                 }
 
+                var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Csv, cultureCode, false,
-                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -1241,10 +1249,11 @@ namespace SOS.Observations.Api.Controllers
                     return validateResult.Result;
                 }
 
+                var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
-                        PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+                        PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -1310,11 +1319,11 @@ namespace SOS.Observations.Api.Controllers
                     return validateResult.Result;
                 }
 
+                var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
-
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Excel, cultureCode, false,
-                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -1383,10 +1392,11 @@ namespace SOS.Observations.Api.Controllers
                     return validateResult.Result;
                 }
 
+                var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.GeoJson, cultureCode,
-                        flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptPassword, null, JobCancellationToken.Null));
+                        flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
