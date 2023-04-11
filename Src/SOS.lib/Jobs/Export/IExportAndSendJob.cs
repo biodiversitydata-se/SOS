@@ -35,6 +35,7 @@ namespace SOS.Lib.Jobs.Export
         [AutomaticRetry(Attempts = 2, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
         [Queue("low")]
         [OneAtTheTime(MaxAttempts = 0, RetryInSeconds = 60)]
+        [HandleFileExportFailure]
         Task<bool> RunAsync(SearchFilter filter,
             int? roleId,
             string authorizationApplicationIdentifier,

@@ -34,6 +34,7 @@ using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using MassTransit;
 using SOS.Hangfire.JobServer.ServiceBus.Consumers;
+using SOS.Lib.Context;
 
 namespace SOS.Hangfire.JobServer
 {
@@ -74,6 +75,7 @@ namespace SOS.Hangfire.JobServer
             if (new[] { "local", "dev", "st", "prod", "at" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
             {
                 var host = CreateHostBuilder(args).Build();
+                HangfireJobServerContext.Host = host;
                 LogStartupSettings(host.Services.GetService<ILogger<Program>>());
                 await host.RunAsync();
             }
