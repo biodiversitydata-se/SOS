@@ -173,7 +173,7 @@ namespace SOS.Observations.Api.Repositories
             var taxonIds = new HashSet<int>((filter.Taxa?.Ids?.Any() ?? false) ? filter.Taxa.Ids : _taxonManager.TaxonTree.GetUnderlyingTaxonIds(0, true));
 
             // If IncludeUnderlyingTaxa = true, underlying taxa are allready added. If false we need to add it here to get observations for them to use in calculation
-            if (!filter.Taxa?.IncludeUnderlyingTaxa ?? true)
+            if ((!filter.Taxa?.IncludeUnderlyingTaxa ?? true) && (filter.Taxa?.Ids?.Any() ?? false))
             {
                 filter.Taxa.Ids = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(filter.Taxa?.Ids, true);
             }
