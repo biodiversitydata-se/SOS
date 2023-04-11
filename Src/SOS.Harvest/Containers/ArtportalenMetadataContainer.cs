@@ -575,6 +575,8 @@ namespace SOS.Harvest.Containers
                 }
             }
 
+            var regexSpaces = new Regex("\\s+");
+            source = regexSpaces.Replace(source," ").Trim();
             return source!;
         }
 
