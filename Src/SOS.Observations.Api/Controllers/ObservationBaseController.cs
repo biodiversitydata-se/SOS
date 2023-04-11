@@ -149,9 +149,9 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
-        protected override Result ValidateSearchFilter(SearchFilterBaseDto filter, bool bboxMandatory = false, bool allowObjectInOutputFields = true)
+        protected override Result ValidateSearchFilter(SearchFilterBaseDto filter, bool allowObjectInOutputFields = true)
         {
-            var result = base.ValidateSearchFilter(filter, bboxMandatory, allowObjectInOutputFields);
+            var result = base.ValidateSearchFilter(filter, allowObjectInOutputFields);
 
             var taxaValidationResult = ValidateTaxa(filter.Taxon?.Ids);
             if (taxaValidationResult.IsFailure)

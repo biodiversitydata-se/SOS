@@ -216,7 +216,7 @@ namespace SOS.Observations.Api.Controllers
             return Result.Failure($"Missing property ({ property }) used for { name }");
         }
 
-        protected virtual Result ValidateSearchFilter(SearchFilterBaseDto filter, bool bboxMandatory = false, bool allowObjectInOutputFields = true)
+        protected virtual Result ValidateSearchFilter(SearchFilterBaseDto filter, bool allowObjectInOutputFields = true)
         {
             var errors = new List<string>();
 
@@ -226,12 +226,6 @@ namespace SOS.Observations.Api.Controllers
             if (areaValidationResult.IsFailure)
             {
                 errors.Add(areaValidationResult.Error);
-            }
-
-            var bboxResult = ValidateBoundingBox(filter?.Geographics?.BoundingBox, bboxMandatory);
-            if (bboxResult.IsFailure)
-            {
-                errors.Add(bboxResult.Error);
             }
 
             if (searchFilter?.ModifiedDate?.From > searchFilter?.ModifiedDate?.To)

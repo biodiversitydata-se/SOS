@@ -127,6 +127,7 @@ namespace SOS.Observations.Api.Controllers
         {
             var validationResults = Result.Combine(
                 validateSearchFilter ? ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
+                ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 ValidateEmail(email),
                 ValidateUserExport(userExport),
                 ValidateEncryptPassword(encryptPassword, confirmEncryptPassword, protectionFilter ?? ProtectionFilterDto.Public),
@@ -163,8 +164,11 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         private async Task<IActionResult> DownloadValidateAsync(SearchFilterBaseDto filter, bool validateSearchFilter, ProtectionFilterDto? protectionFilter)
         {
-            var validationResults = validateSearchFilter ? ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success();
-
+            var validationResults = Result.Combine(
+                validateSearchFilter ? ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
+                ValidateBoundingBox(filter?.Geographics?.BoundingBox, false)
+            );
+           
             if (validationResults.IsFailure)
             {
                 return BadRequest(validationResults);

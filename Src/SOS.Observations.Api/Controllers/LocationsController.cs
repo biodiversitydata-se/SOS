@@ -91,6 +91,7 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = new SearchFilterBaseDto { Geographics = filter };
                 var validationResult = Result.Combine(
                     ValidateSearchFilter(searchFilter),
+                    ValidateBoundingBox(filter?.BoundingBox, false),
                     ValidateSearchPagingArguments(skip, take)
                 );
 

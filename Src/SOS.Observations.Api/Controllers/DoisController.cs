@@ -70,7 +70,8 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var validationResults = Result.Combine(
-                    ValidateSearchFilter(filter));
+                    ValidateSearchFilter(filter),
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResults.IsFailure)
                 {
