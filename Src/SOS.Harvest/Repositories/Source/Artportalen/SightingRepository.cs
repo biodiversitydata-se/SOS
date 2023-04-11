@@ -117,7 +117,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 					LEFT JOIN SightingDescription sdss ON sdss.Id = si.SightingSubstrateSpeciesDescriptionId
                     LEFT JOIN SightingRelation srDeterminer ON srDeterminer.SightingId = si.Id AND srDeterminer.IsPublic = 1 AND srDeterminer.SightingRelationTypeId = 3
                     LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = si.Id AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
-                    LEFT JOIN SightingSummary ssu ON ssu.Id = si.Id
+                    LEFT JOIN SightingSummary ssu ON ssu.Id = si.SightingSummaryId
                     {triggerRuleFrom}
                     LEFT JOIN SightingDatasource sdc ON sdc.SightingId = si.Id 
                     LEFT JOIN (SELECT SightingId FROM SightingComment GROUP BY SightingId) sic ON sic.SightingId = si.Id 

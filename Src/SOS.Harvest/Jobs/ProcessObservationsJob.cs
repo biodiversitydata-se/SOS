@@ -474,7 +474,7 @@ namespace SOS.Harvest.Jobs
                 // 3. Initialization of meta data etc
                 //----------------------------------------------------------------------
                 var getTaxaTask = GetTaxaAsync(mode);                
-                await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(), _validationManager.VerifyCollectionAsync(mode), _validationManager.VerifyCollectionAsync(mode));
+                await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(), _validationManager.VerifyCollectionAsync(mode), _validationManager.VerifyEventCollectionAsync(mode));
 
                 var taxonById = await getTaxaTask;
 

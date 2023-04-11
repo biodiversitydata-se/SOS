@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Autofac;
+using Microsoft.ApplicationInsights;
 using SOS.Harvest.Containers;
 using SOS.Harvest.Containers.Interfaces;
 using SOS.Harvest.DarwinCore;
@@ -453,7 +454,23 @@ namespace SOS.Harvest.IoC.Modules
             
             builder.RegisterType<TaxonListsHarvestJob>().As<ITaxonListsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<VocabulariesImportJob>().As<IVocabulariesImportJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ArtportalenDatasetMetadataHarvestJob>().As<IArtportalenDatasetMetadataHarvestJob>().InstancePerLifetimeScope();            
+            builder.RegisterType<ArtportalenDatasetMetadataHarvestJob>().As<IArtportalenDatasetMetadataHarvestJob>().InstancePerLifetimeScope();
+
+            // Application insights            
+            var telemetryConfiguration = new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration();            
+            if (!string.IsNullOrEmpty(Configurations.ApplicationInsightsConfiguration?.InstrumentationKey))
+            {
+                telemetryConfiguration.ConnectionString = $"InstrumentationKey={Configurations.ApplicationInsightsConfiguration.InstrumentationKey}";
+                //telemetryConfiguration.InstrumentationKey = Configurations.ApplicationInsightsConfiguration.InstrumentationKey;
+            }
+            else
+            {
+                telemetryConfiguration.DisableTelemetry = true;
+            }
+                        
+            var telemetryClient = new TelemetryClient(telemetryConfiguration);
+            builder.RegisterInstance(telemetryClient).As<TelemetryClient>()
+                    .SingleInstance();
         }
     }
 }

@@ -609,7 +609,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"fieldTranslationCultureCode\":\"sv-SE\",\n    \"occurrenceStatus\": \"present\",\n    \"output\" : {\n        \"fields\" :  [\"taxon.id\", \"taxon.vernacularName\", \"taxon.protectionLevel\", \"accessRights\", \"protectionLevel\"]\n    },\n    \"taxon\" : {\n        \"ids\":[100024],\n        \"includeUnderlyingTaxa\" : true        \n    }    \n}"
+							"raw": "{\n    \"fieldTranslationCultureCode\":\"sv-SE\",\n    \"occurrenceStatus\": \"present\",\n    \"output\" : {\n        \"fields\" :  [\"taxon.id\", \"taxon.vernacularName\", \"taxon.sensitivityCategory\", \"accessRights\", \"occurrence.sensitivityCategory\"]\n    },\n    \"taxon\" : {\n        \"ids\":[100024],\n        \"includeUnderlyingTaxa\" : true        \n    }    \n}"
 						},
 						"url": {
 							"raw": "{{testUrl}}/Observations/search?skip=0&take=10",
@@ -648,7 +648,7 @@
 									"});    ",
 									" ",
 									"pm.test(\"Protection level is 1\", function () {",
-									"    pm.expect(result.records.every(o => o.occurrence.protectionLevel === 1)).to.be.true;",
+									"    pm.expect(result.records.every(o => o.occurrence.sensitivityCategory === 1)).to.be.true;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -669,7 +669,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"fieldTranslationCultureCode\":\"sv-SE\",\n    \"occurrenceStatus\": \"present\",    \n    \"taxon\" : {\n        \"ids\":[100055, 267302, 267303, 267320, 100024, 100093],\n        \"includeUnderlyingTaxa\" : true        \n    },\n    \"output\" :{\n        \"fields\":[\"occurrence.protectionLevel\", \"protected\", \"taxon.attributes.protectionLevel\"]\n    }    \n}"
+							"raw": "{\n    \"fieldTranslationCultureCode\":\"sv-SE\",\n    \"occurrenceStatus\": \"present\",    \n    \"taxon\" : {\n        \"ids\":[100055, 267302, 267303, 267320, 100024, 100093],\n        \"includeUnderlyingTaxa\" : true        \n    },\n    \"output\" :{\n        \"fields\":[\"occurrence.sensitivityCategory\", \"protected\", \"taxon.attributes.sensitivityCategory\"]\n    }    \n}"
 						},
 						"url": {
 							"raw": "{{testUrl}}/Observations/search?skip=0&take=1000",
@@ -2124,60 +2124,6 @@
 					"response": []
 				},
 				{
-					"name": "Hämta ordlistan för fältet validationStatus",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const vocabulary = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"",
-									"pm.test(\"Verification vocabulary is returned\", function () {",
-									"    pm.expect(vocabulary.name).to.eql('VerificationStatus');",
-									"    pm.expect(vocabulary.enumId).to.eql('VerificationStatus');    ",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{testUrl}}/Vocabularies/validationStatus",
-							"host": [
-								"{{testUrl}}"
-							],
-							"path": [
-								"Vocabularies",
-								"validationStatus"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Hämta ordlistan för fältet verificationStatus",
 					"event": [
 						{
@@ -2226,111 +2172,6 @@
 							"path": [
 								"Vocabularies",
 								"verificationStatus"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Checklists",
-			"item": [
-				{
-					"name": "Get cheklist by Id",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const checklist = pm.response.json();\r",
-									"\r",
-									"pm.test(\"Successful POST request\", function () {\r",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
-									"});    \r",
-									"\r",
-									"const checklistId = pm.environment.get(\"observations.checklists.checklistId\");\r",
-									"pm.test(\"Checklist is returned\", function () {\r",
-									"    pm.expect(checklist.event.eventId).to.eql(checklistId);    \r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{testUrl}}/CheckLists?id=urn:lsid:artportalen.se:Checklist:4455",
-							"host": [
-								"{{testUrl}}"
-							],
-							"path": [
-								"CheckLists"
-							],
-							"query": [
-								{
-									"key": "id",
-									"value": "urn:lsid:artportalen.se:Checklist:4455"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Calculate trend",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const trend = pm.response.json();\r",
-									"\r",
-									"pm.test(\"Successful POST request\", function () {\r",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
-									"});    \r",
-									"\r",
-									"const calculatedTrend = parseFloat(pm.environment.get(\"observations.checklists.trend\"));\r",
-									"pm.test(\"Trend is larger than \" + calculatedTrend, function () {\r",
-									"    pm.expect(trend.quotient).to.gte(calculatedTrend);\r",
-									"});\r",
-									"\r",
-									"const checkListCount = parseInt(pm.environment.get(\"observations.checklists.checkListCount\"));\r",
-									"pm.test(\"Number of checklists is larger than \" + checkListCount, function () {\r",
-									"    pm.expect(trend.nrChecklists).to.gte(checkListCount);\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n  \"checkList\": {\r\n    \"dataProvider\": {\r\n      \"ids\": [\r\n        1\r\n      ]\r\n    },\r\n    \"minEffortTime\": \"02:00:00\"\r\n  },  \r\n  \"taxonId\": 103026\r\n}"
-						},
-						"url": {
-							"raw": "https://sos-search.artdata.slu.se/CheckLists/CalculateTrend",
-							"protocol": "https",
-							"host": [
-								"sos-search",
-								"artdata",
-								"slu",
-								"se"
-							],
-							"path": [
-								"CheckLists",
-								"CalculateTrend"
 							]
 						}
 					},
