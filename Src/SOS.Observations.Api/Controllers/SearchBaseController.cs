@@ -46,6 +46,11 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        protected void LogObservationCount(long observationCount)
+        {
+            HttpContext.Items.Add("Observation-count", observationCount);
+        }
+
         /// <summary>
         /// Get current users e-mail address
         /// </summary>

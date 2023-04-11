@@ -39,7 +39,6 @@ using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Import;
-using Microsoft.ApplicationInsights;
 
 namespace SOS.Process.IntegrationTests.Jobs
 {
@@ -122,7 +121,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
-                new TelemetryClient(),
                 new NullLogger<DwcArchiveFileWriter>()
             ), new FileService(), dataProviderRepository, verbatimClient, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
 

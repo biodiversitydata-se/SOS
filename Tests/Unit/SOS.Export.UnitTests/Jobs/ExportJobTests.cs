@@ -10,6 +10,8 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Services;
+using SOS.Lib.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Jobs
@@ -26,11 +28,13 @@ namespace SOS.Export.UnitTests.Jobs
         {
             _observationManager = new Mock<IObservationManager>();
             _userExportRepository = new Mock<IUserExportRepository>();
+            _cryptoService = new Mock<ICryptoService>();
             _loggerMock = new Mock<ILogger<ExportAndSendJob>>();
         }
 
         private readonly Mock<IObservationManager> _observationManager;
         private readonly Mock<IUserExportRepository> _userExportRepository;
+        private readonly Mock<ICryptoService> _cryptoService;
         private readonly Mock<ILogger<ExportAndSendJob>> _loggerMock;
 
         /// <summary>
@@ -39,6 +43,7 @@ namespace SOS.Export.UnitTests.Jobs
         private ExportAndSendJob TestObject => new ExportAndSendJob(
             _observationManager.Object,
             _userExportRepository.Object,
+            _cryptoService.Object,
             _loggerMock.Object);
 
         /// <summary>

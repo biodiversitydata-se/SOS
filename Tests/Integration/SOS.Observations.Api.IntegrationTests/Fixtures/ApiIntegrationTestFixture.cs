@@ -46,7 +46,6 @@ using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using SOS.Observations.Api.IntegrationTests.Repositories;
 using SOS.Observations.Api.Services.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using Microsoft.IdentityModel.Abstractions;
 
 namespace SOS.Observations.Api.IntegrationTests.Fixtures
 {
@@ -210,15 +209,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, ProcessedObservationRepository, new NullLogger<DataProviderManager>());
             var fileService = new FileService();
             VocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
-            var telemetryClient = new TelemetryClient();
             var csvFileWriter = new CsvFileWriter(ProcessedObservationRepository, fileService,
-                VocabularyValueResolver, telemetryClient, new NullLogger<CsvFileWriter>());
+                VocabularyValueResolver, new NullLogger<CsvFileWriter>());
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(VocabularyValueResolver, processClient);
             var dwcArchiveEventFileWriter = CreateDwcArchiveEventFileWriter(VocabularyValueResolver, processClient);
             var excelFileWriter = new ExcelFileWriter(ProcessedObservationRepository, fileService,
-                VocabularyValueResolver, telemetryClient, new NullLogger<ExcelFileWriter>());
+                VocabularyValueResolver, new NullLogger<ExcelFileWriter>());
             var geojsonFileWriter = new GeoJsonFileWriter(ProcessedObservationRepository, fileService,
-                VocabularyValueResolver, telemetryClient, new NullLogger<GeoJsonFileWriter>());
+                VocabularyValueResolver, new NullLogger<GeoJsonFileWriter>());
             var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
             var areaCache = new AreaCache(areaRepository);
             var userService = CreateUserService();
@@ -239,8 +237,9 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 processInfoManager,
                 ProcessedObservationRepository,
                 new NullLogger<DataProvidersController>());
+            var cryptoService = new CryptoService(new CryptoConfiguration());
             ExportsController = new ExportsController(ObservationManager, blobStorageManagerMock.Object, areaManager,
-                taxonManager, exportManager, fileService, userExportRepository, observationApiConfiguration,
+                taxonManager, exportManager, cryptoService, fileService, userExportRepository, observationApiConfiguration,
                 new NullLogger<ExportsController>());
             ExportsController.ControllerContext.HttpContext = new DefaultHttpContext();
             TaxonManager = taxonManager;
@@ -286,7 +285,6 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(), new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
-                new TelemetryClient(),
                 new NullLogger<DwcArchiveFileWriter>());
 
             return dwcArchiveFileWriter;
@@ -409,7 +407,6 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClientManager,
                 processedConfigurationCache,
-                new TelemetryClient(),
                 elasticConfiguration,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;

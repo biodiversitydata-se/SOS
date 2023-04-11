@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
-using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -25,7 +24,6 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
 using Xunit;
-using SOS.Lib.IO.DwcArchive.Interfaces;
 
 namespace SOS.Export.IntegrationTests.Managers
 {
@@ -55,7 +53,6 @@ namespace SOS.Export.IntegrationTests.Managers
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()), 
                 new FileService(),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
-                new TelemetryClient(),
                 new NullLogger<DwcArchiveFileWriter>());
 
             var dwcArchiveEventFileWriter = new DwcArchiveEventFileWriter(
@@ -72,20 +69,18 @@ namespace SOS.Export.IntegrationTests.Managers
 
             var processedConfigurationRepository = new ProcessedConfigurationRepository(processClient,
                 new NullLogger<ProcessedConfigurationRepository>());
-            var telemetryClient = new TelemetryClient();
             var processedObservationRepository = new ProcessedObservationCoreRepository(
                 elasticClientManager,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(processedConfigurationRepository),
-                telemetryClient,
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
 
             var excelWriter = new ExcelFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
-                telemetryClient, new NullLogger<ExcelFileWriter>());
+                new NullLogger<ExcelFileWriter>());
             var geoJsonlWriter = new GeoJsonFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
-                telemetryClient, new NullLogger<GeoJsonFileWriter>());
+                new NullLogger<GeoJsonFileWriter>());
             var csvWriter = new CsvFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
-                telemetryClient, new NullLogger<CsvFileWriter>());
+                new NullLogger<CsvFileWriter>());
 
             var filterManager = new Mock<IFilterManager>();
             filterManager

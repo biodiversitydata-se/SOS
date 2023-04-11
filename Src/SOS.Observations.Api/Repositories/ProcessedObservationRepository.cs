@@ -28,9 +28,8 @@ namespace SOS.Observations.Api.Repositories
         public ProcessedObservationRepository(
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            TelemetryClient telemetry,
             ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, telemetry, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, logger)
         {
         }
 
@@ -40,9 +39,6 @@ namespace SOS.Observations.Api.Repositories
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
-
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_Aggregated");
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
 
             // Get number of distinct values
             var searchResponseCount = await Client.SearchAsync<dynamic>(s => s
@@ -128,9 +124,6 @@ namespace SOS.Observations.Api.Repositories
             );
 
             searchResponse.ThrowIfInvalid();
-
-            _telemetry.StopOperation(operation);
-
             var result = searchResponse
                 .Aggregations
                 .Composite("species")
@@ -164,10 +157,7 @@ namespace SOS.Observations.Api.Repositories
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
-
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_Aggregated_Histogram");
-
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
+            
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -207,8 +197,6 @@ namespace SOS.Observations.Api.Repositories
            
             var totalCount = searchResponse.HitsMetadata.Total.Value;
 
-            _telemetry.StopOperation(operation);
-
             var result = searchResponse
                 .Aggregations
                 .DateHistogram("aggregation")
@@ -239,9 +227,6 @@ namespace SOS.Observations.Api.Repositories
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(AggregationType.SightingsPerWeek48);
 
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_Aggregated_HistogramWeek48");
-
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -275,8 +260,6 @@ namespace SOS.Observations.Api.Repositories
             );
 
             searchResponse.ThrowIfInvalid();
-
-            _telemetry.StopOperation(operation);
 
             var yearWeekAggregations = searchResponse
                 .Aggregations
@@ -343,9 +326,6 @@ namespace SOS.Observations.Api.Repositories
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
-
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Aggregations(a => a
@@ -397,8 +377,6 @@ namespace SOS.Observations.Api.Repositories
             {
                 throw new ArgumentOutOfRangeException($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
             }
-
-            _telemetry.StopOperation(operation);
 
             var georesult = searchResponse
                 .Aggregations

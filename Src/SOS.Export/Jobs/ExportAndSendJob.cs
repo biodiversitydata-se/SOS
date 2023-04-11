@@ -12,6 +12,7 @@ using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Export.Jobs
 {
@@ -20,6 +21,7 @@ namespace SOS.Export.Jobs
     /// </summary>
     public class ExportAndSendJob : IExportAndSendJob
     {
+        private readonly ICryptoService _cryptoService;
         private readonly IObservationManager _observationManager;
         private readonly IUserExportRepository _userExportRepository;
         private readonly ILogger<ExportAndSendJob> _logger;
@@ -101,12 +103,15 @@ namespace SOS.Export.Jobs
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="userExportRepository"></param>
+        /// <param name="cryptoService"></param>
         /// <param name="logger"></param>
-        public ExportAndSendJob(IObservationManager observationManager, IUserExportRepository userExportRepository, ILogger<ExportAndSendJob> logger)
+        /// <exception cref="ArgumentNullException"></exception>
+        public ExportAndSendJob(IObservationManager observationManager, IUserExportRepository userExportRepository, ICryptoService cryptoService, ILogger<ExportAndSendJob> logger)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _userExportRepository =
                 userExportRepository ?? throw new ArgumentNullException(nameof(userExportRepository));
+            _cryptoService = cryptoService ?? throw new ArgumentNullException(nameof(cryptoService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -124,7 +129,7 @@ namespace SOS.Export.Jobs
             bool excludeNullValues,
             bool sensitiveObservations,
             bool sendMailFromZendTo,
-            string encryptPassword,
+            string encryptedPassword,
             PerformContext context,
             IJobCancellationToken cancellationToken)
         {
@@ -136,8 +141,8 @@ namespace SOS.Export.Jobs
                 _logger.LogInformation("Start export and send job");
                 Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
                 await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
-                
-                var response = await _observationManager.ExportAndSendAsync(roleId, authorizationApplicationIdentifier, filter, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptPassword, cancellationToken);
+                var password = await _cryptoService.DecryptAsync(encryptedPassword);
+                var response = await _observationManager.ExportAndSendAsync(roleId, authorizationApplicationIdentifier, filter, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, password, cancellationToken);
                 
                 _logger.LogInformation($"End export and send job. Success: {response.Success}");
                 await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);

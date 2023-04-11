@@ -37,14 +37,12 @@ namespace SOS.Lib.IO.Excel
         /// <param name="processedObservationRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
-        /// <param name="telemetry"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public CsvFileWriter(IProcessedObservationCoreRepository processedObservationRepository, 
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
-            TelemetryClient telemetry,
-            ILogger<CsvFileWriter> logger) : base(telemetry)
+            ILogger<CsvFileWriter> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
                                                     throw new ArgumentNullException(
@@ -67,9 +65,6 @@ namespace SOS.Lib.IO.Excel
             
             try
             {
-                using var operation = _telemetry.StartOperation<DependencyTelemetry>("Create_Csv-File");
-                operation.Telemetry.Properties["Filter"] = filter.ToString();
-
                 var nrObservations = 0;
                 var propertyFields =
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
@@ -136,8 +131,6 @@ namespace SOS.Lib.IO.Excel
                 {
                     throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
                 }
-
-                operation.Telemetry.Metrics["Observation-count"] = nrObservations;
 
                 if (gzip)
                 {

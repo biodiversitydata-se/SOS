@@ -45,6 +45,7 @@ namespace SOS.Export.IoC.Modules
         public (ExportConfiguration ExportConfiguration, 
             MongoDbConfiguration ProcessDbConfiguration, 
             BlobStorageConfiguration BlobStorageConfiguration,
+            CryptoConfiguration CryptoConfiguration,
             DataCiteServiceConfiguration DataCiteServiceConfiguration,
             UserServiceConfiguration UserServiceConfiguration) Configurations { get; set; }
 
@@ -57,6 +58,8 @@ namespace SOS.Export.IoC.Modules
             // Add configuration
             builder.RegisterInstance(Configurations.BlobStorageConfiguration).As<BlobStorageConfiguration>()
                 .SingleInstance();
+            builder.RegisterInstance(Configurations.CryptoConfiguration).As<CryptoConfiguration>()
+               .SingleInstance();
             builder.RegisterInstance(Configurations.DataCiteServiceConfiguration).As<DataCiteServiceConfiguration>()
                 .SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.DOIConfiguration).As<DOIConfiguration>()
@@ -99,6 +102,7 @@ namespace SOS.Export.IoC.Modules
 
             // Services
             builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();
+            builder.RegisterType<CryptoService>().As<ICryptoService>().InstancePerLifetimeScope();
             builder.RegisterType<DataCiteService>().As<IDataCiteService>().InstancePerLifetimeScope();
             builder.RegisterType<FileService>().As<IFileService>().InstancePerLifetimeScope();
             builder.RegisterType<HttpClientService>().As<IHttpClientService>().InstancePerLifetimeScope();

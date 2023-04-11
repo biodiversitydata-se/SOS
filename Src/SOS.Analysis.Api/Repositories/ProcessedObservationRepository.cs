@@ -1,6 +1,4 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
-using SOS.Analysis.Api.Repositories.Interfaces;
+﻿using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Managers.Interfaces;
@@ -18,9 +16,8 @@ namespace SOS.Analysis.Api.Repositories
         public ProcessedObservationRepository(
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            TelemetryClient telemetry,
             ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, telemetry, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, logger)
         {
 
         }
@@ -31,8 +28,6 @@ namespace SOS.Analysis.Api.Repositories
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
            
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Analysis_Aggregate_By_User_Field");
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
@@ -77,9 +72,6 @@ namespace SOS.Analysis.Api.Repositories
             );
 
             searchResponse.ThrowIfInvalid();
-
-            _telemetry.StopOperation(operation);
-
             afterKey = searchResponse
                .Aggregations
                .Composite("aggregation")

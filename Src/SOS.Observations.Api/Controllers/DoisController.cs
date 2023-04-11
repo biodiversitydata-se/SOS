@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Hangfire;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -43,6 +44,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="observationApiConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         public DOIsController(IObservationManager observationManager,
             IAreaManager areaManager,
             ITaxonManager taxonManager,

@@ -36,7 +36,6 @@ namespace SOS.Lib.Repositories.Processed
         IProcessedObservationCoreRepository
     {
         private const int ElasticSearchMaxRecords = 10000;
-        protected readonly TelemetryClient _telemetry;
         protected readonly ITaxonManager _taxonManager;
 
         /// <summary>
@@ -553,42 +552,23 @@ namespace SOS.Lib.Repositories.Processed
                     });
         }
 
-        /// Constructor used in public mode
+        /// <summary>
+        /// Constructor
         /// </summary>
         /// <param name="elasticClientManager"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
-        /// <param name="telemetry"></param>
-        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationCoreRepository(
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            TelemetryClient telemetry,
             ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
-            _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             if (elasticConfiguration.Clusters != null)
             {
                 CheckNodes(elasticConfiguration.Clusters.First().Hosts?.Count() ?? 0);
             }
-        }
-
-        /// <summary>
-        /// Constructor used in admin mode
-        /// </summary>
-        /// <param name="elasticClientManager"></param>
-        /// <param name="elasticConfiguration"></param>
-        /// <param name="processedConfigurationCache"></param>
-        /// <param name="logger"></param>
-        public ProcessedObservationCoreRepository(
-            IElasticClientManager elasticClientManager,
-            ElasticSearchConfiguration elasticConfiguration,
-            ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ILogger<ProcessedObservationCoreRepository> logger) : base(false, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
-        {
-
         }
 
         /// <inheritdoc />
@@ -888,10 +868,6 @@ namespace SOS.Lib.Repositories.Processed
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter, skipAuthorizationFilters: skipAuthorizationFilters);
 
-            using var operation =
-                _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_MetricGridAggregation");
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
-
             // Max buckets can't exceed MaxNrElasticSearchAggregationBuckets
             if (maxBuckets.HasValue && maxBuckets.Value > MaxNrElasticSearchAggregationBuckets)
             {
@@ -951,8 +927,6 @@ namespace SOS.Lib.Repositories.Processed
             {
                 throw new ArgumentOutOfRangeException($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
             }
-
-            _telemetry.StopOperation(operation);
 
             var gridResult = new GeoGridMetricResult()
             {
@@ -1052,8 +1026,6 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                using var operation = _telemetry.StartOperation<DependencyTelemetry>("GetObservationsAsync");
-
                 var searchResponse = await Client.SearchAsync<Observation>(s => s
                     .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
                     .Query(q => q
@@ -1074,8 +1046,6 @@ namespace SOS.Lib.Repositories.Processed
                 );
 
                 searchResponse.ThrowIfInvalid();
-
-                operation.Telemetry.Metrics["Observation-count"] = searchResponse.Documents.Count;
 
                 return searchResponse.Documents;
             }
@@ -1194,10 +1164,7 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries(filter);
             
             var sortDescriptor = await Client.GetSortDescriptorAsync<dynamic>(indexNames, filter?.Output?.SortOrders);
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Scroll");
-
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
-           
+ 
             // Retry policy by Polly
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
@@ -1222,11 +1189,6 @@ namespace SOS.Lib.Repositories.Processed
                 return queryResponse;
             });
 
-            operation.Telemetry.Metrics["Observation-count"] = searchResponse.Documents.Count;
-
-            // Optional: explicitly send telemetry item:
-            _telemetry.StopOperation(operation);
-
             return new ScrollResult<dynamic>
             {
                 Records = searchResponse.Documents,
@@ -1234,8 +1196,6 @@ namespace SOS.Lib.Repositories.Processed
                 Take = take,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
-
-            // When operation is disposed, telemetry item is sent.
         }
 
         /// <inheritdoc /> 
@@ -1730,10 +1690,6 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             var sortDescriptor = await Client.GetSortDescriptorAsync<Observation>(indexNames, filter?.Output?.SortOrders);
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
-
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
-
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)                
                 .Source(getAllFields ? p => new SourceFilterDescriptor<dynamic>() : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
@@ -1775,11 +1731,6 @@ namespace SOS.Lib.Repositories.Processed
                 totalCount = countResponse.Count;
             }
 
-            operation.Telemetry.Metrics["Observation-count"] = searchResponse.Documents.Count;
-
-            // Optional: explicitly send telemetry item:
-            _telemetry.StopOperation(operation);
-
             return new PagedResult<dynamic>
             {
                 Records = searchResponse.Documents,
@@ -1796,10 +1747,6 @@ namespace SOS.Lib.Repositories.Processed
             var query = filter.ToQuery(skipSightingTypeFilters: true);
             query.TryAddTermCriteria("occurrence.occurrenceId", occurrenceId);
 
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");
-            operation.Telemetry.Properties["OccurrenceId"] = occurrenceId;
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
-
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Query(q => q
@@ -1813,11 +1760,6 @@ namespace SOS.Lib.Repositories.Processed
             );
 
             searchResponse.ThrowIfInvalid();
-
-            operation.Telemetry.Metrics["Observation-count"] = searchResponse.Documents.Count;
-
-            // Optional: explicitly send telemetry item:
-            _telemetry.StopOperation(operation);
 
             return searchResponse.Documents;
 

@@ -9,6 +9,7 @@ using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,6 +35,8 @@ using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using MassTransit;
 using SOS.Hangfire.JobServer.ServiceBus.Consumers;
+using SOS.Lib.ApplicationInsights;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using SOS.Lib.Context;
 
 namespace SOS.Hangfire.JobServer
@@ -45,6 +48,7 @@ namespace SOS.Hangfire.JobServer
     {
         private static string _env;
         private static ApiManagementServiceConfiguration _apiManagementServiceConfiguration;
+        private static CryptoConfiguration _cryptoConfiguration;
         private static HangfireDbConfiguration _hangfireDbConfiguration;
         private static MongoDbConfiguration _verbatimDbConfiguration;
         private static MongoDbConfiguration _processDbConfiguration;
@@ -164,6 +168,7 @@ namespace SOS.Hangfire.JobServer
 
                     // Get configuration
                     _apiManagementServiceConfiguration = hostContext.Configuration.GetSection("ApiManagementServiceConfiguration").Get<ApiManagementServiceConfiguration>();
+                    _cryptoConfiguration = hostContext.Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>(); 
                     _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
                     _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
                     _searchDbConfiguration = hostContext.Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
@@ -211,7 +216,7 @@ namespace SOS.Hangfire.JobServer
                         return new AutofacServiceProviderFactory(builder =>
                             builder
                                 .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
-                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration) })
+                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration,  _processDbConfiguration, _blobStorageConfiguration, _cryptoConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration) })
                         );
                     }
                 )
