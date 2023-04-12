@@ -113,12 +113,19 @@ namespace SOS.ElasticSearch.Proxy.Extensions
 
             if (bodyDictionary.TryGetValue("sort", out dynamic? sort))
             {
-                var sortDictionary = (IDictionary<string, object>)sort;
+                var sortDictionaryList = (List<object>)sort;
+                if (sortDictionaryList.Count == 0) return;
+                if (sortDictionaryList.Count > 1)
+                {
+                    sortDictionaryList = new List<object> { sortDictionaryList[0] };
+                }
+
+                var sortDictionary = (IDictionary<string, object>)sortDictionaryList.First();
                 if (sortDictionary.ContainsKey("_id"))
                 {
                     sortDictionary.Add("event.endDate", new { order = "desc" });
                     sortDictionary.Remove("_id");
-                    bodyDictionary["sort"] = sortDictionary;
+                    bodyDictionary["sort"] = sortDictionaryList;
                 }
             }
         }
