@@ -237,7 +237,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 processInfoManager,
                 ProcessedObservationRepository,
                 new NullLogger<DataProvidersController>());
-            var cryptoService = new CryptoService(new CryptoConfiguration());
+            var cryptoService = new CryptoService(new CryptoConfiguration() { Password = "password", Salt = "salt" });
             ExportsController = new ExportsController(ObservationManager, blobStorageManagerMock.Object, areaManager,
                 taxonManager, exportManager, cryptoService, fileService, userExportRepository, observationApiConfiguration,
                 new NullLogger<ExportsController>());

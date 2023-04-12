@@ -330,7 +330,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 processedObservationRepository,
                 new NullLogger<DataProvidersController>());
             TaxonManager = taxonManager;
-            var cryptoService = new CryptoService(new CryptoConfiguration());
+            var cryptoService = new CryptoService(new CryptoConfiguration() { Password = "password", Salt = "salt"});
             ProcessedObservationRepository = processedObservationRepository;
             ExportsController = new ExportsController(observationManager, blobStorageManagerMock.Object, areaManager,
                 taxonManager, exportManager, cryptoService, fileService, userExportRepository, observationApiConfiguration,
