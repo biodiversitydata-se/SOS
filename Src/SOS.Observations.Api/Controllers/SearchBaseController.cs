@@ -50,7 +50,7 @@ namespace SOS.Observations.Api.Controllers
         {
             if (HttpContext == null) return;
 
-            HttpContext.Items.Add("Observation-count", observationCount);
+            HttpContext.Items.TryAdd("Observation-count", observationCount);
         }
 
         /// <summary>
