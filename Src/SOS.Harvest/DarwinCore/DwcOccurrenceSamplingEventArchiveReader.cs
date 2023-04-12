@@ -996,14 +996,14 @@ namespace SOS.Harvest.DarwinCore
                 if (occurrenceRecords.Count % archiveReaderContext.BatchSize == 0)
                 {
                     await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, occurrenceRecords);
-                    AddDatasetInformation(occurrenceRecords, archiveReaderContext.DatasetByEventId, archiveReaderContext.Datasets.FirstOrDefault());
+                    AddDatasetInformation(occurrenceRecords, archiveReaderContext.DatasetByEventId, archiveReaderContext.Datasets?.FirstOrDefault());
                     yield return occurrenceRecords;
                     occurrenceRecords.Clear();
                 }
             }
 
             await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, occurrenceRecords);
-            AddDatasetInformation(occurrenceRecords, archiveReaderContext.DatasetByEventId, archiveReaderContext.Datasets.FirstOrDefault());
+            AddDatasetInformation(occurrenceRecords, archiveReaderContext.DatasetByEventId, archiveReaderContext.Datasets?.FirstOrDefault());
             yield return occurrenceRecords;
         }
 
@@ -1032,7 +1032,7 @@ namespace SOS.Harvest.DarwinCore
             }
 
             await AddDataFromExtensionsAsync(archiveReaderContext, events);
-            AddDatasetInformation(events, archiveReaderContext.DatasetByEventId, archiveReaderContext.Datasets.FirstOrDefault());
+            AddDatasetInformation(events, archiveReaderContext.DatasetByEventId, archiveReaderContext.Datasets?.FirstOrDefault());
             foreach (var eve in events)
             {                
                 eve.NotFoundTaxa = GetNotFoundTaxa(eve.Taxa, eve.Observations);                
