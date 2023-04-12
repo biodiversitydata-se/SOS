@@ -28,10 +28,10 @@ namespace SOS.Lib
 
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermsCriteria("eventId", filter.EventIds);
-            query.TryAddTermsCriteria("dataset.identifier", filter.DatasetIds);
+            query.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIds);
             if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
             {
-                query.AddExistsCriteria("dataset");
+                query.AddExistsCriteria("dataStewardship");
             }
 
             return query;

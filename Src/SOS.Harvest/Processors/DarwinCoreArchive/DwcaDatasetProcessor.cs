@@ -143,7 +143,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {            
             var filter = new EventSearchFilter();
             filter.DatasetIds = processedDatasets.Keys.ToList();
-            var datasetEventIds = await _eventRepository.GetAllAggregationItemsListAsync<string, string>(filter, "dataset.identifier", "eventId");
+            var datasetEventIds = await _eventRepository.GetAllAggregationItemsListAsync<string, string>(filter, "dataStewardship.datasetIdentifier", "eventId");
             Dictionary<string, List<string>> eventIdsByDatasetId = datasetEventIds.ToDictionary(m => m.AggregationKey.ToLower(), m => m.Items);
 
             foreach (var eventPair in processedDatasets)
