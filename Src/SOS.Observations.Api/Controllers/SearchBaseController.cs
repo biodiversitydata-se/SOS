@@ -48,7 +48,9 @@ namespace SOS.Observations.Api.Controllers
 
         protected void LogObservationCount(long observationCount)
         {
-            HttpContext.Items.Add("Observation-count", observationCount);
+            if (HttpContext == null) return;
+
+            HttpContext.Items.TryAdd("Observation-count", observationCount);
         }
 
         /// <summary>
