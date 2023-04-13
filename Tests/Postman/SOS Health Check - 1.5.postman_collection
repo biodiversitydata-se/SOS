@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "363193ce-b4fc-4503-b963-c44dd1d5d0a1",
-		"name": "SOS Health Check - Prod 1.5",
+		"_postman_id": "9e4664dc-2dda-4022-b73b-802ff2e0ee50",
+		"name": "SOS Health Check",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "8524282"
+		"_exporter_id": "5495698"
 	},
 	"item": [
 		{
@@ -1079,6 +1079,11 @@
 								{
 									"key": "sortBy",
 									"value": "eventDate",
+									"disabled": true
+								},
+								{
+									"key": "has",
+									"value": "photos",
 									"disabled": true
 								}
 							]
@@ -2172,6 +2177,1128 @@
 							"path": [
 								"Vocabularies",
 								"verificationStatus"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Analysis API",
+			"item": [
+				{
+					"name": "Aggregera på County - Filtrera på utter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Observations exists in more than 10 counties\", function () {    ",
+									"    pm.expect(result.records.length).to.greaterThan(10);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false        \n    },    \n    \"occurrenceStatus\":\"present\"\n}\n"
+						},
+						"url": {
+							"raw": "{{analysisApiUrl}}/internal/aggregation?aggregationField=location.county.name&take=50",
+							"host": [
+								"{{analysisApiUrl}}"
+							],
+							"path": [
+								"internal",
+								"aggregation"
+							],
+							"query": [
+								{
+									"key": "aggregationField",
+									"value": "location.county.name"
+								},
+								{
+									"key": "take",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GeoServer",
+			"item": [
+				{
+					"name": "Get WFS GetFeature",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
+									"});    \r",
+									"\r",
+									"pm.test(\"Observation have properties\", function () {        \r",
+									"    pm.expect(result.features[0].properties).to.have.property('occurrenceId');\r",
+									"    pm.expect(result.features[0].properties).to.have.property('startDate');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"10 observations are returned\", function () {    \r",
+									"    pm.expect(result.numberReturned).to.eql(10);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{geoserverUrl}}/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&outputFormat=application/json&count=10&typeName={{geoserverLayer}}",
+							"host": [
+								"{{geoserverUrl}}"
+							],
+							"path": [
+								"geoserver",
+								"SOS",
+								"ows"
+							],
+							"query": [
+								{
+									"key": "service",
+									"value": "wfs"
+								},
+								{
+									"key": "version",
+									"value": "2.0.0"
+								},
+								{
+									"key": "request",
+									"value": "GetFeature"
+								},
+								{
+									"key": "outputFormat",
+									"value": "application/json"
+								},
+								{
+									"key": "maxFeatures",
+									"value": "10",
+									"disabled": true
+								},
+								{
+									"key": "count",
+									"value": "10"
+								},
+								{
+									"key": "typeName",
+									"value": "{{geoserverLayer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get WFS GetFeature - Fridlysta kärlväxter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
+									"});    \r",
+									"\r",
+									"pm.test(\"Observation have expected property values\", function () {        \r",
+									"    pm.expect(result.features[0].properties.organismGroup).to.eql('Kärlväxter');\r",
+									"    pm.expect(result.features[0].properties.isProtectedByLaw).to.be.true;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{geoserverUrl}}/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&outputFormat=application/json&CQL_Filter=organismGroup = 'Kärlväxter' AND isProtectedByLaw=true&count=10&typeName={{geoserverLayer}}",
+							"host": [
+								"{{geoserverUrl}}"
+							],
+							"path": [
+								"geoserver",
+								"SOS",
+								"ows"
+							],
+							"query": [
+								{
+									"key": "service",
+									"value": "wfs"
+								},
+								{
+									"key": "version",
+									"value": "2.0.0"
+								},
+								{
+									"key": "request",
+									"value": "GetFeature"
+								},
+								{
+									"key": "outputFormat",
+									"value": "application/json"
+								},
+								{
+									"key": "CQL_FILTER",
+									"value": "recordedBy LIKE '%25Gunnar Nyborg%25'",
+									"disabled": true
+								},
+								{
+									"key": "CQL_Filter",
+									"value": "organismGroup = 'Kärlväxter' AND isProtectedByLaw=true"
+								},
+								{
+									"key": "count",
+									"value": "10"
+								},
+								{
+									"key": "typeName",
+									"value": "{{geoserverLayer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ElasticSearchProxy",
+			"item": [
+				{
+					"name": "Search without sort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
+									"});    \r",
+									"\r",
+									"pm.test(\"10 records are returned\", function () {        \r",
+									"    pm.expect(result.hits.hits.length).to.eql(10);    \r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json;+charset=UTF-8",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic ZWxhc3RpYzphcnRkYXRhcm9vdA==",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"size\":10,\"query\":{\"match_all\":{}},\"from\":0} "
+						},
+						"url": {
+							"raw": "{{elasticsearchProxyUrl}}/sos-observation/_search",
+							"host": [
+								"{{elasticsearchProxyUrl}}"
+							],
+							"path": [
+								"sos-observation",
+								"_search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search with sort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
+									"});    \r",
+									"\r",
+									"pm.test(\"10 records are returned\", function () {        \r",
+									"    pm.expect(result.hits.hits.length).to.eql(10);    \r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json;+charset=UTF-8",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic ZWxhc3RpYzphcnRkYXRhcm9vdA==",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"size\":10,\"query\":{\"match_all\":{}},\"from\":0, \"sort\":[{\"_id\":{\"order\":\"asc\"}}]} "
+						},
+						"url": {
+							"raw": "{{elasticsearchProxyUrl}}/sos-observation/_search",
+							"host": [
+								"{{elasticsearchProxyUrl}}"
+							],
+							"path": [
+								"sos-observation",
+								"_search"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "DataStewardship API",
+			"item": [
+				{
+					"name": "Sök dataset - filtrera på datasetIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"1 record matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"The dataset identifier is expected\", function () {",
+									"    pm.expect(result.records[0].identifier).to.eql('Artportalen - Fladdermöss');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"datasetIds\": [\n        \"Artportalen - Fladdermöss\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök datasets - filtrera på datum",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"More than 5 records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.greaterThan(5);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dateFilter\": {\n        \"startDate\": \"2021-06-16T20:00:00Z\",\n        \"endDate\": \"2021-06-17T03:00:00Z\",\n        \"datumFilterType\": \"OverlappingStartDateAndEndDate\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök datasets - filtrera på taxon",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"1 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"taxon\": {\n        \"ids\": [\n            205995\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök datasets - filtrera på län",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"5 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(5);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": {\n        \"county\": \"JönköpingsLän\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök datasets - filtrera på geometri",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"1 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": {\n        \"geometry\": {\n            \"geographicArea\": {\n                \"type\": \"polygon\",\n                \"coordinates\": [\n                    [\n                        [15.07063,57.92573],\n                        [15.0051,58.16108],\n                        [14.58003,58.10148],\n                        [14.64143,57.93294],\n                        [15.07063,57.92573]\n                    ]\n                ]\n            }\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök events - filtrera på datasetIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"500 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(500);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"datasetIds\": [\n        \"Artportalen - Fladdermöss\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök events - filtrera på datum",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"40 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(40);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dateFilter\": {\n        \"startDate\": \"2021-06-16T20:00:00Z\",\n        \"endDate\": \"2021-06-17T03:00:00Z\",\n        \"datumFilterType\": \"OverlappingStartDateAndEndDate\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök events - filtrera på geometri",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"50 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(50);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": {\n        \"geometry\": {\n            \"geographicArea\": {\n                \"type\": \"polygon\",\n                \"coordinates\": [\n                    [\n                        [15.07063,57.92573],\n                        [15.0051,58.16108],\n                        [14.58003,58.10148],\n                        [14.64143,57.93294],\n                        [15.07063,57.92573]\n                    ]\n                ]\n            }\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök events - filtrera på län",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"200 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": {\n        \"county\": \"JönköpingsLän\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök events - filtrera på taxon",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"500 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(500);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"taxon\": {\n        \"ids\": [\n            205995\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök occurrences - filtrera på datasetIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"2000 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(2000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"datasetIds\": [\n        \"Artportalen - Fladdermöss\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/occurrences?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"occurrences"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök occurrences - filtrera på datum",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"300 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(300);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dateFilter\": {\n        \"startDate\": \"2021-06-16T20:00:00Z\",\n        \"endDate\": \"2021-06-17T03:00:00Z\",\n        \"datumFilterType\": \"OverlappingStartDateAndEndDate\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/occurrences?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"occurrences"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök occurrences - filtrera på geometri",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"400 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": {\n        \"geometry\": {\n            \"geographicArea\": {\n                \"type\": \"polygon\",\n                \"coordinates\": [\n                    [\n                        [16.07063,56.92573],\n                        [15.0051,58.16108],\n                        [14.58003,58.10148],\n                        [14.64143,57.93294],\n                        [16.07063,56.92573]\n                    ]\n                ]\n            }\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/occurrences?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"occurrences"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
 							]
 						}
 					},
