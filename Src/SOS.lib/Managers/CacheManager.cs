@@ -74,6 +74,24 @@ namespace SOS.Lib.Managers
                 }
             }
 
+            if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.AnalysisApiAddresses?.Any() ?? false))
+            {
+                foreach (var analysisApiAddress in _sosApiConfiguration.AnalysisApiAddresses)
+                {
+                    var requestUri = $"{analysisApiAddress}Caches/{cache}";
+                    success = success && await ClearAsync(client, requestUri);
+                }
+            }
+
+            if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.DataStewardshipApiAddresses?.Any() ?? false))
+            {
+                foreach (var dataStewardshipApiAddress in _sosApiConfiguration.DataStewardshipApiAddresses)
+                {
+                    var requestUri = $"{dataStewardshipApiAddress}Caches/{cache}";
+                    success = success && await ClearAsync(client, requestUri);
+                }
+            }
+
             return success;
         }
     }
