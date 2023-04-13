@@ -213,7 +213,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             swedishEntries.First().Keys.Should()
                 .BeEquivalentTo("Observation GUID", "Datakälla", "Observatör", "Aktivitet");
             englishEntries.First().Keys.Should()
-                .BeEquivalentTo("Occurrence Id", "Dataset", "Recorded by", "Activity");
+                .BeEquivalentTo("Occurrence Id", "Dataset", "Recorded By", "Activity");
         }
 
         [Fact]
