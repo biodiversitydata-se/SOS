@@ -10,5 +10,9 @@ namespace SOS.Lib.Configuration.Shared
         public IEnumerable<string> ObservationsApiAddresses { get; set; }
 
         public IEnumerable<string> ElasticSearchProxyAddresses { get; set; }
+
+        public IEnumerable<string> AnalysisApiAddresses { get; set; }
+
+        public IEnumerable<string> DataStewardshipApiAddresses { get; set; }
     }
 }

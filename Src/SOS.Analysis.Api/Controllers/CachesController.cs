@@ -1,18 +1,19 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.ElasticSearch.Proxy.Controllers.Interfaces;
 
-namespace SOS.ElasticSearch.Proxy.Controllers
+
+namespace SOS.Analysis.Api.Controllers
 {
     /// <summary>
     ///     Caches controller
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class CachesController : ControllerBase, ICachesController
+    public class CachesController : ControllerBase
     {
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
         private readonly ILogger<CachesController> _logger;
