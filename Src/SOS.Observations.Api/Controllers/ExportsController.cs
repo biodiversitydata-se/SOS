@@ -26,7 +26,6 @@ using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
-using Microsoft.ApplicationInsights;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -720,7 +719,8 @@ namespace SOS.Observations.Api.Controllers
                     CreatedDate = DateTime.UtcNow,
                     NumberOfObservations = Convert.ToInt32(validateResult.Count),
                     Format = eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
-                    Description = description                    
+                    Description = description,
+                    OutputFieldSet = filter?.Output?.FieldSet
                 };
 
                 userExports.Jobs.Add(exportJobInfo);
@@ -1266,7 +1266,8 @@ namespace SOS.Observations.Api.Controllers
                     CreatedDate = DateTime.UtcNow,
                     NumberOfObservations = Convert.ToInt32(validateResult.Count),
                     Format = eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
-                    Description = description
+                    Description = description,
+                    OutputFieldSet = filter?.Output?.FieldSet
                 };
 
                 userExports.Jobs.Add(exportJobInfo);

@@ -28,6 +28,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
@@ -226,12 +227,13 @@ namespace SOS.Observations.Api
                                 Version = description.ApiVersion.ToString(),
                                 Description = "Species Observation System (SOS) - Observations API. Public API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
                             });
-
+                        swagger.CustomSchemaIds(type => type.ToString());
                         swagger.CustomOperationIds(apiDesc =>
                         {
                             apiDesc.TryGetMethodInfo(out MethodInfo methodInfo);
                             string controller = apiDesc.ActionDescriptor.RouteValues["controller"];
                             string methodName = methodInfo.Name;
+                      
                             return $"{controller}_{methodName}".Replace("Async", "", StringComparison.InvariantCultureIgnoreCase);
                         });
                     }
@@ -421,6 +423,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IChecklistManager, ChecklistManager>();
             services.AddScoped<IDataProviderManager, DataProviderManager>();
             services.AddScoped<IDataQualityManager, DataQualityManager>();
+            services.AddScoped<IDataStewardshipManager, DataStewardshipManager>();
             services.AddScoped<IDevOpsManager, DevOpsManager>();
             services.AddScoped<IExportManager, ExportManager>();
             services.AddScoped<IFilterManager, FilterManager>();
@@ -438,6 +441,8 @@ namespace SOS.Observations.Api
             services.AddScoped<IApiUsageStatisticsRepository, ApiUsageStatisticsRepository>();
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
+            services.AddScoped<IDatasetRepository, DatasetRepository>();
+            services.AddScoped<IEventRepository, EventRepository>();
             services.AddScoped<IProcessedChecklistRepository, ProcessedChecklistRepository>();
             services.AddScoped<IUserObservationRepository, UserObservationRepository>();
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
@@ -452,7 +457,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IProjectInfoRepository, ProjectInfoRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
             services.AddScoped<IUserExportRepository, UserExportRepository>();
-
+             
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();
             services.AddSingleton<ICryptoService, CryptoService>();

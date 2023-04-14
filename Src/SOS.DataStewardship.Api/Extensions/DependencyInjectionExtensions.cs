@@ -60,7 +60,7 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddApplicationInsightsTelemetry(webApplicationBuilder.Configuration);
         // Application insights custom
         webApplicationBuilder.Services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-        webApplicationBuilder.Services.AddSingleton(webApplicationBuilder.Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>());
+        webApplicationBuilder.Services.AddSingleton(webApplicationBuilder.Configuration.GetSection("ApplicationInsights").Get<ApplicationInsights>());
         webApplicationBuilder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         webApplicationBuilder.Services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 

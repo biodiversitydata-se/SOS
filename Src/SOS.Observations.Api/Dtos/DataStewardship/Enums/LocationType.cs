@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace SOS.DataStewardship.Api.Contracts.Enums
+namespace SOS.Observations.Api.Dtos.DataStewardship.Enums
 {
     /// <summary>
     /// "The type of survey site that was surveyed, e.g. square, segment, point site, counting zone, route etc."
