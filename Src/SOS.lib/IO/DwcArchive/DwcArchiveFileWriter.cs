@@ -228,8 +228,8 @@ namespace SOS.Lib.IO.DwcArchive
 
             // Create Occurrence txt file
             string occurrenceCsvFilePath = filePathByFilePart[DwcaFilePart.Occurrence];
-            var dwcObservations = processedObservations.ToDarwinCore();
-            if (dataProvider.Id == 1) FixSbdiArtportalenDwcObservations(dwcObservations);
+            bool fixSbdiArtportalenInstitutionCode = dataProvider.Id == 1;
+            var dwcObservations = processedObservations.ToDarwinCore(fixSbdiArtportalenInstitutionCode);
             if (checkForIllegalCharacters) ValidateObservations(dwcObservations);
             await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
             await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
@@ -261,25 +261,6 @@ namespace SOS.Lib.IO.DwcArchive
                     multimediaRows,
                     multimediaFileStream);
             }
-        }
-
-        /// <summary>
-        /// SBDI BioAtlas wants the InstitutionCode to be "SLU Artdatabanken"
-        /// </summary>
-        /// <param name="dwcObservations"></param>
-        private void FixSbdiArtportalenDwcObservations(IEnumerable<DarwinCore> dwcObservations)
-        {
-            foreach (var obs in dwcObservations)
-            {
-                FixSbdiArtportalenDwcObservation(obs);
-            }
-        }
-
-        private void FixSbdiArtportalenDwcObservation(DarwinCore dwcObservation)
-        {
-            var institutionCode = dwcObservation.InstitutionCode;
-            dwcObservation.InstitutionCode = "SLU Artdatabanken";
-            dwcObservation.OwnerInstitutionCode = institutionCode;
         }
 
         private void ValidateObservations(IEnumerable<DarwinCore> dwcObservations)
