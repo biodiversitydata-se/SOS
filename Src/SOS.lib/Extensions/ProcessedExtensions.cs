@@ -237,51 +237,61 @@ namespace SOS.Lib.Extensions
         ///     Cast processed observation object to Darwin Core
         /// </summary>
         /// <param name="processedObservation"></param>
+        /// <param name="fixSbdiArtportalenDwcObservation"></param>
         /// <returns></returns>
-        public static DarwinCore ToDarwinCore(this Observation processedObservation)
+        public static DarwinCore ToDarwinCore(this Observation processedObservation, bool fixSbdiArtportalenDwcObservation = false)
         {
             if (processedObservation == null)
             {
                 return null;
             }
-   
-            return new DarwinCore
+
+            var dwc = new DarwinCore();
+            dwc.AccessRights = processedObservation.AccessRights?.Value;
+            dwc.BasisOfRecord = processedObservation.BasisOfRecord?.Value;
+            dwc.BibliographicCitation = processedObservation.BibliographicCitation;
+            dwc.CollectionCode = processedObservation.CollectionCode;
+            dwc.CollectionID = processedObservation.CollectionId;
+            dwc.DataGeneralizations = processedObservation.DataGeneralizations;
+            dwc.DatasetID = processedObservation.DatasetId;
+            dwc.DatasetName = processedObservation.DatasetName;
+            dwc.Event = processedObservation.Event?.ToDarwinCore();
+            dwc.Identification = processedObservation.Identification?.ToDarwinCore();
+            dwc.InformationWithheld = processedObservation.InformationWithheld;
+            if (fixSbdiArtportalenDwcObservation)
             {
-                AccessRights = processedObservation.AccessRights?.Value,
-                BasisOfRecord = processedObservation.BasisOfRecord?.Value,
-                BibliographicCitation = processedObservation.BibliographicCitation,
-                CollectionCode = processedObservation.CollectionCode,
-                CollectionID = processedObservation.CollectionId,
-                DataGeneralizations = processedObservation.DataGeneralizations,
-                DatasetID = processedObservation.DatasetId,
-                DatasetName = processedObservation.DatasetName,
-                Event = processedObservation.Event?.ToDarwinCore(),
-                Identification = processedObservation.Identification?.ToDarwinCore(),
-                InformationWithheld = processedObservation.InformationWithheld,
-                InstitutionCode = string.IsNullOrEmpty(processedObservation.InstitutionCode?.Value) ? "SLU Artdatabanken" : processedObservation.InstitutionCode?.Value,
-                InstitutionID = processedObservation.InstitutionId,
-                Language = processedObservation.Language,
-                Location = processedObservation.Location?.ToDarwinCore(),
-                MeasurementOrFact = null,
-                Modified = processedObservation.Modified,
-                Occurrence = processedObservation.Occurrence?.ToDarwinCore(),
-                OwnerInstitutionCode = processedObservation.OwnerInstitutionCode,
-                References = processedObservation.References,
-                RightsHolder = processedObservation.RightsHolder,
-                Taxon = processedObservation.Taxon.ToDarwinCore(),
-                Type = processedObservation.Type?.Value
-            };
+                dwc.InstitutionCode = "SLU Artdatabanken";
+                dwc.OwnerInstitutionCode = string.IsNullOrEmpty(processedObservation.InstitutionCode?.Value) ? "SLU Artdatabanken" : processedObservation.InstitutionCode?.Value;
+            }
+            else
+            {
+                dwc.InstitutionCode = string.IsNullOrEmpty(processedObservation.InstitutionCode?.Value) ? "SLU Artdatabanken" : processedObservation.InstitutionCode?.Value;
+                dwc.OwnerInstitutionCode = processedObservation.OwnerInstitutionCode;
+            }
+            dwc.InstitutionID = processedObservation.InstitutionId;
+            dwc.Language = processedObservation.Language;
+            dwc.Location = processedObservation.Location?.ToDarwinCore();
+            dwc.MeasurementOrFact = null;
+            dwc.Modified = processedObservation.Modified;
+            dwc.Occurrence = processedObservation.Occurrence?.ToDarwinCore();
+            dwc.References = processedObservation.References;
+            dwc.RightsHolder = processedObservation.RightsHolder;
+            dwc.Taxon = processedObservation.Taxon.ToDarwinCore();
+            dwc.Type = processedObservation.Type?.Value;
+
+            return dwc;
         }
 
         /// <summary>
         ///     Cast processed Darwin Core objects to Darwin Core
         /// </summary>
         /// <param name="processedObservations"></param>
+        /// <param name="fixSbdiArtportalenDwcObservation"></param>
         /// <returns></returns>
-        public static IEnumerable<DarwinCore> ToDarwinCore(this IEnumerable<Observation> processedObservations)
+        public static IEnumerable<DarwinCore> ToDarwinCore(this IEnumerable<Observation> processedObservations, bool fixSbdiArtportalenDwcObservation = false)
         {
             return processedObservations?
-                .Select(observation => observation.ToDarwinCore());
+                .Select(observation => observation.ToDarwinCore(fixSbdiArtportalenDwcObservation));
         }
 
         #endregion Sighting        
