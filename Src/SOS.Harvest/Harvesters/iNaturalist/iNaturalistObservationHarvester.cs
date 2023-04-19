@@ -52,17 +52,12 @@ namespace SOS.Harvest.Harvesters.iNaturalist
         {
             var harvestInfo = new HarvestInfo("iNaturallist", DateTime.Now);
             var dataProvider = new Lib.Models.Shared.DataProvider() { Id = 19, Identifier = "iNaturalist" };
-            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
-                dataProvider,
-                _verbatimClient,
-                _logger)
-            {
-                TempMode = false
-            };
+            using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, _logger);
+            dwcCollectionRepository.BeginTempMode();
 
             // Get current document count from permanent index
-            var currentDocCount = await dwcArchiveVerbatimRepository.CountAllDocumentsAsync();
-            dwcArchiveVerbatimRepository.TempMode = true;
+            var currentDocCount = await dwcCollectionRepository.OccurrenceRepository.CountAllDocumentsAsync();
+            dwcCollectionRepository.BeginTempMode();            
 
             try
             {
@@ -71,7 +66,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
                 // Make sure we have an empty collection.
                 _logger.LogInformation("Start empty collection for iNaturalist verbatim collection");
-                await dwcArchiveVerbatimRepository.DeleteCollectionAsync();
+                await dwcCollectionRepository.OccurrenceRepository.DeleteCollectionAsync();
                 _logger.LogInformation("Finish empty collection for iNaturalist verbatim collection");
 
                 var nrSightingsHarvested = 0;
@@ -93,7 +88,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                     }
 
                     // Add sightings to MongoDb
-                    await dwcArchiveVerbatimRepository.AddManyAsync(gBIFResult);
+                    await dwcCollectionRepository.OccurrenceRepository.AddManyAsync(gBIFResult);
 
                     nrSightingsHarvested += gBIFResult.Count();
 
@@ -123,8 +118,8 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 {
                     harvestInfo.Status = RunStatus.Success;
                     _logger.LogInformation("Start permanentize temp collection for iNaturalist verbatim");
-                    await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
-                    _logger.LogInformation("Finish permanentize temp collection for iNaturalist verbatim");
+                    await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync();
+                    _logger.LogInformation("Finish permanentize temp collection for iNaturalist verbatim");                    
                 }
                 else
                 {
