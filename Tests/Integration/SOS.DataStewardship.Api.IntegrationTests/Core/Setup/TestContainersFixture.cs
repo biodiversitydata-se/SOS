@@ -2,7 +2,6 @@
 using SOS.Lib.Database.Interfaces;
 using MongoDB.Driver;
 using SOS.Lib.Database;
-using SOS.DataStewardship.Api.IntegrationTests.Core.Extensions;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
