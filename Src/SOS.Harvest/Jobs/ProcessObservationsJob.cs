@@ -506,17 +506,20 @@ namespace SOS.Harvest.Jobs
                 var result = await ProcessVerbatimObservations(dataProvidersToProcess, mode, taxonById!, cancellationToken!);
                 var success = result.All(t => t.Value.Status == RunStatus.Success);
 
-                // Enable indexing for public and protected index
+                //---------------------------------------------------------------
+                // 6. Create Elasticsearch observation index by enable indexing
+                //---------------------------------------------------------------                
                 await EnableIndexingAsync();
-
-                //---------------------------------
-                // 6. Create ElasticSearch index
-                //---------------------------------
+                
                 if (success)
                 {                    
                     // Update dynamic provider data
                     await UpdateProvidersMetadataAsync(dataProvidersToProcess);
 
+                    //-------------------------------------------------------
+                    // 7. Wait for Elasticsearch indexing to finish and
+                    //    start incremental harvest of missing observations
+                    //-------------------------------------------------------
                     if (mode == JobRunModes.Full)
                     {
                         var processCount = result.Sum(s => s.Value.PublicCount);
@@ -526,7 +529,7 @@ namespace SOS.Harvest.Jobs
                         // If docCoumt is less than process count, indexing is not ready yet
                         while (docCount < processCount && iterations < 100)
                         {
-                            iterations++; // Safty to prevent infinite loop.
+                            iterations++; // Safety to prevent infinite loop.
                             _logger.LogInformation($"Waiting for indexing to be done {iterations}");
                             Thread.Sleep(TimeSpan.FromSeconds(6)); // Wait for Elasticsearch indexing to finish.
                             docCount = await _processedObservationRepository.IndexCountAsync(false);
@@ -538,26 +541,7 @@ namespace SOS.Harvest.Jobs
                             var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunIncrementalInactiveAsync(cancellationToken));
 
                             _logger.LogInformation($"Incremental harvest/process job with Id={jobId} was enqueued");
-                        }
-
-                        //----------------------------------------------------------------------------
-                        // 7. End create DwC CSV files and merge the files into multiple DwC-A files.
-                        //----------------------------------------------------------------------------
-                        var dwCCreationTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.DwCCreation);
-                        var dwcFiles = await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
-                        _processTimeManager.Stop(ProcessTimeManager.TimerTypes.DwCCreation, dwCCreationTimerSessionId);
-
-                        if (dwcFiles?.Any() ?? false)
-                        {
-                            foreach (var dwcFile in dwcFiles)
-                            {
-                                // Enqueue upload file to blob storage job
-                                var uploadJobId = BackgroundJob.Enqueue<IUploadToStoreJob>(job => job.RunAsync(dwcFile, _exportContainer, true,
-                                    cancellationToken));
-
-                                _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
-                            }
-                        }
+                        }                        
                     }
 
                     if (!await _processedObservationRepository.EnsureNoDuplicatesAsync())
@@ -569,6 +553,9 @@ namespace SOS.Harvest.Jobs
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull ||
                         mode == JobRunModes.IncrementalInactiveInstance)
                     {
+                        //----------------------------------
+                        // 8. Validate observation indexes
+                        //----------------------------------
                         var validateIndexTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ValidateIndex);
                         _logger.LogInformation($"Start validate indexes");
                         if (!await ValidateIndexesAsync())
@@ -576,27 +563,54 @@ namespace SOS.Harvest.Jobs
                             throw new Exception("Validation of processed indexes failed. Job stopped.");
                         }
 
-                        // Add data stewardardship events & datasets
-                        if (_processConfiguration.ProcessDataset)
+                        if (mode == JobRunModes.Full)
                         {
-                            // Process Events
-                            await InitializeElasticSearchEventAsync();
-                            await DisableEsEventIndexingAsync();
-                            _logger.LogDebug($"Number of data providers that supports events: {dataProvidersToProcess.Where(m => m.SupportEvents).Count()}");
-                            _logger.LogDebug($"Number of data providers that don't supports events: {dataProvidersToProcess.Where(m => !m.SupportEvents).Count()}");
-                            var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
-                            //var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
-                            var eventSuccess = eventResult == null || eventResult.All(t => t.Value.Status == RunStatus.Success);
-                            await EnableEsEventIndexingAsync();
-                            Thread.Sleep(TimeSpan.FromSeconds(6)); // Wait for Elasticsearch indexing to finish.
+                            //----------------------------------------------------------------------------
+                            // 9. End create DwC CSV files and merge the files into multiple DwC-A files.
+                            //----------------------------------------------------------------------------
+                            var dwCCreationTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.DwCCreation);
+                            var dwcFiles = await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
+                            _processTimeManager.Stop(ProcessTimeManager.TimerTypes.DwCCreation, dwCCreationTimerSessionId);
 
-                            // Process Datasets
-                            await InitializeElasticSearchDatasetAsync();
-                            await DisableEsDatasetIndexingAsync();
-                            var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
-                            //var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
-                            var datasetSuccess = datasetResult == null || datasetResult.All(t => t.Value.Status == RunStatus.Success);
-                            await EnableEsDatasetIndexingAsync();
+                            if (dwcFiles?.Any() ?? false)
+                            {
+                                foreach (var dwcFile in dwcFiles)
+                                {
+                                    // Enqueue upload file to blob storage job
+                                    var uploadJobId = BackgroundJob.Enqueue<IUploadToStoreJob>(job => job.RunAsync(dwcFile, _exportContainer, true,
+                                        cancellationToken));
+
+                                    _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
+                                }
+                            }
+
+                            // Add data stewardardship events & datasets
+                            if (_processConfiguration.ProcessDataset)
+                            {
+                                //--------------------
+                                // 10. Process events
+                                //--------------------
+                                // Process Events
+                                await InitializeElasticSearchEventAsync();
+                                await DisableEsEventIndexingAsync();
+                                _logger.LogDebug($"Number of data providers that supports events: {dataProvidersToProcess.Where(m => m.SupportEvents).Count()}");
+                                _logger.LogDebug($"Number of data providers that don't supports events: {dataProvidersToProcess.Where(m => !m.SupportEvents).Count()}");
+                                var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
+                                //var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
+                                var eventSuccess = eventResult == null || eventResult.All(t => t.Value.Status == RunStatus.Success);
+                                await EnableEsEventIndexingAsync();
+                                Thread.Sleep(TimeSpan.FromSeconds(6)); // Wait for Elasticsearch indexing to finish.
+
+                                //----------------------
+                                // 10. Process datasets
+                                //----------------------
+                                await InitializeElasticSearchDatasetAsync();
+                                await DisableEsDatasetIndexingAsync();
+                                var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
+                                //var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
+                                var datasetSuccess = datasetResult == null || datasetResult.All(t => t.Value.Status == RunStatus.Success);
+                                await EnableEsDatasetIndexingAsync();
+                            }
                         }
 
                         _logger.LogInformation($"Finish validate indexes");
@@ -605,11 +619,16 @@ namespace SOS.Harvest.Jobs
                         // Get on going job id's
                         var onGouingJobIds = GetOnGoingJobIds( "ICreateDoiJob", "IExportAndSendJob", "IExportAndStoreJob" );
 
-                        // Toggle active instance if we are done
+                        //---------------------------------------------------------
+                        // 11. Toggle active instance when full processing is done
+                        //---------------------------------------------------------
                         _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstance} => {_processedObservationRepository.InActiveInstance}");
                         await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
                             .InActiveInstance);
 
+                        //-------------------------------------------------------------------------
+                        // 12. Clear ProcessedConfiguration cache in all dependent services (APIs)
+                        //-------------------------------------------------------------------------
                         // Clear processed configuration cache in observation API
                         _logger.LogInformation($"Start clear processed configuration cache at search api");
                         await _cacheManager.ClearAsync(Cache.ProcessedConfiguration);
@@ -642,7 +661,7 @@ namespace SOS.Harvest.Jobs
                 }                
 
                 //-------------------------------
-                // 8. Return processing result
+                // 13. Return processing result
                 //-------------------------------
                 return success ? true : throw new Exception($@"Failed to process observations. {string.Join(", ", result
                     .Where(r => r.Value.Status != RunStatus.Success)
