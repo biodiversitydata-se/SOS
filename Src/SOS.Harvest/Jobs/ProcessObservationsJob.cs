@@ -109,7 +109,7 @@ namespace SOS.Harvest.Jobs
             _logger.LogDebug("Start initialize area cache");
             await _areaHelper.InitializeAsync();
             _logger.LogDebug("Finish initialize area cache");
-        }        
+        }
 
         private async Task InitializeElasticSearchAsync(JobRunModes mode)
         {
@@ -145,7 +145,7 @@ namespace SOS.Harvest.Jobs
 
                     _logger.LogInformation(
                         $"Finish clear ElasticSearch index: {_userObservationRepository.UniqueIndexName}");
-                }                
+                }
             }
             else
             {
@@ -165,7 +165,7 @@ namespace SOS.Harvest.Jobs
         {
             if (!_processConfiguration.ProcessDataset) return;
             _logger.LogInformation($"ProcessedConfiguration.ActiveIndex is {_processedObservationRepository.ActiveInstance}");
-            _logger.LogInformation($"_observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");            
+            _logger.LogInformation($"_observationDatasetRepository.LiveMode={_observationDatasetRepository.LiveMode}");
             _observationDatasetRepository.LiveMode = _processedObservationRepository.LiveMode;
             _logger.LogInformation($"Set _observationDatasetRepository.LiveMode={_processedObservationRepository.LiveMode}");
             _logger.LogInformation($"Start clear ElasticSearch index: UniqueIndexName={_observationDatasetRepository.UniqueIndexName}, IndexName={_observationDatasetRepository.IndexName}");
@@ -183,7 +183,7 @@ namespace SOS.Harvest.Jobs
             _logger.LogInformation($"Start clear ElasticSearch index: UniqueIndexName={_observationEventRepository.UniqueIndexName}, IndexName={_observationEventRepository.IndexName}");
             await _observationEventRepository.ClearCollectionAsync();
             _logger.LogInformation($"Finish clear ElasticSearch index: {_observationEventRepository.UniqueIndexName}");
-        }        
+        }
 
         /// <summary>
         /// Disable Elasticsearch indexing
@@ -328,10 +328,10 @@ namespace SOS.Harvest.Jobs
                 return true;
             }
             var success = true;
-            foreach(var currProvider in currentProcessInfo.ProvidersInfo)
+            foreach (var currProvider in currentProcessInfo.ProvidersInfo)
             {
                 var otherProvider = otherProcessInfo.ProvidersInfo.FirstOrDefault(p => p.DataProviderId.Equals(currProvider.DataProviderId));
-                
+
                 if (otherProvider != null)
                 {
                     double percentLimit = _processConfiguration.MinPercentObservationCount / 100.0;
@@ -363,7 +363,7 @@ namespace SOS.Harvest.Jobs
                 (await _processedObservationRepository.TryToGetOccurenceIdDuplicatesAsync(false, maxItems))?.ToArray();
             if (publicIndexDuplicates?.Any() ?? false)
             {
-                _logger.LogError($"Public index ({_processedObservationRepository.PublicIndexName}) contains multiple documents with same occurrenceId. " + 
+                _logger.LogError($"Public index ({_processedObservationRepository.PublicIndexName}) contains multiple documents with same occurrenceId. " +
                                  $"{string.Join(", ", publicIndexDuplicates)}{(publicIndexDuplicates.Count() == maxItems ? "..." : "")}");
                 return false;
             }
@@ -454,7 +454,7 @@ namespace SOS.Harvest.Jobs
             IJobCancellationToken cancellationToken)
         {
             try
-            {                
+            {
                 var processOverallTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ProcessOverall);
 
                 //-----------------
@@ -473,7 +473,7 @@ namespace SOS.Harvest.Jobs
                 //----------------------------------------------------------------------
                 // 3. Initialization of meta data etc
                 //----------------------------------------------------------------------
-                var getTaxaTask = GetTaxaAsync(mode);                
+                var getTaxaTask = GetTaxaAsync(mode);
                 await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(), _validationManager.VerifyCollectionAsync(mode), _validationManager.VerifyEventCollectionAsync(mode));
 
                 var taxonById = await getTaxaTask;
@@ -508,20 +508,23 @@ namespace SOS.Harvest.Jobs
 
                 //---------------------------------------------------------------
                 // 6. Create Elasticsearch observation index by enable indexing
-                //---------------------------------------------------------------                
+                //---------------------------------------------------------------
                 await EnableIndexingAsync();
-                
+
+                //---------------------------------
+                // 6. Create ElasticSearch index
+                //---------------------------------
                 if (success)
-                {                    
+                {
                     // Update dynamic provider data
                     await UpdateProvidersMetadataAsync(dataProvidersToProcess);
 
-                    //-------------------------------------------------------
-                    // 7. Wait for Elasticsearch indexing to finish and
-                    //    start incremental harvest of missing observations
-                    //-------------------------------------------------------
                     if (mode == JobRunModes.Full)
                     {
+                        //-------------------------------------------------------
+                        // 7. Wait for Elasticsearch indexing to finish and
+                        //    start incremental harvest of missing observations
+                        //-------------------------------------------------------
                         var processCount = result.Sum(s => s.Value.PublicCount);
                         var docCount = await _processedObservationRepository.IndexCountAsync(false);
                         var iterations = 0;
@@ -541,13 +544,32 @@ namespace SOS.Harvest.Jobs
                             var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunIncrementalInactiveAsync(cancellationToken));
 
                             _logger.LogInformation($"Incremental harvest/process job with Id={jobId} was enqueued");
-                        }                        
+                        }
+
+                        //----------------------------------------------------------------------------
+                        // 8. End create DwC CSV files and merge the files into multiple DwC-A files.
+                        //----------------------------------------------------------------------------
+                        var dwCCreationTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.DwCCreation);
+                        var dwcFiles = await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
+                        _processTimeManager.Stop(ProcessTimeManager.TimerTypes.DwCCreation, dwCCreationTimerSessionId);
+
+                        if (dwcFiles?.Any() ?? false)
+                        {
+                            foreach (var dwcFile in dwcFiles)
+                            {
+                                // Enqueue upload file to blob storage job
+                                var uploadJobId = BackgroundJob.Enqueue<IUploadToStoreJob>(job => job.RunAsync(dwcFile, _exportContainer, true,
+                                    cancellationToken));
+
+                                _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
+                            }
+                        }
                     }
 
                     if (!await _processedObservationRepository.EnsureNoDuplicatesAsync())
                     {
                         _logger.LogError($"Failed to delete duplicates");
-                    }                    
+                    }
 
                     // When we do a incremental harvest to live index, there is no meaning to do validation since the data is already live
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull ||
@@ -563,61 +585,38 @@ namespace SOS.Harvest.Jobs
                             throw new Exception("Validation of processed indexes failed. Job stopped.");
                         }
 
-                        if (mode == JobRunModes.Full)
+                        // Add data stewardardship events & datasets
+                        if (_processConfiguration.ProcessDataset)
                         {
-                            //----------------------------------------------------------------------------
-                            // 9. End create DwC CSV files and merge the files into multiple DwC-A files.
-                            //----------------------------------------------------------------------------
-                            var dwCCreationTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.DwCCreation);
-                            var dwcFiles = await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
-                            _processTimeManager.Stop(ProcessTimeManager.TimerTypes.DwCCreation, dwCCreationTimerSessionId);
+                            //--------------------
+                            // 9. Process events
+                            //--------------------
+                            await InitializeElasticSearchEventAsync();
+                            await DisableEsEventIndexingAsync();
+                            _logger.LogDebug($"Number of data providers that supports events: {dataProvidersToProcess.Where(m => m.SupportEvents).Count()}");
+                            _logger.LogDebug($"Number of data providers that don't supports events: {dataProvidersToProcess.Where(m => !m.SupportEvents).Count()}");
+                            var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
+                            //var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
+                            var eventSuccess = eventResult == null || eventResult.All(t => t.Value.Status == RunStatus.Success);
+                            await EnableEsEventIndexingAsync();
+                            Thread.Sleep(TimeSpan.FromSeconds(6)); // Wait for Elasticsearch indexing to finish.
 
-                            if (dwcFiles?.Any() ?? false)
-                            {
-                                foreach (var dwcFile in dwcFiles)
-                                {
-                                    // Enqueue upload file to blob storage job
-                                    var uploadJobId = BackgroundJob.Enqueue<IUploadToStoreJob>(job => job.RunAsync(dwcFile, _exportContainer, true,
-                                        cancellationToken));
-
-                                    _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
-                                }
-                            }
-
-                            // Add data stewardardship events & datasets
-                            if (_processConfiguration.ProcessDataset)
-                            {
-                                //--------------------
-                                // 10. Process events
-                                //--------------------
-                                // Process Events
-                                await InitializeElasticSearchEventAsync();
-                                await DisableEsEventIndexingAsync();
-                                _logger.LogDebug($"Number of data providers that supports events: {dataProvidersToProcess.Where(m => m.SupportEvents).Count()}");
-                                _logger.LogDebug($"Number of data providers that don't supports events: {dataProvidersToProcess.Where(m => !m.SupportEvents).Count()}");
-                                var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
-                                //var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
-                                var eventSuccess = eventResult == null || eventResult.All(t => t.Value.Status == RunStatus.Success);
-                                await EnableEsEventIndexingAsync();
-                                Thread.Sleep(TimeSpan.FromSeconds(6)); // Wait for Elasticsearch indexing to finish.
-
-                                //----------------------
-                                // 10. Process datasets
-                                //----------------------
-                                await InitializeElasticSearchDatasetAsync();
-                                await DisableEsDatasetIndexingAsync();
-                                var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
-                                //var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
-                                var datasetSuccess = datasetResult == null || datasetResult.All(t => t.Value.Status == RunStatus.Success);
-                                await EnableEsDatasetIndexingAsync();
-                            }
+                            //----------------------
+                            // 10. Process datasets
+                            //----------------------
+                            await InitializeElasticSearchDatasetAsync();
+                            await DisableEsDatasetIndexingAsync();
+                            var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
+                            //var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
+                            var datasetSuccess = datasetResult == null || datasetResult.All(t => t.Value.Status == RunStatus.Success);
+                            await EnableEsDatasetIndexingAsync();
                         }
 
                         _logger.LogInformation($"Finish validate indexes");
                         _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateIndex, validateIndexTimerSessionId);
 
                         // Get on going job id's
-                        var onGouingJobIds = GetOnGoingJobIds( "ICreateDoiJob", "IExportAndSendJob", "IExportAndStoreJob" );
+                        var onGouingJobIds = GetOnGoingJobIds("ICreateDoiJob", "IExportAndSendJob", "IExportAndStoreJob");
 
                         //---------------------------------------------------------
                         // 11. Toggle active instance when full processing is done
@@ -629,17 +628,16 @@ namespace SOS.Harvest.Jobs
                         //-------------------------------------------------------------------------
                         // 12. Clear ProcessedConfiguration cache in all dependent services (APIs)
                         //-------------------------------------------------------------------------
-                        // Clear processed configuration cache in observation API
                         _logger.LogInformation($"Start clear processed configuration cache at search api");
                         await _cacheManager.ClearAsync(Cache.ProcessedConfiguration);
                         _logger.LogInformation($"Finish clear processed configuration cache at search api");
 
-                        // Restart export jobs since we have switch data base and "SearchAfter" will fale to go on
+                        // Restart export jobs since we have switch data base and "SearchAfter" will fail to go on
                         RestartJobs(onGouingJobIds);
                     }
                 }
 
-                _logger.LogInformation($"Processing done: {success} {mode}");                
+                _logger.LogInformation($"Processing done: {success} {mode}");
 
                 _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessOverall, processOverallTimerSessionId);
 
@@ -658,7 +656,7 @@ namespace SOS.Harvest.Jobs
 
                         _logger.LogInformation(timerMessage);
                     }
-                }                
+                }
 
                 //-------------------------------
                 // 13. Return processing result
@@ -717,7 +715,7 @@ namespace SOS.Harvest.Jobs
                 // 3. Initialization of meta data etc
                 //----------------------------------------------------------------------
                 var getTaxaTask = GetTaxaAsync(JobRunModes.IncrementalActiveInstance);
-                await Task.WhenAll(InitializeAreaHelperAsync(), _validationManager.VerifyCollectionAsync(mode));                
+                await Task.WhenAll(InitializeAreaHelperAsync(), _validationManager.VerifyCollectionAsync(mode));
 
                 var taxonById = await getTaxaTask;
 
@@ -763,11 +761,11 @@ namespace SOS.Harvest.Jobs
                 //---------------------------------
                 if (success)
                 {
-                    await EnableIndexingAsync();                    
-                    
+                    await EnableIndexingAsync();
+
                     // Add data stewardardship datasets
                     if (_processConfiguration.ProcessDataset && mode == JobRunModes.Full)
-                    {                        
+                    {
                         // Process Events
                         await InitializeElasticSearchEventAsync();
                         await DisableEsEventIndexingAsync();
@@ -874,7 +872,7 @@ namespace SOS.Harvest.Jobs
                     processor.ProcessAsync(dataProvider, cancellationToken));
                 }
             }
-            
+
             var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
             _logger.LogDebug("End processing verbatim events");
             //await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
@@ -891,7 +889,7 @@ namespace SOS.Harvest.Jobs
             if (dataProvidersToProcess == null || !dataProvidersToProcess.Any()) return null;
             var processStart = DateTime.Now;
 
-            var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();            
+            var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
             foreach (var dataProvider in dataProvidersToProcess)
             {
                 _logger.LogDebug($"Start processing verbatim datasets for data provider: {dataProvider}");
@@ -1103,7 +1101,7 @@ namespace SOS.Harvest.Jobs
             IAreaHelper areaHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             ProcessConfiguration processConfiguration,
-            IUserObservationRepository userObservationRepository,            
+            IUserObservationRepository userObservationRepository,
             IDatasetRepository observationDatasetRepository,
             IEventRepository observationEventRepository,
             IDwcaDatasetProcessor dwcaDatasetProcessor,
@@ -1154,7 +1152,7 @@ namespace SOS.Harvest.Jobs
             };
 
             _datasetProcessorByType = new Dictionary<DataProviderType, IDatasetProcessor>
-            {                
+            {
                 {DataProviderType.DwcA, dwcaDatasetProcessor},
                 {DataProviderType.ArtportalenObservations, artportalenDatasetProcessor},
             };
