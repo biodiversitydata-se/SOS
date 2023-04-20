@@ -4,16 +4,14 @@ using MongoDB.Driver;
 using SOS.Lib.Database;
 using Testcontainers.MongoDb;
 using Testcontainers.Elasticsearch;
-using DotNet.Testcontainers.Images;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
     public class TestContainersFixture : IAsyncLifetime
     {
-        private const int ELASTIC_PORT = 9200;
         private const string ELASTIC_PASSWORD = "elastic";
 
-        private const int MONGODB_PORT = 27117;
+ 
         private const string MONGODB_USERNAME = "mongo";
         private const string MONGODB_PASSWORD = "admin";
         private const string MONGODB_IMAGE_NAME = "mongo:6.0";
@@ -32,14 +30,12 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         {
             ElasticsearchContainer = new ElasticsearchBuilder()
                 .WithCleanUp(true)
-                .WithExposedPort(ELASTIC_PORT)
                 .WithPassword(ELASTIC_PASSWORD)
                 .Build();
        
             MongoDbContainer = new MongoDbBuilder()
                 .WithImage(MONGODB_IMAGE_NAME)
                 .WithCleanUp(true)
-                .WithExposedPort(MONGODB_PORT)
                 .WithUsername(MONGODB_USERNAME)
                 .WithPassword(MONGODB_PASSWORD)
                 .Build();
@@ -77,7 +73,6 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
                 .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
                 .EnableApiVersioningHeader()
-          //      .BasicAuthentication(ELASTIC_USERNAME, ELASTIC_PASSWORD)
             .EnableDebugMode());
             return elasticClient;
         }
