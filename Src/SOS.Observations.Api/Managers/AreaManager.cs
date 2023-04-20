@@ -69,7 +69,7 @@ namespace SOS.Observations.Api.Managers
                 };
 
                 var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
-                serializeOptions.Converters.Add(new GeoJsonConverter(true));
+                serializeOptions.Converters.Add(new GeoJsonConverter(true)); // Länsstyrelsen fix. Expects capital letter.
                 serializeOptions.Converters.Add(new JsonStringEnumConverter());
 
                 var areaString = JsonSerializer.Serialize(externalArea, serializeOptions);
