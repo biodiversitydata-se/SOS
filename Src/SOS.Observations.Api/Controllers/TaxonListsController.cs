@@ -47,8 +47,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<TaxonListDefinitionDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [WriteJsonNullValues] // Länsstyrelsen fix - expects null values output.
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> GetTaxonLists([FromQuery] string cultureCode = "sv-SE")
         {
             try

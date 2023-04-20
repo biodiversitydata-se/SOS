@@ -13,7 +13,6 @@
  - Improved support for harvesting events.
  - InstitutionCode field is now set to "SLU Artdatabanken" in Artportalen DwC-A export.
  - Upgrade to .Net 7.
- - Omit writing JSON property if it's value is null.
 
 ### `Fixed`
  - Application Insights Observation Count logging bug.
