@@ -2,13 +2,24 @@
 using SOS.Lib.Database.Interfaces;
 using MongoDB.Driver;
 using SOS.Lib.Database;
+using Testcontainers.MongoDb;
+using Testcontainers.Elasticsearch;
+using DotNet.Testcontainers.Images;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
     public class TestContainersFixture : IAsyncLifetime
     {
-        public ElasticsearchTestcontainer ElasticsearchContainer { get; set; }
-        public MongoDbTestcontainer MongoDbContainer { get; set; }
+        private const int ELASTIC_PORT = 9200;
+        private const string ELASTIC_PASSWORD = "elastic";
+
+        private const int MONGODB_PORT = 27117;
+        private const string MONGODB_USERNAME = "mongo";
+        private const string MONGODB_PASSWORD = "admin";
+        private const string MONGODB_IMAGE_NAME = "mongo:6.0";
+
+        public ElasticsearchContainer ElasticsearchContainer { get; set; }
+        public MongoDbContainer MongoDbContainer { get; set; }
         public TestSubstituteModels TestSubstitutes { get; set; }
 
         public class TestSubstituteModels
@@ -19,17 +30,19 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 
         public TestContainersFixture()
         {
-            var elasticsearchConfiguration = new ElasticsearchTestcontainerConfiguration { Password = "secret" };
-            ElasticsearchContainer = new TestcontainersBuilder<ElasticsearchTestcontainer>()
-                    .WithDatabase(elasticsearchConfiguration)
-                    .WithCleanUp(true)
-                    .Build();
-
-            var mongodbConfiguration = new MongoDbTestcontainerConfiguration { Database = "db", Username = "mongo", Password = "mongo" };
-            MongoDbContainer = new TestcontainersBuilder<MongoDbTestcontainer>()
-                    .WithDatabase(mongodbConfiguration)
-                    .WithCleanUp(true)
-                    .Build();
+            ElasticsearchContainer = new ElasticsearchBuilder()
+                .WithCleanUp(true)
+                .WithExposedPort(ELASTIC_PORT)
+                .WithPassword(ELASTIC_PASSWORD)
+                .Build();
+       
+            MongoDbContainer = new MongoDbBuilder()
+                .WithImage(MONGODB_IMAGE_NAME)
+                .WithCleanUp(true)
+                .WithExposedPort(MONGODB_PORT)
+                .WithUsername(MONGODB_USERNAME)
+                .WithPassword(MONGODB_PASSWORD)
+                .Build();
         }
 
         public async Task InitializeAsync()
@@ -61,10 +74,10 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         private async Task<ElasticClient> InitializeElasticsearchAsync()
         {
             await ElasticsearchContainer.StartAsync().ConfigureAwait(false);
-            var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(ElasticsearchContainer.ConnectionString))
+            var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
                 .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
                 .EnableApiVersioningHeader()
-                .BasicAuthentication(ElasticsearchContainer.Username, ElasticsearchContainer.Password)
+          //      .BasicAuthentication(ELASTIC_USERNAME, ELASTIC_PASSWORD)
             .EnableDebugMode());
             return elasticClient;
         }
@@ -73,19 +86,19 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         {
             await MongoDbContainer.StartAsync().ConfigureAwait(false);
             await RestoreMongoDbBackup(MongoDbContainer);
-            var mongoClientSettings = MongoClientSettings.FromConnectionString(MongoDbContainer.ConnectionString);
+            var mongoClientSettings = MongoClientSettings.FromConnectionString(MongoDbContainer.GetConnectionString());
             var processClient = new ProcessClient(mongoClientSettings, "sos-dev", 10000, 10000);
             return processClient;
         }
 
-        private async Task RestoreMongoDbBackup(MongoDbTestcontainer mongoDbTestcontainer)
+        private async Task RestoreMongoDbBackup(MongoDbContainer mongoDbTestcontainer)
         {
             string filePath = @"data\resources\mongodb-sos-dev.gz".GetAbsoluteFilePath();
             byte[] mongoDbBackupBytes = await File.ReadAllBytesAsync(filePath);
             await mongoDbTestcontainer.CopyFileAsync("/dump/mongodb-sos-dev.gz", mongoDbBackupBytes);
             var cmds = new List<string>()
             {
-                "mongorestore", "--gzip", "--archive=/dump/mongodb-sos-dev.gz", "--username", "mongo", "--password", "mongo"
+                "mongorestore", "--gzip", "--archive=/dump/mongodb-sos-dev.gz", "--username", MONGODB_USERNAME, "--password", MONGODB_PASSWORD
             };
             ExecResult execResult = await mongoDbTestcontainer.ExecAsync(cmds);
             if (execResult.ExitCode != 0) throw new Exception("MongoRestore failed");

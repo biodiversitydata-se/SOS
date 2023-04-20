@@ -13,7 +13,6 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Cache;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.DataStewardship.Api.IntegrationTests.Core.Extensions;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
