@@ -14,6 +14,15 @@ namespace SOS.Lib.JsonConverters
     /// </summary>
     public class GeoJsonConverter : JsonConverter<GeoJsonGeometry<GeoJson2DCoordinates>>
     {
+        private bool _useCapitalLetter; // Länsstyrelsen fix. Expects capital letter.
+        public GeoJsonConverter(bool useCapitalLetter)
+        {
+            this._useCapitalLetter = useCapitalLetter;
+        }
+        public GeoJsonConverter()
+        {            
+        }
+
         private string ReadCoordinateData(ref Utf8JsonReader reader)
         {
             var result = new StringBuilder();
@@ -193,7 +202,7 @@ namespace SOS.Lib.JsonConverters
             ;
             writer.WriteStartObject();
 
-            writer.WritePropertyName("coordinates");
+            writer.WritePropertyName(_useCapitalLetter ? "Coordinates" : "coordinates");
             switch (value.Type)
             {
                 case GeoJsonObjectType.Point:
@@ -217,7 +226,7 @@ namespace SOS.Lib.JsonConverters
                     break;
             }
 
-            writer.WriteString("type", value.Type.ToString());
+            writer.WriteString(_useCapitalLetter ? "Type" : "type", value.Type.ToString());
 
             writer.WriteEndObject();
         }
