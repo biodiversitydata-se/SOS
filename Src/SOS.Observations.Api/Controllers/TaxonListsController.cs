@@ -47,7 +47,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<TaxonListDefinitionDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> GetTaxonLists([FromQuery] string cultureCode = "sv-SE")
         {
             try
@@ -102,6 +102,6 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Error getting taxa");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }
+        }        
     }
 }

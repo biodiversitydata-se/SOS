@@ -1,7 +1,25 @@
 # Changelog
 
+## [2023.04.18]
+**Prod**: 2023-04-18
+### `Added`
+ - Data Stewardship API.
+ - Analysis API.
+ - External Health Check.
+ - Possibility to exclude observations in search criteria.
+ - Added possibility to change column order in exports.
 
-## [1.5.3] - Hotfix
+### `Changed`
+ - Improved support for harvesting events.
+ - InstitutionCode field is now set to "SLU Artdatabanken" in Artportalen DwC-A export.
+ - Upgrade to .Net 7.
+
+### `Fixed`
+ - Application Insights Observation Count logging bug.
+ - Elasticsearch memory bug.
+
+
+## [2023.01.31] - Hotfix
 **Prod**: 2023-03-14
 ### `Added`
  - `SearchFilterInternal.SightingTypeSearchGroupIds` filter.
@@ -15,7 +33,7 @@
  - Sweden area bug.
 
 
-## [1.5.3]
+## [2023.01.31]
 **Prod**: 2023-01-31
 ### `Changed`
  - Deprecated properties removed.
@@ -26,7 +44,7 @@
  - ETRS89 was using wrong EPSG code
 
 
-## [1.5.2]
+## [2022.11.17]
 **Prod**: 2022-11-17
 ### `Changed`
  - Improved user role information by adding information about authorities and areas in the endpoint `/User/Information`.
@@ -35,14 +53,14 @@
  - Some taxa hade wrong `ProtectedByLaw` value.
  - Improved GeoJSON serialization to encode å ä ö properly.
 
-## [1.5.1]
+## [2022.10.17]
 **Prod**: 2022-10-17 
  ### `Fixed`
  - When searching with `TaxonListIds` underlying taxa will be added if `IncludeUnderlyingTaxa=true`.
  - TimeRange file order bug.
  - Aggregation by day bug.
 
-## [1.5]
+## [2022.05.24]
 **Prod**: 2022-05-24 
 
 ### `Added`
@@ -67,7 +85,7 @@
 
 
 
-## [1.4.1]
+## [2022.03.08]
 
 **Prod**: 2022-03-08
 
@@ -76,7 +94,7 @@
 - New parameter `gzip=true` or `gzip=false` to the `/Exports/Download` endpoints to enable retrieving Excel, GeoJSON and CSV files without GZIP compression.
 - `ProvinceCount` property to `CachedCount` endpoint.
 
-## [1.4]
+## [2021.12.02]
 
 **Prod**: 2021-12-02
 
@@ -104,7 +122,7 @@
 - Changed SHARK OccurrenceId value in order to get unique keys.
 - 
 
-## [1.3]
+## [2021.10.05]
 
 **Prod**: 2021-10-05
 
@@ -122,7 +140,7 @@
 ### `Fixed`
 - DwC-A time parsing bug in the harvest step.
 
-## [1.2]
+## [2021.06.17]
 
 ### Releases
 
@@ -150,7 +168,7 @@
 - Areas => Geographics.Areas
 - OnlyValidated => ValidationStatus (enum)
 
-## [1.1]
+## [2021.04.08]
 
 ### Releases
 
@@ -256,7 +274,7 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 - `Occurrence.OrganismQuantityInt` field removed.
 
 
-## [1.0.0] - 2021-01-21
+## [2021.01.21]
 
 ### Releases
 
@@ -313,7 +331,7 @@ OutputFields är borttagen från aggregerade sökningar då den inte fyllde någ
 SearchAggregatedInternal
 SortBy, sortOrder borttagna då den inte fyllde någon funktion
 
-## [0.9.1] - 2020-11-30
+## [2020.11.30] - 2020-11-30
 
 ### Releases
 
