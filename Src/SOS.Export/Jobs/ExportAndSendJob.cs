@@ -137,7 +137,6 @@ namespace SOS.Export.Jobs
 
             try
             {
-                
                 _logger.LogInformation("Start export and send job");
                 Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
                 await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);

@@ -4,17 +4,18 @@ using MongoDB.Driver;
 using SOS.Lib.Database;
 using Testcontainers.MongoDb;
 using Testcontainers.Elasticsearch;
+using DotNet.Testcontainers.Images;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
     public class TestContainersFixture : IAsyncLifetime
     {
         private const string ELASTIC_PASSWORD = "elastic";
+        private const string ELASTIC_IMAGE_NAME = "elasticsearch:8.7.0";
 
- 
         private const string MONGODB_USERNAME = "mongo";
         private const string MONGODB_PASSWORD = "admin";
-        private const string MONGODB_IMAGE_NAME = "mongo:6.0";
+        private const string MONGODB_IMAGE_NAME = "mongo:6.0.5";
 
         public ElasticsearchContainer ElasticsearchContainer { get; set; }
         public MongoDbContainer MongoDbContainer { get; set; }
@@ -29,6 +30,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         public TestContainersFixture()
         {
             ElasticsearchContainer = new ElasticsearchBuilder()
+                .WithImage(ELASTIC_IMAGE_NAME)
                 .WithCleanUp(true)
                 .WithPassword(ELASTIC_PASSWORD)
                 .Build();
@@ -69,10 +71,12 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 
         private async Task<ElasticClient> InitializeElasticsearchAsync()
         {
+       
             await ElasticsearchContainer.StartAsync().ConfigureAwait(false);
             var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
                 .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
                 .EnableApiVersioningHeader()
+          //      .BasicAuthentication(ELASTIC_USERNAME, ELASTIC_PASSWORD)
             .EnableDebugMode());
             return elasticClient;
         }

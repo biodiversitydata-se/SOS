@@ -13,6 +13,7 @@ using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SOS.Export.Services
 {
@@ -81,7 +82,7 @@ namespace SOS.Export.Services
             using var response = await client.PostAsync("https://zendto.slu.se/dropoff.php", form);
             response.Headers.TryGetValues("X-ZendTo-Response", out var responseStrings);
             
-            if (response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode && responseStrings!= null)
             {
                 foreach (var responseString in responseStrings)
                 {
@@ -89,7 +90,7 @@ namespace SOS.Export.Services
                     {
                         var zendToResponse = JsonSerializer.Deserialize<ZendToResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                        if (!zendToResponse.Success)
+                            if (!zendToResponse.Success)
                         {
                             _logger.LogError($"Failed to send file with ZendTo. Response: {responseString}");
                         }
@@ -103,7 +104,7 @@ namespace SOS.Export.Services
                     }
                 }
             }
-            _logger.LogDebug($"Failed to send file using ZendT: {response.ReasonPhrase}");
+            _logger.LogDebug($"Failed to send file using ZendTo: {response.ReasonPhrase}");
             return new ZendToResponse();
         }
 
