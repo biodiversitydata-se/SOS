@@ -860,7 +860,6 @@ namespace SOS.Lib
                     .Field("event.endHistogramWeek")
                     .Field("event.startHistogramWeek")
                     .Field("artportalenInternal.activityCategoryId")
-                    .Field("artportalenInternal.sightingTypeSearchGroupId")
                     .Field("artportalenInternal.triggeredObservationRuleUnspontaneous")
                     .Field("location.attributes.isPrivate")
                     .Field("location.point")
