@@ -37,7 +37,7 @@ steps:
   displayName: Install newman
   inputs:
     command: 'custom'
-    workingDir: Tests/Postman
+    workingDir: Tests/Postman/DataStewardship
     customCommand: 'install newman'
     verbose: false
 
