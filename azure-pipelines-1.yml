@@ -45,7 +45,7 @@ steps:
   displayName: Install newman-reporter-htmlextra
   inputs:
     command: 'custom'
-    workingDir: Tests/Postman
+    workingDir: Tests/Postman/DataStewartship
     customCommand: 'install newman-reporter-htmlextra'
     verbose: false    
 - task: CmdLine@2
