@@ -241,7 +241,7 @@ namespace SOS.Observations.Api.Repositories
                 }
 
                 // Secondary parent
-                if (sumNode.TreeNode.SecondaryParents != null && sumNode.TreeNode.SecondaryParents.Count > 0)
+                if (sumNode.TreeNode.SecondaryParents?.Any() ?? false)
                 {
                     foreach (var secondaryParent in sumNode.TreeNode.SecondaryParents)
                     {
@@ -255,11 +255,11 @@ namespace SOS.Observations.Api.Repositories
                             {
                                 var childSumNode = treeNodeSumByTaxonId[taxonId];
                                 secondaryParentSumNode.SumObservationCount += childSumNode.ObservationCount;
-                                if (secondaryParentSumNode.FirstSighting > childSumNode.FirstSighting)
+                                if (secondaryParentSumNode.FirstSighting == null || secondaryParentSumNode.FirstSighting > childSumNode.FirstSighting)
                                 {
                                     secondaryParentSumNode.FirstSighting = childSumNode.FirstSighting;
                                 }
-                                if (secondaryParentSumNode.LastSighting < childSumNode.LastSighting)
+                                if (secondaryParentSumNode.LastSighting == null || secondaryParentSumNode.LastSighting < childSumNode.LastSighting)
                                 {
                                     secondaryParentSumNode.LastSighting = childSumNode.LastSighting;
                                 }
