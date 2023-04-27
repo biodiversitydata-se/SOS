@@ -1,0 +1,474 @@
+{
+	"info": {
+		"_postman_id": "1eceda41-c05c-40f8-b4f6-530fdba29b66",
+		"name": "SOS DataStewartship tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8524282"
+	},
+	"item": [
+		{
+			"name": "DataSets/Search",
+			"item": [
+				{
+					"name": "Sök efter Fladdermöss",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const dataset = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 1 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(1);",
+									"});",
+									"",
+									"const batCount = parseInt(pm.environment.get(\"dataset.search.batDatasetCount\"));",
+									"pm.test(\"total count > \" + batCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(batCount);",
+									"});",
+									"",
+									"pm.test(\"event count > 50\", function () {    ",
+									"    pm.expect(dataset.eventIds.length).to.greaterThan(50);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      3000299\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/datastewardship/datasets?skip=0&take=1&exportMode=Json",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter Utter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const dataset = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 1 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"event count > 50\", function () {    ",
+									"    pm.expect(dataset.eventIds.length).to.greaterThan(50);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      100077\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/datastewardship/datasets?skip=0&take=1&exportMode=Json",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Events/Search",
+			"item": [
+				{
+					"name": "Sök efter Fladdermöss",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const event = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 1 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(1);",
+									"});",
+									"",
+									"const batCount = parseInt(pm.environment.get(\"event.search.batEventCount\"));",
+									"pm.test(\"total count > \" + batCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(batCount);",
+									"});",
+									"",
+									"pm.test(\"occurrenceIds count > 1\", function () {    ",
+									"    pm.expect(event.occurrenceIds.length).to.greaterThan(1);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      3000299\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/datastewardship/events?skip=0&take=1&exportMode=Json&responseCoordinateSystem=EPSG4326",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								},
+								{
+									"key": "responseCoordinateSystem",
+									"value": "EPSG4326"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter Utter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const event = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 1 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"occurrence id's count > 2\", function () {    ",
+									"    pm.expect(event.occurrenceIds.length).to.greaterThan(2);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dateFilter\": {\n    \"startDate\": \"2021-08-12\",\n    \"endDate\": \"2021-08-13\",\n    \"dateFilterType\": \"BetweenStartDateAndEndDate\"\n  },\n  \"taxon\": {\n    \"ids\": [\n      100077\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/datastewardship/events?skip=0&take=1&exportMode=Json&responseCoordinateSystem=EPSG4326",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								},
+								{
+									"key": "responseCoordinateSystem",
+									"value": "EPSG4326"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Occurrences/Search",
+			"item": [
+				{
+					"name": "Sök efter Fladdermöss",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const dataset = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 1 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(1);",
+									"});",
+									"",
+									"const batCount = parseInt(pm.environment.get(\"dataset.search.batDatasetCount\"));",
+									"pm.test(\"total count > \" + batCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(batCount);",
+									"});",
+									"",
+									"pm.test(\"event count > 50\", function () {    ",
+									"    pm.expect(dataset.eventIds.length).to.greaterThan(50);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      3000299\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/datastewardship/datasets?skip=0&take=1&exportMode=Json",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter Utter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const dataset = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 1 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"event count > 50\", function () {    ",
+									"    pm.expect(dataset.eventIds.length).to.greaterThan(50);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      100077\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/datastewardship/datasets?skip=0&take=1&exportMode=Json",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
