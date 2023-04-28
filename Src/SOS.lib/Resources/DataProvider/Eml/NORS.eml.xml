@@ -15,52 +15,36 @@
 		<title xml:lang="eng">SLU Aqua Institute of Freshwater Research National register of survey test-fishing - NORS</title>
 		<creator>
 			<individualName>
-				<givenName>Manash</givenName>
-				<surName>Shah</surName>
+				<givenName>Anders</givenName>
+				<surName>Kinnerbäck</surName>
 			</individualName>
-			<organizationName>Swedish Museum of Natural History</organizationName>
-			<positionName>Database Developer</positionName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Administrator</positionName>
 			<address>
-				<city>Stockholm</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>manash.shah@nrm.se</electronicMailAddress>
+			<electronicMailAddress>Anders.Kinnerback@slu.se</electronicMailAddress>
 		</creator>
 		<metadataProvider>
 			<individualName>
 				<givenName>Anders</givenName>
 				<surName>Kinnerbäck</surName>
 			</individualName>
-			<organizationName>SLU Aqua</organizationName>
-			<positionName>Research Assistant</positionName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Administrator</positionName>
 			<address>
-				<city>Drottningholm</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>anders.kinnerback@slu.se</electronicMailAddress>
+			<electronicMailAddress>Anders.Kinnerback@slu.se</electronicMailAddress>
 		</metadataProvider>
-		<associatedParty>
-			<individualName>
-				<givenName>Manash</givenName>
-				<surName>Shah</surName>
-			</individualName>
-			<organizationName>Swedish Museum of Natural History</organizationName>
-			<positionName>Database Developer</positionName>
-			<address>
-				<city>Stockholm</city>
-				<country>SE</country>
-			</address>
-			<electronicMailAddress>manash.shah@nrm.se</electronicMailAddress>
-			<role></role>
-		</associatedParty>
 		<pubDate>
-			
 		</pubDate>
 		<language>eng</language>
 		<abstract>
 			<para>
 				Standardized test-fishing with Nordic multi-mesh gillnets is a widely used method in Sweden to investigate the fish fauna in a lake. In 2005 the method became an European standard (EN 14757). Standardized test-fishing catch most of the Swedish species in a representative way, giving a good estimate of species abundance and size distribution. The results are generally used for purposes of environmental protection and fishery management.
-
 				NORS consists of thousands of test-fishing occasions back to the 1950’s. The Department of Aquatic Resources (SLU Aqua) at the Swedish University of Agricultural Sciences is responsible of collecting and checking test-fishing data generated in national and regional environmental programs, on behalf of the Swedish Agency for Marine and Water Management. SLU Aqua also collect test-fishing data from several other types of investigations in order to create a database as representative as possible. The purpose is to facilitate obtaining data of high quality for research, national investigations and reports. The database also serves as a reference for local and regional investigations. All data is available for the public.
 			</para>
 		</abstract>
@@ -106,6 +90,12 @@
 					<southBoundingCoordinate>54.96</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
+			<temporalCoverage>
+                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+                <sos:LivingTimePeriod></sos:LivingTimePeriod>
+                <sos:StartDate>1952</sos:StartDate>
+                <sos:EndDate></sos:EndDate>
+            </temporalCoverage>
 			<taxonomicCoverage>
 				<generalTaxonomicCoverage>Pisces</generalTaxonomicCoverage>
 				<taxonomicClassification>
@@ -118,21 +108,33 @@
 			<description>
 				<para></para>
 			</description>
-			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+			<maintenanceUpdateFrequency>irregular</maintenanceUpdateFrequency>
 		</maintenance>
-
 		<contact>
 			<individualName>
 				<givenName>Anders</givenName>
-				<surName>Telenius</surName>
+				<surName>Kinnerback</surName>
 			</individualName>
-			<organizationName>Swedish Museum of Natural History</organizationName>
-			<positionName>Node manager</positionName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Administrator</positionName>
 			<address>
-				<city>Stockholm</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>anders.telenius@nrm.se</electronicMailAddress>
+			<electronicMailAddress>Anders.Kinnerback@slu.se</electronicMailAddress>
+		</contact>
+		<contact>
+			<individualName>
+				<givenName>Malin</givenName>
+				<surName>Werner</surName>
+			</individualName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Uppsala</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>malin.werner@slu.se</electronicMailAddress>
 		</contact>
 		<sos:resourceType>occurrence data</sos:resourceType>		
 		<sos:datsetSubtype>census data</sos:datsetSubtype>
@@ -142,7 +144,7 @@
 			<gbif>
 				<dateStamp>2015-07-15T02:11:55.647+02:00</dateStamp>
 				<hierarchyLevel>dataset</hierarchyLevel>
-				<citation>National Register of Survey test-fishing - NORS. yyyy. Swedish University of Agricultural Sciences, Department of Aquatic Resources.  https://www.slu.se/sjoprovfiskedatabasen [yyyy-mm-dd].</citation>
+				<citation>Kinnerbäck A (2023). SLU Aqua Institute of Freshwater Research National register of survey test-fishing - NORS. Department of Aquatic resources. https://www.slu.se/sjoprovfiskedatabasen [yyyy-mm-dd].</citation>
 				<formationPeriod>1952-current</formationPeriod>
 				<livingTimePeriod>1952-current</livingTimePeriod>				
 			</gbif>

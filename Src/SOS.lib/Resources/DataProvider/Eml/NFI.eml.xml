@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml scope="system" system=" https://gbif.org" xml:lang="eng" xmlns:dc=" https://purl.org/dc/terms/" xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:sos="https://sos-search.artdata.slu.se/" xmlns:xsi=" https://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd">
+	<dataset>
+		<title xml:lang="eng">Swedish National Forest Inventory: Presence-absence Vegetation data</title>
+		<creator>
+			<individualName>
+				<givenName>Jonas</givenName>
+				<surName>Dahlgren</surName>
+			</individualName>
+			<positionName>Environmental Assessment Specialist</positionName>
+			<organizationName>Swedish National Forest Inventory, SLU</organizationName>
+			<address>
+				<deliveryPoint>Skogsmarksgränd 17</deliveryPoint>
+				<city>Umeå</city>
+				<postalCode>901 83</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>riksskogstaxeringen@slu.se</electronicMailAddress>
+			<onlineUrl>https://www.slu.se/nfi</onlineUrl>
+			<sos:ContactNameType>Organisational</sos:ContactNameType>
+		</creator>
+		<metadataProvider>
+			<sos:MetadataProviderNameType>Organisational</sos:MetadataProviderNameType>
+			<sos:MetadataProviderName>Jonas Dahlgren</sos:MetadataProviderName>
+			<sos:MetadataProviderOrganisation>Swedish National Forest Inventory, SLU</sos:MetadataProviderOrganisation>
+			<organizationName>Swedish National Forest Inventory, SLU</organizationName>
+			<address>
+				<deliveryPoint>Skogsmarksgränd 17</deliveryPoint>
+				<city>Umeå</city>
+				<postalCode>901 83</postalCode>
+				<country>SE</country>
+			</address>
+		</metadataProvider>
+		<pubDate>2022-06-07</pubDate>
+		<Language>English</Language>
+		<UpdateFrequency>annually</UpdateFrequency>
+		<IntellectualRights>
+			<para>
+				Researchers should respect the following rights statement:
+				<ulink url=" https://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>
+				The publisher and rights holder of this work is Department of Forest Resurce Management, SLU. To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the Public Domain (CC0 1.0). Users may copy, modify, distribute and use the work, including for commercial purposes.
+			</para>
+		</IntellectualRights>
+		<Description>
+			The Swedish National Forest Inventory (NFI) is a sample based field inventory performed by the Swedish University of Agricultural Sciences (SLU). The annual inventory is undertaken on sample plots and this forms the basis for a large number of estimates. Data is collected over the whole of Sweden and statistics is published for all land use classes except urban land and sea and fresh water. The data collection is focused on forest land and particularly productive forest land. Since 2003 areas within formally protected land are included and since 2016 non–coniferuos alpine forest was included.
+		</Description>
+		<sos:Keywords>samplingevent, forest land, mires, rock surface, subalpine woodland, pasture land, alpine areas, survey, inventory, statistics, stratified sampling, presence, absence, field layer, bottom layer, coverage</sos:Keywords>
+		<abstract>
+			<para>
+				The Swedish National Forest Inventory (NFI) is a sample based field inventory performed by the Swedish University of Agricultural Sciences (SLU). The annual inventory is undertaken on sample plots and this forms the basis for a large number of estimates. Data is collected over the whole of Sweden and statistics is published for all land use classes except urban land and sea and fresh water. The data collection is focused on forest land and particularly productive forest land. Since 2003 areas within formally protected land are included and since 2016 non–coniferuos alpine forest was included.
+			</para>
+			<para>
+				The sample plots are circular and are, for practical reasons, grouped into clusters (tracts). The tracts are square or rectangular in shape and are of different dimensions in different parts of the country. The density between tracts and the number of sample plots per tract also varies for different parts of the country, with a higher sample intensity in southern Sweden.
+			</para>
+			<para>
+				Two thirds of the sample consists of permanent tracts and one third are temporary. The permanent tracts are revisited every 5th year and the temporary tracts are only visited once. The real coordinates of the permanent sample plots are protected. The coordinates in this dataset are randomly obfuscated with 200-1000 meter.
+			</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Samplingevent</keyword>
+		</keywordSet>
+		<distribution scope="document">
+			<online>
+				<url function="information">https://www.slu.se/NFI</url>
+			</online>
+		</distribution>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>All data is collected within Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>10.371</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.609</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.535</northBoundingCoordinate>
+					<southBoundingCoordinate>55.179</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<temporalCoverage>
+				<rangeOfDates>
+					<beginDate>
+						<calendarDate>1995-01-01</calendarDate>
+					</beginDate>
+					<endDate>
+						<calendarDate>2021-12-31</calendarDate>
+					</endDate>
+				</rangeOfDates>
+			</temporalCoverage>
+			<taxonomicCoverage>
+				<sos:TaxonomicDescription>
+					Approximately 260 species or species groups of plants, lichens and mosses occurring in the Swedish landscape.
+				</sos:TaxonomicDescription>
+				<ScientificName>
+					Plantae, Viridiplantae, Embrophyta, Tracheophyta; Plantae, Viridiplantae, Embrophyta, Bryophyta; Fungi, Lichenes;
+				</ScientificName>
+				<commonName>Plants, Lichens and Mosses</commonName>
+				<TaxonRankName>Kingdom, Phylum, Class</TaxonRankName>
+			</taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<maintenanceUpdateFrequency>annually</maintenanceUpdateFrequency>
+		</maintenance>
+		<contact>
+			<individualName>
+				<givenName>Jonas</givenName>
+				<surName>Dahlgren</surName>
+			</individualName>
+			<organizationName>Swedish University of Agricultural Sciences</organizationName>
+			<positionName>Environmental Assessment Specialist</positionName>
+			<address>
+				<deliveryPoint>Skogsmarksgränd 17</deliveryPoint>
+				<city>Umeå</city>
+				<postalCode>901 83</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>riksskogstaxeringen@slu.se</electronicMailAddress>
+			<onlineUrl>https://www.slu.se/NFI</onlineUrl>
+			<sos:ContactName>Swedish National Forest Inventory,SLU</sos:ContactName>
+			<sos:ContactOrganisationName>Swedish National Forest Inventory,SLU</sos:ContactOrganisationName>
+			<sos:EmailAddress>riksskogstaxeringen@slu.se</sos:EmailAddress>
+			<ContactNameType>Organisational</ContactNameType>
+		</contact>
+		<methods>
+			<methodStep>
+				<description>
+					<para>See sampling description</para>
+				</description>
+			</methodStep>
+			<sampling>
+				<studyExtent>
+					<description>
+						<para>
+							"Fridman J., Holm S., Nilsson M., Nilsson P., Ringvall A. H., Ståhl G. (2014). Adapting National Forest Inventories to changing requirements – the case of the Swedish National Forest Inventory at the turn of the 20th century. Silva Fennica vol. 48 no. 3 article id 1095. https://dx.doi.org/10.14214/sf.1095”
+						</para>
+					</description>
+				</studyExtent>
+				<samplingDescription>
+					<para>
+						The Swedish National Forest Inventory sample plots are circular and are, for practical reasons, grouped into clusters (tracts). The tracts are square or rectangular in shape and are of different dimensions in different parts of the country. The density between tracts and the number of sample plots per tract also varies for different parts of the country, with a higher sample intensity in southern Sweden. Two thirds of the sample consists of permanent tracts and one third are temporary. The permanent tracts are revisited every 5th year and the temporary tracts are only visited once. The real coordinates of the permanent sample plots are protected. The coordinates in this dataset are randomly obfuscated with 200-1000 meter. /Vegetation survey on permanent field plots: Registration of presence/absence for 275 species/species groups (25 ground layer species, 205 field layer species and 45 tree/shrub layer species). The current list consists of 268 species. Registration of coverage is performed in a separate inventory for 71 species/species groups including “no coverage”). The vegetation inventory is undertaken every 10th year on permanent plots. The size of an un-divided sample plot is 100 m2 (radius=5.64 m) for this specific part of the inventory. The plot can be divided into smaller parts if it is crossed by edges between different types of land use classes or forest stand categories. The sample population for presence/absence registration is all forest land (landuse classes Productive forest land, Mires, Rock surface, Subalpine woodland, Pasture land and Alpine areas (2016-). /The sample size (numbers of permanent NFI sample plots where presence/absence registrations are performed) was reduced with 50% from 2018. For the sake of comparability, this dataset is harmonized in such a way that only permanent sample plots that are included in the sample from 2018 onwards are included for the period 1995-2017.
+					</para>
+				</samplingDescription>
+			</sampling>
+			<qualityControl>
+				<description>
+					<para>
+						After the data has been collected in the field it is subjected to a battery of tests and quality controls. Quality control tests are undertaken in the field in the form of probability tests in the hand held computers, this gives the field crews the opportunity of correcting the data directly. Both during and after the field season special control crews undertake a full re-inventory of selected sample tracts to double check the collected data. Finally a second battery of probability tests are undertaken at the field office before the data is transfered to its final storage destination.
+					</para>
+				</description>
+			</qualityControl>
+		</methods>
+		<project>
+			<sos:ProjectTitle>Swedish National Forest Inventory</sos:ProjectTitle>
+			<sos:ProjectDescription>The Swedish National Forest Inventory has the task of describing the state and changes in Sweden's forests. The information collected is used, for example, as a basis for forestry, energy and environmental policy in Sweden. Data from the Swedish National Forest Inventory is part of Sweden's official statistics. At the heart of the Swedish National Forest Inventory is the annual inventory which is undertaken by ca 50 field workers during the snow free period. Every year an inventory is carried out on ca 12 000 sample plots with measurements collected from ca 95 000 trees and large range of other variables describing the stand, site and history of the sample plot.</sos:ProjectDescription>
+			<FunderName>SLU, Swedish Environmental Protection Agency.</FunderName>
+			<funderIdentifier>https://www.slu.se, https://www.naturvardsverket.se</funderIdentifier>
+			<title>Swedish National Forest Inventory</title>
+			<personnel>
+				<individualName>
+					<givenName>Jonas</givenName>
+					<surName>Dahlgren</surName>
+				</individualName>
+				<role>author</role>
+			</personnel>
+			<abstract>
+				<para>
+					The Swedish National Forest Inventory has the task of describing the state and changes in Sweden's forests. The information collected is used, for example, as a basis for forestry, energy and environmental policy in Sweden. Data from the Swedish National Forest Inventory is part of Sweden's official statistics. At the heart of the Swedish National Forest Inventory is the annual inventory which is undertaken by ca 50 field workers during the snow free period. Every year an inventory is carried out on ca 12 000 sample plots with measurements collected from ca 95 000 trees and large range of other variables describing the stand, site and history of the sample plot.
+				</para>
+			</abstract>
+			<funding>
+				<para>
+					The major part of the Swedish NFI is funded by SLU, but the Swedish Environmental Protection Agency also accounts for part of the funding.
+				</para>
+			</funding>
+			<studyAreaDescription>
+				<descriptor citableClassificationSystem="false" name="generic">
+					<descriptorValue>
+						Sweden
+					</descriptorValue>
+				</descriptor>
+			</studyAreaDescription>
+			<designDescription>
+				<description>
+					<para>
+						See the project website (www.slu.se/riksskogstaxeringen) for descriptions of the individual survey schemes.
+					</para>
+				</description>
+			</designDescription>
+		</project>
+		<bibliographiccitation>
+			<sos:BibliographicCitation>
+				[citation 1:]Fridman J., Holm S., Nilsson M., Nilsson P., Ringvall A. H., Ståhl G. (2014). Adapting National Forest Inventories to changing requirements – the case of the Swedish National Forest Inventory at the turn of the 20th century. Silva Fennica vol. 48 no. 3 article id 1095. ”
+			</sos:BibliographicCitation>
+			<sos:BibliographicCitationIdentifier>
+				[citation 1:]Silva Fennica [link to]
+				 https://dx.doi.org/10.14214/sf.1095
+			</sos:BibliographicCitationIdentifier>
+		</bibliographiccitation>
+		<additionalMetadata>
+			<purpose>National Forest Inventory of Sweden's forests</purpose>
+			<maintenance>
+				Important information for potential users of the Swedish NFI sample concerning presence/absence registration of vegetation: / The sample size (numbers of sample plots where presence/absence registrations are performed) was reduced with 50% from 2018. For the sake of comparability, this dataset is harmonized in such a way that only permanent sample plots that are included in the sample from 2018 are included for the period 1995-2017. /Inventory on landuse class Alpine areas was added from the year 2016.
+			</maintenance>
+			<additionalInfo>
+				Important information for potential users of the Swedish NFI sample concerning presence/absence registration of vegetation: / The sample size (numbers of sample plots where presence/absence registrations are performed) was reduced with 50% from 2018. For the sake of comparability, this dataset is harmonized in such a way that only permanent sample plots that are included in the sample from 2018 are included for the period 1995-2017. /Inventory on landuse class Alpine areas was added from the year 2016.
+			</additionalInfo>
+		</additionalMetadata>
+	</dataset>
+</eml:eml>

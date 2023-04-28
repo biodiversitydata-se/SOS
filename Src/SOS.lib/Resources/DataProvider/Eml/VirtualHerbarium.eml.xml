@@ -16,7 +16,7 @@
 			<organizationName>Umeå University</organizationName>
 			<address>
 				<city>Umeå</city>
-				<country>SE</country>
+				<country>Sweden</country>
 			</address>
 			<electronicMailAddress></electronicMailAddress>
             <onlineUrl>https://www.umu.se/</onlineUrl>
@@ -68,7 +68,7 @@
                 <sos:EndDate></sos:EndDate>
             </temporalCoverage>
             <taxonomicCoverage>
-                <sos:TaxonomicDescription></sos:TaxonomicDescription>
+                <sos:TaxonomicDescription>The resource covers Bryophytes, Ascomycetes, Lycophytes and ferns, Angiosperms, Gymnosperms, Smut Fungi.</sos:TaxonomicDescription>
                 <taxonId></taxonId>
                 <sos:TaxonList></sos:TaxonList>
             </taxonomicCoverage>
@@ -88,7 +88,7 @@
             <organizationName>Umeå University</organizationName>
 			<address>
 				<city>Umeå</city>
-				<country>SE</country>
+				<country>Sweden</country>
 			</address>
             <onlineUrl>http://herbarium.emg.umu.se</onlineUrl>
             <sos:contactNameType>Personal</sos:contactNameType>

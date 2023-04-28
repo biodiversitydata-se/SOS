@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" 
+		 xmlns:dc="https://purl.org/dc/terms/" 
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:sos="https://sos-search.artdata.slu.se/" 
+	xmlns:gbif="https://gbif.org/" 
+	xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd" 
+	csystem="https://gbif.org" 
+	scope="system" 
+	xml:lang="eng">
+	<dataset>
+		<identifier></identifier>
+		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:iNaturalist</alternateIdentifier>
+		<title>iNaturalist Sverige</title>
+			<creator>
+			<organizationName>SLU Swedish Species Information Centre (SLU Artdatabanken)</organizationName>
+			<individualName>
+				<givenName>Johan</givenName>
+				<surName>Liljeblad</surName>
+			</individualName>
+			<electronicMailAddress>artdatabanken@slu.se</electronicMailAddress>
+            <onlineUrl>https://www.inaturalist.se/</onlineUrl>
+            <sos:contactNameType>Organizational</sos:contactNameType>
+		</creator>
+		<abstract>
+			<para>iNaturalist.Se är en online-community där naturälskare över hela världen kan lära sig om arter på ett roligt sätt tillsammans. De laddar upp bilder på sina artobservationer och låter andra art- och naturintresserade hjälpa till med artbestämningen. De kan hålla koll på sina och andras fynd, läs fakta om arterna och lär sig känna igen fler arter i Sveriges natur.</para>
+			<para>Fynd som tillhandahålls här är bara de som uppnått forskningsklass – d.v.s. att de uppfyller ett antal kriterier, varav ett är att minst 2/3 av de användare som bidrar med artbestämning är överens. De skördas dagligen från GBIF som i sin tur får exporter från iNaturalist.org en gång per vecka.</para>
+			<para>iNaturalist.Se är den svenska delen av det internationella iNaturalist-nätverket, som är ett gemensamt initiativ av California Academy of Sciences och National Geographic Society. SLU Artdatabanken är medlem i nätverket och ansvarar för den svenska noden.</para>
+		</abstract>
+		<resourceType>
+		</resourceType>
+		<contact>
+			<individualName>
+				<givenName>iNaturalist</givenName>
+				<surName>Sverige</surName>
+			</individualName>
+			<organizationName>iNaturalist</organizationName>
+			<electronicMailAddress>artdatabanken@slu.se</electronicMailAddress>
+			<onlineUrl>
+				https://www.inaturalist.se/
+			</onlineUrl>
+		</contact>
+		<pubDate>2023-03-14</pubDate>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>This resource covers Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>10.03</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.17</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.07</northBoundingCoordinate>
+					<southBoundingCoordinate>54.96</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<temporalCoverage>
+				<rangeOfDates>
+					<beginDate>
+						<calendarDate>2014</calendarDate>
+					</beginDate>
+					<endDate>
+						<calendarDate>current</calendarDate>
+					</endDate>
+				</rangeOfDates>
+			</temporalCoverage>
+		<taxonomicCoverage>
+				<sos:TaxonomicDescription>Biota</sos:TaxonomicDescription>
+				<taxonId></taxonId>
+				<sos:TaxonList></sos:TaxonList>
+			</taxonomicCoverage>
+		</coverage>
+		<metadataLanguage>
+		</metadataLanguage>
+		<language>eng</language>
+		<licenseName>
+		</licenseName>
+		<project>
+			<sos:projectTitle>
+			</sos:projectTitle>
+			<sos:fundingDescription>
+			</sos:fundingDescription>
+			<funderIdentifier>
+			</funderIdentifier>
+			<dc:funderIdentifierType>
+			</dc:funderIdentifierType>
+			<designDescription>
+			</designDescription>
+		</project>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Observation</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the
+				<ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>
+				. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">
+				</url>
+			</online>
+		</distribution>
+		<maintenance>
+			<maintenanceUpdateFrequency>unknown</maintenanceUpdateFrequency>
+		</maintenance>
+		<sos:resourceHomepage>https://www.inaturalist.se/</sos:resourceHomepage>
+	</dataset>
+</eml:eml>

@@ -11,24 +11,28 @@
 	<dataset>
 		<identifier>339cf623d-4b3a-2c9c-f555-cd1244477c11</identifier>
         <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:SHARK</alternateIdentifier>
-        <title>Shark SMHI</title>
+        <title>SHARK - SMHI</title>
 		<creator>
-			<organizationName>SMHI</organizationName>
+            <individualName>
+                <surName>SHARK</surName>
+            </individualName>
+		<organizationName>Swedish Meterological and Hydrological Institute (SMHI)</organizationName>
 			<address>
-				<city>Norrköping</city>
-				<country>SE</country>
+				<country>Sweden</country>
 			</address>
-			<electronicMailAddress></electronicMailAddress>
+			<electronicMailAddress>shark@smhi.se</electronicMailAddress>
             <onlineUrl>https://sharkweb.smhi.se/</onlineUrl>
             <sos:contactNameType>Organizational</sos:contactNameType>
 		</creator>
 		<metadataProvider>
-			<organizationName>SMHI</organizationName>
+        <individualName>
+            <surName>SHARK</surName>
+        </individualName>
+			<organizationName>Swedish Meterological and Hydrological Institute (SMHI)</organizationName>
 			<address>
-				<city>Norrköping</city>
-				<country>SE</country>
+				<country>Sweden</country>
 			</address>
-            <electronicMailAddress></electronicMailAddress>
+            <electronicMailAddress>shark@smhi.se</electronicMailAddress>
             <onlineUrl></onlineUrl>
 		</metadataProvider>		
 		<pubDate>      
@@ -36,8 +40,9 @@
 		<language>ENGLISH</language>
         <licenseName></licenseName>
 		<abstract>
-			<para>Swedish Ocean Archive contains marine environmental monitoring data from the seas surrounding Sweden. Data from SHARK includes marine benthic fauna, marine benthic vegetation, plankton, and seal observations.</para>
-		</abstract>
+			<para>SHARK, the Swedish Ocean Archive database, contains marine environmental monitoring data from the seas surrounding Sweden. Data from SHARK includes marine benthic fauna, marine benthic vegetation, plankton, and seal observations.</para>
+			<para>The national monitoring program was initiated by the Swedish Environmental Protection Agency and is now financed by the Swedish Agency for Marine and Water Management. Monitoring is performed by Stockholm University, Gothenburg University, Umeå University and Linnaeus University.</para>
+        </abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
 			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
@@ -53,7 +58,7 @@
 		</intellectualRights>
 		<coverage>
 			<geographicCoverage>
-				<geographicDescription>This resource covers Sweden.</geographicDescription>
+				<geographicDescription>This resource covers the seas surrounding Sweden. Data are collected within the following marine ecoregions: http://marineregions.org/mrgid/2401, http://marineregions.org/mrgid/2374, http://marineregions.org/mrgid/2379</geographicDescription>
 				<boundingCoordinates>
 					<westBoundingCoordinate>10.03</westBoundingCoordinate>
 					<eastBoundingCoordinate>24.17</eastBoundingCoordinate>
@@ -77,21 +82,20 @@
 			<description>
 				<para/>
 			</description>
-			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+			<maintenanceUpdateFrequency>irregular</maintenanceUpdateFrequency>
 		</maintenance>
 		<contact>
             <individualName>
-                <givenName>Patrik</givenName>
-                <surName>Strömberg</surName>
+                <surName>SHARK</surName>
             </individualName>
-            <electronicMailAddress>patrik.stromberg@smhi.se</electronicMailAddress>
+            <organizationName>Swedish Meterological and Hydrological Institute (SMHI)</organizationName>
+            <electronicMailAddress>shark@smhi.se</electronicMailAddress>
             <organizationName>SMHI</organizationName>
 			<address>
-				<city>Norrköping</city>
-				<country>SE</country>
+				<country>Sweden</country>
 			</address>
             <onlineUrl>https://sharkweb.smhi.se/</onlineUrl>
-            <sos:contactNameType>Personal</sos:contactNameType>
+            <sos:contactNameType>Organizational</sos:contactNameType>
 		</contact>
         <sos:resourceType>occurrence data</sos:resourceType>
         <sos:dataAccessibilityLevel></sos:dataAccessibilityLevel>
@@ -101,21 +105,24 @@
         <gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
         <project>
             <sos:projectTitle></sos:projectTitle>
-            <funding></funding>
+            <funding>The national monitoring program is financed by the Swedish Agency for Marine and Water Management (Havs- och Vattenmyndigheten). </funding>
             <funderIdentifier></funderIdentifier>
             <dc:funderIdentifierType></dc:funderIdentifierType>
             <designDescription></designDescription>
         </project>
         <samplingMethods>
             <studyExtent></studyExtent>
-            <samplingDescription></samplingDescription>
+            <samplingDescription>
+            <para>Information about the program and the methods are available in Swedish at the website of Swedish Agency for Marine and Water Management, https://www.havochvatten.se/vagledning-foreskrifter-och-lagar/vagledningar/ovriga-vagledningar/undersokningstyper-for-miljoovervakning/undersokningstyper/mjukbottenlevande-makrofauna-trend--och-omradesovervakning.html and https://www.havochvatten.se/vagledning-foreskrifter-och-lagar/vagledningar/ovriga-vagledningar/undersokningstyper-for-miljoovervakning/undersokningstyper/sediment---basundersokning.html.</para>
+            <para>Data should be sampled and analyzed according to Leonardsson K. 2004. (In Swedish) Metodbeskrivning för provtagning och analys av mjukbottenlevande makroevertebrater i marin miljö. Umeå universitet, Institutionen för ekologi och geovetenskap, 26 p (https://www.havochvatten.se/download/18.1690613b166605675de898f4/1539942622449/rapport-umu-metodbeskrivning-provtagning-analys-mjukbottenlevande-makroevertebrater-i-marin-miljo.pdf). However, deviations from the manual might occur.</para>
+            </samplingDescription>
             <methodStep></methodStep>
             <qualityControl></qualityControl>
         </samplingMethods>
         <additionalMetadata>
             <metadata>
                 <gettingStarted></gettingStarted>
-                <purpose></purpose>
+                <purpose>The purpose of the monitoring program is to detect long term and short term changes in the soft bottom macrozoobenthos communities. Changes in the macrofauna community can indicate changes in environmental threats like eutrophication, environmental toxins and climate change.</purpose>
                 <sos>
                     <sos:PersonalData></sos:PersonalData>
                     <sos:SensitiveData></sos:SensitiveData>

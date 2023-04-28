@@ -58,9 +58,9 @@
 		<language>ENGLISH</language>
 		<abstract>
 			<para>
-				Artportalen (Swedish Species Observation System) – formerly recognized as Artdata - is a website for reporting and retrieving information on observations of Sweden’s plants, animals and fungi. Observations are entered individually or into several thousand subsets/projects (some of which are individually searchable) by individuals and NGOs (95% of data), by public authorities or agencies, and by corporate enterprises. An observation may include not only the species identity, reporter identity, location and date but additional information such as habitat type and weather can also be entered. Ca. 93% of all data contained in the dataset is unrestricted, the remainder requiring special log-in credentials.
-				Artportalen (Swedish Species Observation System) covers more than 30 000 Swedish species out of the 62 200 recorded in total from the country, including plants (12% of data representing flowering plants and mosses), vertebrates (3 % fishes and herptiles, 74% birds, 0.2% mammals), invertebrates (7%) and fungi (4%). 80% of all data represent observations made from 2001-present, and almost all remaining observations refer to the period 1951-2000. Taxa, nomenclature and hierarchy are sourced from Dyntaxa - The Swedish Taxonomic Database.
-				Artportalen is developed and operated by the SLU Swedish Species Information Centre (SLU Artdatabanken) at the Swedish University of Agricultural Sciences, on behalf of the Swedish Environmental Protection Agency
+				Artportalen (Swedish Species Observation System) is a website for reporting and retrieving information on observations of Sweden’s plants, animals and fungi. Observations are entered individually or are part of several thousand subsets/projects (some of which are individually searchable) by individuals and NGOs (95% of data), by public authorities or agencies, and by corporate enterprises. An observation may include not only the species identity, reporter identity, location and date but additional information such as habitat type and weather can also be entered. Ca. 93% of all data contained in the dataset is public (open access), the remainder is sensitive data requiring special permission.
+				Artportalen covers more than 30 000 Swedish species out of the 62 200 recorded in total from the country, including plants (12% of data representing flowering plants and mosses), vertebrates (3 % fishes and herptiles, 74% birds, 0.2% mammals), invertebrates (7%) and fungi (4%). 80% of all data represent observations made from 2001-present, and almost all remaining observations refer to the period 1951-2000. Taxa, nomenclature and hierarchy are sourced from Dyntaxa - The Swedish Taxonomic Database.
+				Artportalen is developed and operated by the SLU Swedish Species Information Centre (SLU Artdatabanken) at the Swedish University of Agricultural Sciences, on behalf of the Swedish Environmental Protection Agency.
 			</para>
 		</abstract>
 		<keywordSet>
@@ -98,9 +98,10 @@
 				<sos:LivingTimePeriod/>
 			</temporalCoverage>
 			<taxonomicCoverage>
-				<sos:TaxonomicDescription/>
-				<taxonId>0</taxonId>
-				<sos:TaxonList/>
+				<sos:TaxonomicDescription>All taxa occuring in Sweden.</sos:TaxonomicDescription>
+				<taxonId></taxonId>
+				<sos:scientificName>Biota</sos:scientificName>
+				<sos:TaxonList></sos:TaxonList>
 			</taxonomicCoverage>
 		</coverage>
 		<maintenance>

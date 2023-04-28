@@ -1,0 +1,335 @@
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+         xmlns:dc="http://purl.org/dc/terms/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+         packageId="252f45fe-dfb6-46d6-9457-59bb3947c517/v1.7" system="http://gbif.org" scope="system"
+         xml:lang="eng">
+
+	<dataset>
+		<alternateIdentifier>252f45fe-dfb6-46d6-9457-59bb3947c517</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=lu_kbv</alternateIdentifier>
+		<title xml:lang="eng">Coastal birds in the Gulf of Bothnia (Kustfåglar i Bottniska Viken)</title>
+		<creator>
+			<individualName>
+				<givenName>Peter</givenName>
+				<surName>Nilsson</surName>
+			</individualName>
+			<organizationName>Västernorrland County Administrative Board</organizationName>
+			<positionName>Nature conservation officer</positionName>
+			<address>
+				<deliveryPoint>Nybrogatan 15</deliveryPoint>
+				<city>Härnösand</city>
+				<postalCode>871 31</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>peter.nilsson@lansstyrelsen.se</electronicMailAddress>
+		</creator>
+		<creator>
+			<individualName>
+				<givenName>Susanne</givenName>
+				<surName>Backe</surName>
+			</individualName>
+			<organizationName>Norrbotten County Administrative Board</organizationName>
+			<positionName>Biologist</positionName>
+			<address>
+				<deliveryPoint>Stationsgatan 5</deliveryPoint>
+				<city>Luleå</city>
+				<postalCode>972 38</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>susanne.backe@lansstyrelsen.se</electronicMailAddress>
+		</creator>
+		<creator>
+			<individualName>
+				<givenName>Erik</givenName>
+				<surName>Owusu-Ansah</surName>
+			</individualName>
+			<organizationName>Västerbotten County Administrative Board</organizationName>
+			<positionName>Environmental officer</positionName>
+			<address>
+				<deliveryPoint>Storgatan 71B</deliveryPoint>
+				<city>Umeå</city>
+				<postalCode>901 86</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>erik.owusu-ansah@lansstyrelsen.se</electronicMailAddress>
+		</creator>
+		<creator>
+			<individualName>
+				<givenName>Karin</givenName>
+				<surName>Antonsson Brink</surName>
+			</individualName>
+			<organizationName>Gävleborg County Administrative Board</organizationName>
+			<positionName>Environmental officer</positionName>
+			<address>
+				<deliveryPoint>Borgmästarplan 2</deliveryPoint>
+				<city>Gävle</city>
+				<postalCode>802 66</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>karin.antonsson.brink@lansstyrelsen.se</electronicMailAddress>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Annelie</givenName>
+				<surName>Jönsson</surName>
+			</individualName>
+			<organizationName>Department of Biology, Lund University</organizationName>
+			<positionName>PhD, Researcher</positionName>
+			<address>
+				<deliveryPoint>Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>22362</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>naturdatavardskap@biol.lu.se</electronicMailAddress>
+		</metadataProvider>
+		<metadataProvider>
+			<individualName>
+				<givenName>Susanne</givenName>
+				<surName>Backe</surName>
+			</individualName>
+			<organizationName>Norrbotten County Administrative Board</organizationName>
+			<positionName>Biologist</positionName>
+			<address>
+				<deliveryPoint>Stationsgatan 5</deliveryPoint>
+				<city>Luleå</city>
+				<postalCode>972 38</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>susanne.backe@lansstyrelsen.se</electronicMailAddress>
+		</metadataProvider>
+		<associatedParty>
+			<individualName>
+				<givenName>Mathieu</givenName>
+				<surName>Blanchet</surName>
+			</individualName>
+			<organizationName>Department of Biology, Lund University</organizationName>
+			<positionName>IT</positionName>
+			<address>
+				<deliveryPoint>Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>22362</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>mathieu.blanchet@biol.lu.se</electronicMailAddress>
+			<role>programmer</role>
+		</associatedParty>
+		<pubDate>
+			2022-09-13
+		</pubDate>
+		<language>swe</language>
+		<abstract>
+			<para>Coastal birds in the Gulf of Bothnia (Kustfåglar i Bottniska Viken) is a joint subprogramme (gemensamt delprogram) within the regional environmental monitoring in Sweden. The programme is run by the four County Administrative Boards (Länsstyrelsen) of Norrbotten, Västerbotten, Västernorrland and Gävleborg.</para>
+			<para>The programme was developed in 2009-2010, and its purpose is to register the presence and population sizes of breeding bird species characteristic of coastal and archipelagic areas in the Gulf of Bothnia, thus enabling changes of these to be monitored.</para>
+			<para>The work is carried out in collaboration with, and is supported by, the Swedish Environmental Protection Agency. The surveys are carried out by employees at the County Administrative Boards as well as hired consultants and experienced ornithologists.</para>
+			<para>In this dataset, some information is placed in the table ExtendedMeasurementOrFacts (eMoF), which is part of the Source Archive available to download directly from the dataset’s page here on gbif.org. The Source Archive contains the data exactly as uploaded to gbif (verbatim). Should you choose to download the dataset as GBIF Annotated Archive instead, the data has been interpreted and quality controlled by gbif, but, the data in the eMoF will not be included as the eMoF extension is not yet supported by gbif.</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Samplingevent</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<additionalInfo>
+			<para>
+				Important information for potential users of the data from Coastal birds in the Gulf of Bothnia:
+
+				1) Users of the data have to construct zero data for each species themselves. The occurrence table contains observations of birds that were actually present at the sites, but the surveyor would have looked for all species that are included in the survey design. For sites where no observations were made at all, the occurrence table also includes one zero observation with vernacularName set to &quot;SpeciesIncludedInSurvey&quot;, and occurrenceStatus set to &quot;Absent&quot;. This is to ensure that information about surveyor is included in the DwC-A also for these events.
+
+				2) Complete zero observations (null visits), i.e. when no individuals of any of the species included in the survey design were observed at a site, have not been registered on a regular basis in the 2010-2019 data. From 2020 it is compulsory to report such null visits. Whether a visit is a null visit (true) or not (false) is noted under Null visit in the table Extended measurement or fact (emof).
+
+				3) Please note that some of the data in this dataset overlap with the Swedish Coastal Bird Monitoring Programme. However, in this regional programme birds have only been surveyed on islands (and the surrounding 100m buffer of sea) that are located within 2x2km squares, whereas in the national scheme birds are surveyed within the entire 2x2km square. Where applicable, information about this is included in the eMoF table (Duplicate data), with details of the corresponding id:s of national squares.
+
+				4) The coordinates supplied are the centroid coordinates for each counting zone.
+
+				5) Weather: up to and including 2019 weather was reported in a freetext field. From 2020 it is compulsory to report precipitation, visibility and wind strength using one alternative from a fixed list. Reporting wind direction, cloudiness and temperature is optional, but when done, fixed lists of alternatives are used.
+			</para>
+		</additionalInfo>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>All data is collected along the coastline of the four counties of Norrbotten, Västerbotten, Västernorrland and Gävleborg on the Swedish side of the Gulf of Bothnia.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>16.611</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.346</eastBoundingCoordinate>
+					<northBoundingCoordinate>66.231</northBoundingCoordinate>
+					<southBoundingCoordinate>59.933</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<temporalCoverage>
+				<rangeOfDates>
+					<beginDate>
+						<calendarDate>2010-05-31</calendarDate>
+					</beginDate>
+					<endDate>
+						<calendarDate>2021-06-24</calendarDate>
+					</endDate>
+				</rangeOfDates>
+			</temporalCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>
+					Bird species that breed in coastal and archipelagic environments within the following groups are surveyed:
+					Ducks, geese and swans (Anatidae)
+					Grebes (Podicipedidae)
+					Divers (Gaviidae)
+					Waders, gulls and auks (Charadriiformes)
+					Herons (Ardeidae)
+
+					The following species are also included in the survey:
+					Rock pipit (Anthus petrosus)
+					Great cormorant (Phalacrocorax carbo)
+					Eurasian coot (Fulica atra)
+					Common crane (Grus grus)
+					Osprey (Pandion haliaetus)
+					White-tailed eagle (Haliaeetus albicilla)
+
+					Species with a security class 3 or higher (according to the Swedish species information centre (Artdatabanken)) are not shown in this dataset at present. Currently these species are osprey (Pandion haliaetus), white-tailed eagle (Haliaeetus albicilla) and red-throated loon (Gavia stellata).
+
+					Pulli are not counted, except for common eider pulli from 2020 onwards.
+				</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Aves</taxonRankValue>
+					<commonName>Birds</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>kingdom</taxonRankName>
+					<taxonRankValue>Animalia</taxonRankValue>
+					<commonName>Animals</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Chordata</taxonRankValue>
+					<commonName>Chordates</commonName>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<purpose>
+			<para>Regional environmental monitoring of coastal breeding birds.</para>
+		</purpose>
+		<maintenance>
+			<description>
+				<para>New data are added to the dataset yearly when the survey of that year is completed and data has been quality checked. In between these yearly updates the data is corrected as required.</para>
+			</description>
+			<maintenanceUpdateFrequency>annually</maintenanceUpdateFrequency>
+		</maintenance>
+
+		<contact>
+			<individualName>
+				<givenName>Peter</givenName>
+				<surName>Nilsson</surName>
+			</individualName>
+			<organizationName>Västernorrland County Administrative Board</organizationName>
+			<positionName>Nature conservation officer</positionName>
+			<address>
+				<deliveryPoint>Nybrogatan 15</deliveryPoint>
+				<city>Härnösand</city>
+				<postalCode>871 31</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>peter.nilsson@lansstyrelsen.se</electronicMailAddress>
+		</contact>
+		<contact>
+			<individualName>
+				<givenName>Susanne</givenName>
+				<surName>Backe</surName>
+			</individualName>
+			<organizationName>Norrbotten County Administrative Board</organizationName>
+			<positionName>Biologist</positionName>
+			<address>
+				<deliveryPoint>Stationsgatan 5</deliveryPoint>
+				<city>Luleå</city>
+				<postalCode>972 38</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>susanne.backe@lansstyrelsen.se</electronicMailAddress>
+		</contact>
+		<contact>
+			<individualName>
+				<givenName>Erik</givenName>
+				<surName>Owusu-Ansah</surName>
+			</individualName>
+			<organizationName>Västerbotten County Administrative Board</organizationName>
+			<positionName>Environmental officer</positionName>
+			<address>
+				<deliveryPoint>Storgatan 71B</deliveryPoint>
+				<city>Umeå</city>
+				<postalCode>901 86</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>erik.owusu-ansah@lansstyrelsen.se</electronicMailAddress>
+		</contact>
+		<contact>
+			<individualName>
+				<givenName>Karin</givenName>
+				<surName>Antonsson Brink</surName>
+			</individualName>
+			<organizationName>Gävleborg County Administrative Board</organizationName>
+			<positionName>Environmental officer</positionName>
+			<address>
+				<deliveryPoint>Borgmästarplan 2</deliveryPoint>
+				<city>Gävle</city>
+				<postalCode>802 66</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>karin.antonsson.brink@lansstyrelsen.se</electronicMailAddress>
+		</contact>
+		<methods>
+			<methodStep>
+				<description>
+					<para>See Sampling description.</para>
+				</description>
+			</methodStep>
+			<sampling>
+				<studyExtent>
+					<description>
+						<para>
+							Selection of study sites: When developing the subprogramme, the study area was covered by a 2x2km grid in which survey squares were clumped into blocks of four adjoining squares. Squares included in the programme contain at least one island. The mainland is not included in the survey.
+
+							At the start of the programme, a number of so called permanent blocks were surveyed every year. Each year, a number of blocks were randomly selected and added to the survey that particular year.
+
+							After a method evaluation in 2014 and in concurrence with the start-up of a national coastal bird monitoring scheme in 2015, the strategy for site selection was changed. From 2015 no sites are randomly selected. Instead, all permanent blocks from 2010-2014 have been kept and are surveyed on a 4 year rotation. In addition, the national squares (also 2x2km) that lie within the study area are surveyed yearly.
+
+							Number of study sites:
+							2010-2014: In total 114 blocks (453 squares). In Norrbotten 33 blocks (133 squares), and in each of the other three counties 27 blocks (107 squares). Note: Västernorrland and Västerbotten did not join the programme until 2011.
+							2015-ongoing: In total 65 national squares plus 28,5 blocks (114 squares). In Norrbotten 26 national squares + 8,25 regional blocks, Västerbotten 15 national squares + 6,75 regional blocks, Västernorrland 13 national squares + 6,75 regional blocks, Gävleborg 11 national squares + 6,75 regional blocks.
+
+							Timing and frequency: Surveys are carried out once per site each year (25 May-25 June), with different time periods northwards along the coast, allowing for differences in start of the breeding season: Gävleborg 25/5-10/6, Västernorrland 1-15/6, Västerbotten 5-20/6, Norrbotten 10-25/6.
+						</para>
+					</description>
+				</studyExtent>
+				<samplingDescription>
+					<para>
+						In each survey square bird observations are registered per counting zone, where a counting zone is an island (or a group of islands in close proximity to each other) and the 100m buffer of sea surrounding the island.
+						Surveys are generally carried out by boat,  but bare islands (i.e. without trees) are surveyed by going ashore (weather conditions allowing). Only the area of a counting zone that lies within the square boundaries is surveyed.
+
+						Species, numbers and breeding activity of birds observed is registered, as well as age and sex when possible.
+					</para>
+				</samplingDescription>
+			</sampling>
+			<qualityControl>
+				<description>
+					<para>Confidence in the data is good. All data are checked and validated by the surveyors.</para>
+				</description>
+			</qualityControl>
+		</methods>
+	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2020-12-21T09:48:50.394+01:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Nilsson P, Backe S, Owusu-Ansah E, Antonsson Brink K (2022): Coastal birds in the Gulf of Bothnia (Kustfåglar i Bottniska Viken). v1.7. Department of Biology, Lund University. Dataset/Samplingevent. https://www.gbif.se/ipt/resource?r=lu_kbv&amp;v=1.7</citation>
+				<bibliography>
+					<citation>HELCOM 2018. Abundance of waterbirds in the breeding season. HELCOM core indicator report. July 2018. Online. (https://www.helcom.fi/wp-content/uploads/2019/08/Abundance-of-waterbirds-in-the-breeding-season-HELCOM-core-indicator-2018.pdf).</citation>
+				</bibliography>
+				<dc:replaces>252f45fe-dfb6-46d6-9457-59bb3947c517/v1.7.xml</dc:replaces>
+			</gbif>
+		</metadata>
+	</additionalMetadata>
+</eml:eml>

@@ -1,0 +1,154 @@
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+		 xmlns:dc="http://purl.org/dc/terms/"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
+		 packageId="9940af5a-3271-4e6a-ad71-ced986b9a9a5/v26.821" system="http://gbif.org" scope="system"
+xml:lang="eng">
+
+	<dataset>
+		<alternateIdentifier>9940af5a-3271-4e6a-ad71-ced986b9a9a5</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=nhrs-nrm</alternateIdentifier>
+		<title xml:lang="eng">Entomological Collections (NHRS), Swedish Museum of Natural History (NRM)</title>
+		<creator>
+			<individualName>
+				<givenName>Kevin</givenName>
+				<surName>Holston</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>kevin.holston@nrm.se</electronicMailAddress>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Kevin</givenName>
+				<surName>Holston</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>kevin.holston@nrm.se</electronicMailAddress>
+		</metadataProvider>
+		<pubDate>
+			2023-04-17
+		</pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>The dataset represents the digital holdings of insects, arachnids (mites and spiders) and myriapods (millipedes and centipedes) at the Swedish Museum of Natural History. These collections include over three million specimens, are international in scope, and have broad systematic and geographic coverage.</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Specimen</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>NHRS</keyword>
+			<keyword>Terrestrial Arthropods</keyword>
+			<keyword>Insects</keyword>
+			<keyword>Myriapods</keyword>
+			<keyword>Spiders</keyword>
+			<keyword>Mites</keyword>
+			<keyword>Types</keyword>
+			<keyword>Worldwide</keyword>
+			<keyword>Sweden</keyword>
+			<keywordThesaurus>Not Applicable</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>Specimens from all continents, with significant digitized holdings representing the entomological fauna of Sweden and recent collecting in New Caledonia, Tasmania, and Madagascar.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>-180</westBoundingCoordinate>
+					<eastBoundingCoordinate>180</eastBoundingCoordinate>
+					<northBoundingCoordinate>90</northBoundingCoordinate>
+					<southBoundingCoordinate>-90</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			            <temporalCoverage>
+                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+                <sos:LivingTimePeriod></sos:LivingTimePeriod>
+                <sos:StartDate>1784</sos:StartDate>
+                <sos:EndDate></sos:EndDate>
+            </temporalCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>Arthropoda: Insecta, Myrapoda, Arachnida. This dataset represents the digitized holdings of insect, arachnid (mites and spiders) and myriapod (millipedes and centipedes) specimens at the Swedish Museum of Natural History.</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Arthropoda</taxonRankValue>
+					<commonName>Arthropods</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Insecta</taxonRankValue>
+					<commonName>Insects</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>subphylum</taxonRankName>
+					<taxonRankValue>Myriapoda</taxonRankValue>
+					<commonName>Myriapods</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Arachnida</taxonRankValue>
+					<commonName>Arachnids</commonName>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para></para>
+			</description>
+			<maintenanceUpdateFrequency>irregular</maintenanceUpdateFrequency>
+		</maintenance>
+
+		<contact>
+			<individualName>
+				<givenName>Niklas</givenName>
+				<surName>Apelquist</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>niklas.apelqvist@nrm.se</electronicMailAddress>
+		</contact>
+	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2015-10-28T09:59:14.971+01:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Swedish Museum of Natural History, Entomological Collections</citation>
+				<collection>
+					<parentCollectionIdentifier>Not Applicable</parentCollectionIdentifier>
+					<collectionIdentifier>http://grbio.org/cool/jd65-7xyf</collectionIdentifier>
+					<collectionName>Entomological Collections (NHRS)</collectionName>
+				</collection>
+				<specimenPreservationMethod>pinned</specimenPreservationMethod>
+				<livingTimePeriod>1800s to current</livingTimePeriod>
+				<dc:replaces>9940af5a-3271-4e6a-ad71-ced986b9a9a5/v26.821.xml</dc:replaces>
+			</gbif>
+		</metadata>
+	</additionalMetadata>
+</eml:eml>

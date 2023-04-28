@@ -1,0 +1,119 @@
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+		 xmlns:dc="http://purl.org/dc/terms/"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
+		 packageId="6aa7c400-0c66-11dd-84d2-b8a03c50a862/v4.16" system="http://gbif.org" scope="system"
+xml:lang="eng">
+
+	<dataset>
+		<alternateIdentifier>6aa7c400-0c66-11dd-84d2-b8a03c50a862</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=nrm-porpoises</alternateIdentifier>
+		<title xml:lang="eng">Porpoise Observation Database (NRM)</title>
+		<creator>
+			<individualName>
+				<givenName>Linnea</givenName>
+				<surName>Cervin</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Senior Assistant</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>Linnea.Cervin@nrm.se</electronicMailAddress>
+		</creator>
+		<pubDate>
+			2023-03-27
+		</pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>
+				This data set contains observations of dead or alive harbor porpoises made by the public, mostly around the Swedish coast. A few observations are from Norwegian, Danish, Finish and German waters. Each observation of harbor porpoise is verified at the Swedish Museum of Natural History before it is approved and published on the web. The verification consists of controlling the accuracy of number of animals sighted, if the coordinates are correct and if pictures are attached that they really show a porpoise and not another species. If any of these three seem unlikely, the reporter is contacted and asked more detailed questions. The report is approved or denied depending on the answers given. Pictures and movies that can’t be uploaded to the database due to size problems are saved at the museum server and marked with the identification number given by the database. By the end of the year the data is submitted to HELCOM who then summarize all the member state’s data from the Baltic proper to the Kattegat basin.
+
+				The porpoise is one of the smallest tooth whales in the world and the only whale species that breeds in Swedish waters. They are to be found in temperate water in the northern hemisphere where they live in small groups of 1-3 individuals. The females give birth to a calf in the summer months which then suckles for about 10 months before it is left on its own and she has a new calf. The porpoises around Sweden are divided in to three groups that don’t mix very often. The North Sea population is found on the west coast in Skagerrak down to the Falkenberg area. The Belt Sea population is to be found a bit north of Falkenberg down to Blekinge archipelago in the Baltic. The Baltic proper population is the smallest population and consists only of a few hundred animals and is considered as an endangered sub species. They are most commonly found from the Blekinge archipelago up to Åland Sea with a hot spot area south of Gotland at Hoburg’s bank and the Mid-Sea bank.
+
+				The Porpoise Observation Database was started in 2005 at the request of the Swedish Environmental Protection Agency to get a better understanding of where to find porpoises with the idea to use the public to expand the “survey area”. The first year 26 sightings were reported, where 4 was from the Baltic Sea. The museum is particularly interested in sightings from the Baltic Sea due to the low numbers of animals and lack of data and knowledge about this group. In the beginning only live sightings were reported but later also found dead animals were added.
+
+				Some of the animals that are reported dead are collected. Depending on where it is found and its state of decay, the animal can be subsampled in the field. A piece of blubber and some teeth are then send in by mail and stored in the Environmental Specimen Bank at the Swedish Museum of Natural History in Stockholm. If the whole animal is collected an autopsy is performed at the National Veterinary Institute in Uppsala to try and determine cause of death. Organs, teeth and parasites are sampled and saved at the Environmental Specimen Bank as well. Information about the animal i.e. location, founding date, sex, age, length, weight, blubber thickness as well as type of organ and the amount that is sampled is then added to the Specimen Bank database. If there is an interest in getting samples or data from the Specimen Bank, one have to send in an application to the Department of Environmental research and monitoring and state the purpose of the study and the amount of samples needed.
+			</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Observation</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>Observations gathered in the Baltic Sea and on the west coast of Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>9.51</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.59</eastBoundingCoordinate>
+					<northBoundingCoordinate>66.46</northBoundingCoordinate>
+					<southBoundingCoordinate>55.06</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			            <temporalCoverage>
+                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+                <sos:LivingTimePeriod></sos:LivingTimePeriod>		
+                <sos:StartDate>1997</sos:StartDate>
+                <sos:EndDate></sos:EndDate>
+			<taxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>species</taxonRankName>
+					<taxonRankValue>Phocoena phocoena</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>species</taxonRankName>
+					<taxonRankValue>Megaptera novaeangliae</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>species</taxonRankName>
+					<taxonRankValue>Orcinus orca</taxonRankValue>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para></para>
+			</description>
+			<maintenanceUpdateFrequency>continually</maintenanceUpdateFrequency>
+		</maintenance>
+
+		<contact>
+			<individualName>
+				<givenName>Linnea</givenName>
+				<surName>Cervin</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Senior Assistant</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>Linnea.Cervin@nrm.se</electronicMailAddress>
+		</contact>
+	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2013-09-11T04:21:13.837+02:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<dc:replaces>6aa7c400-0c66-11dd-84d2-b8a03c50a862/v4.16.xml</dc:replaces>
+			</gbif>
+		</metadata>
+	</additionalMetadata>
+</eml:eml>
