@@ -1,14 +1,18 @@
-using Swashbuckle.AspNetCore.Annotations;
-
 namespace SOS.DataStewardship.Api.Contracts.Models
 {    
-    [SwaggerSchema("Geometry filter")]
+    /// <summary>
+	/// Geometry filter
+	/// </summary>
     public class GeometryFilter
     {        
-        [SwaggerSchema("GeoJSON geometry")]
+        /// <summary>
+		/// GeoJSON geometry
+		/// </summary>
         public IGeoShape GeographicArea { get; set; }        
         
-        [SwaggerSchema("The offset in meters from the geometries. This variable is required if geometries type is point")]
+        /// <summary>
+		/// The offset in meters from the geometries. This variable is required if geometries type is point
+		/// </summary>
         public double? MaxDistanceFromGeometries { get; set; }
     }
 }

@@ -13,7 +13,7 @@ public class GetOccurrencesBySearchEndpoint : IEndpointDefinition
     public void DefineEndpoint(WebApplication app)
     {
         app.MapPost("/datastewardship/occurrences", GetOccurrencesBySearchAsync)
-            .Produces<Contracts.Models.PagedResult<OccurrenceModel>>(StatusCodes.Status200OK)
+            .Produces<Contracts.Models.PagedResult<Contracts.Models.Occurrence>>(StatusCodes.Status200OK)
             .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
             .AddEndpointFilter<ValidatorFilter<OccurrenceFilter>>()

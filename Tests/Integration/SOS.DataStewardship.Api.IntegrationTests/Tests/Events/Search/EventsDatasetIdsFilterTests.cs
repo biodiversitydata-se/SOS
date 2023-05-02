@@ -25,7 +25,7 @@ public class EventsDatasetIdsFilterTests : TestBase
         };
         
         // Act
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
             $"datastewardship/events?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert

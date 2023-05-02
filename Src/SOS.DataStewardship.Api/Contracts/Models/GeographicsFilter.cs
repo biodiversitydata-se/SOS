@@ -1,30 +1,39 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.Lib.Swagger;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
 {    
-    [SwaggerSchema("Geographics filter")]
+    /// <summary>
+	/// Geographics filter
+	/// </summary>
     public class GeographicsFilter
     {
         [SwaggerExclude]
         public GeometryFilter Area { get; set; }
 
-        [SwaggerSchema("County filter")]
+        /// <summary>
+		/// County filter
+		/// </summary>
         public County? County { get; set; }
 
-        [SwaggerSchema("Geometry filter")]
+        /// <summary>
+		/// Geometry filter
+		/// </summary>
         public GeometryFilter Geometry { get; set; }
 
-        [SwaggerSchema("Municipality filter")]
+        /// <summary>
+		/// Municipality filter
+		/// </summary>
         public Municipality? Municipality { get; set; }
 
-        [SwaggerSchema("Parish filter")]
+        /// <summary>
+		/// Parish filter
+		/// </summary>
         public Parish? Parish { get; set; }
 
-        [SwaggerSchema("Province filter")]
+        /// <summary>
+		/// Province filter
+		/// </summary>
         public Province? Province { get; set; }
-
-       
     }
 }

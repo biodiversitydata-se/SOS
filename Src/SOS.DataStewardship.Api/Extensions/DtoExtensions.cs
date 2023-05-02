@@ -102,11 +102,11 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static EventModel ToEventModel(this ProcessedDataStewardship.Event.Event observationEvent, CoordinateSystem responseCoordinateSystem)
+        public static Contracts.Models.Event ToEventModel(this ProcessedDataStewardship.Event.Event observationEvent, CoordinateSystem responseCoordinateSystem)
         {
             if (observationEvent == null) return null;
 
-            var ev = new EventModel();
+            var ev = new Contracts.Models.Event();
             ev.EventID = observationEvent.EventId;
             ev.ParentEventID = observationEvent.ParentEventId;
             ev.EventRemarks = observationEvent.EventRemarks;
@@ -204,10 +204,10 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static EventModel ToEventModel(this Observation observation, IEnumerable<string> occurrenceIds, CoordinateSystem responseCoordinateSystem)
+        public static Contracts.Models.Event ToEventModel(this Observation observation, IEnumerable<string> occurrenceIds, CoordinateSystem responseCoordinateSystem)
         {
             if (observation == null) return null;            
-            var ev = new EventModel();
+            var ev = new Contracts.Models.Event();
             ev.EventID = observation.Event.EventId;
             ev.ParentEventID = observation.Event.ParentEventId;
             ev.EventRemarks = observation.Event.EventRemarks;
@@ -322,9 +322,9 @@ namespace SOS.DataStewardship.Api.Extensions
             return AssociatedMediaType.Bild; // default
         }
 
-        public static OccurrenceModel ToOccurrenceModel(this Observation observation, CoordinateSystem responseCoordinateSystem)
+        public static Contracts.Models.Occurrence ToOccurrenceModel(this Observation observation, CoordinateSystem responseCoordinateSystem)
         {
-            var occurrence = new OccurrenceModel();
+            var occurrence = new Contracts.Models.Occurrence();
             occurrence.AssociatedMedia = observation.Occurrence?.Media.ToAssociatedMedias();
             if (observation?.BasisOfRecord?.Id != null)
             {
@@ -387,9 +387,9 @@ namespace SOS.DataStewardship.Api.Extensions
             };
         }
 
-        public static TaxonModel ToTaxonModel(this Taxon taxon)
+        public static Contracts.Models.Taxon ToTaxonModel(this Lib.Models.Processed.Observation.Taxon taxon)
         {
-            return new TaxonModel
+            return new Contracts.Models.Taxon
             {
                 ScientificName = taxon.ScientificName,
                 TaxonID = taxon.Id.ToString(),

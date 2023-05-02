@@ -1,26 +1,37 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
-using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
-{
-    [SwaggerSchema("Associate Media", Required = new[] { "License" })]
+{    
+    /// <summary>
+    /// Associate Media
+    /// </summary>
     public class AssociatedMedia
     {        
-        [SwaggerSchema("Name of attachment.")]
+        /// <summary>
+		/// Name of attachment.
+		/// </summary>
         public string AssociatedMediaName { get; set; }
         
-        [SwaggerSchema("Format of attachment, e.g. image, video, sound, pdf etc.")]
+        /// <summary>
+		/// Format of attachment, e.g. image, video, sound, pdf etc.
+		/// </summary>
         public AssociatedMediaType? AssociatedMediaType { get; set; }
 
-        [SwaggerSchema("Link to attachment.")]
+        /// <summary>
+		/// Link to attachment.
+		/// </summary>
         public string AssociatedMediaLink { get; set; }
 
+        /// <summary>
+        /// States which Creative Commons license that is applied to the attachment.
+        /// </summary>
         [Required]
-        [SwaggerSchema("States which Creative Commons license that is applied to the attachment.")]
         public string License { get; set; }
 
-        [SwaggerSchema("States who the creator of the attachment is.")]
+        /// <summary>
+		/// States who the creator of the attachment is.
+		/// </summary>
         public string RightsHolder { get; set; }
     }
 }

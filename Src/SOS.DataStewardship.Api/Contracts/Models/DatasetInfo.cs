@@ -1,14 +1,18 @@
-using Swashbuckle.AspNetCore.Annotations;
-
 namespace SOS.DataStewardship.Api.Contracts.Models
 {
-    [SwaggerSchema("Dataset info")]
+    /// <summary>
+	/// Dataset info
+	/// </summary>
     public class DatasetInfo
     {        
-        [SwaggerSchema("Identifier")]
+        /// <summary>
+		/// Identifier
+		/// </summary>
         public string Identifier { get; set; }
         
-        [SwaggerSchema("Title")]
+        /// <summary>
+		/// Title
+		/// </summary>
         public string Title { get; set; }
     }
 }

@@ -1,34 +1,47 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.Lib.Swagger;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
 {    
-    [SwaggerSchema("Events search filter")]
+    /// <summary>
+	/// Events search filter
+	/// </summary>
     public class EventsFilter
     {        
-        [SwaggerSchema("Export mode")]
+        /// <summary>
+		/// Export mode
+		/// </summary>
         public ExportMode ExportMode { get; set; }
         
-        [SwaggerSchema("DatasetIds filter")]
+        /// <summary>
+		/// DatasetIds filter
+		/// </summary>
         public List<string> DatasetIds { get; set; }
 
         [SwaggerExclude]
         public List<string> DatasetList { get; set; }
 
-        [SwaggerSchema("EventIds filter")]
+        /// <summary>
+		/// EventIds filter
+		/// </summary>
         public List<string> EventIds { get; set; }
 
-        [SwaggerSchema("Date filter")]
+        /// <summary>
+		/// Date filter
+		/// </summary>
         public DateFilter DateFilter { get; set; }
 
         [SwaggerExclude]
         public DateFilter Datum { get; set; }
 
-        [SwaggerSchema("Taxon filter")]
+        /// <summary>
+		/// Taxon filter
+		/// </summary>
         public TaxonFilter Taxon { get; set; }
 
-        [SwaggerSchema("Area filter")]
+        /// <summary>
+		/// Area filter
+		/// </summary>
         public GeographicsFilter Area { get; set; }
     }
 }

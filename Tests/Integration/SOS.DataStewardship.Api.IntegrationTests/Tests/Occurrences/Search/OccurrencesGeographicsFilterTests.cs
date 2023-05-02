@@ -29,7 +29,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
         };
         
         // Act
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
@@ -54,7 +54,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
         };
 
         // Act
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
@@ -79,7 +79,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
         };
 
         // Act
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
@@ -104,7 +104,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
         };
 
         // Act
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
@@ -129,7 +129,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
         };
 
         // Act
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
@@ -154,7 +154,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
         };
 
         // Act
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert

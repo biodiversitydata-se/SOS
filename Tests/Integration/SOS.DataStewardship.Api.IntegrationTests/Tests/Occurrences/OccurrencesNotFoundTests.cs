@@ -39,7 +39,7 @@ public class OccurrencesNotFoundTests : TestBase
         };
 
         // Act        
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
 
         // Assert

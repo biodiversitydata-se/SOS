@@ -40,7 +40,7 @@ public class EventsNotFoundTests : TestBase
         };
 
         // Act        
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
             $"datastewardship/events", searchFilter, jsonSerializerOptions);
 
         // Assert

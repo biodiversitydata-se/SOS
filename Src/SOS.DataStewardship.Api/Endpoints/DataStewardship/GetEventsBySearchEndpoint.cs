@@ -13,7 +13,7 @@ public class GetEventsBySearchEndpoint : IEndpointDefinition
     public void DefineEndpoint(WebApplication app)
     {
         app.MapPost("/datastewardship/events", GetEventsBySearchAsync)
-            .Produces<Contracts.Models.PagedResult<EventModel>>(StatusCodes.Status200OK)
+            .Produces<Contracts.Models.PagedResult<Contracts.Models.Event>>(StatusCodes.Status200OK)
             .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
             .AddEndpointFilter<ValidatorFilter<EventsFilter>>()

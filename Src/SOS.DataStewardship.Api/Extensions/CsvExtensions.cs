@@ -116,7 +116,7 @@ namespace SOS.DataStewardship.Api.Extensions
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
-        public static byte[] ToCsv(this EventModel @event)
+        public static byte[] ToCsv(this Contracts.Models.Event @event)
         {
             if (@event == null)
             {
@@ -131,7 +131,7 @@ namespace SOS.DataStewardship.Api.Extensions
         /// </summary>
         /// <param name="datasets"></param>
         /// <returns></returns>
-        public static byte[] ToCsv(this IEnumerable<EventModel> events)
+        public static byte[] ToCsv(this IEnumerable<Contracts.Models.Event> events)
         {
             if (!events?.Any() ?? true)
             {
@@ -193,7 +193,7 @@ namespace SOS.DataStewardship.Api.Extensions
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
-        public static byte[] ToCsv(this OccurrenceModel occurrence)
+        public static byte[] ToCsv(this Contracts.Models.Occurrence occurrence)
         {
             if (occurrence == null)
             {
@@ -208,7 +208,7 @@ namespace SOS.DataStewardship.Api.Extensions
         /// </summary>
         /// <param name="datasets"></param>
         /// <returns></returns>
-        public static byte[] ToCsv(this IEnumerable<OccurrenceModel> occurrences)
+        public static byte[] ToCsv(this IEnumerable<Contracts.Models.Occurrence> occurrences)
         {
             if (!occurrences?.Any() ?? true)
             {

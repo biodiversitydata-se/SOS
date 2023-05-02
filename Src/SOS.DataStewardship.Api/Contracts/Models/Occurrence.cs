@@ -6,7 +6,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
     /// <summary>
     /// A specific observation of an organism or a uniform group of organisms made at an event.
     /// </summary>
-    public class OccurrenceModel
+    public class Occurrence
     {
         /// <summary>
         /// An identifier for the Occurrence (as opposed to a particular digital record of the occurrence). In the absence of a persistent global unique identifier, construct one from a combination of identifiers in the record that will most closely make the occurrenceID globally unique. (Source: Darwin Core quick reference guide)
@@ -45,7 +45,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// Taxonomic information about the observation. States which species (or subspecies, species aggregation, genus, family etc) was observed and identified.
         /// </summary>
         [Required]
-        public TaxonModel Taxon { get; set; }
+        public Taxon Taxon { get; set; }
 
         /// <summary>
         /// States whether a specific taxon was observed or not. Observations with "Förekomst" = "inte observerad" are so called zero observations.

@@ -5,7 +5,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
     /// <summary>
     /// Taxonomic information about the observation. States which species (or subspecies, species aggregation, genus, family etc) was observed and identified.
     /// </summary>
-    public class TaxonModel
+    public class Taxon
     {
         /// <summary>
         /// Unique id for species or other given taxon rank according to Dyntaxa.
