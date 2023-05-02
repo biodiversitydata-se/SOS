@@ -2,7 +2,6 @@
 using SOS.DataStewardship.Api.Extensions;
 using SOS.DataStewardship.Api.Application.Managers.Interfaces;
 using SOS.DataStewardship.Api.Contracts.Enums;
-using SOS.DataStewardship.Api.Contracts.Models;
 
 namespace SOS.DataStewardship.Api.Endpoints.DataStewardship;
 
@@ -11,7 +10,7 @@ public class GetEventByIdEndpoint : IEndpointDefinition
     public void DefineEndpoint(WebApplication app)
     {
         app.MapGet("/datastewardship/events/{id}", GetEventByIdAsync)
-            .Produces<EventModel>(StatusCodes.Status200OK, "application/json")
+            .Produces<Contracts.Models.Event>(StatusCodes.Status200OK, "application/json")
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
             .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);

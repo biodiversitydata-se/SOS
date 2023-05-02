@@ -16,20 +16,20 @@ public class EventsPaginationTests : TestBase
         var testDataSet = TestData.Create(10);
         await ProcessFixture.AddDataToElasticsearchAsync(testDataSet.Events, testDataSet.Observations);
         var searchFilter = new EventsFilter();
-        var eventModels = new List<EventModel>();
-        var allEventModels = new List<EventModel>();
+        var eventModels = new List<Event>();
+        var allEventModels = new List<Event>();
         int take = 2;
 
         // Act - Get all by pagination
         for (int skip = 0; skip < testDataSet.Events.Count(); skip += take)
         {
-            var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+            var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
                 $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
             eventModels.AddRange(pageResult.Records);
         }
         
         // Act - Get all in one request
-        var pageResultAll = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+        var pageResultAll = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
                 $"datastewardship/events?skip=0&take={testDataSet.Events.Count()}", searchFilter, jsonSerializerOptions);
         allEventModels.AddRange(pageResultAll.Records);
 
@@ -53,7 +53,7 @@ public class EventsPaginationTests : TestBase
         int take = 2;
 
         // Act        
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
             $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
 
         // Assert
@@ -75,7 +75,7 @@ public class EventsPaginationTests : TestBase
         int take = 2;
 
         // Act
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
             $"datastewardship/events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
 
         // Assert

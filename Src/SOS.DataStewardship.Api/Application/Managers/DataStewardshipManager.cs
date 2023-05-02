@@ -76,7 +76,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         return JsonSerializer.Deserialize<Observation>(JsonSerializer.Serialize(dynamicObject, _jsonSerializerOptions), _jsonSerializerOptions);
     }
 
-    private async Task<EventModel> GetEventByIdFromObservationIndexAsync(string id, CoordinateSystem responseCoordinateSystem)
+    private async Task<Contracts.Models.Event> GetEventByIdFromObservationIndexAsync(string id, CoordinateSystem responseCoordinateSystem)
     {
         var filter = new SearchFilter(0);
         filter.EventIds = new List<string> { id };
@@ -92,7 +92,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         return ev;
     }
 
-    private async Task<EventModel> GetEventByIdFromEventIndexAsync(string id, CoordinateSystem responseCoordinateSystem)
+    private async Task<Contracts.Models.Event> GetEventByIdFromEventIndexAsync(string id, CoordinateSystem responseCoordinateSystem)
     {
         var observationEvents = await _observationEventRepository.GetEventsByIds(new List<string> { id });
 
@@ -105,7 +105,7 @@ public class DataStewardshipManager : IDataStewardshipManager
     /// <remarks>
     /// This search uses the Observation index.
     /// </remarks>
-    private async Task<Contracts.Models.PagedResult<EventModel>> GetEventsBySearchFromObservationIndexAsync(EventsFilter eventsFilter, 
+    private async Task<Contracts.Models.PagedResult<Contracts.Models.Event>> GetEventsBySearchFromObservationIndexAsync(EventsFilter eventsFilter, 
         int skip, 
         int take,
         CoordinateSystem responseCoordinateSystem)
@@ -122,7 +122,7 @@ public class DataStewardshipManager : IDataStewardshipManager
 
         var firstOccurrenceIdInEvents = eventIds.Select(m => m.Value.First());
         var observations = await _processedObservationCoreRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
-        var events = new List<EventModel>();
+        var events = new List<Contracts.Models.Event>();
         foreach (var observation in observations)
         {
             var occurrenceIds = occurrenceIdsByEventId[observation.Event.EventId.ToLower()];
@@ -134,7 +134,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         int totalCount = eventOccurrenceIds.Count;
         var records = events;
 
-        return new Contracts.Models.PagedResult<EventModel>()
+        return new Contracts.Models.PagedResult<Contracts.Models.Event>()
         {
             Skip = skip,
             Take = take,
@@ -147,7 +147,7 @@ public class DataStewardshipManager : IDataStewardshipManager
     /// <remarks>
     /// This search uses the Event index.
     /// </remarks>
-    private async Task<Contracts.Models.PagedResult<EventModel>> GetEventsBySearchFromEventIndexAsync(EventsFilter eventsFilter, 
+    private async Task<Contracts.Models.PagedResult<Contracts.Models.Event>> GetEventsBySearchFromEventIndexAsync(EventsFilter eventsFilter, 
         int skip, 
         int take, 
         CoordinateSystem responseCoordinateSystem)
@@ -161,7 +161,7 @@ public class DataStewardshipManager : IDataStewardshipManager
             Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);
         int count = eventIdPageResult.Records.Count();
         int totalCount = Convert.ToInt32(eventIdPageResult.TotalCount);
-        var records = Enumerable.Empty<EventModel>();
+        var records = Enumerable.Empty<Contracts.Models.Event>();
         if (eventIdPageResult.Records.Any())
         {
             var sortOrders = new List<SortOrderFilter>
@@ -174,7 +174,7 @@ public class DataStewardshipManager : IDataStewardshipManager
             records = events;
         }        
 
-        return new Contracts.Models.PagedResult<EventModel>()
+        return new Contracts.Models.PagedResult<Contracts.Models.Event>()
         {
             Skip = skip,
             Take = take,
@@ -184,14 +184,14 @@ public class DataStewardshipManager : IDataStewardshipManager
         };
     }
 
-    private async Task<Contracts.Models.PagedResult<EventModel>> GetEventsBySearchFromEventIndexSortByDateAsync(EventsFilter eventsFilter,
+    private async Task<Contracts.Models.PagedResult<Contracts.Models.Event>> GetEventsBySearchFromEventIndexSortByDateAsync(EventsFilter eventsFilter,
         int skip,
         int take,
         CoordinateSystem responseCoordinateSystem)
     {
         var filter = eventsFilter.ToSearchFilter();
         await _filterManager.PrepareFilterAsync(null, null, filter);        
-        var records = Enumerable.Empty<EventModel>();
+        var records = Enumerable.Empty<Contracts.Models.Event>();
         var allEventIds = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "event.eventId");
         int totalCount = allEventIds.Count();
         if (allEventIds.Any())
@@ -210,7 +210,7 @@ public class DataStewardshipManager : IDataStewardshipManager
                 .ToList();
         }
 
-        return new Contracts.Models.PagedResult<EventModel>()
+        return new Contracts.Models.PagedResult<Contracts.Models.Event>()
         {
             Skip = skip,
             Take = take,
@@ -280,7 +280,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         };
     }
 
-    public async Task<EventModel> GetEventByIdAsync(string id, CoordinateSystem responseCoordinateSystem)
+    public async Task<Contracts.Models.Event> GetEventByIdAsync(string id, CoordinateSystem responseCoordinateSystem)
     {        
         var evnt = await GetEventByIdFromEventIndexAsync(id, responseCoordinateSystem);
 
@@ -292,7 +292,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         return evnt;
     }
 
-    public async Task<Contracts.Models.PagedResult<EventModel>> GetEventsBySearchAsync(EventsFilter eventsFilter, 
+    public async Task<Contracts.Models.PagedResult<Contracts.Models.Event>> GetEventsBySearchAsync(EventsFilter eventsFilter, 
         int skip, 
         int take, 
         CoordinateSystem responseCoordinateSystem)
@@ -302,7 +302,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         // return await GetEventsBySearchFromObservationIndexAsync(eventsFilter, skip, take);
     }
 
-    public async Task<OccurrenceModel> GetOccurrenceByIdAsync(string id, CoordinateSystem responseCoordinateSystem)
+    public async Task<Contracts.Models.Occurrence> GetOccurrenceByIdAsync(string id, CoordinateSystem responseCoordinateSystem)
     {
         var filter = new SearchFilter(0) {
             IsPartOfDataStewardshipDataset = true
@@ -323,7 +323,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         return occurrence;
     }
 
-    public async Task<Contracts.Models.PagedResult<OccurrenceModel>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take, CoordinateSystem responseCoordinateSystem)
+    public async Task<Contracts.Models.PagedResult<Contracts.Models.Occurrence>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take, CoordinateSystem responseCoordinateSystem)
     {
         var filter = occurrenceFilter.ToSearchFilter();
         filter.IsPartOfDataStewardshipDataset = true;
@@ -333,7 +333,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         var observations = CastDynamicsToObservations(pageResult.Records);
         var occurrences = observations.Select(x => x.ToOccurrenceModel(responseCoordinateSystem)).ToList();
 
-        return new Contracts.Models.PagedResult<OccurrenceModel>()
+        return new Contracts.Models.PagedResult<Contracts.Models.Occurrence>()
         {
             Skip = skip,
             Take = take,

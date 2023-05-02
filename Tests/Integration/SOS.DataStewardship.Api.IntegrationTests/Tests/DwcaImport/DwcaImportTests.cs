@@ -31,12 +31,12 @@ public class DwcaImportTests : TestBase
 
         // Get all events
         var eventsSearchFilter = new EventsFilter { };
-        var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+        var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
             $"datastewardship/events", eventsSearchFilter, jsonSerializerOptions);
 
         // Get all occurrences
         var occurrenceSearchFilter = new OccurrenceFilter { };
-        var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences", occurrenceSearchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
@@ -76,12 +76,12 @@ public class DwcaImportTests : TestBase
 
         // Get all events
         var eventsSearchFilter = new EventsFilter { };
-        var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+        var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
             $"datastewardship/events", eventsSearchFilter, jsonSerializerOptions);
 
         // Get all occurrences
         var occurrenceSearchFilter = new OccurrenceFilter { };
-        var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences", occurrenceSearchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
@@ -128,12 +128,12 @@ public class DwcaImportTests : TestBase
 
         // Get all events
         var eventsSearchFilter = new EventsFilter { };
-        var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+        var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
             $"datastewardship/events", eventsSearchFilter, jsonSerializerOptions);
 
         // Get all occurrences
         var occurrenceSearchFilter = new OccurrenceFilter { };
-        var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences", occurrenceSearchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------
@@ -176,12 +176,12 @@ public class DwcaImportTests : TestBase
 
         // Get all events
         var eventsSearchFilter = new EventsFilter { };
-        var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, EventsFilter>(
+        var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
             $"datastewardship/events", eventsSearchFilter, jsonSerializerOptions);
 
         // Get all occurrences
         var occurrenceSearchFilter = new OccurrenceFilter { };
-        var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences?skip=0&take=100", occurrenceSearchFilter, jsonSerializerOptions);
 
         //-----------------------------------------------------------------------------------------------------------

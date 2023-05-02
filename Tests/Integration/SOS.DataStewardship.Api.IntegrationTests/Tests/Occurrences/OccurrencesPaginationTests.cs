@@ -17,19 +17,19 @@ public class OccurrencesPaginationTests : TestBase
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
         var searchFilter = new OccurrenceFilter();
         int take = 2;
-        var occurrenceModels = new List<OccurrenceModel>();
-        var allOccurrenceModels = new List<OccurrenceModel>();
+        var occurrenceModels = new List<Occurrence>();
+        var allOccurrenceModels = new List<Occurrence>();
 
         // Act - Get all by pagination
         for (int skip = 0; skip < observations.Count(); skip += take)
         {
-            var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+            var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
                 $"datastewardship/occurrences?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
             occurrenceModels.AddRange(pageResult.Records);
         }
 
         // Act - Get all in one request
-        var pageResultAll = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var pageResultAll = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
                 $"datastewardship/occurrences?skip=0&take={observations.Count()}", searchFilter, jsonSerializerOptions);
         allOccurrenceModels.AddRange(pageResultAll.Records);
 
@@ -53,7 +53,7 @@ public class OccurrencesPaginationTests : TestBase
         int take = 2;
 
         // Act
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<OccurrenceModel>, OccurrenceFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
             $"datastewardship/occurrences?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
 
         // Assert
@@ -75,7 +75,7 @@ public class OccurrencesPaginationTests : TestBase
         int take = 2;
 
         // Act
-        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<EventModel>, OccurrenceFilter>(
+        var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, OccurrenceFilter>(
             $"datastewardship/occurrences?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
 
         // Assert

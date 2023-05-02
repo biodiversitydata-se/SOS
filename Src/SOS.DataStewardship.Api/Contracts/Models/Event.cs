@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace SOS.DataStewardship.Api.Contracts.Models
 {    
     [SwaggerSchema("A specified event when organisms were surveyed according to a specified methodology at a specific place.", Required = new[] { "EventID" })]
-    public class EventModel
+    public class Event
     {        
         [Required]        
         [SwaggerSchema("A unique id for the survey event within a specific dataset hosted by the respective datahosts. A survey event is usually a visit to a survey area/site. A survey event can also be a visit to a smaller defined part of a survey area/site or one of several samples from the same place. The term survey event can also represent a specific period or season. What eventID is representing is given in the attribute eventType.")]
