@@ -69,7 +69,7 @@
 			<temporalCoverage>
 				<sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
 				<sos:LivingTimePeriod></sos:LivingTimePeriod>
-				<sos:StartDate></sos:StartDate>
+				<sos:StartDate>2009</sos:StartDate>
 				<sos:EndDate></sos:EndDate>
 			</temporalCoverage>
 			<taxonomicCoverage>

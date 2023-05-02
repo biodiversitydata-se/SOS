@@ -1,0 +1,113 @@
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+		 xmlns:dc="http://purl.org/dc/terms/"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
+		 packageId="4f70108a-dda7-4e8b-8298-babaee5182c3/v19.9" system="http://gbif.org" scope="system"
+xml:lang="eng">
+
+	<dataset>
+		<alternateIdentifier>4f70108a-dda7-4e8b-8298-babaee5182c3</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=nrm-ringedbirds</alternateIdentifier>
+		<title xml:lang="eng">Bird Ringing Centre in Sweden (NRM)</title>
+		<creator>
+			<individualName>
+				<givenName>Thord</givenName>
+				<surName>Fransson</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Senior Curator</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>Thord.Fransson@nrm.se</electronicMailAddress>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Thord</givenName>
+				<surName>Fransson</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Senior Curator</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>Thord.Fransson@nrm.se</electronicMailAddress>
+		</metadataProvider>
+		<pubDate>
+			2023-03-17
+		</pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>This database contains information about bird ringing in Sweden.</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>Covers Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>8</westBoundingCoordinate>
+					<eastBoundingCoordinate>26</eastBoundingCoordinate>
+					<northBoundingCoordinate>70</northBoundingCoordinate>
+					<southBoundingCoordinate>55</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<temporalCoverage>
+                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+                <sos:LivingTimePeriod></sos:LivingTimePeriod>
+                <sos:StartDate>1913</sos:StartDate>
+                <sos:EndDate></sos:EndDate>
+            </temporalCoverage>
+			<taxonomicCoverage>
+                <sos:TaxonomicDescription>Birds</sos:TaxonomicDescription>
+                <taxonId>4000104</taxonId>
+                <sos:TaxonList></sos:TaxonList>
+            </taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para></para>
+			</description>
+			<maintenanceUpdateFrequency>irregular</maintenanceUpdateFrequency>
+		</maintenance>
+
+		<contact>
+			<individualName>
+				<givenName>Thord</givenName>
+				<surName>Fransson</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Senior Curator</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>Thord.Fransson@nrm.se</electronicMailAddress>
+		</contact>
+	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2011-08-03T03:38:41.685+02:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Fransson T (2023). Bird Ringing Centre in Sweden (NRM). Version 19.9. Swedish Museum of Natural History. Occurrence dataset. https://www.gbif.se/ipt/resource?r=nrm-ringedbirds&amp;v=19.9</citation>
+				<dc:replaces>4f70108a-dda7-4e8b-8298-babaee5182c3/v19.9.xml</dc:replaces>
+			</gbif>
+		</metadata>
+	</additionalMetadata>
+</eml:eml>

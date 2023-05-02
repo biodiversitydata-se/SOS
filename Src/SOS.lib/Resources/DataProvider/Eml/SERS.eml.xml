@@ -15,46 +15,31 @@
 		<title xml:lang="eng">SLU Aqua  Institute of Freshwater Research Swedish Electrofishing Registry - SERS</title>
 		<creator>
 			<individualName>
-				<givenName>Erik</givenName>
-				<surName>Myrstener</surName>
+				<givenName>Anders</givenName>
+				<surName>Kinnerbäck</surName>
 			</individualName>
-			<organizationName>Swedish Museum of Natural History</organizationName>
-			<positionName>Database Developer</positionName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Administrator</positionName>
 			<address>
-				<city>Stockholm</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>SERS@slu.se</electronicMailAddress>
+			<electronicMailAddress>Anders.Kinnerback@slu.se</electronicMailAddress>
 		</creator>
 		<metadataProvider>
 			<individualName>
 				<givenName>Erik</givenName>
 				<surName>Myrstener</surName>
 			</individualName>
-			<organizationName>SLU Aqua</organizationName>
-			<positionName>Research Assistant</positionName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Environmental analyst</positionName>
 			<address>
-				<city>Drottningholm</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>SERS@slu.se</electronicMailAddress>
+			<electronicMailAddress>erik.myrstener@slu.se</electronicMailAddress>
 		</metadataProvider>
-		<associatedParty>
-			<individualName>
-				<givenName>Erik</givenName>
-				<surName>Myrstener</surName>
-			</individualName>
-			<organizationName>Swedish Museum of Natural History</organizationName>
-			<positionName>Database Developer</positionName>
-			<address>
-				<city>Stockholm</city>
-				<country>SE</country>
-			</address>
-			<electronicMailAddress>SERS@slu.se</electronicMailAddress>
-			<role></role>
-		</associatedParty>
 		<pubDate>
-			
 		</pubDate>
 		<language>eng</language>
 		<abstract>
@@ -103,6 +88,12 @@
 					<southBoundingCoordinate>54.96</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
+			<temporalCoverage>
+                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+                <sos:LivingTimePeriod></sos:LivingTimePeriod>
+                <sos:StartDate>1951</sos:StartDate>
+                <sos:EndDate></sos:EndDate>
+            </temporalCoverage>
 			<taxonomicCoverage>
 				<generalTaxonomicCoverage>Pisces</generalTaxonomicCoverage>
 				<taxonomicClassification>
@@ -115,21 +106,20 @@
 			<description>
 				<para></para>
 			</description>
-			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+			<maintenanceUpdateFrequency>irregular</maintenanceUpdateFrequency>
 		</maintenance>
-
 		<contact>
 			<individualName>
 				<givenName>Erik</givenName>
 				<surName>Myrstener</surName>
 			</individualName>
-			<organizationName>Swedish Museum of Natural History</organizationName>
-			<positionName>Node manager</positionName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Environmental analyst</positionName>
 			<address>
-				<city>Stockholm</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>SERS@slu.se</electronicMailAddress>
+			<electronicMailAddress>erik.myrstener@slu.se</electronicMailAddress>
 		</contact>
 		<sos:resourceType>occurrence data</sos:resourceType>		
 		<sos:datsetSubtype>census data</sos:datsetSubtype>
@@ -139,7 +129,7 @@
 			<gbif>
 				<dateStamp>2015-07-15T01:27:43.876+02:00</dateStamp>
 				<hierarchyLevel>dataset</hierarchyLevel>
-				<citation>Swedish Electrofishing Register -SERS. yyyy. Swedish University of Agricultural Sciences, Department of Aquatic Resources. https://www.slu.se/elfiskeregistret [yyyy-mm-dd]</citation>
+				<citation>Kinnerbäck A, Myrstener E (2023). SLU Aqua Institute of Freshwater Research Swedish Electrofishing Registry - SERS. Department of Aquatic resources, SLU. Occurrence dataset. https://www.slu.se/elfiskeregistret [yyyy-mm-dd]</citation>
 				<formationPeriod>1951-current</formationPeriod>
 				<livingTimePeriod>1951-current</livingTimePeriod>				
 			</gbif>

@@ -15,16 +15,16 @@
 		<title xml:lang="eng">SLU Aqua Institute of Coastal Research Database for Coastal Fish - KUL</title>
 		<creator>
 			<individualName>
-				<givenName>Manash</givenName>
-				<surName>Shah</surName>
+				<givenName>Anders</givenName>
+				<surName>Kinnerbäck</surName>
 			</individualName>
-			<organizationName>Swedish Museum of Natural History</organizationName>
-			<positionName>Database Developer</positionName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Administrator</positionName>
 			<address>
-				<city>Stockholm</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>manash.shah@nrm.se</electronicMailAddress>
+			<electronicMailAddress>Anders.Kinnerback@slu.se</electronicMailAddress>
 		</creator>
 		<metadataProvider>
 			<individualName>
@@ -39,22 +39,7 @@
 			</address>
 			<electronicMailAddress>ylva.ericson@slu.se</electronicMailAddress>
 		</metadataProvider>
-		<associatedParty>
-			<individualName>
-				<givenName>Manash</givenName>
-				<surName>Shah</surName>
-			</individualName>
-			<organizationName>Swedish Museum of Natural History</organizationName>
-			<positionName>Database Developer</positionName>
-			<address>
-				<country>SE</country>
-			</address>
-			<electronicMailAddress>manash.shah@nrm.se</electronicMailAddress>
-			<role>user</role>
-		</associatedParty>
-		<pubDate>
-			
-		</pubDate>
+		<pubDate>2023-04-06</pubDate>
 		<language>eng</language>
 		<abstract>
 			<para>The Department of Aquatic Resources (SLU Aqua) at the Swedish University of Agricultural Sciences is responsible of collecting and checking test-fishing data generated in national and regional environmental programs on behalf of the Swedish Agency for Marine and Water Management. The test fishing is performed with standardized methods. SLU Aqua also collect test-fishing data from several other types of investigations (e g recipient monitoring). The purpose is to facilitate obtaining data of high quality for research, national investigations and reports. The database also serves as a reference for local and regional investigations. Data is available for the public on https://www.slu.se/kul.</para>
@@ -99,6 +84,12 @@
 					<southBoundingCoordinate>55.57</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
+			<temporalCoverage>
+                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+                <sos:LivingTimePeriod></sos:LivingTimePeriod>
+                <sos:StartDate>1988</sos:StartDate>
+                <sos:EndDate></sos:EndDate>
+            </temporalCoverage>
 			<taxonomicCoverage>
 				<generalTaxonomicCoverage>Pisces</generalTaxonomicCoverage>
 				<taxonomicClassification>
@@ -111,21 +102,33 @@
 			<description>
 				<para></para>
 			</description>
-			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+			<maintenanceUpdateFrequency>irregular</maintenanceUpdateFrequency>
 		</maintenance>
-
 		<contact>
 			<individualName>
 				<givenName>Anders</givenName>
-				<surName>Telenius</surName>
+				<surName>Kinnerbäck</surName>
 			</individualName>
-			<organizationName>Swedish Museum of Natural History</organizationName>
-			<positionName>Node manager</positionName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Administrator</positionName>
 			<address>
-				<city>Stockholm</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>anders.telenius@nrm.se</electronicMailAddress>
+			<electronicMailAddress>Anders.Kinnerback@slu.se</electronicMailAddress>
+		</contact>
+		<contact>
+			<individualName>
+				<givenName>Malin</givenName>
+				<surName>Werner</surName>
+			</individualName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Uppsala</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>malin.werner@slu.se</electronicMailAddress>
 		</contact>
 		<sos:resourceType>occurrence data</sos:resourceType>		
 		<sos:datsetSubtype>census data</sos:datsetSubtype>

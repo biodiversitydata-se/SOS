@@ -11,7 +11,7 @@
 	<dataset>
 		<identifier>33ac455a-9356-bbcd-f4d3-fe346567dc32</identifier>
         <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:MVM</alternateIdentifier>
-        <title>MVM</title>
+        <title>Miljödata MVM</title>
 		<creator>
 			<organizationName>Environmental data MVM, SLU</organizationName>
 			<address>
@@ -64,7 +64,7 @@
             <temporalCoverage>
                 <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
                 <sos:LivingTimePeriod></sos:LivingTimePeriod>
-                <sos:StartDate></sos:StartDate>
+                <sos:StartDate>1964</sos:StartDate>
                 <sos:EndDate></sos:EndDate>
             </temporalCoverage>
             <taxonomicCoverage>
@@ -124,7 +124,7 @@
             </metadata>
         </additionalMetadata>
         <citations>
-            <sos:ResourceCitation></sos:ResourceCitation>
+            <sos:ResourceCitation>Miljödata-MVM [yyyy]. Swedish University of Agricultural Sciences (SLU). National data host lakes and watercourses, and national data host agricultural land, https://miljodata.slu.se/mvm/ [yyyy-mm-dd or dd/mm/yyyy]</sos:ResourceCitation>
         </citations>
 	</dataset>
 </eml:eml>

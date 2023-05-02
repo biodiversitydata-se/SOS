@@ -54,19 +54,19 @@
 		</intellectualRights>
 		<coverage>
 			<geographicCoverage>
-				<geographicDescription>This resource covers Sweden.</geographicDescription>
+				<geographicDescription>This resource covers areas of the Skagerrak and Kattegat off the West coast of Sweden.</geographicDescription>
 				<boundingCoordinates>
-					<westBoundingCoordinate>0.0</westBoundingCoordinate>
-					<eastBoundingCoordinate>0.0</eastBoundingCoordinate>
-					<northBoundingCoordinate>0.0</northBoundingCoordinate>
-					<southBoundingCoordinate>0.0</southBoundingCoordinate>
+					<westBoundingCoordinate>10.10</westBoundingCoordinate>
+					<eastBoundingCoordinate>12.90</eastBoundingCoordinate>
+					<northBoundingCoordinate>58.67</northBoundingCoordinate>
+					<southBoundingCoordinate>55.75</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
             <temporalCoverage>
                 <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
                 <sos:LivingTimePeriod></sos:LivingTimePeriod>
-                <sos:StartDate></sos:StartDate>
-                <sos:EndDate></sos:EndDate>
+                <sos:StartDate>2010-01-01</sos:StartDate>
+                <sos:EndDate>2010-12-31</sos:EndDate>
             </temporalCoverage>
             <taxonomicCoverage>
                 <sos:TaxonomicDescription>Fish</sos:TaxonomicDescription>

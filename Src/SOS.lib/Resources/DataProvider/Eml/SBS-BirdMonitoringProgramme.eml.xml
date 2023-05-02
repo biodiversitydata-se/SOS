@@ -1,0 +1,368 @@
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+         xmlns:dc="http://purl.org/dc/terms/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+         packageId="093d659d-99e1-4bd0-9de7-6330b361ea54/v1.4" system="http://gbif.org" scope="system"
+         xml:lang="eng">
+
+	<dataset>
+		<alternateIdentifier>093d659d-99e1-4bd0-9de7-6330b361ea54</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=lu_sft_kfr</alternateIdentifier>
+		<title xml:lang="eng">Swedish Bird Survey: Swedish coastal bird monitoring programme (Nationella kustfågelövervakningen)</title>
+		<creator>
+			<individualName>
+				<givenName>Fredrik</givenName>
+				<surName>Haas</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>PhD, Researcher</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>fageltaxering@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biology.lu.se/fredrik-haas</onlineUrl>
+		</creator>
+		<creator>
+			<individualName>
+				<givenName>Martin</givenName>
+				<surName>Green</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>PhD, Researcher</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>fageltaxering@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biology.lu.se/martin-green</onlineUrl>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Fredrik</givenName>
+				<surName>Haas</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>PhD, Researcher</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>fageltaxering@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biology.lu.se/fredrik-haas</onlineUrl>
+		</metadataProvider>
+		<metadataProvider>
+			<individualName>
+				<givenName>Martin</givenName>
+				<surName>Green</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>PhD, Researcher</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>fageltaxering@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biology.lu.se/martin-green</onlineUrl>
+		</metadataProvider>
+		<metadataProvider>
+			<individualName>
+				<givenName>Annelie</givenName>
+				<surName>Jönsson</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>PhD, Researcher</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>naturdatavardskap@biol.lu.se</electronicMailAddress>
+		</metadataProvider>
+		<associatedParty>
+			<individualName>
+				<givenName>Mathieu</givenName>
+				<surName>Blanchet</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>IT developer</positionName>
+			<electronicMailAddress>mathieu.blanchet@biol.lu.se</electronicMailAddress>
+			<role>programmer</role>
+		</associatedParty>
+		<pubDate>
+			2022-09-26
+		</pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>The Swedish coastal bird monitoring programme (aka the ”Archipelago squares”/”Kustfågelrutorna”) is one of several schemes within the Swedish Bird Survey (see below), run by the Department of Biology at Lund University.</para>
+			<para>The survey scheme was initiated in 2015 as a standardized method for detecting and reporting changes in the abundance of coastal and archipelagic birds and their distributions in Sweden over time.</para>
+			<para>The 200 archipelago squares are distributed along the Swedish coastline and are surveyed during the breeding season.</para>
+			<para>In this dataset, some information is placed in the table ExtendedMeasurementOrFacts (eMoF), which is part of the Source Archive available to download directly from the dataset’s page here on gbif.org. The Source Archive contains the data exactly as uploaded to gbif (verbatim). Should you choose to download the dataset as GBIF Annotated Archive instead, the data has been interpreted and quality controlled by gbif, but, the data in the eMoF will not be included as the eMoF extension is not yet supported by gbif.</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Samplingevent</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<additionalInfo>
+			<para>
+				Important information for potential users of the Archipelago squares data:
+
+				1) The data shown in this Darwin core archive are, for each bird species, the sum total of all individuals observed in the entire square during this visit. Numbers registered on islands vs open water are not included in the DwC archive. Mammals are reported as present/absent.
+
+				2) Null visits and zero observations: Users of the data have to construct zero data for each species themselves. The occurrence table contains observations of species that were actually present at the surveyed sites, but the surveyor would have looked for all species that are included in the survey design. For visits to sites where no observations were made at all (when such null visits exist), the occurrence table also includes one zero observation with vernacularName set to &quot;SpeciesIncludedInSurvey&quot;, and occurrenceStatus set to &quot;Absent&quot;. This is to ensure that information about surveyor is included in the DwC-A also for these events. Additionally, information about whether a visit is a nullvisit (i.e. true = no survey species observed) or not (i.e. false = one or more survey species were observed) is included in the ”extended measurement or fact table”.
+
+				3) The coordinates supplied are for the central point of a 5 x 5 km square, within which the central point of the survey square is located.
+
+				4) The sample size reported in the DwC archive is the area of each square. Some of the original 2 x 2 km squares have had their borders redrawn to include the whole of islands otherwise situated right on the border, resulting in larger sampling areas.
+
+				5) Breeding vs migrating birds: The surveyor is expected to report all birds seen or heard. This survey is carried out at the time of year when most birds have just started breeding. One can therefore assume that the very majority of birds that are registered are actually breeding, or attempting to breed, in the location where they were registered. There are however some notable exceptions. Some of the species registered do not breed in Sweden, and are instead migrating individuals; for example Brent Goose (prutgås), Greater White-fronted Goose (bläsgås) and Grey Plover (kustpipare). For some species breeding in the far north of Sweden, individuals are seen further south as they are on their way to or from the breeding grounds. Examples of such species are Bar-tailed Godwit (myrspov), Spotted Redshank ( svartsnäppa) and Wood Sandpiper (grönbena). There are also reports of uncommon species that are yet to be confirmed as breeding in Sweden, but where it is possible that the individual registered was actually breeding at the location. Regardless of which of the described situations applies, all data is included in the dataset, and it is the user’s responsibility to decide how to use the data.
+			</para>
+		</additionalInfo>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">http://www.fageltaxering.lu.se</url>
+			</online>
+		</distribution>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>All data is collected within Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>10.957</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.167</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.06</northBoundingCoordinate>
+					<southBoundingCoordinate>55.336</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<temporalCoverage>
+				<rangeOfDates>
+					<beginDate>
+						<calendarDate>2015-05-15</calendarDate>
+					</beginDate>
+					<endDate>
+						<calendarDate>2021-06-24</calendarDate>
+					</endDate>
+				</rangeOfDates>
+			</temporalCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>
+					All species within the following groups are surveyed:
+					Ducks, geese and swans (Anatidae)
+					Grebes (Podicipedidae)
+					Divers (Gaviidae)
+					Waders, gulls and auks (Charadriiformes)
+					Cormorants (Phalacrocoracidae)
+					Herons (Ardeidae)
+
+					The following species are also included in the survey:
+					Rock pipit (Anthus petrosus)
+					Eurasian coot (Fulica atra) (from 2016)
+					Common crane (Grus grus) (from 2016)
+					Osprey (Pandion haliaetus)
+					White-tailed eagle (Haliaeetus albicilla)
+					Crow (Corvus corone)
+					Raven (Corvus corax)
+					American mink (Neovison vison)
+					Red fox (Vulpes vulpes) (from 2021)
+					Badger (Meles meles) (from 2021)
+
+					Species with a security class 4 or higher (according to the Swedish species information centre (Artdatabanken)) are not shown in this dataset. Currently this concerns one species only: White-tailed eagle (havsörn; Haliaeetus albicilla). In addition, razorbills and guillemots on Stora Karlsö (square I0002) are at present not included here.
+
+					All observed individuals (except pulli and juveniles) of the above mentioned bird species are counted.
+
+					Special case: In some counties counting Common eider pulli is or has been optional while in other counties it is mandatory. Information about whether common eider pulli have been counted or not can be found in the &quot;extended measurement or fact table&quot;.
+
+					Mammalian predators are recorded with presence/absence only.
+				</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>kingdom</taxonRankName>
+					<taxonRankValue>Animalia</taxonRankValue>
+					<commonName>Animals</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Chordata</taxonRankValue>
+					<commonName>Chordates</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Aves</taxonRankValue>
+					<commonName>Birds</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Mammalia</taxonRankValue>
+					<commonName>Mammals</commonName>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<purpose>
+			<para>National environmental monitoring of birds.</para>
+		</purpose>
+		<maintenance>
+			<description>
+				<para>New data are added to the dataset yearly when the survey of that year is completed and data has been quality checked. In between these yearly updates the data is corrected as required.</para>
+			</description>
+			<maintenanceUpdateFrequency>annually</maintenanceUpdateFrequency>
+		</maintenance>
+
+		<contact>
+			<individualName>
+				<givenName>Fredrik</givenName>
+				<surName>Haas</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>PhD, Researcher</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>fageltaxering@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biology.lu.se/fredrik-haas</onlineUrl>
+		</contact>
+		<contact>
+			<individualName>
+				<givenName>Martin</givenName>
+				<surName>Green</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>PhD, Researcher</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>fageltaxering@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biology.lu.se/martin-green</onlineUrl>
+		</contact>
+		<methods>
+			<methodStep>
+				<description>
+					<para>See sampling description.</para>
+				</description>
+			</methodStep>
+			<sampling>
+				<studyExtent>
+					<description>
+						<para>
+							Geography: There are 200 archipelago squares (2 x 2 km) distributed along the Swedish coastline. The squares are distributed to the 14 coastal counties in proportion to how many islands there are in each county. A county that contains many islands has been allocated more squares than a county with fewer islands. Each square contains at least one island, and the locations of the squares are fixed.
+
+							Timing and frequency: The aim is for all squares to be surveyed once every year during the main breeding season for the majority of species. Since Sweden is a long country the survey is carried out during different time intervals in different parts of the country:
+
+							All counties south of Gävleborg county: 20 May – 5 June
+							Gävleborg county: 25 May – 10 June
+							Västernorrland county: 1 – 15 June
+							Västerbotten county: 5 – 20 June
+							Norrbotten county: 10 – 25 June
+
+							So far a minimum of 184 squares have been surveyed each year since the start of the programme in 2015, and all 200 squares were covered in two years (2018 and 2020).
+						</para>
+					</description>
+				</studyExtent>
+				<samplingDescription>
+					<para>
+						The archipelago squares are surveyed mainly by boat. All islands located within a square are scanned from a distance of maximum 50 metres as the boat is driven around them. Some predetermined islands are surveyed by going ashore, and this is repeated every year.
+
+						All birds within a square should be counted regardless of whether they are on/near the islands or out on open water. In the counties of Norrbotten, Västerbotten, Västernorrland and Gävleborg it is mandatory to register the numbers of birds on open water vs on islands including the surrounding 100m buffer of water. For all other counties this is optional.
+
+						The boat is driven in such a way as to minimize the distance travelled. Hence, open water is only scanned on the route to/from/around islands.
+
+						The surveyors do their best to determine whether birds close to the square border are within it or outside.
+
+						The two squares I0002 and I0003 (containing the very bird rich islands Stora Karlsö and Lilla Karlsö) are not surveyed in the same way as other squares. Here the survey is instead carried out in a number of subsquares on the islands. In addition, razorbills and guillemots are surveyed by a different organisation on Stora Karlsö (I0002) and data for these species are therefore not included here at present.
+
+						All individuals except for pulli and juveniles are counted. However, in 2017 counting common eider pulli was introduced. Counting eider pulli was mandatory in eight of the 14 counties from the start, but optional in the others. It became mandatory in 2018 in Halland and Uppsala and in 2020 in Gävleborg, Norrbotten and Västerbotten, but it is still optional in Gotland. Where eider pulli are counted, the dominating size class of the total number of pulli within a square is also reported according to this scale:
+						Size class 1 includes pulli that are &lt; 25 % of the adult size.
+						Size class 2 includes pulli that are 25-50 % of the adult size.
+						Size class 3 includes pulli that are 50-75 % of the adult size.
+						Size class 4 includes pulli that are &gt; 75% of the adult size.
+					</para>
+				</samplingDescription>
+			</sampling>
+			<qualityControl>
+				<description>
+					<para>Data is checked and validated by the project leaders, specifically species identity, numbers and geographical location. Confidence in the data is good.</para>
+				</description>
+			</qualityControl>
+		</methods>
+		<project >
+			<title>Swedish Bird Survey (Svensk Fågeltaxering)</title>
+			<personnel>
+				<individualName>
+					<givenName>Fredrik</givenName>
+					<surName>Haas</surName>
+				</individualName>
+				<role>author</role>
+			</personnel>
+			<personnel>
+				<individualName>
+					<givenName>Martin</givenName>
+					<surName>Green</surName>
+				</individualName>
+				<role>author</role>
+			</personnel>
+			<personnel>
+				<individualName>
+					<givenName>Åke</givenName>
+					<surName>Lindström</surName>
+				</individualName>
+				<role>author</role>
+			</personnel>
+			<abstract>
+				<para>
+					The Swedish Bird Survey (Svensk Fågeltaxering) is a subprogramme within national environmental monitoring in Sweden. The Swedish Bird Survey is run by the Department of Biology at Lund University. It includes several survey schemes: fixed routes (standardrutter), summer and winter point count routes (sommar- och vinterpunktrutter), night routes (nattrutter), the Swedish waterfowl count (Sjöfågel höst och vinter), and the Swedish coastal bird monitoring programme (Nationella kustfågelövervakningen).
+
+					The work is carried out in collaboration with, and is supported by, the Swedish Environmental Protection Agency and the County Administrative Boards. The Swedish Bird Survey is the Swedish representative in the European Bird Census Council (EBCC).
+
+					All the survey schemes mentioned above serve to monitor changes in the Swedish bird populations. Since 1975, experienced and competent ornithologists volunteer to count birds in more than a thousand locations across Sweden, at different times of the year. Since the surveys are carried out in the same way each year, the outcome can be compared between years and hence changes detected.
+				</para>
+			</abstract>
+			<funding>
+				<para>The Swedish Environmental Protection Agency supports the Swedish Bird Survey. Most of the County Administrative Boards fund some of the survey schemes at a regional scale.</para>
+			</funding>
+			<studyAreaDescription>
+				<descriptor name="generic"
+							citableClassificationSystem="false">
+					<descriptorValue>Sweden</descriptorValue>
+				</descriptor>
+			</studyAreaDescription>
+			<designDescription>
+				<description>
+					<para>See the project website (www.fageltaxering.lu.se, in Swedish) for descriptions of the individual survey schemes.</para>
+				</description>
+			</designDescription>
+		</project>
+	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2021-03-10T09:17:08.815+01:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Haas F, Green M (2022): Swedish Bird Survey: Swedish coastal bird monitoring programme (Nationella kustfågelövervakningen). v1.4. Department of Biology, Lund University. Dataset/Samplingevent. https://www.gbif.se/ipt/resource?r=lu_sft_kfr&amp;v=1.4</citation>
+				<bibliography>
+					<citation>HELCOM (2018). Abundance of waterbirds in the breeding season. HELCOM core indicator report. See https://helcom.fi/media/core%20indicators/Abundance-of-waterbirds-in-the-breeding-season-HELCOM-core-indicator-2018.pdf</citation>
+				</bibliography>
+				<resourceLogoUrl>https://www.gbif.se/ipt/logo.do?r=lu_sft_std</resourceLogoUrl>
+				<dc:replaces>093d659d-99e1-4bd0-9de7-6330b361ea54/v1.4.xml</dc:replaces>
+			</gbif>
+		</metadata>
+	</additionalMetadata>
+</eml:eml>

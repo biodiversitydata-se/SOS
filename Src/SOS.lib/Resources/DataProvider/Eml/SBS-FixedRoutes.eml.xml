@@ -1,0 +1,309 @@
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+         xmlns:dc="http://purl.org/dc/terms/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+         packageId="91fa1a0d-a208-40aa-8a6e-f2c0beb9b253/v1.12" system="http://gbif.org" scope="system"
+         xml:lang="eng">
+
+	<dataset>
+		<alternateIdentifier>91fa1a0d-a208-40aa-8a6e-f2c0beb9b253</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=lu_sft_std</alternateIdentifier>
+		<title xml:lang="eng">Swedish Bird Survey: Fixed routes (Standardrutterna)</title>
+		<creator>
+			<individualName>
+				<givenName>Åke</givenName>
+				<surName>Lindström</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>Professor</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>fageltaxering@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biology.lu.se/ake-lindstrom</onlineUrl>
+			<userId directory="http://orcid.org/">0000-0002-5597-6209</userId>
+		</creator>
+		<creator>
+			<individualName>
+				<givenName>Martin</givenName>
+				<surName>Green</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>PhD, Researcher</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>fageltaxering@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biology.lu.se/martin-green</onlineUrl>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Åke</givenName>
+				<surName>Lindström</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>Professor</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>fageltaxering@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biology.lu.se/ake-lindstrom</onlineUrl>
+			<userId directory="http://orcid.org/">0000-0002-5597-6209</userId>
+		</metadataProvider>
+		<associatedParty>
+			<individualName>
+				<givenName>Mathieu</givenName>
+				<surName>Blanchet</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>IT</positionName>
+			<address>
+				<deliveryPoint>Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>mathieu.blanchet@biol.lu.se</electronicMailAddress>
+			<role>programmer</role>
+		</associatedParty>
+		<pubDate>
+			2022-07-08
+		</pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>The fixed routes (standardrutterna) are one of several schemes within the Swedish Bird Survey (see below), run by the Department of Biology at Lund University, on behalf of the Swedish Environmental Protection Agency. The fixed routes were initiated in 1996 as a standardized method for detecting and reporting changes in the abundance of birds (since 1996) and mammals (since 2011), and their distributions in Sweden over time.</para>
+			<para>This is possible due to the routes being distributed across Sweden in such a way that all main habitats are surveyed in a representative manner, and by counting birds and mammals using the same methods, in the same locations, year after year.</para>
+			<para>The surveys are carried out by volunteer ornithologists.</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Samplingevent</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Samplingevent</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<additionalInfo>
+			<para>
+				Important information for potential users of the Fixed route data:
+
+				1) The data shown in this Darwin core archive are, for each bird or mammal species, the sum of all individuals on all the line transects during this visit.
+
+				2) The coordinates supplied are for the central point of each 25 x 25 km square of the survey grid, within which the route is situated.
+
+				3) Breeding vs migrating birds: The survey person is expected to report all birds seen or heard. This survey is carried out at the time of year when most birds have just started breeding. One can therefore assume that the very majority of birds that are registered are actually breeding, or attempting to breed, in the location where they were registered. There are however some notable exceptions. Some of the species registered do not breed in Sweden, and are instead migrating individuals; for example Brent Goose (prutgås), Greater White-fronted Goose (bläsgås) and Grey Plover (kustpipare). For some species breeding in the far north of Sweden, individuals are seen further south as they are on their way to or from the breeding grounds. Examples of such species are Bar-tailed Godwit (myrspov), Spotted Redshank (svartsnäppa) and Wood Sandpiper (grönbena). There are also reports of uncommon species that are yet to be confirmed as breeding in Sweden, but where it’s possible that the individual registered was actually breeding at the location. Regardless of which of the described situations applies, all data is included in the dataset, and it is the user’s responsibility to decide how to use the data.
+
+				4) Adults vs young of the year: Some birds start breeding early enough for the young to have left the nest at the time of the survey. These young of the year are not normally included in the numbers reported, but for some species it cannot be ruled out that some are indeed included. For the three Loxia species, breeding already in late winter, young of the year definitely constitute a large part of the birds registered.
+			</para>
+		</additionalInfo>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">http://www.fageltaxering.lu.se</url>
+			</online>
+		</distribution>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>All data is collected within Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>10.957</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.167</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.06</northBoundingCoordinate>
+					<southBoundingCoordinate>55.336</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<temporalCoverage>
+				<rangeOfDates>
+					<beginDate>
+						<calendarDate>1996-05-23</calendarDate>
+					</beginDate>
+					<endDate>
+						<calendarDate>2021-07-06</calendarDate>
+					</endDate>
+				</rangeOfDates>
+			</temporalCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>
+					All bird species in Sweden occurring naturally in the wild are included in the survey. Since 2011, also the following mammals (approximately, all larger than rodents) are included in the survey: Western European hedgehog, Eurasian red squirrel, Eurasian beaver, European hare, mountain hare, European rabbit, Eurasian lynx, grey wolf, red fox, brown bear, stoat, least weasel, American mink, western polecat, pine marten, wolverine, Eurasian otter, Eurasian badger, wild boar, moose, European roe deer, red deer, fallow deer, harbor seal, grey seal and ringed seal.
+
+					Species with a security class 4 or higher (according to the Swedish species information centre (Artdatabanken)) are not shown in this dataset at present. Currently these species are: Lesser white-fronted goose (fjällgås; Anser erythropus), Golden eagle (kungsörn; Aquila chrysaetos),  White-tailed eagle (havsörn; Haliaeetus albicilla), Pallid harrier (stäpphök; Circus macrourus),  Montagu’s harrier (ängshök; Circus pygargus), Peregrine falcon (pilgrimsfalk; Falco peregrinus), Gyrfalcon (jaktfalk; Falco rusticolus), Eagle owl (berguv; Bubo bubo), Snowy owl (fjälluggla; Bubo scandiacus), White-backed woodpecker (vitryggig hackspett; Dendrocopos leucotos), Eurasian lynx (lo; Lynx lynx), Brown bear (brunbjörn; Ursus arctos), Wolverine (järv; Gulo gulo) and Arctic fox (fjällräv; (Vulpes lagopus).
+				</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>kingdom</taxonRankName>
+					<taxonRankValue>Animalia</taxonRankValue>
+					<commonName>Animals</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Chordata</taxonRankValue>
+					<commonName>Chordates</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Aves</taxonRankValue>
+					<commonName>Birds</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Mammalia</taxonRankValue>
+					<commonName>Mammals</commonName>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<purpose>
+			<para>National environmental monitoring of birds and mammals.</para>
+		</purpose>
+		<maintenance>
+			<description>
+				<para>New data are added to the dataset yearly when the survey of that year is completed and data has been quality checked. In between these yearly updates the data is corrected as required.</para>
+			</description>
+			<maintenanceUpdateFrequency>annually</maintenanceUpdateFrequency>
+		</maintenance>
+
+		<contact>
+			<individualName>
+				<givenName>Åke</givenName>
+				<surName>Lindström</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>Professor</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>fageltaxering@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biology.lu.se/ake-lindstrom</onlineUrl>
+			<userId directory="http://orcid.org/">0000-0002-5597-6209</userId>
+		</contact>
+		<contact>
+			<individualName>
+				<givenName>Martin</givenName>
+				<surName>Green</surName>
+			</individualName>
+			<organizationName>Lund University</organizationName>
+			<positionName>PhD, Researcher</positionName>
+			<address>
+				<deliveryPoint>Ecology building, Sölvegatan 37</deliveryPoint>
+				<city>Lund</city>
+				<postalCode>223 62</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>fageltaxering@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biology.lu.se/martin-green</onlineUrl>
+		</contact>
+		<methods>
+			<methodStep>
+				<description>
+					<para>See sampling description</para>
+				</description>
+			</methodStep>
+			<sampling>
+				<studyExtent>
+					<description>
+						<para>
+							Geography and habitat: In total there are 716 Fixed routes systematically distributed across Sweden in a 25 by 25 km grid. This means that all main habitats are surveyed in a representative manner.
+
+							Timing and frequency: The survey should be carried out in the main breeding season for the majority of species. Hence the date for the survey will vary across the country (approximately 20 May-5 July). Start time should be 04:00 (+/-30 min), but no earlier than 30 minutes before sunrise. Each route should ideally be surveyed once per year, but each year there are routes that were not surveyed. These are prioritised the following year.
+						</para>
+					</description>
+				</studyExtent>
+				<samplingDescription>
+					<para>
+						General layout: A fixed route consists of eight 1km-line transects and eight 5minute-points, along a 2 by 2 km square. Line transects and points should be considered as two separate surveys. (NOTE: some routes consist of less than eight lines and/or points. This is the case when lines/points end up e.g. in a lake or the sea due routes being distributed in a standardised grid. However, a particular route has the same number of lines and points each year it is surveyed.)
+
+						A given animal can occur on one point and one line, but double-counting the same animal on two points or two lines should be avoided. All birds (excluding young of the year) and mammals (including young of the year, but see the species list) seen or heard are registered no matter how near or far from the line or point they are.
+
+						Line transects: Counting is carried out while slowly walking, stopping to listen and watch as necessary, during approximately 30-40 minutes per km depending on the terrain.
+
+						Point counts: Birds and mammals are counted while standing still for 5 minutes at each point.
+					</para>
+				</samplingDescription>
+			</sampling>
+			<qualityControl>
+				<description>
+					<para>Data is checked and validated by the project leaders, specifically species identity, numbers and geographical location. Confidence in the data is good.</para>
+				</description>
+			</qualityControl>
+		</methods>
+		<project >
+			<title>Swedish Bird Survey (Svensk Fågeltaxering)</title>
+			<personnel>
+				<individualName>
+					<givenName>Åke</givenName>
+					<surName>Lindström</surName>
+				</individualName>
+				<userId directory="http://orcid.org/">0000-0002-5597-6209</userId>
+				<role>author</role>
+			</personnel>
+			<personnel>
+				<individualName>
+					<givenName>Martin</givenName>
+					<surName>Green</surName>
+				</individualName>
+				<role>author</role>
+			</personnel>
+			<personnel>
+				<individualName>
+					<givenName>Fredrik</givenName>
+					<surName>Haas</surName>
+				</individualName>
+				<role>author</role>
+			</personnel>
+			<abstract>
+				<para>
+					The Swedish Bird Survey (Svensk Fågeltaxering) is a subprogramme within national environmental monitoring in Sweden. The Swedish Bird Survey is run by the Department of Biology at Lund University. It includes several survey schemes: fixed routes (standardrutter), summer and winter point count routes (sommar- och vinterpunktrutter), night routes (nattrutter), the Swedish waterfowl count (Sjöfågel höst och vinter), and the Swedish coastal bird monitoring programme (Nationella kustfågelövervakningen).
+
+					The work is carried out on behalf of the Swedish Environmental Protection Agency, and in collaboration with the County Administrative Boards. The Swedish Bird Survey is the Swedish representative in the European Bird Census Council (EBCC).
+
+					All the survey schemes mentioned above serve to monitor changes in the Swedish bird populations. Since 1975, experienced and competent ornithologists volunteer to count birds in more than a thousand locations across Sweden, at different times of the year. Since the surveys are carried out in the same way each year, the outcome can be compared between years and hence changes detected.
+				</para>
+			</abstract>
+			<funding>
+				<para>The Swedish Environmental Protection Agency supports the Swedish Bird Survey. Most of the County Administrative Boards fund some of the survey schemes at a regional scale.</para>
+			</funding>
+			<studyAreaDescription>
+				<descriptor name="generic"
+							citableClassificationSystem="false">
+					<descriptorValue>Sweden</descriptorValue>
+				</descriptor>
+			</studyAreaDescription>
+			<designDescription>
+				<description>
+					<para>See the project website (www.fageltaxering.lu.se, in Swedish) for descriptions of the individual survey schemes.</para>
+				</description>
+			</designDescription>
+		</project>
+	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2020-01-30T09:09:28.994+01:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Lindström Å, Green M (2022): Swedish Bird Survey: Fixed routes (Standardrutterna). v1.12. Department of Biology, Lund University. Dataset/Samplingevent. https://www.gbif.se/ipt/resource?r=lu_sft_std&amp;v=1.12</citation>
+				<bibliography>
+					<citation>Lindström, Å., Svensson, S., Green, M. &amp; Ottvall, R. 2007. Distribution and population changes of two subspecies of Chiffchaff Phylloscopus collybita in Sweden. – Ornis Svecica 17: 137–147.</citation>
+					<citation identifier="doi: 10.1111/1365-2656.12035">Davey, C., Devictor, V., Jonzén, N., Lindström, Å. &amp; Smith, H. G. 2013. Impact of climate change on communities: revealing species contribution. – J. Anim. Ecol. 82:551–561.</citation>
+				</bibliography>
+				<resourceLogoUrl>https://www.gbif.se/ipt/logo.do?r=lu_sft_std</resourceLogoUrl>
+				<dc:replaces>91fa1a0d-a208-40aa-8a6e-f2c0beb9b253/v1.12.xml</dc:replaces>
+			</gbif>
+		</metadata>
+	</additionalMetadata>
+</eml:eml>
