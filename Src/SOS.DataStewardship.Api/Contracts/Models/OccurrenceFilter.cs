@@ -1,32 +1,41 @@
 using SOS.Lib.Swagger;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
 {
-    [SwaggerSchema("Occurrence search filter.")]
+    /// <summary>
+	/// Occurrence search filter.
+	/// </summary>
     public class OccurrenceFilter
     {
-        [SwaggerSchema("Area filter.")]
+        /// <summary>
+		/// Area filter.
+		/// </summary>
         public GeographicsFilter Area { get; set; }
 
-        [SwaggerSchema("DatasetIds filter.")]
+        /// <summary>
+		/// DatasetIds filter.
+		/// </summary>
         public List<string> DatasetIds { get; set; }
 
         [SwaggerExclude]
         public List<string> DatasetList { get; set; }
 
-        [SwaggerSchema("Date filter.")]
+        /// <summary>
+		/// Date filter.
+		/// </summary>
         public DateFilter DateFilter { get; set; }
 
         [SwaggerExclude]
         public DateFilter Datum { get; set; }
 
-        [SwaggerSchema("EventIds filter.")]
+        /// <summary>
+		/// EventIds filter.
+		/// </summary>
         public List<string> EventIds { get; set; }
 
-        [SwaggerSchema("Taxon filter.")]
+        /// <summary>
+		/// Taxon filter.
+		/// </summary>
         public TaxonFilter Taxon { get; set; }
-        
-       
     }
 }

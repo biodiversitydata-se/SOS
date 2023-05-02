@@ -1,18 +1,25 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
 {
-    [SwaggerSchema("Date filter")]
+    /// <summary>
+	/// Date filter
+	/// </summary>
     public class DateFilter
     {        
-        [SwaggerSchema("Event start date specified in the ISO 8601 standard. If no timezone is specified, GMT+1 (CEST) is assumed")]
+        /// <summary>
+		/// Event start date specified in the ISO 8601 standard. If no timezone is specified, GMT+1 (CEST) is assumed
+		/// </summary>
         public DateTime? StartDate { get; set; }
         
-        [SwaggerSchema("Event end date specified in the ISO 8601 standard. If no timezone is specified, GMT+1 (CEST) is assumed")]
+        /// <summary>
+		/// Event end date specified in the ISO 8601 standard. If no timezone is specified, GMT+1 (CEST) is assumed
+		/// </summary>
         public DateTime? EndDate { get; set; }
         
-        [SwaggerSchema("Date filter type")]
+        /// <summary>
+		/// Date filter type
+		/// </summary>
         public DateFilterType DateFilterType { get; set; }
     }
 }
