@@ -1172,7 +1172,8 @@ namespace SOS.Observations.Api.Extensions
                 Point = location.Point,
                 PointWithBuffer = location.PointWithBuffer,
                 PointWithDisturbanceBuffer = location.PointWithDisturbanceBuffer,
-                ProjectId = location.Attributes?.ProjectId
+                ProjectId = location.Attributes?.ProjectId,
+                Type = location.Type
             };
         }
 

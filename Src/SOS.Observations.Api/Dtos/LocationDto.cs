@@ -1,4 +1,5 @@
 ﻿using Nest;
+using SOS.Lib.Enums;
 
 namespace SOS.Observations.Api.Dtos
 {
@@ -159,5 +160,10 @@ namespace SOS.Observations.Api.Dtos
         /// Id of project
         /// </summary>
         public int? ProjectId { get; set; }
+
+        /// <summary>
+        /// Location type, point, polygon or unknown
+        /// </summary>
+        public LocationType? Type { get; set; }
     }
 }
