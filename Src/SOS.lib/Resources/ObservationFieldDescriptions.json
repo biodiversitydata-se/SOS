@@ -1429,15 +1429,27 @@
         "FieldSet": "AllWithValues"
     },
     {
-        "PropertyName": "WaterBody",
-        "PropertyPath": "Location.WaterBody",
-        "DataType": "String",
+      "PropertyName": "WaterBody",
+      "PropertyPath": "Location.WaterBody",
+      "DataType": "String",
+      "DataTypeIsNullable": false,
+      "SwedishTitle": "Vattenområde",
+      "EnglishTitle": "Water body",
+      "DwcName": "waterBody",
+      "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/waterBody",
+      "DependsOn": "Location.WaterBody",
+      "FieldSet": "AllWithValues"
+    },
+    {
+        "PropertyName": "LocationType",
+        "PropertyPath": "Location.Type",
+        "DataType": "Int32",
         "DataTypeIsNullable": false,
-        "SwedishTitle": "Vattenområde",
-        "EnglishTitle": "Water body",
-        "DwcName": "waterBody",
+        "SwedishTitle": "Lokaltyp",
+        "EnglishTitle": "Location type",
+        "DwcName": "",
         "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/waterBody",
-        "DependsOn": "Location.WaterBody",
+        "DependsOn": "Location.Type",
         "FieldSet": "AllWithValues"
     },
     {
