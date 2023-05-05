@@ -1,4 +1,4 @@
-using SOS.DataStewardship.Api.Contracts.Models;
+ï»¿using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
@@ -42,7 +42,7 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        string exptectedDataset = "ArtportalenDataHost - Dataset Bats (Hallaröd)";
+        string exptectedDataset = "ArtportalenDataHost - Dataset Bats (HallarÃ¶d)";
 
         datasetsBySearchPageResult.TotalCount.Should().Be(1, "because the DwC-A file contains 1 datasets");
         datasetsBySearchPageResult.Records.First().Identifier.Should().Be(exptectedDataset);
@@ -88,7 +88,7 @@ public class DwcaImportTests : TestBase
         // Assert
         //-----------------------------------------------------------------------------------------------------------
         string[] exptectedDatasets = new[] { 
-            "ArtportalenDataHost - Dataset Bats (Hallaröd)", 
+            "ArtportalenDataHost - Dataset Bats (HallarÃ¶d)", 
             "ArtportalenDataHost - Dataset Bats (Other)" 
         };
         
@@ -140,8 +140,8 @@ public class DwcaImportTests : TestBase
         // Assert
         //-----------------------------------------------------------------------------------------------------------
         string[] exptectedDatasets = new[] {
-            "ArtportalenDataHost - Dataset Bats (Hallaröd)",
-            "Dataset Bats (Hallaröd)"
+            "ArtportalenDataHost - Dataset Bats (HallarÃ¶d)",
+            "Dataset Bats (HallarÃ¶d)"
         };
 
         datasetsBySearchPageResult.TotalCount.Should().Be(2, "because each DwC-A file contains 1 datasets");
@@ -187,7 +187,7 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        string exptectedDataset = "ArtportalenDataHost - Dataset Bats (Hallaröd)";
+        string exptectedDataset = "ArtportalenDataHost - Dataset Bats (HallarÃ¶d)";
 
         datasetsBySearchPageResult.TotalCount.Should().Be(1, "because the DwC-A file contains 1 datasets");
         datasetsBySearchPageResult.Records.First().Identifier.Should().Be(exptectedDataset);
