@@ -98,7 +98,7 @@ namespace SOS.Harvest.Processors
         private IDictionary<int, HashSet<string>> LoadTaxonProtection()
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath!, @"Resources\TaxonProtection.json");
+            var filePath = Path.Combine(assemblyPath!, @"Resources/TaxonProtection.json");
             using (var fs = FileSystemHelper.WaitForFile(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 var taxonProtection = JsonSerializer.DeserializeAsync<IEnumerable<ProtectedTaxon>>(fs, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Result;
