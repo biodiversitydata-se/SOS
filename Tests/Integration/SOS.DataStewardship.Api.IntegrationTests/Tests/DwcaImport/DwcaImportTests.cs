@@ -1,4 +1,4 @@
-using SOS.DataStewardship.Api.Contracts.Models;
+ï»¿using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
@@ -18,7 +18,7 @@ public class DwcaImportTests : TestBase
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
         var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
-        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-single-dataset.zip", dataProvider, Output);
+        await ProcessFixture.ImportDwcaFileAsync(@"Data/Resources/dwca-datastewardship-single-dataset.zip", dataProvider, Output);
 
         //-----------------------------------------------------------------------------------------------------------
         // Act
@@ -42,7 +42,7 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        string exptectedDataset = "ArtportalenDataHost - Dataset Bats (Hallaröd)";
+        string exptectedDataset = "ArtportalenDataHost - Dataset Bats (HallarÃ¶d)";
 
         datasetsBySearchPageResult.TotalCount.Should().Be(1, "because the DwC-A file contains 1 datasets");
         datasetsBySearchPageResult.Records.First().Identifier.Should().Be(exptectedDataset);
@@ -63,7 +63,7 @@ public class DwcaImportTests : TestBase
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
         var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
-        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-multiple-datasets.zip", dataProvider, Output);
+        await ProcessFixture.ImportDwcaFileAsync(@"Data/Resources/dwca-datastewardship-multiple-datasets.zip", dataProvider, Output);
 
         //-----------------------------------------------------------------------------------------------------------
         // Act
@@ -88,7 +88,7 @@ public class DwcaImportTests : TestBase
         // Assert
         //-----------------------------------------------------------------------------------------------------------
         string[] exptectedDatasets = new[] { 
-            "ArtportalenDataHost - Dataset Bats (Hallaröd)", 
+            "ArtportalenDataHost - Dataset Bats (HallarÃ¶d)", 
             "ArtportalenDataHost - Dataset Bats (Other)" 
         };
         
@@ -112,8 +112,8 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------        
         var files = new List<(string filePath, DataProvider dataProvider)>()
         {
-            (@"data\resources\dwca-datastewardship-single-dataset.zip", new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA }),
-            (@"data\resources\dwca-datastewardship-single-dataset-with-other-dataset-identifier.zip", new DataProvider { Id = 106, Identifier = "TestDataStewardshipBats (other name)", Type = DataProviderType.DwcA })
+            (@"Data/Resources/dwca-datastewardship-single-dataset.zip", new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA }),
+            (@"Data/Resources/dwca-datastewardship-single-dataset-with-other-dataset-identifier.zip", new DataProvider { Id = 106, Identifier = "TestDataStewardshipBats (other name)", Type = DataProviderType.DwcA })
         };
         await ProcessFixture.ImportDwcaFilesAsync(files, Output);
 
@@ -140,8 +140,8 @@ public class DwcaImportTests : TestBase
         // Assert
         //-----------------------------------------------------------------------------------------------------------
         string[] exptectedDatasets = new[] {
-            "ArtportalenDataHost - Dataset Bats (Hallaröd)",
-            "Dataset Bats (Hallaröd)"
+            "ArtportalenDataHost - Dataset Bats (HallarÃ¶d)",
+            "Dataset Bats (HallarÃ¶d)"
         };
 
         datasetsBySearchPageResult.TotalCount.Should().Be(2, "because each DwC-A file contains 1 datasets");
@@ -163,7 +163,7 @@ public class DwcaImportTests : TestBase
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
         var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
-        await ProcessFixture.ImportDwcaFileAsync(@"data\resources\dwca-datastewardship-single-dataset-with-taxalist.zip", dataProvider, Output);
+        await ProcessFixture.ImportDwcaFileAsync(@"Data/Resources/dwca-datastewardship-single-dataset-with-taxalist.zip", dataProvider, Output);
 
         //-----------------------------------------------------------------------------------------------------------
         // Act
@@ -187,7 +187,7 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        string exptectedDataset = "ArtportalenDataHost - Dataset Bats (Hallaröd)";
+        string exptectedDataset = "ArtportalenDataHost - Dataset Bats (HallarÃ¶d)";
 
         datasetsBySearchPageResult.TotalCount.Should().Be(1, "because the DwC-A file contains 1 datasets");
         datasetsBySearchPageResult.Records.First().Identifier.Should().Be(exptectedDataset);

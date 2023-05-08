@@ -2,8 +2,8 @@
 {
     public enum LocationType
     {
-        Unknown,
-        Point,
-        Polygon
+        Unknown = 0,
+        Point = 1,
+        Polygon = 2
     }
 }

@@ -1,4 +1,4 @@
-using SOS.DataStewardship.Api.Contracts.Enums;
+ï»¿using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.Lib.Enums.VocabularyValues;
 
@@ -49,7 +49,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
         
         var searchFilter = new OccurrenceFilter {
             Area = new GeographicsFilter {
-                County = County.UppsalaLän
+                County = County.UppsalaLÃ¤n
             }
         };
 
@@ -68,7 +68,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
         var testDataSet = TestData.Create(10);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithProvince(ProvinceIds.Uppland)
-             .TheNext(9).WithProvince(ProvinceIds.Småland)
+             .TheNext(9).WithProvince(ProvinceIds.SmÃ¥land)
             .Build();
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
 
@@ -93,7 +93,7 @@ public class OccurrencesGeographicsFilterTests : TestBase
         var testDataSet = TestData.Create(10);
         var observations = testDataSet.ObservationsBuilder
             .TheFirst(1).WithParish(ParishId.Uppsala)
-             .TheNext(9).WithParish(ParishId.Säby)
+             .TheNext(9).WithParish(ParishId.SÃ¤by)
             .Build();
         await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
         

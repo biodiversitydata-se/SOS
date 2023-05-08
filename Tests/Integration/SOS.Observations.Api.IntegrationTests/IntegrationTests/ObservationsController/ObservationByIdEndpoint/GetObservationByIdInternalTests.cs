@@ -23,33 +23,33 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             _fixture = fixture;
         }
 
-        //[Fact]
-        //[Trait("Category", "ApiIntegrationTest")]
-        //public async Task Get_observation_by_using_Artportalen_fetch_mode()
-        //{
-        //    //-----------------------------------------------------------------------------------------------------------
-        //    // Arrange
-        //    //-----------------------------------------------------------------------------------------------------------            
-        //    string occurrenceId = "urn:lsid:artportalen.se:Sighting:67611684";
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task GetObservationById()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------            
+            string occurrenceId = "urn:lsid:artportalen.se:Sighting:80354827";
 
-        //    //-----------------------------------------------------------------------------------------------------------
-        //    // Act
-        //    //-----------------------------------------------------------------------------------------------------------
-        //    var response = await _fixture.ObservationsController.GetObservationByIdInternal(null, 
-        //        null, 
-        //        occurrenceId, 
-        //        null, 
-        //        OutputFieldSet.Minimum, 
-        //        "sv-SE", 
-        //        false, 
-        //        ArtportalenFetchModeDto.Artportalen);
-            
-        //    var result = response.GetResult<object>();            
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.GetObservationByIdInternal(null,
+                null,
+                occurrenceId,
+                null,
+                OutputFieldSet.All,
+                "sv-SE",
+                false,
+                false);
 
-        //    //-----------------------------------------------------------------------------------------------------------
-        //    // Assert
-        //    //-----------------------------------------------------------------------------------------------------------
-        //    result.Should().NotBeNull();            
-        //}
+            var result = response.GetResult<object>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Should().NotBeNull();
+        }
     }
 }
