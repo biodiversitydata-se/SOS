@@ -19,7 +19,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="dataProvider"></param>
         /// <param name="batchId">If the processing is done in parallel for a data provider, use the batchId to identify tha specifc batch that was processed.</param>
         /// <returns></returns>
-        Task<bool> WriteObservations(
+        Task<bool> WriteHeaderlessDwcaFileParts(
             IEnumerable<Observation> processedObservations,
             DataProvider dataProvider,
             string batchId = "");

@@ -57,14 +57,15 @@ namespace SOS.Lib.Extensions
         public static IEnumerable<SimpleMultimediaRow> ToSimpleMultimediaRows(this
             Observation observation)
         {
-            return observation?.Occurrence?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Occurrence.OccurrenceId)) ?? Enumerable.Empty<SimpleMultimediaRow>();
+            return observation?.Occurrence?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Event?.EventId, observation.Occurrence.OccurrenceId)) ?? Enumerable.Empty<SimpleMultimediaRow>();
         }
 
         private static SimpleMultimediaRow ToSimpleMultimediaRow(
-            this Multimedia multimedia, string occurrenceId)
+            this Multimedia multimedia, string eventId, string occurrenceId)
         {
             return new SimpleMultimediaRow
             {
+                EventId = eventId,
                 OccurrenceId = occurrenceId,
                 Type = multimedia.Type,
                 Format = multimedia.Format,
@@ -101,7 +102,7 @@ namespace SOS.Lib.Extensions
             IEnumerable<ExtendedMeasurementOrFactRow> eventEmof = null;
             if (observation.MeasurementOrFacts != null)
             {
-                occurrenceEmof = observation.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Occurrence.OccurrenceId));
+                occurrenceEmof = observation.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Occurrence.OccurrenceId, observation.Event.EventId));
             }
 
             if (observation.Event?.MeasurementOrFacts != null)

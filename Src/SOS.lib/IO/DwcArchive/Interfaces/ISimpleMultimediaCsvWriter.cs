@@ -27,19 +27,21 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
             IJobCancellationToken cancellationToken);
 
         /// <summary>
-        /// Create a headerless Simple Multimedia extension CSV file.
+        ///  Create a headerless Simple Multimedia extension CSV file.
         /// </summary>
         /// <param name="multimediaRows"></param>
         /// <param name="streamWriter"></param>
-        /// <returns></returns>
+        /// <param name="eventBased"></param>
         void WriteHeaderlessCsvFile(
             IEnumerable<SimpleMultimediaRow> multimediaRows,
-            StreamWriter streamWriter);
+            StreamWriter streamWriter,
+            bool eventBased = false);
 
         /// <summary>
         /// Write Simple multimedia extension header row.
         /// </summary>
         /// <param name="csvFileHelper"></param>
-        void WriteHeaderRow(CsvFileHelper csvFileHelper);
+        /// <param name="eventBased"></param>
+        void WriteHeaderRow(CsvFileHelper csvFileHelper, bool eventBased);
     }
 }

@@ -121,40 +121,54 @@ namespace SOS.Lib.IO.DwcArchive
 
         public static class SimpleMultimediaFactory
         {
-            public static ExtensionMetadata Create()
+            public static ExtensionMetadata Create(bool isEventCore = false)
             {
-                var extension = new ExtensionMetadata("http://rs.gbif.org/terms/1.0/Multimedia",
-                    "multimedia.txt");
-                extension.Fields.Add(new ExtensionMetadataField(0, "",
-                    "occurrenceID", true));
-                extension.Fields.Add(new ExtensionMetadataField(1, "http://purl.org/dc/terms/type",
-                    "type"));
-                extension.Fields.Add(new ExtensionMetadataField(2, "http://purl.org/dc/terms/format",
-                    "format"));
-                extension.Fields.Add(new ExtensionMetadataField(3, "http://purl.org/dc/terms/identifier",
-                    "identifier"));
-                extension.Fields.Add(new ExtensionMetadataField(4, "http://purl.org/dc/terms/references",
-                    "references"));
-                extension.Fields.Add(new ExtensionMetadataField(5, "http://purl.org/dc/terms/title",
-                    "title"));
-                extension.Fields.Add(new ExtensionMetadataField(6, "http://purl.org/dc/terms/description",
-                    "description"));
-                extension.Fields.Add(new ExtensionMetadataField(7, "http://purl.org/dc/terms/source",
-                    "source"));
-                extension.Fields.Add(new ExtensionMetadataField(8, "http://purl.org/dc/terms/audience",
-                    "audience"));
-                extension.Fields.Add(new ExtensionMetadataField(9, "http://purl.org/dc/terms/created",
-                    "created"));
-                extension.Fields.Add(new ExtensionMetadataField(10, "http://purl.org/dc/terms/creator",
-                    "creator"));
-                extension.Fields.Add(new ExtensionMetadataField(11, "http://purl.org/dc/terms/contributor",
-                    "contributor"));
-                extension.Fields.Add(new ExtensionMetadataField(12, "http://purl.org/dc/terms/publisher",
-                    "publisher"));
-                extension.Fields.Add(new ExtensionMetadataField(13, "http://purl.org/dc/terms/license",
-                    "license"));
-                extension.Fields.Add(new ExtensionMetadataField(14, "http://purl.org/dc/terms/rightsHolder",
-                    "rightsHolder"));
+                if (isEventCore)
+                    return CreateEventMultimedia();
+                else
+                    return CreateOccurrenceMultimedia();
+            }
+
+            private static ExtensionMetadata CreateEventMultimedia()
+            {
+                var extension = new ExtensionMetadata("http://rs.gbif.org/terms/1.0/Multimedia", "multimedia.txt");
+                extension.Fields.Add(new ExtensionMetadataField(0, "", "eventID", true));
+                extension.Fields.Add(new ExtensionMetadataField(1, "", "occurrenceID", true));
+                extension.Fields.Add(new ExtensionMetadataField(2, "http://purl.org/dc/terms/type", "type"));
+                extension.Fields.Add(new ExtensionMetadataField(3, "http://purl.org/dc/terms/format", "format"));
+                extension.Fields.Add(new ExtensionMetadataField(4, "http://purl.org/dc/terms/identifier", "identifier"));
+                extension.Fields.Add(new ExtensionMetadataField(5, "http://purl.org/dc/terms/references", "references"));
+                extension.Fields.Add(new ExtensionMetadataField(6, "http://purl.org/dc/terms/title", "title"));
+                extension.Fields.Add(new ExtensionMetadataField(7, "http://purl.org/dc/terms/description", "description"));
+                extension.Fields.Add(new ExtensionMetadataField(8, "http://purl.org/dc/terms/source", "source"));
+                extension.Fields.Add(new ExtensionMetadataField(9, "http://purl.org/dc/terms/audience", "audience"));
+                extension.Fields.Add(new ExtensionMetadataField(10, "http://purl.org/dc/terms/created", "created"));
+                extension.Fields.Add(new ExtensionMetadataField(11, "http://purl.org/dc/terms/creator", "creator"));
+                extension.Fields.Add(new ExtensionMetadataField(12, "http://purl.org/dc/terms/contributor", "contributor"));
+                extension.Fields.Add(new ExtensionMetadataField(13, "http://purl.org/dc/terms/publisher", "publisher"));
+                extension.Fields.Add(new ExtensionMetadataField(14, "http://purl.org/dc/terms/license", "license"));
+                extension.Fields.Add(new ExtensionMetadataField(15, "http://purl.org/dc/terms/rightsHolder", "rightsHolder"));
+                return extension;
+            }
+
+            private static ExtensionMetadata CreateOccurrenceMultimedia()
+            {
+                var extension = new ExtensionMetadata("http://rs.gbif.org/terms/1.0/Multimedia", "multimedia.txt");
+                extension.Fields.Add(new ExtensionMetadataField(0, "", "occurrenceID", true));
+                extension.Fields.Add(new ExtensionMetadataField(1, "http://purl.org/dc/terms/type", "type"));
+                extension.Fields.Add(new ExtensionMetadataField(2, "http://purl.org/dc/terms/format", "format"));
+                extension.Fields.Add(new ExtensionMetadataField(3, "http://purl.org/dc/terms/identifier", "identifier"));
+                extension.Fields.Add(new ExtensionMetadataField(4, "http://purl.org/dc/terms/references", "references"));
+                extension.Fields.Add(new ExtensionMetadataField(5, "http://purl.org/dc/terms/title", "title"));
+                extension.Fields.Add(new ExtensionMetadataField(6, "http://purl.org/dc/terms/description", "description"));
+                extension.Fields.Add(new ExtensionMetadataField(7, "http://purl.org/dc/terms/source", "source"));
+                extension.Fields.Add(new ExtensionMetadataField(8, "http://purl.org/dc/terms/audience", "audience"));
+                extension.Fields.Add(new ExtensionMetadataField(9, "http://purl.org/dc/terms/created", "created"));
+                extension.Fields.Add(new ExtensionMetadataField(10, "http://purl.org/dc/terms/creator", "creator"));
+                extension.Fields.Add(new ExtensionMetadataField(11, "http://purl.org/dc/terms/contributor", "contributor"));
+                extension.Fields.Add(new ExtensionMetadataField(12, "http://purl.org/dc/terms/publisher", "publisher"));
+                extension.Fields.Add(new ExtensionMetadataField(13, "http://purl.org/dc/terms/license", "license"));
+                extension.Fields.Add(new ExtensionMetadataField(14, "http://purl.org/dc/terms/rightsHolder", "rightsHolder"));
                 return extension;
             }
         }

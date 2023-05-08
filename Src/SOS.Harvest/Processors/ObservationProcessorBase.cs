@@ -172,7 +172,7 @@ namespace SOS.Harvest.Processors
 
             LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservations);
             vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true);
-            var success = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
+            var success = await dwcArchiveFileWriterCoordinator.WriteHeaderlessDwcaFileParts(processedObservations, dataProvider, batchId);
 
             TimeManager.Stop(ProcessTimeManager.TimerTypes.CsvWrite, csvWriteTimerSessionId);
 

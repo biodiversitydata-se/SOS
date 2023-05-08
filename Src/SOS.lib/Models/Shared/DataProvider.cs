@@ -123,6 +123,11 @@ namespace SOS.Lib.Models.Shared
         public bool SupportEvents { get; set; }
 
         /// <summary>
+        /// A event based DwC will be created when provider data i processed if this is set to true
+        /// </summary>
+        public bool CreateEventDwC { get; set; }
+
+        /// <summary>
         /// Get identifier used for checklists
         /// </summary>
         [JsonIgnore]
