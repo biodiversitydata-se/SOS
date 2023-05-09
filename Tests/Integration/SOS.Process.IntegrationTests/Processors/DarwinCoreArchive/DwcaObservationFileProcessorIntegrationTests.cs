@@ -31,6 +31,8 @@ using SOS.Harvest.Processors.DarwinCoreArchive;
 using Xunit;
 using Xunit.Abstractions;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.IO.DwcArchive.Interfaces;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 {
@@ -109,16 +111,40 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyValueResolver =
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
-            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(
-                    vocabularyValueResolver,
-                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
-                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
-                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
-                new FileService(),
-                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
-                new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), dataProviderRepository, importClient, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            var extendedMeasurementOrFactCsvWriter = new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>());
+            var simpleMultimediaCsvWriter = new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>());
+            var fileService = new FileService();
+
+            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(
+                new DwcArchiveFileWriter(
+                    new DwcArchiveOccurrenceCsvWriter(
+                        vocabularyValueResolver,
+                        new NullLogger<DwcArchiveOccurrenceCsvWriter>()
+                    ),
+                    extendedMeasurementOrFactCsvWriter,
+                    simpleMultimediaCsvWriter,
+                    fileService,
+                    dataProviderRepository,
+                    new NullLogger<DwcArchiveFileWriter>()
+                ),
+                new DwcArchiveEventFileWriter(
+                    new DwcArchiveOccurrenceCsvWriter(
+                        vocabularyValueResolver,
+                        new NullLogger<DwcArchiveOccurrenceCsvWriter>()
+                    ),
+                    new DwcArchiveEventCsvWriter(vocabularyValueResolver, new NullLogger<DwcArchiveEventCsvWriter>()),
+                    extendedMeasurementOrFactCsvWriter,
+                    simpleMultimediaCsvWriter,
+                    dataProviderRepository,
+                    fileService,
+                    new NullLogger<DwcArchiveEventFileWriter>()
+                ),
+                fileService, 
+                dataProviderRepository, 
+                importClient, 
+                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, 
+                new NullLogger<DwcArchiveFileWriterCoordinator>()
+            );
             var dwcaConfiguration = new DwcaConfiguration()
             {
                 BatchSize = 5000,

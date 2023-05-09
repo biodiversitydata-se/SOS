@@ -45,6 +45,11 @@ namespace SOS.Lib.IO.DwcArchive
             return filePathByFilePart;
         }
 
+        /// <summary>
+        /// Get CSV file paths for this data provider and batch id.
+        /// </summary>
+        /// <param name="batchId"></param>
+        /// <returns></returns>
         public Dictionary<DwcaEventFilePart, string> GetOrCreateEventFilePathByFilePart(string batchId)
         {
             if (!EventFilePathByBatchIdAndFilePart.TryGetValue(batchId, out var filePathByFilePart))
@@ -98,17 +103,6 @@ namespace SOS.Lib.IO.DwcArchive
     {
         public HashSet<string> WrittenEvents { get; set; } = new HashSet<string>();
         public HashSet<string> WrittenMeasurements { get; set; } = new HashSet<string>();
-        // Test checklist present-absent-data
-        //public Dictionary<string, List<string>> FoundOccurrencesByEventId { get; set; } = new Dictionary<string, List<string>>();
-        //public Dictionary<string, List<string>> NotFoundOccurrencesByEventId { get; set; } = new Dictionary<string, List<string>>();
-        //public Dictionary<string, List<TaxonCount>> FoundTaxonByEventId { get; set; } = new Dictionary<string, List<TaxonCount>>();
-        //public Dictionary<string, List<int>> NotFoundTaxonByEventId { get; set; } = new Dictionary<string, List<int>>();
+        public HashSet<string> WrittenMultimedia { get; set; } = new HashSet<string>();
     }
-
-    // Test checklist present-absent-data
-    //public class TaxonCount
-    //{
-    //    public int TaxonId { get; set; }
-    //    public int IndividualCount { get; set; }
-    //}
 }

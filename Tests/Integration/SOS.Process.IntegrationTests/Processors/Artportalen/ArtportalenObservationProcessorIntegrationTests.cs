@@ -167,19 +167,41 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
 
             var dataProviderRepository =
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
+            var extendedMeasurementOrFactCsvWriter = new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>());
+            var simpleMultimediaCsvWriter = new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>());
+            var fileService = new FileService();
 
-            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(
-                    vocabularyValueResolver,
-                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
-                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
-                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
-                new FileService(),
-                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
-                new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), dataProviderRepository,
+
+            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(
+                new DwcArchiveFileWriter(
+                    new DwcArchiveOccurrenceCsvWriter(
+                        vocabularyValueResolver,
+                        new NullLogger<DwcArchiveOccurrenceCsvWriter>()
+                    ),
+                    extendedMeasurementOrFactCsvWriter,
+                    simpleMultimediaCsvWriter,
+                    fileService,
+                    dataProviderRepository,
+                    new NullLogger<DwcArchiveFileWriter>()
+                ),
+                new DwcArchiveEventFileWriter(
+                    new DwcArchiveOccurrenceCsvWriter(
+                        vocabularyValueResolver,
+                        new NullLogger<DwcArchiveOccurrenceCsvWriter>()
+                    ),
+                    new DwcArchiveEventCsvWriter(vocabularyValueResolver, new NullLogger<DwcArchiveEventCsvWriter>()),
+                    extendedMeasurementOrFactCsvWriter,
+                    simpleMultimediaCsvWriter,
+                    dataProviderRepository,
+                    fileService,
+                    new NullLogger<DwcArchiveEventFileWriter>()
+                ),
+                fileService, 
+                dataProviderRepository,
                 verbatimClient,
-                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, 
+                new NullLogger<DwcArchiveFileWriterCoordinator>()
+            );
             return dwcArchiveFileWriterCoordinator;
         }
 

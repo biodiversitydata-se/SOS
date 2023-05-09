@@ -7,7 +7,6 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.IO.DwcArchive.Interfaces;
-using SOS.Export.Models;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -73,9 +72,11 @@ namespace SOS.Lib.IO.DwcArchive
                 throw;
             }
         }
+
         public void WriteHeaderlessCsvFile(
             IEnumerable<SimpleMultimediaRow> multimediaRows,
-            StreamWriter streamWriter)
+            StreamWriter streamWriter,
+            bool eventBased = false)
         {
             try
             {
@@ -85,7 +86,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // Write simple multimedia rows to CSV file.
                 foreach (var multimediaRow in multimediaRows)
                 {
-                    WriteSimpleMultimediaRow(csvFileHelper, multimediaRow);
+                    WriteSimpleMultimediaRow(csvFileHelper, multimediaRow, eventBased);
                 }
 
                 csvFileHelper.FinishWrite();
@@ -97,9 +98,9 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        public void WriteHeaderRow(CsvFileHelper csvFileHelper)
+        public void WriteHeaderRow(CsvFileHelper csvFileHelper, bool eventBased = false)
         {
-            var multimediaExtensionMetadata = ExtensionMetadata.SimpleMultimediaFactory.Create();
+            var multimediaExtensionMetadata = ExtensionMetadata.SimpleMultimediaFactory.Create(eventBased);
             foreach (var multimediaField in multimediaExtensionMetadata.Fields.OrderBy(field => field.Index))
             {
                 csvFileHelper.WriteField(multimediaField.CSVColumnName);
@@ -113,11 +114,18 @@ namespace SOS.Lib.IO.DwcArchive
         /// </summary>
         /// <param name="csvFileHelper"></param>
         /// <param name="multimediaRow"></param>
+        /// <param name="eventBased"></param>
         /// <remarks>The fields must be written in correct order. FieldDescriptionId sorted ascending.</remarks>
         private static void WriteSimpleMultimediaRow(
             CsvFileHelper csvFileHelper,
-            SimpleMultimediaRow multimediaRow)
+            SimpleMultimediaRow multimediaRow,
+            bool eventBased = false)
         {
+            if (eventBased)
+            {
+                csvFileHelper.WriteField(multimediaRow.EventId);
+            }
+
             csvFileHelper.WriteField(multimediaRow.OccurrenceId);
             csvFileHelper.WriteField(multimediaRow.Type);
             csvFileHelper.WriteField(multimediaRow.Format);

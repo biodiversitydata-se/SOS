@@ -13,20 +13,24 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 namespace SOS.Lib.IO.DwcArchive.Interfaces
 {
     public interface IDwcArchiveEventFileWriter
-    {                         
+    {
         /// <summary>
-        /// Write part of DwC-A event CSV files to disk.
+        ///  Write part of DwC-A event CSV files to disk.
         /// </summary>
+        /// <param name="dataProvider"></param>
         /// <param name="dwcObservations"></param>
         /// <param name="eventFilePathByFilePart"></param>
         /// <param name="writtenEventsData"></param>
+        /// <param name="checkForIllegalCharacters"></param>
         /// <returns></returns>
-        Task WriteHeaderlessEventDwcaFiles(
+        Task WriteHeaderlessEventDwcaFilesAsync(
+            DataProvider dataProvider,
             ICollection<Observation> dwcObservations,
             Dictionary<DwcaEventFilePart, string> eventFilePathByFilePart,
-            WrittenEventSets writtenEventsData);
+            WrittenEventSets writtenEventsData,
+            bool checkForIllegalCharacters = false);
 
-        Task<FileExportResult> CreateEventDwcArchiveFileAsync(
+        Task<string> CreateEventDwcArchiveFileAsync(
             DataProvider dataProvider,
             string exportFolderPath,
             DwcaFilePartsInfo dwcaFilePartsInfo);

@@ -30,6 +30,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
+        /// <param name="edgeLengths">One or more edge lenghts to calculate AOO and EEO</param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="useCenterPoint">If true, grid cell center point will be used, else grid cell corner points will be used.</param>
         /// <param name="useEdgeLengthRatio">Change behavior of edgeLength. When true: 
@@ -45,9 +46,10 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         Task<IActionResult> CalculateAooAndEooInternalAsync(
             int? roleId,
             string? authorizationApplicationIdentifier,
-            SearchFilterAooEooInternalDto searchFilter,
+            SearchFilterInternalDto searchFilter,
+            double[] edgeLengths,
             int? gridCellSizeInMeters = 2000,
-            bool? useCenterPoint = true, 
+            bool? useCenterPoint = true,
             bool? useEdgeLengthRatio = true, 
             bool? allowHoles = false,
             bool? returnGridCells = false,

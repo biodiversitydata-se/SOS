@@ -61,27 +61,29 @@ namespace SOS.Lib.IO.DwcArchive
             if (writeField[(int)FieldDescriptionId.References]) csvFileHelper.WriteField(dwcObservation.References);
             if (writeField[(int)FieldDescriptionId.RightsHolder]) csvFileHelper.WriteField(dwcObservation.RightsHolder);
             if (writeField[(int)FieldDescriptionId.Type]) csvFileHelper.WriteField(dwcObservation.Type);
-            if (writeField[(int)FieldDescriptionId.Day]) csvFileHelper.WriteField(dwcObservation.Event.Day.HasValue ? dwcObservation.Event.Day.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.EndDayOfYear]) csvFileHelper.WriteField(dwcObservation.Event.EndDayOfYear.HasValue ? dwcObservation.Event.EndDayOfYear.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.EventDate]) csvFileHelper.WriteField(dwcObservation.Event.EventDate);
+            
             if (!isEventCore)
             {
+                if (writeField[(int)FieldDescriptionId.Day]) csvFileHelper.WriteField(dwcObservation.Event.Day.HasValue ? dwcObservation.Event.Day.ToString() : null);
+                if (writeField[(int)FieldDescriptionId.EndDayOfYear]) csvFileHelper.WriteField(dwcObservation.Event.EndDayOfYear.HasValue ? dwcObservation.Event.EndDayOfYear.ToString() : null);
+                if (writeField[(int)FieldDescriptionId.EventDate]) csvFileHelper.WriteField(dwcObservation.Event.EventDate);
                 if (writeField[(int)FieldDescriptionId.EventID]) csvFileHelper.WriteField(dwcObservation.Event.EventID);
+                if (writeField[(int)FieldDescriptionId.EventRemarks]) csvFileHelper.WriteField(dwcObservation.Event.EventRemarks);
+                if (writeField[(int)FieldDescriptionId.EventTime]) csvFileHelper.WriteField(dwcObservation.Event.EventTime);
+                if (writeField[(int)FieldDescriptionId.FieldNotes]) csvFileHelper.WriteField(dwcObservation.Event.FieldNotes);
+                if (writeField[(int)FieldDescriptionId.FieldNumber]) csvFileHelper.WriteField(dwcObservation.Event.FieldNumber);
+                if (writeField[(int)FieldDescriptionId.Habitat]) csvFileHelper.WriteField(dwcObservation.Event.Habitat);
+                if (writeField[(int)FieldDescriptionId.Month]) csvFileHelper.WriteField(dwcObservation.Event.Month.HasValue ? dwcObservation.Event.Month.ToString() : null);
+                if (writeField[(int)FieldDescriptionId.ParentEventID]) csvFileHelper.WriteField(dwcObservation.Event.ParentEventID);
+                if (writeField[(int)FieldDescriptionId.SampleSizeValue]) csvFileHelper.WriteField(dwcObservation.Event.SampleSizeValue);
+                if (writeField[(int)FieldDescriptionId.SampleSizeUnit]) csvFileHelper.WriteField(dwcObservation.Event.SampleSizeUnit);
+                if (writeField[(int)FieldDescriptionId.SamplingEffort]) csvFileHelper.WriteField(dwcObservation.Event.SamplingEffort);
+                if (writeField[(int)FieldDescriptionId.SamplingProtocol]) csvFileHelper.WriteField(dwcObservation.Event.SamplingProtocol);
+                if (writeField[(int)FieldDescriptionId.StartDayOfYear]) csvFileHelper.WriteField(dwcObservation.Event.StartDayOfYear.HasValue ? dwcObservation.Event.StartDayOfYear.ToString() : null);
+                if (writeField[(int)FieldDescriptionId.VerbatimEventDate]) csvFileHelper.WriteField(dwcObservation.Event.VerbatimEventDate);
+                if (writeField[(int)FieldDescriptionId.Year]) csvFileHelper.WriteField(dwcObservation.Event.Year.HasValue ? dwcObservation.Event.Year.ToString() : null);
             }
-            if (writeField[(int)FieldDescriptionId.EventRemarks]) csvFileHelper.WriteField(dwcObservation.Event.EventRemarks);
-            if (writeField[(int)FieldDescriptionId.EventTime]) csvFileHelper.WriteField(dwcObservation.Event.EventTime);
-            if (writeField[(int)FieldDescriptionId.FieldNotes]) csvFileHelper.WriteField(dwcObservation.Event.FieldNotes);
-            if (writeField[(int)FieldDescriptionId.FieldNumber]) csvFileHelper.WriteField(dwcObservation.Event.FieldNumber);
-            if (writeField[(int)FieldDescriptionId.Habitat]) csvFileHelper.WriteField(dwcObservation.Event.Habitat);
-            if (writeField[(int)FieldDescriptionId.Month]) csvFileHelper.WriteField(dwcObservation.Event.Month.HasValue ? dwcObservation.Event.Month.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.ParentEventID]) csvFileHelper.WriteField(dwcObservation.Event.ParentEventID);
-            if (writeField[(int)FieldDescriptionId.SampleSizeValue]) csvFileHelper.WriteField(dwcObservation.Event.SampleSizeValue);
-            if (writeField[(int)FieldDescriptionId.SampleSizeUnit]) csvFileHelper.WriteField(dwcObservation.Event.SampleSizeUnit);
-            if (writeField[(int)FieldDescriptionId.SamplingEffort]) csvFileHelper.WriteField(dwcObservation.Event.SamplingEffort);
-            if (writeField[(int)FieldDescriptionId.SamplingProtocol]) csvFileHelper.WriteField(dwcObservation.Event.SamplingProtocol);
-            if (writeField[(int)FieldDescriptionId.StartDayOfYear]) csvFileHelper.WriteField(dwcObservation.Event.StartDayOfYear.HasValue ? dwcObservation.Event.StartDayOfYear.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.VerbatimEventDate]) csvFileHelper.WriteField(dwcObservation.Event.VerbatimEventDate);
-            if (writeField[(int)FieldDescriptionId.Year]) csvFileHelper.WriteField(dwcObservation.Event.Year.HasValue ? dwcObservation.Event.Year.ToString() : null);
+            
             if (writeField[(int)FieldDescriptionId.DateIdentified]) csvFileHelper.WriteField(dwcObservation.Identification.DateIdentified);
             if (writeField[(int)FieldDescriptionId.IdentificationID]) csvFileHelper.WriteField(dwcObservation.Identification.IdentificationID);
             if (writeField[(int)FieldDescriptionId.IdentificationQualifier]) csvFileHelper.WriteField(dwcObservation.Identification.IdentificationQualifier);

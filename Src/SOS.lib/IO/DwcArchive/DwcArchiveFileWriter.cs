@@ -24,9 +24,6 @@ using SOS.Lib.Factories;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -376,10 +373,7 @@ namespace SOS.Lib.IO.DwcArchive
                 return;
             }
 
-            var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().ToList();
             using var archive = ZipFile.Open(tempFilePath, ZipArchiveMode.Create);
-            
-            // Create meta.xml
             var dwcExtensions = new List<DwcaFilePart>();
 
             // Create occurrence.txt
@@ -392,6 +386,7 @@ namespace SOS.Lib.IO.DwcArchive
             _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvFileHelper,
                 FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions());
             await csvFileHelper.FlushAsync();
+            
             foreach (var filePath in occurrenceFilePaths)
             {
                 await using var readStream = File.OpenRead(filePath);
@@ -427,7 +422,7 @@ namespace SOS.Lib.IO.DwcArchive
                 dwcExtensions.Add(DwcaFilePart.Multimedia);
                 await using var multimediaFileStream = archive.CreateEntry("multimedia.txt", CompressionLevel.Optimal).Open();
                 csvFileHelper.InitializeWrite(multimediaFileStream, "\t");
-                _simpleMultimediaCsvWriter.WriteHeaderRow(csvFileHelper);
+                _simpleMultimediaCsvWriter.WriteHeaderRow(csvFileHelper, false);
                 await csvFileHelper.FlushAsync();
                 foreach (var filePath in multimediaFilePaths)
                 {
@@ -440,6 +435,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
 
             // Create meta.xml
+            var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().ToList();
             await using var metaFileStream = archive.CreateEntry("meta.xml", CompressionLevel.Optimal).Open();
             DwcArchiveMetaFileWriter.CreateMetaXmlFile(metaFileStream, fieldDescriptions.ToList(), dwcExtensions);
             metaFileStream.Close();
