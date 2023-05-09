@@ -97,14 +97,6 @@ namespace SOS.Analysis.Api.Controllers
             return filter;
         }
 
-        protected async Task<SearchFilterAooEooInternalDto> InitializeSearchFilterAsync(SearchFilterAooEooInternalDto filter) {
-
-            filter ??= new SearchFilterAooEooInternalDto();
-            filter.Geographics ??= new GeographicsFilterDto();
-            filter.Geographics.BoundingBox = await GetBoundingBoxAsync(filter.Geographics);
-            return filter;
-        }
-
         /// <summary>
         /// Get id of current user
         /// </summary>

@@ -106,6 +106,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
+        /// <param name="edgeLengths">One or more edge lenghts to calculate AOO and EEO</param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="useCenterPoint">If true, grid cell center point will be used, else grid cell corner points will be used.</param>
         /// <param name="useEdgeLengthRatio">Change behavior of edgeLength. When true: 
@@ -128,7 +129,8 @@ namespace SOS.Analysis.Api.Controllers
         public async Task<IActionResult> CalculateAooAndEooInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
-            [FromBody] SearchFilterAooEooInternalDto searchFilter,
+            [FromBody] SearchFilterInternalDto searchFilter,
+            [FromQuery] double[] edgeLengths,
             [FromQuery] int? gridCellSizeInMeters = 2000,
             [FromQuery] bool? useCenterPoint = true,
             [FromQuery] bool? useEdgeLengthRatio = true,
@@ -143,9 +145,9 @@ namespace SOS.Analysis.Api.Controllers
                 CheckAuthorization(searchFilter.ProtectionFilter);
                 searchFilter = await InitializeSearchFilterAsync(searchFilter);
                 var edgeLengthValidation = Result.Success();
-                if ((useEdgeLengthRatio ?? false) && (searchFilter.EdgeLengths?.Any() ?? false))
+                if ((useEdgeLengthRatio ?? false) && (edgeLengths?.Any() ?? false))
                 {
-                    foreach(var edgeLength in searchFilter.EdgeLengths)
+                    foreach(var edgeLength in edgeLengths)
                     {
                         edgeLengthValidation = ValidateDouble(edgeLength, 0.0, 1.0, "Edge length");
                         if (edgeLengthValidation.IsFailure)
@@ -157,7 +159,7 @@ namespace SOS.Analysis.Api.Controllers
 
                 var validationResult = Result.Combine(
                     edgeLengthValidation,
-                    searchFilter.EdgeLengths?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one edge length"),
+                    edgeLengths?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one edge length"),
                     ValidateSearchFilter(searchFilter!),
                     ValidateInt(gridCellSizeInMeters!.Value, minLimit: 100, maxLimit: 100000, "Grid cell size in meters"),
                     ValidateMetricTilesLimit(searchFilter.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters.Value));
@@ -175,7 +177,7 @@ namespace SOS.Analysis.Api.Controllers
                     filter, 
                     gridCellSizeInMeters!.Value, 
                     useCenterPoint!.Value,
-                    searchFilter!.EdgeLengths!, 
+                    edgeLengths!, 
                     useEdgeLengthRatio!.Value, 
                     allowHoles!.Value,
                     returnGridCells!.Value,
