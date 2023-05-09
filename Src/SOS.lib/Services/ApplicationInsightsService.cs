@@ -77,12 +77,12 @@ namespace SOS.Lib.Services
                         requestingSystem = tostring(customDimensions['Requesting-System']),                        
                         duration, 
                         success,
-                        responseCount = toint(customDimensions['Response-count'])
+                        observationCount = toint(customDimensions['Observation-count'])
                     | summarize 
                         requestCount = count(), 
                         failureCount = count(success == false), 
                         averageDuration = toint(avg(duration)),
-                        sumResponseCount = sum(responseCount)
+                        sumObservationCount = sum(observationCount)
                         by 
                             method, 
                             endpoint,
@@ -129,7 +129,7 @@ namespace SOS.Lib.Services
                         resultCode, 
                         requestBody = customDimensions['Request-body'], 
                         protectedObservations = customDimensions['Protected-observations'], 
-                        responseCount = customDimensions['Response-count'],
+                        observationCount = customDimensions['Observation-count'],
                         requestingSystem = tostring(customDimensions['Requesting-System'])";
 
             var result = await QueryApplicationInsightsAsync<ApplicationInsightsQueryResponse>(query);
