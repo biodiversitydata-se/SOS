@@ -11,7 +11,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
     public class TestContainersFixture : IAsyncLifetime
     {
         private const string ELASTIC_PASSWORD = "elastic";
-        private const string ELASTIC_IMAGE_NAME = "elasticsearch:8.7.0";
+        private const string ELASTIC_IMAGE_NAME = "elasticsearch:8.7.1";
 
         private const string MONGODB_USERNAME = "mongo";
         private const string MONGODB_PASSWORD = "admin";
