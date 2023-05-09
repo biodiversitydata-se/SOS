@@ -105,7 +105,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <summary>
         /// Validate areas
         /// </summary>
-        /// <param name="areaIds"></param>
+        /// <param name="areaKeys"></param>
         /// <returns></returns>
         protected async Task<Result> ValidateAreasAsync(IEnumerable<AreaFilterDto> areaKeys)
         {
