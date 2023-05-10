@@ -424,6 +424,13 @@ The following taxon lists exists:
 | 21 	| 6	| Risk assessment - Potentially high impact 	| Risklista - Potentiellt hög risk (PH) 	|
 | 22 	| 6	| Risk assessment - Low impact 	| Risklista - Låg risk (LO) 	|
 | 23 	| 6	| Risk assessment - No known impact 	| Risklista - Ingen känd risk (NK) 	|
+| 24 	| 7	| Red listed species - Near threatened (NT) | Rödlista - Nära hotad (NT) 	|
+| 25 	| 7	| Red listed species - Vulnerable (VU) | Rödlista - Sårbar (VU)	|
+| 26 	| 7	| Red listed species - Endangered (EN) | Rödlista - Starkt hotad (EN) |
+| 27 	| 7	| Red listed species - Critically endangered (CR) | Rödlista - Akut hotad (CR) |
+| 28 	| 7	| Red listed species - Nationally extinct (RE) | Rödlista - Nationellt utdöd (RE) |
+| 29 	| 7	| Red listed species - Data deficient  (DD) | Rödlista - Kunskapsbrist (DD) |
+
 
 ### Search for observations with taxon lists - merge
 
