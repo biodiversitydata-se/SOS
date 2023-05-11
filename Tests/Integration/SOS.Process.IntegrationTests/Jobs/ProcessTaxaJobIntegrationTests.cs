@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Verbatim;
-using SOS.Process.Jobs;
-using SOS.Process.Processors.Taxon;
+using SOS.Harvest.Jobs;
+using SOS.Harvest.Processors.Taxon;
 using Xunit;
 
 namespace SOS.Process.IntegrationTests.Jobs
@@ -29,13 +29,13 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processDbConfiguration.WriteBatchSize);
             var elasticConfiguration = GetElasticConfiguration();
 
-            var taxonProcessor = new TaxonProcessor(null, null, null, null, null); //Todo
+            var taxonProcessor = new TaxonProcessor(null, null, null, null, null, null); //Todo
 
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
 
             var processInfoRepository =
-                new ProcessInfoRepository(processClient, elasticConfiguration, new NullLogger<ProcessInfoRepository>());
+                new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var processTaxaJob = new ProcessTaxaJob(
                 taxonProcessor,
                 harvestInfoRepository,

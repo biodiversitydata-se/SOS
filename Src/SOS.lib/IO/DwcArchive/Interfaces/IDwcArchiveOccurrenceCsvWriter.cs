@@ -5,7 +5,7 @@ using Hangfire;
 using SOS.Export.Models;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.IO.DwcArchive.Interfaces
@@ -13,20 +13,24 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
     public interface IDwcArchiveOccurrenceCsvWriter
     {
         /// <summary>
-        ///     Creates a DwC occurrence CSV file.
+        /// Creates a DwC occurrence CSV file.
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="stream"></param>
         /// <param name="fieldDescriptions"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="leaveStreamOpen"></param>
+        /// <param name="isEventCore"></param>
         /// <returns></returns>
-        Task<bool> CreateOccurrenceCsvFileAsync(
-            FilterBase filter,
+        Task<int> CreateOccurrenceCsvFileAsync(
+            SearchFilter filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
-            IJobCancellationToken cancellationToken);
+            IProcessedObservationCoreRepository processedObservationRepository,
+            IJobCancellationToken cancellationToken,
+            bool leaveStreamOpen = false,
+            bool isEventCore = false);
 
         /// <summary>
         /// Write Occurrence CSV file without headers using the stream writer.

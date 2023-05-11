@@ -2,9 +2,10 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Import.Repositories.Source.Artportalen;
-using SOS.Import.Services;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Services;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Repositories
@@ -19,7 +20,7 @@ namespace SOS.Import.IntegrationTests.Repositories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var importConfiguration = GetImportConfiguration();
-            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
+            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration, new NullLogger<ArtportalenDataService>());
             var sightingRelationRepository = new SightingRelationRepository(
                 artportalenDataService,
                 new Mock<ILogger<SightingRelationRepository>>().Object);

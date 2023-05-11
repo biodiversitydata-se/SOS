@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.IO.Excel.Interfaces
 {
@@ -17,16 +18,16 @@ namespace SOS.Lib.IO.Excel.Interfaces
         /// <param name="exportPath"></param>
         /// <param name="fileName"></param>
         /// <param name="culture"></param>
-        /// <param name="outputFieldSet"></param>
         /// <param name="propertyLabelType"></param>
+        /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<string> CreateFileAync(SearchFilter filter, 
+        Task<FileExportResult> CreateFileAync(SearchFilter filter, 
             string exportPath, 
             string fileName, 
-            string culture, 
-            OutputFieldSet outputFieldSet,
+            string culture,
             PropertyLabelType propertyLabelType,
+            bool gzip,
             IJobCancellationToken cancellationToken);
     }
 }

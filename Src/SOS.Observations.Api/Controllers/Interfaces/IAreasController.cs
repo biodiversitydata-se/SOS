@@ -23,6 +23,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int take = 100);
 
         /// <summary>
+        /// Get a single area
+        /// </summary>
+        /// <param name="areaType"></param>
+        /// <param name="featureId"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetArea([FromRoute] AreaTypeDto areaType, [FromRoute] string featureId);
+
+        /// <summary>
         ///     Get an area as a zipped JSON file including its polygon.
         /// </summary>
         /// <param name="areaType">The area type.</param>

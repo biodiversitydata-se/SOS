@@ -1,9 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
 {
     public class Media
     {
+        /// <summary>
+        /// Media comments
+        /// </summary>
+        public ICollection<MediaComment> Comments { get; set; }
+
         /// <summary>
         ///    Copyright text
         /// </summary>

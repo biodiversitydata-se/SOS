@@ -6,7 +6,7 @@ using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
@@ -20,6 +20,7 @@ namespace SOS.Lib.Cache
         private readonly IAreaRepository _areaRepository;
 
         protected readonly ConcurrentDictionary<(AreaType, string), IGeoShape> _geometryCache;
+        private const int NumberOfEntriesCleanupLimit = 10000;
 
         /// <summary>
         /// Constructor
@@ -61,7 +62,7 @@ namespace SOS.Lib.Cache
                 if (areas != null)
                 {
                     foreach (var area in areas)
-                    {
+                    {                        
                         Cache.TryAdd(area.Id, area);
                     }
                 }
@@ -91,6 +92,10 @@ namespace SOS.Lib.Cache
 
             if (geometry != null)
             {
+                if (_geometryCache.Count > NumberOfEntriesCleanupLimit) // prevent too large geometry cache
+                {
+                    _geometryCache.Clear();
+                }
                 _geometryCache.TryAdd((areaType, featureId), geometry);
             }
 

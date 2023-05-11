@@ -15,18 +15,21 @@ namespace SOS.Lib.Managers
 {
     public class ValidationManager : IValidationManager
     {
-        private readonly IInvalidObservationRepository _invalidObservationRepository;        
+        private readonly IInvalidObservationRepository _invalidObservationRepository;
+        private readonly IInvalidEventRepository _invalidEventRepository;
         private readonly ILogger<ValidationManager> _logger;
 
         /// <summary>
         /// Constructor
-        /// </summary>
-        /// <param name="invalidObservationRepository"></param>
-        /// <param name="logger"></param>
-        public ValidationManager(IInvalidObservationRepository invalidObservationRepository, ILogger<ValidationManager> logger)
+        /// </summary>        
+        public ValidationManager(IInvalidObservationRepository invalidObservationRepository,
+            IInvalidEventRepository invalidEventRepository,
+            ILogger<ValidationManager> logger)
         {
             _invalidObservationRepository = invalidObservationRepository ??
-                                            throw new ArgumentNullException(nameof(invalidObservationRepository));       
+                                            throw new ArgumentNullException(nameof(invalidObservationRepository));
+            _invalidEventRepository = invalidEventRepository ??
+                                            throw new ArgumentNullException(nameof(invalidEventRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -51,7 +54,7 @@ namespace SOS.Lib.Managers
         public ICollection<InvalidObservation> ValidateObservations(ref ICollection<Observation> observations, DataProvider dataProvider)
         {
             var validItems = new List<Observation>();
-            var invalidItems = new List<InvalidObservation>();            
+            var invalidItems = new List<InvalidObservation>();
             foreach (var observation in observations)
             {
                 var observationValidation = ValidateObservation(observation, dataProvider);
@@ -82,54 +85,76 @@ namespace SOS.Lib.Managers
 
             if (observation.Event?.StartDate == null || observation.Event.EndDate == null)
             {
-                observationValidation.Defects.Add("Event StartDate and/or EndDate is missing");
+                observationValidation.Defects.Add(new ObservationDefect(
+                    ObservationDefect.ObservationDefectType.MissingMandatoryField,
+                    "Event StartDate and/or EndDate is missing")
+                );
             }
             else
             {
                 if (observation.Event.StartDate > observation.Event.EndDate)
                 {
-                    observationValidation.Defects.Add("Event StartDate is greater than EndDate");
+                    observationValidation.Defects.Add(new ObservationDefect(
+                        ObservationDefect.ObservationDefectType.LogicError,
+                        "Event StartDate is greater than EndDate")
+                    );
                 }
             }
 
-            if (observation.Taxon == null)
+            if ((observation.Taxon?.Id ?? -1) == -1)
             {
-                observationValidation.Defects.Add("Taxon not found");
-            }
-
-            if ((observation.Location?.CoordinateUncertaintyInMeters ?? 0) > 100000)
-            {
-                observationValidation.Defects.Add($"CoordinateUncertaintyInMeters exceeds max value 100 km ({observation.Location?.CoordinateUncertaintyInMeters ?? 0}m)");
-            }
+                observationValidation.Defects.Add(new ObservationDefect(
+                    ObservationDefect.ObservationDefectType.TaxonNotFound,
+                    $"Taxon not found ({observation.Taxon?.VerbatimId})")
+                );
+            }            
 
             if (observation.Location == null || !observation.Location.DecimalLatitude.HasValue ||
                 !observation.Location.DecimalLongitude.HasValue)
             {
-                observationValidation.Defects.Add("Coordinate is missing");
+                observationValidation.Defects.Add(new ObservationDefect(
+                    ObservationDefect.ObservationDefectType.MissingMandatoryField,
+                    "Coordinates are missing")
+                );
             }
-            else if (!observation.IsInEconomicZoneOfSweden)
+            else if (!observation.Location.IsInEconomicZoneOfSweden)
             {
-                observationValidation.Defects.Add($"Sighting outside Swedish economic zone (lon: {observation.Location?.DecimalLongitude}, lat:{observation.Location?.DecimalLatitude})");
+                observationValidation.Defects.Add(new ObservationDefect(
+                    ObservationDefect.ObservationDefectType.LocationOutsideOfSweden,
+                    $"Sighting outside Swedish economic zone (lon: {observation.Location?.DecimalLongitude}, lat:{observation.Location?.DecimalLatitude})")
+                );
             }
 
             if (observation.Location?.Point == null)
             {
-                observationValidation.Defects.Add("Location point is missing");
+                observationValidation.Defects.Add(new ObservationDefect(
+                    ObservationDefect.ObservationDefectType.MissingMandatoryField,
+                    "Location point is missing")
+                );
             }
 
             if (observation.Location?.PointLocation == null)
             {
-                observationValidation.Defects.Add("Location point location is missing");
+                observationValidation.Defects.Add(new ObservationDefect(
+                    ObservationDefect.ObservationDefectType.MissingMandatoryField,
+                    "Point location is missing")
+                );
             }
 
             if (observation.Location?.PointWithBuffer == null)
             {
-                observationValidation.Defects.Add("Location point with buffer is missing");
+                observationValidation.Defects.Add(new ObservationDefect(
+                    ObservationDefect.ObservationDefectType.MissingMandatoryField,
+                    "Location point with buffer is missing")
+                );
             }
-
+         
             if (string.IsNullOrEmpty(observation?.Occurrence.CatalogNumber))
             {
-                observationValidation.Defects.Add("CatalogNumber is missing");
+                observationValidation.Defects.Add(new ObservationDefect(
+                    ObservationDefect.ObservationDefectType.MissingMandatoryField,
+                    "CatalogNumber is missing")
+                );
             }
 
             return observationValidation;
@@ -138,7 +163,6 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task VerifyCollectionAsync(JobRunModes mode)
         {
-            _invalidObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
             var collectionCreated = false;
             if (mode == JobRunModes.Full)
             {
@@ -154,6 +178,132 @@ namespace SOS.Lib.Managers
             if (collectionCreated)
             {
                 await _invalidObservationRepository.CreateIndexAsync();
+            }
+        }
+
+        public async Task<bool> AddInvalidEventsToDb(ICollection<InvalidEvent> invalidEvents)
+        {
+            try
+            {
+                if (invalidEvents == null || invalidEvents.Count == 0) return false;
+
+                await _invalidEventRepository.AddManyAsync(invalidEvents);
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Write invalid events failed");
+                return false;
+            }
+        }
+
+        public ICollection<InvalidEvent> ValidateEvents(ref ICollection<Models.Processed.DataStewardship.Event.Event> events, DataProvider dataProvider)
+        {
+            var validItems = new List<Models.Processed.DataStewardship.Event.Event>();
+            var invalidItems = new List<InvalidEvent>();
+            foreach (var ev in events)
+            {
+                var eventValidation = ValidateEvent(ev, dataProvider);
+
+                if (eventValidation.IsInvalid)
+                {
+                    invalidItems.Add(eventValidation);
+                }
+                else
+                {
+                    validItems.Add(ev);
+                }
+            }
+
+            events = validItems;
+            return invalidItems.Any() ? invalidItems : null;
+        }
+
+        public InvalidEvent ValidateEvent(Models.Processed.DataStewardship.Event.Event ev, DataProvider dataProvider)
+        {
+            var eventValidation = new InvalidEvent(ev.DataProviderId.ToString(), dataProvider.Names.Translate("en-GB"), ev.EventId);
+
+            if (ev.StartDate == null || ev.EndDate == null)
+            {
+                eventValidation.Defects.Add(new EventDefect(
+                    EventDefect.EventDefectType.MissingMandatoryField,
+                    "Event StartDate and/or EndDate is missing")
+                );
+            }
+            else
+            {
+                if (ev.StartDate > ev.EndDate)
+                {
+                    eventValidation.Defects.Add(new EventDefect(
+                        EventDefect.EventDefectType.LogicError,
+                        "Event StartDate is greater than EndDate")
+                    );
+                }
+            }
+
+
+            if ((ev.Location?.CoordinateUncertaintyInMeters ?? 0) > 100000)
+            {
+                eventValidation.Defects.Add(new EventDefect(
+                    EventDefect.EventDefectType.ValueOutOfRange,
+                    $"CoordinateUncertaintyInMeters exceeds max value 100 km ({ev.Location?.CoordinateUncertaintyInMeters ?? 0}m)")
+                );
+            }
+
+            if (ev.Location == null || !ev.Location.DecimalLatitude.HasValue ||
+                !ev.Location.DecimalLongitude.HasValue)
+            {
+                eventValidation.Defects.Add(new EventDefect(EventDefect.EventDefectType.MissingMandatoryField, "Coordinates are missing")
+                );
+            }
+            else if (!ev.Location.IsInEconomicZoneOfSweden)
+            {
+                eventValidation.Defects.Add(new EventDefect(
+                    EventDefect.EventDefectType.LocationOutsideOfSweden,
+                    $"Sighting outside Swedish economic zone (lon: {ev.Location?.DecimalLongitude}, lat:{ev.Location?.DecimalLatitude})")
+                );
+            }
+
+            if (ev.Location?.Point == null)
+            {
+                eventValidation.Defects.Add(new EventDefect(
+                    EventDefect.EventDefectType.MissingMandatoryField,
+                    "Location point is missing")
+                );
+            }
+
+            if (ev.Location?.PointLocation == null)
+            {
+                eventValidation.Defects.Add(new EventDefect(EventDefect.EventDefectType.MissingMandatoryField, "Point location is missing")
+                );
+            }
+
+            if (ev.Location?.PointWithBuffer == null)
+            {
+                eventValidation.Defects.Add(new EventDefect(EventDefect.EventDefectType.MissingMandatoryField, "Location point with buffer is missing")
+                );
+            }
+
+            return eventValidation;
+        }
+
+        public async Task VerifyEventCollectionAsync(JobRunModes mode)
+        {
+            var collectionCreated = false;
+            if (mode == JobRunModes.Full)
+            {
+                // Make sure invalid collection is empty 
+                await _invalidEventRepository.DeleteCollectionAsync();
+                await _invalidEventRepository.AddCollectionAsync();
+            }
+            else
+            {
+                collectionCreated = await _invalidEventRepository.VerifyCollectionAsync();
+            }
+
+            if (collectionCreated)
+            {
+                await _invalidEventRepository.CreateIndexAsync();
             }
         }
     }

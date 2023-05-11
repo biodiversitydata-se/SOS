@@ -3,10 +3,12 @@
     public enum AreaType
     {
         Municipality = 1,
-
-        //   Community = 11,
+        Community = 11,
+        Sea = 12,
         CountryRegion = 13,
+        NatureType = 15,
         Province = 16,
+        Ramsar = 17,
         BirdValidationArea = 18,
         Parish = 19,
         Spa = 20,
@@ -15,6 +17,8 @@
         SwedishForestAgencyDistricts = 24,
         EconomicZoneOfSweden = 25,
         Sci = 26,
-        WaterArea = 27
+        WaterArea = 27,
+        Atlas5x5 = 29,
+        Atlas10x10 = 30
     }
 }

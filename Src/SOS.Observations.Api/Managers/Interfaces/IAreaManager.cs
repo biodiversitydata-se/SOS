@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Nest;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
@@ -31,6 +31,14 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <returns></returns>
         Task<PagedResult<AreaBaseDto>> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes, string searchString,
             int skip, int take);
+
+        /// <summary>
+        /// Get a single area
+        /// </summary>
+        /// <param name="areaType"></param>
+        /// <param name="featureId"></param>
+        /// <returns></returns>
+        Task<AreaBaseDto> GetAreaAsync(AreaTypeDto areaType, string featureId);
 
         /// <summary>
         /// Get area as zip file in specified format.

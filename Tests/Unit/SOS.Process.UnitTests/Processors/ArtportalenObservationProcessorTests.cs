@@ -16,8 +16,9 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Managers.Interfaces;
-using SOS.Process.Processors.Artportalen;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors
@@ -33,20 +34,26 @@ namespace SOS.Process.UnitTests.Processors
         public ArtportalenObservationProcessorTests()
         {
             _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
+            _userObservationRepositoryMock = new Mock<IUserObservationRepository>();
             _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
+            _artportalenDatasetRepositoryMock = new Mock<IArtportalenDatasetMetadataRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
-            _processConfiguration = new ProcessConfiguration();
+            _processConfiguration = new ProcessConfiguration() { ArtportalenUrl = "https://www.artportalen.se" };
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _diffusionManagerMock = new Mock<IDiffusionManager>();
             _processManagerMock = new Mock<IProcessManager>();
+            _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _validationManagerMock = new Mock<IValidationManager>();
+            _sightingRepository = new Mock<ISightingRepository>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
         }
 
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IUserObservationRepository> _userObservationRepositoryMock;
         private readonly Mock<IVocabularyRepository> _vocabularyRepositoryMock;
+        private readonly Mock<IArtportalenDatasetMetadataRepository> _artportalenDatasetRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
@@ -54,17 +61,22 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
         private readonly Mock<IDiffusionManager> _diffusionManagerMock;
-
+        private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
+        private readonly Mock<ISightingRepository> _sightingRepository;
 
         private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
             _artportalenVerbatimRepository.Object,
             _processedObservationRepositoryMock.Object,
             _vocabularyRepositoryMock.Object,
+            _artportalenDatasetRepositoryMock.Object,
             _vocabularyResolverMock.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processManagerMock.Object,
             _validationManagerMock.Object,
             _diffusionManagerMock.Object,
+            _processTimeManagerMock.Object,
+            _sightingRepository.Object,
+            _userObservationRepositoryMock.Object,
             _processConfiguration,
             _loggerMock.Object);
 
@@ -102,7 +114,7 @@ namespace SOS.Process.UnitTests.Processors
         [Fact]
         public async Task ProcessAsyncException()
         {
-            // -----------------------------------------------------------------------------------------------------------
+            //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dataProvider = new DataProvider

@@ -53,6 +53,11 @@ namespace SOS.Lib.Models.ApplicationInsights
         public string ResponseCount { get; set; }
 
         /// <summary>
+        /// Name of system making the request
+        /// </summary>
+        public string RequestingSystem { get; set; }        
+
+        /// <summary>
         /// Successful call
         /// </summary>
         public string Success { get; set; }

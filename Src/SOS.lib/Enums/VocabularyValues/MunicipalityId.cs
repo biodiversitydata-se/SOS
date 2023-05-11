@@ -6,1453 +6,1164 @@
     public enum MunicipalityId
     {
         /// <summary>
-        ///     Ale.
+        /// Ale
         /// </summary>
-        Ale = 53,
-
+        Ale = 1440,
         /// <summary>
-        ///     Alingsås.
+        /// Alingsås
         /// </summary>
-        Alingsas = 54,
-
+        Alingsås = 1489,
         /// <summary>
-        ///     Alvesta.
+        ///  Alvesta
         /// </summary>
-        Alvesta = 55,
-
+        Alvesta = 764,
         /// <summary>
-        ///     Aneby.
+        ///  Aneby
         /// </summary>
-        Aneby = 56,
-
+        Aneby = 604,
         /// <summary>
-        ///     Arboga.
+        ///  Arboga
         /// </summary>
-        Arboga = 57,
-
+        Arboga = 1984,
         /// <summary>
-        ///     Arjeplog.
+        ///  Arjeplog
         /// </summary>
-        Arjeplog = 58,
-
+        Arjeplog = 2506,
         /// <summary>
-        ///     Bjurholm.
+        ///  Arvidsjaur
         /// </summary>
-        Bjurholm = 59,
-
+        Arvidsjaur = 2505,
         /// <summary>
-        ///     Arvidsjaur.
+        ///  Arvika
         /// </summary>
-        Arvidsjaur = 60,
-
+        Arvika = 1784,
         /// <summary>
-        ///     Arvika.
+        ///  Askersund
         /// </summary>
-        Arvika = 61,
-
+        Askersund = 1882,
         /// <summary>
-        ///     Askersund.
+        ///  Avesta
         /// </summary>
-        Askersund = 62,
-
+        Avesta = 2084,
         /// <summary>
-        ///     Avesta.
+        ///  Bengtsfors
         /// </summary>
-        Avesta = 63,
-
+        Bengtsfors = 1460,
         /// <summary>
-        ///     Bengtsfors.
+        ///  Berg
         /// </summary>
-        Bengtsfors = 64,
-
+        Berg = 2326,
         /// <summary>
-        ///     Berg.
+        ///  Bjurholm
         /// </summary>
-        Berg = 65,
-
+        Bjurholm = 2403,
         /// <summary>
-        ///     Bjuv.
+        ///  Bjuv
         /// </summary>
-        Bjuv = 66,
-
+        Bjuv = 1260,
         /// <summary>
-        ///     Boden.
+        ///  Boden
         /// </summary>
-        Boden = 67,
-
+        Boden = 2582,
         /// <summary>
-        ///     Bollebygd.
+        ///  Bollebygd
         /// </summary>
-        Bollebygd = 68,
-
+        Bollebygd = 1443,
         /// <summary>
-        ///     Bollnäs.
+        ///  Bollnäs
         /// </summary>
-        Bollnas = 69,
-
+        Bollnäs = 2183,
         /// <summary>
-        ///     Lycksele.
+        ///  Borgholm
         /// </summary>
-        Lycksele = 70,
-
+        Borgholm = 885,
         /// <summary>
-        ///     Lysekil.
+        ///  Borlänge
         /// </summary>
-        Lysekil = 71,
-
+        Borlänge = 2081,
         /// <summary>
-        ///     Malmö.
+        ///  Borås
         /// </summary>
-        Malmo = 72,
-
+        Borås = 1490,
         /// <summary>
-        ///     Malung-Sälen.
+        /// Botkyrka
         /// </summary>
-        MalungSalen = 73,
-
+        Botkyrka = 127,
         /// <summary>
-        ///     Malå.
+        /// Boxholm
         /// </summary>
-        Mala = 74,
-
+        Boxholm = 560,
         /// <summary>
-        ///     Mariestad.
+        /// Bromölla
         /// </summary>
-        Mariestad = 75,
-
+        Bromölla = 1272,
         /// <summary>
-        ///     Mark.
+        ///  Bräcke
         /// </summary>
-        Mark = 76,
-
+        Bräcke = 2305,
         /// <summary>
-        ///     Markaryd.
+        /// Burlöv
         /// </summary>
-        Markaryd = 77,
-
+        Burlöv = 1231,
         /// <summary>
-        ///     Mellerud.
+        /// Båstad
         /// </summary>
-        Mellerud = 78,
-
+        Båstad = 1278,
         /// <summary>
-        ///     Mjölby.
+        ///  Dals-Ed
         /// </summary>
-        Mjolby = 79,
-
+        DalsEd = 1438,
         /// <summary>
-        ///     Mora.
+        ///  Danderyd
         /// </summary>
-        Mora = 80,
-
+        Danderyd = 162,
         /// <summary>
-        ///     Motala.
+        ///  Degerfors
         /// </summary>
-        Motala = 81,
-
+        Degerfors = 1862,
         /// <summary>
-        ///     Mullsjö.
+        ///  Dorotea
         /// </summary>
-        Mullsjo = 82,
-
+        Dorotea = 2425,
         /// <summary>
-        ///     Munkedal.
+        ///  Eda
         /// </summary>
-        Munkedal = 83,
-
+        Eda = 1730,
         /// <summary>
-        ///     Munkfors.
+        ///  Ekerö
         /// </summary>
-        Munkfors = 84,
-
+        Ekerö = 125,
         /// <summary>
-        ///     Mölndal.
+        ///  Eksjö
         /// </summary>
-        Molndal = 85,
-
+        Eksjö = 686,
         /// <summary>
-        ///     Mönsterås.
+        ///  Emmaboda
         /// </summary>
-        Monsteras = 86,
-
+        Emmaboda = 682,
         /// <summary>
-        ///     Mörbylånga.
+        ///  Enköping
         /// </summary>
-        Morbylanga = 87,
-
+        Enköping = 381,
         /// <summary>
-        ///     Nacka.
+        /// Eskilstuna
         /// </summary>
-        Nacka = 88,
-
+        Eskilstuna = 484,
         /// <summary>
-        ///     Nordmaling.
+        /// Eslöv
         /// </summary>
-        Nordmaling = 89,
-
+        Eslöv = 1285,
         /// <summary>
-        ///     Norrköping.
+        /// Essunga
         /// </summary>
-        Norrkoping = 90,
-
+        Essunga = 1445,
         /// <summary>
-        ///     Norrtälje.
+        /// Fagersta
         /// </summary>
-        Norrtalje = 91,
-
+        Fagersta = 1982,
         /// <summary>
-        ///     Norsjö.
+        /// Falkenberg
         /// </summary>
-        Norsjo = 92,
-
+        Falkenberg = 1382,
         /// <summary>
-        ///     Nora.
+        /// Falköping
         /// </summary>
-        Nora = 93,
-
+        Falköping = 1499,
         /// <summary>
-        ///     Norberg.
+        ///  Falun
         /// </summary>
-        Norberg = 94,
-
+        Falun = 2080,
         /// <summary>
-        ///     Nordanstig.
+        ///  Filipstad
         /// </summary>
-        Nordanstig = 95,
-
+        Filipstad = 1782,
         /// <summary>
-        ///     Nykvarn.
+        ///  Finspång
         /// </summary>
-        Nykvarn = 96,
-
+        Finspång = 562,
         /// <summary>
-        ///     Nyköping.
+        ///  Flen
         /// </summary>
-        Nykoping = 97,
-
+        Flen = 482,
         /// <summary>
-        ///     Nynäshamn.
+        ///  Forshaga
         /// </summary>
-        Nynashamn = 98,
-
+        Forshaga = 1763,
         /// <summary>
-        ///     Nässjö.
+        ///  Färgelanda
         /// </summary>
-        Nassjo = 99,
-
+        Färgelanda = 1439,
         /// <summary>
-        ///     Ockelbo.
+        /// Gagnef
         /// </summary>
-        Ockelbo = 100,
-
+        Gagnef = 2026,
         /// <summary>
-        ///     Olofström.
+        /// Gislaved
         /// </summary>
-        Olofstrom = 101,
-
+        Gislaved = 662,
         /// <summary>
-        ///     Orsa.
+        /// Gnesta
         /// </summary>
-        Orsa = 102,
-
+        Gnesta = 461,
         /// <summary>
-        ///     Orust.
+        /// Gnosjö
         /// </summary>
-        Orust = 103,
-
+        Gnosjö = 617,
         /// <summary>
-        ///     Osby.
+        /// Gotland
         /// </summary>
-        Osby = 104,
-
+        Gotland = 980,
         /// <summary>
-        ///     Oskarshamn.
+        /// Grums
         /// </summary>
-        Oskarshamn = 105,
-
+        Grums = 1764,
         /// <summary>
-        ///     Ovanåker.
+        /// Grästorp
         /// </summary>
-        Ovanaker = 106,
-
+        Grästorp = 1444,
         /// <summary>
-        ///     Oxelösund.
+        /// Gullspång
         /// </summary>
-        Oxelosund = 107,
-
+        Gullspång = 1447,
         /// <summary>
-        ///     Pajala.
+        /// Gällivare
         /// </summary>
-        Pajala = 108,
-
+        Gällivare = 2523,
         /// <summary>
-        ///     Partille.
+        /// Gävle
         /// </summary>
-        Partille = 109,
-
+        Gävle = 2180,
         /// <summary>
-        ///     Perstorp.
+        /// Göteborg
         /// </summary>
-        Perstorp = 110,
-
+        Göteborg = 1480,
         /// <summary>
-        ///     Piteå.
+        /// Götene
         /// </summary>
-        Pitea = 111,
-
+        Götene = 1471,
         /// <summary>
-        ///     Ragunda.
+        /// Habo
         /// </summary>
-        Ragunda = 112,
-
+        Habo = 643,
         /// <summary>
-        ///     Robertsfors.
+        /// Hagfors
         /// </summary>
-        Robertsfors = 113,
-
+        Hagfors = 1783,
         /// <summary>
-        ///     Ronneby.
+        /// Hallsberg
         /// </summary>
-        Ronneby = 114,
-
+        Hallsberg = 1861,
         /// <summary>
-        ///     Rättvik.
+        /// Hallstahammar
         /// </summary>
-        Rattvik = 115,
-
+        Hallstahammar = 1961,
         /// <summary>
-        ///     Sala.
+        /// Halmstad
         /// </summary>
-        Sala = 116,
-
+        Halmstad = 1380,
         /// <summary>
-        ///     Salem.
+        /// Hammarö
         /// </summary>
-        Salem = 117,
-
+        Hammarö = 1761,
         /// <summary>
-        ///     Sandviken.
+        /// Haninge
         /// </summary>
-        Sandviken = 118,
-
+        Haninge = 136,
         /// <summary>
-        ///     Sigtuna.
+        /// Haparanda
         /// </summary>
-        Sigtuna = 119,
-
+        Haparanda = 2583,
         /// <summary>
-        ///     Simrishamn.
+        /// Heby
         /// </summary>
-        Simrishamn = 120,
-
+        Heby = 331,
         /// <summary>
-        ///     Sjöbo.
+        /// Hedemora
         /// </summary>
-        Sjobo = 121,
-
+        Hedemora = 2083,
         /// <summary>
-        ///     Skara.
+        /// Helsingborg
         /// </summary>
-        Skara = 122,
-
+        Helsingborg = 1283,
         /// <summary>
-        ///     Skellefteå.
+        /// Herrljunga
         /// </summary>
-        Skelleftea = 123,
-
+        Herrljunga = 1466,
         /// <summary>
-        ///     Tingsryd.
+        /// Hjo
         /// </summary>
-        Tingsryd = 124,
-
+        Hjo = 1497,
         /// <summary>
-        ///     Tjörn.
+        /// Hofors
         /// </summary>
-        Tjorn = 125,
-
+        Hofors = 2104,
         /// <summary>
-        ///     Tomelilla.
+        /// Huddinge
         /// </summary>
-        Tomelilla = 126,
-
+        Huddinge = 126,
         /// <summary>
-        ///     Skinnskatteberg.
+        /// Hudiksvall
         /// </summary>
-        Skinnskatteberg = 127,
-
+        Hudiksvall = 2184,
         /// <summary>
-        ///     Sorsele.
+        /// Hultsfred
         /// </summary>
-        Sorsele = 128,
-
+        Hultsfred = 860,
         /// <summary>
-        ///     Sotenäs.
+        /// Hylte
         /// </summary>
-        Sotenas = 129,
-
+        Hylte = 1315,
         /// <summary>
-        ///     Skurup.
+        /// Håbo
         /// </summary>
-        Skurup = 130,
-
+        Håbo = 305,
         /// <summary>
-        ///     Skövde.
+        /// Hällefors
         /// </summary>
-        Skovde = 131,
-
+        Hällefors = 1863,
         /// <summary>
-        ///     Smedjebacken.
+        /// Härjedalen
         /// </summary>
-        Smedjebacken = 132,
-
+        Härjedalen = 2361,
         /// <summary>
-        ///     Sollefteå.
+        /// Härnösand
         /// </summary>
-        Solleftea = 133,
-
+        Härnösand = 2280,
         /// <summary>
-        ///     Sollentuna.
+        /// Härryda
         /// </summary>
-        Sollentuna = 134,
-
+        Härryda = 1401,
         /// <summary>
-        ///     Solna.
+        ///Hässleholm
         /// </summary>
-        Solna = 135,
-
+        Hässleholm = 1293,
         /// <summary>
-        ///     Staffanstorp.
+        /// Höganäs
         /// </summary>
-        Staffanstorp = 136,
-
+        Höganäs = 1284,
         /// <summary>
-        ///     Stenungsund.
+        /// Högsby
         /// </summary>
-        Stenungsund = 137,
-
+        Högsby = 821,
         /// <summary>
-        ///     Stockholm.
+        /// Hörby
         /// </summary>
-        Stockholm = 138,
-
+        Hörby = 1266,
         /// <summary>
-        ///     Storfors.
+        /// Höör
         /// </summary>
-        Storfors = 139,
-
+        Höör = 1267,
         /// <summary>
-        ///     Storuman.
+        /// Jokkmokk
         /// </summary>
-        Storuman = 140,
-
+        Jokkmokk = 2510,
         /// <summary>
-        ///     Strängnäs.
+        /// Järfälla
         /// </summary>
-        Strangnas = 141,
-
+        Järfälla = 123,
         /// <summary>
-        ///     Strömstad.
+        /// Jönköping
         /// </summary>
-        Stromstad = 142,
-
+        Jönköping = 680,
         /// <summary>
-        ///     Strömsund.
+        /// Kalix
         /// </summary>
-        Stromsund = 143,
-
+        Kalix = 2514,
         /// <summary>
-        ///     Sundbyberg.
+        /// Kalmar
         /// </summary>
-        Sundbyberg = 144,
-
+        Kalmar = 880,
         /// <summary>
-        ///     Sundsvall.
+        /// Karlsborg
         /// </summary>
-        Sundsvall = 145,
-
+        Karlsborg = 1446,
         /// <summary>
-        ///     Sunne.
+        /// Karlshamn
         /// </summary>
-        Sunne = 146,
-
+        Karlshamn = 1082,
         /// <summary>
-        ///     Borgholm.
+        /// Karlskoga
         /// </summary>
-        Borgholm = 147,
-
+        Karlskoga = 1883,
         /// <summary>
-        ///     Borlänge.
+        /// Karlskrona
         /// </summary>
-        Borlange = 148,
-
+        Karlskrona = 1080,
         /// <summary>
-        ///     Borås.
+        /// Karlstad
         /// </summary>
-        Boras = 149,
-
+        Karlstad = 1780,
         /// <summary>
-        ///     Botkyrka.
+        /// Katrineholm
         /// </summary>
-        Botkyrka = 150,
-
+        Katrineholm = 483,
         /// <summary>
-        ///     Boxholm.
+        /// Kil
         /// </summary>
-        Boxholm = 151,
-
+        Kil = 1715,
         /// <summary>
-        ///     Bromölla.
+        /// Kinda
         /// </summary>
-        Bromolla = 152,
-
+        Kinda = 513,
         /// <summary>
-        ///     Bräcke.
+        /// Kiruna
         /// </summary>
-        Bracke = 153,
-
+        Kiruna = 2584,
         /// <summary>
-        ///     Burlöv.
+        /// Klippan
         /// </summary>
-        Burlov = 154,
-
+        Klippan = 1276,
         /// <summary>
-        ///     Båstad.
+        /// Knivsta
         /// </summary>
-        Bastad = 155,
-
+        Knivsta = 330,
         /// <summary>
-        ///     Dals-Ed.
+        /// Kramfors
         /// </summary>
-        DalsEd = 156,
-
+        Kramfors = 2282,
         /// <summary>
-        ///     Danderyd.
+        /// Kristianstad
         /// </summary>
-        Danderyd = 157,
-
+        Kristianstad = 1290,
         /// <summary>
-        ///     Degerfors.
+        /// Kristinehamn
         /// </summary>
-        Degerfors = 158,
-
+        Kristinehamn = 1781,
         /// <summary>
-        ///     Dorotea.
+        /// Krokom
         /// </summary>
-        Dorotea = 159,
-
+        Krokom = 2309,
         /// <summary>
-        ///     Eda.
+        /// Kumla
         /// </summary>
-        Eda = 160,
-
+        Kumla = 1881,
         /// <summary>
-        ///     Ekerö.
+        /// Kungsbacka
         /// </summary>
-        Ekero = 161,
-
+        Kungsbacka = 1384,
         /// <summary>
-        ///     Eksjö.
+        /// Kungsor for Kungsör
         /// </summary>
-        Eksjo = 162,
-
+        Kungsör = 1960,
         /// <summary>
-        ///     Emmaboda.
+        /// Kungälv
         /// </summary>
-        Emmaboda = 163,
-
+        Kungälv = 1482,
         /// <summary>
-        ///     Enköping.
+        /// Kävlinge
         /// </summary>
-        Enkoping = 164,
-
+        Kävlinge = 1261,
         /// <summary>
-        ///     Eskilstuna.
+        /// Köping
         /// </summary>
-        Eskilstuna = 165,
-
+        Köping = 1983,
         /// <summary>
-        ///     Eslöv.
+        /// Laholm
         /// </summary>
-        Eslov = 166,
-
+        Laholm = 1381,
         /// <summary>
-        ///     Essunga.
+        /// Landskrona
         /// </summary>
-        Essunga = 167,
-
+        Landskrona = 1282,
         /// <summary>
-        ///     Fagersta.
+        /// Laxå
         /// </summary>
-        Fagersta = 168,
-
+        Laxå = 1860,
         /// <summary>
-        ///     Falkenberg.
+        /// Lekeberg
         /// </summary>
-        Falkenberg = 169,
-
+        Lekeberg = 1814,
         /// <summary>
-        ///     Falköping.
+        /// Leksand
         /// </summary>
-        Falkoping = 170,
-
+        Leksand = 2029,
         /// <summary>
-        ///     Falun.
+        /// Lerum
         /// </summary>
-        Falun = 171,
-
+        Lerum = 1441,
         /// <summary>
-        ///     Gagnef.
+        /// Lessebo
         /// </summary>
-        Gagnef = 172,
-
+        Lessebo = 761,
         /// <summary>
-        ///     Gislaved.
+        /// Lidingö
         /// </summary>
-        Gislaved = 173,
-
+        Lidingö = 186,
         /// <summary>
-        ///     Filipstad.
+        /// Lidköping
         /// </summary>
-        Filipstad = 174,
-
+        Lidköping = 1494,
         /// <summary>
-        ///     Finspång.
+        /// Lilla Edet
         /// </summary>
-        Finspang = 175,
-
+        LillaEdet = 1462,
         /// <summary>
-        ///     Flen.
+        /// Lindesberg
         /// </summary>
-        Flen = 176,
-
+        Lindesberg = 1885,
         /// <summary>
-        ///     Forshaga.
+        /// Linköping
         /// </summary>
-        Forshaga = 177,
-
+        Linköping = 580,
         /// <summary>
-        ///     Färgelanda.
+        /// Ljungby
         /// </summary>
-        Fargelanda = 178,
-
+        Ljungby = 781,
         /// <summary>
-        ///     Gnesta.
+        /// Ljusdal
         /// </summary>
-        Gnesta = 179,
-
+        Ljusdal = 2161,
         /// <summary>
-        ///     Gnosjö.
+        /// Ljusnarsberg
         /// </summary>
-        Gnosjo = 180,
-
+        Ljusnarsberg = 1886,
         /// <summary>
-        ///     Gotland.
+        /// Lomma
         /// </summary>
-        Gotland = 181,
-
+        Lomma = 1262,
         /// <summary>
-        ///     Grums.
+        /// Ludvika
         /// </summary>
-        Grums = 182,
-
+        Ludvika = 2085,
         /// <summary>
-        ///     Grästorp.
+        /// Luleå
         /// </summary>
-        Grastorp = 183,
-
+        Luleå = 2580,
         /// <summary>
-        ///     Gullspång.
+        /// Lund
         /// </summary>
-        Gullspang = 184,
-
+        Lund = 1281,
         /// <summary>
-        ///     Gällivare.
+        /// Lycksele
         /// </summary>
-        Gallivare = 185,
-
+        Lycksele = 2481,
         /// <summary>
-        ///     Gävle.
+        /// Lysekil
         /// </summary>
-        Gavle = 186,
-
+        Lysekil = 1484,
         /// <summary>
-        ///     Hallstahammar.
+        /// Malmö
         /// </summary>
-        Hallstahammar = 187,
-
+        Malmö = 1280,
         /// <summary>
-        ///     Halmstad.
+        /// Malung-Sälen
         /// </summary>
-        Halmstad = 188,
-
+        MalungSälen = 2023,
         /// <summary>
-        ///     Göteborg.
+        /// Malå
         /// </summary>
-        Goteborg = 189,
-
+        Malå = 2418,
         /// <summary>
-        ///     Hammarö.
+        /// Mariestad
         /// </summary>
-        Hammaro = 190,
-
+        Mariestad = 1493,
         /// <summary>
-        ///     Krokom.
+        /// Mark
         /// </summary>
-        Krokom = 191,
-
+        Mark = 1463,
         /// <summary>
-        ///     Götene.
+        /// Markaryd
         /// </summary>
-        Gotene = 192,
-
+        Markaryd = 767,
         /// <summary>
-        ///     Habo.
+        /// Mellerud
         /// </summary>
-        Habo = 193,
-
+        Mellerud = 1461,
         /// <summary>
-        ///     Hagfors.
+        /// Mjölby
         /// </summary>
-        Hagfors = 194,
-
+        Mjölby = 586,
         /// <summary>
-        ///     Hallsberg.
+        /// Mora
         /// </summary>
-        Hallsberg = 195,
-
+        Mora = 2062,
         /// <summary>
-        ///     Haninge.
+        /// Motala
         /// </summary>
-        Haninge = 196,
-
+        Motala = 583,
         /// <summary>
-        ///     Haparanda.
+        /// Mullsjö
         /// </summary>
-        Haparanda = 197,
-
+        Mullsjö = 642,
         /// <summary>
-        ///     Hedemora.
+        /// Munkedal
         /// </summary>
-        Hedemora = 198,
-
+        Munkedal = 1430,
         /// <summary>
-        ///     Heby.
+        /// Munkfors
         /// </summary>
-        Heby = 199,
-
+        Munkfors = 1762,
         /// <summary>
-        ///     Helsingborg.
+        /// Mölndal
         /// </summary>
-        Helsingborg = 200,
-
+        Mölndal = 1481,
         /// <summary>
-        ///     Herrljunga.
+        /// Mönsterås
         /// </summary>
-        Herrljunga = 201,
-
+        Mönsterås = 861,
         /// <summary>
-        ///     Hjo.
+        /// Mörbylånga
         /// </summary>
-        Hjo = 202,
-
+        Mörbylånga = 840,
         /// <summary>
-        ///     Hofors.
+        /// Nacka
         /// </summary>
-        Hofors = 203,
-
+        Nacka = 182,
         /// <summary>
-        ///     Huddinge.
+        /// Nora
         /// </summary>
-        Huddinge = 204,
-
+        Nora = 1884,
         /// <summary>
-        ///     Hudiksvall.
+        /// Norberg
         /// </summary>
-        Hudiksvall = 205,
-
+        Norberg = 1962,
         /// <summary>
-        ///     Hultsfred.
+        /// Nordanstig
         /// </summary>
-        Hultsfred = 206,
-
+        Nordanstig = 2132,
         /// <summary>
-        ///     Hylte.
+        /// Nordmaling
         /// </summary>
-        Hylte = 207,
-
+        Nordmaling = 2401,
         /// <summary>
-        ///     Hällefors.
+        /// Norrköping
         /// </summary>
-        Hallefors = 208,
-
+        Norrköping = 581,
         /// <summary>
-        ///     Härjedalen.
+        /// Norrtälje
         /// </summary>
-        Harjedalen = 209,
-
+        Norrtälje = 188,
         /// <summary>
-        ///     Härnösand.
+        /// Norsjö
         /// </summary>
-        Harnosand = 210,
-
+        Norsjö = 2417,
         /// <summary>
-        ///     Härryda.
+        /// Nybro
         /// </summary>
-        Harryda = 211,
-
+        Nybro = 881,
         /// <summary>
-        ///     Hässleholm.
+        /// Nykvarn
         /// </summary>
-        Hassleholm = 212,
-
+        Nykvarn = 140,
         /// <summary>
-        ///     Håbo.
+        /// Nyköping
         /// </summary>
-        Haabo = 213,
-
+        Nyköping = 480,
         /// <summary>
-        ///     Höganäs.
+        /// Nynäshamn
         /// </summary>
-        Hoganas = 214,
-
+        Nynäshamn = 192,
         /// <summary>
-        ///     Högsby.
+        /// Nässjö
         /// </summary>
-        Hogsby = 215,
-
+        Nässjö = 682,
         /// <summary>
-        ///     Hörby.
+        /// Ockelbo
         /// </summary>
-        Horby = 216,
-
+        Ockelbo = 2101,
         /// <summary>
-        ///     Höör.
+        /// Olofström
         /// </summary>
-        Hoor = 217,
-
+        Olofström = 1060,
         /// <summary>
-        ///     Jokkmokk.
+        /// Orsa
         /// </summary>
-        Jokkmokk = 218,
-
+        Orsa = 2034,
         /// <summary>
-        ///     Järfälla.
+        /// Orust
         /// </summary>
-        Jarfalla = 219,
-
+        Orust = 1421,
         /// <summary>
-        ///     Jönköping.
+        /// Osby
         /// </summary>
-        Jonkoping = 220,
-
+        Osby = 1273,
         /// <summary>
-        ///     Kalix.
+        /// Oskarshamn
         /// </summary>
-        Kalix = 221,
-
+        Oskarshamn = 882,
         /// <summary>
-        ///     Kalmar.
+        /// Ovanåker
         /// </summary>
-        Kalmar = 222,
-
+        Ovanåker = 2121,
         /// <summary>
-        ///     Karlsborg.
+        /// Oxelösund
         /// </summary>
-        Karlsborg = 223,
-
+        Oxelösund = 481,
         /// <summary>
-        ///     Karlshamn.
+        /// Pajala
         /// </summary>
-        Karlshamn = 224,
-
+        Pajala = 2521,
         /// <summary>
-        ///     Karlskoga.
+        /// Partille
         /// </summary>
-        Karlskoga = 225,
-
+        Partille = 1402,
         /// <summary>
-        ///     Karlskrona.
+        /// Perstorp
         /// </summary>
-        Karlskrona = 226,
-
+        Perstorp = 1275,
         /// <summary>
-        ///     Karlstad.
+        /// Piteå
         /// </summary>
-        Karlstad = 227,
-
+        Piteå = 2581,
         /// <summary>
-        ///     Katrineholm.
+        /// Ragunda
         /// </summary>
-        Katrineholm = 228,
-
+        Ragunda = 2303,
         /// <summary>
-        ///     Kil.
+        /// Robertsfors
         /// </summary>
-        Kil = 229,
-
+        Robertsfors = 2409,
         /// <summary>
-        ///     Kinda.
+        /// Ronneby
         /// </summary>
-        Kinda = 230,
-
+        Ronneby = 1081,
         /// <summary>
-        ///     Kiruna.
+        /// Rättvik
         /// </summary>
-        Kiruna = 231,
-
+        Rättvik = 2031,
         /// <summary>
-        ///     Klippan.
+        /// Sala
         /// </summary>
-        Klippan = 232,
-
+        Sala = 1981,
         /// <summary>
-        ///     Knivsta.
+        /// Salem
         /// </summary>
-        Knivsta = 233,
-
+        Salem = 128,
         /// <summary>
-        ///     Kramfors.
+        /// Sandviken
         /// </summary>
-        Kramfors = 234,
-
+        Sandviken = 2181,
         /// <summary>
-        ///     Kristianstad.
+        /// Sigtuna
         /// </summary>
-        Kristianstad = 235,
-
+        Sigtuna = 191,
         /// <summary>
-        ///     Kristinehamn.
+        /// Simrishamn
         /// </summary>
-        Kristinehamn = 236,
-
+        Simrishamn = 1291,
         /// <summary>
-        ///     Kumla.
+        /// Sjöbo
         /// </summary>
-        Kumla = 237,
-
+        Sjöbo = 1065,
         /// <summary>
-        ///     Kungsbacka.
+        /// Skara
         /// </summary>
-        Kungsbacka = 238,
-
+        Skara = 1495,
         /// <summary>
-        ///     Nybro.
+        /// Skellefteå
         /// </summary>
-        Nybro = 239,
-
+        Skellefteå = 2482,
         /// <summary>
-        ///     Kungsör.
+        /// Skinnskatteberg
         /// </summary>
-        Kungsor = 240,
-
+        Skinnskatteberg = 1904,
         /// <summary>
-        ///     Kungälv.
+        /// Skurup
         /// </summary>
-        Kungalv = 241,
-
+        Skurup = 1264,
         /// <summary>
-        ///     Kävlinge.
+        /// Skövde
         /// </summary>
-        Kavlinge = 242,
-
+        Skövde = 1496,
         /// <summary>
-        ///     Landskrona.
+        /// Smedjebacken
         /// </summary>
-        Landskrona = 243,
-
+        Smedjebacken = 2061,
         /// <summary>
-        ///     Laxå.
+        /// Sollefteå
         /// </summary>
-        Laxa = 244,
-
+        Sollefteå = 2283,
         /// <summary>
-        ///     Lekeberg.
+        /// Sollentuna
         /// </summary>
-        Lekeberg = 245,
-
+        Sollentuna = 163,
         /// <summary>
-        ///     Leksand.
+        /// Solna
         /// </summary>
-        Leksand = 246,
-
+        Solna = 184,
         /// <summary>
-        ///     Köping.
+        /// Sorsele
         /// </summary>
-        Koping = 247,
-
+        Sorsele = 2422,
         /// <summary>
-        ///     Laholm.
+        /// Sotenäs
         /// </summary>
-        Laholm = 248,
-
+        Sotenäs = 1427,
         /// <summary>
-        ///     Lerum.
+        /// Staffanstorp
         /// </summary>
-        Lerum = 249,
-
+        Staffanstorp = 1230,
         /// <summary>
-        ///     Ljusnarsberg.
+        /// Stenungsund
         /// </summary>
-        Ljusnarsberg = 250,
-
+        Stenungsund = 1415,
         /// <summary>
-        ///     Lomma.
+        /// Stockholm
         /// </summary>
-        Lomma = 251,
-
+        Stockholm = 180,
         /// <summary>
-        ///     Lessebo.
+        /// Storfors
         /// </summary>
-        Lessebo = 252,
-
+        Storfors = 1760,
         /// <summary>
-        ///     Lidingö.
+        /// Storuman
         /// </summary>
-        Lidingo = 253,
-
+        Storuman = 2421,
         /// <summary>
-        ///     Lidköping.
+        /// Strängnäs
         /// </summary>
-        Lidkoping = 254,
-
+        Strängnäs = 486,
         /// <summary>
-        ///     Lilla Edet.
+        /// Strömstad
         /// </summary>
-        LillaEdet = 255,
-
+        Strömstad = 1486,
         /// <summary>
-        ///     Lindesberg.
+        /// Strömsund
         /// </summary>
-        Lindesberg = 256,
-
+        Strömsund = 2313,
         /// <summary>
-        ///     Linköping.
+        /// Sundbyberg
         /// </summary>
-        Linkoping = 257,
-
+        Sundbyberg = 183,
         /// <summary>
-        ///     Ljungby.
+        /// Sundsvall
         /// </summary>
-        Ljungby = 258,
-
+        Sundsvall = 2281,
         /// <summary>
-        ///     Ljusdal.
+        /// Sunne
         /// </summary>
-        Ljusdal = 259,
-
+        Sunne = 1766,
         /// <summary>
-        ///     Ludvika.
+        /// Surahammar
         /// </summary>
-        Ludvika = 260,
-
+        Surahammar = 1907,
         /// <summary>
-        ///     Luleå.
+        /// Svalöv
         /// </summary>
-        Lulea = 261,
-
+        Svalöv = 1214,
         /// <summary>
-        ///     Lund.
+        /// Svedala
         /// </summary>
-        Lund = 262,
-
+        Svedala = 1263,
         /// <summary>
-        ///     Surahammar.
+        /// Svenljunga
         /// </summary>
-        Surahammar = 263,
-
+        Svenljunga = 1465,
         /// <summary>
-        ///     Svalöv.
+        /// Säffle
         /// </summary>
-        Svalov = 264,
-
+        Säffle = 1785,
         /// <summary>
-        ///     Svedala.
+        /// Säter
         /// </summary>
-        Svedala = 265,
-
+        Säter = 2082,
         /// <summary>
-        ///     Svenljunga.
+        /// Sävsjö
         /// </summary>
-        Svenljunga = 266,
-
+        Sävsjö = 684,
         /// <summary>
-        ///     Säffle.
+        /// Söderhamn
         /// </summary>
-        Saffle = 267,
-
+        Söderhamn = 2182,
         /// <summary>
-        ///     Säter.
+        /// Söderköping
         /// </summary>
-        Sater = 268,
-
+        Söderköping = 582,
         /// <summary>
-        ///     Sävsjö.
+        /// Södertälje
         /// </summary>
-        Savsjo = 269,
-
+        Södertälje = 181,
         /// <summary>
-        ///     Söderhamn.
+        /// Sölvesborg
         /// </summary>
-        Soderhamn = 270,
-
+        Sölvesborg = 1083,
         /// <summary>
-        ///     Söderköping.
+        /// Tanum
         /// </summary>
-        Soderkoping = 271,
-
+        Tanum = 1435,
         /// <summary>
-        ///     Södertälje.
+        /// Tibro
         /// </summary>
-        Sodertalje = 272,
-
+        Tibro = 1472,
         /// <summary>
-        ///     Sölvesborg.
+        /// Tidaholm
         /// </summary>
-        Solvesborg = 273,
-
+        Tidaholm = 1498,
         /// <summary>
-        ///     Tanum.
+        /// Tierp
         /// </summary>
-        Tanum = 274,
-
+        Tierp = 360,
         /// <summary>
-        ///     Tibro.
+        /// Timrå
         /// </summary>
-        Tibro = 275,
-
+        Timrå = 2262,
         /// <summary>
-        ///     Tidaholm.
+        /// Tingsryd
         /// </summary>
-        Tidaholm = 276,
-
+        Tingsryd = 763,
         /// <summary>
-        ///     Tierp.
+        /// Tjörn
         /// </summary>
-        Tierp = 277,
-
+        Tjörn = 1419,
         /// <summary>
-        ///     Timrå.
+        /// Tomelilla
         /// </summary>
-        Timra = 278,
-
+        Tomelilla = 1270,
         /// <summary>
-        ///     Torsby.
+        /// Torsby
         /// </summary>
-        Torsby = 279,
-
+        Torsby = 1737,
         /// <summary>
-        ///     Torsås.
+        /// Torsås
         /// </summary>
-        Torsas = 280,
-
+        Torsås = 834,
         /// <summary>
-        ///     Älvsbyn.
+        /// Tranemo
         /// </summary>
-        Alvsbyn = 281,
-
+        Tranemo = 1452,
         /// <summary>
-        ///     Tranemo.
+        /// Tranås
         /// </summary>
-        Tranemo = 282,
-
+        Tranås = 687,
         /// <summary>
-        ///     Tranås.
+        /// Trelleborg
         /// </summary>
-        Tranas = 283,
-
+        Trelleborg = 1287,
         /// <summary>
-        ///     Trelleborg.
+        /// Trollhättan
         /// </summary>
-        Trelleborg = 284,
-
+        Trollhättan = 1488,
         /// <summary>
-        ///     Trollhättan.
+        /// Trosa
         /// </summary>
-        Trollhattan = 285,
-
+        Trosa = 488,
         /// <summary>
-        ///     Trosa.
+        /// Tyresö
         /// </summary>
-        Trosa = 286,
-
+        Tyresö = 138,
         /// <summary>
-        ///     Tyresö.
+        /// Täby
         /// </summary>
-        Tyreso = 287,
-
+        Täby = 160,
         /// <summary>
-        ///     Täby.
+        /// Töreboda
         /// </summary>
-        Taby = 288,
-
+        Töreboda = 1473,
         /// <summary>
-        ///     Töreboda.
+        /// Uddevalla
         /// </summary>
-        Toreboda = 289,
-
+        Uddevalla = 1485,
         /// <summary>
-        ///     Upplands Väsby.
+        /// Ulricehamn
         /// </summary>
-        UpplandsVasby = 290,
-
+        Ulricehamn = 1491,
         /// <summary>
-        ///     Uppsala.
+        /// Umeå
         /// </summary>
-        Uppsala = 291,
-
+        Umeå = 2480,
         /// <summary>
-        ///     Uppvidinge.
+        /// Upplands Väsby
         /// </summary>
-        Uppvidinge = 292,
-
+        UpplandsVäsby = 114,
         /// <summary>
-        ///     Uddevalla.
+        /// Upplands-Bro
         /// </summary>
-        Uddevalla = 293,
-
+        UpplandsBro = 139,
         /// <summary>
-        ///     Ulricehamn.
+        /// Uppsala
         /// </summary>
-        Ulricehamn = 294,
-
+        Uppsala = 380,
         /// <summary>
-        ///     Umeå.
+        /// Uppvidinge
         /// </summary>
-        Umea = 295,
-
+        Uppvidinge = 760,
         /// <summary>
-        ///     Upplands-Bro.
+        /// Vadstena
         /// </summary>
-        UpplandsBro = 296,
-
+        Vadstena = 584,
         /// <summary>
-        ///     Vadstena.
+        /// Vaggeryd
         /// </summary>
-        Vadstena = 297,
-
+        Vaggeryd = 665,
         /// <summary>
-        ///     Vaggeryd.
+        /// Valdemarsvik
         /// </summary>
-        Vaggeryd = 298,
-
+        Valdemarsvik = 563,
         /// <summary>
-        ///     Valdemarsvik.
+        /// Vallentuna
         /// </summary>
-        Valdemarsvik = 299,
-
+        Vallentuna = 115,
         /// <summary>
-        ///     Vallentuna.
+        /// Vansbro
         /// </summary>
-        Vallentuna = 300,
-
+        Vansbro = 2021,
         /// <summary>
-        ///     Vansbro.
+        /// Vara
         /// </summary>
-        Vansbro = 301,
-
+        Vara = 1470,
         /// <summary>
-        ///     Vara.
+        /// Varberg
         /// </summary>
-        Vara = 302,
-
+        Varberg = 1383,
         /// <summary>
-        ///     Varberg.
+        /// Vaxholm
         /// </summary>
-        Varberg = 303,
-
+        Vaxholm = 187,
         /// <summary>
-        ///     Vaxholm.
+        /// Vellinge
         /// </summary>
-        Vaxholm = 304,
-
+        Vellinge = 1233,
         /// <summary>
-        ///     Vellinge.
+        /// Vetlanda
         /// </summary>
-        Vellinge = 305,
-
+        Vetlanda = 685,
         /// <summary>
-        ///     Vetlanda.
+        /// Vilhelmina
         /// </summary>
-        Vetlanda = 306,
-
+        Vilhelmina = 2462,
         /// <summary>
-        ///     Vilhelmina.
+        /// Vimmerby
         /// </summary>
-        Vilhelmina = 307,
-
+        Vimmerby = 884,
         /// <summary>
-        ///     Vimmerby.
+        /// Vindeln
         /// </summary>
-        Vimmerby = 308,
-
+        Vindeln = 2404,
         /// <summary>
-        ///     Vindeln.
+        /// Vingåker
         /// </summary>
-        Vindeln = 309,
-
+        Vingåker = 428,
         /// <summary>
-        ///     Vingåker.
+        /// Vårgårda
         /// </summary>
-        Vingaker = 310,
-
+        Vårgårda = 1442,
         /// <summary>
-        ///     Vänersborg.
+        /// Vänersborg
         /// </summary>
-        Vanersborg = 311,
-
+        Vänersborg = 1487,
         /// <summary>
-        ///     Vännäs.
+        /// Vännäs
         /// </summary>
-        Vannas = 312,
-
+        Vännäs = 2460,
         /// <summary>
-        ///     Älvdalen.
+        /// Värmdö
         /// </summary>
-        Alvdalen = 313,
-
+        Värmdö = 120,
         /// <summary>
-        ///     Älvkarleby.
+        /// Värnamo
         /// </summary>
-        Alvkarleby = 314,
-
+        Värnamo = 683,
         /// <summary>
-        ///     Värmdö.
+        /// Västervik
         /// </summary>
-        Varmdo = 315,
-
+        Västervik = 883,
         /// <summary>
-        ///     Värnamo.
+        /// Västerås
         /// </summary>
-        Varnamo = 316,
-
+        Västerås = 1980,
         /// <summary>
-        ///     Västervik.
+        /// Växjö
         /// </summary>
-        Vastervik = 317,
-
+        Växjö = 780,
         /// <summary>
-        ///     Västerås.
+        /// Ydre
         /// </summary>
-        Vasteras = 318,
-
+        Ydre = 512,
         /// <summary>
-        ///     Växjö.
+        /// Ystad
         /// </summary>
-        Vaxjo = 319,
-
+        Ystad = 1286,
         /// <summary>
-        ///     Vårgårda.
+        /// Åmål
         /// </summary>
-        Vargarda = 320,
-
+        Åmål = 1492,
         /// <summary>
-        ///     Ydre.
+        /// Ånge
         /// </summary>
-        Ydre = 321,
-
+        Ånge = 2260,
         /// <summary>
-        ///     Ystad.
+        /// Åre
         /// </summary>
-        Ystad = 322,
-
+        Åre = 2321,
         /// <summary>
-        ///     Älmhult.
+        /// Årjäng
         /// </summary>
-        Almhult = 323,
-
+        Årjäng = 1765,
         /// <summary>
-        ///     Ängelholm.
+        /// Åsele
         /// </summary>
-        Angelholm = 324,
-
+        Åsele = 2463,
         /// <summary>
-        ///     Åmål.
+        /// Åstorp
         /// </summary>
-        Amal = 325,
-
+        Åstorp = 1277,
         /// <summary>
-        ///     Ånge.
+        /// Åtvidaberg
         /// </summary>
-        Ange = 326,
-
+        Åtvidaberg = 561,
         /// <summary>
-        ///     Åre.
+        /// Älmhult
         /// </summary>
-        Are = 327,
-
+        Älmhult = 765,
         /// <summary>
-        ///     Årjäng.
+        /// Älvdalen
         /// </summary>
-        Arjang = 328,
-
+        Älvdalen = 2039,
         /// <summary>
-        ///     Åsele.
+        /// Älvkarleby
         /// </summary>
-        Asele = 329,
-
+        Älvkarleby = 319,
         /// <summary>
-        ///     Åstorp.
+        /// Älvsbyn
         /// </summary>
-        Astorp = 330,
-
+        Älvsbyn = 2560,
         /// <summary>
-        ///     Åtvidaberg.
+        /// Ängelholm
         /// </summary>
-        Atvidaberg = 331,
-
+        Ängelholm = 1292,
         /// <summary>
-        ///     Öckerö.
+        /// Öckerö
         /// </summary>
-        Ockero = 332,
-
+        Öckerö = 1407,
         /// <summary>
-        ///     Ödeshög.
+        /// Ödeshög
         /// </summary>
-        Odeshog = 333,
-
+        Ödeshög = 509,
         /// <summary>
-        ///     Örebro.
+        /// Örebro
         /// </summary>
-        Orebro = 334,
-
+        Örebro = 1880,
         /// <summary>
-        ///     Örkelljunga.
+        /// Örkelljunga
         /// </summary>
-        Orkelljunga = 335,
-
+        Örkelljunga = 1257,
         /// <summary>
-        ///     Örnsköldsvik.
+        /// Örnsköldsvik
         /// </summary>
-        Ornskoldsvik = 336,
-
+        Örnsköldsvik = 2284,
         /// <summary>
-        ///     Östersund.
+        /// Östersund
         /// </summary>
-        Ostersund = 337,
-
+        Östersund = 2380,
         /// <summary>
-        ///     Österåker.
+        /// Österåker
         /// </summary>
-        Osteraker = 338,
-
+        Österåker = 117,
         /// <summary>
-        ///     Östhammar.
+        /// Östhammar
         /// </summary>
-        Osthammar = 339,
-
+        Östhammar = 382,
         /// <summary>
-        ///     Östra Göinge.
+        /// Östra Göinge
         /// </summary>
-        OstraGoinge = 340,
-
+        ÖstraGöinge = 1256,
         /// <summary>
-        ///     Överkalix.
+        /// Överkalix
         /// </summary>
-        Overkalix = 341,
-
+        Överkalix = 2513,
         /// <summary>
-        ///     Övertorneå.
+        /// Övertorneå
         /// </summary>
-        Overtornea = 342
+        Övertorneå = 2518
     }
 }

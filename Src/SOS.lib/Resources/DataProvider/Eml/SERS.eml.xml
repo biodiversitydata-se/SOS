@@ -1,131 +1,138 @@
-<?xml version="1.0" encoding="utf-8"?>
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
-         xmlns:dc="http://purl.org/dc/terms/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:sos="https://sos-search.artdata.slu.se/"
-         xmlns:gbif="http://gbif.org/"
+         xmlns:dc="https://purl.org/dc/terms/"
+         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+		 xmlns:sos="https://sos-search.artdata.slu.se/"
+         xmlns:gbif="https://gbif.org/"
          xmlns:snd="https://snd.gu.se/"
-         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
-         packageId="33cf4a39-bc3a-af57-2255-98c6a44c2f7d" system="https://sos-search.artdata.slu.se/" scope="system"
-         xml:lang="en">
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+         packageId="9e932f70-0c61-11dd-84ce-b8a03c50a862" system="https://sos-search.artdata.slu.se/" scope="system"
+         xml:lang="eng">
+
 	<dataset>
-		<identifier>33cf4a39-bc3a-af57-2255-98c6a44c2f7d</identifier>
-        <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:SERS</alternateIdentifier>
-        <title>The Database for electrofishing in streams (SERS)</title>
+		<alternateIdentifier>9e932f70-0c61-11dd-84ce-b8a03c50a862</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=fiv-sers</alternateIdentifier>
+		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:SERS</alternateIdentifier>
+		<title xml:lang="eng">SLU Aqua  Institute of Freshwater Research Swedish Electrofishing Registry - SERS</title>
 		<creator>
+			<individualName>
+				<givenName>Anders</givenName>
+				<surName>Kinnerbäck</surName>
+			</individualName>
 			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Administrator</positionName>
 			<address>
-				<city>Lysekil</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress></electronicMailAddress>
-            <onlineUrl>http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/database-for-testfishing-in-streams/</onlineUrl>
-            <sos:contactNameType>Organizational</sos:contactNameType>
+			<electronicMailAddress>Anders.Kinnerback@slu.se</electronicMailAddress>
 		</creator>
 		<metadataProvider>
+			<individualName>
+				<givenName>Erik</givenName>
+				<surName>Myrstener</surName>
+			</individualName>
 			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Environmental analyst</positionName>
 			<address>
-				<city>Lysekil</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-            <electronicMailAddress></electronicMailAddress>
-            <onlineUrl></onlineUrl>
-		</metadataProvider>		
-		<pubDate>      
+			<electronicMailAddress>erik.myrstener@slu.se</electronicMailAddress>
+		</metadataProvider>
+		<pubDate>
 		</pubDate>
-		<language>ENGLISH</language>
-        <licenseName></licenseName>
+		<language>eng</language>
 		<abstract>
-			<para>The database called SERS contains data from experimental fishing with electricity in Swedish rivers and streams.</para>
+			<para>Electrofishing is a quantitative method to monitor the fish fauna in running waters, allowing fish to be released back alive. SERS consists of results from over 58 000 electrofishing occasions all over Sweden, as far as back to the 1950’s. The Department of Aquatic Resources (SLU Aqua) at the Swedish University of Agricultural Sciences is responsible of collecting and quality assuring test-fishing data generated in national and regional environmental programs, on behalf of the Swedish Agency for Marine and Water Management. The purpose is to facilitate the access of high quality data for research, national investigations and reports. The database also serves as a reference for local and regional investigations. All data is available for the public (www.slu.se/elfiskeregistret).</para>
 		</abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
-			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
 		</keywordSet>
 		<keywordSet>
 			<keyword>Observation</keyword>
-			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Sweden</keyword>
+			<keyword>Pisces</keyword>
+			<keyword>Fish</keyword>
+			<keyword>Electrofishing</keyword>
+			<keyword>Running waters</keyword>
+			<keyword>Freshwater</keyword>
+			<keywordThesaurus>Not Applicable</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
 		</keywordSet>
 		<intellectualRights>
-			<para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="https://creativecommons.org/publicdomain/zero/1.0/legalcode">
 					<citetitle>Public Domain (CC0 1.0)</citetitle>
-				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
 		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">https://www.slu.se/en/departments/aquatic-resources1/databases/database-for-testfishing-in-streams/</url>
+			</online>
+		</distribution>
 		<coverage>
 			<geographicCoverage>
-				<geographicDescription>This resource covers Sweden.</geographicDescription>
+				<geographicDescription>Sweden</geographicDescription>
 				<boundingCoordinates>
-					<westBoundingCoordinate>0.0</westBoundingCoordinate>
-					<eastBoundingCoordinate>0.0</eastBoundingCoordinate>
-					<northBoundingCoordinate>0.0</northBoundingCoordinate>
-					<southBoundingCoordinate>0.0</southBoundingCoordinate>
+					<westBoundingCoordinate>10.03</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.17</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.07</northBoundingCoordinate>
+					<southBoundingCoordinate>54.96</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
-            <temporalCoverage>
+			<temporalCoverage>
                 <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
                 <sos:LivingTimePeriod></sos:LivingTimePeriod>
-                <sos:StartDate></sos:StartDate>
+                <sos:StartDate>1951</sos:StartDate>
                 <sos:EndDate></sos:EndDate>
             </temporalCoverage>
-            <taxonomicCoverage>
-                <sos:TaxonomicDescription>Fish</sos:TaxonomicDescription>
-                <taxonId>6000995</taxonId>
-                <sos:TaxonList></sos:TaxonList>
-            </taxonomicCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>Pisces</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Pisces</taxonRankValue>
+				</taxonomicClassification>
+			</taxonomicCoverage>
 		</coverage>
 		<maintenance>
 			<description>
-				<para/>
+				<para></para>
 			</description>
-			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+			<maintenanceUpdateFrequency>irregular</maintenanceUpdateFrequency>
 		</maintenance>
 		<contact>
-            <individualName>
-                <givenName>Berit</givenName>
-                <surName>Sers</surName>
-            </individualName>
-            <electronicMailAddress>berit.sers@slu.se</electronicMailAddress>
-            <organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<individualName>
+				<givenName>Erik</givenName>
+				<surName>Myrstener</surName>
+			</individualName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Environmental analyst</positionName>
 			<address>
-				<city>Lysekil</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-            <onlineUrl>http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/database-for-testfishing-in-streams/</onlineUrl>
-            <sos:contactNameType>Personal</sos:contactNameType>
+			<electronicMailAddress>erik.myrstener@slu.se</electronicMailAddress>
 		</contact>
-        <sos:resourceType>occurrence data</sos:resourceType>
-        <sos:dataAccessibilityLevel></sos:dataAccessibilityLevel>
-        <sos:datsetSubtype>census data</sos:datsetSubtype>
-        <sos:resourceHomepage>http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/database-for-testfishing-in-streams/</sos:resourceHomepage>
-        <gbif:MetadataLanguage>ENGLISH</gbif:MetadataLanguage>
-        <gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
-        <project>
-            <sos:projectTitle></sos:projectTitle>
-            <funding></funding>
-            <funderIdentifier></funderIdentifier>
-            <dc:funderIdentifierType></dc:funderIdentifierType>
-            <designDescription></designDescription>
-        </project>
-        <samplingMethods>
-            <studyExtent></studyExtent>
-            <samplingDescription></samplingDescription>
-            <methodStep></methodStep>
-            <qualityControl></qualityControl>
-        </samplingMethods>
-        <additionalMetadata>
-            <metadata>
-                <gettingStarted></gettingStarted>
-                <purpose></purpose>
-                <sos>
-                    <sos:PersonalData></sos:PersonalData>
-                    <sos:SensitiveData></sos:SensitiveData>
-                    <sos:SensitiveDataDescription></sos:SensitiveDataDescription>
-                </sos>
-                <snd:dataFormat></snd:dataFormat>
-            </metadata>
-        </additionalMetadata>
-        <citations>
-            <sos:ResourceCitation></sos:ResourceCitation>
-        </citations>
+		<sos:resourceType>occurrence data</sos:resourceType>		
+		<sos:datsetSubtype>census data</sos:datsetSubtype>
 	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2015-07-15T01:27:43.876+02:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Kinnerbäck A, Myrstener E (2023). SLU Aqua Institute of Freshwater Research Swedish Electrofishing Registry - SERS. Department of Aquatic resources, SLU. Occurrence dataset. https://www.slu.se/elfiskeregistret [yyyy-mm-dd]</citation>
+				<formationPeriod>1951-current</formationPeriod>
+				<livingTimePeriod>1951-current</livingTimePeriod>				
+			</gbif>
+		</metadata>
+	</additionalMetadata>
 </eml:eml>

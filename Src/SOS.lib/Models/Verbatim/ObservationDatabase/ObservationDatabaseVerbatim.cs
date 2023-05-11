@@ -7,9 +7,9 @@ namespace SOS.Lib.Models.Verbatim.ObservationDatabase
     {
         public int? CoordinateUncertaintyInMeters { get; set; }
 
-        public double CoordinateX { get; set; }
+        public double? CoordinateX { get; set; }
 
-        public double CoordinateY { get; set; }
+        public double? CoordinateY { get; set; }
 
         public string CollectionCode { get; set; }
 
@@ -19,7 +19,7 @@ namespace SOS.Lib.Models.Verbatim.ObservationDatabase
 
         public DateTime EditDate { get; set; }
 
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         public string Habitat { get; set; }
 
@@ -55,7 +55,7 @@ namespace SOS.Lib.Models.Verbatim.ObservationDatabase
 
         public string Stadium { get; set; }
 
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
         public string Substrate { get; set; }
 

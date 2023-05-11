@@ -5,8 +5,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
-using SOS.Import.DarwinCore;
-using SOS.Import.Managers;
+using SOS.Harvest.DarwinCore;
+using SOS.Harvest.Managers;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -17,6 +17,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
+using SOS.Harvest.Managers;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Managers
@@ -121,7 +122,7 @@ namespace SOS.Import.IntegrationTests.Managers
             var jsonResolver = new IgnorableSerializerContractResolver { SetStringPropertyDefaultsToEmptyString = true}
                 .Ignore<Observation>(obs => obs.Location.Point)
                 .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
-                .Ignore<Observation>(obs => obs.IsInEconomicZoneOfSweden)
+                .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
                 .Ignore<DwcObservationVerbatim>(obs => obs.RecordId)
                 .Ignore<DwcObservationVerbatim>(obs => obs.Id)
                 .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderId)
@@ -161,6 +162,7 @@ namespace SOS.Import.IntegrationTests.Managers
             var processedTaxonRepository = new TaxonRepository(
                 processClient,
                 new NullLogger<TaxonRepository>());
+            var processConfiguration = new ProcessConfiguration();
 
             var validationReportManager = new DwcaDataValidationReportManager(
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
@@ -169,6 +171,8 @@ namespace SOS.Import.IntegrationTests.Managers
                 areaHelper,
                 vocabularyValueResolver,
                 processedTaxonRepository,
+                new ProcessTimeManager(processConfiguration),
+                processConfiguration,
                 new NullLogger<DwcaDataValidationReportManager>()
             );
 
@@ -178,7 +182,9 @@ namespace SOS.Import.IntegrationTests.Managers
         private ValidationManager CreateValidationManager()
         {
             var invalidObservationRepositoryMock = new Mock<IInvalidObservationRepository>();
-            ValidationManager validationManager = new ValidationManager(invalidObservationRepositoryMock.Object, new NullLogger<ValidationManager>());
+            var invalidEventRepositoryMock = new Mock<IInvalidEventRepository>();
+            ValidationManager validationManager = new ValidationManager(invalidObservationRepositoryMock.Object, 
+                invalidEventRepositoryMock.Object, new NullLogger<ValidationManager>());
             return validationManager;
         }
     }

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Hangfire;
 
 namespace SOS.Lib.Jobs.Import
@@ -10,7 +9,7 @@ namespace SOS.Lib.Jobs.Import
         ///     Run vocabularies import.
         /// </summary>
         /// <returns></returns>
-        [DisplayName("Harvest vocabularies from files")]
+        [JobDisplayName("Harvest vocabularies from files")]
         [Queue("high")]
         Task<bool> RunAsync();
     }

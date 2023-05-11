@@ -37,7 +37,7 @@ namespace SOS.Lib.Repositories.Processed
                     Builders<InvalidObservation>.IndexKeys.Ascending(io => io.OccurrenceID))
             };
 
-            Logger.LogDebug("Creating Area indexes");
+            Logger.LogDebug("Creating InvalidObservation indexes");
             await MongoCollection.Indexes.CreateManyAsync(indexModels);
         }
     }

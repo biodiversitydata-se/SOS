@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
 using Moq;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Processors.DarwinCoreArchive;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Process.UnitTests.TestHelpers.Factories;
 using SOS.TestHelpers.Helpers;
 using Xunit;
@@ -44,11 +46,14 @@ namespace SOS.Process.UnitTests.TestHelpers
                 ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
             var vocabularyRepository = VocabularyRepositoryStubFactory.Create();
             var areaHelper = new AreaHelper(processedAreaRepositoryStub.Object);
+            var processConfiguration = new ProcessConfiguration();
             var factory = DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,
                 mammaliaTaxonByTaxonId,
                 vocabularyRepository.Object,
-                areaHelper).Result;
+                areaHelper,
+                new ProcessTimeManager(processConfiguration),
+                processConfiguration).Result;
             return factory;
         }
     }

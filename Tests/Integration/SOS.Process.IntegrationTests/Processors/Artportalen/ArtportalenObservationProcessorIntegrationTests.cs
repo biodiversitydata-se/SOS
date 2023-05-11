@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Lib.Cache;
@@ -17,7 +15,6 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Managers;
-using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
@@ -25,9 +22,13 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services;
-using SOS.Process.Managers;
-using SOS.Process.Processors.Artportalen;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Services;
 using Xunit;
+using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
+using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
 
 namespace SOS.Process.IntegrationTests.Processors.Artportalen
 {
@@ -74,7 +75,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             var processConfiguration = GetProcessConfiguration();
             var exportConfiguration = GetExportConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
-            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration);
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var verbatimClient = new VerbatimClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
@@ -94,23 +95,26 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 new NullLogger<DarwinCoreArchiveVerbatimRepository>());
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
-            var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
-            IProcessedObservationRepository processedObservationRepository;
+            var invalidEventRepository =
+                new InvalidEventRepository(processClient, new NullLogger<InvalidEventRepository>());
+            var validationManager = new ValidationManager(invalidObservationRepository, invalidEventRepository, new NullLogger<ValidationManager>());
+            IProcessedObservationCoreRepository processedObservationRepository;
             if (storeProcessedObservations)
             {
-                processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
-                    new ElasticSearchConfiguration(), 
-                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
-                    new NullLogger<ProcessedObservationRepository>());
+                processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager,
+                    new ElasticSearchConfiguration(),
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                    new NullLogger<ProcessedObservationCoreRepository>());
             }
             else
             {
                 processedObservationRepository = CreateProcessedObservationRepositoryMock(batchSize).Object;
             }
-
+            IUserObservationRepository userObservationRepository = new Mock<IUserObservationRepository>().Object;
 
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
+            var datasetRepository = new ArtportalenDatasetMetadataRepository(processClient, new NullLogger<ArtportalenDatasetMetadataRepository>());
             var artportalenVerbatimRepository = new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>());
 
             
@@ -118,16 +122,24 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var processManager = new ProcessManager(processConfiguration);
+            var processTimeManager = new ProcessTimeManager(processConfiguration);
+            var artportalenConfiguration = GetArtportalenConfiguration();
+            var artportalenDataService = new ArtportalenDataService(artportalenConfiguration, new NullLogger<ArtportalenDataService>());
+            var sightingRepository = new SightingRepository(artportalenDataService, new NullLogger<SightingRepository>());
 
             return new ArtportalenObservationProcessor(
                 artportalenVerbatimRepository,
                 processedObservationRepository,
                 vocabularyRepository,
+                datasetRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
+                sightingRepository,
+                userObservationRepository,
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
         }
@@ -155,27 +167,50 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
 
             var dataProviderRepository =
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
+            var extendedMeasurementOrFactCsvWriter = new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>());
+            var simpleMultimediaCsvWriter = new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>());
+            var fileService = new FileService();
 
-            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(
-                    vocabularyValueResolver,
-                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
-                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
-                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
-                new FileService(),
-                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
-                new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), dataProviderRepository,
+
+            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(
+                new DwcArchiveFileWriter(
+                    new DwcArchiveOccurrenceCsvWriter(
+                        vocabularyValueResolver,
+                        new NullLogger<DwcArchiveOccurrenceCsvWriter>()
+                    ),
+                    extendedMeasurementOrFactCsvWriter,
+                    simpleMultimediaCsvWriter,
+                    fileService,
+                    dataProviderRepository,
+                    new NullLogger<DwcArchiveFileWriter>()
+                ),
+                new DwcArchiveEventFileWriter(
+                    new DwcArchiveOccurrenceCsvWriter(
+                        vocabularyValueResolver,
+                        new NullLogger<DwcArchiveOccurrenceCsvWriter>()
+                    ),
+                    new DwcArchiveEventCsvWriter(vocabularyValueResolver, new NullLogger<DwcArchiveEventCsvWriter>()),
+                    extendedMeasurementOrFactCsvWriter,
+                    simpleMultimediaCsvWriter,
+                    dataProviderRepository,
+                    fileService,
+                    new NullLogger<DwcArchiveEventFileWriter>()
+                ),
+                fileService, 
+                dataProviderRepository,
                 verbatimClient,
-                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, 
+                new NullLogger<DwcArchiveFileWriterCoordinator>()
+            );
             return dwcArchiveFileWriterCoordinator;
         }
 
-        private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock(int batchSize)
+        private Mock<IProcessedObservationCoreRepository> CreateProcessedObservationRepositoryMock(int batchSize)
         {
-            var mock = new Mock<IProcessedObservationRepository>();
+            var mock = new Mock<IProcessedObservationCoreRepository>();
             mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>())).ReturnsAsync(true);
-            mock.Setup(m => m.BatchSize).Returns(batchSize);
+            mock.Setup(m => m.WriteBatchSize).Returns(batchSize);
+            mock.Setup(m => m.ReadBatchSize).Returns(batchSize);
             return mock;
         }
 

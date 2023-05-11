@@ -1,5 +1,4 @@
 ﻿using System;
-using Nest;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Processed.Observation
@@ -9,6 +8,14 @@ namespace SOS.Lib.Models.Processed.Observation
     /// </summary>
     public class ProjectInfo : IEntity<int>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public ProjectInfo()
+        {
+
+        }
+
         /// <summary>
         ///     Indicates if species observations that are reported in
         ///     a project are publicly available or not.
@@ -35,7 +42,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Date when the project ends (UTC).
         /// </summary>
-        [Date]
         public DateTime? EndDate { get; set; }
 
         /// <summary>
@@ -64,7 +70,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Date when the project starts (UTC).
         /// </summary>
-        [Date]
         public DateTime? StartDate { get; set; }
 
         /// <summary>

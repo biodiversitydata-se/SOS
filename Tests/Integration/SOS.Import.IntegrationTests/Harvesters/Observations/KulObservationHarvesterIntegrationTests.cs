@@ -4,8 +4,8 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Import.Harvesters.Observations;
-using SOS.Import.Services;
+using SOS.Harvest.Harvesters.AquaSupport.Kul;
+using SOS.Harvest.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Repositories.Verbatim;
@@ -29,7 +29,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
 
             var kulObservationService = new KulObservationService(
-                new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), 
+                new AquaSupportRequestService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<AquaSupportRequestService>()), 
                 importConfiguration.KulServiceConfiguration,
                 new NullLogger<KulObservationService>());
 
@@ -51,7 +51,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
+            var result = await kulObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -72,7 +72,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
 
             var kulObservationHarvester = new KulObservationHarvester(
                 new KulObservationService(
-                    new HttpClientService(new Mock<ILogger<HttpClientService>>().Object),
+                    new AquaSupportRequestService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<AquaSupportRequestService>()),
                     importConfiguration.KulServiceConfiguration,
                     new NullLogger<KulObservationService>()),
                 new Mock<IKulObservationVerbatimRepository>().Object,
@@ -82,7 +82,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
+            var result = await kulObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

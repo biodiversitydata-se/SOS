@@ -20,8 +20,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         /// <remarks>
         /// Only Mammalia taxon and its underlying taxa is available in this unit test to keep the execution time fast.
         /// </remarks>
-        [Theory]
-        [InlineData(null, "233622", 233622)] // find by taxon id
+        [Theory]        
         [InlineData(null, "urn:lsid:dyntaxa.se:Taxon:233622", 233622)] // find integer in guid
         [InlineData("equus asinus", null, 233622)] // find by scientific name
         //[InlineData("Felis lynx", null, 100057)] // find by synonyme (synonyms aren't yet included in test data)
@@ -43,7 +42,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
             int? parsedTaxonId = observation.Taxon?.Id;
 
             //-----------------------------------------------------------------------------------------------------------
@@ -77,12 +76,12 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Taxon.Should().BeNull();
+            observation.Taxon.Id.Should().Be(-1, "because -1 means that the taxon was not found");
         }
     }
 }

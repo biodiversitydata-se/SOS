@@ -5,7 +5,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SharpCompress.Common.Zip;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Database.Interfaces;
@@ -25,18 +24,21 @@ namespace SOS.Lib.IO.DwcArchive
         private readonly object _initWriteCsvLock = new object();
         private readonly IFileService _fileService;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
+        private readonly IDwcArchiveEventFileWriter _dwcArchiveEventFileWriter;
         private readonly DwcaFilesCreationConfiguration _dwcaFilesCreationConfiguration;
         private readonly ILogger<DwcArchiveFileWriterCoordinator> _logger;
         private readonly IDataProviderRepository _dataProviderRepository;
         private readonly IVerbatimClient _importClient;
 
         private Dictionary<DataProvider, DwcaFilePartsInfo> _dwcaFilePartsInfoByDataProvider;
+        private WrittenEventSets _writtenEventSets;
+        public bool Enabled => _dwcaFilesCreationConfiguration.IsEnabled;
 
         /// <summary>
         /// Simplified by only returning file size
         /// </summary>
         /// <param name="path"></param>
-        /// <returns></returns>
+        /// <returns></returns>l
         private async Task<string> GetFileHashAsync(string path)
         {
             try
@@ -68,7 +70,6 @@ namespace SOS.Lib.IO.DwcArchive
             try
             {
                 await using var stream = emlZipEntry.Open();
-                stream.Position = 0;
                 var size = await DwCArchiveEmlFileFactory.GetEmlSizeWithoutPubDateAsync(stream);
                 return size;
             }
@@ -80,6 +81,7 @@ namespace SOS.Lib.IO.DwcArchive
 
         public DwcArchiveFileWriterCoordinator(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
+            IDwcArchiveEventFileWriter dwcArchiveEventFileWriter,
             IFileService fileService,
             IDataProviderRepository dataProviderRepository,
             IVerbatimClient importClient,
@@ -87,6 +89,7 @@ namespace SOS.Lib.IO.DwcArchive
             ILogger<DwcArchiveFileWriterCoordinator> logger)
         {
             _dwcArchiveFileWriter = dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
+            _dwcArchiveEventFileWriter = dwcArchiveEventFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveEventFileWriter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dataProviderRepository = dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
             _importClient = importClient ??
@@ -102,6 +105,7 @@ namespace SOS.Lib.IO.DwcArchive
         public void BeginWriteDwcCsvFiles()
         {
             _dwcaFilePartsInfoByDataProvider = new Dictionary<DataProvider, DwcaFilePartsInfo>();
+            _writtenEventSets = new WrittenEventSets();
         }
 
         /// <summary>
@@ -111,22 +115,25 @@ namespace SOS.Lib.IO.DwcArchive
         /// <param name="dataProvider"></param>
         /// <param name="batchId">If the processing is done in parallel for a data provider, use the batchId to identify the specific batch that was processed.</param>
         /// <returns></returns>
-        public async Task<bool> WriteObservations(
+        public async Task<bool> WriteHeaderlessDwcaFileParts(
             IEnumerable<Observation> processedObservations,
             DataProvider dataProvider,
             string batchId = "")
         {
-            if (!_dwcaFilesCreationConfiguration.IsEnabled || !(processedObservations?.Any() ?? false))
+            if (!Enabled || !(processedObservations?.Any() ?? false))
             {
                 return true;
             }
 
-            // todo - change name to [WriteHeaderlessDwcaFile] or [WriteHeaderlessDwcaFileParts] ?
             try
             {
-                if (string.IsNullOrEmpty(dataProvider?.Identifier)) return false;
-                if (batchId == null) batchId = "";
+                if (string.IsNullOrEmpty(dataProvider?.Identifier)) {
+                    return false;
+                }
+
+                batchId ??= "";
                 Dictionary<DwcaFilePart, string> filePathByFilePart;
+                Dictionary<DwcaEventFilePart, string> filePathByEventFilePart;
                 lock (_initWriteCsvLock)
                 {
                     DwcaFilePartsInfo dwcaFilePartsInfo = null;
@@ -136,12 +143,24 @@ namespace SOS.Lib.IO.DwcArchive
                     }
 
                     filePathByFilePart = dwcaFilePartsInfo.GetOrCreateFilePathByFilePart(batchId);
+                    filePathByEventFilePart = dwcaFilePartsInfo.GetOrCreateEventFilePathByFilePart(batchId);
                 }
 
                 // Exclude sensitive species.
                 var publicObservations = processedObservations
                     .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
-                await _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(publicObservations, filePathByFilePart);
+                var writeHeaderlessDwcaFilesTasks = new List<Task>()
+                {
+                    _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters)
+                };
+
+                if (dataProvider.CreateEventDwC)
+                {
+                    writeHeaderlessDwcaFilesTasks.Add(_dwcArchiveEventFileWriter.WriteHeaderlessEventDwcaFilesAsync(dataProvider, publicObservations, filePathByEventFilePart, _writtenEventSets, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters));
+                }
+
+                await Task.WhenAll(writeHeaderlessDwcaFilesTasks);
+
                 return true;
             }
             catch (Exception e)
@@ -159,8 +178,8 @@ namespace SOS.Lib.IO.DwcArchive
         {
             try
             {
-                if (!_dwcaFilesCreationConfiguration.IsEnabled) return null;
-                var dwcaCreationTasks = new Dictionary<DataProvider, Task<string>>();
+                if (!Enabled) return null;
+                var dwcaCreationTasks = new Dictionary<(DataProvider dataProvider, bool eventBased), Task<string>>();
                 foreach (var pair in _dwcaFilePartsInfoByDataProvider)
                 {
                     var provider = pair.Key;
@@ -190,7 +209,7 @@ namespace SOS.Lib.IO.DwcArchive
                                 await fileStream.DisposeAsync();
                                 await sourceStream.DisposeAsync();
 
-                                dwcaCreationTasks.Add(provider, Task.FromResult(filePath));
+                                dwcaCreationTasks.Add((provider, false), Task.FromResult(filePath));
                             }
                         }
                         catch (Exception e)
@@ -201,11 +220,16 @@ namespace SOS.Lib.IO.DwcArchive
                         continue;
                     }
 
-                    dwcaCreationTasks.Add(provider, _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(provider,
+                    dwcaCreationTasks.Add((provider, false), _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(provider,
                         _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
+                    if (provider.CreateEventDwC)
+                    {
+                        dwcaCreationTasks.Add((provider, true), _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileAsync(provider,
+                        _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
+                    }
                 }
 
-                dwcaCreationTasks.Add(new DataProvider { Id = 0, Identifier = "SOS Complete" }, _dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
+                dwcaCreationTasks.Add((new DataProvider { Id = 0, Identifier = "SOS Complete" }, false), _dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
                     _dwcaFilePartsInfoByDataProvider.Values));
                 await Task.WhenAll(dwcaCreationTasks.Values);
 
@@ -214,7 +238,7 @@ namespace SOS.Lib.IO.DwcArchive
 
                 foreach (var task in dwcaCreationTasks)
                 {
-                    var dataProvider = task.Key;
+                    var dataProvider = task.Key.dataProvider;
                     var filePath = task.Value.Result;
 
                     // Id 0 = complete Dwc archive file
@@ -225,7 +249,7 @@ namespace SOS.Lib.IO.DwcArchive
                     }
 
                     var hash = await GetFileHashAsync(task.Value.Result);
-                    _logger.LogInformation($"Generated DwC-A file for {dataProvider}. Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
+                    _logger.LogInformation($"Generated DwC-A {(task.Key.eventBased ? "event based" : "")} file for {dataProvider}. Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
                     if (dataProvider.LatestUploadedFileHash == hash)
                     {
                         continue;
@@ -268,9 +292,9 @@ namespace SOS.Lib.IO.DwcArchive
             }
             else
             {
-                // Empty folder from CSV files before we start to create new ones.
-                foreach (string file in Directory.GetFiles(dwcaFilePartsInfo.ExportFolder, "*.csv")
-                    .Where(item => item.EndsWith(".csv")))
+                // Empty folder from txt files before we start to create new ones.
+                foreach (string file in Directory.GetFiles(dwcaFilePartsInfo.ExportFolder, "*.txt")
+                    .Where(item => item.EndsWith(".txt")))
                 {
                     File.Delete(file);
                 }
@@ -287,7 +311,19 @@ namespace SOS.Lib.IO.DwcArchive
             if (_dwcaFilePartsInfoByDataProvider == null) return;
             foreach (var dwcaFileCreationInfo in _dwcaFilePartsInfoByDataProvider.Values)
             {
-                foreach (string filePath in dwcaFileCreationInfo.FilePathByBatchIdAndFilePart.Values.SelectMany(f => f.Values))
+                foreach (var filePath in dwcaFileCreationInfo.FilePathByBatchIdAndFilePart.Values.SelectMany(f => f.Values))
+                {
+                    try
+                    {
+                        if (File.Exists(filePath)) File.Delete(filePath);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e, $"Failed to delete file: {filePath}");
+                    }
+                }
+
+                foreach (var filePath in dwcaFileCreationInfo.EventFilePathByBatchIdAndFilePart.Values.SelectMany(f => f.Values))
                 {
                     try
                     {

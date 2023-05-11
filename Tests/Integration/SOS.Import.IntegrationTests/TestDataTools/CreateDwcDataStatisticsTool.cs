@@ -5,9 +5,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Logging.Abstractions;
 using OfficeOpenXml;
-using SOS.Import.DarwinCore;
-using SOS.Import.Harvesters.Observations;
-using SOS.Import.Services;
+using SOS.Harvest.DarwinCore;
+using SOS.Harvest.Harvesters.DwC;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
 using SOS.Lib.Models.Shared;
@@ -64,8 +63,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 processConfiguration.WriteBatchSize
                 );
             var dwcObservationHarvester = new DwcObservationHarvester(
-                importClient,
-                new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
+                importClient,                
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), 

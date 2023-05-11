@@ -1,0 +1,11 @@
+version: '3.9'
+services:
+  mongodb_container:
+    image: mongo:4.4.14
+    ports:
+      - 27017:27017
+    volumes:
+      - sos_local_env_data:/data/db
+
+volumes:
+  sos_local_env_data:

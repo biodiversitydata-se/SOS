@@ -120,11 +120,11 @@ namespace SOS.Lib.IO.DwcArchive
 
             //Create:
             //< files >
-            //  < location > taxon.csv </ location >
+            //  < location > taxon.txt </ location >
             //</ files >
             XmlNode filesNode = doc.CreateElement("files", elementNamespace);
             XmlNode locationNode = doc.CreateElement("location", elementNamespace);
-            locationNode.AppendChild(doc.CreateTextNode("occurrence.csv"));
+            locationNode.AppendChild(doc.CreateTextNode("occurrence.txt"));
             filesNode.AppendChild(locationNode);
             coreNode.AppendChild(filesNode);
 
@@ -184,11 +184,11 @@ namespace SOS.Lib.IO.DwcArchive
 
             //Create:
             //< files >
-            //  < location > taxon.csv </ location >
+            //  < location > taxon.txt </ location >
             //</ files >
             XmlNode filesNode = doc.CreateElement("files", elementNamespace);
             XmlNode locationNode = doc.CreateElement("location", elementNamespace);
-            locationNode.AppendChild(doc.CreateTextNode("event.csv"));
+            locationNode.AppendChild(doc.CreateTextNode("event.txt"));
             filesNode.AppendChild(locationNode);
             coreNode.AppendChild(filesNode);
 
@@ -221,7 +221,7 @@ namespace SOS.Lib.IO.DwcArchive
             var extension = doc.CreateElement("extension", elementNamespace);
 
             var attr = doc.CreateAttribute("encoding");
-            attr.Value = "UTF8";
+            attr.Value = "UTF-8";
             extension.Attributes.Append(attr);
 
             attr = doc.CreateAttribute("fieldsTerminatedBy");

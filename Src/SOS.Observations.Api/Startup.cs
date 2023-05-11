@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elasticsearch.Net;
+using System.Threading.Tasks;
 using Hangfire;
-using Hangfire.Dashboard;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
@@ -22,19 +22,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NLog.Web;
+using SOS.Lib.ActionFilters;
+using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -51,9 +53,11 @@ using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Middleware;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
@@ -65,13 +69,17 @@ using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
-using SOS.Observations.Api.ActionFilters;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.ApplicationInsights;
+using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.HealthChecks;
+using SOS.Observations.Api.HealthChecks.Custom;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
-using SOS.Observations.Api.Swagger;
+using SOS.Observations.Api.Repositories;
+using SOS.Observations.Api.Repositories.Interfaces;
+using SOS.Observations.Api.Services.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
@@ -88,7 +96,7 @@ namespace SOS.Observations.Api
         private const string InternalApiName = "InternalSosObservations";
         private const string PublicApiName = "PublicSosObservations";
         private const string InternalApiPrefix = "Internal";
-
+        private IWebHostEnvironment CurrentEnvironment { get; set; }
         private bool _isDevelopment;
         /// <summary>
         ///     Start up
@@ -97,6 +105,7 @@ namespace SOS.Observations.Api
         public Startup(IWebHostEnvironment env)
         {
             var environment = env.EnvironmentName.ToLower();
+            CurrentEnvironment = env;
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -104,7 +113,7 @@ namespace SOS.Observations.Api
                 .AddJsonFile($"appsettings.{environment}.json", true)
                 .AddEnvironmentVariables();
 
-            _isDevelopment = environment.Equals("local");
+            _isDevelopment = CurrentEnvironment.IsEnvironment("local") || CurrentEnvironment.IsEnvironment("dev");
             if (_isDevelopment)
             {
                 // If Development mode, add secrets stored on developer machine 
@@ -128,14 +137,18 @@ namespace SOS.Observations.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.AddResponseCaching();
 
             services.AddControllers()
-                .AddXmlSerializerFormatters()
                 .AddJsonOptions(options =>
                 {
-                    options
-.JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
+                    options.JsonSerializerOptions.AllowTrailingCommas = true;
+                    //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull; // Some clients does not support omitting null values, so use JsonIgnoreCondition.Never for now.
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+                    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                    options.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
+                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()); // Is this needed?
                 });
 
             // MongoDB conventions.
@@ -161,28 +174,18 @@ namespace SOS.Observations.Api
                     options.TokenValidationParameters.RoleClaimType = "rname";
                 });
 
-            // Add Mvc Core services
-            services.AddMvcCore(option => { option.EnableEndpointRouting = false; })
-                .AddApiExplorer()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                });
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-
             // Add application insights.
             services.AddApplicationInsightsTelemetry(Configuration);
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.ObservationApi.ApplicationInsights>());
+            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
             services.AddApiVersioning(o =>
             {
                 o.AssumeDefaultVersionWhenUnspecified = true;
-                o.DefaultApiVersion = new ApiVersion(1, 0);
+                o.DefaultApiVersion = new ApiVersion(1, 5);
                 o.ReportApiVersions = true;
                 o.ApiVersionReader = new HeaderApiVersionReader("X-Api-Version");
             });
@@ -204,6 +207,7 @@ namespace SOS.Observations.Api
             services.AddSwaggerGen(
                 swagger =>
                 {
+                    swagger.UseInlineDefinitionsForEnums();
                     foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
                     {
                         swagger.SwaggerDoc(
@@ -223,18 +227,20 @@ namespace SOS.Observations.Api
                                 Version = description.ApiVersion.ToString(),
                                 Description = "Species Observation System (SOS) - Observations API. Public API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
                             });
-
+                        swagger.CustomSchemaIds(type => type.ToString());
                         swagger.CustomOperationIds(apiDesc =>
                         {
                             apiDesc.TryGetMethodInfo(out MethodInfo methodInfo);
                             string controller = apiDesc.ActionDescriptor.RouteValues["controller"];
                             string methodName = methodInfo.Name;
-                            return $"{controller}_{methodName}";
+                      
+                            return $"{controller}_{methodName}".Replace("Async", "", StringComparison.InvariantCultureIgnoreCase);
                         });
                     }
 
-                    // add a custom operation filter which sets default values
+                    // add a custom operation filters
                     swagger.OperationFilter<SwaggerDefaultValues>();
+                    swagger.OperationFilter<SwaggerAddOptionalHeaderParameters>();
 
                     var currentAssembly = Assembly.GetExecutingAssembly();
                     var xmlDocs = currentAssembly.GetReferencedAssemblies()
@@ -292,9 +298,23 @@ namespace SOS.Observations.Api
             var observationApiConfiguration = Configuration.GetSection("ObservationApiConfiguration")
                 .Get<ObservationApiConfiguration>();
 
+            // Response compression
+            if (observationApiConfiguration.EnableResponseCompression)
+            {
+                services.AddResponseCompression(o => o.EnableForHttps = true);
+                services.Configure<BrotliCompressionProviderOptions>(options =>
+                {
+                    options.Level = observationApiConfiguration.ResponseCompressionLevel;
+                });
+                services.Configure<GzipCompressionProviderOptions>(options =>
+                {
+                    options.Level = observationApiConfiguration.ResponseCompressionLevel;
+                });
+            }
+
             // Hangfire
             var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
-            
+
             services.AddHangfire(configuration =>
                 configuration
                     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
@@ -318,6 +338,8 @@ namespace SOS.Observations.Api
                         })
             );
 
+            services.AddSingleton(Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>());
+
             //setup the elastic search configuration
             var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
             services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(elasticConfiguration));
@@ -332,35 +354,51 @@ namespace SOS.Observations.Api
                 .Get<BlobStorageConfiguration>();
 
             var healthCheckConfiguration = Configuration.GetSection("HealthCheckConfiguration").Get<HealthCheckConfiguration>();
+            var artportalenApiServiceConfiguration = Configuration.GetSection("ArtportalenApiServiceConfiguration").Get<ArtportalenApiServiceConfiguration>();
 
             // Add configuration
+            services.AddSingleton(artportalenApiServiceConfiguration);
             services.AddSingleton(observationApiConfiguration);
             services.AddSingleton(blobStorageConfiguration);
+            services.AddSingleton(Configuration.GetSection("DevOpsConfiguration").Get<DevOpsConfiguration>());
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
             services.AddSingleton(healthCheckConfiguration);
             services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
+            services.AddSingleton(Configuration);
 
-
-            services.AddHealthChecks()
+            services.AddSingleton<IHealthCheckPublisher, HealthReportCachePublisher>();
+            services.Configure<HealthCheckPublisherOptions>(options =>
+            {
+                options.Delay = TimeSpan.FromSeconds(10);
+                options.Period = TimeSpan.FromSeconds(90); // Create new health check every 90 sek and cache reult
+                options.Timeout = TimeSpan.FromSeconds(60);
+            });
+            var healthChecks = services.AddHealthChecks()
                 .AddDiskStorageHealthCheck(
                     x => x.AddDrive("C:\\", (long)(healthCheckConfiguration.MinimumLocalDiskStorage * 1000)),
                     name: $"Primary disk: min {healthCheckConfiguration.MinimumLocalDiskStorage}GB free - warning",
                     failureStatus: HealthStatus.Degraded,
                     tags: new[] { "disk" })
-                .AddMongoDb(processedDbConfiguration.GetConnectionString())
-                .AddHangfire(a => a
-                    .MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
+                .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" })
+                .AddHangfire(a => a.MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
                 .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
-                .AddCheck<SearchHealthCheck>("Search", tags: new[] { "database", "elasticsearch", "query" })
+                .AddCheck<SearchDataProvidersHealthCheck>("Search data providers", tags: new[] { "database", "elasticsearch", "query" })
+                .AddCheck<SearchPerformanceHealthCheck>("Search performance", tags: new[] { "database", "elasticsearch", "query", "performance" })
+                .AddCheck<AzureSearchHealthCheck>("Azure search API health check", tags: new[] { "azure", "database", "elasticsearch", "query" })
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
-                .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" })
-                .AddElasticsearch(a => a
-                        .UseServer(string.Join(';', elasticConfiguration.Clusters.Select(c => c.Hosts)))
-                        .UseBasicAuthentication(elasticConfiguration.UserName, elasticConfiguration.Password)
-                        .UseCertificateValidationCallback((o, certificate, arg3, arg4) => true)
-                        .UseCertificateValidationCallback(CertificateValidations.AllowAll), "ElasticSearch", null,
-                    tags: new[] { "database", "elasticsearch", "system" });
+                .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
+                .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
+                .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" })
+                .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" })
+                .AddCheck<APDbRestoreHealthCheck>("Artportalen database backup restore", tags: new[] { "database", "sql server" });
+
+            if (CurrentEnvironment.IsEnvironment("prod"))
+            {
+                healthChecks.AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
+                healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
+                healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] { "wfs" }); // add this to ST environment when we have a GeoServer test environment.
+            }
 
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
@@ -372,27 +410,46 @@ namespace SOS.Observations.Api
             services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
             services.AddSingleton<ICache<int, TaxonList>, TaxonListCache>();
-            services.AddSingleton<IClassCache<ProcessedConfiguration>, ClassCache<ProcessedConfiguration>>();
+            services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
+            var taxonSumAggregationCache = new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions())) { CacheDuration = TimeSpan.FromHours(12) };
+            services.AddSingleton<IClassCache<Dictionary<int, TaxonSumAggregationItem>>>(taxonSumAggregationCache);
+            services.AddSingleton<IClassCache<HealthCheckResult>, ClassCache<HealthCheckResult>>();
 
             // Add managers
             services.AddScoped<IAreaManager, AreaManager>();
             services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
+            services.AddSingleton<IChecklistManager, ChecklistManager>();
             services.AddScoped<IDataProviderManager, DataProviderManager>();
             services.AddScoped<IDataQualityManager, DataQualityManager>();
+            services.AddScoped<IDataStewardshipManager, DataStewardshipManager>();
+            services.AddScoped<IDevOpsManager, DevOpsManager>();
             services.AddScoped<IExportManager, ExportManager>();
             services.AddScoped<IFilterManager, FilterManager>();
+            services.AddScoped<ILocationManager, LocationManager>();
             services.AddScoped<IObservationManager, ObservationManager>();
             services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
+            services.AddScoped<IProjectManager, ProjectManager>();
             services.AddScoped<ITaxonListManager, TaxonListManager>();
-            services.AddScoped<ITaxonManager, TaxonManager>();
+            services.AddSingleton<ITaxonManager, TaxonManager>();
+            services.AddScoped<ITaxonSearchManager, TaxonSearchManager>();
+            services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IVocabularyManager, VocabularyManager>();
 
             // Add repositories
+            services.AddScoped<IApiUsageStatisticsRepository, ApiUsageStatisticsRepository>();
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
+            services.AddScoped<IDatasetRepository, DatasetRepository>();
+            services.AddScoped<IEventRepository, EventRepository>();
+            services.AddScoped<IProcessedChecklistRepository, ProcessedChecklistRepository>();
+            services.AddScoped<IUserObservationRepository, UserObservationRepository>();
+            services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
+            services.AddScoped<IProcessedLocationRepository, ProcessedLocationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
+            services.AddScoped<IProcessedTaxonRepository, ProcessedTaxonRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
@@ -400,12 +457,15 @@ namespace SOS.Observations.Api
             services.AddScoped<IProjectInfoRepository, ProjectInfoRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
             services.AddScoped<IUserExportRepository, UserExportRepository>();
-
+             
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();
+            services.AddSingleton<ICryptoService, CryptoService>();
+            services.AddSingleton<IDevOpsService, DevOpsService>();
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IArtportalenApiService, ArtportalenApiService>();
 
             // Add writers
             services.AddScoped<IDwcArchiveFileWriter, DwcArchiveFileWriter>();
@@ -432,10 +492,22 @@ namespace SOS.Observations.Api
         /// <param name="apiVersionDescriptionProvider"></param>
         /// <param name="configuration"></param>
         /// <param name="applicationInsightsConfiguration"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider, TelemetryConfiguration configuration, Lib.Configuration.ObservationApi.ApplicationInsights applicationInsightsConfiguration, IProtectedLogRepository protectedLogRepository)
+        /// <param name="observationApiConfiguration"></param>
+        /// <param name="protectedLogRepository"></param>
+        public void Configure(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IApiVersionDescriptionProvider apiVersionDescriptionProvider,
+            TelemetryConfiguration configuration,
+            Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration,
+            ObservationApiConfiguration observationApiConfiguration,
+            IProtectedLogRepository protectedLogRepository)
         {
+            if (observationApiConfiguration.EnableResponseCompression)
+            {
+                app.UseResponseCompression();
+            }
 
-            NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
@@ -452,10 +524,6 @@ namespace SOS.Observations.Api
             {
                 app.UseMiddleware<EnableRequestBufferingMiddelware>();
                 app.UseMiddleware<StoreRequestBodyMiddleware>();
-            }
-            if (applicationInsightsConfiguration.EnableSearchResponseCountLogging)
-            {
-                app.UseMiddleware<StoreSearchCountMiddleware>();
             }
 
             app.UseHangfireDashboard();
@@ -488,36 +556,21 @@ namespace SOS.Observations.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseResponseCaching();
-            app.Use(async (context, next) =>
-            {
-                context.Response.GetTypedHeaders().CacheControl =
-                    new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
-                    {
-                        Public = true,
-                        MaxAge = TimeSpan.FromSeconds(60)
-                    };
-                context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.Vary] =
-                    new string[] { "Accept-Encoding" };
-
-                await next();
-            });
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health", new HealthCheckOptions()
                 {
-                    Predicate = _ => true,
-                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                    Predicate = _ => false,
+                    ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.Latest)
                 });
                 endpoints.MapHealthChecks("/health-json", new HealthCheckOptions()
                 {
-                    Predicate = _ => true,
-                    ResponseWriter = async (context, report) =>
+                    Predicate = _ => false,
+                    ResponseWriter = async (context, _) =>
                     {
-                        var result = JsonConvert.SerializeObject(
+                        var report = HealthReportCachePublisher.Latest;
+                        var result = report == null ? "{}" : JsonConvert.SerializeObject(
                             new
                             {
                                 status = report.Status.ToString(),
@@ -547,6 +600,13 @@ namespace SOS.Observations.Api
             {
                 protectedLogRepository.CreateIndexAsync();
             }
+
+            var serviceProvider = app.ApplicationServices;
+            var taxonSearchManager = serviceProvider.GetService<ITaxonSearchManager>();
+            Task.Run(() =>
+            {
+                taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { 0 });
+            });
         }
 
         private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
@@ -558,22 +618,6 @@ namespace SOS.Observations.Api
                 ? actionApiVersionModel.DeclaredApiVersions
                 : actionApiVersionModel.ImplementedApiVersions;
             return apiVersions;
-        }
-    }
-
-    /// <summary>
-    /// </summary>
-    public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
-    {
-        /// <summary>
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public bool Authorize(DashboardContext context)
-        {
-            // Allow outside. You need an authentication scenario for this part.
-            // DON'T GO PRODUCTION WITH THIS LINES.
-            return true;
         }
     }
 }

@@ -14101,15 +14101,6 @@
                 at the time of the Occurrence.
             </summary>
         </member>
-        <member name="P:SOS.Lib.Models.Processed.Observation.ProcessedOccurrence.IndividualID">
-            <summary>
-                An identifier for an individual or named group of
-                individual organisms represented in the Occurrence.
-                Meant to accommodate resampling of the same individual
-                or group for monitoring purposes. May be a global unique
-                identifier or an identifier specific to a data set.
-            </summary>
-        </member>
         <member name="P:SOS.Lib.Models.Processed.Observation.ProcessedOccurrence.IsNaturalOccurrence">
             <summary>
                 Indicates if this species occurrence is natural or

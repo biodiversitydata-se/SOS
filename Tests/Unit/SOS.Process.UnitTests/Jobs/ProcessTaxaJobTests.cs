@@ -8,8 +8,8 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Jobs;
-using SOS.Process.Processors.Taxon.Interfaces;
+using SOS.Harvest.Jobs;
+using SOS.Harvest.Processors.Taxon.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Jobs
@@ -104,7 +104,7 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(1);
 
             _harvestInfoRepository.Setup(r => r.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HarvestInfo(DateTime.Now) {Status = RunStatus.Success});
+                .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now) {Status = RunStatus.Success});
 
             _processInfoRepository.Setup(r => r.VerifyCollectionAsync());
 

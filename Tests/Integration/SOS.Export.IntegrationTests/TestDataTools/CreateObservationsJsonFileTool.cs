@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Newtonsoft.Json;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
-using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
-using SOS.TestHelpers.JsonConverters;
+using SOS.Lib.Repositories.Resource;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.TestDataTools
@@ -38,23 +38,22 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            var processedObservationRepository = new ProcessedObservationRepository(
-                new ElasticClientManager(elasticSearchConfiguration, true),
-                exportClient,
+            var processedObservationRepository = new ProcessedObservationCoreRepository(
+                new ElasticClientManager(elasticSearchConfiguration),
                 new ElasticSearchConfiguration(),
-                new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
-                new Mock<ILogger<ProcessedObservationRepository>>().Object);
+                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
+                new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observations = await processedObservationRepository.ScrollObservationsAsync(new SearchFilter(), null);
+            var observations = await processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(new SearchFilter(0));
 
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> {new ObjectIdConverter()}
-            };
-            var strJson = JsonConvert.SerializeObject(observations, serializerSettings);
+            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+            serializeOptions.Converters.Add(new ObjectIdConverter());
+
+            var strJson = JsonSerializer.Serialize(observations, serializeOptions);
+
             File.WriteAllText(filePath, strJson, Encoding.UTF8);
         }
     }

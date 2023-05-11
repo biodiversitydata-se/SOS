@@ -17,7 +17,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
 
         private readonly DwcaObservationFactoryFixture _fixture;
 
-        [Fact (Skip="Behavior mapping not completed yet")]
+        [Fact(Skip = "Behavior mapping not completed yet")]
         public void Behavior_field_with_value_foraging_is_mapped_to_Activity_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -32,12 +32,12 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.Activity.Id.Should().Be((int) ActivityId.Foraging);
+            result.Occurrence.Activity.Id.Should().Be((int)ActivityId.Foraging);
         }
 
         /// <remarks>
@@ -65,7 +65,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -88,12 +88,12 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.OccurrenceStatus.Id.Should().Be((int) OccurrenceStatusId.Absent);
+            result.Occurrence.OccurrenceStatus.Id.Should().Be((int)OccurrenceStatusId.Absent);
             result.Occurrence.IsPositiveObservation.Should().BeFalse();
             result.Occurrence.IsNeverFoundObservation.Should().BeTrue();
             result.Occurrence.IsNotRediscoveredObservation.Should().BeFalse();
@@ -115,12 +115,12 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.OccurrenceStatus.Id.Should().Be((int) OccurrenceStatusId.Present);
+            result.Occurrence.OccurrenceStatus.Id.Should().Be((int)OccurrenceStatusId.Present);
             result.Occurrence.IsPositiveObservation.Should().BeTrue();
             result.Occurrence.IsNeverFoundObservation.Should().BeFalse();
             result.Occurrence.IsNotRediscoveredObservation.Should().BeFalse();
@@ -142,12 +142,12 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.LifeStage.Id.Should().Be((int) LifeStageId.InFruit);
+            result.Occurrence.LifeStage.Id.Should().Be((int)LifeStageId.InFruit);
         }
 
         [Fact(Skip = "ReproductiveCondition mapping not completed yet")]
@@ -165,12 +165,12 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.Activity.Id.Should().Be((int) ActivityId.PregnantFemale);
+            result.Occurrence.Activity.Id.Should().Be((int)ActivityId.PregnantFemale);
         }
 
         [Theory]
@@ -191,7 +191,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -214,7 +214,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -238,12 +238,45 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
             //-----------------------------------------------------------------------------------------------------------
             result.Occurrence.Sex.Should().BeNull();
+        }
+
+        /// <remarks>
+        ///     Life Stage GBIF Vocabulary
+        ///     http://rs.gbif.org/vocabulary/gbif/life_stage.xml
+        /// </remarks>
+        [Theory]
+        [InlineData("1", 1)]
+        [InlineData("  254 ", 254)]
+        [InlineData("", null)]
+        [InlineData(null, null)]
+        public void OrganismQuantityInt_is_parsed_from_OrganismQuantity(
+            string organismQuantity,
+            int? expectedValue)
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var builder = new DwcObservationVerbatimBuilder();
+            var dwcaObservation = builder
+                .WithDefaultValues()
+                .WithOrganismQuantity(organismQuantity)
+                .Build();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observation.Occurrence.OrganismQuantityInt.Should().Be(expectedValue);
         }
     }
 }

@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DwC_A;
-using Elasticsearch.Net;
 using FluentAssertions;
 using Hangfire;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Driver;
 using Moq;
-using Nest;
-using SOS.Import.DarwinCore;
+using SOS.Harvest.DarwinCore;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
@@ -22,7 +18,6 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Managers;
-using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
@@ -31,10 +26,13 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services;
-using SOS.Process.Managers;
-using SOS.Process.Processors.DarwinCoreArchive;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.DarwinCoreArchive;
 using Xunit;
 using Xunit.Abstractions;
+using SOS.Lib.Configuration.Import;
+using SOS.Lib.IO.DwcArchive.Interfaces;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 {
@@ -50,12 +48,12 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
         private DwcaObservationProcessor CreateDwcaObservationProcessor(
             bool storeProcessedObservations,
-            List<DwcObservationVerbatim> dwcObservationVerbatims)
+            IEnumerable<DwcObservationVerbatim> dwcObservationVerbatims)
         {
             var processConfiguration = GetProcessConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
 
-            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration);
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
                 processDbConfiguration.GetMongoDbSettings(),
@@ -86,18 +84,20 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 .ReturnsAsync(mockCursor.Object);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
+            var invalidEventRepository =
+                new InvalidEventRepository(processClient, new NullLogger<InvalidEventRepository>());
             var processManager = new ProcessManager(processConfiguration);
-            var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
+            var validationManager = new ValidationManager(invalidObservationRepository, invalidEventRepository, new NullLogger<ValidationManager>());
             var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
-            IProcessedObservationRepository processedObservationRepository;
-            
+            IProcessedObservationCoreRepository processedObservationRepository;
+            var processTimeManager = new ProcessTimeManager(processConfiguration);
             if (storeProcessedObservations)
             {
-                processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
-                    new ElasticSearchConfiguration(),  
-                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
-                    new NullLogger<ProcessedObservationRepository>());
+                processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager,
+                    new ElasticSearchConfiguration(),
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                    new NullLogger<ProcessedObservationCoreRepository>());
             }
             else
             {
@@ -111,16 +111,46 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyValueResolver =
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
-            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(
-                    vocabularyValueResolver,
-                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
-                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
-                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
-                new FileService(),
-                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
-                new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), dataProviderRepository, importClient, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            var extendedMeasurementOrFactCsvWriter = new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>());
+            var simpleMultimediaCsvWriter = new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>());
+            var fileService = new FileService();
+
+            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(
+                new DwcArchiveFileWriter(
+                    new DwcArchiveOccurrenceCsvWriter(
+                        vocabularyValueResolver,
+                        new NullLogger<DwcArchiveOccurrenceCsvWriter>()
+                    ),
+                    extendedMeasurementOrFactCsvWriter,
+                    simpleMultimediaCsvWriter,
+                    fileService,
+                    dataProviderRepository,
+                    new NullLogger<DwcArchiveFileWriter>()
+                ),
+                new DwcArchiveEventFileWriter(
+                    new DwcArchiveOccurrenceCsvWriter(
+                        vocabularyValueResolver,
+                        new NullLogger<DwcArchiveOccurrenceCsvWriter>()
+                    ),
+                    new DwcArchiveEventCsvWriter(vocabularyValueResolver, new NullLogger<DwcArchiveEventCsvWriter>()),
+                    extendedMeasurementOrFactCsvWriter,
+                    simpleMultimediaCsvWriter,
+                    dataProviderRepository,
+                    fileService,
+                    new NullLogger<DwcArchiveEventFileWriter>()
+                ),
+                fileService, 
+                dataProviderRepository, 
+                importClient, 
+                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, 
+                new NullLogger<DwcArchiveFileWriterCoordinator>()
+            );
+            var dwcaConfiguration = new DwcaConfiguration()
+            {
+                BatchSize = 5000,
+                ImportPath = @"C:\Temp",
+                UseDwcaCollectionRepository = true
+            };
 
             return new DwcaObservationProcessor(
                 verbatimClient.Object,
@@ -132,15 +162,18 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
+                dwcaConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
         }
 
-        private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock()
+        private Mock<IProcessedObservationCoreRepository> CreateProcessedObservationRepositoryMock()
         {
-            var mock = new Mock<IProcessedObservationRepository>();
+            var mock = new Mock<IProcessedObservationCoreRepository>();
             mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>())).ReturnsAsync(true);
-            mock.Setup(m => m.BatchSize).Returns(100000);
+            mock.Setup(m => m.ReadBatchSize).Returns(10000);
+            mock.Setup(m => m.WriteBatchSize).Returns(1000);
             return mock;
         }
 

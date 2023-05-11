@@ -82,6 +82,35 @@ namespace SOS.Lib.Managers
             return Result.Success(returnDescription);
         }
 
+        public async Task<Result<string>> InitDefaultDataProvider(string dataProviderIdOrIdentifier)
+        {
+            if (string.IsNullOrWhiteSpace(dataProviderIdOrIdentifier)) return Result.Failure<string>("dataProviderIdOrIdentifier is empty");
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var filePath = Path.Combine(assemblyPath, @"Resources\DataProvider\DefaultDataProviders.json");
+            var dataProviders =
+                JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
+
+            DataProvider dataProvider = null;
+            if (int.TryParse(dataProviderIdOrIdentifier, out var providerId))
+            {
+                dataProvider = dataProviders.FirstOrDefault(m => m.Id == providerId);
+            }
+            else
+            {
+                dataProvider = dataProviders.FirstOrDefault(m => m.Identifier == dataProviderIdOrIdentifier);
+            }
+
+            if (dataProvider == null) return Result.Failure<string>($"DataProvider information doesn't exist for {dataProviderIdOrIdentifier}");
+            var existingProvider = await _dataProviderRepository.GetAsync(dataProvider.Id);
+            if (existingProvider != null)
+            {
+                await _dataProviderRepository.DeleteAsync(dataProvider.Id);
+            }
+            await _dataProviderRepository.AddAsync(dataProvider);
+
+            return Result.Success($"DataProvider {dataProvider.Identifier} was added");
+        }
+
         /// <inheritdoc />
         public async Task<Result<string>> InitDefaultEml(IEnumerable<int> datproviderIds)
         {
@@ -93,7 +122,17 @@ namespace SOS.Lib.Managers
                 providers = providers?.Where(p => datproviderIds.Contains(p.Id))?.ToList();
             }
 
-            if ((!providers?.Any() ?? true) && !datproviderIds.Contains(-1))
+            if (!(datproviderIds?.Any() ?? true) || datproviderIds.Contains(-1))
+            {
+                providers.Add(DataProvider.CompleteSosDataProvider);
+            }
+
+            if (!(datproviderIds?.Any() ?? true) || datproviderIds.Contains(-2))
+            {
+                providers.Add(DataProvider.FilterSubsetDataProvider);
+            }
+
+            if (!providers?.Any() ?? true)
             {
                 message = "No providers found";
                 _logger.LogWarning(message);
@@ -102,11 +141,6 @@ namespace SOS.Lib.Managers
 
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var emlDirectory = Path.Combine(assemblyPath, @"Resources\DataProvider\Eml");
-
-            if ((datproviderIds?.Any() ?? false) || datproviderIds.Contains(-1))
-            {
-               providers.Add(DataProvider.CompleteSosDataProvider);
-            }
 
             foreach (var provider in providers)
             {

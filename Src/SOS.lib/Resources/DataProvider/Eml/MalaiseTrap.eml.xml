@@ -1,0 +1,242 @@
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+		 xmlns:dc="http://purl.org/dc/terms/"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
+		 packageId="38c1351d-9cfe-42c0-97da-02d2c8be141c/v27.817" system="http://gbif.org" scope="system"
+xml:lang="eng">
+
+	<dataset>
+		<alternateIdentifier>38c1351d-9cfe-42c0-97da-02d2c8be141c</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=smtp-nrm</alternateIdentifier>
+		<title xml:lang="eng">Swedish Malaise Trap Project (SMTP) Collection Inventory</title>
+		<creator>
+			<individualName>
+				<givenName>Kevin</givenName>
+				<surName>Holston</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>kevin.holston@nrm.se</electronicMailAddress>
+			<userId directory="http://orcid.org/">0000-0002-0786-4069</userId>
+		</creator>
+		<creator>
+			<individualName>
+				<givenName>Dave</givenName>
+				<surName>Karlsson</surName>
+			</individualName>
+			<organizationName>Station Linné</organizationName>
+			<positionName>Managing Director</positionName>
+			<address>
+				<city>Farjestaden</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>dave.karlsson@stationlinne.se</electronicMailAddress>
+			<userId directory="http://orcid.org/">0000-0003-4639-823X</userId>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Mattias</givenName>
+				<surName>Forshage</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Stockholm</city>
+			</address>
+			<electronicMailAddress>mattias.forshage@nrm.se</electronicMailAddress>
+		</metadataProvider>
+		<metadataProvider>
+			<individualName>
+				<givenName>Kevin</givenName>
+				<surName>Holston</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>kevin.holston@nrm.se</electronicMailAddress>
+			<userId directory="http://orcid.org/">0000-0002-0786-4069</userId>
+		</metadataProvider>
+		<metadataProvider>
+			<individualName>
+				<givenName>Dave</givenName>
+				<surName>Karlsson</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Farjestaden</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>dave.karlsson@stationlinne.se</electronicMailAddress>
+			<userId directory="http://orcid.org/">0000-0003-4639-823X</userId>
+		</metadataProvider>
+		<pubDate>
+			2023-04-17
+		</pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>
+				SMTP data are occurrence data from a major inventory project targeting mainly flying insects, where Malaise traps were collecting on a large number of localities throughout Sweden during 2003-2006. The project is a part of the Swedish Taxonomy Initiative, and is currently run from Station Linné on Öland. The total catch has been estimated to approximately 80 million specimens, and sorting and identification is ongoing (and will continue for some time). Already after a small part of the catch has been identified to the species level, there are several hundreds of species new to the country or to science.
+
+				Most of the material is kept in 96% alcohol, but certain groups are being dry-mounted in connection with identification, on pins or slides. The catch is part of the collections of the Swedish Museum of Natural History, and data are handled via the museum and the DINA system.
+
+				The purpose of the inventory was primarily to find new species to the country and to science, and in general to acquire fresh material of poorly known insect groups for research projects within the Swedish Taxonomy Initiative framework, especially Hymenoptera and Diptera. However it turned out to be an interesting material also for mere faunistic mapping of the distribution of species within the country also for better known groups, and specimens and/or data can be used for investigating various ecological and other questions.
+
+				Data is in the form of a sorting inventory or species lists. The difference is merely practical, since both concern identifications and record the occurrence of a certain taxon i a certain sample (representing a time interval and a particular locality). But sorting inventory deals with taxa on different levels which are continuously being identified by regular project staff for distribution to taxonomic specialists, while species identifications (and similar) represent the target level, and is performed by specialists for a particular group one by one (in single sub-projects if you will).
+
+				Metadata (project description, trap description, trap localities and classification of what habitat they represent, temporal interval of single samples with occasional comments about physical quality (state of preservation) are detailed and constitute its own subset of data as well as a cornerstone in the occurrence data.
+			</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Specimen</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Malaise Trap</keyword>
+			<keyword>Insecta</keyword>
+			<keyword>Diptera</keyword>
+			<keyword>Hymenoptera</keyword>
+			<keywordThesaurus>Not Applicable</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">http://www.stationlinne.se/en/research/the-swedish-malaise-trap-project-smtp/</url>
+			</online>
+		</distribution>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>Data are from 73 malaise traps from circa 45 localities from all over Sweden, from Sandhammaren in the very south to Nuolja in the mountains in the northwest, from Hamburgsund on the west coast to Vasikavuoma in the northeast. The distribution is far from random, and instead it is based in an integration of the wish to cover a diversity of particularly species-rich habitats with practical concerns for availability for emptying and maintenance.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>11.16</westBoundingCoordinate>
+					<eastBoundingCoordinate>23.82</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.35</northBoundingCoordinate>
+					<southBoundingCoordinate>55.27</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			            <temporalCoverage>
+                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+                <sos:LivingTimePeriod></sos:LivingTimePeriod>		
+                <sos:StartDate>2003</sos:StartDate>
+                <sos:EndDate>2006</sos:EndDate>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>The target group is mainly flying insects, but all animals caught are being sorted and in the long run identified to species. For example the material includes large amounts of other terrestral arthropods (spiders, mites, springtails) and scattered specimens of other invertebrates (snails, earthworms etc) (– and even single anecdotal examples of unwanted bycatch of vertebrates).</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>kingdom</taxonRankName>
+					<taxonRankValue>Animalia</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Arthropoda</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Insecta</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>family</taxonRankName>
+					<taxonRankValue>Diptera</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>family</taxonRankName>
+					<taxonRankValue>Hymenoptera</taxonRankValue>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para></para>
+			</description>
+			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+		</maintenance>
+
+		<contact>
+			<individualName>
+				<givenName>Kevin</givenName>
+				<surName>Holston</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>kevin.holston@nrm.se</electronicMailAddress>
+		</contact>
+		<contact>
+			<individualName>
+				<givenName>Dave</givenName>
+				<surName>Karlsson</surName>
+			</individualName>
+			<organizationName>Station Linné</organizationName>
+			<positionName>Managing Director</positionName>
+			<address>
+				<city>Farjestaden</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>dave.karlsson@stationlinne.se</electronicMailAddress>
+			<userId directory="http://orcid.org/">0000-0003-4639-823X</userId>
+		</contact>
+		<methods>
+			<methodStep>
+				<description>
+					<para></para>
+				</description>
+			</methodStep>
+		</methods>
+		<project >
+			<title>Swedish Malaise Trap Project (SMTP)</title>
+			<personnel>
+				<individualName>
+					<givenName>Dave</givenName>
+					<surName>Karlsson</surName>
+				</individualName>
+				<role></role>
+			</personnel>
+			<studyAreaDescription>
+				<descriptor name="generic"
+							citableClassificationSystem="false">
+					<descriptorValue>Sweden: 54 localities across Sweden, from Sandhammaren on the south coast of Skäne to Nuoljas alpine region at Abisko.</descriptorValue>
+				</descriptor>
+			</studyAreaDescription>
+		</project>
+	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2015-10-28T01:54:57.685+01:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Swedish Malaise Trap Project (SMTP) Collection Inventory</citation>
+				<collection>
+					<parentCollectionIdentifier>Not Applicable</parentCollectionIdentifier>
+					<collectionIdentifier>Not Applicable</collectionIdentifier>
+					<collectionName>Swedish Malaise Trap Project (SMTP) Collection Inventory</collectionName>
+				</collection>
+				<specimenPreservationMethod>alcohol</specimenPreservationMethod>
+				<livingTimePeriod>2003-2006</livingTimePeriod>
+				<dc:replaces>38c1351d-9cfe-42c0-97da-02d2c8be141c/v27.817.xml</dc:replaces>
+			</gbif>
+		</metadata>
+	</additionalMetadata>
+</eml:eml>

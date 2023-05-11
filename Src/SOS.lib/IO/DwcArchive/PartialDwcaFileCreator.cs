@@ -43,7 +43,7 @@ namespace SOS.Lib.IO.DwcArchive
             Directory.CreateDirectory(destinationFolder);
             File.WriteAllText(Path.Join(destinationFolder, "meta.xml"), dwcaFileComponents.Meta);
             File.WriteAllText(Path.Join(destinationFolder, "eml.xml"), dwcaFileComponents.Eml);
-            File.WriteAllLines(Path.Join(destinationFolder, "occurrence.csv"), dwcaFileComponents.OccurrenceComponent.GetRowsWithHeader());
+            File.WriteAllLines(Path.Join(destinationFolder, "occurrence.txt"), dwcaFileComponents.OccurrenceComponent.GetRowsWithHeader());
             foreach (var extensionComponent in dwcaFileComponents.Extensions)
             {
                 File.WriteAllLines(Path.Join(destinationFolder, extensionComponent.Filename), extensionComponent.GetRowsWithHeader());
@@ -129,6 +129,64 @@ namespace SOS.Lib.IO.DwcArchive
             }
 
             return dwcaOccurrenceComponent;
+        }
+
+        public static HashSet<string> GetDistinctValuesFromDwcaFile(string sourceFilePath, int nrRowsLimit, int startRow, string term)
+        {
+            var dwcaFileComponents = new DwcaFileComponents();
+            HashSet<string> distinctValues = new HashSet<string>();
+
+            using (FileStream zipToOpen = new FileStream(sourceFilePath, FileMode.Open))
+            {
+                using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
+                {
+                    var metaEntry = archive.Entries.Single(m => m.FullName.Equals("meta.xml", StringComparison.InvariantCultureIgnoreCase));
+                    dwcaFileComponents.Meta = ReadZipEntryAsString(metaEntry);                    
+                    var occurrenceEntry = archive.Entries.FirstOrDefault(m => m.FullName.StartsWith("occurrence", StringComparison.InvariantCultureIgnoreCase)
+                                                                             || m.FullName.StartsWith("observation", StringComparison.InvariantCultureIgnoreCase));
+                    distinctValues = GetDistinctValuesFromOccurrenceCsvFile(nrRowsLimit, startRow, term, occurrenceEntry);                    
+                }
+
+                return distinctValues;
+            }
+        }
+
+        private static HashSet<string> GetDistinctValuesFromOccurrenceCsvFile(int nrRowsLimit, int startRow, string term, ZipArchiveEntry occurrenceEntry)
+        {
+            int nrRowsRead = 0;
+            int nrObservations = 0;
+            Stream stream = occurrenceEntry.Open();
+            StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+            var dwcaOccurrenceComponent = new DwcaOccurrenceComponent() { Filename = occurrenceEntry.Name };
+            string[] headers = null;
+            Dictionary<string, int> headerIndexByHeader = new Dictionary<string, int>();
+            int termIndex = 0;
+            HashSet<string> distinctValues = new HashSet<string>();
+            while (!reader.EndOfStream && nrObservations < nrRowsLimit)
+            {
+                string line = reader.ReadLine();
+                if (nrRowsRead == 0) // Read header
+                {
+                    dwcaOccurrenceComponent.Header = line;
+                    headers = line.Split('\t');
+                    headerIndexByHeader = headers.ToDictionary(h => h, h => Array.IndexOf(headers, h), StringComparer.OrdinalIgnoreCase);
+                    termIndex = headerIndexByHeader[term];
+                    nrRowsRead++;
+                    continue;
+                }
+
+                if (startRow < nrRowsRead)
+                {
+                    string[] values = line.Split('\t');
+                    var value = values[termIndex];
+                    distinctValues.Add(value);                    
+                    nrObservations++;
+                }
+
+                nrRowsRead++;
+            }
+
+            return distinctValues;
         }
 
         private static DwcaExtensionComponent ReadExtensionCsvFile(ZipArchiveEntry zipArchiveEntry, HashSet<string> observationIds)

@@ -11,61 +11,117 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IExportsController
     {
         /// <summary>
-        /// Returns a list of datasets available for download. A DwC-A file is usually created once a day for each dataset.
+        /// Returns a list of data provider datasets (DwC-A) available for download. A file is usually created once a day for each dataset.
         /// </summary>
         /// <returns></returns>
-        Task<IActionResult> GetDatasetsList();
+        Task<IActionResult> GetDatasetsListAsync();
+
+        /// <summary>
+        /// Get all exports for a user
+        /// </summary>
+        /// <returns></returns>
+        Task<IActionResult> GetMyExportsAsync();
+
+        /// <summary>
+        /// Get export by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetMyExportAsync(string id);
 
         /// <summary>
         ///  Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter</param>
-        /// <param name="outputFieldSet">The observation property field set.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
-        Task<IActionResult> DownloadCsv(
-            [FromBody] ExportFilterDto filter,
-            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
-            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
-            [FromQuery] string cultureCode = "sv-SE");
+        Task<IActionResult> DownloadCsvAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter,
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            string cultureCode = "sv-SE",
+            bool gzip = true,
+            bool sensitiveObservations = false);
 
         /// <summary>
         /// Download DwC export file. The limit is 25 000 observations. If you need to download more observations, use the OrderDwC endpoint.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter"></param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
-        Task<IActionResult> DownloadDwC(ExportFilterDto filter);
+        Task<IActionResult> DownloadDwCAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter,
+            bool eventBased = false,
+            bool validateSearchFilter = false,
+            bool sensitiveObservations = false);
 
         /// <summary>
         ///  Download Excel export file. The limit is 25 000 observations. If you need to download more observations, use the OrderExcel endpoint.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter</param>
-        /// <param name="outputFieldSet">The observation property field set.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
-        Task<IActionResult> DownloadExcel(ExportFilterDto filter,
-            OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
-            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
-            string cultureCode = "sv-SE");
+        Task<IActionResult> DownloadExcelAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter,
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            string cultureCode = "sv-SE",
+            bool gzip = true,
+            bool sensitiveObservations = false);
 
         /// <summary>
         /// Download GeoJson export file. The limit is 25 000 observations. If you need to download more observations, use the OrderGeoJson endpoint.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
-        /// <param name="outputFieldSet">The observation property field set.</param>
-        /// <param name="propertyLabelType">The label type to use if flatOut=false.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The label type to use if flat=false.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
-        /// <param name="flatOut">If true, the observations will be serialized as a flat JSON structure.</param>
+        /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
         /// <param name="excludeNullValues">Exclude properties with null values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
-        Task<IActionResult> DownloadGeoJson(ExportFilterDto filter,
-            OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+        Task<IActionResult> DownloadGeoJsonAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter,
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
-            bool flatOut = true,
-            bool excludeNullValues = true);
+            bool flat = true,
+            bool excludeNullValues = true,
+            bool gzip = true,
+            bool sensitiveObservations = false);
 
         /// <summary>
         /// Starts the process of creating a Csv file with observations based on provided filter.
@@ -73,16 +129,31 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// The limit is 2 000 000 observations.
         /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
         /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="description"></param>
-        /// <param name="outputFieldSet"></param>
-        /// <param name="propertyLabelType"></param>
-        /// <param name="cultureCode"></param>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <returns></returns>
-        Task<IActionResult> OrderCsv(ExportFilterDto filter,
+        Task<IActionResult> OrderCsvAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter,
             string description,
-            OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            bool sensitiveObservations = false,
+            bool sendMailFromZendTo = true,
+            string encryptPassword = "",
+            string confirmEncryptPassword = "",
             string cultureCode = "sv-SE");
 
         /// <summary>
@@ -91,10 +162,28 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// The limit is 2 000 000 observations.
         /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
         /// <returns></returns>
-        Task<IActionResult> OrderDwC(ExportFilterDto filter, string description);
+        Task<IActionResult> OrderDwCAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter,
+            string description,
+            bool eventBased = false,
+            bool validateSearchFilter = false,
+            bool sensitiveObservations = false,
+            bool sendMailFromZendTo = true,
+            string encryptPassword = "",
+            string confirmEncryptPassword = "");
 
         /// <summary>
         /// Starts the process of creating a Excel file with observations based on provided filter.
@@ -102,16 +191,31 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// The limit is 2 000 000 observations.
         /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
-        /// <param name="outputFieldSet">The observation property field set.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <returns></returns>
-        Task<IActionResult> OrderExcel(ExportFilterDto filter, 
+        Task<IActionResult> OrderExcelAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter,
             string description,
-            OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
-            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            bool sensitiveObservations = false,
+            bool sendMailFromZendTo = true,
+            string encryptPassword = "",
+            string confirmEncryptPassword = "",
             string cultureCode = "sv-SE");
 
         /// <summary>
@@ -120,20 +224,263 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// The limit is 2 000 000 observations.
         /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="description">A description of your download. Will be displayed in the email.</param>
-        /// <param name="outputFieldSet">The observation property field set.</param>
-        /// <param name="propertyLabelType">The label type to use if flatOut=false.</param>
-        /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
-        /// <param name="flatOut">If true, the observations will be serialized as a flat JSON structure.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <param name="propertyLabelType">The label type to use if flat=false.</param>
+        /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
         /// <param name="excludeNullValues">Exclude properties with null values.</param>
+        /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
+
         /// <returns></returns>
-        Task<IActionResult> OrderGeoJson(ExportFilterDto filter,
+        Task<IActionResult> OrderGeoJsonAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter,
             string description,
-            OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            bool sensitiveObservations = false,
+            bool sendMailFromZendTo = true,
+            string encryptPassword = "",
+            string confirmEncryptPassword = "",
+            bool flat = true,
+            bool excludeNullValues = true,
+            string cultureCode = "sv-SE");
+
+        /// <summary>
+        ///  Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
+        Task<IActionResult> DownloadCsvInternalAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterInternalDto filter,
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
-            bool flatOut = true,
-            bool excludeNullValues = true);
+            bool gzip = true,
+            bool sensitiveObservations = false);
+
+        /// <summary>
+        /// Download DwC export file. The limit is 25 000 observations. If you need to download more observations, use the OrderDwC endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter"></param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
+        Task<IActionResult> DownloadDwCInternalAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterInternalDto filter,
+            bool eventBased = false,
+            bool validateSearchFilter = false,
+            bool sensitiveObservations = false);
+
+        /// <summary>
+        ///  Download Excel export file. The limit is 25 000 observations. If you need to download more observations, use the OrderExcel endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
+        Task<IActionResult> DownloadExcelInternalAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterInternalDto filter,
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            string cultureCode = "sv-SE",
+            bool gzip = true,
+            bool sensitiveObservations = false);
+
+        /// <summary>
+        /// Download GeoJson export file. The limit is 25 000 observations. If you need to download more observations, use the OrderGeoJson endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The label type to use if flat=false.</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
+        /// <param name="excludeNullValues">Exclude properties with null values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
+        Task<IActionResult> DownloadGeoJsonInternalAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterInternalDto filter,
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            string cultureCode = "sv-SE",
+            bool flat = true,
+            bool excludeNullValues = true,
+            bool gzip = true,
+            bool sensitiveObservations = false);
+
+        /// <summary>
+        /// Starts the process of creating a Csv file with observations based on provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <returns></returns>
+        Task<IActionResult> OrderCsvInternalAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterInternalDto filter,
+            string description,
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            bool sensitiveObservations = false,
+            bool sendMailFromZendTo = true,
+            string encryptPassword = "",
+            string confirmEncryptPassword = "",
+            string cultureCode = "sv-SE");
+
+        /// <summary>
+        /// Starts the process of creating a DwC-A file with observations based on provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <returns></returns>
+        Task<IActionResult> OrderDwCInternalAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterInternalDto filter,
+            string description,
+            bool eventBased = false,
+            bool validateSearchFilter = false,
+            bool sensitiveObservations = false,
+            bool sendMailFromZendTo = true,
+            string encryptPassword = "",
+            string confirmEncryptPassword = "");
+
+        /// <summary>
+        /// Starts the process of creating a Excel file with observations based on provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <returns></returns>
+        Task<IActionResult> OrderExcelInternalAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterInternalDto filter,
+            string description,
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            bool sensitiveObservations = false,
+            bool sendMailFromZendTo = true,
+            string encryptPassword = "",
+            string confirmEncryptPassword = "",
+            string cultureCode = "sv-SE");
+
+        /// <summary>
+        /// Starts the process of creating a GeoJSON file with observations based on the provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="description">A description of your download. Will be displayed in the email.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <param name="propertyLabelType">The label type to use if flat=false.</param>
+        /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
+        /// <param name="excludeNullValues">Exclude properties with null values.</param>
+        /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
+
+        /// <returns></returns>
+        Task<IActionResult> OrderGeoJsonInternalAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterInternalDto filter,
+            string description,
+            OutputFieldSet outputFieldSet,
+            bool validateSearchFilter = false,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            bool sensitiveObservations = false,
+            bool sendMailFromZendTo = true,
+            string encryptPassword = "",
+            string confirmEncryptPassword = "",
+            bool flat = true,
+            bool excludeNullValues = true,
+            string cultureCode = "sv-SE");
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -14,7 +13,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.DataCite;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
@@ -57,7 +56,6 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Create a DwC-A file using passed filter and give it a DOI")]
         public async Task<bool> RunAsync(SearchFilter filter, string emailAddress, IJobCancellationToken cancellationToken)
         {
             try
@@ -143,7 +141,9 @@ namespace SOS.Export.Jobs
             catch (Exception e)
             {
                 _logger.LogInformation("Failed to create DOI.", e);
+                throw;
             }
+
             return false;
         }
     }

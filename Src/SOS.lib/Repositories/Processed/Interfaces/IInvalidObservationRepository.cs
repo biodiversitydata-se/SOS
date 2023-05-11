@@ -5,7 +5,7 @@ using SOS.Lib.Models.Processed.Validation;
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
     /// <summary>
-    ///     Processed data class
+    ///     Invalid observation repository
     /// </summary>
     public interface IInvalidObservationRepository : IMongoDbProcessedRepositoryBase<InvalidObservation, ObjectId>
     {

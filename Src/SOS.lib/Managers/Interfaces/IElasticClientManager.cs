@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Nest;
+﻿using Nest;
 
 namespace SOS.Lib.Managers.Interfaces
 {

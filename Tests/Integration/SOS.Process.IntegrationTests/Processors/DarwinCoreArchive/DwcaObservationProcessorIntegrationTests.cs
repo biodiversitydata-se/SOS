@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Elasticsearch.Net;
 using FluentAssertions;
 using Hangfire;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Nest;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
@@ -19,17 +15,17 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Managers;
-using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
-using SOS.Process.Managers;
-using SOS.Process.Processors.DarwinCoreArchive;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.DarwinCoreArchive;
 using Xunit;
 using Xunit.Abstractions;
+using SOS.Lib.Configuration.Import;
 
 namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 {
@@ -112,7 +108,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
         {
             var processConfiguration = GetProcessConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
-            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration);
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var verbatimClient = new VerbatimClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
@@ -128,20 +124,21 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processDbConfiguration.WriteBatchSize);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
-            
+            var invalidEventRepository =
+                new InvalidEventRepository(processClient, new NullLogger<InvalidEventRepository>());
             var processManager = new ProcessManager(processConfiguration);
-            var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
+            var validationManager = new ValidationManager(invalidObservationRepository, invalidEventRepository, new NullLogger<ValidationManager>());
             var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
-
-            IProcessedObservationRepository processedObservationRepository;
+            var processTimeManager = new ProcessTimeManager(processConfiguration);
+            IProcessedObservationCoreRepository processedObservationRepository;
      
             if (storeProcessedObservations)
             {
-                processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
-                    new ElasticSearchConfiguration(), 
-                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
-                    new NullLogger<ProcessedObservationRepository>());
+                processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager, 
+                    new ElasticSearchConfiguration(),
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                    new NullLogger<ProcessedObservationCoreRepository>());
             }
             else
             {
@@ -150,6 +147,13 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
+
+            var dwcaConfiguration = new DwcaConfiguration()
+            {
+                BatchSize = 5000,
+                ImportPath = @"C:\Temp",
+                UseDwcaCollectionRepository = true
+            };
 
             return new DwcaObservationProcessor(
                 verbatimClient,
@@ -161,7 +165,9 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
+                dwcaConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
         }
 
@@ -188,25 +194,49 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
           
             var dataProviderRepository =
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
+            var extendedMeasurementOrFactCsvWriter = new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>());
+            var simpleMultimediaCsvWriter = new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>());
+            var fileService = new FileService();
 
-            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(
-                    vocabularyValueResolver,
-                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
-                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
-                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
-                new FileService(),
-                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
-                new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), dataProviderRepository, verbatimClient, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(
+                new DwcArchiveFileWriter(
+                    new DwcArchiveOccurrenceCsvWriter(
+                        vocabularyValueResolver,
+                        new NullLogger<DwcArchiveOccurrenceCsvWriter>()
+                    ),
+                    extendedMeasurementOrFactCsvWriter,
+                    simpleMultimediaCsvWriter,
+                    fileService,
+                    dataProviderRepository,
+                    new NullLogger<DwcArchiveFileWriter>()
+                ),
+                new DwcArchiveEventFileWriter(
+                    new DwcArchiveOccurrenceCsvWriter(
+                        vocabularyValueResolver,
+                        new NullLogger<DwcArchiveOccurrenceCsvWriter>()
+                    ),
+                    new DwcArchiveEventCsvWriter(vocabularyValueResolver, new NullLogger<DwcArchiveEventCsvWriter>()),
+                    extendedMeasurementOrFactCsvWriter,
+                    simpleMultimediaCsvWriter,
+                    dataProviderRepository,
+                    fileService,
+                    new NullLogger<DwcArchiveEventFileWriter>()
+                ),
+                fileService, 
+                dataProviderRepository, 
+                verbatimClient, 
+                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, 
+                new NullLogger<DwcArchiveFileWriterCoordinator>()
+            );
             return dwcArchiveFileWriterCoordinator;
         }
 
-        private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock(int batchSize)
+        private Mock<IProcessedObservationCoreRepository> CreateProcessedObservationRepositoryMock(int batchSize)
         {
-            var mock = new Mock<IProcessedObservationRepository>();
+            var mock = new Mock<IProcessedObservationCoreRepository>();
             mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>())).ReturnsAsync(true);
-            mock.Setup(m => m.BatchSize).Returns(batchSize);
+            mock.Setup(m => m.ReadBatchSize).Returns(batchSize);
+            mock.Setup(m => m.WriteBatchSize).Returns(batchSize);
             return mock;
         }
 

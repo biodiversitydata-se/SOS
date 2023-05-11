@@ -1,15 +1,52 @@
-﻿using System;
+﻿using Force.DeepCloner;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+
 
 namespace SOS.Lib.Extensions
 {
     public static class ObjectExtensions
     {
+        private static object GetValueOrExpandoObject(object @object, PropertyInfo property)
+        {
+            var value = property.GetValue(@object);
+            if (value == null) return null;
+
+            var valueType = value.GetType();
+            if (valueType.IsValueType || value is string) return value;
+
+            if (value is IEnumerable enumerable) return ToExpandoCollection(enumerable);
+
+            return ToExpando(value);
+        }
+
+        private static ExpandoObject ToExpando(object @object)
+        {
+            var properties = @object.GetType().GetProperties();
+            IDictionary<string, object> expando = new ExpandoObject();
+            foreach (var property in properties)
+            {
+                var value = GetValueOrExpandoObject(@object, property);
+                expando.Add(property.Name, value);
+            }
+            return (ExpandoObject)expando;
+        }
+
+        private static IEnumerable<ExpandoObject> ToExpandoCollection(IEnumerable enumerable)
+        {
+            var enumerator = enumerable.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                yield return ToExpando(enumerator.Current);
+            }
+        }
+
         public static bool IsValueTypeOrString(this Type type)
         {
             return type.IsValueType || type == typeof(string);
@@ -30,6 +67,8 @@ namespace SOS.Lib.Extensions
             return type.IsAssignableTo(typeof(IEnumerable));
         }
 
+        
+
         /// <summary>
         /// Get object property
         /// </summary>
@@ -43,6 +82,7 @@ namespace SOS.Lib.Extensions
                 BindingFlags.SetProperty | BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
         }
 
+       
         /// <summary>
         /// Get property type
         /// </summary>
@@ -55,13 +95,16 @@ namespace SOS.Lib.Extensions
             return underlyingType ?? propertyType;
         }
 
+
+
         /// <summary>
         /// Check if property exist in object
         /// </summary>
-        /// <param name="source"></param>
+        /// <param name="objectType"></param>
         /// <param name="propertyName"></param>
+        /// <param name="allowObject"></param>
         /// <returns></returns>
-        public static bool HasProperty(this Type objectType, string propertyName)
+        public static bool HasProperty(this Type objectType, string propertyName, bool allowObject = true)
         {
             if (string.IsNullOrEmpty(propertyName))
             {
@@ -72,6 +115,12 @@ namespace SOS.Lib.Extensions
             var levels = objectHierarchy?.Length ?? 0;
 
             var property = objectType.GetProperties().FirstOrDefault(p => p.Name.Equals(objectHierarchy[0], StringComparison.CurrentCultureIgnoreCase));
+
+            // Root objects not are allowed and this is a root object
+            if (!allowObject && levels == 1 && (property?.PropertyType?.Namespace?.StartsWith("SOS", StringComparison.CurrentCultureIgnoreCase) ?? false) && !(property?.PropertyType?.IsEnum ?? false))
+            {
+                return false;
+            }
 
             return levels == 1 ? property != null : property?.PropertyType.HasProperty(string.Join('.', objectHierarchy.Skip(1))) ?? false;
         }
@@ -119,10 +168,15 @@ namespace SOS.Lib.Extensions
         /// <typeparam name="T">Object type.</typeparam>
         /// <param name="original">Object to copy.</param>
         /// <returns></returns>
-        public static T Clone<T>(this T original) where T : class
+        public static T Clone<T>(this T original) where T : class, new()
         {
+            return original.DeepClone();
+        }
 
-            return DotNetCore.Mapping.Extensions.Clone(original);
+        public static dynamic ToDynamic(this object value)
+        {            
+            var expando = ToExpando(value);
+            return expando;
         }
 
         #region ConcurrentDictionary

@@ -49,12 +49,20 @@ namespace SOS.Lib.Services
         /// </summary>
         private bool _disposed;
 
-        private HttpClient GetClient(Dictionary<string, string> headerData = null)
+        private HttpClient GetClient(IDictionary<string, string> headerData = null, bool disableCertificateValidation = false)
         {
-            var httpClient = new HttpClient
-            {
-                Timeout = TimeSpan.FromMinutes(30)
-            };
+
+            var httpClient = disableCertificateValidation ?
+                    new HttpClient(new HttpClientHandler
+                    {
+                        ClientCertificateOptions = ClientCertificateOption.Manual,
+                        ServerCertificateCustomValidationCallback =
+                            (httpRequestMessage, cert, cetChain, policyErrors) => true
+                    }) : 
+                    new HttpClient();
+
+            httpClient.Timeout = TimeSpan.FromMinutes(30);
+            httpClient.DefaultRequestHeaders.Add("requesting-system", "SOS");
 
             if (!headerData?.Any() ?? true)
             {
@@ -72,6 +80,19 @@ namespace SOS.Lib.Services
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
                     AuthenticationSchemes.Basic.ToString(),
                     Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}"))
+                );
+            }
+
+            var personalAccessToken = headerData
+                .FirstOrDefault(hd => hd.Key.Equals("personalAccessToken", StringComparison.CurrentCultureIgnoreCase)).Value;
+            if (!string.IsNullOrEmpty(personalAccessToken))
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                    Convert.ToBase64String(
+                        ASCIIEncoding.ASCII.GetBytes(
+                            string.Format("{0}:{1}", "", personalAccessToken)
+                        )
+                    )
                 );
             }
 
@@ -132,16 +153,16 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<T> GetDataAsync<T>(Uri requestUri, Dictionary<string, string> headerData)
+        public async Task<T> GetDataAsync<T>(Uri requestUri, IDictionary<string, string> headerData)
         {
             var httpClient = GetClient(headerData);
+            
             var responsePhrase = string.Empty;
             try
             {
                 var httpResponseMessage = await httpClient.GetAsync(requestUri);
                 responsePhrase = httpResponseMessage.ReasonPhrase;
                 httpResponseMessage.EnsureSuccessStatusCode();
- 
                 return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerializationHelper.SerializerOptions);
             }
             catch (Exception ex)
@@ -157,10 +178,10 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<Stream> GetFileStreamAsync(Uri requestUri, Dictionary<string, string> headerData = null)
+        public async Task<Stream> GetFileStreamAsync(Uri requestUri, IDictionary<string, string> headerData = null)
         {
-            var httpClient = GetClient(headerData);
-
+            var httpClient = GetClient(headerData, true);
+         
             var response = await httpClient.GetAsync(requestUri, HttpCompletionOption.ResponseContentRead);
            
             return response.StatusCode == HttpStatusCode.OK ? await response.Content.ReadAsStreamAsync() : null;
@@ -173,13 +194,13 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<T> PostDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData)
+        public async Task<T> PostDataAsync<T>(Uri requestUri, object model, IDictionary<string, string> headerData)
         {
             return await PostDataAsync<T>(requestUri, model, headerData, "application/json");
         }
 
         /// <inheritdoc />
-        public async Task<T> PostDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData, string contentType)
+        public async Task<T> PostDataAsync<T>(Uri requestUri, object model, IDictionary<string, string> headerData, string contentType)
         {
             var httpClient = GetClient(headerData);
             try
@@ -208,13 +229,13 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<T> PutDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData)
+        public async Task<T> PutDataAsync<T>(Uri requestUri, object model, IDictionary<string, string> headerData)
         {
             return await PutDataAsync<T>(requestUri, model, headerData, "application/json");
         }
 
         /// <inheritdoc />
-        public async Task<T> PutDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData, string contentType)
+        public async Task<T> PutDataAsync<T>(Uri requestUri, object model, IDictionary<string, string> headerData, string contentType)
         {
             var httpClient = GetClient(headerData);
             try

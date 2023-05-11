@@ -8,28 +8,8 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// <summary>
     ///     Processed data class
     /// </summary>
-    public interface IMongoDbProcessedRepositoryBase<TEntity, in TKey> : IProcessRepositoryBase<TEntity> where TEntity : IEntity<TKey>
-    {
-        /// <summary>
-        /// Name of active instance
-        /// </summary>
-        string ActiveInstanceName { get; }
-
-        /// <summary>
-        /// Current instance
-        /// </summary>
-        string CurrentInstanceName { get; }
-
-        /// <summary>
-        /// Name of inactive instance
-        /// </summary>
-        string InactiveInstanceName { get; }
-
-        /// <summary>
-        /// Collection contains protected data
-        /// </summary>
-        bool Protected { get; set; }
-
+    public interface IMongoDbProcessedRepositoryBase<TEntity, in TKey> where TEntity : IEntity<TKey>
+    {        
         /// <summary>
         ///     Add one item
         /// </summary>
@@ -88,6 +68,19 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> DeleteCollectionAsync();
 
         /// <summary>
+        ///     Get cursor to all documents in collection
+        /// </summary>
+        /// <returns></returns>
+        Task<IAsyncCursor<TEntity>> GetAllByCursorAsync();
+
+        /// <summary>
+        ///     Get cursor to all documents in collection
+        /// </summary>
+        /// <returns></returns>
+        Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection,
+            bool noCursorTimeout = false);
+
+        /// <summary>
         ///     Get all items.
         /// </summary>
         /// <returns></returns>
@@ -99,13 +92,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="id"></param>
         /// <returns></returns>
         Task<TEntity> GetAsync(TKey id);
-
-        /// <summary>
-        ///     Set active instance
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <returns></returns>
-        Task<bool> SetActiveInstanceAsync(byte instance);
 
         /// <summary>
         ///     Make sure collection exists

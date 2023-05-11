@@ -5,8 +5,8 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Helpers;
+using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 
@@ -47,7 +47,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<TaxonListDefinitionDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> GetTaxonLists([FromQuery] string cultureCode = "sv-SE")
         {
             try
@@ -102,6 +102,6 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Error getting taxa");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }
+        }        
     }
 }

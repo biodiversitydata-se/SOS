@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SOS.Administration.Gui.Models
+﻿namespace SOS.Administration.Gui.Models
 {
     public class ActiveInstanceInfoDto
-    {
-        public int Id { get; set; }
-        public int ActiveInstance { get; set; }
+    { 
+        /// <summary>
+        ///     Active instance 0 or 1
+        /// </summary>
+        public byte ActiveInstance { get; set; }
+
+        /// <summary>
+        ///     Id of configuration (always 0)
+        /// </summary>
+        public string Id { get; set; }
     }
 }

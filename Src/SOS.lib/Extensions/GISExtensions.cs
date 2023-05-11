@@ -3,16 +3,17 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using AgileObjects.AgileMapper.Extensions;
+using MongoDB.Driver.GeoJsonObjectModel;
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NetTopologySuite.Utilities;
-using Org.BouncyCastle.Utilities.Collections;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Gis;
 
 namespace SOS.Lib.Extensions
 {
@@ -21,6 +22,8 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class GISExtensions
     {
+        private readonly static IDictionary<string, Point> _transformPointCache = new ConcurrentDictionary<string, Point>();
+        private readonly static WKTReader _wktReader;
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -49,7 +52,9 @@ namespace SOS.Lib.Extensions
                         new MathTransformFilter(coordinateTransformation.MathTransform));
                 }
             }
-        }
+
+            _wktReader = new WKTReader(); 
+    }
 
         #region Private
 
@@ -90,30 +95,24 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         private static string GetCoordinateSystemWkt(CoordinateSys coordinateSystem)
         {
-            switch (coordinateSystem)
+            return coordinateSystem switch
             {
-                case CoordinateSys.WebMercator:
-                    return
-                        @"PROJCS[""Google Mercator"",GEOGCS[""WGS 84"",DATUM[""World Geodetic System 1984"",SPHEROID[""WGS 84"", 6378137.0, 298.257223563, AUTHORITY[""EPSG"",""7030""]],AUTHORITY[""EPSG"",""6326""]],PRIMEM[""Greenwich"", 0.0, AUTHORITY[""EPSG"",""8901""]],UNIT[""degree"", 0.017453292519943295], AXIS[""Geodetic latitude"", NORTH], AXIS[""Geodetic longitude"", EAST], AUTHORITY[""EPSG"",""4326""]], PROJECTION[""Mercator_1SP""], PARAMETER[""semi_minor"", 6378137.0], PARAMETER[""latitude_of_origin"", 0.0], PARAMETER[""central_meridian"", 0.0], PARAMETER[""scale_factor"", 1.0], PARAMETER[""false_easting"", 0.0], PARAMETER[""false_northing"", 0.0], UNIT[""m"", 1.0], AXIS[""Easting"", EAST], AXIS[""Northing"", NORTH], AUTHORITY[""EPSG"",""900913""]]";
-                //return @"PROJCS[""WGS 84 / Pseudo - Mercator"",GEOGCS[""WGS 84"",DATUM[""WGS_1984"",SPHEROID[""WGS 84"",6378137,298.257223563,AUTHORITY[""EPSG"",""7030""]],AUTHORITY[""EPSG"",""6326""]],PRIMEM[""Greenwich"",0,AUTHORITY[""EPSG"",""8901""]],UNIT[""degree"",0.0174532925199433,AUTHORITY[""EPSG"",""9122""]],AUTHORITY[""EPSG"",""4326""]],PROJECTION[""Mercator_1SP""],PARAMETER[""central_meridian"",0],PARAMETER[""scale_factor"",1],PARAMETER[""false_easting"",0],PARAMETER[""false_northing"",0],UNIT[""metre"",1,AUTHORITY[""EPSG"",""9001""]],AXIS[""X"",EAST],AXIS[""Y"",NORTH],EXTENSION[""PROJ4"","" + proj = merc + a = 6378137 + b = 6378137 + lat_ts = 0.0 + lon_0 = 0.0 + x_0 = 0.0 + y_0 = 0 + k = 1.0 + units = m + nadgrids = @null + wktext + no_defs""],AUTHORITY[""EPSG"",""3857""]]";
-                case CoordinateSys.Rt90_25_gon_v:
-                    return
-                        @"PROJCS[""SWEREF99 / RT90 2.5 gon V emulation"", GEOGCS[""SWEREF99"", DATUM[""SWEREF99"", SPHEROID[""GRS 1980"",6378137.0,298.257222101, AUTHORITY[""EPSG"",""7019""]], TOWGS84[0.0,0.0,0.0,0.0,0.0,0.0,0.0], AUTHORITY[""EPSG"",""6619""]], PRIMEM[""Greenwich"",0.0, AUTHORITY[""EPSG"",""8901""]], UNIT[""degree"",0.017453292519943295], AXIS[""Geodetic latitude"",NORTH], AXIS[""Geodetic longitude"",EAST], AUTHORITY[""EPSG"",""4619""]], PROJECTION[""Transverse Mercator""], PARAMETER[""central_meridian"",15.806284529444449], PARAMETER[""latitude_of_origin"",0.0], PARAMETER[""scale_factor"",1.00000561024], PARAMETER[""false_easting"",1500064.274], PARAMETER[""false_northing"",-667.711], UNIT[""m"",1.0], AXIS[""Northing"",NORTH], AXIS[""Easting"",EAST], AUTHORITY[""EPSG"",""3847""]]";
-                case CoordinateSys.SWEREF99:
-                    return
-                        @"GEOGCS[""SWEREF99"", DATUM[""SWEREF99"", SPHEROID[""GRS 1980"", 6378137, 298.257222101, AUTHORITY[""EPSG"", ""7019""]], TOWGS84[0, 0, 0, 0, 0, 0, 0], AUTHORITY[""EPSG"", ""6619""]], PRIMEM[""Greenwich"", 0, AUTHORITY[""EPSG"", ""8901""]], UNIT[""degree"", 0.0174532925199433, AUTHORITY[""EPSG"", ""9122""]], AUTHORITY[""EPSG"", ""4619""]]";
-                case CoordinateSys.SWEREF99_TM:
-                    return
-                        @"PROJCS[""SWEREF99 TM"", GEOGCS[""SWEREF99"", DATUM[""D_SWEREF99"", SPHEROID[""GRS_1980"",6378137,298.257222101]], PRIMEM[""Greenwich"",0], UNIT[""Degree"",0.017453292519943295]], PROJECTION[""Transverse_Mercator""], PARAMETER[""latitude_of_origin"",0], PARAMETER[""central_meridian"",15], PARAMETER[""scale_factor"",0.9996], PARAMETER[""false_easting"",500000], PARAMETER[""false_northing"",0], UNIT[""Meter"",1]]";
-                case CoordinateSys.WGS84:
-                    return
-                        @"GEOGCS[""GCS_WGS_1984"", DATUM[""WGS_1984"", SPHEROID[""WGS_1984"",6378137,298.257223563]], PRIMEM[""Greenwich"",0], UNIT[""Degree"",0.017453292519943295]]";
-                case CoordinateSys.ETRS89:
-                    return
-                        @"PROJCS[""ETRS89 / LAEA Europe"",GEOGCS[""ETRS89"",DATUM[""European_Terrestrial_Reference_System_1989"",SPHEROID[""GRS 1980"",6378137,298.257222101,AUTHORITY[""EPSG"",""7019""]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[""EPSG"",""6258""]],PRIMEM[""Greenwich"",0,AUTHORITY[""EPSG"",""8901""]],UNIT[""degree"",0.0174532925199433,AUTHORITY[""EPSG"",""9122""]],AUTHORITY[""EPSG"",""4258""]],PROJECTION[""Lambert_Azimuthal_Equal_Area""],PARAMETER[""latitude_of_center"",52],PARAMETER[""longitude_of_center"",10],PARAMETER[""false_easting"",4321000],PARAMETER[""false_northing"",3210000],UNIT[""metre"",1,AUTHORITY[""EPSG"",""9001""]],AUTHORITY[""EPSG"",""3035""]]";
-                default:
-                    throw new ArgumentException("Not handled coordinate system id " + coordinateSystem);
-            }
+                CoordinateSys.ETRS89 =>
+                    @"GEOGCS[""ETRS89"", DATUM[""European_Terrestrial_Reference_System_1989"",  SPHEROID[""GRS 1980"", 6378137, 298.257222101, AUTHORITY[""EPSG"", ""7019""]], AUTHORITY[""EPSG"", ""6258""]], PRIMEM[""Greenwich"",0, AUTHORITY[""EPSG"", ""8901""]], UNIT[""degree"", 0.0174532925199433,AUTHORITY[""EPSG"", ""9122""]], AUTHORITY[""EPSG"", ""4258""]]",
+                CoordinateSys.ETRS89_LAEA_Europe =>
+                    @"PROJCS[""ETRS89 / LAEA Europe"",GEOGCS[""ETRS89"",DATUM[""European_Terrestrial_Reference_System_1989"",SPHEROID[""GRS 1980"",6378137,298.257222101,AUTHORITY[""EPSG"",""7019""]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[""EPSG"",""6258""]],PRIMEM[""Greenwich"",0,AUTHORITY[""EPSG"",""8901""]],UNIT[""degree"",0.0174532925199433,AUTHORITY[""EPSG"",""9122""]],AUTHORITY[""EPSG"",""4258""]],PROJECTION[""Lambert_Azimuthal_Equal_Area""],PARAMETER[""latitude_of_center"",52],PARAMETER[""longitude_of_center"",10],PARAMETER[""false_easting"",4321000],PARAMETER[""false_northing"",3210000],UNIT[""metre"",1,AUTHORITY[""EPSG"",""9001""]],AUTHORITY[""EPSG"",""3035""]]",                    
+                CoordinateSys.Rt90_25_gon_v =>
+                    @"PROJCS[""SWEREF99 / RT90 2.5 gon V emulation"", GEOGCS[""SWEREF99"", DATUM[""SWEREF99"", SPHEROID[""GRS 1980"",6378137.0,298.257222101, AUTHORITY[""EPSG"",""7019""]], TOWGS84[0.0,0.0,0.0,0.0,0.0,0.0,0.0], AUTHORITY[""EPSG"",""6619""]], PRIMEM[""Greenwich"",0.0, AUTHORITY[""EPSG"",""8901""]], UNIT[""degree"",0.017453292519943295], AXIS[""Geodetic latitude"",NORTH], AXIS[""Geodetic longitude"",EAST], AUTHORITY[""EPSG"",""4619""]], PROJECTION[""Transverse Mercator""], PARAMETER[""central_meridian"",15.806284529444449], PARAMETER[""latitude_of_origin"",0.0], PARAMETER[""scale_factor"",1.00000561024], PARAMETER[""false_easting"",1500064.274], PARAMETER[""false_northing"",-667.711], UNIT[""m"",1.0], AXIS[""Northing"",NORTH], AXIS[""Easting"",EAST], AUTHORITY[""EPSG"",""3847""]]",
+                CoordinateSys.SWEREF99 =>
+                    @"GEOGCS[""SWEREF99"", DATUM[""SWEREF99"", SPHEROID[""GRS 1980"", 6378137, 298.257222101, AUTHORITY[""EPSG"", ""7019""]], TOWGS84[0, 0, 0, 0, 0, 0, 0], AUTHORITY[""EPSG"", ""6619""]], PRIMEM[""Greenwich"", 0, AUTHORITY[""EPSG"", ""8901""]], UNIT[""degree"", 0.0174532925199433, AUTHORITY[""EPSG"", ""9122""]], AUTHORITY[""EPSG"", ""4619""]]",
+                CoordinateSys.SWEREF99_TM =>
+                    @"PROJCS[""SWEREF99 TM"",GEOGCS[""SWEREF99"", DATUM[""SWEREF99"", SPHEROID[""GRS 1980"", 6378137, 298.257222101, AUTHORITY[""EPSG"", ""7019""]], TOWGS84[0, 0, 0, 0, 0, 0, 0], AUTHORITY[""EPSG"", ""6619""]], PRIMEM[""Greenwich"", 0, AUTHORITY[""EPSG"", ""8901""]], UNIT[""degree"", 0.0174532925199433, AUTHORITY[""EPSG"", ""9122""]], AUTHORITY[""EPSG"", ""4619""]], PROJECTION[""Transverse_Mercator""], PARAMETER[""latitude_of_origin"", 0], PARAMETER[""central_meridian"", 15], PARAMETER[""scale_factor"", 0.9996], PARAMETER[""false_easting"", 500000], PARAMETER[""false_northing"", 0], UNIT[""metre"", 1, AUTHORITY[""EPSG"", ""9001""]], AUTHORITY[""EPSG"", ""3006""]]",
+                CoordinateSys.WebMercator =>
+                    @"PROJCS[""Google Mercator"",GEOGCS[""WGS 84"",DATUM[""World Geodetic System 1984"",SPHEROID[""WGS 84"", 6378137.0, 298.257223563, AUTHORITY[""EPSG"",""7030""]],AUTHORITY[""EPSG"",""6326""]],PRIMEM[""Greenwich"", 0.0, AUTHORITY[""EPSG"",""8901""]],UNIT[""degree"", 0.017453292519943295], AXIS[""Geodetic latitude"", NORTH], AXIS[""Geodetic longitude"", EAST], AUTHORITY[""EPSG"",""4326""]], PROJECTION[""Mercator_1SP""], PARAMETER[""semi_minor"", 6378137.0], PARAMETER[""latitude_of_origin"", 0.0], PARAMETER[""central_meridian"", 0.0], PARAMETER[""scale_factor"", 1.0], PARAMETER[""false_easting"", 0.0], PARAMETER[""false_northing"", 0.0], UNIT[""m"", 1.0], AXIS[""Easting"", EAST], AXIS[""Northing"", NORTH], AUTHORITY[""EPSG"",""900913""]]",
+                CoordinateSys.WGS84 =>
+                    @"GEOGCS[""GCS_WGS_1984"", DATUM[""WGS_1984"", SPHEROID[""WGS_1984"",6378137,298.257223563]], PRIMEM[""Greenwich"",0], UNIT[""Degree"",0.017453292519943295]]",
+                _ => throw new ArgumentException("Not handled coordinate system id " + coordinateSystem)
+            };
         }
 
         /// <summary>
@@ -123,6 +122,11 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         private static GeoCoordinate[][] ToGeoShapePolygonCoordinates(this Polygon polygon)
         {
+            if ((polygon?.Coordinates?.Length ?? 0) == 0)
+            {
+                return null!;
+            }
+
             var coordinates = new List<GeoCoordinate[]>();
             var exteriorRing = polygon.ExteriorRing.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray();
             var holes = polygon.Holes.Select(h => h.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray()).ToArray();
@@ -138,15 +142,13 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="coordinates"></param>
         /// <returns></returns>
-        private static GeoCoordinate[][] ToGeoShapePolygonCoordinates(this ArrayList coordinates)
+        private static GeoCoordinate[][] ToGeoShapePolygonCoordinates(this GeoJsonPolygonCoordinates<GeoJson2DCoordinates> coordinates)
         {
-            var rings = coordinates.ToArray()
-                .Select(lr => (lr as double[][]).Select(c => new GeoCoordinate(c[1], c[0])).ToArray()).ToArray();
-            var exteriorRing = rings.First();
-            var holes = rings.Skip(1)?.ToArray();
+            var exteriorRing = coordinates.Exterior.Positions
+                .Select(p => new GeoCoordinate(p.Y, p.X))?.ToArray();
+            var holes = coordinates.Holes.Select(h => h.Positions.Select(p => new GeoCoordinate(p.Y, p.X))?.ToArray())?.ToArray();
 
             var newCoordinates = new List<GeoCoordinate[]>();
-
             newCoordinates.Add(exteriorRing);
             newCoordinates.AddRange(holes);
 
@@ -187,54 +189,178 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         private static LinearRing TryMakeRingValid(this LinearRing linearRing)
         {
-            var count = linearRing?.NumPoints ?? 0;
-            if (count < 2)
+            var coordinates = TryMakeRingValid<Coordinate>(linearRing?.Coordinates);
+
+            if (coordinates?.Any() ?? false)
             {
-                return null;
+                return Geometry.DefaultFactory.CreateLinearRing(coordinates as Coordinate[]);
             }
 
-            // Use hash set, no duplicates will be added
-            var validatedCoordinates = new HashSet<Coordinate>();
-
-            for (var i = 0; i < count; i++)
-            {
-                validatedCoordinates.Add(linearRing.Coordinates[i]);
-            }
-
-            // Make sure last coordinate equals first
-            var newRingCoordinates = new Coordinate[validatedCoordinates.Count + 1];
-            validatedCoordinates.CopyTo(newRingCoordinates, 0);
-            new [] { new Coordinate(newRingCoordinates[0].X, newRingCoordinates[0].Y) }.CopyTo(newRingCoordinates, validatedCoordinates.Count);
-
-            return Geometry.DefaultFactory.CreateLinearRing(newRingCoordinates);
+            return null;
         }
 
         private static IEnumerable<GeoCoordinate> TryMakeRingValid(this IEnumerable<GeoCoordinate> linearRing)
         {
-            var count = linearRing?.Count() ?? 0;
-            if (count < 2)
+            return TryMakeRingValid<GeoCoordinate>(linearRing);
+        }
+
+        private static IEnumerable<T> TryMakeRingValid<T>(this IEnumerable<T> linearRing)
+        {
+            // Use hash set, no duplicates will be added
+            var validatedCoordinates = new HashSet<T>(linearRing);
+            var coordinateCount = validatedCoordinates.Count();
+            if (coordinateCount < 3)
             {
                 return null;
             }
 
-            // Use hash set, no duplicates will be added
-            var validatedCoordinates = new HashSet<GeoCoordinate>();
-
-            foreach (var coordinate in linearRing)
-            {
-                validatedCoordinates.Add(coordinate);
-            }
-
-            var newRingCoordinates = new GeoCoordinate[validatedCoordinates.Count + 1];
+            // Make sure last coordinate equals first
+            var newRingCoordinates = new T[validatedCoordinates.Count + 1];
             validatedCoordinates.CopyTo(newRingCoordinates, 0);
-            new[] {new GeoCoordinate(newRingCoordinates[0].Latitude, newRingCoordinates[0].Longitude)}.CopyTo(
-                newRingCoordinates, validatedCoordinates.Count);
+            new[] { newRingCoordinates[0] }.CopyTo(newRingCoordinates, coordinateCount);
 
             return newRingCoordinates;
         }
         #endregion Private
 
         #region Public
+
+        /// <summary>
+        /// Make envelope as small as possible
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <param name="boundingBox"></param>
+        /// <param name="maxDistanceFromPoint"></param>
+        /// <returns></returns>
+        public static Envelope AdjustByGeometry(
+           this Envelope boundingBox,
+           Geometry geometry,
+           double? maxDistanceFromPoint)
+        {
+            if (geometry == null)
+            {
+                return boundingBox;
+            }
+
+            Envelope envelope;
+            if (geometry is Point point)
+            {
+                if (maxDistanceFromPoint.HasValue)
+                {
+                    var sweref99TmGeom = point.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
+                    var bufferedGeomSweref99Tm = sweref99TmGeom.Buffer(maxDistanceFromPoint.Value);
+                    var bufferedGeomWgs84 = bufferedGeomSweref99Tm.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+                    envelope = bufferedGeomWgs84.EnvelopeInternal;
+                }
+                else
+                {
+                    return boundingBox;
+                }
+            }
+            else
+            {
+                envelope = geometry.EnvelopeInternal;
+            }
+
+            if (envelope.IsNull)
+            {
+                return boundingBox;
+            }
+
+            return boundingBox.Intersection(envelope);
+        }
+
+        public static long CalculateNumberOfTiles(this Envelope envelope,
+            int zoom)
+        {
+            if (envelope == null)
+            {
+                return 0;
+            }
+    
+            var tileWidthInDegrees = 360.0 / Math.Pow(2, zoom + 1);
+            var latCentre = (envelope.MaxY + envelope.MinY) / 2;
+            var tileHeightInDegrees = tileWidthInDegrees * Math.Cos(latCentre.ToRadians());
+
+            var lonDiff = Math.Abs(envelope.MaxX - envelope.MinX);
+            var latDiff = Math.Abs(envelope.MaxY - envelope.MinY);
+            var maxLonTiles = Math.Ceiling(lonDiff / tileWidthInDegrees);
+            var maxLatTiles = Math.Ceiling(latDiff / tileHeightInDegrees);
+            var maxTilesTot = (long)(maxLonTiles * maxLatTiles);
+
+            return maxTilesTot;
+        }
+
+        /// <summary>
+        /// Calculte concave hull for a list of polygons
+        /// </summary>
+        /// <param name="points">Points used for calculation</param>
+        /// <param name="edgeLength">The target maximum edge length or the target edge length ratio if useEdgeLengthRatio = true</param>
+        /// <param name="useEdgeLengthRatio">Use edge length ratio instead of edge length. The edge length ratio is a fraction of the length difference between the 
+        /// longest and shortest edges in the Delaunay Triangulation of the input points</param>
+        /// <param name="allowHoles"></param>
+        /// <returns></returns>
+        public static Geometry ConcaveHull(this Point[] points, double edgeLength = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
+        {
+            if (!points?.Any() ?? true)
+            {
+                return null;
+            }
+
+            return useEdgeLengthRatio ?
+               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLengthRatio(new MultiPoint(points), edgeLength, allowHoles)
+               :
+               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLength(new MultiPoint(points), edgeLength, allowHoles);
+        }
+
+        /// <summary>
+        /// Calculte concave hull for a list of polygons
+        /// </summary>
+        /// <param name="polygons">Polygons used for calculation</param>
+        /// <param name="useCenterPoint">Use polygon center point amd not polygon envelope edges, less points to use in calculation makes this faster</param>
+        /// <param name="edgeLength">The target maximum edge length or the target edge length ratio if useEdgeLengthRatio = true</param>
+        /// <param name="useEdgeLengthRatio">Use edge length ratio instead of edge length. The edge length ratio is a fraction of the length difference between the 
+        /// longest and shortest edges in the Delaunay Triangulation of the input points</param>
+        /// <param name="allowHoles"></param>
+        /// <returns></returns>
+        public static Geometry ConcaveHull(this Polygon[] polygons, bool useCenterPoint = true, double edgeLength = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
+        {
+            var points = new HashSet<Point>();
+            if (useCenterPoint)
+            {
+                //Create a geometry with all grid cell points, this is faster than using the gridcells because it's less coordinates
+                polygons.ForEach(p => points.Add(p.Centroid));
+            }
+            else
+            {
+                foreach(var polygon in polygons)
+                {
+                    polygon.Coordinates.ForEach(c => points.Add(new Point(c)));
+                }
+            }
+
+            return points.ToArray().ConcaveHull(edgeLength, useEdgeLengthRatio, allowHoles);
+        }
+
+        public static Geometry ConcaveHull(this MultiPolygon multiPolygon, bool useCenterPoint = true, double edgeLength = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
+        {
+            return ConcaveHull(multiPolygon?.Geometries.Select(g => g as Polygon)?.ToArray(), useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
+        }
+
+        /// <summary>
+        /// Get the convex hull for a list of polygons
+        /// </summary>
+        /// <param name="polygons">Boundig box as polygon</param>
+        /// <returns></returns>
+        public static Geometry ConvexHull(this Polygon[] polygons)
+        {
+            if (!polygons?.Any() ?? true)
+            {
+                return null;
+            }
+
+            return new MultiPolygon(polygons).ConvexHull();
+        }
 
         /// <summary>
         ///     Get the EPSG code for the specified coordinate system.
@@ -274,6 +400,68 @@ namespace SOS.Lib.Extensions
             }
 
             return geometry.IsValid;
+        }
+
+
+        public static bool IsValid(this GeoJsonGeometry<GeoJson2DCoordinates> geoJsonGeometry)
+        {
+            switch (geoJsonGeometry?.Type)
+            {
+                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.Point:
+                    var point = (GeoJsonPoint<GeoJson2DCoordinates>)geoJsonGeometry;
+                    return (point?.Coordinates.X ?? 0) != 0 && (point?.Coordinates.Y ?? 0) != 0;
+                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.Polygon:
+                    var polygon = (GeoJsonPolygon<GeoJson2DCoordinates>)geoJsonGeometry;
+                    return (polygon?.Coordinates?.Exterior?.Positions?.Count ?? 0) > 2;
+                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.MultiPolygon:
+                    var multiPolygon = (GeoJsonMultiPolygon<GeoJson2DCoordinates>)geoJsonGeometry;
+                    return (multiPolygon?.Coordinates?.Polygons?.FirstOrDefault()?.Exterior?.Positions?.Count ?? 0) > 2;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Cast XY bounding box to polygon
+        /// </summary>
+        /// <param name="boundinBox"></param>
+        /// <returns></returns>
+        public static Polygon ToPolygon(this XYBoundingBox boundinBox)
+        {
+            if (boundinBox == null)
+            {
+                return null!;
+            }
+
+            return new Polygon(
+                new LinearRing(new[]
+                {
+                    new Coordinate(boundinBox.TopLeft.X, boundinBox.TopLeft.Y),
+                    new Coordinate(boundinBox.BottomRight.X, boundinBox.TopLeft.Y),
+                    new Coordinate(boundinBox.BottomRight.X, boundinBox.BottomRight.Y),
+                    new Coordinate(boundinBox.TopLeft.X, boundinBox.BottomRight.Y),
+                    new Coordinate(boundinBox.TopLeft.X, boundinBox.TopLeft.Y)
+                })
+            );
+        }
+
+        /// <summary>
+        /// Create a new feature
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <param name="attributes"></param>
+        /// <returns></returns>
+        public static Feature ToFeature(this Geometry geometry, IEnumerable<KeyValuePair<string, object>> attributes)
+        {
+            if (geometry == null)
+            {
+                return null!;
+            }
+
+            return new Feature(
+                geometry,
+                new AttributesTable(attributes)
+            );
         }
 
         /// <summary>
@@ -341,25 +529,20 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="point"></param>
         /// <param name="accuracy"></param>
-        /// <param name="defaultWhenAccuracyIsUnknown"></param>
         /// <returns></returns>
-        public static Geometry ToCircle(this Point point, int? accuracy, int defaultWhenAccuracyIsUnknown = 5000)
+        public static Geometry ToCircle(this Point point, int accuracy)
         {
             if (point?.Coordinate == null || point.Coordinate.X <= 0 || point.Coordinate.Y <= 0)
             {
                 return null;
             }
-
-            if (accuracy == null || accuracy < 0)
-            {
-                accuracy = defaultWhenAccuracyIsUnknown;
-            }
-            else if (accuracy == 0)
+            if (accuracy == 0)
             {
                 accuracy = 1;
             }
 
             var shapeFactory = new GeometricShapeFactory();
+            
             shapeFactory.NumPoints = accuracy < 1000 ? 32 : accuracy < 10000 ? 64 : 128;
             shapeFactory.Centre = point.Coordinate;
             var diameterInMeters = (double)accuracy * 2;
@@ -383,7 +566,7 @@ namespace SOS.Lib.Extensions
 
                     break;
             }
-
+            
             var circle = shapeFactory.CreateCircle();
             circle.SRID = point.SRID;
             return circle;
@@ -412,91 +595,111 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Cast envelope to geoemtry
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <returns></returns>
+        public static Envelope ToEnvelope(this Geometry geometry)
+        {
+            return (geometry?.Coordinates?.Any() ?? false) ? new Envelope(geometry.Coordinates) : null;
+        }
+
+        /// <summary>
+        /// Cast LatLonBoundingBox to envelope
+        /// </summary>
+        /// <param name="boundingBox"></param>
+        /// <returns></returns>
+        public static Envelope ToEnvelope(this LatLonBoundingBox boundingBox)
+        {
+            return boundingBox?.BottomRight == null || boundingBox?.TopLeft == null ? 
+                null : 
+                new Envelope(new Coordinate(boundingBox.BottomRight.Longitude, boundingBox.BottomRight.Latitude), new Coordinate(boundingBox.TopLeft.Longitude, boundingBox.TopLeft.Latitude));
+        }
+
+        /// <summary>
         ///     Cast geometry to geo json
         /// </summary>
         /// <param name="geometry"></param>
         /// <returns></returns>
-        public static GeoJsonGeometry ToGeoJson(this Geometry geometry)
+        public static GeoJsonGeometry<GeoJson2DCoordinates> ToGeoJson(this Geometry geometry)
         {
             if (geometry?.Coordinates == null)
             {
                 return null;
             }
 
-            var coordinates = new ArrayList();
+
             switch (geometry.OgcGeometryType)
             {
                 case OgcGeometryType.Point:
                     var point = (Point) geometry;
-                    coordinates.Add(point.Coordinate.X);
-                    coordinates.Add(point.Coordinate.Y);
-                    break;
+                    return new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(point.Coordinate.X, point.Coordinate.Y));
                 case OgcGeometryType.Polygon:
                     var polygon = (Polygon) geometry;
-                    coordinates = polygon.ToGeoJsonPolygonCoordinates();
-                    break;
+
+                    return new GeoJsonPolygon<GeoJson2DCoordinates>(new GeoJsonPolygonCoordinates<GeoJson2DCoordinates>(
+                            new GeoJsonLinearRingCoordinates<GeoJson2DCoordinates>(
+                                polygon.ExteriorRing?.Coordinates?.Select(c => new GeoJson2DCoordinates(c.X, c.Y))
+                            ),
+                            polygon.Holes?.Select(h =>
+                                new GeoJsonLinearRingCoordinates<GeoJson2DCoordinates>(
+                                    h.Coordinates?.Select(c => new GeoJson2DCoordinates(c.X, c.Y))
+                                )
+                            )
+                        )
+                    );
                 case OgcGeometryType.MultiPolygon:
                     var multiPolygon = (MultiPolygon) geometry;
-
-                    foreach (var geom in multiPolygon.Geometries)
+                    var multiPolygonCoordinates = new List<GeoJsonPolygonCoordinates<GeoJson2DCoordinates>>();
+                    foreach (Polygon poly in multiPolygon.Geometries)
                     {
-                        coordinates.Add(((Polygon) geom).ToGeoJsonPolygonCoordinates());
+                        multiPolygonCoordinates.Add(((GeoJsonPolygon<GeoJson2DCoordinates>)poly.ToGeoJson()).Coordinates);
                     }
 
-                    break;
-                default:
+                    return new GeoJsonMultiPolygon<GeoJson2DCoordinates>(new GeoJsonMultiPolygonCoordinates<GeoJson2DCoordinates>(multiPolygonCoordinates))
+ ;                default:
                     throw new ArgumentException($"Not handled geometry type: {geometry.GeometryType}");
             }
-
-            return new GeoJsonGeometry
-            {
-                Type = geometry.OgcGeometryType.ToString(),
-                Coordinates = coordinates
-            };
         }
 
         /// <summary>
-        ///     Cast geo shape to geo json geometry
+        /// Cast GeoJson point to Geometry
         /// </summary>
-        /// <param name="geoShape"></param>
+        /// <param name="geoJsonGeometry"></param>
         /// <returns></returns>
-        public static Geometry ToGeometry(this IGeoShape geoShape)
+        public static Geometry ToGeometry(this GeoJsonGeometry<GeoJson2DCoordinates> geoJsonGeometry)
         {
-            if (geoShape == null)
+            if (geoJsonGeometry == null)
             {
                 return null;
             }
 
-            switch (geoShape.Type?.ToLower())
+            switch (geoJsonGeometry.Type)
             {
-                case "point":
-                    var point = (PointGeoShape)geoShape;
-                    return Geometry.DefaultFactory.CreatePoint(new Coordinate(point.Coordinates.Longitude,
-                        point.Coordinates.Latitude));
-                case "linestring":
-                    var linestring = (LineString)geoShape;
-                    return Geometry.DefaultFactory.CreateLineString(linestring.Coordinates.Select(c => new Coordinate(c.X, c.Y))?.ToArray());
-                case "linearring":
-                    var linearring = (LinearRing)geoShape;
-                    return Geometry.DefaultFactory.CreateLinearRing(linearring.Coordinates.Select(c => new Coordinate(c.X, c.Y))?.ToArray());
-                case "polygon":
-                    var polygon = (PolygonGeoShape)geoShape;
-                    var linearRings = polygon.Coordinates.Select(lr =>
-                            new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()).TryMakeRingValid())
-                        .ToArray();
+                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.Point:
+                    var point = (GeoJsonPoint<GeoJson2DCoordinates>)geoJsonGeometry;
+                    return Geometry.DefaultFactory.CreatePoint(new Coordinate(point.Coordinates.X,
+                        point.Coordinates.Y));
+                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.LineString:
+                    var linestring = (GeoJsonLineString<GeoJson2DCoordinates>)geoJsonGeometry;
+                    return Geometry.DefaultFactory.CreateLineString(linestring.Coordinates.Positions.Select(c => new Coordinate(c.X, c.Y))?.ToArray());
 
-                    return Geometry.DefaultFactory.CreatePolygon(linearRings.First(), linearRings.Skip(1)?.ToArray());
-                case "multipolygon":
-                    var multiPolygons = (MultiPolygonGeoShape)geoShape;
+                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.Polygon:
+                    var polygon = (GeoJsonPolygon<GeoJson2DCoordinates>)geoJsonGeometry;
+                    var exterior = new LinearRing(polygon.Coordinates.Exterior.Positions.Select(p =>
+                            new Coordinate(p.X, p.Y)).TryMakeRingValid().ToArray());
+                    var holes = polygon.Coordinates.Holes.Select(lr =>
+                            new LinearRing(lr.Positions.Select(pnt => new Coordinate(pnt.X, pnt.Y)).ToArray()).TryMakeRingValid())
+                        .ToArray();
+                    return Geometry.DefaultFactory.CreatePolygon(exterior, holes);
+                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.MultiPolygon:
+                    var multiPolygons = (GeoJsonMultiPolygon<GeoJson2DCoordinates>)geoJsonGeometry;
                     var polygons = new List<Polygon>();
 
-                    foreach (var poly in multiPolygons.Coordinates)
+                    foreach (var polygonCoordinates in multiPolygons.Coordinates.Polygons)
                     {
-                        var lr = poly.Select(lr =>
-                                new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()).TryMakeRingValid())
-                            .ToArray();
-
-                        polygons.Add(new Polygon(lr.First(), lr.Skip(1)?.ToArray()));
+                        var geoJsonPolygon = new GeoJsonPolygon<GeoJson2DCoordinates>(polygonCoordinates);
+                        polygons.Add((Polygon)geoJsonPolygon.ToGeometry());
                     }
 
                     return Geometry.DefaultFactory.CreateMultiPolygon(polygons.ToArray());
@@ -505,85 +708,45 @@ namespace SOS.Lib.Extensions
             }
         }
 
-        /// <summary>
-        ///     Cast geojson geometry to geometry
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        public static Geometry ToGeometry(this GeoJsonGeometry geometry)
-        {
-            if (!geometry?.IsValid ?? true)
-            {
-                return null;
-            }
-
-            switch (geometry.Type?.ToLower())
-            {
-                case "point":
-                    var coordinates = geometry.Coordinates.ToArray().Select(p => (double)p).ToArray();
-                    return Geometry.DefaultFactory.CreatePoint(new Coordinate(coordinates[0],
-                        coordinates[1]));
-                case "polygon":
-                case "holepolygon":
-                    var (shell,  holes) = geometry.Coordinates.ToGeometryPolygonCoordinates();
-                    return Geometry.DefaultFactory.CreatePolygon(shell, holes);
-                case "multipolygon":
-                    var polygones = new List<Polygon>();
-                    foreach (ArrayList polyCoordinates in geometry.Coordinates)
-                    {
-                        var (polyShell, polyHoles) = polyCoordinates.ToGeometryPolygonCoordinates();
-                        polygones.Add(Geometry.DefaultFactory.CreatePolygon(polyShell, polyHoles)); ;
-                    }
-
-                    return Geometry.DefaultFactory.CreateMultiPolygon(polygones.ToArray());
-                default:
-                    return null;
-            }
-        }
+        
 
         /// <summary>
         ///     Cast geo shape to geo json geometry
         /// </summary>
         /// <param name="geometry"></param>
         /// <returns></returns>
-        public static GeoJsonGeometry ToGeoJson(this IGeoShape geoShape)
+        public static GeoJsonGeometry<GeoJson2DCoordinates> ToGeoJson(this IGeoShape geoShape)
         {
             if (geoShape == null)
             {
                 return null;
             }
 
-            var coordinates = new ArrayList();
-            var type = "";
             switch (geoShape.Type?.ToLower())
             {
                 case "point":
                     var point = (PointGeoShape)geoShape;
-                    coordinates.Add(point.Coordinates.Longitude);
-                    coordinates.Add(point.Coordinates.Latitude);
-                    type = "Point"; // Type in correct case
-                    break;
+                    return new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(point.Coordinates.Longitude, point.Coordinates.Latitude));
                 case "polygon":
                     var polygon = (PolygonGeoShape)geoShape;
-                    coordinates.AddRange(polygon.Coordinates
-                        .Select(ls => ls.Select(pnt => new[] {pnt.Longitude, pnt.Latitude})).ToArray());
-                    type = "Polygon"; // Type in correct case
-                    break;
+                    var exterior = new GeoJsonLinearRingCoordinates<GeoJson2DCoordinates>(polygon.Coordinates?.FirstOrDefault()?.Select(c => new GeoJson2DCoordinates(c.Longitude, c.Latitude)));
+                    var holes = polygon.Coordinates?.Skip(1)?.Select(h => new GeoJsonLinearRingCoordinates<GeoJson2DCoordinates>(h?.Select(c => new GeoJson2DCoordinates(c.Longitude, c.Latitude))));
+                    return new GeoJsonPolygon<GeoJson2DCoordinates>(new GeoJsonPolygonCoordinates<GeoJson2DCoordinates>(exterior, holes));
                 case "multipolygon":
-                    var multiPolygons = (MultiPolygonGeoShape)geoShape;
-                    coordinates.AddRange(multiPolygons.Coordinates
-                        .Select(p => p.Select(ls => ls.Select(pnt => new[] {pnt.Longitude, pnt.Latitude}))).ToArray());
-                    type = "MultiPolygon"; // Type in correct case
-                    break;
+                    var multiPolygon = (MultiPolygonGeoShape)geoShape;
+                    var multiPolygonCoordinates = new List<GeoJsonPolygonCoordinates<GeoJson2DCoordinates>>();
+
+                    foreach(var coordinates in multiPolygon.Coordinates)
+                    {
+                        var mExterior = new GeoJsonLinearRingCoordinates<GeoJson2DCoordinates>(coordinates?.FirstOrDefault()?.Select(c => new GeoJson2DCoordinates(c.Longitude, c.Latitude)));
+                        var mHoles = coordinates?.Skip(1)?.Select(h => new GeoJsonLinearRingCoordinates<GeoJson2DCoordinates>(h?.Select(c => new GeoJson2DCoordinates(c.Longitude, c.Latitude))));
+                        multiPolygonCoordinates.Add(new GeoJsonPolygonCoordinates<GeoJson2DCoordinates>(mExterior, mHoles));
+                    }
+                    
+                    return new GeoJsonMultiPolygon<GeoJson2DCoordinates>(new GeoJsonMultiPolygonCoordinates<GeoJson2DCoordinates>(multiPolygonCoordinates));
                 default:
                     return null;
             }
-
-            return new GeoJsonGeometry
-            {
-                Type = type,
-                Coordinates = coordinates
-            };
         }
 
         /// <summary>
@@ -599,21 +762,6 @@ namespace SOS.Lib.Extensions
             }
 
             return new GeoLocation(point.Y, point.X);
-        }
-
-        /// <summary>
-        ///     Cast GeoJsonGeometry (point) to geo location
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        public static GeoLocation ToGeoLocation(this GeoJsonGeometry geometry)
-        {
-            if (geometry?.Type?.ToLower() != "point")
-            {
-                return null;
-            }
-
-            return new GeoLocation((double) geometry.Coordinates[1], (double) geometry.Coordinates[0]);
         }
 
         /// <summary>
@@ -636,34 +784,36 @@ namespace SOS.Lib.Extensions
         /// <summary>
         ///     Cast geojson geometry to Geo shape
         /// </summary>
-        /// <param name="geometry"></param>
+        /// <param name="geoJsonGeometry"></param>
         /// <returns></returns>
-        public static IGeoShape ToGeoShape(this GeoJsonGeometry geometry)
+        public static IGeoShape ToGeoShape(this GeoJsonGeometry<GeoJson2DCoordinates> geoJsonGeometry)
         {
-            if (!geometry.IsValid)
+            if (!geoJsonGeometry.IsValid())
             {
                 return null;
             }
 
-            switch (geometry.Type?.ToLower())
+            switch (geoJsonGeometry?.Type)
             {
-                case "point":
-                    var coordinates = geometry.Coordinates.ToArray().Select(p => (double) p).ToArray();
-                    return new PointGeoShape(new GeoCoordinate(coordinates[1], coordinates[0]));
-                case "polygon":
-                case "holepolygon":
-                    var polygonCoordinates = geometry.Coordinates.ToGeoShapePolygonCoordinates();
-                    return new PolygonGeoShape(polygonCoordinates);
-                case "multipolygon":
+                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.Point:
+                    var point = (GeoJsonPoint<GeoJson2DCoordinates>)geoJsonGeometry;
+                    return new PointGeoShape(new GeoCoordinate(point.Coordinates.Y, point.Coordinates.X));
+                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.Polygon:
+                    var polygon = (GeoJsonPolygon<GeoJson2DCoordinates>)geoJsonGeometry;
+                    return new PolygonGeoShape(polygon.Coordinates.ToGeoShapePolygonCoordinates());
+                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.MultiPolygon:
+                    var multiPolygon = (GeoJsonMultiPolygon<GeoJson2DCoordinates>)geoJsonGeometry;
+
                     var multiPolygonCoordinates = new List<GeoCoordinate[][]>();
-                    foreach (var polyCoorinates in geometry.Coordinates)
+                    foreach (var polyCoorinates in multiPolygon?.Coordinates?.Polygons?.Select(p => p.ToGeoShapePolygonCoordinates()))
                     {
-                        multiPolygonCoordinates.Add(((ArrayList) polyCoorinates).ToGeoShapePolygonCoordinates());
+                        multiPolygonCoordinates.Add(polyCoorinates);
                     }
 
                     return new MultiPolygonGeoShape(multiPolygonCoordinates);
+
                 default:
-                    return null;
+                    return null!;
             }
         }
 
@@ -722,29 +872,117 @@ namespace SOS.Lib.Extensions
         public static Geometry ToGeometry(
             this string wkt)
         {
-            var factory = new GeometryFactory();
-            var wktReader = new WKTReader(factory);
-            var geometry = wktReader.Read(wkt);
-
+            var geometry = _wktReader.Read(wkt);
+  
             return geometry;
         }
 
         /// <summary>
-        ///     Transform coordinates
+        ///     Cast geo shape to geo json geometry
+        /// </summary>
+        /// <param name="geoShape"></param>
+        /// <returns></returns>
+        public static Geometry ToGeometry(this IGeoShape geoShape)
+        {
+            if (geoShape == null)
+            {
+                return null;
+            }
+
+            switch (geoShape.Type?.ToLower())
+            {
+                case "point":
+                    var point = (PointGeoShape)geoShape;
+                    return Geometry.DefaultFactory.CreatePoint(new Coordinate(point.Coordinates.Longitude,
+                        point.Coordinates.Latitude));
+                case "linestring":
+                    var linestring = (LineString)geoShape;
+                    return Geometry.DefaultFactory.CreateLineString(linestring.Coordinates.Select(c => new Coordinate(c.X, c.Y))?.ToArray());
+                case "linearring":
+                    var linearring = (LinearRing)geoShape;
+                    return Geometry.DefaultFactory.CreateLinearRing(linearring.Coordinates.Select(c => new Coordinate(c.X, c.Y))?.ToArray());
+                case "polygon":
+                    var polygon = (PolygonGeoShape)geoShape;
+                    var linearRings = polygon.Coordinates.Select(lr =>
+                            new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()).TryMakeRingValid())
+                        .ToArray();
+
+                    return Geometry.DefaultFactory.CreatePolygon(linearRings.First(), linearRings.Skip(1)?.ToArray());
+                case "multipolygon":
+                    var multiPolygons = (MultiPolygonGeoShape)geoShape;
+                    var polygons = new List<Polygon>();
+
+                    foreach (var poly in multiPolygons.Coordinates)
+                    {
+                        var lr = poly.Select(lr =>
+                                new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()).TryMakeRingValid())
+                            .ToArray();
+
+                        polygons.Add(new Polygon(lr.First(), lr.Skip(1)?.ToArray()));
+                    }
+
+                    return Geometry.DefaultFactory.CreateMultiPolygon(polygons.ToArray());
+                default:
+                    return null;
+            }
+        }
+
+        public static Envelope Transform(
+            this Envelope envelope,
+            CoordinateSys fromCoordinateSystem,
+            CoordinateSys toCoordinateSystem)
+        {
+            if (envelope == null)
+            {
+                return null;
+            }
+
+            if (fromCoordinateSystem == toCoordinateSystem)
+            {
+                return envelope;
+            }
+
+            var topLeft = new Point(envelope.MinX, envelope.MaxY).Transform(fromCoordinateSystem, toCoordinateSystem);
+            var bottomRight = new Point(envelope.MaxX, envelope.MinY).Transform(fromCoordinateSystem, toCoordinateSystem);
+
+            return new Envelope(topLeft.Coordinate.X, bottomRight.Coordinate.X, topLeft.Coordinate.Y,
+                bottomRight.Coordinate.Y);
+        }
+
+        /// <summary>
+        ///  Transform coordinates
         /// </summary>
         /// <param name="geometry"></param>
         /// <param name="fromCoordinateSystem"></param>
         /// <param name="toCoordinateSystem"></param>
+        /// <param name="usePointCache"></param>
         /// <returns></returns>
-        public static Geometry Transform(
-            this Geometry geometry,
+        public static T Transform<T>(
+            this T geometry,
             CoordinateSys fromCoordinateSystem,
-            CoordinateSys toCoordinateSystem)
+            CoordinateSys toCoordinateSystem,
+            bool usePointCache = true) where T : Geometry
         {
+            if (geometry == null)
+            {
+                return null;
+            }
+
             if (fromCoordinateSystem == toCoordinateSystem)
             {
                 geometry.SRID = (int)toCoordinateSystem;
                 return geometry;
+            }
+
+            var key = string.Empty;
+            if (usePointCache && geometry is Point point)
+            {
+                key = $"{fromCoordinateSystem}:{toCoordinateSystem}:{point.Coordinate.X}:{point.Coordinate.Y}";
+
+                if (_transformPointCache.TryGetValue(key, out var cachedPoint))
+                {
+                    return cachedPoint as T;
+                }
             }
 
             var mathTransformFilter =
@@ -753,17 +991,27 @@ namespace SOS.Lib.Extensions
             var transformedGeometry = geometry.Copy();
             transformedGeometry.Apply(mathTransformFilter);
             transformedGeometry.SRID = (int) toCoordinateSystem;
-            return transformedGeometry;
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                // If we got this far and key is set, try add point to cache
+                lock (_transformPointCache)
+                {
+                    _transformPointCache.TryAdd(key, transformedGeometry as Point);
+                }
+            }
+
+            return transformedGeometry as T;
         }
 
         /// <summary>
         ///     Convert angle to radians
         /// </summary>
-        /// <param name="val"></param>
+        /// <param name="degrees"></param>
         /// <returns></returns>
-        public static double ToRadians(this double val)
+        public static double ToRadians(this double degrees)
         {
-            return Math.PI / 180 * val;
+            return degrees * Math.PI / 180;
         }
 
         /// <summary>
@@ -833,13 +1081,18 @@ namespace SOS.Lib.Extensions
 
             if (strCoordinateSystem.Equals("epsg:3035", StringComparison.OrdinalIgnoreCase))
             {
+                coordinateSystem = CoordinateSys.ETRS89_LAEA_Europe;
+                return true;
+            }
+
+            if (strCoordinateSystem.Equals("epsg:4258", StringComparison.OrdinalIgnoreCase))
+            {
                 coordinateSystem = CoordinateSys.ETRS89;
                 return true;
             }
 
             return false;
         }
-
         #endregion Public
     }
 }

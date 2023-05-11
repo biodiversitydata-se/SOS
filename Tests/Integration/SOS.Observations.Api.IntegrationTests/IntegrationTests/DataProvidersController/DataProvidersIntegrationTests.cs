@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Observations.Api.Dtos;
@@ -26,7 +27,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.DataProvidersCo
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.DataProvidersController.GetDataProviders("sv-SE", true);
+            var response = await _fixture.DataProvidersController.GetDataProvidersAsync("sv-SE", true);
             var dataProviders = response.GetResult<List<DataProviderDto>>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -42,7 +43,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.DataProvidersCo
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.DataProvidersController.GetDataProviders();
+            var response = await _fixture.DataProvidersController.GetDataProvidersAsync();
             var dataProviders = response.GetResult<List<DataProviderDto>>();
 
             //-----------------------------------------------------------------------------------------------------------

@@ -1,57 +1,66 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
 
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="xunit.runner.json" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="xunit.runner.json" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="xunit.runner.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="xunit.runner.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.3.85" />
-    <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="FluentAssertions" Version="6.1.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="3.1.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="MessagePack" Version="2.5.108" />
+		<PackageReference Include="Moq" Version="4.18.4" />
+		<PackageReference Include="FluentAssertions" Version="6.10.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+		<PackageReference Include="xunit" Version="2.4.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="3.2.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
-    <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
+		<ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Resources\AllProcessedBasicTaxa.msgpck">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Vocabularies.msgpck">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\SexVocabulary.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="Resources\AllProcessedBasicTaxa.msgpck">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies.msgpck">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\SexVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Shared\" />
-    <Folder Include="TestHelpers\Factories\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Models\Shared\" />
+		<Folder Include="TestHelpers\Factories\" />
+	</ItemGroup>
 
 </Project>

@@ -96,7 +96,7 @@
         ///     identifier or an identifier specific to a data set.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string IndividualID { get; set; }
+        //public string IndividualID { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: lifeStage.

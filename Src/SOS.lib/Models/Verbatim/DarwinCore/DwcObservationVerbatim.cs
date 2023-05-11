@@ -298,6 +298,11 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string EventID { get; set; }
 
         /// <summary>
+        /// Data stewardship dataset id.
+        /// </summary>
+        public string DataStewardshipDatasetId { get; set; }
+
+        /// <summary>
         ///     An identifier for the broader Event that groups this and potentially other Events.
         /// </summary>
         public string ParentEventID { get; set; }

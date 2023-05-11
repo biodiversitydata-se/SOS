@@ -4,7 +4,7 @@ using System.Xml.XPath;
 using DwC_A;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using SOS.Import.DarwinCore;
+using SOS.Harvest.DarwinCore;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.DarwinCore

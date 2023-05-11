@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using Nest;
@@ -20,6 +22,61 @@ namespace SOS.Lib.Helpers
 
         private static readonly NetTopologySuite.IO.GeoJsonReader GeoJsonReader = new NetTopologySuite.IO.GeoJsonReader();
         private static readonly NetTopologySuite.IO.GeoJsonWriter GeoJsonWriter = new NetTopologySuite.IO.GeoJsonWriter();
+
+        /// <summary>
+        /// Add missing grid cells to grid
+        /// </summary>
+        /// <param name="gridCellFeaturesSweRef99"></param>
+        /// <param name="envelope"></param>
+        /// <param name="gridCellsInMeters"></param>
+        /// <param name="attributes"></param>
+        public static void FillInBlanks(IDictionary<string, IFeature> gridCellFeaturesSweRef99,
+            Envelope envelope,
+            int gridCellsInMeters, 
+            IEnumerable<KeyValuePair<string, object>> attributes)
+        {
+            // Start at top left gridcell bottom left corner
+            var x = envelope.MinX;
+            var y = envelope.MaxY - gridCellsInMeters;
+
+            while (y >= envelope.MinY)
+            {
+                while (x < envelope.MaxX)
+                {
+                    var id = GeoJsonHelper.GetGridCellId(gridCellsInMeters, (int)x, (int)y);
+
+                    // Try to get grid cell
+                    if (!gridCellFeaturesSweRef99.TryGetValue(id, out var feature))
+                    {
+                        // Grid cell is missing, create a new one
+                        feature = new Feature(
+                            new Polygon(
+                                new LinearRing(
+                                    new[] {
+                                        new Coordinate(x, y), // bottom left
+                                        new Coordinate(x, y + gridCellsInMeters), // top left 
+                                        new Coordinate(x + gridCellsInMeters, y + gridCellsInMeters), // top rigth
+                                        new Coordinate(x + gridCellsInMeters, y), // bottom rigth
+                                        new Coordinate(x, y) // bottom left
+                                    }
+                            )),
+                            new AttributesTable(
+                                new KeyValuePair<string, object>[] {
+                                            new KeyValuePair<string, object>("id", id)
+                                }.Concat(attributes)
+                            )
+                        );
+
+                        gridCellFeaturesSweRef99.Add(id, feature);
+                    }
+
+                    x += gridCellsInMeters;
+                }
+
+                x = envelope.MinX;
+                y -= gridCellsInMeters;
+            }
+        }
 
         public static string GetFeatureCollectionString(IEnumerable<IDictionary<string, object>> records, bool flattenProperties)
         {
@@ -130,6 +187,23 @@ namespace SOS.Lib.Helpers
             var feature = GetFeature(geometry, attributesTable);
             string strGeoJson = GeoJsonWriter.Write(feature);
             return strGeoJson;
+        }
+
+        public static string GetGridCellId(int gridCellSizeInMeters, int left, int bottom)
+        {            
+            var gridSizeInKm = gridCellSizeInMeters / 1000.0;
+            var gridSizesInM = gridCellSizeInMeters.ToString();
+            var noOfZeros = gridSizesInM.Length - gridSizesInM.TrimEnd('0').Length;
+            string lowLeftX = left.ToString();
+            string lowLeftY = bottom.ToString();
+            var strLowerLeftY = lowLeftY.Remove(lowLeftY.ToString().Length - noOfZeros, noOfZeros);
+            var strLowerLeftX = lowLeftX.Remove(lowLeftX.ToString().Length - noOfZeros, noOfZeros); 
+            string id;
+            if (gridCellSizeInMeters < 1000)
+                id = $"{gridCellSizeInMeters}mN{strLowerLeftY}E{strLowerLeftX}";
+            else
+                id = $"{gridSizeInKm.ToString(CultureInfo.InvariantCulture)}kmN{strLowerLeftY}E{strLowerLeftX}";            
+            return id;
         }
     }
 }

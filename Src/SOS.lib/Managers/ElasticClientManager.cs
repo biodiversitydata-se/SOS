@@ -10,11 +10,10 @@ namespace SOS.Lib.Managers
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="elasticSearchConfiguration"></param>
-        /// <param name="debugMode"></param>
-        public ElasticClientManager(ElasticSearchConfiguration elasticSearchConfiguration, bool debugMode = false)
+        /// <param name="elasticSearchConfiguration"></param>        
+        public ElasticClientManager(ElasticSearchConfiguration elasticSearchConfiguration)
         {
-            Clients = elasticSearchConfiguration.GetClients(debugMode);
+            Clients = elasticSearchConfiguration.GetClients();
         }
 
         /// <inheritdoc />

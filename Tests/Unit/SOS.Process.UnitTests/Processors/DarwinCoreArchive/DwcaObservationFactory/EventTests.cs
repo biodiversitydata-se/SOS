@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
@@ -27,19 +26,19 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
                 .WithDefaultValues()
-                .WithEventDate("2019-03-18T08:13:26.000Z")
-                .WithEventTime("08:13:26.000Z")
+                .WithEventDate("2019-03-18T14:13:26.000Z")
+                .WithEventTime("14:13:26.000Z")
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Event.StartDate.Should().Be(DateTime.SpecifyKind(new DateTime(2019, 3, 18,8,13,26), DateTimeKind.Utc));
+            result.Event.StartDate.Should().Be(DateTime.SpecifyKind(new DateTime(2019, 3, 18, 14, 13, 26), DateTimeKind.Utc));
         }
 
         [Fact]
@@ -58,7 +57,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -85,13 +84,17 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Event.StartDate.Should().Be(DateTime.SpecifyKind(new DateTime(2014, 4, 24, 14, 30, 0), DateTimeKind.Utc)
                 .Subtract(TimeSpan.FromHours(2)));
+            result.Event.PlainStartTime.Should().Be("14:30");
+            result.Event.PlainEndTime.Should().Be("14:30");
+            result.Event.PlainStartDate.Should().Be("2014-04-24");
+            result.Event.PlainEndDate.Should().Be("2014-04-24");
         }
     }
 }

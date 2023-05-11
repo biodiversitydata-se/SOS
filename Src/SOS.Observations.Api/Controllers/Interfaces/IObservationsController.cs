@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Enums;
 using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.Controllers.Interfaces
@@ -12,33 +11,13 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     ///     Observations controller interface.
     /// </summary>
     public interface IObservationsController
-    {
-        Task<IActionResult> CachedCount(
-            int taxonId,
-            bool includeUnderlyingTaxa = false,
-            int? fromYear = null,
-            int? toYear = null,
-            AreaTypeDto? areaType = null,
-            string featureId = null,
-            int? dataProviderId = null,
-            bool validateSearchFilter = false);
-
-        Task<IActionResult> MultipleCachedCount(
-            IEnumerable<int> taxonIds,
-            bool includeUnderlyingTaxa = false,
-            int? fromYear = null,
-            int? toYear = null,
-            AreaTypeDto? areaType = null,
-            string featureId = null,
-            int? dataProviderId = null,
-            bool validateSearchFilter = false);
-
+    {       
         Task<IActionResult> Count(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilterBaseDto filter,
             bool validateSearchFilter = false,
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> ObservationsBySearch(
             int? roleId,
@@ -47,14 +26,41 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             SearchSortOrder sortOrder, 
             bool validateSearchFilter, 
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
+
+        Task<IActionResult> ObservationsBySearchDwc(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            string kingdom,
+            string identificationVerificationStatus,
+            string license,
+            string scientificName,
+            int? taxonKey,
+            string issue,
+            string has,
+            DateTime? minEventDate,
+            DateTime? maxEventDate,
+            string dataProviderIds,
+            string translationCultureCode,
+            bool sensitiveObservations,
+            int skip, 
+            int take, 
+            string sortBy,
+            SearchSortOrder sortOrder);
+
+        Task<IActionResult> ObservationByIdDwc(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            string id,
+            string translationCultureCode = "sv-SE",
+            bool sensitiveObservations = false);
 
         Task<IActionResult> CountInternal(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilterInternalBaseDto filter,
             bool validateSearchFilter = false,
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> ObservationsBySearchInternal(
             int? roleId,
@@ -66,9 +72,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             SearchSortOrder sortOrder,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false,
-            OutputFormatDto outputFormat = OutputFormatDto.Json,
-            bool useSwedishDates = false);
+            bool sensitiveObservations = false,
+            OutputFormatDto outputFormat = OutputFormatDto.Json);
 
         Task<IActionResult> SearchAggregatedInternal(
             int? roleId,
@@ -79,7 +84,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int take,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> GeogridAggregation(
             int? roleId,
@@ -88,7 +93,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int zoom,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> GeogridAggregationInternal(
             int? roleId,
@@ -97,16 +102,34 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int zoom,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
             int? roleId,
             string authorizationApplicationIdentifier,
-            SearchFilterAggregationDto filter,
+            SearchFilterAggregationInternalDto filter,
             int zoom,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
+
+        Task<IActionResult> MetricGridAggregationAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterAggregationDto filter,
+            int gridCellSizeInMeters = 10000,
+            bool validateSearchFilter = false,
+            bool sensitiveObservations = false);
+
+        Task<IActionResult> MetricGridAggregationInternalAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterAggregationInternalDto filter,
+            int gridCellSizeInMeters = 10000,
+            bool validateSearchFilter = false,
+            bool sensitiveObservations = false,
+            MetricCoordinateSys metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
+            OutputFormatDto outputFormat = OutputFormatDto.Json);
 
         Task<IActionResult> TaxonAggregation(
             int? roleId,
@@ -116,7 +139,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int? take,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> TaxonAggregationInternal(
             int? roleId,
@@ -126,19 +149,15 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int? take,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
-
-        //Task<IActionResult> TaxonExistsIndication(
-        //    SearchFilterDto filter,
-        //    bool validateSearchFilter = false,
-        //    bool protectedObservations = false);
+            bool sensitiveObservations = false,
+            bool sumUnderlyingTaxa = false);        
 
         Task<IActionResult> TaxonExistsIndicationInternal(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilterAggregationInternalDto filter,
            bool validateSearchFilter = false,
-           bool protectedObservations = false);
+           bool sensitiveObservations = false);
 
         /// <summary>
         ///  Signal search
@@ -158,36 +177,78 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool onlyAboveMyClearance = true);
 
         /// <summary>
-        /// Get observation by occurrence id
+        ///  Get observation by occurrence id
         /// </summary>
+        /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="id"></param>
         /// <param name="occurrenceId"></param>
         /// <param name="fieldSet"></param>
         /// <param name="translationCultureCode"></param>
-        /// <param name="protectedObservations"></param>
+        /// <param name="sensitiveObservations"></param>
         /// <returns></returns>
         Task<IActionResult> GetObservationById(
             int? roleId,
             string authorizationApplicationIdentifier,
-            string occurrenceId, OutputFieldSet fieldSet, 
+            string id,
+            string occurrenceId,
+            OutputFieldSet fieldSet, 
             string translationCultureCode = "sv-SE", 
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         /// <summary>
         /// Get observation by occurrence id, include internal data
         /// </summary>
+        /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="id"></param>
         /// <param name="occurrenceId"></param>
         /// <param name="fieldSet"></param>
         /// <param name="translationCultureCode"></param>
-        /// <param name="protectedObservations"></param>
+        /// <param name="sensitiveObservations"></param>
+        /// <param name="ensureArtportalenUpdated"></param>
         /// <returns></returns>
         Task<IActionResult> GetObservationByIdInternal(
             int? roleId,
             string authorizationApplicationIdentifier,
+            string id,
             string occurrenceId,
             OutputFieldSet fieldSet,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false,
+            bool ensureArtportalenUpdated = false);
+
+        /// <summary>
+        /// Count current users observations group by year
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetUserYearCountAsync(
+           SearchFilterAggregationInternalDto filter,
+           bool validateSearchFilter = false);
+
+        /// <summary>
+        /// Count current users observations group by year and month
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetUserYearMonthCountAsync(
+            SearchFilterAggregationInternalDto filter,
+            bool validateSearchFilter = false);
+
+        /// <summary>
+        /// Count current users observations group by year, month and day
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="validateSearchFilter"></param>
+        Task<IActionResult> GetUserYearMonthDayCountAsync(
+           SearchFilterAggregationInternalDto filter,
+           int skip = 0,
+           int take = 20,
+           bool validateSearchFilter = false);
     }
 }

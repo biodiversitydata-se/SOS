@@ -3,13 +3,14 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Import.Containers;
-using SOS.Import.Entities.Artportalen;
-using SOS.Import.Harvesters.Observations;
-using SOS.Import.Repositories.Source.Artportalen;
-using SOS.Import.Repositories.Source.Artportalen.Interfaces;
-using SOS.Import.Services;
+using SOS.Harvest.Containers;
+using SOS.Harvest.Entities.Artportalen;
+using SOS.Harvest.Harvesters.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
+using SOS.Harvest.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
@@ -17,6 +18,8 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using Xunit;
+using ITaxonRepository = SOS.Harvest.Repositories.Source.Artportalen.Interfaces.ITaxonRepository;
+using TaxonRepository = SOS.Harvest.Repositories.Source.Artportalen.TaxonRepository;
 
 namespace SOS.Import.IntegrationTests.Harvesters.Observations
 {
@@ -33,7 +36,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.ArtportalenConfiguration.ChunkSize = 125000;
             importConfiguration.ArtportalenConfiguration.MaxNumberOfSightingsHarvested = 100000;
 
-            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
+            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration, new NullLogger<ArtportalenDataService>());
 
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var importClient = new VerbatimClient(
@@ -45,6 +48,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new ArtportalenVerbatimRepository(importClient, new Mock<ILogger<ArtportalenVerbatimRepository>>().Object);
             var mediadataRepository =
                 new MediaRepository(artportalenDataService, new Mock<ILogger<MediaRepository>>().Object);
+            var diaryEntryRepository =
+                new DiaryEntryRepository(artportalenDataService, new Mock<ILogger<DiaryEntryRepository>>().Object);
             var metadataRepository =
                 new MetadataRepository(artportalenDataService, new Mock<ILogger<MetadataRepository>>().Object);
             var projectRepository =
@@ -53,16 +58,15 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new SightingRepository(artportalenDataService, new Mock<ILogger<SightingRepository>>().Object);
             var personRepository =
                 new PersonRepository(artportalenDataService, new Mock<ILogger<PersonRepository>>().Object);
-            var organizationRepository = new OrganizationRepository(artportalenDataService,
-                new Mock<ILogger<OrganizationRepository>>().Object);
             var sightingRelationRepository = new SightingRelationRepository(artportalenDataService,
                 new Mock<ILogger<SightingRelationRepository>>().Object);
             var speciesCollectionItemRepository = new SpeciesCollectionItemRepository(artportalenDataService,
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
+            var taxonRepository = new TaxonRepository(artportalenDataService, new Mock<ILogger<TaxonRepository>>().Object);
 
-            var processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
-            siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>())).ReturnsAsync(new List<SiteEntity>());
+            var processedObservationRepository = new Mock<IProcessedObservationCoreRepository>().Object;
+            siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>())).ReturnsAsync(new List<SiteEntity>());
 
             var processedDbConfiguration = GetProcessDbConfiguration();
             var processedClient = new ProcessClient(processedDbConfiguration.GetMongoDbSettings(), processedDbConfiguration.DatabaseName, processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
@@ -78,19 +82,17 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 sightingRepository,
                 siteRepositoryMock.Object,
                 sightingVerbatimRepository,
-                personRepository,
-                organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 processedObservationRepository,
-                new ArtportalenMetadataContainer(),
+                new ArtportalenMetadataContainer(diaryEntryRepository, metadataRepository, personRepository, projectRepository, taxonRepository, new Mock<ILogger<ArtportalenMetadataContainer>>().Object),
                 areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await observationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
+            var res = await observationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -108,10 +110,12 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var importConfiguration = GetImportConfiguration();
             importConfiguration.ArtportalenConfiguration.ChunkSize = 125000;
             importConfiguration.ArtportalenConfiguration.MaxNumberOfSightingsHarvested = 100000;
-            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
+            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration, new NullLogger<ArtportalenDataService>());
             var sightingVerbatimRepositoryMock = new Mock<IArtportalenVerbatimRepository>();
             var mediadataRepository =
                 new MediaRepository(artportalenDataService, new Mock<ILogger<MediaRepository>>().Object);
+            var diaryEntryRepository =
+                new DiaryEntryRepository(artportalenDataService, new Mock<ILogger<DiaryEntryRepository>>().Object);
             IMetadataRepository metadataRepository =
                 new MetadataRepository(artportalenDataService, new Mock<ILogger<MetadataRepository>>().Object);
             IProjectRepository projectRepository =
@@ -120,15 +124,14 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new SightingRepository(artportalenDataService, new Mock<ILogger<SightingRepository>>().Object);
             var personRepository =
                 new PersonRepository(artportalenDataService, new Mock<ILogger<PersonRepository>>().Object);
-            var organizationRepository = new OrganizationRepository(artportalenDataService,
-                new Mock<ILogger<OrganizationRepository>>().Object);
             var sightingRelationRepository = new SightingRelationRepository(artportalenDataService,
                 new Mock<ILogger<SightingRelationRepository>>().Object);
             var speciesCollectionItemRepository = new SpeciesCollectionItemRepository(artportalenDataService,
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
-            siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>()));
-            var processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
+            siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>()));
+            var processedObservationRepository = new Mock<IProcessedObservationCoreRepository>().Object;
+            var taxonRepositoryMock = new Mock<ITaxonRepository>().Object;
 
             var processedDbConfiguration = GetProcessDbConfiguration();
             var processedClient = new ProcessClient(processedDbConfiguration.GetMongoDbSettings(), processedDbConfiguration.DatabaseName, processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
@@ -142,20 +145,18 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 projectRepository,
                 sightingRepository,
                 siteRepositoryMock.Object,
-                sightingVerbatimRepositoryMock.Object,
-                personRepository,
-                organizationRepository,
+                 sightingVerbatimRepositoryMock.Object,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 processedObservationRepository,
-                new ArtportalenMetadataContainer(),
+                new ArtportalenMetadataContainer(diaryEntryRepository, metadataRepository, personRepository, projectRepository, taxonRepositoryMock, new Mock<ILogger<ArtportalenMetadataContainer>>().Object),
                 areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await observationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
+            var res = await observationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
@@ -11,16 +14,18 @@ using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Cache;
-using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Log;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -35,9 +40,16 @@ namespace SOS.Observations.Api.Managers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ITaxonObservationCountCache _taxonObservationCountCache;
+        private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
         private readonly ILogger<ObservationManager> _logger;
-        
-        private void PostProcessObservations(bool protectedObservations, IEnumerable<dynamic> processedObservations, string cultureCode, bool useSwedishDates = false)
+
+        private async Task<long> GetProvinceCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
+        {
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            return await _processedObservationRepository.GetProvinceCountAsync(filter);
+        }
+
+        private void PostProcessObservations(ProtectionFilter protectionFilter, IEnumerable<dynamic> processedObservations, string cultureCode)
         {
             if (!processedObservations?.Any() ?? true)
             {
@@ -48,18 +60,19 @@ namespace SOS.Observations.Api.Managers
             {
                 var occurenceIds = new HashSet<string>();
                 var observations = processedObservations.Cast<IDictionary<string, object>>().ToList();
-                _vocabularyValueResolver.ResolveVocabularyMappedValues(observations, cultureCode, true);
-                if (useSwedishDates)
-                {
-                    LocalDateTimeConverterHelper.ConvertToLocalTime(observations);
-                }
-
+                LocalDateTimeConverterHelper.ConvertToLocalTime(observations);
+                
+                // Resolve vocabulary values.
+                _vocabularyValueResolver.ResolveVocabularyMappedValues(observations, cultureCode);
+               
                 foreach (var obs in observations)
                 {
-                    if (protectedObservations && obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
-                        out var occurrenceObject))
+                    if (!protectionFilter.Equals(ProtectionFilter.Public) &&
+                        obs.TryGetValue(nameof(Observation.Sensitive).ToLower(), out var sensitive) &&
+                        obs.TryGetValue(nameof(Observation.Occurrence).ToLower(), out var occurrenceObject)
+                    )
                     {
-                        if (occurrenceObject is IDictionary<string, object> occurrenceDictionary && occurrenceDictionary.TryGetValue("occurrenceId", out var occurenceId))
+                        if (((bool)sensitive) && occurrenceObject is IDictionary<string, object> occurrenceDictionary && occurrenceDictionary.TryGetValue("occurrenceId", out var occurenceId))
                         {
                             occurenceIds.Add(occurenceId as string);
                         }
@@ -67,7 +80,7 @@ namespace SOS.Observations.Api.Managers
                 }
 
                 // Log protected observations
-                if (protectedObservations)
+                if (!protectionFilter.Equals(ProtectionFilter.Public))
                 {
                     var user =  _httpContextAccessor.HttpContext?.User;
 
@@ -91,7 +104,7 @@ namespace SOS.Observations.Api.Managers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(e, "Error in postprocessing observations");
                 throw;
             }
         }
@@ -105,6 +118,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="filterManager"></param>
         /// <param name="httpContextAccessor"></param>
         /// <param name="taxonObservationCountCache"></param>
+        /// <param name="taxonSumAggregationCache"></param>
         /// <param name="logger"></param>
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
@@ -113,6 +127,7 @@ namespace SOS.Observations.Api.Managers
             IFilterManager filterManager,
             IHttpContextAccessor httpContextAccessor,
             ITaxonObservationCountCache taxonObservationCountCache,
+            IClassCache<Dictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -122,10 +137,15 @@ namespace SOS.Observations.Api.Managers
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
+            _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));            
+            _taxonSumAggregationCache = taxonSumAggregationCache ?? throw new ArgumentNullException(nameof(taxonSumAggregationCache));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            // Make sure we are working with live data
+            _processedObservationRepository.LiveMode = true;
         }
+
 
         public int MaxNrElasticSearchAggregationBuckets => _processedObservationRepository.MaxNrElasticSearchAggregationBuckets;
 
@@ -133,20 +153,26 @@ namespace SOS.Observations.Api.Managers
         public async Task<PagedResult<dynamic>> GetChunkAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
-            SearchFilter filter, int skip, int take, string sortBy,
-            SearchSortOrder sortOrder, bool useSwedishDates = false)
+            SearchFilter filter, 
+            int skip, 
+            int take)
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
-                    await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder);
-                PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode, useSwedishDates);
+                    await _processedObservationRepository.GetChunkAsync(filter, skip, take);
+                PostProcessObservations(filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
 
                 return processedObservations;
             }
             catch (AuthenticationRequiredException e)
             {
+                throw;
+            }
+            catch(TimeoutException e)
+            {
+                _logger.LogError(e, "Get chunk of observations timeout");
                 throw;
             }
             catch (Exception e)
@@ -162,20 +188,23 @@ namespace SOS.Observations.Api.Managers
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int take, 
-            string sortBy,
-            SearchSortOrder sortOrder,
             string scrollId)
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
-                    await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, sortBy, sortOrder, scrollId);
-                PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
+                    await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, scrollId);
+                PostProcessObservations(filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
                 return processedObservations;
             }
             catch (AuthenticationRequiredException e)
             {
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get observations by scroll timeout");
                 throw;
             }
             catch (Exception e)
@@ -193,7 +222,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
 
                 if(aggregationType.IsDateHistogram())
                     return await _processedObservationRepository.GetAggregatedHistogramChunkAsync(filter, aggregationType);
@@ -201,10 +230,18 @@ namespace SOS.Observations.Api.Managers
                 if(aggregationType.IsSpeciesSightingsList())
                     return await _processedObservationRepository.GetAggregatedChunkAsync(filter, aggregationType, skip, take);
 
+                if (aggregationType == AggregationType.SightingsPerWeek48)
+                    return await _processedObservationRepository.GetAggregated48WeekHistogramAsync(filter);
+
                 return null;
             }
             catch (AuthenticationRequiredException e)
             {
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get aggregated chunk of observations timeout");
                 throw;
             }
             catch (Exception e)
@@ -214,48 +251,23 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-
         /// <inheritdoc />
-        public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision)
+        public async Task<GeoGridTileResult> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision)
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
-                return await _processedObservationRepository.GetGeogridAggregationAsync(filter, precision);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to aggregate to geogrids.");
-                throw;
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision)
-        {
-            try
-            {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision);
             }
-            catch (Exception e)
+            catch (ArgumentOutOfRangeException e)
             {
-                _logger.LogError(e, "Failed to aggregate to geogrids.");
+                _logger.LogError(e, "Failed to aggregate to metric tiles. To many buckets");
                 throw;
             }
-        }
-
-        /// <inheritdoc />
-        public async Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
-            int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter, 
-            int zoom)
-        {
-            try
+            catch (TimeoutException e)
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
-                return await _processedObservationRepository.GetCompleteGeoTileTaxaAggregationAsync(filter, zoom);
+                _logger.LogError(e, "Get geogrid tile aggregation timeout");
+                throw;
             }
             catch (Exception e)
             {
@@ -265,22 +277,29 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
-            int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter,
-            int zoom,
-            string geoTilePage,
-            int? taxonIdPage)
+        public async Task<GeoGridMetricResult> GetMetricGridAggregationAsync(int? roleId, string authorizationApplicationIdentifier,
+                SearchFilter filter, int gridCellSizeInMeters, MetricCoordinateSys metricCoordinateSys)
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
-                return await _processedObservationRepository.GetPageGeoTileTaxaAggregationAsync(filter, zoom, geoTilePage, taxonIdPage);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+                var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellSizeInMeters, metricCoordinateSys);
+
+                return result;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                _logger.LogError(e, "Failed to aggregate to metric tiles. To many buckets");
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Aggregate to metric tiles timeout");
+                throw;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to aggregate to geogrids.");
+                _logger.LogError(e, "Failed to aggregate to metric tiles.");
                 throw;
             }
         }
@@ -292,25 +311,17 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<LocationDto>> GetLocationsAsync(IEnumerable<string> locationIds)
+        public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
         {
-            var locations =  await _processedObservationRepository.GetLocationsAsync(locationIds);
-
-            return locations?.Select(l => l.ToDto());
-        }
-
-        /// <inheritdoc />
-        public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, FilterBase filter)
-        {
-            await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             return await _processedObservationRepository.GetMatchCountAsync(filter);
         }
 
-        public async Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(FilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch)
+        public async Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(SearchFilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch)
         {
-            TaxonObservationCountCacheKey taxonObservationCountCacheKey = TaxonObservationCountCacheKey.Create(taxonObservationCountSearch);
-            Dictionary<int, int> countByTaxonId = new Dictionary<int, int>();
-            HashSet<int> notCachedTaxonIds = new HashSet<int>();
+            var taxonObservationCountCacheKey = TaxonObservationCountCacheKey.Create(taxonObservationCountSearch);
+            var countByTaxonId = new Dictionary<int, TaxonCount>();
+            var notCachedTaxonIds = new HashSet<int>();
             foreach (var taxonId in taxonObservationCountSearch.TaxonIds)
             {
                 taxonObservationCountCacheKey.TaxonId = taxonId;
@@ -329,61 +340,24 @@ namespace SOS.Observations.Api.Managers
                 foreach (var notCachedTaxonId in notCachedTaxonIds)
                 {
                     filter.Taxa.Ids = new[] { notCachedTaxonId };
-                    int count = Convert.ToInt32(await GetMatchCountAsync(null, null, filter));
-                    countByTaxonId.Add(notCachedTaxonId, count);
+                    int observationCount = Convert.ToInt32(await GetMatchCountAsync(null, null, filter));                    
+                    int provinceCount = Convert.ToInt32(await GetProvinceCountAsync(null, null, filter));
+                    var taxonCount = new TaxonCount { ObservationCount = observationCount, ProvinceCount = provinceCount };
                     var cacheKey = TaxonObservationCountCacheKey.Create(taxonObservationCountSearch, notCachedTaxonId);
-                    _taxonObservationCountCache.Add(cacheKey, count);
+                    countByTaxonId.Add(notCachedTaxonId, taxonCount);
+                    _taxonObservationCountCache.Add(cacheKey, taxonCount);
                 }
             }
 
             var taxonCountDtos = countByTaxonId
-                .Select(m => new TaxonObservationCountDto { Count = m.Value, TaxonId = m.Key });
-            return taxonCountDtos;
-        }
-
-        /// <inheritdoc />
-        public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
-            int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter,
-            int? skip,
-            int? take)
-        {
-            try
-            {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
-                return await _processedObservationRepository.GetTaxonAggregationAsync(filter, skip, take);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get taxon aggregation");
-                throw;
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
-            int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter)
-        {
-            try
-            {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "Sighting", 0, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
-
-                if (filter?.Taxa?.Ids?.Count() > 10000)
+                .Select(m => new TaxonObservationCountDto
                 {
-                    throw new TaxonValidationException("Your filter exceeds 10000 taxon id's");
-                }
+                    TaxonId = m.Key,
+                    ObservationCount = m.Value.ObservationCount,
+                    ProvinceCount = m.Value.ProvinceCount
+                });
 
-                var result = await _processedObservationRepository.GetTaxonExistsIndicationAsync(filter);
-                return result?.ToTaxonAggregationItemDtos();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get taxon exists indication");
-                throw;
-            }
+            return taxonCountDtos;
         }
 
         /// <inheritdoc />
@@ -396,15 +370,20 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
 
                 if (!filter.ExtendedAuthorization?.ExtendedAreas?.Any() ?? true)
                 {
                     throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                 }
-
+                
                 var result = await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
                 return result;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Aggregate to metric tiles timeout");
+                throw;
             }
             catch (Exception e)
             {
@@ -413,20 +392,151 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        public async Task<dynamic> GetObservationAsync(int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields)
+        /// <inheritdoc />
+        public async Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool protectedIndex, int maxReturnedItems)
         {
-            var filter = includeInternalFields ? new SearchFilterInternal() : new SearchFilter();
+            return await _processedObservationRepository.TryToGetOccurenceIdDuplicatesAsync(protectedIndex, maxReturnedItems);
+        }
 
-            filter.PopulateOutputFields(outputFieldSet);
-            filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
+        /// <inheritdoc />
+        public async Task<dynamic> GetObservationAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet,
+            string translationCultureCode, bool protectedObservations, bool includeInternalFields, bool ensureArtportalenUpdated = false)
+        {
+            if (ensureArtportalenUpdated && (occurrenceId?.Contains("artportalen", StringComparison.CurrentCultureIgnoreCase) ?? false))
+            {
+                var regex = new Regex(@"\d+$");
+                var match = regex.Match(occurrenceId);
+                if (int.TryParse(match.Value, out var sightingId))
+                {
+                    var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(
+                        job => job.RunHarvestArtportalenObservationsAsync(new[] { sightingId },
+                        JobCancellationToken.Null));
 
-            await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, null, null, null, null, false);
+                    using var connection = JobStorage.Current.GetConnection();
+                    var stateData = connection.GetStateData(jobId);
+
+                    while (stateData.Name.Equals("Enqueued", StringComparison.CurrentCultureIgnoreCase) ||
+                           stateData.Name.Equals("Processing", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        Thread.Sleep(100);
+                        stateData = connection.GetStateData(jobId);
+                    }
+                }
+            }
+
+            var protectionFilter = protectedObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public;
+            var filter = includeInternalFields ? 
+                new SearchFilterInternal(userId ?? 0, protectionFilter) { NotPresentFilter = SightingNotPresentFilter.IncludeNotPresent } : 
+                new SearchFilter(userId ?? 0, protectionFilter);
+            filter.Output = new OutputFilter();
+            filter.Output.PopulateFields(outputFieldSet);
             
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "Sighting", null, null, null, false);
+
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
 
-            PostProcessObservations(protectedObservations, processedObservation, translationCultureCode);
-           
+            PostProcessObservations(protectionFilter, processedObservation, translationCultureCode);
+
             return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<YearCountResultDto>> GetUserYearCountAsync(SearchFilter filter)
+        {
+            try
+            {
+                // Make sure mandatory properties is set
+                filter.ExtendedAuthorization.ObservedByMe = true;
+                filter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Public; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
+                filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
+                await _filterManager.PrepareFilterAsync(null, null, filter);
+
+                if (filter.ExtendedAuthorization.UserId == 0)
+                {
+                    throw new AuthenticationRequiredException("You have to login in order to use this end point");
+                }
+
+                var result = await _processedObservationRepository.GetUserYearCountAsync(filter);
+                return result?.ToDtos();
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get user year count timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get user year count");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<YearMonthCountResultDto>> GetUserYearMonthCountAsync(SearchFilter filter)
+        {
+            try
+            {
+                // Make sure mandatory properties is set
+                filter.ExtendedAuthorization.ObservedByMe = true;
+                filter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Public; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
+                filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
+                await _filterManager.PrepareFilterAsync(null, null, filter);
+
+                if (filter.ExtendedAuthorization.UserId == 0)
+                {
+                    throw new AuthenticationRequiredException("You have to login in order to use this end point");
+                }
+
+                var result = await _processedObservationRepository.GetUserYearMonthCountAsync(filter);
+                return result?.ToDtos();
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get user year, month count timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get user year, month count");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<YearMonthDayCountResultDto>> GetUserYearMonthDayCountAsync(SearchFilter filter, int skip, int take)
+        {
+            try
+            {
+                // Make sure mandatory properties is set
+                filter.ExtendedAuthorization.ObservedByMe = true;
+                filter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Public; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
+                filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
+                await _filterManager.PrepareFilterAsync(null, null, filter);
+
+                if (filter.ExtendedAuthorization.UserId == 0)
+                {
+                    throw new AuthenticationRequiredException("You have to login in order to use this end point");
+                }
+              
+                var result = await _processedObservationRepository.GetUserYearMonthDayCountAsync(filter, skip, take);
+                return result?.ToDtos();
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get user year, month count timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get user year, month count");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> HasIndexOccurrenceIdDuplicatesAsync(bool protectedIndex)
+        {
+            return await _processedObservationRepository.HasIndexOccurrenceIdDuplicatesAsync(protectedIndex);
         }
 
         /// <inheritdoc />

@@ -71,7 +71,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             coreNode.Attribute("rowType")?.Value.Should().Be("http://rs.tdwg.org/dwc/terms/Occurrence");
-            locationNode.Value.Should().Be("occurrence.csv");
+            locationNode.Value.Should().Be("occurrence.txt");
             firstFieldNode.Attribute("term")?.Value.Should().Be("http://rs.tdwg.org/dwc/terms/occurrenceID");
         }
     }

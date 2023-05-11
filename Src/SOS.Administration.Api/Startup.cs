@@ -20,7 +20,6 @@ using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Newtonsoft.Json.Converters;
-using SOS.Administration.Api.Managers.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.JsonConverters;
@@ -170,7 +169,6 @@ namespace SOS.Administration.Api
             var sosApiConfiguration = Configuration.GetSection("SosApiConfiguration").Get<SosApiConfiguration>();
             services.AddSingleton<SosApiConfiguration>(sosApiConfiguration);
             var importConfiguration = Configuration.GetSection("ImportConfiguration").Get<ImportConfiguration>();
-            services.AddSingleton<AreaHarvestConfiguration>(importConfiguration.AreaHarvestConfiguration);
             services.AddSingleton<GeoRegionApiConfiguration>(importConfiguration.GeoRegionApiConfiguration);
 
             services.AddScoped<ICacheManager, CacheManager>();

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Nest;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
 
@@ -11,9 +10,28 @@ namespace SOS.Lib.Models.Processed.Observation
     public class ArtportalenInternal
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public ArtportalenInternal()
+        {
+
+        }
+
+        /// <summary>
+        /// Activity category id
+        /// </summary>
+        [SwaggerExclude]
+        public int? ActivityCategoryId { get; set; }
+
+        /// <summary>
         /// Bird validation areas.
         /// </summary>
         public IEnumerable<string> BirdValidationAreaIds { get; set; }
+
+        /// <summary>
+        /// Id of checklist
+        /// </summary>
+        public int? ChecklistId { get; set; }
 
         /// <summary>
         /// Year of confirmation.
@@ -31,34 +49,41 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? DeterminationYear { get; set; }
 
         /// <summary>
-        ///     Ids of Species Facts connected to Taxon
+        /// Id > 0 = diffused
         /// </summary>
-        public IEnumerable<int> SpeciesFactsIds { get; set; }
+        public int DiffusionId { get; set; }
 
         /// <summary>
-        ///     Id of SightingSpeciesCollectionItem in Artportalen.
+        /// Event month range start date => end date
         /// </summary>
-        public int? SightingSpeciesCollectionItemId { get; set; }
+        public IEnumerable<int> EventMonths { get; set; }
+
+        /// <summary>
+        /// Field diary group id
+        /// </summary>
+        public int? FieldDiaryGroupId { get; set; }
 
         /// <summary>
         ///     Has Triggered Validation Rules
         /// </summary>
-        public bool HasTriggeredValidationRules { get; set; }
+        //[Obsolete("Replaced by HasTriggeredVerificationRules")]
+        //public bool HasTriggeredValidationRules => HasTriggeredVerificationRules;
+
+        /// <summary>
+        ///     Has Triggered Verification Rules
+        /// </summary>
+        public bool HasTriggeredVerificationRules { get; set; }
 
         /// <summary>
         ///     Has any Triggered Validation Rule with Warning
         /// </summary>
-        public bool HasAnyTriggeredValidationRuleWithWarning { get; set; }
+        //[Obsolete("Replaced by HasAnyTriggeredVerificationRuleWithWarning")]
+        //public bool HasAnyTriggeredValidationRuleWithWarning => HasAnyTriggeredVerificationRuleWithWarning;
 
         /// <summary>
-        ///     ExternalId of Site in Artportalen.
+        ///     Has any Triggered Verification Rule with Warning
         /// </summary>
-        public string LocationExternalId { get; set; }
-
-        /// <summary>
-        ///     Note of Interest.
-        /// </summary>
-        public bool NoteOfInterest { get; set; }
+        public bool HasAnyTriggeredVerificationRuleWithWarning { get; set; }
 
         /// <summary>
         ///     HasUserComments
@@ -66,9 +91,25 @@ namespace SOS.Lib.Models.Processed.Observation
         public bool HasUserComments { get; set; }
 
         /// <summary>
+        ///     ExternalId of Site in Artportalen.
+        /// </summary>
+        //[Obsolete("Use Location.Attributes.ExternalId")]
+        //public string LocationExternalId { get; set; }
+
+        /// <summary>
+        ///     Note of Interest.
+        /// </summary>
+        public bool NoteOfInterest { get; set; }
+
+        /// <summary>
         /// Sighting Id.
         /// </summary>
         public int SightingId { get; set; }
+
+        /// <summary>
+        ///     Id of SightingSpeciesCollectionItem in Artportalen.
+        /// </summary>
+        public int? SightingSpeciesCollectionItemId { get; set; }
 
         /// <summary>
         ///     Sighting type.
@@ -81,9 +122,21 @@ namespace SOS.Lib.Models.Processed.Observation
         public int SightingTypeSearchGroupId { get; set; }
 
         /// <summary>
+        ///     Ids of Species Facts connected to Taxon
+        /// </summary>
+        public IEnumerable<int> SpeciesFactsIds { get; set; }
+
+        /// <summary>
+        /// Species group id.
+        /// </summary>
+        //[Obsolete("Replaced by taxon.SpeciesGroup (Enum)")]
+        //public int? SpeciesGroupId { get; set; }
+
+        /// <summary>
         ///     Id of sightings RegionalSightingState
         /// </summary>
-        public int? RegionalSightingStateId { get; set; }
+        //[Obsolete("This is too be deleted")]
+        //public int? RegionalSightingStateId { get; set; }
 
         /// <summary>
         ///     Id of publishing types.
@@ -93,17 +146,15 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Internal field used for searches by Artportalen, contains extra user information.
         /// </summary>
-        [Nested]
         public IEnumerable<UserInternal> OccurrenceRecordedByInternal { get; set; }
 
         /// <summary>
         /// Info about users verifying the observation
         /// </summary>
-        [Nested]
         public IEnumerable<UserInternal> OccurrenceVerifiedByInternal { get; set; }
 
         /// <summary>
-        ///     The original presentation name for ParisRegion from data provider.
+        ///     The original presentation name for ParishRegion from data provider.
         /// </summary>
         public string LocationPresentationNameParishRegion { get; set; }
 
@@ -118,6 +169,12 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Name of parent location, if any.
         /// </summary>
         public string ParentLocality { get; set; }
+
+        /// <summary>
+        /// AP site.includedbysiteid
+        /// </summary>
+        [SwaggerExclude]
+        public int? IncludedByLocationId { get; set; }
 
         /// <summary>
         ///     User id of the person that reported the species observation.
@@ -142,8 +199,34 @@ namespace SOS.Lib.Models.Processed.Observation
         public bool IncrementalHarvested { get; set; }
 
         /// <summary>
+        /// Second hand information flag
+        /// </summary>
+        public bool SecondHandInformation { get; set; }
+
+        /// <summary>
         ///  Sighting barcode url
         /// </summary>
         public string SightingBarcodeURL { get; set; }
+
+        /// <summary>
+        /// Sighting summary
+        /// </summary>
+        public string Summary { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule frequency id
+        /// </summary>
+        public int? TriggeredObservationRuleFrequencyId { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule reproduction id
+        /// </summary>
+        public int? TriggeredObservationRuleReproductionId { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule unspontaneous
+        /// </summary>
+        [SwaggerExclude]
+        public bool? TriggeredObservationRuleUnspontaneous { get; set; }
     }
 }

@@ -1,10 +1,20 @@
-﻿namespace SOS.Lib.Models.Processed.Observation
+﻿using Org.BouncyCastle.Utilities.Collections;
+
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// Taxon vernacular name.
     /// </summary>
     public class TaxonVernacularName
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public TaxonVernacularName()
+        {
+
+        }
+
         /// <summary>
         /// A common vernacular name.
         /// </summary>
@@ -28,6 +38,11 @@
         /// </summary>
         public bool IsPreferredName { get; set; }
 
+        /// <summary>
+        /// Valid for sighting
+        /// </summary>
+        public bool ValidForSighting { get; set; }
+
         public override string ToString()
         {
             return $"{Name} [{Language}]";
@@ -36,7 +51,7 @@
         protected bool Equals(TaxonVernacularName other)
         {
             return Name == other.Name && Language == other.Language && CountryCode == other.CountryCode &&
-                   IsPreferredName == other.IsPreferredName;
+                   IsPreferredName == other.IsPreferredName && ValidForSighting == other.ValidForSighting;
         }
 
         public override bool Equals(object obj)
@@ -55,6 +70,7 @@
                 hashCode = (hashCode * 397) ^ (Language != null ? Language.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (CountryCode != null ? CountryCode.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ IsPreferredName.GetHashCode();
+                hashCode = (hashCode * 397) ^ ValidForSighting.GetHashCode();
                 return hashCode;
             }
         }

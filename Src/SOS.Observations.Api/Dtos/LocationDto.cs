@@ -1,4 +1,5 @@
 ﻿using Nest;
+using SOS.Lib.Enums;
 
 namespace SOS.Observations.Api.Dtos
 {
@@ -42,6 +43,11 @@ namespace SOS.Observations.Api.Dtos
         ///     This field uses a controlled vocabulary.
         /// </remarks>
         public IdValueDto<int> Country { get; set; }
+
+        /// <summary>
+        /// The name of the country region
+        /// </summary>
+        public IdValueDto<string> CountryRegion { get; set; }
 
         /// <summary>
         ///     The standard code for the country in which the
@@ -100,6 +106,11 @@ namespace SOS.Observations.Api.Dtos
         public double? DecimalLongitude { get; set; }
 
         /// <summary>
+        ///     External Id of site
+        /// </summary>
+        public string ExternalId { get; set; }
+
+        /// <summary>
         ///     The specific description of the place. Less specific
         ///     geographic information can be provided in other
         ///     geographic terms (higherGeography, continent, country,
@@ -143,6 +154,16 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         /// Point with disturbance buffer
         /// </summary>
-        public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }
+        public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }        
+
+        /// <summary>
+        /// Id of project
+        /// </summary>
+        public int? ProjectId { get; set; }
+
+        /// <summary>
+        /// Location type, point, polygon or unknown
+        /// </summary>
+        public LocationType? Type { get; set; }
     }
 }

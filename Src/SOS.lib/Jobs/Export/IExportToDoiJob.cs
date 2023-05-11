@@ -14,6 +14,7 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="fileName"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [JobDisplayName("Copy export file to DOI repository and give it a DOI")]
         [Queue("medium")]
         Task<bool> RunAsync(string fileName, IJobCancellationToken cancellationToken);
     }

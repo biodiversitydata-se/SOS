@@ -12,10 +12,9 @@ namespace SOS.Administration.Api.Controllers.Interfaces
     {
         /// <summary>
         ///     Run process job
-        /// </summary>
-        /// <param name="copyFromActiveOnFail"></param>
+        /// </summary>        
         /// <returns></returns>
-        Task<IActionResult> RunProcessJob(bool copyFromActiveOnFail);
+        Task<IActionResult> RunProcessJob();
 
         /// <summary>
         /// Run process job for selected data providers

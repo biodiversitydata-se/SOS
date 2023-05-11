@@ -2,7 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
@@ -14,17 +16,26 @@ using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Lib.Helpers
 {
     public class AreaHelper : IAreaHelper
     {
-        private readonly AreaType[] _areaTypes =
-            {AreaType.County, AreaType.Province, AreaType.Municipality, AreaType.Parish, AreaType.EconomicZoneOfSweden};
+        private readonly AreaType[] _areaTypesInStrTree = {
+            AreaType.CountryRegion,
+            AreaType.County, 
+            AreaType.Province, 
+            AreaType.Municipality, 
+            AreaType.Parish, 
+            AreaType.EconomicZoneOfSweden
+        };
 
         private IDictionary<string, PositionLocation> _featureCache;
         private readonly IAreaRepository _processedAreaRepository;
         private STRtree<IFeature> _strTree;
+        private SemaphoreSlim _initializeSemaphoreSlim = new SemaphoreSlim(1, 1);
+        private static readonly object _lockObject = new object();
 
         /// <summary>
         ///     Constructor
@@ -39,38 +50,38 @@ namespace SOS.Lib.Helpers
             ClearCache();
         }
 
-
         /// <inheritdoc />
-        public void AddAreaDataToProcessedObservations(IEnumerable<Observation> processedObservations)
+        public void AddAreaDataToProcessedLocation(Location processedLocation)
         {
-            foreach (var processedObservation in processedObservations)
-            {
-                AddAreaDataToProcessedObservation(processedObservation);
-            }
-        }
-
-        /// <inheritdoc />
-        public void AddAreaDataToProcessedObservation(Observation processedObservation)
-        {
-            if ((processedObservation?.Location?.DecimalLongitude ?? 0) == 0 
-                || (processedObservation?.Location?.DecimalLatitude ?? 0) == 0)
+            if ((processedLocation?.DecimalLongitude ?? 0) == 0
+                || (processedLocation?.DecimalLatitude ?? 0) == 0)
             {
                 return;
             }
 
-            var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude.Value,
-                processedObservation.Location.DecimalLatitude.Value);
-            processedObservation.Location.County = positionLocation?.County;
-            processedObservation.Location.Municipality = positionLocation?.Municipality;
-            processedObservation.Location.Parish = positionLocation?.Parish;
-            processedObservation.Location.Province = positionLocation?.Province;
-            processedObservation.IsInEconomicZoneOfSweden = positionLocation?.EconomicZoneOfSweden ?? false;
+            var positionLocations = GetPositionLocations(processedLocation.DecimalLongitude.Value,
+                processedLocation.DecimalLatitude.Value);
+            processedLocation.CountryRegion = positionLocations?.CountryRegion;
+            processedLocation.County = positionLocations?.County;
+            processedLocation.Municipality = positionLocations?.Municipality;
+            processedLocation.Parish = positionLocations?.Parish;
+            processedLocation.Province = positionLocations?.Province;
+            processedLocation.IsInEconomicZoneOfSweden = positionLocations?.EconomicZoneOfSweden ?? false;
 
-            processedObservation.Location.Attributes.ProvincePartIdByCoordinate =
-                GetProvincePartIdByCoordinate(processedObservation.Location.Province?.FeatureId);
+            processedLocation.Attributes.ProvincePartIdByCoordinate =
+                GetProvincePartIdByCoordinate(processedLocation.Province?.FeatureId);
 
-            processedObservation.Location.Attributes.CountyPartIdByCoordinate = GetCountyPartIdByCoordinate(
-                processedObservation.Location.County?.FeatureId, processedObservation.Location.Province?.FeatureId);
+            processedLocation.Attributes.CountyPartIdByCoordinate = GetCountyPartIdByCoordinate(
+                processedLocation.County?.FeatureId, processedLocation.Province?.FeatureId);
+        }
+
+        /// <inheritdoc />
+        public void AddAreaDataToProcessedLocations(IEnumerable<Location> processedLocations)
+        {
+            foreach (var processedLocation in processedLocations)
+            {
+                AddAreaDataToProcessedLocation(processedLocation);
+            }
         }
 
         /// <inheritdoc />
@@ -81,28 +92,6 @@ namespace SOS.Lib.Helpers
                 return;
             }
 
-         /*   var coordinates = site.Point.Coordinates.ToArray().Select(p => (double)p).ToArray();
-            var positionLocation = GetPositionLocation(coordinates[0], coordinates[1]);
-            site.County = positionLocation?.County == null ? null :new GeographicalArea
-            {
-                FeatureId = positionLocation.County.FeatureId,
-                Name = positionLocation.County.Name
-            };
-            site.Municipality = positionLocation?.Municipality == null ? null : new GeographicalArea
-            {
-                FeatureId = positionLocation.Municipality.FeatureId,
-                Name = positionLocation.Municipality.Name
-            };
-            site.Parish = positionLocation?.Parish == null ? null : new GeographicalArea
-            {
-                FeatureId = positionLocation.Parish.FeatureId,
-                Name = positionLocation.Parish.Name
-            };
-            site.Province = positionLocation?.Province == null ? null : new GeographicalArea
-            {
-                FeatureId = positionLocation.Province.FeatureId,
-                Name = positionLocation.Province.Name
-            };*/
             site.ProvincePartIdByCoordinate =
                 GetProvincePartIdByCoordinate(site.Province?.FeatureId);
 
@@ -121,33 +110,69 @@ namespace SOS.Lib.Helpers
         public async Task InitializeAsync()
         {
             // If tree already initialized, return
-            if (IsInitialized)
+            if (IsInitialized) return;
+                       
+            try
             {
-                return;
-            }
-            
-            ClearCache();
+                await _initializeSemaphoreSlim.WaitAsync();
+                if (!IsInitialized)
+                {
+                    ClearCache();
 
-            var areas = await _processedAreaRepository.GetAsync(_areaTypes);
-            foreach (var area in areas)
+                    var areas = await _processedAreaRepository.GetAsync(_areaTypesInStrTree);
+                    foreach (var area in areas)
+                    {
+                        var geometry = await _processedAreaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
+
+                        var attributes = new Dictionary<string, object>();
+                        attributes.Add("name", area.Name);
+                        attributes.Add("areaType", area.AreaType);
+                        attributes.Add("featureId", area.FeatureId);
+
+                        var feature = geometry.ToFeature(attributes);
+                        _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
+                    }
+                    
+                    _strTree.Build();
+                    IsInitialized = true;
+                }
+            }
+            finally
             {
-                var geometry = await _processedAreaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
-
-                var attributes = new Dictionary<string, object>();
-                attributes.Add("name", area.Name);
-                attributes.Add("areaType", area.AreaType);
-                attributes.Add("featureId", area.FeatureId);
-
-                var feature = geometry.ToFeature(attributes);
-                _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
+                _initializeSemaphoreSlim.Release();
             }
-
-            _strTree.Build();
-            IsInitialized = true;
         }
 
         /// <inheritdoc />
         public bool IsInitialized { get; private set; }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<Models.Shared.Area>> GetAreasAsync(AreaType type)
+        {
+            return await _processedAreaRepository.GetAsync(new[] {type});
+        }
+
+        /// <inheritdoc />
+        public async Task<Geometry> GetGeometryAsync(AreaType type, string featureId)
+        {
+            return await _processedAreaRepository.GetGeometryAsync(type, featureId);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IFeature> GetPointFeatures(Point point)
+        {
+            var featuresContainingPoint = new List<IFeature>();
+            var possibleFeatures = _strTree.Query(point.EnvelopeInternal);
+            foreach (var feature in possibleFeatures)
+            {
+                if (feature.Geometry.Contains(point))
+                {
+                    featuresContainingPoint.Add(feature);
+                }
+            }
+
+            return featuresContainingPoint;
+        }
 
         /// <summary>
         ///     Get all features where position is inside area
@@ -173,7 +198,7 @@ namespace SOS.Lib.Helpers
             return featuresContainingPoint;
         }
 
-        private PositionLocation GetPositionLocation(double decimalLongitude, double decimalLatitude)
+        private PositionLocation GetPositionLocations(double decimalLongitude, double decimalLatitude)
         {
             // Round coordinates to 5 decimals (roughly 1m)
             var key = $"{Math.Round(decimalLongitude, 5)}-{Math.Round(decimalLatitude, 5)}";
@@ -181,84 +206,58 @@ namespace SOS.Lib.Helpers
             // Try to get areas from cache. If areas not found for that position, try to get from repository
             if (!_featureCache.TryGetValue(key, out var positionLocation))
             {
-                var features = GetPointFeatures(decimalLongitude, decimalLatitude);
-                positionLocation = new PositionLocation();
-
-                if (features != null)
+                lock (_lockObject)
                 {
-                    foreach (var feature in features)
+                    var features = GetPointFeatures(decimalLongitude, decimalLatitude);
+                    positionLocation = new PositionLocation();
+
+                    if (features != null)
                     {
-                        if (Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
-                            out var areaType))
+                        foreach (var feature in features)
                         {
-                            var area = new Area
+                            if (Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
+                                out var areaType))
                             {
-                                FeatureId = feature.Attributes.GetOptionalValue("featureId")?.ToString(),
-                                Name = feature.Attributes.GetOptionalValue("name")?.ToString()
-                            };
-                            switch ((AreaType)areaType)
-                            {
-                                case AreaType.County:
-                                    positionLocation.County = area;
-                                    break;
-                                case AreaType.Municipality:
-                                    positionLocation.Municipality = area;
-                                    break;
-                                case AreaType.Parish:
-                                    positionLocation.Parish = area;
-                                    break;
-                                case AreaType.Province:
-                                    positionLocation.Province = area;
-                                    break;
-                                case AreaType.EconomicZoneOfSweden:
-                                    positionLocation.EconomicZoneOfSweden = true;
-                                    break;
+                                var featureId = feature.Attributes.GetOptionalValue("featureId")?.ToString();
+                                var name = feature.Attributes.GetOptionalValue("name")?.ToString();
+                                var area = string.IsNullOrEmpty(featureId) ? null! : new Area
+                                {
+                                    FeatureId = featureId,
+                                    Name =  string.IsNullOrEmpty(name) ? null : name // Make sure name equals null if empty. To prevent empty string and null to be handled different when aggregation on the field
+                                };
+                                switch ((AreaType)areaType)
+                                {
+                                    case AreaType.CountryRegion:
+                                        positionLocation.CountryRegion = area;
+                                        break;
+                                    case AreaType.County:
+                                        positionLocation.County = area;
+                                        break;
+                                    case AreaType.Municipality:
+                                        positionLocation.Municipality = area;
+                                        break;
+                                    case AreaType.Parish:
+                                        positionLocation.Parish = area;
+                                        break;
+                                    case AreaType.Province:
+                                        positionLocation.Province = area;
+                                        break;
+                                    case AreaType.EconomicZoneOfSweden:
+                                        positionLocation.EconomicZoneOfSweden = true;
+                                        break;
+                                }
                             }
                         }
                     }
-                }
 
-                if (!_featureCache.ContainsKey(key))
-                {
-                    _featureCache.TryAdd(key, positionLocation);
+                    if (!_featureCache.ContainsKey(key))
+                    {
+                        _featureCache.TryAdd(key, positionLocation);
+                    }
                 }
             }
 
             return positionLocation;
-        }
-
-        private static void SetProvincePartIdByCoordinate(Observation processedObservation)
-        {
-            // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
-            processedObservation.Location.Attributes.ProvincePartIdByCoordinate = processedObservation.Location.Province?.FeatureId;
-            if (new[]
-            {
-                ProvinceIds.LuleLappmark,
-                ProvinceIds.LyckseleLappmark,
-                ProvinceIds.PiteLappmark,
-                ProvinceIds.TorneLappmark,
-                ProvinceIds.ÅseleLappmark
-            }.Contains(processedObservation.Location.Province?.FeatureId))
-            {
-                processedObservation.Location.Attributes.ProvincePartIdByCoordinate = SpecialProvincePartId.Lappland;
-            }
-        }
-
-        private static void SetCountyPartIdByCoordinate(Observation processedObservation)
-        {
-            // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
-            processedObservation.Location.Attributes.CountyPartIdByCoordinate = processedObservation.Location.County?.FeatureId;
-            if (processedObservation.Location.County?.FeatureId == CountyId.Kalmar)
-            {
-                if (processedObservation.Location.Province?.FeatureId == ProvinceIds.Öland)
-                {
-                    processedObservation.Location.Attributes.CountyPartIdByCoordinate = SpecialCountyPartId.Öland;
-                }
-                else
-                {
-                    processedObservation.Location.Attributes.CountyPartIdByCoordinate = SpecialCountyPartId.KalmarFastland;
-                }
-            }
         }
 
         private static string GetProvincePartIdByCoordinate(string provinceFeatureId)

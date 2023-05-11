@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.Shark
@@ -201,7 +202,7 @@ namespace SOS.Lib.Models.Verbatim.Shark
         /// <summary>
         ///     Parameter
         /// </summary>
-        public string Parameter { get; set; }
+        public ICollection<SharkParameter> Parameters { get; set; }
 
         /// <summary>
         ///     Platform code
@@ -459,19 +460,9 @@ namespace SOS.Lib.Models.Verbatim.Shark
         public string Taxonomist { get; set; }
 
         /// <summary>
-        ///     Unit of value
-        /// </summary>
-        public string Unit { get; set; }
-
-        /// <summary>
         ///     Upper Mesh Size Um
         /// </summary>
         public string UpperMeshSizeUm { get; set; }
-
-        /// <summary>
-        ///     Value property
-        /// </summary>
-        public string Value { get; set; }
 
         /// <summary>
         ///     Comment of variable

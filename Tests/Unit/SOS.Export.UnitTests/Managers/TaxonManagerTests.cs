@@ -94,7 +94,7 @@ namespace SOS.Export.UnitTests.Managers
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            tree.Root.TaxonId.Should().Be(0);
+            tree.Should().Be(null);
         }
 
         /// <summary>

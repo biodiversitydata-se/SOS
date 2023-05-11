@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
+using SOS.Export.Models.ZendTo;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Enums;
@@ -14,10 +13,12 @@ using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Excel.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Services.Interfaces;
+using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.IO.DwcArchive;
 
 namespace SOS.Export.Managers
 {
@@ -30,12 +31,13 @@ namespace SOS.Export.Managers
         private readonly IBlobStorageService _blobStorageService;
         private readonly ICsvFileWriter _csvWriter;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
+        private readonly IDwcArchiveEventFileWriter _dwcArchiveEventFileWriter;
         private readonly IExcelFileWriter _excelWriter;
         private readonly IGeoJsonFileWriter _geoJsonWriter;
         private readonly string _exportPath;
         private readonly IFileService _fileService;
         private readonly ILogger<ObservationManager> _logger;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IZendToService _zendToService;
 
@@ -43,8 +45,10 @@ namespace SOS.Export.Managers
         /// Constructor
         /// </summary>
         /// <param name="dwcArchiveFileWriter"></param>
+        /// <param name="dwcArchiveEventFileWriter"></param>
         /// <param name="excelWriter"></param>
         /// <param name="geoJsonWriter"></param>
+        /// <param name="csvWriter"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="fileService"></param>
@@ -53,11 +57,14 @@ namespace SOS.Export.Managers
         /// <param name="fileDestination"></param>
         /// <param name="filterManager"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ObservationManager(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
+            IDwcArchiveEventFileWriter dwcArchiveEventFileWriter,
             IExcelFileWriter excelWriter,
             IGeoJsonFileWriter geoJsonWriter,
-            IProcessedObservationRepository processedObservationRepository,
+            ICsvFileWriter csvWriter,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IFileService fileService,
             IBlobStorageService blobStorageService,
@@ -68,11 +75,14 @@ namespace SOS.Export.Managers
         {
             _dwcArchiveFileWriter =
                 dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
+            _dwcArchiveEventFileWriter = 
+                dwcArchiveEventFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveEventFileWriter));
             _excelWriter =
                 excelWriter ?? throw new ArgumentNullException(nameof(excelWriter));
             _geoJsonWriter =
                 geoJsonWriter ?? throw new ArgumentNullException(nameof(geoJsonWriter));
-
+            _csvWriter =
+                csvWriter ?? throw new ArgumentNullException(nameof(csvWriter));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _processInfoRepository =
@@ -90,41 +100,54 @@ namespace SOS.Export.Managers
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExportAndSendAsync(SearchFilter filter, 
+        public async Task<ZendToResponse> ExportAndSendAsync(
+            int? roleId, 
+            string authorizationApplicationIdentifier,
+            SearchFilter filter, 
             string emailAddress,
             string description,
             ExportFormat exportFormat,
             string culture,
             bool flatOut,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
+            bool sensitiveObservations,
+            bool sendMailFromZendTo,
+            string encryptPassword,
             IJobCancellationToken cancellationToken)
         {
-            var zipFilePath = "";
+            FileExportResult fileExportResult = null;
             try
             {
-                await _filterManager.PrepareFilter(0,null, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
 
-                zipFilePath = exportFormat switch
+                fileExportResult = exportFormat switch
                 {
-                    ExportFormat.Csv => await CreateCsvExportAsync(filter, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
-                    ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken),
-                    ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, cancellationToken)
+                    ExportFormat.Csv => await CreateCsvExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, cancellationToken),
+                    ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), false, cancellationToken),
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, cancellationToken),
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken)
                 };
                 
                 // zend file to user
-                return await _zendToService.SendFile(emailAddress, description, zipFilePath, exportFormat);
+                return await _zendToService.SendFile(
+                    emailAddress, 
+                    description, 
+                    fileExportResult.FilePath, 
+                    exportFormat, 
+                    sendMailFromZendTo, 
+                    !sensitiveObservations,// Can't include pass code if sensitive observations is selcted
+                    sensitiveObservations || !string.IsNullOrEmpty(encryptPassword), // Encrypt file if sensitive observations is selcted or password is passed
+                    encryptPassword);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to export and send sightings");
-                return false;
+                return new ZendToResponse();
             }
             finally
             {
-                _fileService.DeleteFile(zipFilePath);
+                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
             }
         }
 
@@ -146,11 +169,11 @@ namespace SOS.Export.Managers
             string description,
             IJobCancellationToken cancellationToken)
         {
-            var zipFilePath = "";
+            FileExportResult fileExportResult = null;
             try
             {
-                await _filterManager.PrepareFilter(0,null, filter);
-                zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
+                await _filterManager.PrepareFilterAsync(null, null, filter);
+                fileExportResult = await CreateDWCExportAsync(filter, fileName, false, cancellationToken);
 
                 // Blob Storage Containers must be in lower case
                 blobStorageContainer = blobStorageContainer?.ToLower();
@@ -158,21 +181,14 @@ namespace SOS.Export.Managers
                 // Make sure container exists
                 await _blobStorageService.CreateContainerAsync(blobStorageContainer);
 
-                var tasks = new List<Task<bool>>
-                {
-                    // Upload file to blob storage
-                    _blobStorageService.UploadBlobAsync(zipFilePath, blobStorageContainer),
-                };
-
+                // Upload file to blob storage
+                var success = await _blobStorageService.UploadBlobAsync(fileExportResult.FilePath, blobStorageContainer);
+           
                 if (!string.IsNullOrEmpty(emailAddress))
                 {
                     // Send file to user
-                    tasks.Add(_zendToService.SendFile(emailAddress, description, zipFilePath, ExportFormat.DwC));
+                    success = success && ((await _zendToService.SendFile(emailAddress, description, fileExportResult.FilePath, ExportFormat.DwC))?.Success ?? false);
                 }
-
-                await Task.WhenAll(tasks);
-
-                var success = tasks.All(t => t.Result);
 
                 return success;
             }
@@ -184,7 +200,7 @@ namespace SOS.Export.Managers
             finally
             {
                 // Remove local file
-                _fileService.DeleteFile(zipFilePath);
+                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
             }
         }
 
@@ -194,29 +210,29 @@ namespace SOS.Export.Managers
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
         /// <param name="culture"></param>
-        /// <param name="outputFieldSet"></param>
         /// <param name="propertyLabelType"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<string> CreateCsvExportAsync(SearchFilter filter,
+        private async Task<FileExportResult> CreateCsvExportAsync(
+            SearchFilter filter,
             string fileName,
             string culture,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             IJobCancellationToken cancellationToken)
         {
             try
             {
-                var zipFilePath = await _csvWriter.CreateFileAync(
+                bool gzip = true;
+                var fileExportResult = await _csvWriter.CreateFileAync(
                     filter,
                     _exportPath,
                     fileName,
                     culture,
-                    outputFieldSet,
                     propertyLabelType,
+                    gzip,
                     cancellationToken);
 
-                return zipFilePath;
+                return fileExportResult;
             }
             catch (JobAbortedException)
             {
@@ -231,20 +247,33 @@ namespace SOS.Export.Managers
         }
 
         /// <summary>
-        ///     Create a Darwin Core Archive file
+        ///  Create a Darwin Core Archive file
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
+        /// <param name="eventDwC"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>Path to created file</returns>
-        private async Task<string> CreateDWCExportAsync(SearchFilter filter, string fileName,
+        /// <returns></returns>
+        private async Task<FileExportResult> CreateDWCExportAsync(SearchFilter filter, string fileName, bool eventDwC,
             IJobCancellationToken cancellationToken)
         {
             try
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
+                if (eventDwC)
+                {
+                    return await _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileAsync(
+                       DataProvider.FilterSubsetDataProvider,
+                       filter,
+                       fileName,
+                       _processedObservationRepository,
+                       processInfo,
+                       _exportPath,
+                       cancellationToken);
+                }
+               
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
-                var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                return await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,
                     filter,
                     fileName,
@@ -252,10 +281,7 @@ namespace SOS.Export.Managers
                     fieldDescriptions,
                     processInfo,
                     _exportPath,
-                    cancellationToken);
-                cancellationToken?.ThrowIfCancellationRequested();
-
-                return zipFilePath;
+                    cancellationToken); 
             }
             catch (JobAbortedException)
             {
@@ -269,25 +295,24 @@ namespace SOS.Export.Managers
             }
         }
 
-        private async Task<string> CreateExcelExportAsync(SearchFilter filter, 
+        private async Task<FileExportResult> CreateExcelExportAsync(SearchFilter filter, 
             string fileName, 
             string culture,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             IJobCancellationToken cancellationToken)
         {
             try
             {
-                var zipFilePath = await _excelWriter.CreateFileAync(
+                var fileExportResult = await _excelWriter.CreateFileAync(
                     filter,
                     _exportPath,
                     fileName,
                     culture,
-                    outputFieldSet,
                     propertyLabelType,
+                    gzip: true,
                     cancellationToken);
 
-                return zipFilePath;
+                return fileExportResult;
             }
             catch (JobAbortedException)
             {
@@ -301,29 +326,29 @@ namespace SOS.Export.Managers
             }
         }
 
-        private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, 
+        private async Task<FileExportResult> CreateGeoJsonExportAsync(SearchFilter filter, 
             string fileName, 
             string culture, 
             bool flatOut,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
             IJobCancellationToken cancellationToken)
         {
             try
             {
-                var zipFilePath = await _geoJsonWriter.CreateFileAync(
+                bool gzip = true;
+                var fileExportResult = await _geoJsonWriter.CreateFileAync(
                    filter,
                    _exportPath,
                    fileName,
                    culture,
                    flatOut,
-                   outputFieldSet, 
                    propertyLabelType, 
                    excludeNullValues,
+                   gzip,
                    cancellationToken);
                 
-                return zipFilePath;
+                return fileExportResult;
             }
             catch (JobAbortedException)
             {

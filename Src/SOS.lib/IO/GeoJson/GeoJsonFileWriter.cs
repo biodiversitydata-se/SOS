@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 using Hangfire;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -13,8 +17,9 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Models;
+using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
@@ -22,7 +27,7 @@ namespace SOS.Lib.IO.GeoJson
 {
     public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
     {
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ILogger<GeoJsonFileWriter> _logger;
@@ -34,10 +39,11 @@ namespace SOS.Lib.IO.GeoJson
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="logger"></param>
-        public GeoJsonFileWriter(IProcessedObservationRepository processedObservationRepository,
+        /// <exception cref="ArgumentNullException"></exception>
+        public GeoJsonFileWriter(IProcessedObservationCoreRepository processedObservationRepository,
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
-            ILogger<GeoJsonFileWriter> logger)
+            ILogger<GeoJsonFileWriter> logger) 
         {
             _processedObservationRepository = processedObservationRepository ??
                                                     throw new ArgumentNullException(
@@ -50,44 +56,60 @@ namespace SOS.Lib.IO.GeoJson
 
 
         /// <inheritdoc />
-        public async Task<string> CreateFileAync(SearchFilter filter,
+        public async Task<FileExportResult> CreateFileAync(SearchFilter filter,
             string exportPath,
             string fileName,
             string culture,
             bool flatOut,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
+            bool gzip,
             IJobCancellationToken cancellationToken)
         {
             string temporaryZipExportFolderPath = null;
 
             try
             {
-                var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[outputFieldSet];
+                var nrObservations = 0;
+                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
+                var propertyFields =
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
                 JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
                 {
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
-                await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "Observations.geojson"), 1048576);
-                await using var jsonWriter = new Utf8JsonWriter(fileStream);
+                var observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "Observations.geojson");
+                await using var fileStream = File.Create(observationsFilePath, 1048576);
+                var jsonWriterOptions = new JsonWriterOptions()
+                {
+                    //To be able to display å,ä,ö e.t.c. properly we need to add the range Latin1Supplement to the list of characters which should not be displayed as UTF8 encoded values (\uxxxx).
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement)
+                };
+
+                await using var jsonWriter = new Utf8JsonWriter(fileStream, jsonWriterOptions);
                 jsonWriter.WriteStartObject();
                 jsonWriter.WriteString("type", "FeatureCollection");
                 jsonWriter.WriteString("crs", "EPSG:4326");
                 jsonWriter.WritePropertyName("features");
                 jsonWriter.WriteStartArray();
+               
+                var searchAfterResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);
 
-                var scrollResult = await _processedObservationRepository.ScrollObservationsAsDynamicAsync(filter, null);
-                while (scrollResult?.Records?.Any() ?? false)
+                while (searchAfterResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+                    nrObservations += searchAfterResult.Records.Count();
+                    // Start fetching next batch of observations.
+                    var searchAfterResultTask = _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchAfterResult.PointInTimeId, searchAfterResult.SearchAfter);
 
                     if (flatOut)
                     {
-                        var processedObservations = CastDynamicsToObservations(scrollResult.Records);
+                        var processedObservations = CastDynamicsToObservations(searchAfterResult.Records);
+
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
+
                         foreach (var observation in processedObservations)
                         {
                             var flatObservation = new FlatObservation(observation);
@@ -96,8 +118,11 @@ namespace SOS.Lib.IO.GeoJson
                     }
                     else
                     {
-                        var processedRecords = scrollResult.Records.Cast<IDictionary<string, object>>();
+                        var processedRecords = searchAfterResult.Records.Cast<IDictionary<string, object>>();
+
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
+
+                        LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);
                         foreach (var record in processedRecords)
                         {
                             await WriteFeature(propertyFields, record, excludeNullValues, jsonWriter, jsonSerializerOptions);
@@ -105,16 +130,41 @@ namespace SOS.Lib.IO.GeoJson
                     }
 
                     // Get next batch of observations.
-                    scrollResult = await _processedObservationRepository.ScrollObservationsAsDynamicAsync(filter, scrollResult.ScrollId);
+                    searchAfterResult = await searchAfterResultTask;
                 }
+                
                 jsonWriter.WriteEndArray();
                 jsonWriter.WriteEndObject();
                 await jsonWriter.FlushAsync();
                 await jsonWriter.DisposeAsync();
                 fileStream.Close();
-                await StoreFilterAsync(temporaryZipExportFolderPath, filter);
-                var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
-                return zipFilePath;
+
+                // If less tha 99% of expected observations where fetched, something is wrong
+                if (nrObservations < expectedNoOfObservations * 0.99)
+                {
+                    throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
+                }
+
+                if (gzip)
+                {
+                    await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+                    var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
+                    return new FileExportResult
+                    {
+                        FilePath = zipFilePath,
+                        NrObservations = nrObservations
+                    };
+                }
+                else
+                {                                        
+                    var destinationFilePath = Path.Combine(exportPath, $"{fileName}.geojson");
+                    File.Move(observationsFilePath, destinationFilePath);
+                    return new FileExportResult
+                    {
+                        FilePath = destinationFilePath,
+                        NrObservations = nrObservations
+                    };
+                }                
             }
             catch (Exception e)
             {
@@ -132,7 +182,7 @@ namespace SOS.Lib.IO.GeoJson
             var geoJsonConverterFactory = new NetTopologySuite.IO.Converters.GeoJsonConverterFactory();
             var attributesTableConverter = geoJsonConverterFactory.CreateConverter(typeof(AttributesTable), null);
             var geometryConverter = geoJsonConverterFactory.CreateConverter(typeof(Geometry), null);
-            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions();
+            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             jsonSerializerOptions.Converters.Add(attributesTableConverter);
             jsonSerializerOptions.Converters.Add(geometryConverter);
             return jsonSerializerOptions;
@@ -146,7 +196,7 @@ namespace SOS.Lib.IO.GeoJson
         }
 
         private async Task WriteFeature(
-            List<PropertyFieldDescription> propertyFields,
+            IEnumerable<PropertyFieldDescription> propertyFields,
             IDictionary<string, object> record,
             bool excludeNullValues,
             Utf8JsonWriter jsonWriter,
@@ -160,7 +210,7 @@ namespace SOS.Lib.IO.GeoJson
         }
 
         private async Task WriteFeature(
-            List<PropertyFieldDescription> propertyFields,
+            IEnumerable<PropertyFieldDescription> propertyFields,
             Observation observation,
             bool excludeNullValues,
             Utf8JsonWriter jsonWriter,
@@ -174,7 +224,7 @@ namespace SOS.Lib.IO.GeoJson
         }
 
         private async Task WriteFeature(
-            List<PropertyFieldDescription> propertyFields,
+            IEnumerable<PropertyFieldDescription> propertyFields,
             FlatObservation flatObservation,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
@@ -213,23 +263,17 @@ namespace SOS.Lib.IO.GeoJson
             Utf8JsonWriter jsonWriter,
             JsonSerializerOptions jsonSerializerOptions)
         {
-            if (id != null)
+            jsonWriter.WriteStartObject();
+            jsonWriter.WriteString("type", "Feature");
+            if (!string.IsNullOrEmpty(id))
             {
-                jsonWriter.WriteStartObject();
-                jsonWriter.WriteString("type", "Feature");
                 jsonWriter.WriteString("id", id);
-                jsonWriter.WritePropertyName("geometry");
             }
-            else
-            {
-                jsonWriter.WriteStartObject();
-                jsonWriter.WriteString("type", "Feature");
-                jsonWriter.WritePropertyName("geometry");
-            }
-
-            System.Text.Json.JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
+            jsonWriter.WritePropertyName("geometry");
+            
+            JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
             jsonWriter.WritePropertyName("properties");
-            System.Text.Json.JsonSerializer.Serialize(jsonWriter, attributesTable, jsonSerializerOptions);
+            JsonSerializer.Serialize(jsonWriter, attributesTable, jsonSerializerOptions);
             jsonWriter.WriteEndObject();
         }
 
@@ -244,7 +288,7 @@ namespace SOS.Lib.IO.GeoJson
 
         private AttributesTable GetFeatureAttributesTable(
             Observation observation,
-            List<PropertyFieldDescription> propertyFields,
+            IEnumerable<PropertyFieldDescription> propertyFields,
             bool excludeNullValues)
         {
             var attributesTable = new AttributesTable();
@@ -254,7 +298,7 @@ namespace SOS.Lib.IO.GeoJson
 
         private AttributesTable GetFeatureAttributesTable(
             FlatObservation flatObservation,
-            List<PropertyFieldDescription> propertyFields,
+            IEnumerable<PropertyFieldDescription> propertyFields,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues)
         {

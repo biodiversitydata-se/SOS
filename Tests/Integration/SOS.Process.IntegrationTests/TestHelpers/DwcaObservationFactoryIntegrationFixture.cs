@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
@@ -11,7 +12,8 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
-using SOS.Process.Processors.DarwinCoreArchive;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.DarwinCoreArchive;
 
 namespace SOS.Process.IntegrationTests.TestHelpers
 {
@@ -34,7 +36,10 @@ namespace SOS.Process.IntegrationTests.TestHelpers
         private ValidationManager CreateValidationManager()
         {
             var invalidObservationRepositoryMock = new Mock<IInvalidObservationRepository>();
-            ValidationManager validationManager = new ValidationManager(invalidObservationRepositoryMock.Object, new NullLogger<ValidationManager>());
+            var invalidEventRepositoryMock = new Mock<IInvalidEventRepository>();
+            ValidationManager validationManager = new ValidationManager(invalidObservationRepositoryMock.Object,
+                invalidEventRepositoryMock.Object,
+                new NullLogger<ValidationManager>());
             return validationManager;
         }
 
@@ -52,12 +57,14 @@ namespace SOS.Process.IntegrationTests.TestHelpers
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var areaHelper =
                 new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
-
+            var processConfiguration = new ProcessConfiguration();
             var dwcaObservationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,
                 taxonByTaxonId,
                 vocabularyRepository,
-                areaHelper);
+                areaHelper,
+                new ProcessTimeManager(processConfiguration),
+                processConfiguration);
 
             return dwcaObservationFactory;
         }

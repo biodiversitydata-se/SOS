@@ -4,8 +4,8 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Import.Harvesters.Observations;
-using SOS.Import.Services;
+using SOS.Harvest.Harvesters.iNaturalist;
+using SOS.Harvest.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Services;
@@ -46,7 +46,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
+            var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -83,7 +83,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
+            var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

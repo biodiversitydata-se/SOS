@@ -4,7 +4,7 @@ using System.Linq;
 using SOS.Lib.Cache;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 
 namespace SOS.Lib.Models.Cache
 {

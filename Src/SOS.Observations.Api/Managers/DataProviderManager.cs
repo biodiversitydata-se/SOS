@@ -7,6 +7,7 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -16,23 +17,29 @@ namespace SOS.Observations.Api.Managers
     public class DataProviderManager : IDataProviderManager
     {
         private readonly IDataProviderCache _dataProviderCache;
-        private readonly ILogger<DataProviderManager> _logger;
         private readonly IProcessInfoManager _processInfoManager;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly ILogger<DataProviderManager> _logger;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="dataProviderCache"></param>
         /// <param name="processInfoManager"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DataProviderManager(
             IDataProviderCache dataProviderCache,
             IProcessInfoManager processInfoManager,
+            IProcessedObservationRepository processedObservationRepository,
             ILogger<DataProviderManager> logger)
         {
             _dataProviderCache =
                 dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
             _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
+            _processedObservationRepository = processedObservationRepository ??
+                                              throw new ArgumentNullException(nameof(processedObservationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -40,7 +47,7 @@ namespace SOS.Observations.Api.Managers
         public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true)
         {
             var dataProviderDtos = new List<DataProviderDto>();
-            var processInfosActive = await _processInfoManager.GetProcessInfoAsync(true);
+            var processInfosActive = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
             var allDataProviders = await _dataProviderCache.GetAllAsync();
             var selectedDataProviders = includeInactive
                 ? allDataProviders
@@ -74,10 +81,7 @@ namespace SOS.Observations.Api.Managers
                 }
                 else
                 {
-                    if (includeProvidersWithNoObservations)
-                    {
-                        dataProviderDtos.Add(DataProviderDto.Create(dataProvider, cultureCode));
-                    }
+                    dataProviderDtos.Add(DataProviderDto.Create(dataProvider, cultureCode));
                 }
             }
 
@@ -87,6 +91,10 @@ namespace SOS.Observations.Api.Managers
         public async Task<byte[]> GetEmlFileAsync(int providerId)
         {
             var eml = await _dataProviderCache.GetEmlAsync(providerId);
+            if (eml == null)
+            {
+                return Array.Empty<byte>();
+            }
 
             return await eml?.ToBytesAsync();
         }

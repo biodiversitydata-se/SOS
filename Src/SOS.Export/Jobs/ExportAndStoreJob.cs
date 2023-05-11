@@ -1,12 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Export.Jobs
 {
@@ -30,7 +29,6 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Create a DwC-A file using passed filter and store it in blob storage")]
         public async Task<bool> RunAsync(SearchFilter filter, string blobStorageContainer, string fileName, 
             IJobCancellationToken cancellationToken)
         {

@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Entities.Artportalen;
-using SOS.Import.Repositories.Source.Artportalen;
-using SOS.Import.Services.Interfaces;
+using SOS.Harvest.Entities.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Constants;
+using SOS.Lib.Models.Shared;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
@@ -40,18 +41,21 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetActivitiesAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetActivitiesAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetActivitiesAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -61,20 +65,20 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetActivitiesAsyncSuccess()
         {
-            IEnumerable<MetadataWithCategoryEntity> activities = new[]
+            IEnumerable<MetadataWithCategoryEntity<int>> activities = new[]
             {
-                new MetadataWithCategoryEntity
+                new MetadataWithCategoryEntity<int>
                 {
                     Id = 1, CategoryId = 1, CategoryName = "Category", Translation = "Activity 1", CultureCode = "sv-GB"
                 },
-                new MetadataWithCategoryEntity
+                new MetadataWithCategoryEntity<int>
                 {
                     Id = 2, CategoryId = 1, CategoryName = "Category", Translation = "Activity 2", CultureCode = "sv-GB"
                 }
             };
 
             _artportalenDataServiceMock
-                .Setup(spds => spds.QueryAsync<MetadataWithCategoryEntity>(It.IsAny<string>(), null, false))
+                .Setup(spds => spds.QueryAsync<MetadataWithCategoryEntity<int>>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -95,18 +99,21 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetBiotopesAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetBiotopesAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetBiotopesAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -116,13 +123,13 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetBiotopessAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> biotopes = new[]
+            IEnumerable<MetadataEntity<int>> biotopes = new[]
             {
-                new MetadataEntity {Id = 1, Translation = "Biotope 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity {Id = 2, Translation = "Biotope 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int> {Id = 1, Translation = "Biotope 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int> {Id = 2, Translation = "Biotope 2", CultureCode = Cultures.en_GB}
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(biotopes);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -143,18 +150,21 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetGendersAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetGendersAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetGendersAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -164,13 +174,13 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetGendersAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> activities = new[]
+            IEnumerable<MetadataEntity<int>> activities = new[]
             {
-                new MetadataEntity {Id = 1, Translation = "Gender 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity {Id = 2, Translation = "Gender 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int> {Id = 1, Translation = "Gender 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int> {Id = 2, Translation = "Gender 2", CultureCode = Cultures.en_GB}
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -191,18 +201,21 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetStagesAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetStagesAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetStagesAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -212,13 +225,13 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetStagesAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> activities = new[]
+            IEnumerable<MetadataEntity<int>> activities = new[]
             {
-                new MetadataEntity {Id = 1, Translation = "Stage 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity {Id = 2, Translation = "Stage 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int> {Id = 1, Translation = "Stage 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int> {Id = 2, Translation = "Stage 2", CultureCode = Cultures.en_GB}
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -239,18 +252,21 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetSubstratesAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetSubstratesAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetSubstratesAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -260,13 +276,13 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetSubstratesAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> substrates = new[]
+            IEnumerable<MetadataEntity<int>> substrates = new[]
             {
-                new MetadataEntity {Id = 1, Translation = "Substrate 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity {Id = 2, Translation = "Substrate 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int> {Id = 1, Translation = "Substrate 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int> {Id = 2, Translation = "Substrate 2", CultureCode = Cultures.en_GB}
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(substrates);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -287,18 +303,21 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetUnitsAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetUnitsAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetUnitsAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -308,13 +327,13 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetUnitsAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> activities = new[]
+            IEnumerable<MetadataEntity<int>> activities = new[]
             {
-                new MetadataEntity {Id = 1, Translation = "Unit 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity {Id = 2, Translation = "Unit 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int> {Id = 1, Translation = "Unit 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int> {Id = 2, Translation = "Unit 2", CultureCode = Cultures.en_GB}
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -335,18 +354,21 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetValidationStatusAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetValidationStatusAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetValidationStatusAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -356,13 +378,13 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetValidationStatusAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> validationStatus = new[]
+            IEnumerable<MetadataEntity<int>> validationStatus = new[]
             {
-                new MetadataEntity {Id = 1, Translation = "ValidationStatus 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity {Id = 2, Translation = "ValidationStatus 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int> {Id = 1, Translation = "ValidationStatus 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int> {Id = 2, Translation = "ValidationStatus 2", CultureCode = Cultures.en_GB}
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(validationStatus);
 
             //-----------------------------------------------------------------------------------------------------------

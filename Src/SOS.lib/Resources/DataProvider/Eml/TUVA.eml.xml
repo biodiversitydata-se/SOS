@@ -1,0 +1,156 @@
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+		 xmlns:dc="http://purl.org/dc/terms/"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
+		 packageId="59bc8df0-0c71-11dd-84d4-b8a03c50a862/v2.4" system="http://gbif.org" scope="system"
+xml:lang="eng">
+
+	<dataset>
+		<alternateIdentifier>59bc8df0-0c71-11dd-84d4-b8a03c50a862</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=sjv-tuva</alternateIdentifier>
+		<title xml:lang="eng">National Meadow and Pasture Inventory (TUVA)</title>
+		<creator>
+			<individualName>
+				<givenName>Susanne</givenName>
+				<surName>Lindh</surName>
+			</individualName>
+			<organizationName>Swedish Board of Agriculture</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Jönköping</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>Susanne.lindh@jordbruksverket.se</electronicMailAddress>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Susanne</givenName>
+				<surName>Lindh</surName>
+			</individualName>
+			<organizationName>Swedish Board of Agriculture</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Jönköping</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>Susanne.lindh@jordbruksverket.se</electronicMailAddress>
+		</metadataProvider>
+		<associatedParty>
+			<individualName>
+				<givenName>Veronika</givenName>
+				<surName>Johansson</surName>
+			</individualName>
+			<organizationName>The Swedish Museum of Natural History</organizationName>
+			<positionName>Data manager</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>veronika.johansson@nrm.se</electronicMailAddress>
+			<role></role>
+		</associatedParty>
+		<pubDate>
+			2023-03-24
+		</pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>
+				The Meadow and Pasture Inventory is a Swedish national inventory of biologically valuable meadows and pastures. The inventory collects information about a number of natural and cultural environments containing flora and other organisms that are highly dependent on hay-making or grazing animals. In the inventory only nature values connected to hay-making or grazing are assessed. The information from the inventory is open to all and collected in the Swedish Board of Agriculture database TUVA (www.jordbruksverket.se/tuva). The TUVA database contains information about:
+
+				1. Fully inventoried pastures and meadows (classified as mown meadow, open pasture, forest pasture and mountain pasture),
+				2. Meadows and pastures that are restorable,
+				3. Non-applicable meadows and pastures.
+
+				A sub-classification of the types of meadows and pastures treated was also made using the Habitat Directive; Council Directive 92/43/EEC, or they were classified as developmental- or other types of fields. Inventories of indicator species (vascular plants), meadow fungi, trees and shrubs, cultural elements, water bodies and status of present management was also performed.
+				The majority of the meadows and pastures in TUVA were inventoried between the years 2002 and 2004. Inventories have since then and up until 2012 been performed on a smaller scale. From 2016 and onwards, the national inventory has been reopened with a focus on performing repeated monitoring of already inventoried meadows and pastures.
+
+				The information from the Meadow and Pasture Inventory is used for monitoring the environmental quality objective set up by the Swedish government; ‘a rich farming landscape’. It is also used for evaluating rural programs and for reporting to the EU Habitat Directive. The inventory is also used as a basis for national, regional and local strategies and programs for environmental management, spatial planning and case management. Data from the inventory have also been used for research.
+			</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Observation</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				This work is licensed under a <ulink url="http://creativecommons.org/licenses/by/4.0/legalcode">
+					<citetitle>Creative Commons Attribution (CC-BY) 4.0 License</citetitle>
+				</ulink>.
+			</para>
+		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">https://jordbruksverket.se/tuva</url>
+			</online>
+		</distribution>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>Sweden</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>8.438</westBoundingCoordinate>
+					<eastBoundingCoordinate>26.719</eastBoundingCoordinate>
+					<northBoundingCoordinate>70.259</northBoundingCoordinate>
+					<southBoundingCoordinate>54.368</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<temporalCoverage>
+                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+                <sos:LivingTimePeriod></sos:LivingTimePeriod>                 
+                <sos:StartDate>2001</sos:StartDate>
+                <sos:EndDate>2004</sos:EndDate>
+            </temporalCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>Mainly vascular plants and fungi, but also bryophytes, lichens and some fauna.</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>kingdom</taxonRankName>
+					<taxonRankValue>Plantae</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>kingdom</taxonRankName>
+					<taxonRankValue>Fungi</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Bryophyta</taxonRankValue>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para></para>
+			</description>
+			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+		</maintenance>
+
+		<contact>
+			<individualName>
+				<givenName>Anna</givenName>
+				<surName>Blomquist</surName>
+			</individualName>
+			<organizationName>Swedish Board of Agriculture</organizationName>
+			<positionName>Head of TUVA</positionName>
+			<address>
+				<city>Jönköping</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>Anna.Blomquist@jordbruksverket.se</electronicMailAddress>
+		</contact>
+	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2015-05-13T01:27:33.583+02:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<dc:replaces>59bc8df0-0c71-11dd-84d4-b8a03c50a862/v2.4.xml</dc:replaces>
+			</gbif>
+		</metadata>
+	</additionalMetadata>
+</eml:eml>

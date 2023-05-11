@@ -15,9 +15,13 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Search.Filters;
+using System.Diagnostics;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace SOS.Lib.IO.Excel
 {
@@ -26,10 +30,29 @@ namespace SOS.Lib.IO.Excel
     /// </summary>
     public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
     {
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ILogger<ExcelFileWriter> _logger;
+
+        /// <summary>
+        /// Try to save Excel packagec# async method not 
+        /// </summary>
+        /// <param name="package"></param>
+        /// <returns></returns>
+        private async Task TrySavePackageAync(ExcelPackage package)
+        {
+            if (package == null)
+            {
+                return;
+            }
+
+            // Save to file
+            _logger.LogDebug($"Begin save Excel export. {package.File.FullName}");
+            await package.SaveAsync();
+            _logger.LogDebug($"Finish save Excel export. {package.File.FullName}");
+            package.Dispose();
+        }
 
         /// <summary>
         /// Constructor
@@ -37,8 +60,10 @@ namespace SOS.Lib.IO.Excel
         /// <param name="processedObservationRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
+        /// <param name="telemetry"></param>
         /// <param name="logger"></param>
-        public ExcelFileWriter(IProcessedObservationRepository processedObservationRepository, 
+        /// <exception cref="ArgumentNullException"></exception>
+        public ExcelFileWriter(IProcessedObservationCoreRepository processedObservationRepository, 
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
             ILogger<ExcelFileWriter> logger)
@@ -52,62 +77,70 @@ namespace SOS.Lib.IO.Excel
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
         
-        public async Task<string> CreateFileAync(SearchFilter filter, string exportPath,
-            string fileName, string culture, OutputFieldSet outputFieldSet, PropertyLabelType propertyLabelType,
+        public async Task<FileExportResult> CreateFileAync(SearchFilter filter, 
+            string exportPath,
+            string fileName, 
+            string culture,
+            PropertyLabelType propertyLabelType,
+            bool gzip,
             IJobCancellationToken cancellationToken)
         {
             string temporaryZipExportFolderPath = null;
 
             try
             {
-                var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[outputFieldSet];
+                string excelFilePath = null;
+                int nrObservations = 0;
+                var propertyFields =
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
                 {
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
-
-                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, null);
+                
+                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
+                var stopwatch = Stopwatch.StartNew();
+                _logger.LogDebug($"Excel export. Begin ES Scroll call for file: {fileName}");
+                var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
+                stopwatch.Stop();
+                _logger.LogDebug($"Excel export. End ES Scroll call for file: {fileName}. Elapsed: {stopwatch.ElapsedMilliseconds/1000}s");
                 var fileCount = 0;
                 var rowIndex = 0;
                 ExcelPackage package = null;
                 ExcelWorksheet sheet = null;
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                var packageSaveTasks = new List<Task>();
 
-                while (scrollResult?.Records?.Any() ?? false)
+                while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+                    // Start fetching next batch of observations.
+                    var searchResultTask = _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
 
                     // Fetch observations from ElasticSearch.
-                    var processedObservations = scrollResult.Records.ToArray();
-
+                    var processedObservations = searchResult.Records.ToArray();
+                    
                     // Resolve vocabulary values.
-                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
-
+                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
+                    
                     // Write occurrence rows to CSV file.
                     foreach (var observation in processedObservations)
                     {
                         var flatObservation = new FlatObservation(observation);
-                        // Max 500000 rows in a file
-                        if (rowIndex % 500000 == 0)
+                        // Max 100000 observations rows in a file
+                        if (rowIndex % 100002 == 0)
                         {
-                            // If we have a package, save it
-                            if (package != null)
-                            {
-                                WriteHeader(sheet, propertyFields, propertyLabelType);
-
-                                // Save to file
-                                await package.SaveAsync();
-                                sheet.Dispose();
-                                package.Dispose();
-                            }
+                            packageSaveTasks.Add(TrySavePackageAync(package));
 
                             // Create new file
                             fileCount++;
-                            var file = new FileInfo(Path.Combine(temporaryZipExportFolderPath, $"{fileCount}-Observations.xlsx"));
+                            excelFilePath = Path.Combine(temporaryZipExportFolderPath, $"{fileCount}-Observations.xlsx");
+                            var file = new FileInfo(excelFilePath);
                             package = new ExcelPackage(file);
                             sheet = package.Workbook.Worksheets.Add("Observations");
-                            rowIndex = 1;
+                            WriteHeader(sheet, propertyFields, propertyLabelType);
+                            rowIndex = 2;
                         }
 
                         int columnIndex = 1;
@@ -121,33 +154,51 @@ namespace SOS.Lib.IO.Excel
                                 _ => value
                             };
 
-                            sheet.Cells[rowIndex + 1, columnIndex].Value = val;
+                            sheet.Cells[rowIndex, columnIndex].Value = val;
                             columnIndex++;
                         }
 
                         rowIndex++;
                     }
-
+                    
+                    nrObservations += processedObservations.Length;
                     // Get next batch of observations.
-                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
+                    stopwatch.Restart();
+                    _logger.LogDebug($"Excel export. Begin ES Scroll call for file: {fileName}");
+                    searchResult = await searchResultTask;
+                    stopwatch.Stop();
+                    _logger.LogDebug($"Excel export. End ES Scroll call for file: {fileName}. Elapsed: {stopwatch.ElapsedMilliseconds / 1000}s");
                 }
 
-                // If we have a package, save it
-                if (package != null)
+                // If less tha 99% of expected observations where fetched, something is wrong
+                if (nrObservations < expectedNoOfObservations * 0.99)
                 {
-                    WriteHeader(sheet, propertyFields, propertyLabelType);
-
-                    // Save to file
-                    await package.SaveAsync();
-                    sheet.Dispose();
-                    package.Dispose();
+                    throw new Exception($"Excel export expected {expectedNoOfObservations} but only got {nrObservations}");
                 }
 
-                await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+                packageSaveTasks.Add(TrySavePackageAync(package));
+                await Task.WhenAll(packageSaveTasks);
 
-                var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
-
-                return zipFilePath;
+                if (gzip)
+                {
+                    await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+                    var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
+                    return new FileExportResult
+                    {
+                        FilePath = zipFilePath,
+                        NrObservations = nrObservations
+                    };
+                }
+                else
+                {
+                    var destinationFilePath = Path.Combine(exportPath, $"{fileName}.xlsx");
+                    File.Move(excelFilePath, destinationFilePath);
+                    return new FileExportResult
+                    {
+                        FilePath = destinationFilePath,
+                        NrObservations = nrObservations
+                    };
+                }
             }
             catch (Exception e)
             {
@@ -160,13 +211,13 @@ namespace SOS.Lib.IO.Excel
             }
         }
 
-        private void WriteHeader(ExcelWorksheet sheet, List<PropertyFieldDescription> propertyFields, PropertyLabelType propertyLabelType)
+        private void WriteHeader(ExcelWorksheet sheet, IEnumerable<PropertyFieldDescription> propertyFields, PropertyLabelType propertyLabelType)
         {
             if (!propertyFields?.Any() ?? true)
             {
                 return;
             }
-
+            _logger.LogDebug($"Start write Excel header");
             int columnIndex = 1;
             foreach (var propertyField in propertyFields)
             {
@@ -180,6 +231,7 @@ namespace SOS.Lib.IO.Excel
                 sheet.Column(columnIndex).AutoFit(10, 70);
                 columnIndex++;
             }
+            _logger.LogDebug($"Finish write Excel header");
         }
         
         private void FormatColumns(ExcelWorksheet worksheet, List<PropertyFieldDescription> propertyFields)
@@ -192,32 +244,14 @@ namespace SOS.Lib.IO.Excel
             // Format columns
             foreach (var fieldDescription in propertyFields)
             {
-                string format;
-                switch (fieldDescription.DataType)
+                var format = fieldDescription.DataType switch
                 {
-                    // Text format: "@"
-                    // General format: "General"
-                    // Date format 1: "yyyy-mm-dd"
-                    // Date format 2: "yyyy-MM-dd"
-
-                    case "DateTime":
-                        // Since Excel doesn't handle dates before 1900 we can't set date format
-                        format = "";
-                        break;
-                    case "Double":
-                        format = "General";
-                        //format = "#.###############";
-
-                        break;
-                    case "Int32":
-                    case "Int64":
-                        format = "0";
-                        break;
-                    default:
-                        format = "General";
-                        break;
-                }
-
+                    "DateTime" => "",  // Since Excel doesn't handle dates before 1900 we can't set date format
+                    //"Double" => "#.###############",
+                    "Int32" or "Int64" => "0",
+                    _ => "General"
+                };
+                
                 worksheet.Cells[firstDataRow, columnIndex, 500000+1, columnIndex].Style.Numberformat.Format = format;
                 columnIndex++;
             }

@@ -19,7 +19,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="dataProvider"></param>
         /// <param name="batchId">If the processing is done in parallel for a data provider, use the batchId to identify tha specifc batch that was processed.</param>
         /// <returns></returns>
-        Task<bool> WriteObservations(
+        Task<bool> WriteHeaderlessDwcaFileParts(
             IEnumerable<Observation> processedObservations,
             DataProvider dataProvider,
             string batchId = "");
@@ -33,5 +33,10 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// Create DwC-A for each data provider and DwC-A for all data providers combined.
         /// </summary>
         Task<IEnumerable<string>> CreateDwcaFilesFromCreatedCsvFiles();
+
+        /// <summary>
+        /// True if DwC-A files should be created; false otherwise.
+        /// </summary>
+        bool Enabled { get; }
     }
 }

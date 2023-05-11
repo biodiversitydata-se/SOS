@@ -1,20 +1,5 @@
 ﻿using FluentAssertions;
-using SOS.Lib.Enums;
-using SOS.Process.Managers;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO.Compression;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Xunit;
-using SharpCompress.Common;
-using static SOS.Process.IntegrationTests.Dwca.CreatePartialDwcaFileTests;
-using SOS.Lib.Helpers;
-using Nest;
 using SOS.Lib.IO.DwcArchive;
 
 namespace SOS.Process.IntegrationTests.Dwca
@@ -77,5 +62,31 @@ namespace SOS.Process.IntegrationTests.Dwca
             //-----------------------------------------------------------------------------------------------------------            
             filePath.Should().NotBeEmpty();
         }
+
+        [Fact]
+        public void Get_distinct_values_from_dwca_file()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------            
+            string sourceFilePath = @"C:\DwC-A\Artportalen.dwca.zip";            
+            int nrRowsLimit = 100;
+            int startRow = 0;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------            
+            System.Collections.Generic.HashSet<string> distinctValues = PartialDwcaFileCreator.GetDistinctValuesFromDwcaFile(
+                sourceFilePath,
+                nrRowsLimit,
+                startRow,
+                "institutionCode");
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            distinctValues.Should().NotBeEmpty();
+        }
+
     }
 }

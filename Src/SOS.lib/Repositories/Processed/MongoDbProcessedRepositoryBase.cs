@@ -7,18 +7,18 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Helpers;
 
 namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
-    ///     Base class for cosmos db repositories
+    ///     Base class MongoDB repositories
     /// </summary>
-    public class MongoDbProcessedRepositoryBase<TEntity, TKey> : ProcessRepositoryBase<TEntity>, IMongoDbProcessedRepositoryBase<TEntity, TKey>
-        where TEntity : IEntity<TKey>
+    public class MongoDbProcessedRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
-        private readonly IProcessClient _client;
-
+        protected readonly IProcessClient _client;
+        protected ILogger<MongoDbProcessedRepositoryBase<TEntity, TKey>> Logger;
+        
         /// <summary>
         ///     Mongo db
         /// </summary>
@@ -28,7 +28,8 @@ namespace SOS.Lib.Repositories.Processed
         ///     Get collection
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(CurrentInstanceName);
+        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(IndexName);
+        private string IndexName => IndexHelper.GetInstanceName<TEntity>();
 
         /// <summary>
         ///     Constructor
@@ -39,25 +40,115 @@ namespace SOS.Lib.Repositories.Processed
         public MongoDbProcessedRepositoryBase(
             IProcessClient client,
             bool toggleable,
-            ILogger<ProcessRepositoryBase<TEntity>> logger
-        ) : base (client, toggleable, logger, null)
+            ILogger<MongoDbProcessedRepositoryBase<TEntity, TKey>> logger
+        )
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
-            
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Database = _client.GetDatabase();
         }
+        private async Task<bool> AddAsync(TEntity item, IMongoCollection<TEntity> mongoCollection, byte attempt)
+        {
+            try
+            {
+                await mongoCollection.InsertOneAsync(item);
 
-        /// <inheritdoc />
-        public string ActiveInstanceName => GetInstanceName(ActiveInstance, Protected);
+                return true;
+            }
+            catch (MongoExecutionTimeoutException)
+            {
+                if (attempt < 3)
+                {
+                    return await AddAsync(item, mongoCollection, ++attempt);
+                }
 
-        /// <inheritdoc />
-        public string CurrentInstanceName => GetInstanceName(CurrentInstance, Protected);
+                throw new Exception("Failed to add item to mongodb. Request time out.");
+            }
+            catch (MongoWriteException)
+            {
+                // Item allready exists
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
 
-        /// <inheritdoc />
-        public string InactiveInstanceName => GetInstanceName(InActiveInstance, Protected);
+       /// <summary>
+       /// Add batch of items
+       /// </summary>
+       /// <param name="batch"></param>
+       /// <param name="attempt"></param>
+       /// <returns></returns>
+        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch, byte attempt)
+        {
+            if (!batch?.Any() ?? true)
+            {
+                return true;
+            }
 
-        /// <inheritdoc />
-        public bool Protected { get; set; }
+            try
+            {
+                await MongoCollection.InsertManyAsync(batch,
+                    new InsertManyOptions { IsOrdered = false, BypassDocumentValidation = true });
+
+                return true;
+            }
+            catch (MongoExecutionTimeoutException)
+            {
+                if (attempt < 3)
+                {
+                    return await AddBatchAsync(batch, ++attempt);
+                }
+
+                throw new Exception("Failed to add batch to mongodb. Request time out.");
+            }
+            catch (MongoCommandException e)
+            {
+                switch (e.Code)
+                {
+                    case 16500: //Request Rate too Large
+                        // If attempt failed, try split items in half and try again
+                        var batchCount = batch.Count() / 2;
+
+                        // If we are down to less than 10 items something must be wrong
+                        if (batchCount > 5)
+                        {
+                            var addTasks = new List<Task<bool>>
+                            {
+                                AddBatchAsync(batch.Take(batchCount)),
+                                AddBatchAsync(batch.Skip(batchCount))
+                            };
+
+                            // Run all tasks async
+                            await Task.WhenAll(addTasks);
+                            return addTasks.All(t => t.Result);
+                        }
+
+                        break;
+                }
+
+                Logger.LogError(e.ToString());
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="batch"></param>
+        /// <returns></returns>
+        protected async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
+        {
+            return await AddBatchAsync(batch, 1);
+        }        
 
         /// <inheritdoc />
         public async Task<bool> UpdateAsync(TKey id, TEntity entity)
@@ -83,6 +174,18 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync()
+        {
+            return await GetAllByCursorAsync(MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection,
+            bool noCursorTimeout = false)
+        {
+            return await mongoCollection.FindAsync(FilterDefinition<TEntity>.Empty,
+                new FindOptions<TEntity, TEntity> { NoCursorTimeout = noCursorTimeout, BatchSize = _client.ReadBatchSize, AllowPartialResults = true, CursorType = CursorType.NonTailable });
+        }
 
         /// <inheritdoc />
         public virtual async Task<List<TEntity>> GetAllAsync()
@@ -101,22 +204,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<bool> AddAsync(TEntity item, IMongoCollection<TEntity> mongoCollection)
         {
-            try
-            {
-                await mongoCollection.InsertOneAsync(item);
-
-                return true;
-            }
-            catch (MongoWriteException)
-            {
-                // Item allready exists
-                return true;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
+            return await AddAsync(item, mongoCollection, 1);
         }
 
         /// <inheritdoc />
@@ -125,7 +213,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(CurrentInstanceName);
+                await Database.CreateCollectionAsync(IndexName);
 
                 return true;
             }
@@ -184,7 +272,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                await Database.DropCollectionAsync(CurrentInstanceName);
+                await Database.DropCollectionAsync(IndexName);
 
                 return true;
             }
@@ -220,7 +308,7 @@ namespace SOS.Lib.Repositories.Processed
             var exists = (await Database
                     .ListCollectionNamesAsync(new ListCollectionNamesOptions
                     {
-                        Filter = new BsonDocument("name", CurrentInstanceName)
+                        Filter = new BsonDocument("name", IndexName)
                     }))
                 .Any();
 
@@ -228,66 +316,12 @@ namespace SOS.Lib.Repositories.Processed
             if (!exists)
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(CurrentInstanceName);
+                await Database.CreateCollectionAsync(IndexName);
 
                 return true;
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="batch"></param>
-        /// <returns></returns>
-        protected async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
-        {
-            if (!batch?.Any() ?? true)
-            {
-                return true;
-            }
-
-            try
-            {
-                await MongoCollection.InsertManyAsync(batch,
-                    new InsertManyOptions {IsOrdered = false, BypassDocumentValidation = true});
-
-                return true;
-            }
-            catch (MongoCommandException e)
-            {
-                switch (e.Code)
-                {
-                    case 16500: //Request Rate too Large
-                        // If attempt failed, try split items in half and try again
-                        var batchCount = batch.Count() / 2;
-
-                        // If we are down to less than 10 items something must be wrong
-                        if (batchCount > 5)
-                        {
-                            var addTasks = new List<Task<bool>>
-                            {
-                                AddBatchAsync(batch.Take(batchCount)),
-                                AddBatchAsync(batch.Skip(batchCount))
-                            };
-
-                            // Run all tasks async
-                            await Task.WhenAll(addTasks);
-                            return addTasks.All(t => t.Result);
-                        }
-
-                        break;
-                }
-
-                Logger.LogError(e.ToString());
-
-                return false;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
         }
     }
 }

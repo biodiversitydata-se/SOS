@@ -9,6 +9,18 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface ISystemsController
     {
         /// <summary>
+        /// Get build info
+        /// </summary>
+        /// <returns></returns>
+      //  Task<IActionResult> GetBuildInfoAsync();
+
+        /// <summary>
+        /// Get copyright including system build time
+        /// </summary>
+        /// <returns></returns>
+        IActionResult Copyright();
+
+        /// <summary>
         ///     Get information about observation processing
         /// </summary>
         /// <param name="active">True: get information about last processing, false get information about previous processing</param>

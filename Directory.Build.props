@@ -1,0 +1,5 @@
+<Project>
+ <PropertyGroup>
+   <Copyright>Copyright © $([System.DateTime]::UtcNow.Year) SLU Artdatabanken</Copyright>
+ </PropertyGroup>
+</Project>

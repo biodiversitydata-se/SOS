@@ -6,9 +6,9 @@
     },
     "Docker": {
       "commandName": "Docker",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "dev",        
-      }
+        "environmentVariables": {
+            "ASPNETCORE_ENVIRONMENT": "Prod"
+        }
     }
   }
 }

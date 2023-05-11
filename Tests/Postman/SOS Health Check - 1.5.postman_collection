@@ -1,0 +1,3310 @@
+{
+	"info": {
+		"_postman_id": "9e4664dc-2dda-4022-b73b-802ff2e0ee50",
+		"name": "SOS Health Check",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5495698"
+	},
+	"item": [
+		{
+			"name": "Observations/Search",
+			"item": [
+				{
+					"name": "Sök efter Utter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 2 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(2);",
+									"});",
+									"",
+									"const otterCount = parseInt(pm.environment.get(\"observations.search.otterCount\"));",
+									"pm.test(\"total count > \" + otterCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(otterCount);",
+									"});",
+									"",
+									"pm.test(\"TaxonId is 100077\", function () {    ",
+									"    pm.expect(observation.taxon.id).to.eql(100077);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false        \n    },    \n    \"occurrenceStatus\":\"present\"\n}\n"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter rödlistade arter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 2 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(2);",
+									"});",
+									"",
+									"const redListedCount = parseInt(pm.environment.get(\"observations.search.redListedCount\"));",
+									"pm.test(\"total count >= \" + redListedCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(redListedCount);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-01\",\n\t    \"endDate\":\"2019-12-31\"\n    },\n    \"taxon\" : {\n        \"redListCategories\": [ \"CR\", \"EN\", \"VU\" ]\n    },\n    \"occurrenceStatus\":\"present\",\n    \"output\": {\n        \"fieldSet\":\"all\"\n    }\n}\n"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/Internal/search?skip=0&take=2",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"Internal",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter Utter - med outputSet",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 2 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(2);",
+									"});",
+									"",
+									"const otterCount = parseInt(pm.environment.get(\"observations.search.otterCount\"));",
+									"pm.test(\"total count > \" + otterCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(otterCount);",
+									"});",
+									"",
+									"pm.test(\"TaxonId is 100077\", function () {    ",
+									"    pm.expect(observation.taxon.id).to.eql(100077);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false\n    },    \n    \"occurrenceStatus\":\"present\",\n    \"output\":{\n        \"fieldSet\": \"minimum\",\n        \"fields\": [\"taxon.attributes.vernacularNames\"]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök med Internalfilter.ReportedByUserId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    "
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n     \"extendedFilter\": {    \n        \"reportedByUserServiceUserId\": 1278    \n     },\n     \"output\":{\n         \"fieldSet\":\"minimum\",\n         \"fields\": [\"taxon.attributes.redlistCategory\"]\n     }     \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/Internal/Search?skip=0&take=10",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"Internal",
+								"Search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter Utter- internal GeoJSON",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    "
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false        \n    },    \n    \"occurrenceStatus\":\"present\"    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/Internal/search?skip=0&take=2&outputFormat=geojsonflat",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"Internal",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								},
+								{
+									"key": "outputFormat",
+									"value": "geojsonflat"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter Utter i Tranås kommun",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Municipality is Tranås\", function () {    ",
+									"    pm.expect(observation.location.municipality.name).to.eql('Tranås');",
+									"});",
+									"",
+									"pm.test(\"Taxon vernacular name is 'utter'\", function () {    ",
+									"    pm.expect(observation.taxon.vernacularName).to.eql('utter');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2022-01-31T07:59:46.862Z\",\n        \"dateFilterType\": \"OverlappingStartDateAndEndDate\"\n    },\n    \"taxon\" : {\n        \"ids\" : [100077]        \n    },\n    \"geographics\": {\n        \"areas\" : [\n            {\n                \"areaType\": \"Municipality\",\n                \"featureId\": \"687\"\n            },\n            {\n                \"areaType\": \"County\",\n                \"featureId\": \"6\"\n            }        \n        ]\n    },    \n    \"occurrenceStatus\":\"present\"    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Räkna observationer i Leksands kommun",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    "
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\",\n        \"dateFilterType\": \"OverlappingStartDateAndEndDate\"\n    },\n    \"geographics\": {\n        \"areas\" : [\n            {\n                \"areaType\": \"Municipality\",\n                \"featureId\": \"2029\"\n            }   \n        ]\n    },\n    \"occurrenceStatus\":\"present\"\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/count",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter Utter med polygon",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Taxon vernacular name is 'utter'\", function () {    ",
+									"    pm.expect(observation.taxon.vernacularName).to.eql('utter');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"taxon\": {\n        \"ids\": [\n            100077\n        ]\n    },\n    \"geographics\": {        \n        \"geometries\": [\n            {\"type\":\"polygon\", \"coordinates\":[[[15.07063, 57.92573],[15.0051, 58.16108],[14.58003, 58.10148],[14.64143, 57.93294],[15.07063, 57.92573]]]}\n        ],        \n        \"considerObservationAccuracy\": true\n    }    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter Utter med cirkel",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Municipality is Tranås\", function () {    ",
+									"    pm.expect(observation.location.municipality.name).to.eql('Tranås');",
+									"});",
+									"",
+									"pm.test(\"Taxon vernacular name is 'utter'\", function () {    ",
+									"    pm.expect(observation.taxon.vernacularName).to.eql('utter');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"taxon\": {\n        \"ids\": [\n            100077\n        ]\n    },\n    \"geographics\": {        \n        \"geometries\": [\n            {\"type\":\"point\", \"coordinates\": [14.99047, 58.01563]}\n        ], \n        \"maxDistanceFromPoint\": 5000\n    }    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter skyddade fynd som aldrig ska visas (Varg)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									" ",
+									"pm.test(\"Returns 0 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fieldTranslationCultureCode\":\"sv-SE\",\n    \"occurrenceStatus\": \"present\",\n    \"output\" : {\n        \"fields\" :  [\"taxon.id\", \"taxon.vernacularName\", \"taxon.sensitivityCategory\", \"accessRights\", \"occurrence.sensitivityCategory\"]\n    },\n    \"taxon\" : {\n        \"ids\":[100024],\n        \"includeUnderlyingTaxa\" : true        \n    }    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=10",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter skyddade fynd som kan vara publikt tillgängliga",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									" ",
+									"pm.test(\"Protection level is 1\", function () {",
+									"    pm.expect(result.records.every(o => o.occurrence.sensitivityCategory === 1)).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fieldTranslationCultureCode\":\"sv-SE\",\n    \"occurrenceStatus\": \"present\",    \n    \"taxon\" : {\n        \"ids\":[100055, 267302, 267303, 267320, 100024, 100093],\n        \"includeUnderlyingTaxa\" : true        \n    },\n    \"output\" :{\n        \"fields\":[\"occurrence.sensitivityCategory\", \"protected\", \"taxon.attributes.sensitivityCategory\"]\n    }    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=1000",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter alla observationer med occurrenceStatus=\"present\"",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const observationCount = parseInt(pm.environment.get(\"observations.search.observationCount\"));",
+									"pm.test(\"total count > \" + observationCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(observationCount);",
+									"});",
+									"",
+									"pm.test(\"Occurrence status has value 'present'\", function () {    ",
+									"    pm.expect(observation.occurrence.occurrenceStatus.value).to.eql('present');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{        \n    \"occurrenceStatus\": \"present\",\n    \"output\" : {\n        \"fields\" :  [\"rightsHolder\", \"datasetName\", \"occurrence.recordedBy\", \"occurrence.catalogNumber\", \"occurrence.occurrenceStatus\", \"taxon.id\", \"taxon.vernacularName\", \"taxon.redlistCategory\"]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=1",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter observationer med occurrenceStatus=\"absent\"",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const absentObservationCount = parseInt(pm.environment.get(\"observations.search.absentObservationCount\"));",
+									"pm.test(\"total count > \" + absentObservationCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(absentObservationCount);",
+									"});",
+									"",
+									"pm.test(\"Occurrence status has value 'present'\", function () {    ",
+									"    pm.expect(observation.occurrence.occurrenceStatus.value).to.eql('absent');",
+									"    pm.expect(observation.occurrence.isPositiveObservation).to.be.false;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \n    \"dataprovider\": {\n        \"ids\": [1]\n    },    \n    \"occurrenceStatus\":\"absent\",\n    \"output\" : {\n        \"fieldSet\" : \"Extended\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=1&translationCultureCode=sv-SE",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "translationCultureCode",
+									"value": "sv-SE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter observationer med projektparametrar",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 2 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"projectIds\": [2976],\n    \"date\": {\n        \"startDate\":\"2016-09-01\",\n\t    \"endDate\":\"2022-09-30\"\n    },\n    \"output\": {\n        \"fieldSet\":\"all\"        \n    }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/search?skip=0&take=2",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "OnlySecondHandInformation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 2 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(2);",
+									"});",
+									"",
+									"const secondHandInfoCount = parseInt(pm.environment.get(\"observations.search.secondHandInfoCount\"));",
+									"pm.test(\"total count > \" + secondHandInfoCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(secondHandInfoCount);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{  \n  \"extendedFilter\": {   \n    \"onlySecondHandInformation\": true  \n  },\n  \"output\": {\n      \"fieldSet\":\"all\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/Internal/search?skip=0&take=2",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"Internal",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Räkna Skogsstyrelsens naturvårdsartlista observationer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    "
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"taxon\" : {\n        \"taxonListIds\":[18],\n        \"includeUnderlyingTaxa\" : false\n    }\n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/count",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter Utter - DwC",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 2 records\", function () {    ",
+									"    pm.expect(result.length).to.eql(2);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false        \n    },    \n    \"occurrenceStatus\":\"present\"\n}\n"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/Search/DwC?kingdom=Plantae&translationCultureCode=en-GB&skip=0&take=2",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"Search",
+								"DwC"
+							],
+							"query": [
+								{
+									"key": "kingdom",
+									"value": "Plantae"
+								},
+								{
+									"key": "translationCultureCode",
+									"value": "en-GB"
+								},
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								},
+								{
+									"key": "sortBy",
+									"value": "eventDate",
+									"disabled": true
+								},
+								{
+									"key": "has",
+									"value": "photos",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Observations/GeoGridAggregation",
+			"item": [
+				{
+					"name": "Geogridaggregering med alla däggdjur",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const gridCell = result.gridCells[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const mammalCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalCellCount\"));",
+									"pm.test(\"grid cell count > \" + mammalCellCount, function () {    ",
+									"    pm.expect(result.gridCellCount).to.greaterThan(mammalCellCount);",
+									"});",
+									"",
+									"const mammalCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalCountCell\"));",
+									"pm.test(\"Observation count > \" + mammalCountCell + \" for the grid cell with most observations\", function () {    ",
+									"    pm.expect(gridCell.observationsCount).to.greaterThan(mammalCountCell);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[4000107],\n        \"includeUnderlyingTaxa\" : true\n    },        \n    \"occurrenceStatus\":\"present\"    \n}\n"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/geogridaggregation?zoom=10",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"geogridaggregation"
+							],
+							"query": [
+								{
+									"key": "zoom",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Geogridaggregering med ogiltiga taxa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const gridCell = result.gridCells[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const invalidTaxaCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.invalidTaxaCellCount\"));",
+									"pm.test(\"grid cell count > \" + invalidTaxaCellCount, function () {    ",
+									"    pm.expect(result.gridCellCount).to.greaterThan(invalidTaxaCellCount);",
+									"});",
+									"",
+									"const invalidTaxaCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.invalidTaxaCountCell\"));",
+									"pm.test(\"Observation count > \" + invalidTaxaCountCell + \" for the grid cell with most observations\", function () {    ",
+									"    pm.expect(gridCell.observationsCount).to.greaterThan(invalidTaxaCountCell);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[4000107],\n        \"includeUnderlyingTaxa\" : true\n    },        \n    \"occurrenceStatus\":\"present\"    \n}\n"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/geogridaggregation?zoom=10",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"geogridaggregation"
+							],
+							"query": [
+								{
+									"key": "zoom",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Geogridaggregering med alla däggdjur & bbox",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const gridCell = result.gridCells[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const mammalBboxCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalBboxCellCount\"));",
+									"pm.test(\"grid cell count > \" + mammalBboxCellCount, function () {    ",
+									"    pm.expect(result.gridCellCount).to.greaterThan(mammalBboxCellCount);",
+									"});",
+									"",
+									"const mammalBboxCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalBboxCountCell\"));",
+									"pm.test(\"Observation count > \" + mammalBboxCellCount + \" for the grid cell with most observations\", function () {    ",
+									"    pm.expect(gridCell.observationsCount).to.greaterThan(mammalBboxCountCell);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": {\n        \"startDate\": \"1990-01-31T07:59:46.862Z\",\n        \"endDate\": \"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\": {\n        \"ids\": [\n            4000107\n        ],\n        \"includeUnderlyingTaxa\": true\n    },\n    \"geographics\": {\n        \"boundingBox\": {\n            \"bottomRight\": {\n                \"latitude\": 59.17592824927137,\n                \"longitude\": 18.28125\n            },\n            \"topLeft\": {\n                \"latitude\": 59.355596110016315,\n                \"longitude\": 17.9296875\n            }\n        }\n    },    \n    \"occurrenceStatus\": \"present\"    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/geogridaggregation?zoom=15",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"geogridaggregation"
+							],
+							"query": [
+								{
+									"key": "zoom",
+									"value": "15"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MetricGridAggregering med alla däggdjur & bbox",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const gridCell = result.gridCells[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": {\n        \"startDate\": \"1990-01-31T07:59:46.862Z\",\n        \"endDate\": \"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\": {\n        \"ids\": [\n            4000107\n        ],\n        \"includeUnderlyingTaxa\": true\n    },\n    \"geographics\": {\n        \"boundingBox\": {\n            \"bottomRight\": {\n                \"latitude\": 59.17592824927137,\n                \"longitude\": 18.28125\n            },\n            \"topLeft\": {\n                \"latitude\": 59.355596110016315,\n                \"longitude\": 17.9296875\n            }\n        }\n    },    \n    \"occurrenceStatus\": \"present\"    \n}"
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Observations/Internal/MetricGridAggregation?gridCellSizeInMeters=10000",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Observations",
+								"Internal",
+								"MetricGridAggregation"
+							],
+							"query": [
+								{
+									"key": "gridCellSizeInMeters",
+									"value": "10000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Geogridaggregering med cirkel",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const gridCell = result.gridCells[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const circleCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.circleCellCount\"));",
+									"pm.test(\"grid cell count > \" + circleCellCount, function () {    ",
+									"    pm.expect(result.gridCellCount).to.greaterThan(circleCellCount);",
+									"});",
+									"",
+									"const circleCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.circleCountCell\"));",
+									"pm.test(\"Observation count > \" + circleCountCell + \" for the grid cell with most observations\", function () {    ",
+									"    pm.expect(gridCell.observationsCount).to.greaterThan(circleCountCell);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": {\n        \"startDate\": \"1990-01-31T07:59:46.862Z\",\n        \"endDate\": \"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\": {\n        \"ids\": [\n            4000107\n        ],\n        \"includeUnderlyingTaxa\": true\n    },\n    \"geographics\": {\n          \"geometries\": [\n            {\n                \"type\": \"point\",\n                \"coordinates\": [\n                    14.99047,\n                    58.01563\n                ]\n            }\n        ],\n        \"maxDistanceFromPoint\": 5000\n    },    \n    \"occurrenceStatus\": \"present\"    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/geogridaggregation?zoom=15",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"geogridaggregation"
+							],
+							"query": [
+								{
+									"key": "zoom",
+									"value": "15"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Observations/TaxonAggregation",
+			"item": [
+				{
+					"name": "Taxonaggregering med alla taxa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const taxonRecord = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
+									"pm.test(\"total count > \" + taxaCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(taxaCount);",
+									"});",
+									"",
+									"const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },        \n    \"occurrenceStatus\":\"present\"    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/TaxonAggregation?skip=0&take=100",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"TaxonAggregation"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Taxonaggregering med alla taxa - sum",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const taxonRecord = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
+									"pm.test(\"total count > \" + taxaCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(taxaCount);",
+									"});",
+									"",
+									"const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"taxon\": {\n        \"includeUnderlyingTaxa\":true\n    },\n    \"occurrenceStatus\":\"present\"    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"Internal",
+								"TaxonAggregation"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "100"
+								},
+								{
+									"key": "sumUnderlyingTaxa",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Taxonaggregering med alla taxa - Internal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const taxonRecord = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
+									"pm.test(\"total count > \" + taxaCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(taxaCount);",
+									"});",
+									"",
+									"const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },        \n    \"occurrenceStatus\":\"present\"    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/Internal/TaxonAggregation?skip=0&take=100",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"Internal",
+								"TaxonAggregation"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Taxonaggregering med alla taxa & bbox",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const taxonRecord = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const bBoxtaxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.bBoxtaxaCount\"));",
+									"pm.test(\"total count > \" + bBoxtaxaCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(bBoxtaxaCount);",
+									"});",
+									"",
+									"const bBoxmostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.bBoxmostCommonCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + bBoxmostCommonCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(bBoxmostCommonCount);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },    \n    \"geographics\": {\n        \"boundingBox\": {\n            \"bottomRight\": {\n                \"latitude\": 59.17592824927137,\n                \"longitude\": 18.28125\n            },\n            \"topLeft\": {\n                \"latitude\": 59.355596110016315,\n                \"longitude\": 17.9296875\n            }\n        }\n    },        \n    \"occurrenceStatus\":\"present\"    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/TaxonAggregation?skip=0&take=500",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"TaxonAggregation"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "500"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Taxonaggregering med cirkel",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const result = pm.response.json();",
+									"const taxonRecord = result.records[0];",
+									"",
+									"const circleCount = parseInt(pm.environment.get(\"observations.taxonAggregation.circleCount\"));",
+									"pm.test(\"total count > \" + circleCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(circleCount);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "a797384f056149d2bee82a4456568fae",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"geographics\": {\n        \"geometries\": [\n            {\n                \"type\": \"point\",\n                \"coordinates\": [\n                    14.99047,\n                    58.01563\n                ]\n            }\n        ],\n        \"maxDistanceFromPoint\": 5000\n    }    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/TaxonAggregation?skip=0&take=100",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"TaxonAggregation"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Taxonaggregering med cirkel - cumulative sum",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const result = pm.response.json();",
+									"const taxonRecord = result.records[0];",
+									"",
+									"const circleCumulativeCount = parseInt(pm.environment.get(\"observations.taxonAggregation.circleCumulativeCount\"));",
+									"pm.test(\"total count > \" + circleCumulativeCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(circleCumulativeCount);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "a797384f056149d2bee82a4456568fae",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"geographics\": {\n        \"geometries\": [\n            {\n                \"type\": \"point\",\n                \"coordinates\": [\n                    14.99047,\n                    58.01563\n                ]\n            }\n        ],\n        \"maxDistanceFromPoint\": 5000\n    }    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"Internal",
+								"TaxonAggregation"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "100"
+								},
+								{
+									"key": "sumUnderlyingTaxa",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Taxonaggregering med alla taxa - Internal cumulative sum",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const taxonRecord = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const internalCumulativeTotCount = parseInt(pm.environment.get(\"observations.taxonAggregation.internalCumulativeTotCount\"));",
+									"pm.test(\"total count > \" + internalCumulativeTotCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(internalCumulativeTotCount);",
+									"});",
+									"",
+									"const internalCumulativeObsCount = parseInt(pm.environment.get(\"observations.taxonAggregation.internalCumulativeObsCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + internalCumulativeObsCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(internalCumulativeObsCount);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\": {\n        \"includeUnderlyingTaxa\": true\n    },\n    \"occurrenceStatus\":\"present\"    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"Internal",
+								"TaxonAggregation"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "100"
+								},
+								{
+									"key": "sumUnderlyingTaxa",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Taxonaggregering med alla taxa - sum (only species)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"const taxonRecord = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"const speciesTotCount = parseInt(pm.environment.get(\"observations.taxonAggregation.speciesTotCount\"));",
+									"pm.test(\"total count > \" + speciesTotCount, function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(speciesTotCount);",
+									"});",
+									"",
+									"const speciesObsCount = parseInt(pm.environment.get(\"observations.taxonAggregation.speciesObsCount\"));",
+									"pm.test(\"The taxon with most observations has more than \" + speciesObsCount, function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(speciesObsCount);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"taxon\": {\n        \"includeUnderlyingTaxa\":true,\n        \"taxonCategories\": [17]\n    },\n    \"occurrenceStatus\":\"present\"    \n}"
+						},
+						"url": {
+							"raw": "{{testUrl}}/Observations/Internal/TaxonAggregation?skip=0&take=100&sumUnderlyingTaxa=true",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Observations",
+								"Internal",
+								"TaxonAggregation"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "100"
+								},
+								{
+									"key": "sumUnderlyingTaxa",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "DataProviders",
+			"item": [
+				{
+					"name": "Hämta alla data providers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Init variables",
+									"const dataProviders = pm.response.json();",
+									"const artportalenDataProvider = dataProviders.find(d => d.id == 1);",
+									"",
+									"// Tests",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});   ",
+									"",
+									"pm.test(\"Every dataprovider has Id and Identifier property\", function () {",
+									"    pm.expect(dataProviders.every(d => d.id !== undefined && d.identifier !== undefined)).to.be.true;",
+									"});",
+									"",
+									"const observationCount = parseInt(pm.environment.get(\"observations.dataProviders.observationCount\"));",
+									"pm.test(\"Artportalen observations is more than \" + observationCount, function () {",
+									"    pm.expect(artportalenDataProvider.publicObservations).to.be.greaterThan(observationCount);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{testUrl}}/DataProviders",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"DataProviders"
+							]
+						},
+						"description": "Hämta alla aktiva dataset"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ProcessInformation",
+			"item": [
+				{
+					"name": "Hämta ProcessInformation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const processInformation = pm.response.json();",
+									"var yesterday = new Date();",
+									"yesterday.setDate(yesterday.getDate() - 1);",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});   ",
+									"",
+									"pm.test(\"Latest Process was successful\", function () {",
+									"    pm.expect(processInformation.status === 'Success').to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{testUrl}}/Systems/ProcessInformation?active=true",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Systems",
+								"ProcessInformation"
+							],
+							"query": [
+								{
+									"key": "active",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Hämta alla aktiva dataset"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vocabularies",
+			"item": [
+				{
+					"name": "Hämta ordlistan för fältet lifeStage",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const lifeStageVocabulary = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"LifeStage vocabulary is returned\", function () {",
+									"    pm.expect(lifeStageVocabulary.name).to.eql('LifeStage');",
+									"    pm.expect(lifeStageVocabulary.enumId).to.eql('LifeStage');    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{testUrl}}/Vocabularies/lifeStage",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Vocabularies",
+								"lifeStage"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hämta ordlistan för fältet verificationStatus",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const vocabulary = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Verification vocabulary is returned\", function () {",
+									"    pm.expect(vocabulary.name).to.eql('VerificationStatus');",
+									"    pm.expect(vocabulary.enumId).to.eql('VerificationStatus');    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{testUrl}}/Vocabularies/verificationStatus",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"Vocabularies",
+								"verificationStatus"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Analysis API",
+			"item": [
+				{
+					"name": "Aggregera på County - Filtrera på utter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Observations exists in more than 10 counties\", function () {    ",
+									"    pm.expect(result.records.length).to.greaterThan(10);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false        \n    },    \n    \"occurrenceStatus\":\"present\"\n}\n"
+						},
+						"url": {
+							"raw": "{{analysisApiUrl}}/internal/aggregation?aggregationField=location.county.name&take=50",
+							"host": [
+								"{{analysisApiUrl}}"
+							],
+							"path": [
+								"internal",
+								"aggregation"
+							],
+							"query": [
+								{
+									"key": "aggregationField",
+									"value": "location.county.name"
+								},
+								{
+									"key": "take",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GeoServer",
+			"item": [
+				{
+					"name": "Get WFS GetFeature",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
+									"});    \r",
+									"\r",
+									"pm.test(\"Observation have properties\", function () {        \r",
+									"    pm.expect(result.features[0].properties).to.have.property('occurrenceId');\r",
+									"    pm.expect(result.features[0].properties).to.have.property('startDate');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"10 observations are returned\", function () {    \r",
+									"    pm.expect(result.numberReturned).to.eql(10);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{geoserverUrl}}/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&outputFormat=application/json&count=10&typeName={{geoserverLayer}}",
+							"host": [
+								"{{geoserverUrl}}"
+							],
+							"path": [
+								"geoserver",
+								"SOS",
+								"ows"
+							],
+							"query": [
+								{
+									"key": "service",
+									"value": "wfs"
+								},
+								{
+									"key": "version",
+									"value": "2.0.0"
+								},
+								{
+									"key": "request",
+									"value": "GetFeature"
+								},
+								{
+									"key": "outputFormat",
+									"value": "application/json"
+								},
+								{
+									"key": "maxFeatures",
+									"value": "10",
+									"disabled": true
+								},
+								{
+									"key": "count",
+									"value": "10"
+								},
+								{
+									"key": "typeName",
+									"value": "{{geoserverLayer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get WFS GetFeature - Fridlysta kärlväxter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
+									"});    \r",
+									"\r",
+									"pm.test(\"Observation have expected property values\", function () {        \r",
+									"    pm.expect(result.features[0].properties.organismGroup).to.eql('Kärlväxter');\r",
+									"    pm.expect(result.features[0].properties.isProtectedByLaw).to.be.true;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{geoserverUrl}}/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&outputFormat=application/json&CQL_Filter=organismGroup = 'Kärlväxter' AND isProtectedByLaw=true&count=10&typeName={{geoserverLayer}}",
+							"host": [
+								"{{geoserverUrl}}"
+							],
+							"path": [
+								"geoserver",
+								"SOS",
+								"ows"
+							],
+							"query": [
+								{
+									"key": "service",
+									"value": "wfs"
+								},
+								{
+									"key": "version",
+									"value": "2.0.0"
+								},
+								{
+									"key": "request",
+									"value": "GetFeature"
+								},
+								{
+									"key": "outputFormat",
+									"value": "application/json"
+								},
+								{
+									"key": "CQL_FILTER",
+									"value": "recordedBy LIKE '%25Gunnar Nyborg%25'",
+									"disabled": true
+								},
+								{
+									"key": "CQL_Filter",
+									"value": "organismGroup = 'Kärlväxter' AND isProtectedByLaw=true"
+								},
+								{
+									"key": "count",
+									"value": "10"
+								},
+								{
+									"key": "typeName",
+									"value": "{{geoserverLayer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ElasticSearchProxy",
+			"item": [
+				{
+					"name": "Search without sort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
+									"});    \r",
+									"\r",
+									"pm.test(\"10 records are returned\", function () {        \r",
+									"    pm.expect(result.hits.hits.length).to.eql(10);    \r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json;+charset=UTF-8",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic ZWxhc3RpYzphcnRkYXRhcm9vdA==",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"size\":10,\"query\":{\"match_all\":{}},\"from\":0} "
+						},
+						"url": {
+							"raw": "{{elasticsearchProxyUrl}}/sos-observation/_search",
+							"host": [
+								"{{elasticsearchProxyUrl}}"
+							],
+							"path": [
+								"sos-observation",
+								"_search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search with sort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
+									"});    \r",
+									"\r",
+									"pm.test(\"10 records are returned\", function () {        \r",
+									"    pm.expect(result.hits.hits.length).to.eql(10);    \r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json;+charset=UTF-8",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic ZWxhc3RpYzphcnRkYXRhcm9vdA==",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"size\":10,\"query\":{\"match_all\":{}},\"from\":0, \"sort\":[{\"_id\":{\"order\":\"asc\"}}]} "
+						},
+						"url": {
+							"raw": "{{elasticsearchProxyUrl}}/sos-observation/_search",
+							"host": [
+								"{{elasticsearchProxyUrl}}"
+							],
+							"path": [
+								"sos-observation",
+								"_search"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "DataStewardship API",
+			"item": [
+				{
+					"name": "Sök dataset - filtrera på datasetIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"1 record matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"The dataset identifier is expected\", function () {",
+									"    pm.expect(result.records[0].identifier).to.eql('Artportalen - Fladdermöss');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"datasetIds\": [\n        \"Artportalen - Fladdermöss\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök datasets - filtrera på datum",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"More than 5 records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.greaterThan(5);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dateFilter\": {\n        \"startDate\": \"2021-06-16T20:00:00Z\",\n        \"endDate\": \"2021-06-17T03:00:00Z\",\n        \"datumFilterType\": \"OverlappingStartDateAndEndDate\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök datasets - filtrera på taxon",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"1 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"taxon\": {\n        \"ids\": [\n            205995\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök datasets - filtrera på län",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"5 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(5);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": {\n        \"county\": \"JönköpingsLän\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök datasets - filtrera på geometri",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"1 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": {\n        \"geometry\": {\n            \"geographicArea\": {\n                \"type\": \"polygon\",\n                \"coordinates\": [\n                    [\n                        [15.07063,57.92573],\n                        [15.0051,58.16108],\n                        [14.58003,58.10148],\n                        [14.64143,57.93294],\n                        [15.07063,57.92573]\n                    ]\n                ]\n            }\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök events - filtrera på datasetIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"500 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(500);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"datasetIds\": [\n        \"Artportalen - Fladdermöss\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök events - filtrera på datum",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"40 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(40);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dateFilter\": {\n        \"startDate\": \"2021-06-16T20:00:00Z\",\n        \"endDate\": \"2021-06-17T03:00:00Z\",\n        \"datumFilterType\": \"OverlappingStartDateAndEndDate\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök events - filtrera på geometri",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"50 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(50);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": {\n        \"geometry\": {\n            \"geographicArea\": {\n                \"type\": \"polygon\",\n                \"coordinates\": [\n                    [\n                        [15.07063,57.92573],\n                        [15.0051,58.16108],\n                        [14.58003,58.10148],\n                        [14.64143,57.93294],\n                        [15.07063,57.92573]\n                    ]\n                ]\n            }\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök events - filtrera på län",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"200 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": {\n        \"county\": \"JönköpingsLän\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök events - filtrera på taxon",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"500 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(500);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"taxon\": {\n        \"ids\": [\n            205995\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök occurrences - filtrera på datasetIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"2000 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(2000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"datasetIds\": [\n        \"Artportalen - Fladdermöss\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/occurrences?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"occurrences"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök occurrences - filtrera på datum",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"300 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(300);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dateFilter\": {\n        \"startDate\": \"2021-06-16T20:00:00Z\",\n        \"endDate\": \"2021-06-17T03:00:00Z\",\n        \"datumFilterType\": \"OverlappingStartDateAndEndDate\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/occurrences?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"occurrences"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök occurrences - filtrera på geometri",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"    ",
+									"pm.test(\"400 or more records matches the query\", function () {",
+									"    pm.expect(result.totalCount).to.gte(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": {\n        \"geometry\": {\n            \"geographicArea\": {\n                \"type\": \"polygon\",\n                \"coordinates\": [\n                    [\n                        [16.07063,56.92573],\n                        [15.0051,58.16108],\n                        [14.58003,58.10148],\n                        [14.64143,57.93294],\n                        [16.07063,56.92573]\n                    ]\n                ]\n            }\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/occurrences?skip=0&take=2",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"occurrences"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

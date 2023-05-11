@@ -155,7 +155,13 @@ namespace SOS.Lib.UnitTests.Helpers
                     "2007-03-01T13:00:00Z/2008-05-11T15:30:00Z", "", "", "", "time", true,
                     DateTime.SpecifyKind(new DateTime(2007, 3, 1, 13, 0, 0), DateTimeKind.Utc).ToLocalTime(),
                     DateTime.SpecifyKind(new DateTime(2008, 5, 11, 15, 30, 0), DateTimeKind.Utc).ToLocalTime()
-                } // 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC).
+                }, // 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC).
+                new object[]
+                {
+                    "2007-03-01T13:00:00Z /", "", "", "", "time", true,
+                    DateTime.SpecifyKind(new DateTime(2007, 3, 1, 13, 0, 0), DateTimeKind.Utc).ToLocalTime(),
+                    DateTime.SpecifyKind(new DateTime(2007, 3, 1, 13, 0, 0), DateTimeKind.Utc).ToLocalTime()
+                } // 2007-03-01T13:00:00Z (For <start>/<end> expressions, if any elements are missing from the end value, they are assumed to be the same as for the start value including the time zone.).
             };
     }
 }

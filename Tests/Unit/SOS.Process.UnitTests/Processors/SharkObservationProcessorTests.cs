@@ -17,8 +17,8 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Managers.Interfaces;
-using SOS.Process.Processors.Shark;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Shark;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors
@@ -35,23 +35,25 @@ namespace SOS.Process.UnitTests.Processors
         {
             _sharkObservationVerbatimRepositoryMock = new Mock<ISharkObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
-            _processedObservationRepository = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepository = new Mock<IProcessedObservationCoreRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _processManagerMock = new Mock<IProcessManager>();
             _validationManagerMock = new Mock<IValidationManager>();
             _diffusionManagerMock = new Mock<IDiffusionManager>();
+            _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _loggerMock = new Mock<ILogger<SharkObservationProcessor>>();
         }
 
         private readonly Mock<ISharkObservationVerbatimRepository> _sharkObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepository;
+        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepository;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IProcessManager> _processManagerMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<IDiffusionManager> _diffusionManagerMock;
+        private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
         private readonly Mock<ILogger<SharkObservationProcessor>> _loggerMock;
 
         private SharkObservationProcessor TestObject => new SharkObservationProcessor(
@@ -63,6 +65,7 @@ namespace SOS.Process.UnitTests.Processors
             _processManagerMock.Object,
             _validationManagerMock.Object,
             _diffusionManagerMock.Object,
+            _processTimeManagerMock.Object,
             new ProcessConfiguration(),
             _loggerMock.Object);
 
@@ -147,7 +150,7 @@ namespace SOS.Process.UnitTests.Processors
             _sharkObservationVerbatimRepositoryMock.Setup(r => r.GetAllByCursorAsync())
                 .ReturnsAsync(mockCursor.Object);
 
-            _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<Observation>>()));
+            _areaHelper.Setup(r => r.AddAreaDataToProcessedLocations(It.IsAny<IEnumerable<Location>>()));
 
             _processedObservationRepository.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>()))
                 .ReturnsAsync(true);

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Nest;
 using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -41,7 +42,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var geometry = feature.Geometry;
             var geoShape = geometry.ToGeoShape();
 
-            ExportFilterDto searchFilter = new ExportFilterDto
+            var searchFilter = new SearchFilterDto()
             {
                 Geographics = new GeographicsFilterDto
                 {
@@ -57,7 +58,14 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.AllWithKnownValues, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcelAsync(
+                null,
+                null, 
+                searchFilter, 
+                OutputFieldSet.Minimum, 
+                false,
+                PropertyLabelType.Swedish, 
+                "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -83,7 +91,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var geometry = feature.Geometry;
             var geoShape = geometry.ToGeoShape();
 
-            ExportFilterDto searchFilter = new ExportFilterDto
+            var searchFilter = new SearchFilterDto()
             {
                 Geographics = new GeographicsFilterDto
                 {
@@ -99,7 +107,14 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, OutputFieldSet.AllWithKnownValues, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadGeoJsonAsync(
+                null,
+                null,
+                searchFilter, 
+                OutputFieldSet.Minimum,
+                false,
+                PropertyLabelType.Swedish, 
+                "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -126,12 +141,19 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 PropertyNameCaseInsensitive = true,
                 Converters = { new GeoShapeConverter(), new GeoLocationConverter(), new JsonStringEnumConverter() }
             };
-            var searchFilter = JsonSerializer.Deserialize<ExportFilterDto>(str, jsonSerializerOptions);
+            var searchFilter = JsonSerializer.Deserialize<SearchFilterDto>(str, jsonSerializerOptions);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, OutputFieldSet.AllWithKnownValues, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadGeoJsonAsync(
+                null,
+                null,
+                searchFilter, 
+                OutputFieldSet.Minimum, 
+                false,
+                PropertyLabelType.Swedish, 
+                "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -141,6 +163,52 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var filename = FilenameHelper.CreateFilenameWithDate("geojson_export", "zip");
             var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
             await System.IO.File.WriteAllBytesAsync(filePath, bytes);
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Convert_filter_geometries_to_GeoJson_FeatureCollection()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            string jsonFilePath = @"C:\GIS\Uttag filter\uttag_filter.json";
+            var str = await System.IO.File.ReadAllTextAsync(jsonFilePath, Encoding.UTF8);
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new GeoShapeConverter(), new GeoLocationConverter(), new JsonStringEnumConverter() }
+            };
+            var searchFilter = JsonSerializer.Deserialize<ExportFilterDto>(str, jsonSerializerOptions);
+            FeatureCollection featureCollection = new FeatureCollection();
+            var geoJsonReader = new GeoJsonReader();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            foreach (var geometry in searchFilter.Geographics.Geometries)
+            {
+                string strGeometry = JsonSerializer.Serialize(geometry, jsonSerializerOptions);
+                var multiPolygon = geoJsonReader.Read<MultiPolygon>(strGeometry);
+                var feature = new Feature { Geometry = multiPolygon };
+                featureCollection.Add(feature);
+            }
+
+            GeoJsonWriter geoJsonWriter = new GeoJsonWriter();
+            var strJson = geoJsonWriter.Write(featureCollection);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            strJson.Should().NotBeNull();
+        }
+
+        private static Feature LoadFeature(string filePath)
+        {
+            var geoJsonReader = new GeoJsonReader();
+            var str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
+            var feature = geoJsonReader.Read<Feature>(str);
+            return feature;
         }
 
         private static FeatureCollection LoadFeatureCollection(string filePath)

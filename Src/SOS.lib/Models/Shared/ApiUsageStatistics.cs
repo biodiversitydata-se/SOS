@@ -15,9 +15,30 @@ namespace SOS.Lib.Models.Shared
         public string AccountId { get; set; }
 
         /// <summary>
+        /// Email address to api management user
+        /// </summary>
+        public string ApiManagementUserEmail { get; set; }
+
+        /// <summary>
+        /// Api management user email domain
+        /// </summary>
+        public string ApiManagementUserEmailDomain =>
+            (ApiManagementUserEmail?.IndexOf('@') ?? -1) > -1 ? ApiManagementUserEmail.Substring(ApiManagementUserEmail.IndexOf('@') + 1) : "";
+
+        /// <summary>
+        /// Name of api management user
+        /// </summary>
+        public string ApiManagementUserName { get; set; }
+
+        /// <summary>
         /// Average duration
         /// </summary>
         public long AverageDuration { get; set; }
+
+        /// <summary>
+        /// End point
+        /// </summary>
+        public string BaseEndpoint => Endpoint?.Contains('/') ?? false ? Endpoint.Substring(0, Endpoint.IndexOf('/')) : Endpoint;
 
         /// <summary>
         /// Issue date
@@ -50,8 +71,34 @@ namespace SOS.Lib.Models.Shared
         public long RequestCount { get; set; }
 
         /// <summary>
+        /// Name of system making the request
+        /// </summary>
+        public string RequestingSystem { get; set; }
+
+        /// <summary>
+        /// Sum of observations returned
+        /// </summary>
+        public long SumResponseCount { get; set; }
+
+        /// <summary>
+        /// E-mail to user making the request
+        /// </summary>
+        public string UserEmail { get; set; }
+
+        /// <summary>
         /// User making the request
         /// </summary>
+        public string UserEmailDomain =>
+            (UserEmail?.IndexOf('@') ?? -1) > -1 ? UserEmail.Substring(UserEmail.IndexOf('@') + 1) : "";
+
+        /// <summary>
+        /// Id of user making the request
+        /// </summary>
         public string UserId { get; set; }
+
+        /// <summary>
+        /// User making the request
+        /// </summary>
+        public string UserName { get; set; }
     }
 }

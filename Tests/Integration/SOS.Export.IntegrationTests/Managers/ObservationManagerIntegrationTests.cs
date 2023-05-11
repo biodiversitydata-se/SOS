@@ -2,9 +2,6 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
-using Microsoft.ApplicationInsights;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -22,8 +19,7 @@ using SOS.Lib.IO.Excel;
 using SOS.Lib.IO.GeoJson;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
@@ -37,7 +33,7 @@ namespace SOS.Export.IntegrationTests.Managers
         {
             var exportConfiguration = GetExportConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
-            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration);
 
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
@@ -59,32 +55,47 @@ namespace SOS.Export.IntegrationTests.Managers
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new NullLogger<DwcArchiveFileWriter>());
 
-            var processedObservationRepository = new ProcessedObservationRepository(
+            var dwcArchiveEventFileWriter = new DwcArchiveEventFileWriter(
+                new DwcArchiveOccurrenceCsvWriter(
+                    vocabularyValueResolver,
+                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                new DwcArchiveEventCsvWriter(vocabularyValueResolver, new NullLogger<DwcArchiveEventCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new FileService(),
+                new NullLogger<DwcArchiveEventFileWriter>());
+
+
+            var processedConfigurationRepository = new ProcessedConfigurationRepository(processClient,
+                new NullLogger<ProcessedConfigurationRepository>());
+            var processedObservationRepository = new ProcessedObservationCoreRepository(
                 elasticClientManager,
-                processClient,
                 elasticConfiguration,
-                new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryDistributedCacheOptions())),
-                new TelemetryClient(),
-                new HttpContextAccessor(),
-                new Mock<ILogger<ProcessedObservationRepository>>().Object);
+                new ProcessedConfigurationCache(processedConfigurationRepository),
+                new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
 
             var excelWriter = new ExcelFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
                 new NullLogger<ExcelFileWriter>());
             var geoJsonlWriter = new GeoJsonFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
                 new NullLogger<GeoJsonFileWriter>());
+            var csvWriter = new CsvFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
+                new NullLogger<CsvFileWriter>());
 
             var filterManager = new Mock<IFilterManager>();
             filterManager
                 .Setup(us => us
-                    .PrepareFilter(0, null, new SearchFilter(), "Sighting", 0, false, false, true)
+                    .PrepareFilterAsync(0, null, new SearchFilter(0, ProtectionFilter.Public), "Sighting", 0, false, false, true)
                 );
 
             var observationManager = new ObservationManager(
                 dwcArchiveFileWriter,
+                dwcArchiveEventFileWriter,
                 excelWriter,
                 geoJsonlWriter,
+                csvWriter,
                 processedObservationRepository,
-                new ProcessInfoRepository(processClient, elasticConfiguration, new Mock<ILogger<ProcessInfoRepository>>().Object),
+                new ProcessInfoRepository(processClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,
@@ -109,7 +120,7 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndStoreAsync(new SearchFilter(), "Test", "all", "", JobCancellationToken.Null);
+                await observationManager.ExportAndStoreAsync(new SearchFilter(0), "Test", "all", "", JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -131,31 +142,44 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndSendAsync(new SearchFilter{ DataProviderIds = new List<int>{1}, OutputFields = new List<string>{
-                    "datasetName",
-                    "event.startDate",
-                    "event.endDate",
-                    "identification.validated",
-                    "location.decimalLongitude",
-                    "location.decimalLatitude",
-                    "occurrence.occurrenceId",
-                    "occurrence.reportedBy",
-                    "taxon.id",
-                    "taxon.scientificName",
-                    "taxon.vernacularName"}
-                }, "mats.lindgren@slu.se", "AP", 
+                await observationManager.ExportAndSendAsync(null, null, 
+                    new SearchFilter(0)
+                    {
+                        DataProviderIds = new List<int> { 1 },
+                        Output = new OutputFilter
+                        {
+                            Fields = new [] {
+                                "datasetName",
+                                "event.startDate",
+                                "event.endDate",
+                                "identification.verified",
+                                "location.decimalLongitude",
+                                "location.decimalLatitude",
+                                "occurrence.occurrenceId",
+                                "occurrence.reportedBy",
+                                "taxon.id",
+                                "taxon.scientificName",
+                                "taxon.vernacularName"
+                            }
+                        }
+                    }, 
+                    "mats.lindgren@slu.se", 
+                    "AP", 
                     ExportFormat.GeoJson, 
-                    "en-GB", 
-                    false, 
-                    OutputFieldSet.All, 
+                    "en-GB",
+                    false,
                     PropertyLabelType.PropertyPath,
                     false,
-                    JobCancellationToken.Null);
+                    false,
+                    false,
+                    null,
+                    JobCancellationToken.Null
+                );
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
+            result.Success.Should().BeTrue();
         }
 
         [Fact]
@@ -172,27 +196,33 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndSendAsync(new SearchFilter
+                await observationManager.ExportAndSendAsync(null, null, new SearchFilter(0)
                 {
                     DataProviderIds = new List<int> { 1 },
-                    OutputFields = new List<string> {
-                        "datasetName",
-                        "event.startDate",
-                        "event.endDate",
-                        "identification.validated",
-                        "location.decimalLongitude",
-                        "location.decimalLatitude",
-                        "occurrence.occurrenceId",
-                        "occurrence.reportedBy",
-                        "taxon.id",
-                        "taxon.scientificName",
-                        "taxon.vernacularName"}
-                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyPath, false, JobCancellationToken.Null);
+                    Output = new OutputFilter
+                    {
+                        Fields = new[] {
+                            "datasetName",
+                            "event.startDate",
+                            "event.endDate",
+                            "identification.verified",
+                            "location.decimalLongitude",
+                            "location.decimalLatitude",
+                            "occurrence.occurrenceId",
+                            "occurrence.reportedBy",
+                            "taxon.id",
+                            "taxon.scientificName",
+                            "taxon.vernacularName"
+                        }
+                    }
+                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false,  PropertyLabelType.PropertyPath, false, false,
+                    false,
+                    null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
+            result.Success.Should().BeTrue();
         }
     }
 }

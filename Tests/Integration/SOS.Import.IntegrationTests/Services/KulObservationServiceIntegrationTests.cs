@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Import.Services;
+using SOS.Harvest.Services;
 using SOS.Lib.Services;
 using Xunit;
 
@@ -21,7 +21,7 @@ namespace SOS.Import.IntegrationTests.Services
             //-----------------------------------------------------------------------------------------------------------
             var importConfiguration = GetImportConfiguration();
             var kulObservationService = new KulObservationService(
-                new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), 
+                new AquaSupportRequestService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<AquaSupportRequestService>()),
                 importConfiguration.KulServiceConfiguration,
                 new NullLogger<KulObservationService>());
             var changedFrom = new DateTime(2015, 1, 1);
@@ -30,7 +30,7 @@ namespace SOS.Import.IntegrationTests.Services
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = (await kulObservationService.GetAsync(0));
+            var result = (await kulObservationService.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), 0));
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

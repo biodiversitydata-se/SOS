@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Services;
+using SOS.Harvest.Services;
+using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
-using SOS.Lib.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Services
@@ -19,18 +18,17 @@ namespace SOS.Import.UnitTests.Services
         /// </summary>
         public NorsObservationServiceTests()
         {
-            _httpClientService = new Mock<IHttpClientService>();
+            _aquaSupportRequestServiceMock = new Mock<IAquaSupportRequestService>();
             _norsServiceConfiguration = new NorsServiceConfiguration
-                { MaxNumberOfSightingsHarvested = 10, MaxReturnedChangesInOnePage = 10 };
+                { MaxNumberOfSightingsHarvested = 10 };
             _loggerMock = new Mock<ILogger<NorsObservationService>>();
         }
-
-        private readonly Mock<IHttpClientService> _httpClientService;
+        private readonly Mock<IAquaSupportRequestService> _aquaSupportRequestServiceMock;
         private readonly NorsServiceConfiguration _norsServiceConfiguration;
         private readonly Mock<ILogger<NorsObservationService>> _loggerMock;
 
         private NorsObservationService TestObject => new NorsObservationService(
-            _httpClientService.Object,
+            _aquaSupportRequestServiceMock.Object,
             _norsServiceConfiguration,
             _loggerMock.Object);
 
@@ -44,12 +42,12 @@ namespace SOS.Import.UnitTests.Services
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _httpClientService.Setup(s => s.GetFileStreamAsync(It.IsAny<Uri>(), null))
+            _aquaSupportRequestServiceMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<long>(), It.IsAny<int>()))
                 .Throws(new Exception("Exception"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.GetAsync(0); };
+            Func<Task> act = async () => { await TestObject.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), 0); };
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -68,13 +66,13 @@ namespace SOS.Import.UnitTests.Services
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             //TODO fix test file
-            _httpClientService.Setup(s => s.GetFileStreamAsync(It.IsAny<Uri>(), It.IsAny<Dictionary<string, string>>()))
-                .ReturnsAsync(new FileStream("", FileMode.Open));
+            _aquaSupportRequestServiceMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<long>(), It.IsAny<int>()))
+                .ReturnsAsync(new XDocument());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetAsync(0);
+            var result = await TestObject.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), 0);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

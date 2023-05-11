@@ -50,16 +50,46 @@ namespace SOS.Lib.Repositories.Verbatim
         /// <summary>
         /// Store data in temporary collection and switch it on success 
         /// </summary>
-        public bool TempMode { get; set; }
+        public virtual bool TempMode { get; set; }
+
+        protected virtual string GetCollectionName(bool? tempMode)
+        {
+            if (tempMode.HasValue)
+                return $"{base.CollectionName}{(tempMode.Value ? "_temp" : "")}";
+            else
+                return $"{base.CollectionName}{(TempMode ? "_temp" : "")}";
+        }
+
+        public virtual async Task<bool> AddCollectionAsync(bool? tempMode)
+        {
+            return await AddCollectionAsync(GetCollectionName(tempMode));
+        }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
-        protected VerbatimRepositoryBase(
+        public VerbatimRepositoryBase(
             IVerbatimClient importClient,
             ILogger logger) : base(importClient, logger)
+        {
+            if (Database != null)
+            {
+                _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = "SourceFile" });
+            }
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="importClient"></param>
+        /// <param name="collectionName"></param>
+        /// <param name="logger"></param>
+        public VerbatimRepositoryBase(
+            IVerbatimClient importClient,
+            string collectionName,
+            ILogger logger) : base(importClient, collectionName, logger)
         {
             if (Database != null)
             {
@@ -72,10 +102,15 @@ namespace SOS.Lib.Repositories.Verbatim
         /// </summary>
         protected override string CollectionName => $"{base.CollectionName}{(TempMode ? "_temp" : "")}";
 
-        /// <inheritdoc />
-        public async Task<bool> PermanentizeCollectionAsync()
+        public virtual async Task<bool> PermanentizeCollectionAsync()
         {
-            if (!TempMode || !await CheckIfCollectionExistsAsync())
+            return await PermanentizeCollectionAsync(null);
+        }
+
+        /// <inheritdoc />
+        public virtual async Task<bool> PermanentizeCollectionAsync(bool? tempMode = null)
+        {
+            if (!TempMode || !await CheckIfCollectionExistsAsync() || await CountAllDocumentsAsync() == 0)
             {
                 return true;
             }
@@ -99,7 +134,7 @@ namespace SOS.Lib.Repositories.Verbatim
         }
 
         /// <inheritdoc />
-        public async Task<Stream> GetSourceFileAsync(int providerId)
+        public virtual async Task<Stream> GetSourceFileAsync(int providerId)
         {
             try
             {
@@ -118,14 +153,14 @@ namespace SOS.Lib.Repositories.Verbatim
 
                 return fileStream;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return null;
             }
         }
 
         /// <inheritdoc />
-        public async Task<bool> StoreSourceFileAsync(int providerId, Stream fileStream)
+        public virtual async Task<bool> StoreSourceFileAsync(int providerId, Stream fileStream)
         {
             if (fileStream == null)
             {

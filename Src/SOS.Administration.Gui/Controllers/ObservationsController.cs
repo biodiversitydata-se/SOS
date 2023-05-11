@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Administration.Gui.Dtos;
 using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Administration.Gui.Controllers
@@ -68,11 +69,12 @@ namespace SOS.Administration.Gui.Controllers
             try 
             {
                 var obs = await observations.FirstAsync();
+                var point = (GeoJsonPoint<GeoJson2DCoordinates>)obs?.Site?.Point;
                 var realObs = new RealObservationDto
                 {
                     OccurrenceId = obs.SightingId.ToString(),
-                    Lat = (double)obs.Site.Point.Coordinates[1],
-                    Lon = (double)obs.Site.Point.Coordinates[0]
+                    Lat = point?.Coordinates?.Y ?? 0,
+                    Lon = point?.Coordinates?.X ?? 0
                 };
                 return realObs;
             }

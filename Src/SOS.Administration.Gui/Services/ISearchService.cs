@@ -1,6 +1,6 @@
 ﻿using SOS.Administration.Gui.Dtos;
 using System.Threading.Tasks;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 
 namespace SOS.Administration.Gui.Services
 {

@@ -15,8 +15,6 @@ namespace SOS.Lib.Helpers
     public static class FieldDescriptionHelper
     {
         private static readonly List<FieldDescription> AllFields;
-        private static readonly Dictionary<string, FieldDescription> AllFieldsByName;
-        private static readonly Dictionary<int, FieldDescription> AllFieldsById;
         private static readonly Dictionary<FieldDescriptionId, FieldDescription> AllFieldsByFieldDescriptionId;
 
         private static readonly FieldDescriptionId[] MandatoryDwcFields =
@@ -37,8 +35,6 @@ namespace SOS.Lib.Helpers
         static FieldDescriptionHelper()
         {
             AllFields = LoadFieldDescriptions().ToList();
-            AllFieldsByName = AllFields.ToDictionary(x => x.Name, x => x);
-            AllFieldsById = AllFields.ToDictionary(x => x.Id, x => x);
             AllFieldsByFieldDescriptionId = AllFields.ToDictionary(x => (FieldDescriptionId)x.Id, x => x);
         }
 
@@ -456,14 +452,15 @@ namespace SOS.Lib.Helpers
             ,FieldDescriptionId.LithostratigraphicTerms
             ,FieldDescriptionId.LowestBiostratigraphicZone
             ,FieldDescriptionId.Member
+            ,FieldDescriptionId.AccessRights
         };
 
-        public static IEnumerable<FieldDescription> GetAllDwcEventCoreOccurrenceFieldDescriptions()
+        public static IEnumerable<FieldDescription> GetAllDwcCoreEventOccurrenceFieldDescriptions()
         {
-            return GetFieldDescriptions(AllDwcEventCoreOccurrenceFieldDescriptions);
+            return GetFieldDescriptions(AllDwcCoreEventOccurrenceFieldDescriptions);
         }
 
-        private static readonly FieldDescriptionId[] AllDwcEventCoreOccurrenceFieldDescriptions =
+        private static readonly FieldDescriptionId[] AllDwcCoreEventOccurrenceFieldDescriptions =
         {
             FieldDescriptionId.EventID,
             FieldDescriptionId.OccurrenceID,

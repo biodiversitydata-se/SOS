@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Nest;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
-using MongoDB.Driver;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Helpers;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
@@ -14,22 +16,19 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public class ProcessRepositoryBase<TEntity> : IProcessRepositoryBase<TEntity>
+    public abstract class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
-        private readonly IProcessClient _client;
-        private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
-        private IClassCache<ProcessedConfiguration> _processedConfigurationCache;
+        private readonly IElasticClientManager _elasticClientManager;
+        private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
+        private readonly ElasticSearchConfiguration _elasticConfiguration;
+        private readonly ElasticSearchIndexConfiguration _elasticSearchIndexConfiguration;
         private readonly bool _toggleable;
+        protected string _id = typeof(TEntity).Name;
 
         /// <summary>
         ///     Disposed
         /// </summary>
         private bool _disposed;
-
-        /// <summary>
-        ///     Mongo db
-        /// </summary>
-        private IMongoDatabase _database;
 
         /// <summary>
         ///     Get configuration object
@@ -39,26 +38,9 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                // Cache is only used in public API
-                if (_processedConfigurationCache != null)
-                {
-                    var processedConfig = _processedConfigurationCache.Get();
+                var processedConfig = _processedConfigurationCache.GetAsync(_id)?.Result;
 
-                    if (processedConfig == null)
-                    {
-                        processedConfig = MongoCollectionConfiguration
-                            .Find(Builders<ProcessedConfiguration>.Filter.Empty)
-                            .FirstOrDefault();
-
-                        _processedConfigurationCache.Set(processedConfig);
-                    }
-
-                    return processedConfig;
-                }
-
-                return MongoCollectionConfiguration
-                    .Find(Builders<ProcessedConfiguration>.Filter.Empty)
-                    .FirstOrDefault();
+                return processedConfig ?? new ProcessedConfiguration { Id = _id };
             }
             catch (Exception e)
             {
@@ -68,43 +50,11 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-        /// <summary>
-        ///     Make sure configuration collection exists
-        /// </summary>
-        private void InitializeConfiguration()
-        {
-            if (_database == null)
-            {
-                return;
-            }
+        protected IElasticClient Client => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[CurrentInstance];
 
-            //filter by collection name
-            var exists = _database
-                .ListCollectionNames(new ListCollectionNamesOptions
-                {
-                    Filter = new BsonDocument("name", _collectionNameConfiguration)
-                })
-                .Any();
+        protected IElasticClient InActiveClient => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[InActiveInstance];
 
-            //check for existence
-            if (!exists)
-            {
-                // Create the collection
-                _database.CreateCollection(_collectionNameConfiguration);
-
-                MongoCollectionConfiguration.InsertOne(new ProcessedConfiguration
-                {
-                    ActiveInstance = 1
-                });
-            }
-        }
-
-        /// <summary>
-        ///     Configuration collection
-        /// </summary>
-        private IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => _database
-            .GetCollection<ProcessedConfiguration>(_collectionNameConfiguration)
-            .WithWriteConcern(new WriteConcern(1, journal: true));
+        protected int ClientCount => _elasticClientManager.Clients.Length;
 
         /// <summary>
         ///     Dispose
@@ -127,7 +77,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <summary>
         ///     Logger
         /// </summary>
-        protected readonly ILogger<ProcessRepositoryBase<TEntity>> Logger;
+        protected readonly ILogger<ProcessRepositoryBase<TEntity, TKey>> Logger;
 
         /// <summary>
         /// Get name of instance
@@ -139,35 +89,66 @@ namespace SOS.Lib.Repositories.Processed
             IndexHelper.GetInstanceName<TEntity>(_toggleable, instance, protectedObservations);
 
         /// <summary>
+        /// Index prefix (if any)
+        /// </summary>
+        protected string IndexPrefix => _elasticConfiguration.IndexPrefix;
+
+        /// <summary>
+        /// number of replicas
+        /// </summary>
+        protected int NumberOfReplicas => _elasticSearchIndexConfiguration.NumberOfReplicas;
+
+        /// <summary>
+        /// Number of shards
+        /// </summary>
+        protected int NumberOfShards => _elasticSearchIndexConfiguration.NumberOfShards;
+
+        /// <summary>
+        /// Number of shards
+        /// </summary>
+        protected int NumberOfShardsProtected => _elasticSearchIndexConfiguration.NumberOfShardsProtected;
+
+        /// <summary>
+        /// Scroll batch size
+        /// </summary>
+        protected int ScrollBatchSize => _elasticSearchIndexConfiguration.ScrollBatchSize;
+
+        /// <summary>
+        /// Scroll timeout
+        /// </summary>
+        protected string ScrollTimeout => _elasticSearchIndexConfiguration.ScrollTimeout;
+
+        /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="client"></param>
         /// <param name="toggleable"></param>
-        /// <param name="logger"></param>
+        /// <param name="elasticClientManager"></param>
         /// <param name="processedConfigurationCache"></param>
-        public ProcessRepositoryBase(
-            IProcessClient client,
+        /// <param name="elasticConfiguration"></param>
+        /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        protected ProcessRepositoryBase(
             bool toggleable,
-            ILogger<ProcessRepositoryBase<TEntity>> logger,
-            IClassCache<ProcessedConfiguration> processedConfigurationCache = null
+            IElasticClientManager elasticClientManager,
+            ICache<string, ProcessedConfiguration> processedConfigurationCache,
+            ElasticSearchConfiguration elasticConfiguration,
+            ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
         )
         {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-            _toggleable = toggleable;
+            _toggleable = toggleable;            
+            _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
+            _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
+            _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
+            _elasticSearchIndexConfiguration = elasticConfiguration.IndexSettings?.FirstOrDefault(i => i.Name.Equals(IndexHelper.GetInstanceName<TEntity>(), StringComparison.CurrentCultureIgnoreCase));
+            if (_elasticSearchIndexConfiguration == null)
+            {
+                logger.LogError($"Settings for index {IndexHelper.GetInstanceName<TEntity>()} is missing. Default settings is used.");
+                _elasticSearchIndexConfiguration = new ElasticSearchIndexConfiguration() { Name = IndexHelper.GetInstanceName<TEntity>() };
+            }
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _processedConfigurationCache = processedConfigurationCache;
-
-            _database = _client.GetDatabase();
-            BatchSize = _client.WriteBatchSize;
-            // Init config
-            InitializeConfiguration();
-
             // Default use non live instance
             LiveMode = false;
-        }
-
-        /// <inheritdoc />
-        public int BatchSize { get; }
+        }        
 
         /// <summary>
         ///     Dispose
@@ -182,13 +163,29 @@ namespace SOS.Lib.Repositories.Processed
         public byte ActiveInstance => GetConfiguration()?.ActiveInstance ?? 1;
 
         /// <inheritdoc />
-        public byte InActiveInstance => (byte) (ActiveInstance == 0 ? 1 : 0);
+        public byte InActiveInstance => (byte)(ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
         public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;
 
         /// <inheritdoc />
+        public void ClearConfigurationCache()
+        {
+            _processedConfigurationCache.Clear();
+        }
+
+        public string IndexName => IndexHelper.GetIndexName<TEntity>(_elasticConfiguration.IndexPrefix, ClientCount == 1, LiveMode ? ActiveInstance : InActiveInstance, false);
+
+        /// <inheritdoc />
         public bool LiveMode { get; set; }
+
+        /// <summary>
+        /// Max number of aggregation buckets
+        /// </summary>
+        public int MaxNrElasticSearchAggregationBuckets => _elasticSearchIndexConfiguration.MaxNrAggregationBuckets;
+
+        /// <inheritdoc />
+        public int ReadBatchSize => _elasticSearchIndexConfiguration?.ReadBatchSize ?? 1000;
 
         /// <inheritdoc />
         public async Task<bool> SetActiveInstanceAsync(byte instance)
@@ -199,12 +196,7 @@ namespace SOS.Lib.Repositories.Processed
 
                 config.ActiveInstance = instance;
 
-                var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
-                    x => x.Id.Equals(config.Id),
-                    config,
-                    new ReplaceOptions { IsUpsert = true });
-
-                return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
+                return await _processedConfigurationCache.AddOrUpdateAsync(config);
             }
             catch (Exception e)
             {
@@ -213,5 +205,8 @@ namespace SOS.Lib.Repositories.Processed
                 return default;
             }
         }
+
+        /// <inheritdoc />
+        public int WriteBatchSize => _elasticSearchIndexConfiguration.WriteBatchSize;
     }
 }

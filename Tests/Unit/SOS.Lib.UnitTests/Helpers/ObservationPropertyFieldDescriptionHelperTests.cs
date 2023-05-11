@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Helpers;
 using Xunit;
 
@@ -16,10 +11,12 @@ namespace SOS.Lib.UnitTests.Helpers
         public void ValidateUniquePropertyNamesAndTitles()
         {
             // Act
-            bool unique = ObservationPropertyFieldDescriptionHelper.ValidateUniquePropertyNames();
+            bool uniqueProperties = ObservationPropertyFieldDescriptionHelper.ValidateUniquePropertyNames();
+            bool uniqueDependencyMapping = ObservationPropertyFieldDescriptionHelper.ValidateUniqueDependencyMapping();
 
             // Assert
-            unique.Should().BeTrue();
+            uniqueProperties.Should().BeTrue();
+            uniqueDependencyMapping.Should().BeTrue();
         }
     }
 }

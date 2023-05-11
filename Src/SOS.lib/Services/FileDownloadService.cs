@@ -61,6 +61,11 @@ namespace SOS.Lib.Services
             try
             {
                 await using var xmlStream = await GetFileStreamAsync(url, "application/xml");
+                if (!xmlStream?.CanRead ?? true)
+                {
+                    throw new NullReferenceException(nameof(xmlStream));
+                }
+                
                 xmlStream.Seek(0, SeekOrigin.Begin);
 
                 var xDocument = await XDocument.LoadAsync(xmlStream, LoadOptions.None, CancellationToken.None);
@@ -71,7 +76,7 @@ namespace SOS.Lib.Services
             catch (Exception e)
             {
                 _logger.LogError($"Failed to get XML-file ({url})", e);
-                return null;
+                throw;
             }
         }
 
@@ -80,7 +85,17 @@ namespace SOS.Lib.Services
         {
             try
             {
+                if (string.IsNullOrEmpty(url))
+                {
+                    return false;
+                }
+
                 await using var fileStream = File.Create(path);
+                if (!fileStream?.CanWrite ?? true)
+                {
+                    throw new NullReferenceException(nameof(fileStream));
+                }
+
                 await using var dwcAStream = await GetFileStreamAsync(url, acceptHeaderContentType);
                 dwcAStream.Seek(0, SeekOrigin.Begin);
                 dwcAStream.CopyTo(fileStream);

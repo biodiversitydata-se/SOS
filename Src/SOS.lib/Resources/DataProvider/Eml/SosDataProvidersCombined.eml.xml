@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
-         xmlns:dc="http://purl.org/dc/terms/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:dc="https://purl.org/dc/terms/"
+         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
          xmlns:sos="https://sos-search.artdata.slu.se/"
-         xmlns:gbif="http://gbif.org/"
+         xmlns:gbif="https://gbif.org/"
          xmlns:snd="https://snd.gu.se/"
-         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
          packageId="38b4c89f-584c-41bb-bd8f-cd1def33e92f" system="https://sos-search.artdata.slu.se/" scope="system"
          xml:lang="en">
 	<dataset>
@@ -38,11 +38,11 @@
 		</abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
-			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
 		</keywordSet>
 		<keywordSet>
 			<keyword>Observation</keyword>
-			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
 		</keywordSet>
 		<intellectualRights>
 			<para></para>
@@ -51,10 +51,10 @@
 			<geographicCoverage>
 				<geographicDescription>This resource covers Sweden.</geographicDescription>
 				<boundingCoordinates>
-					<westBoundingCoordinate>10.13</westBoundingCoordinate>
-					<eastBoundingCoordinate>24.59</eastBoundingCoordinate>
-					<northBoundingCoordinate>69.3</northBoundingCoordinate>
-					<southBoundingCoordinate>55.11</southBoundingCoordinate>
+					<westBoundingCoordinate>10.03</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.17</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.07</northBoundingCoordinate>
+					<southBoundingCoordinate>54.96</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
             <temporalCoverage>
@@ -110,11 +110,9 @@
             <metadata>
                 <gettingStarted></gettingStarted>
                 <purpose></purpose>
-                <sos>
-                    <sos:PersonalData></sos:PersonalData>
-                    <sos:SensitiveData></sos:SensitiveData>
-                    <sos:SensitiveDataDescription></sos:SensitiveDataDescription>
-                </sos>
+                <sos:PersonalData></sos:PersonalData>
+                <sos:SensitiveData></sos:SensitiveData>
+                <sos:SensitiveDataDescription></sos:SensitiveDataDescription>
                 <snd:dataFormat></snd:dataFormat>
             </metadata>
         </additionalMetadata>

@@ -9,11 +9,10 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Web;
 using SOS.Administration.Api.IoC;
-using SOS.Import.IoC.Modules;
+using SOS.Harvest.IoC.Modules;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
-using SOS.Process.IoC.Modules;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace SOS.Administration.Api
@@ -24,10 +23,11 @@ namespace SOS.Administration.Api
     {
         private static MongoDbConfiguration _verbatimDbConfiguration;
         private static ImportConfiguration _importConfiguration;
+        private static ProcessConfiguration _processConfiguration;
         private static MongoDbConfiguration _processDbConfiguration;
         private static ApplicationInsightsConfiguration _applicationInsightsConfiguration;
         private static SosApiConfiguration _sosApiConfiguration;
-
+        private static UserServiceConfiguration _userServiceConfiguration;
 
         /// <summary>
         ///     Main
@@ -79,35 +79,36 @@ namespace SOS.Administration.Api
                     LogManager.ReconfigExistingLoggers();
                 })
                 .UseServiceProviderFactory(hostContext =>
+                {
+                    if (hostContext.HostingEnvironment.EnvironmentName.Equals("local",
+                        StringComparison.CurrentCultureIgnoreCase))
                     {
-                        if (hostContext.HostingEnvironment.EnvironmentName.Equals("local",
-                            StringComparison.CurrentCultureIgnoreCase))
+                        // IIS Express don't get values from secret storage.  This workaround fix it
+                        foreach (var prop in hostContext.Properties)
                         {
-                            // IIS Express don't get values from secret storage.  This workaround fix it
-                            foreach (var prop in hostContext.Properties)
+                            if (prop.Value.GetType().Name.Equals("Startup"))
                             {
-                                if (prop.Value.GetType().Name.Equals("Startup"))
-                                {
-                                    var startUp = (Startup)prop.Value;
-                                    hostContext.Configuration = startUp.Configuration;
-                                }
+                                var startUp = (Startup)prop.Value;
+                                hostContext.Configuration = startUp.Configuration;
                             }
                         }
-                        
-                        /* Get values from secrets storage  */
-                        _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
-                        _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
-                        _importConfiguration = hostContext.Configuration.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
-                        _applicationInsightsConfiguration = hostContext.Configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>();
-                        _sosApiConfiguration = hostContext.Configuration.GetSection(nameof(SosApiConfiguration)).Get<SosApiConfiguration>();
-
-                        return new AutofacServiceProviderFactory(builder =>
-                            builder
-                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration) })
-                                .RegisterModule(new ProcessModule { Configurations = (new ProcessConfiguration(), _verbatimDbConfiguration, _processDbConfiguration) })
-                                .RegisterModule<AdministrationModule>()
-                        );
                     }
+
+                    /* Get values from secrets storage  */
+                    _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+                    _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+                    _importConfiguration = hostContext.Configuration.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
+                    _processConfiguration = hostContext.Configuration.GetSection(nameof(ProcessConfiguration)).Get<ProcessConfiguration>();
+                    _applicationInsightsConfiguration = hostContext.Configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>();
+                    _sosApiConfiguration = hostContext.Configuration.GetSection(nameof(SosApiConfiguration)).Get<SosApiConfiguration>();
+                    _userServiceConfiguration = hostContext.Configuration.GetSection(nameof(UserServiceConfiguration)).Get<UserServiceConfiguration>();
+
+                    return new AutofacServiceProviderFactory(builder =>
+                        builder
+                            .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, null, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
+                            .RegisterModule<AdministrationModule>()
+                    );
+                }
                 )
                 .UseNLog();
         }

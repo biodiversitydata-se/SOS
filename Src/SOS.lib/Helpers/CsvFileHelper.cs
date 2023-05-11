@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NReco.Csv;
@@ -56,6 +55,18 @@ namespace SOS.Lib.Helpers
             _streamWriter?.Dispose();
         }
 
+        /// <summary>
+        /// Flush writer
+        /// </summary>
+        public void Flush()
+        {
+            _streamWriter.Flush();
+        }
+
+        /// <summary>
+        /// Flush writer
+        /// </summary>
+        /// <returns></returns>
         public async Task FlushAsync()
         {
             await _streamWriter.FlushAsync();
@@ -79,9 +90,13 @@ namespace SOS.Lib.Helpers
         /// <param name="mapping"></param>
         /// <returns></returns>
         public IEnumerable<T> GetRecords<T>(IVariableLengthReaderBuilder<T> mapping)
+
         { 
-            var parser = mapping.Build(";");
+
             var builder = new StringBuilder();
+            const string delimiter = "\t";
+            var parser = mapping.Build(delimiter);
+
             var records = new List<T>();
             _csvReader.Read();
 
@@ -92,13 +107,14 @@ namespace SOS.Lib.Helpers
                 {
                     if (i > 0)
                     {
-                        builder.Append(";");
+                        builder.Append(delimiter);
                     }
 
                     builder.Append(GetField(i));
                 }
 
-                var row = builder.ToString();
+                var row = builder.Replace("\"", "'").ToString();
+
                 records.Add(parser.Parse(row));
             }
 
@@ -122,9 +138,10 @@ namespace SOS.Lib.Helpers
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="delimiter"></param>
-        public void InitializeWrite(Stream stream, string delimiter)
+        /// <param name="leaveStreamOpen"></param>
+        public void InitializeWrite(Stream stream, string delimiter, bool leaveStreamOpen = false)
         {
-            InitializeWrite(new StreamWriter(stream, Encoding.UTF8), delimiter);
+            InitializeWrite(new StreamWriter(stream, Encoding.UTF8, -1, leaveStreamOpen), delimiter);
         }
 
         /// <summary>
@@ -158,7 +175,6 @@ namespace SOS.Lib.Helpers
         /// <summary>
         /// Write field
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="field"></param>
         public void WriteField(string field)
         {

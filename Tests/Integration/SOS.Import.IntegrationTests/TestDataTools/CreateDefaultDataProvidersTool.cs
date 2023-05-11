@@ -75,61 +75,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 },
                 new DataProvider
                 {
-                    Identifier = DataProviderIdentifiers.ClamGateway,
-                    Names = new []
-                    {
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "en-GB",
-                            Value = "Clam Gateway"
-                        },
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "sv-SE",
-                            Value = "Musselportalen"
-                        }
-                    },
-                    Descriptions = new []
-                    {
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "en-GB",
-                            Value = "The Clam Gateway is an independent site for collecting data about large freshwater clams in Sweden. Threatened and rare species are of special interest but information on more common clams is also important."
-                        },
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "sv-SE",
-                            Value = "Musselportalen är ett öppet rapporteringssystem för stormusslor som förekommer i svenska sjöar och vatten­drag. Syftet är att öka kunskapen om stormusslor och innehållet i portalen kan användas för att följa tillståndet för de hotade och sällsynta musselarter­na i landet."
-                        }
-                    },
-                    Organizations = new []
-                    {
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "en-GB",
-                            Value = "SLU Swedish Species Information Centre (SLU Artdatabanken)"
-                        },
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "sv-SE",
-                            Value = "SLU Artdatabanken"
-                        }
-                    },
-                    ContactPerson = new ContactPerson
-                    {
-                        Email = "eddie.vonwachenfeldt@slu.se",
-                        FirstName = "Eddie",
-                        LastName = "Von Wachenfeldt"
-                    },
-                    Url = "http://musselportalen.se/",
-                    Type = DataProviderType.ClamPortalObservations,
-                    IsActive = true,
-                    IncludeInScheduledHarvest = true,
-                    IncludeInSearchByDefault = true,
-                    HarvestSchedule = "* * * * *"
-                },
-                new DataProvider
-                {
                     Identifier = DataProviderIdentifiers.KUL,
                     Names = new []
                     {
@@ -511,6 +456,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Url =
                         "http://www.nrm.se/forskningochsamlingar/miljoforskningochovervakning/ringmarkningscentralen.214.html",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
+                    DownloadUrls = new []
+                    {
+                        new DownloadUrl{ Type = DownloadUrl.DownloadType.Observations, Url = "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds"}
+                    },
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
@@ -567,6 +516,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     },
                     Url = "http://www.gbif.org/dataset/9940af5a-3271-4e6a-ad71-ced986b9a9a5",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
+                    DownloadUrls = new []
+                    {
+                        new DownloadUrl{ Type = DownloadUrl.DownloadType.Observations, Url = "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm"}
+                    },
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
@@ -623,6 +576,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     },
                     Url = "http://www.gbif.org/dataset/38c1351d-9cfe-42c0-97da-02d2c8be141c",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=smtp-nrm",
+                    DownloadUrls = new []
+                    {
+                        new DownloadUrl{ Type = DownloadUrl.DownloadType.Observations, Url = "http://www.gbif.se/ipt/archive.do?r=smtp-nrm"}
+                    },
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
@@ -679,6 +636,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     },
                     Url = "http://www.gbif.org/dataset/6aa7c400-0c66-11dd-84d2-b8a03c50a862",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
+                    DownloadUrls = new []
+                    {
+                        new DownloadUrl{ Type = DownloadUrl.DownloadType.Observations, Url = "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises"}
+                    },
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
@@ -730,6 +691,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     },
                     Url = "https://www.dagfjarilar.lu.se/",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=lu_sebms",
+                    DownloadUrls = new []
+                    {
+                        new DownloadUrl{ Type = DownloadUrl.DownloadType.Observations, Url = "http://www.gbif.se/ipt/archive.do?r=lu_sebms"}
+                    },
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
@@ -1021,7 +986,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             var dataProviders = new List<DataProvider>
             {
                 dataProviderByIdentifier[DataProviderIdentifiers.Artportalen],
-                dataProviderByIdentifier[DataProviderIdentifiers.ClamGateway],
                 dataProviderByIdentifier[DataProviderIdentifiers.KUL],
                 dataProviderByIdentifier[DataProviderIdentifiers.MVM],
                 dataProviderByIdentifier[DataProviderIdentifiers.NORS],

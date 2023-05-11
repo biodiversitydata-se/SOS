@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models;
 
@@ -15,18 +12,20 @@ namespace SOS.Lib.Helpers
     /// </summary>
     public static class ObservationPropertyFieldDescriptionHelper
     {
-        public static readonly List<PropertyFieldDescription> AllFields;
+        public static readonly IEnumerable<PropertyFieldDescription> AllFields;
         public static readonly Dictionary<string, PropertyFieldDescription> FieldByPropertyPath;
-        public static readonly Dictionary<OutputFieldSet, List<PropertyFieldDescription>> FieldsByFieldSet;
-        public static readonly Dictionary<OutputFieldSet, List<string>> OutputFieldsByFieldSet;
+        public static readonly Dictionary<OutputFieldSet, ICollection<PropertyFieldDescription>> FieldsByFieldSet;
+        public static readonly Dictionary<OutputFieldSet, HashSet<string>> JsonFormatDependencyByFieldSet;
+        private static readonly Dictionary<string, string> ExportFormatFieldByJsonFormatField;
 
         static ObservationPropertyFieldDescriptionHelper()
         {
             AllFields = LoadFieldDescriptionsFromJson();
             InitDataTypeEnum(AllFields);
-            FieldByPropertyPath = AllFields.ToDictionary(x => x.PropertyPath, x => x);
+            FieldByPropertyPath = AllFields.ToDictionary(x => x.PropertyPath.ToLower(), x => x);
             FieldsByFieldSet = CreateFieldSetDictionary(AllFields);
-            OutputFieldsByFieldSet = CreateOutputFieldsDictionary(FieldsByFieldSet);
+            JsonFormatDependencyByFieldSet = CreateJsonFormatDependencyDictionary(FieldsByFieldSet);
+            ExportFormatFieldByJsonFormatField = CreateExportFormatFieldByJsonFormatFieldDictionary(AllFields);
         }
 
         /// <summary>
@@ -43,7 +42,7 @@ namespace SOS.Lib.Helpers
                 case PropertyLabelType.PropertyPath:
                     return field.PropertyPath;
                 case PropertyLabelType.PropertyName:
-                    return field.Name;
+                    return field.PropertyName;
                 case PropertyLabelType.Swedish:
                     return field.GetSwedishTitle();
                 case PropertyLabelType.English:
@@ -53,7 +52,7 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        private static void InitDataTypeEnum(List<PropertyFieldDescription> fields)
+        private static void InitDataTypeEnum(IEnumerable<PropertyFieldDescription> fields)
         {
             foreach (var field in fields)
             {
@@ -67,6 +66,9 @@ namespace SOS.Lib.Helpers
                         break;
                     case "DateTime":
                         field.DataTypeEnum = PropertyFieldDataType.DateTime;
+                        break;
+                    case "TimeSpan":
+                        field.DataTypeEnum = PropertyFieldDataType.TimeSpan;
                         break;
                     case "Double":
                         field.DataTypeEnum = PropertyFieldDataType.Double;
@@ -85,7 +87,7 @@ namespace SOS.Lib.Helpers
                 // string data type is always nullable.
                 if (field.DataTypeEnum == PropertyFieldDataType.String)
                 {
-                    field.DataTypeNullable = true;
+                    field.DataTypeIsNullable = true;
                 }
             }
         }
@@ -101,7 +103,7 @@ namespace SOS.Lib.Helpers
             {
                 if (propertyPathSet.Contains(field.PropertyPath.ToLowerInvariant()))
                     return false;
-                if (propertyNameSet.Contains(field.Name.ToLowerInvariant()))
+                if (propertyNameSet.Contains(field.PropertyName.ToLowerInvariant()))
                     return false;
                 if (swedishNameSet.Contains(field.GetSwedishTitle().ToLowerInvariant()))
                     return false;
@@ -109,7 +111,7 @@ namespace SOS.Lib.Helpers
                     return false;
 
                 propertyPathSet.Add(field.PropertyPath.ToLowerInvariant());
-                propertyNameSet.Add(field.Name.ToLowerInvariant());
+                propertyNameSet.Add(field.PropertyName.ToLowerInvariant());
                 swedishNameSet.Add(field.GetSwedishTitle().ToLowerInvariant());
                 englishNameSet.Add(field.GetEnglishTitle().ToLowerInvariant());
             }
@@ -117,29 +119,47 @@ namespace SOS.Lib.Helpers
             return true;
         }
 
-        private static Dictionary<OutputFieldSet, List<PropertyFieldDescription>> CreateFieldSetDictionary(
-            List<PropertyFieldDescription> fields)
+        public static bool ValidateUniqueDependencyMapping()
         {
-            var fieldsByFieldSet = new Dictionary<OutputFieldSet, List<PropertyFieldDescription>>
+            var dependencySet = new HashSet<string>();
+            HashSet<string> dependsOnDuplicates = new HashSet<string>();
+
+            foreach (var field in FieldsByFieldSet[OutputFieldSet.All])
+            {
+                if (dependencySet.Contains(field.DependsOn))
+                {
+                    dependsOnDuplicates.Add(field.DependsOn);
+                }
+
+                dependencySet.Add(field.DependsOn);
+            }
+
+            return dependsOnDuplicates.Count <= 0;
+        }
+
+
+        private static Dictionary<OutputFieldSet, ICollection<PropertyFieldDescription>> CreateFieldSetDictionary(
+            IEnumerable<PropertyFieldDescription> fields)
+        {
+            var fieldsByFieldSet = new Dictionary<OutputFieldSet, ICollection<PropertyFieldDescription>>
             {
                 {OutputFieldSet.Minimum, new List<PropertyFieldDescription>()},
                 {OutputFieldSet.Extended, new List<PropertyFieldDescription>()},
-                {OutputFieldSet.AllWithKnownValues, new List<PropertyFieldDescription>()},
+                {OutputFieldSet.AllWithValues, new List<PropertyFieldDescription>()},
                 {OutputFieldSet.All, new List<PropertyFieldDescription>()}
             };
             
-            foreach (var field in fields.Where(m => m.IsPartOfFlatObservation.GetValueOrDefault()))
+            foreach (var field in fields)
             {
-                if (string.IsNullOrEmpty(field.FieldSet)) continue;
                 if (field.FieldSet == "Minimum")
                 {
                     fieldsByFieldSet[OutputFieldSet.Minimum].Add(field);
                     fieldsByFieldSet[OutputFieldSet.Extended].Add(field);
-                    fieldsByFieldSet[OutputFieldSet.AllWithKnownValues].Add(field);
+                    fieldsByFieldSet[OutputFieldSet.AllWithValues].Add(field);
                     fieldsByFieldSet[OutputFieldSet.All].Add(field);
                     field.FieldSets = new List<OutputFieldSet>
                     {
-                        OutputFieldSet.Minimum, OutputFieldSet.Extended, OutputFieldSet.AllWithKnownValues,
+                        OutputFieldSet.Minimum, OutputFieldSet.Extended, OutputFieldSet.AllWithValues,
                         OutputFieldSet.All
                     };
                     field.FieldSetEnum = OutputFieldSet.Minimum;
@@ -147,23 +167,23 @@ namespace SOS.Lib.Helpers
                 else if (field.FieldSet == "Extended")
                 {
                     fieldsByFieldSet[OutputFieldSet.Extended].Add(field);
-                    fieldsByFieldSet[OutputFieldSet.AllWithKnownValues].Add(field);
+                    fieldsByFieldSet[OutputFieldSet.AllWithValues].Add(field);
                     fieldsByFieldSet[OutputFieldSet.All].Add(field);
                     field.FieldSets = new List<OutputFieldSet>
                     {
-                        OutputFieldSet.Extended, OutputFieldSet.AllWithKnownValues, OutputFieldSet.All
+                        OutputFieldSet.Extended, OutputFieldSet.AllWithValues, OutputFieldSet.All
                     };
                     field.FieldSetEnum = OutputFieldSet.Extended;
                 }
-                else if (field.FieldSet == "AllWithKnownValues")
+                else if (field.FieldSet == "AllWithValues")
                 {
-                    fieldsByFieldSet[OutputFieldSet.AllWithKnownValues].Add(field);
+                    fieldsByFieldSet[OutputFieldSet.AllWithValues].Add(field);
                     fieldsByFieldSet[OutputFieldSet.All].Add(field);
                     field.FieldSets = new List<OutputFieldSet>
                     {
-                        OutputFieldSet.AllWithKnownValues, OutputFieldSet.All
+                        OutputFieldSet.AllWithValues, OutputFieldSet.All
                     };
-                    field.FieldSetEnum = OutputFieldSet.AllWithKnownValues;
+                    field.FieldSetEnum = OutputFieldSet.AllWithValues;
                 }
                 else if (field.FieldSet == "All")
                 {
@@ -174,48 +194,100 @@ namespace SOS.Lib.Helpers
                     };
                     field.FieldSetEnum = OutputFieldSet.All;
                 }
+                else
+                {
+                    field.FieldSetEnum = OutputFieldSet.None;
+                }
             }
 
             return fieldsByFieldSet;
         }
 
-        private static Dictionary<OutputFieldSet, List<string>> CreateOutputFieldsDictionary(
-            Dictionary<OutputFieldSet, List<PropertyFieldDescription>> fieldsByFieldSet)
+        private static Dictionary<string, string> CreateExportFormatFieldByJsonFormatFieldDictionary(
+            IEnumerable<PropertyFieldDescription> fields)
         {
-            var outputfieldsByFieldSet = new Dictionary<OutputFieldSet, List<string>>
+            var exportFormatFieldByJsonFormatField = new Dictionary<string, string>();
+            foreach (var field in fields)
             {
-                {OutputFieldSet.Minimum, new List<string>()},
-                {OutputFieldSet.Extended, new List<string>()},
-                {OutputFieldSet.AllWithKnownValues, new List<string>()},
-                {OutputFieldSet.All, new List<string>()}
+                if (field.FieldSetEnum == OutputFieldSet.None) continue;
+
+                var dependentFields = field.GetJsonFormatDependsOn();
+                if (dependentFields.Length > 1)
+                {
+                    foreach (var dependentField in dependentFields)
+                    {
+                        exportFormatFieldByJsonFormatField.TryAdd(dependentField.ToLower(), field.PropertyPath);
+                    }
+                }
+            }
+            
+            return exportFormatFieldByJsonFormatField;
+        }
+
+        private static Dictionary<OutputFieldSet, HashSet<string>> CreateJsonFormatDependencyDictionary(
+            Dictionary<OutputFieldSet, ICollection<PropertyFieldDescription>> fieldsByFieldSet)
+        {
+            var jsonFormatDependencyByFieldSet = new Dictionary<OutputFieldSet, HashSet<string>>
+            {
+                {OutputFieldSet.Minimum, new HashSet<string>()},
+                {OutputFieldSet.Extended, new HashSet<string>()}
             };
 
             foreach (var pair in fieldsByFieldSet)
             {
-                if (pair.Key == OutputFieldSet.All || pair.Key == OutputFieldSet.AllWithKnownValues)
+                if (pair.Key == OutputFieldSet.All || pair.Key == OutputFieldSet.AllWithValues)
                 {
                     continue; // retrieve all fields from Elasticsearch
                 }
 
-                var outputFieldSet = new HashSet<string>();
                 foreach (var field in pair.Value)
                 {
-                    outputFieldSet.Add(field.DependsOn);
+                    foreach (var dependentField in field.GetJsonFormatDependsOn())
+                    {
+                        jsonFormatDependencyByFieldSet[pair.Key].Add(dependentField);
+                    }
                 }
-
-                outputfieldsByFieldSet[pair.Key] = outputFieldSet.ToList();
             }
-            
-            return outputfieldsByFieldSet;
+
+            return jsonFormatDependencyByFieldSet;
         }
 
-        private static List<PropertyFieldDescription> LoadFieldDescriptionsFromJson()
+        private static IEnumerable<PropertyFieldDescription> LoadFieldDescriptionsFromJson()
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, @"Resources\ObservationFieldDescriptions.json");
             using var fs = FileSystemHelper.WaitForFileAndThenOpenIt(filePath);
             var fields = System.Text.Json.JsonSerializer.DeserializeAsync<List<PropertyFieldDescription>>(fs).Result;
             return fields;
+        }
+
+        public static IEnumerable<PropertyFieldDescription> GetExportFieldsFromOutputFields(IEnumerable<string> outputFields)
+        {
+            if (!outputFields?.Any() ?? true) return FieldsByFieldSet[OutputFieldSet.AllWithValues];
+
+            var fieldsSet = new HashSet<string>();
+            foreach (var outputField in outputFields)
+            {
+                if (ExportFormatFieldByJsonFormatField.TryGetValue(outputField.ToLower(), out string exportField))
+                {
+                    fieldsSet.Add(exportField);
+                }
+                else
+                {
+                    fieldsSet.Add(outputField);
+                }
+            }
+
+            var propertyFields = new List<PropertyFieldDescription>();
+            foreach (var field in fieldsSet)
+            {
+                if (FieldByPropertyPath.TryGetValue(field.ToLower(), out var propertyField))
+                {
+                    propertyFields.Add(propertyField);
+                }
+            }
+
+            return propertyFields;
         }
     }
 }

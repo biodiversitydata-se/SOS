@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Models.Search;
+using Quartz;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -109,6 +110,37 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Export file => DOI job failed to start");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("{fileName}/ToDOI/Schedule")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult ScheduleExportToDoi([FromRoute] string fileName, [FromBody]string cronExpression)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    return BadRequest("You must provide a file name");
+                }
+
+                if (!CronExpression.IsValidExpression(cronExpression))
+                {
+                    return BadRequest("You must provide a correct crone expression");
+                }
+
+                RecurringJob.AddOrUpdate<IExportToDoiJob>(nameof(IExportToDoiJob),
+                    job => job.RunAsync(fileName, JobCancellationToken.Null),
+                    cronExpression, TimeZoneInfo.Local);
+
+                return new OkObjectResult("Export To DOI Job Scheduled.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Export file => DOI job failed to schedule");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

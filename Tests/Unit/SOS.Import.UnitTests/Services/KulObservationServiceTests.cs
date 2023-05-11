@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Services;
+using SOS.Harvest.Services;
+using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
-using SOS.Lib.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Services
@@ -20,21 +18,21 @@ namespace SOS.Process.UnitTests.Services
         /// </summary>
         public KulObservationServiceTests()
         {
-            _httpClientService = new Mock<IHttpClientService>();
+            _aquaSupportRequestServiceMock = new Mock<IAquaSupportRequestService>();
             _clamServiceConfiguration = new KulServiceConfiguration
             {
-                MaxNumberOfSightingsHarvested = 10, MaxReturnedChangesInOnePage = 10,
+                MaxNumberOfSightingsHarvested = 10,
                 StartHarvestYear = DateTime.Now.Year
             };
             _loggerMock = new Mock<ILogger<KulObservationService>>();
         }
 
-        private readonly Mock<IHttpClientService> _httpClientService;
+        private readonly Mock<IAquaSupportRequestService> _aquaSupportRequestServiceMock;
         private readonly KulServiceConfiguration _clamServiceConfiguration;
         private readonly Mock<ILogger<KulObservationService>> _loggerMock;
 
         private KulObservationService TestObject => new KulObservationService(
-            _httpClientService.Object,
+            _aquaSupportRequestServiceMock.Object,
             _clamServiceConfiguration,
             _loggerMock.Object);
 
@@ -48,12 +46,12 @@ namespace SOS.Process.UnitTests.Services
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _httpClientService.Setup(s => s.GetFileStreamAsync(It.IsAny<Uri>(), It.IsAny<Dictionary<string, string>>()))
-                .Throws(new Exception("Exception"));
+            _aquaSupportRequestServiceMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<long>(), It.IsAny<int>()))
+               .Throws(new Exception("Exception"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.GetAsync(0); };
+            Func<Task> act = async () => { await TestObject.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), 0); };
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -72,13 +70,13 @@ namespace SOS.Process.UnitTests.Services
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             //TODO fix test file
-            _httpClientService.Setup(s => s.GetFileStreamAsync(It.IsAny<Uri>(), It.IsAny<Dictionary<string, string>>()))
-                .ReturnsAsync(new FileStream("", FileMode.Open));
+            _aquaSupportRequestServiceMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<long>(), It.IsAny<int>()))
+                .ReturnsAsync(new XDocument());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetAsync(0);
+            var result = await TestObject.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), 0);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

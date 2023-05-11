@@ -1,34 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
-         xmlns:dc="http://purl.org/dc/terms/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:dc="https://purl.org/dc/terms/"
+         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
          xmlns:sos="https://sos-search.artdata.slu.se/"
-         xmlns:gbif="http://gbif.org/"
+         xmlns:gbif="https://gbif.org/"
          xmlns:snd="https://snd.gu.se/"
-         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
          packageId="339cf623d-4b3a-2c9c-f555-cd1244477c11" system="https://sos-search.artdata.slu.se/" scope="system"
          xml:lang="en">
 	<dataset>
 		<identifier>339cf623d-4b3a-2c9c-f555-cd1244477c11</identifier>
         <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:SHARK</alternateIdentifier>
-        <title>Shark SMHI</title>
+        <title>SHARK - SMHI</title>
 		<creator>
-			<organizationName>SMHI</organizationName>
+            <individualName>
+                <surName>SHARK</surName>
+            </individualName>
+		<organizationName>Swedish Meterological and Hydrological Institute (SMHI)</organizationName>
 			<address>
-				<city>Norrköping</city>
-				<country>SE</country>
+				<country>Sweden</country>
 			</address>
-			<electronicMailAddress></electronicMailAddress>
-            <onlineUrl>http://sharkweb.smhi.se/</onlineUrl>
+			<electronicMailAddress>shark@smhi.se</electronicMailAddress>
+            <onlineUrl>https://sharkweb.smhi.se/</onlineUrl>
             <sos:contactNameType>Organizational</sos:contactNameType>
 		</creator>
 		<metadataProvider>
-			<organizationName>SMHI</organizationName>
+        <individualName>
+            <surName>SHARK</surName>
+        </individualName>
+			<organizationName>Swedish Meterological and Hydrological Institute (SMHI)</organizationName>
 			<address>
-				<city>Norrköping</city>
-				<country>SE</country>
+				<country>Sweden</country>
 			</address>
-            <electronicMailAddress></electronicMailAddress>
+            <electronicMailAddress>shark@smhi.se</electronicMailAddress>
             <onlineUrl></onlineUrl>
 		</metadataProvider>		
 		<pubDate>      
@@ -36,29 +40,30 @@
 		<language>ENGLISH</language>
         <licenseName></licenseName>
 		<abstract>
-			<para>Swedish Ocean Archive contains marine environmental monitoring data from the seas surrounding Sweden. Data from SHARK includes marine benthic fauna, marine benthic vegetation, plankton, and seal observations.</para>
-		</abstract>
+			<para>SHARK, the Swedish Ocean Archive database, contains marine environmental monitoring data from the seas surrounding Sweden. Data from SHARK includes marine benthic fauna, marine benthic vegetation, plankton, and seal observations.</para>
+			<para>The national monitoring program was initiated by the Swedish Environmental Protection Agency and is now financed by the Swedish Agency for Marine and Water Management. Monitoring is performed by Stockholm University, Gothenburg University, Umeå University and Linnaeus University.</para>
+        </abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
-			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
 		</keywordSet>
 		<keywordSet>
 			<keyword>Observation</keyword>
-			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
 		</keywordSet>
 		<intellectualRights>
-			<para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+			<para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="https://creativecommons.org/publicdomain/zero/1.0/legalcode">
 					<citetitle>Public Domain (CC0 1.0)</citetitle>
 				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
 		</intellectualRights>
 		<coverage>
 			<geographicCoverage>
-				<geographicDescription>This resource covers Sweden.</geographicDescription>
+				<geographicDescription>This resource covers the seas surrounding Sweden. Data are collected within the following marine ecoregions: http://marineregions.org/mrgid/2401, http://marineregions.org/mrgid/2374, http://marineregions.org/mrgid/2379</geographicDescription>
 				<boundingCoordinates>
-					<westBoundingCoordinate>0.0</westBoundingCoordinate>
-					<eastBoundingCoordinate>0.0</eastBoundingCoordinate>
-					<northBoundingCoordinate>0.0</northBoundingCoordinate>
-					<southBoundingCoordinate>0.0</southBoundingCoordinate>
+					<westBoundingCoordinate>10.03</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.17</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.07</northBoundingCoordinate>
+					<southBoundingCoordinate>54.96</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
             <temporalCoverage>
@@ -77,45 +82,47 @@
 			<description>
 				<para/>
 			</description>
-			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+			<maintenanceUpdateFrequency>irregular</maintenanceUpdateFrequency>
 		</maintenance>
 		<contact>
             <individualName>
-                <givenName>Patrik</givenName>
-                <surName>Strömberg</surName>
+                <surName>SHARK</surName>
             </individualName>
-            <electronicMailAddress>patrik.stromberg@smhi.se</electronicMailAddress>
+            <organizationName>Swedish Meterological and Hydrological Institute (SMHI)</organizationName>
+            <electronicMailAddress>shark@smhi.se</electronicMailAddress>
             <organizationName>SMHI</organizationName>
 			<address>
-				<city>Norrköping</city>
-				<country>SE</country>
+				<country>Sweden</country>
 			</address>
-            <onlineUrl>http://sharkweb.smhi.se/</onlineUrl>
-            <sos:contactNameType>Personal</sos:contactNameType>
+            <onlineUrl>https://sharkweb.smhi.se/</onlineUrl>
+            <sos:contactNameType>Organizational</sos:contactNameType>
 		</contact>
         <sos:resourceType>occurrence data</sos:resourceType>
         <sos:dataAccessibilityLevel></sos:dataAccessibilityLevel>
         <sos:datsetSubtype>census data</sos:datsetSubtype>
-        <sos:resourceHomepage>http://sharkweb.smhi.se/</sos:resourceHomepage>
+        <sos:resourceHomepage>https://sharkweb.smhi.se/</sos:resourceHomepage>
         <gbif:MetadataLanguage>ENGLISH</gbif:MetadataLanguage>
         <gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
         <project>
             <sos:projectTitle></sos:projectTitle>
-            <funding></funding>
+            <funding>The national monitoring program is financed by the Swedish Agency for Marine and Water Management (Havs- och Vattenmyndigheten). </funding>
             <funderIdentifier></funderIdentifier>
             <dc:funderIdentifierType></dc:funderIdentifierType>
             <designDescription></designDescription>
         </project>
         <samplingMethods>
             <studyExtent></studyExtent>
-            <samplingDescription></samplingDescription>
+            <samplingDescription>
+            <para>Information about the program and the methods are available in Swedish at the website of Swedish Agency for Marine and Water Management, https://www.havochvatten.se/vagledning-foreskrifter-och-lagar/vagledningar/ovriga-vagledningar/undersokningstyper-for-miljoovervakning/undersokningstyper/mjukbottenlevande-makrofauna-trend--och-omradesovervakning.html and https://www.havochvatten.se/vagledning-foreskrifter-och-lagar/vagledningar/ovriga-vagledningar/undersokningstyper-for-miljoovervakning/undersokningstyper/sediment---basundersokning.html.</para>
+            <para>Data should be sampled and analyzed according to Leonardsson K. 2004. (In Swedish) Metodbeskrivning för provtagning och analys av mjukbottenlevande makroevertebrater i marin miljö. Umeå universitet, Institutionen för ekologi och geovetenskap, 26 p (https://www.havochvatten.se/download/18.1690613b166605675de898f4/1539942622449/rapport-umu-metodbeskrivning-provtagning-analys-mjukbottenlevande-makroevertebrater-i-marin-miljo.pdf). However, deviations from the manual might occur.</para>
+            </samplingDescription>
             <methodStep></methodStep>
             <qualityControl></qualityControl>
         </samplingMethods>
         <additionalMetadata>
             <metadata>
                 <gettingStarted></gettingStarted>
-                <purpose></purpose>
+                <purpose>The purpose of the monitoring program is to detect long term and short term changes in the soft bottom macrozoobenthos communities. Changes in the macrofauna community can indicate changes in environmental threats like eutrophication, environmental toxins and climate change.</purpose>
                 <sos>
                     <sos:PersonalData></sos:PersonalData>
                     <sos:SensitiveData></sos:SensitiveData>

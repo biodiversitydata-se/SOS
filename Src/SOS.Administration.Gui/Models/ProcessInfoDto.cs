@@ -15,6 +15,7 @@ namespace SOS.Administration.Gui.Models
             public DateTime? ProcessEnd { get; set; }
             public DateTime? ProcessStart { get; set; }
             public string ProcessStatus { get; set; }
+            public int? ProcessFailCount { get; set; }
             public int? PublicProcessCount { get; set; }
             public int? ProtectedProcessCount { get; set; }
             public DateTime? HarvestEnd { get; set; }
@@ -30,7 +31,7 @@ namespace SOS.Administration.Gui.Models
             public string DataProviderType { get; set; }
         }
         public string Id { get; set; }
-
+        public int ProcessFailCount { get; set; }
         public int PublicCount { get; set; }
         public int ProtectedCount { get; set; }
         public DateTime End { get; set; }

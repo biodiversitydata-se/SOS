@@ -1,5 +1,4 @@
-﻿using System;
-using NetTopologySuite.Features;
+﻿using NetTopologySuite.Features;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 

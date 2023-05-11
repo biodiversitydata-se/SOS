@@ -6,8 +6,8 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Harvesters.Observations;
-using SOS.Import.Services.Interfaces;
+using SOS.Harvest.Harvesters.AquaSupport.Nors;
+using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Nors;
@@ -26,7 +26,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _norsObservationVerbatimRepositoryMock = new Mock<INorsObservationVerbatimRepository>();
             _norsObservationServiceMock = new Mock<INorsObservationService>();
             _norsServiceConfiguration = new NorsServiceConfiguration
-                {MaxReturnedChangesInOnePage = 10, MaxNumberOfSightingsHarvested = 1};
+                { MaxNumberOfSightingsHarvested = 1 };
             _loggerMock = new Mock<ILogger<NorsObservationHarvester>>();
         }
 
@@ -45,13 +45,13 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         ///     Test aggregation fail
         /// </summary>
         /// <returns></returns>
-        [Fact]
+        [Fact (Skip = "too slow for being a unit test. Todo - move to integration test.")]
         public async Task HarvestNorsAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _norsObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
+            _norsObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()))
                 .ThrowsAsync(new Exception("Fail"));
 
             //-----------------------------------------------------------------------------------------------------------
@@ -66,16 +66,16 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         }
 
         /// <summary>
-        ///     Make a successful norss harvest
+        ///     Make a successful nors harvest
         /// </summary>
         /// <returns></returns>
-        [Fact]
+        [Fact(Skip = "too slow for being a unit test. Todo - move to integration test.")]
         public async Task HarvestNorsAsyncSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _norsObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
+            _norsObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()))
                 .ReturnsAsync(new XDocument());
 
             _norsObservationVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())

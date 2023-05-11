@@ -3,12 +3,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using Moq;
-using Newtonsoft.Json;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Export.UnitTests.TestHelpers.Factories
 {
@@ -16,26 +17,26 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
     {
         public static string TenObservations = @"Resources\TenProcessedTestObservations.json";
 
-        public static Mock<IProcessedObservationRepository> Create(Observation observation)
+        public static Mock<IProcessedObservationCoreRepository> Create(Observation observation)
         {
-            var stub = new Mock<IProcessedObservationRepository>();
+            var stub = new Mock<IProcessedObservationCoreRepository>();
             
-            stub.SetupSequence(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
-                .ReturnsAsync(new ScrollResult<Observation>
+            stub.SetupSequence(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), null, null))
+                .ReturnsAsync(new SearchAfterResult<Observation>
                 {
                     Records = new[] { observation } // return the observation the first call.
                 })
-                .ReturnsAsync(new ScrollResult<Observation>
+                .ReturnsAsync(new SearchAfterResult<Observation>
                 {
                     Records = Enumerable.Empty<Observation>()  // return empty the second call. new Observation[0]
                 });
 
-            stub.SetupSequence(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
-                .ReturnsAsync(new ScrollResult<Observation>
+            stub.SetupSequence(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), It.IsAny<string>(), It.IsAny<IEnumerable<object>>()))
+                .ReturnsAsync(new SearchAfterResult<Observation>
                 {
                     Records = new[] {observation} // return the observation the first call.
                 })
-                .ReturnsAsync(new ScrollResult<Observation>
+                .ReturnsAsync(new SearchAfterResult<Observation>
                     {
                         Records = Enumerable.Empty<Observation>()  // return empty the second call. new Observation[0]
                 });
@@ -48,12 +49,12 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
             var str = File.ReadAllText(filePath, Encoding.UTF8);
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> {new ObjectIdConverter()}
-            };
 
-            var observations = JsonConvert.DeserializeObject<List<Observation>>(str, serializerSettings);
+            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true, };
+            serializeOptions.Converters.Add(new ObjectIdConverter());
+
+            var observations = JsonSerializer.Deserialize<List<Observation>>(str, serializeOptions);
+
             return observations;
         }
     }

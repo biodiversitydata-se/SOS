@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Elasticsearch.Net;
 using FluentAssertions;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
-using Nest;
+using Moq;
 using SOS.Lib.Cache;
 using SOS.Lib.Database;
 using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Resource;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Repositories
@@ -30,7 +28,7 @@ namespace SOS.Export.IntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await processedObservationRepository.ScrollMultimediaAsync(new SearchFilter(), null);
+            var result = await processedObservationRepository.GetMultimediaBySearchAfterAsync(new SearchFilter(0));
             IEnumerable<SimpleMultimediaRow> multimediaRows = result.Records;
 
             //-----------------------------------------------------------------------------------------------------------
@@ -50,7 +48,7 @@ namespace SOS.Export.IntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await processedObservationRepository.ScrollMeasurementOrFactsAsync(new SearchFilter(), null);
+            var result = await processedObservationRepository.GetMeasurementOrFactsBySearchAfterAsync(new SearchFilter(0));
             var projectParameters = result.Records;
 
             //-----------------------------------------------------------------------------------------------------------
@@ -59,7 +57,7 @@ namespace SOS.Export.IntegrationTests.Repositories
             projectParameters.Should().NotBeEmpty();
         }
 
-        private ProcessedObservationRepository GetProcessedObservationRepository()
+        private ProcessedObservationCoreRepository GetProcessedObservationRepository()
         {
             var processDbConfiguration = GetProcessDbConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
@@ -69,12 +67,11 @@ namespace SOS.Export.IntegrationTests.Repositories
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var processedObservationRepository =
-                new ProcessedObservationRepository(
-                    new ElasticClientManager(elasticConfiguration, true),
-                    exportClient,
+                new ProcessedObservationCoreRepository(
+                    new ElasticClientManager(elasticConfiguration),
                     elasticConfiguration,
-                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
-                    new NullLogger<ProcessedObservationRepository>());
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),                   
+                    new NullLogger<ProcessedObservationCoreRepository>());
 
             return processedObservationRepository;
         }

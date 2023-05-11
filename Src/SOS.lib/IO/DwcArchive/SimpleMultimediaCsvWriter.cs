@@ -7,11 +7,10 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.IO.DwcArchive.Interfaces;
-using SOS.Export.Models;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -25,16 +24,15 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         public async Task<bool> CreateCsvFileAsync(
-            FilterBase filter,
+            SearchFilterBase filter,
             Stream stream,
-            IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IJobCancellationToken cancellationToken)
         {
             try
             {
-                var scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, null);
-                var hasRecords = scrollResult?.Records?.Any() ?? false;
+                var searchResult = await processedObservationRepository.GetMultimediaBySearchAfterAsync(filter);
+                var hasRecords = searchResult?.Records?.Any() ?? false;
                 if (!hasRecords) return false;
 
                 var csvFileHelper = new CsvFileHelper();
@@ -42,12 +40,13 @@ namespace SOS.Lib.IO.DwcArchive
                 // Write header row
                 WriteHeaderRow(csvFileHelper);
 
-                while (scrollResult?.Records?.Any() ?? false)
+                while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+                    var searchResultTask = processedObservationRepository.GetMultimediaBySearchAfterAsync(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
 
                     // Fetch observations from ElasticSearch.
-                    var multimediaRows = scrollResult.Records.ToArray();
+                    var multimediaRows = searchResult.Records.ToArray();
 
                     // Write occurrence rows to CSV file.
                     foreach (var row in multimediaRows)
@@ -57,7 +56,7 @@ namespace SOS.Lib.IO.DwcArchive
                     await csvFileHelper.FlushAsync();
 
                     // Get next batch of observations.
-                    scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, scrollResult.ScrollId);
+                    searchResult = await searchResultTask;
                 }
                 csvFileHelper.FinishWrite();
                 return true;
@@ -76,7 +75,8 @@ namespace SOS.Lib.IO.DwcArchive
 
         public void WriteHeaderlessCsvFile(
             IEnumerable<SimpleMultimediaRow> multimediaRows,
-            StreamWriter streamWriter)
+            StreamWriter streamWriter,
+            bool eventBased = false)
         {
             try
             {
@@ -86,7 +86,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // Write simple multimedia rows to CSV file.
                 foreach (var multimediaRow in multimediaRows)
                 {
-                    WriteSimpleMultimediaRow(csvFileHelper, multimediaRow);
+                    WriteSimpleMultimediaRow(csvFileHelper, multimediaRow, eventBased);
                 }
 
                 csvFileHelper.FinishWrite();
@@ -98,9 +98,9 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        public void WriteHeaderRow(CsvFileHelper csvFileHelper)
+        public void WriteHeaderRow(CsvFileHelper csvFileHelper, bool eventBased = false)
         {
-            var multimediaExtensionMetadata = ExtensionMetadata.SimpleMultimediaFactory.Create();
+            var multimediaExtensionMetadata = ExtensionMetadata.SimpleMultimediaFactory.Create(eventBased);
             foreach (var multimediaField in multimediaExtensionMetadata.Fields.OrderBy(field => field.Index))
             {
                 csvFileHelper.WriteField(multimediaField.CSVColumnName);
@@ -114,11 +114,18 @@ namespace SOS.Lib.IO.DwcArchive
         /// </summary>
         /// <param name="csvFileHelper"></param>
         /// <param name="multimediaRow"></param>
+        /// <param name="eventBased"></param>
         /// <remarks>The fields must be written in correct order. FieldDescriptionId sorted ascending.</remarks>
         private static void WriteSimpleMultimediaRow(
             CsvFileHelper csvFileHelper,
-            SimpleMultimediaRow multimediaRow)
+            SimpleMultimediaRow multimediaRow,
+            bool eventBased = false)
         {
+            if (eventBased)
+            {
+                csvFileHelper.WriteField(multimediaRow.EventId);
+            }
+
             csvFileHelper.WriteField(multimediaRow.OccurrenceId);
             csvFileHelper.WriteField(multimediaRow.Type);
             csvFileHelper.WriteField(multimediaRow.Format);

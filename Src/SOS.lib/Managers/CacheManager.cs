@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,30 @@ namespace SOS.Lib.Managers
     {
         private readonly SosApiConfiguration _sosApiConfiguration;
         private readonly ILogger<CacheManager> _logger;
+
+        private async Task<bool> ClearAsync(HttpClient client, string requestUri)
+        {
+            try
+            {
+                var response = await client.DeleteAsync(requestUri);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation($"Failed to clear cache ({requestUri})");
+                    return false;
+                }
+
+                _logger.LogInformation($"Cache cleared ({requestUri})");
+               
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Failed to clear cache ({requestUri})");
+                return false;
+            }
+        }
 
         /// <summary>
         /// Constructor
@@ -29,30 +54,45 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task<bool> ClearAsync(Enums.Cache cache)
         {
-            try
+            var success = true;
+            var client = new HttpClient();
+            if (_sosApiConfiguration?.ObservationsApiAddresses?.Any() ?? false)
             {
-                var client = new HttpClient();
                 foreach (var observationsApiAddress in _sosApiConfiguration.ObservationsApiAddresses)
                 {
                     var requestUri = $"{observationsApiAddress}Caches/{cache}";
-                    var response = await client.DeleteAsync(requestUri);
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        _logger.LogInformation($"Failed to clear {cache} cache on ({observationsApiAddress})");
-                        return false;
-                    }
-
-                    _logger.LogInformation($"{cache} cache cleared ({observationsApiAddress})");
+                    success = success && await ClearAsync(client, requestUri);
                 }
-
-                return true;
             }
-            catch (Exception e)
+            
+            if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.ElasticSearchProxyAddresses?.Any() ?? false))
             {
-                _logger.LogError(e, "Failed to clear {cache} cache");
-                return false;
+                foreach (var elasticSearchProxyAddress in _sosApiConfiguration.ElasticSearchProxyAddresses)
+                {
+                    var requestUri = $"{elasticSearchProxyAddress}Caches/{cache}";
+                    success = success && await ClearAsync(client, requestUri);
+                }
             }
+
+            if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.AnalysisApiAddresses?.Any() ?? false))
+            {
+                foreach (var analysisApiAddress in _sosApiConfiguration.AnalysisApiAddresses)
+                {
+                    var requestUri = $"{analysisApiAddress}Caches/{cache}";
+                    success = success && await ClearAsync(client, requestUri);
+                }
+            }
+
+            if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.DataStewardshipApiAddresses?.Any() ?? false))
+            {
+                foreach (var dataStewardshipApiAddress in _sosApiConfiguration.DataStewardshipApiAddresses)
+                {
+                    var requestUri = $"{dataStewardshipApiAddress}Caches/{cache}";
+                    success = success && await ClearAsync(client, requestUri);
+                }
+            }
+
+            return success;
         }
     }
 }

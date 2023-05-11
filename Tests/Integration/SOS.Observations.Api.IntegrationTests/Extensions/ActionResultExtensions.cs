@@ -21,5 +21,11 @@ namespace SOS.Observations.Api.IntegrationTests.Extensions
             var fileContentResult = (FileContentResult)response;
             return fileContentResult.FileContents;
         }
+
+        public static T GetResultObject<T>(this IActionResult response)
+        {
+            var okObjectResult = (OkObjectResult)response;
+            return (T)okObjectResult.Value;
+        }
     }
 }

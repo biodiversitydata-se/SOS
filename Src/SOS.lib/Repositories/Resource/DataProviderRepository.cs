@@ -40,7 +40,7 @@ namespace SOS.Lib.Repositories.Resource
         /// <inheritdoc />
         public override async Task<List<DataProvider>> GetAllAsync()
         {
-            var allDataProviders = await base.GetAllAsync();
+            var allDataProviders = await base.GetAllAsync();            
             return allDataProviders.OrderBy(provider => provider.Id).ToList();
         }
 

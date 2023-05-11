@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Entities.Artportalen;
-using SOS.Import.Repositories.Source.Artportalen;
-using SOS.Import.Services.Interfaces;
+using SOS.Harvest.Entities.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
@@ -45,7 +45,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>());
+            var result = await TestObject.GetByIdsAsync(It.IsAny<IEnumerable<int>>());
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetByIdsAsync(new []{1,2}, It.IsAny<bool>());
+            var result = await TestObject.GetByIdsAsync(new []{1,2});
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

@@ -1,56 +1,65 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <UserSecretsId>92cd2cdb-499c-480d-9f04-feaf7a68f89c</UserSecretsId>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<UserSecretsId>92cd2cdb-499c-480d-9f04-feaf7a68f89c</UserSecretsId>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="xunit.runner.json" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="xunit.runner.json" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="6.1.0" />
-    <PackageReference Include="Hangfire.Core" Version="1.7.25" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="FluentAssertions" Version="6.10.0" />
+		<PackageReference Include="Hangfire.Core" Version="1.7.34" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+		<PackageReference Include="Moq" Version="4.18.4" />
+		<PackageReference Include="xunit" Version="2.4.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Src\SOS.Export\SOS.Export.csproj" />
-    <ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
-    <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Src\SOS.Export\SOS.Export.csproj" />
+		<ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
+		<ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Resources\DefaultTestObservation.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Vocabularies.msgpck">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\TenProcessedTestObservations.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="Resources\DefaultTestObservation.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies.msgpck">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\TenProcessedTestObservations.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-    <Folder Include="Repositories\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Helpers\" />
+		<Folder Include="Repositories\" />
+	</ItemGroup>
 
 </Project>

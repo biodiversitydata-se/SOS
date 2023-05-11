@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using SOS.Lib.Models.Gis;
-
-
-namespace SOS.Observations.Api.Dtos
+﻿namespace SOS.Observations.Api.Dtos
 {
     public class GeoGridCellDto
     {

@@ -3,9 +3,10 @@ using System.Threading.Tasks;
 using Hangfire;
 using SOS.Export.Models;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
@@ -26,11 +27,11 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
-        Task<string> CreateDwcArchiveFileAsync(
+        Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider, 
-            FilterBase filter,
+            SearchFilter filter,
             string fileName,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken);
@@ -49,11 +50,11 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
-        Task<string> CreateDwcArchiveFileAsync(
+        Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider, 
-            FilterBase filter,
+            SearchFilter filter,
             string fileName,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
             ProcessInfo processInfo,
             string exportFolderPath,
@@ -62,12 +63,16 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <summary>
         /// Write part of DwC-A CSV files to disk.
         /// </summary>
+        /// <param name="dataProvider"></param>
         /// <param name="dwcObservations"></param>
         /// <param name="filePathByFilePart"></param>
+        /// <param name="checkForIllegalCharacters"></param>
         /// <returns></returns>
         Task WriteHeaderlessDwcaFiles(
+            DataProvider dataProvider,
             ICollection<Observation> dwcObservations,
-            Dictionary<DwcaFilePart, string> filePathByFilePart);
+            Dictionary<DwcaFilePart, string> filePathByFilePart,
+            bool checkForIllegalCharacters = false);
 
         /// <summary>
         /// Create a DwC-A file for a data provider.

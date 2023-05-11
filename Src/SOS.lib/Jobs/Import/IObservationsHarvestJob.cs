@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hangfire;
-using SOS.Lib.Enums;
+using SOS.Lib.HangfireAttributes;
 
 namespace SOS.Lib.Jobs.Import
 {
@@ -13,22 +13,25 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [JobExpirationTimeout(Minutes = 60 * 24 * 3)]
         [DisableConcurrentExecution(45)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        [DisplayName("Full Harvest Observations")]
+        [JobDisplayName("Full Observations Harvest")]
         [Queue("high")]
         Task<bool> RunFullAsync(IJobCancellationToken cancellationToken);
 
         /// <summary>
-        ///     Incremental harvest of multiple sources, start processing when done
+        ///  Incremental harvest of multiple sources, start processing when done
         /// </summary>
+        /// <param name="fromDate"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [JobExpirationTimeout(Minutes = 0)]
         [DisableConcurrentExecution(45)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        [DisplayName("Incremental Harvest Observations, active instance")]
+        [JobDisplayName("Incremental Harvest Observations, active instance")]
         [Queue("high")]
-        Task<bool> RunIncrementalActiveAsync(IJobCancellationToken cancellationToken);
+        Task<bool> RunIncrementalActiveAsync(DateTime? fromDate, IJobCancellationToken cancellationToken);
 
         /// <summary>
         ///     Incremental harvest of multiple sources, start processing when done
@@ -37,7 +40,7 @@ namespace SOS.Lib.Jobs.Import
         /// <returns></returns>
         [DisableConcurrentExecution(45)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        [DisplayName("Incremental Harvest Observations, inactive instance")]
+        [JobDisplayName("Incremental Harvest Observations, inactive instance")]
         [Queue("high")]
         Task<bool> RunIncrementalInactiveAsync(IJobCancellationToken cancellationToken);
 
@@ -49,6 +52,7 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [DisableConcurrentExecution(45)]
+        [JobDisplayName("Harvest and process observations from passed provides")]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         Task<bool> RunAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
@@ -62,10 +66,19 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [DisableConcurrentExecution(45)]
+        [JobDisplayName("Harvest observations from passed provides")]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]
         Task<bool> RunHarvestObservationsAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
+            IJobCancellationToken cancellationToken);
+
+        [JobExpirationTimeout(Minutes = 0)]
+        [JobDisplayName("Harvest specific observations from Artportalen")]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
+        [Queue("high")]
+        Task<bool> RunHarvestArtportalenObservationsAsync(
+            IEnumerable<int> sightingIds,
             IJobCancellationToken cancellationToken);
     }
 }

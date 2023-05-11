@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Standart.Hash.xxHash;
+using System;
 using System.Globalization;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -9,16 +9,62 @@ namespace SOS.Lib.Extensions
 {
     public static class StringExtensions
     {
-        public static string UntilNonAlfanumeric(this string value)
+        private static readonly Regex RxFromNonAlfanumeric = new Regex(@"\w+$", RegexOptions.Compiled);
+        private static readonly Regex RxUntilNonAlfanumeric = new Regex(@"\w+", RegexOptions.Compiled);
+        private static readonly Regex RxNewLineTab = new Regex(@"\r\n?|\n|\t", RegexOptions.Compiled);
+        private static readonly Regex RxIllegalCharacters = new Regex(@"\p{C}+", RegexOptions.Compiled); // Match all control characters and other non-printable characters
+
+        /// <summary>
+        /// Remove unprintable characters 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string Clean(this string value)
         {
-            var regex = new Regex(@"\w+");
-            return regex.Match(value).Value;
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return RxIllegalCharacters.Replace(value, match => // Slower, but handles new line and tab correctly.
+            {
+                if (RxNewLineTab.IsMatch(match.Value))
+                    return " ";
+                else
+                    return "";
+            }).Trim();
+        }
+
+        /// <summary>
+        /// Checks if the string contains unprintable characters.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool ContainsIllegalCharacters(this string value)
+        {
+            if (string.IsNullOrEmpty(value)) return false;
+
+            return RxIllegalCharacters.IsMatch(value);
         }
 
         public static string FromNonAlfanumeric(this string value)
         {
-            var regex = new Regex(@"\w+$");
-            return regex.Match(value).Value;
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return RxFromNonAlfanumeric.Match(value).Value;
+        }
+
+        public static string UntilNonAlfanumeric(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return RxUntilNonAlfanumeric.Match(value).Value;
         }
 
         /// <summary>
@@ -349,10 +395,23 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static string ToHash(this string source)
         {
-            var sha1 = SHA1.Create();
-            var buf = Encoding.UTF8.GetBytes(source);
-            var hash = sha1.ComputeHash(buf, 0, buf.Length);
-            return BitConverter.ToString(hash).Replace("-", "");
+            if (string.IsNullOrEmpty(source))
+            {
+                return null;
+            }
+
+            byte[] data = Encoding.UTF8.GetBytes(source);
+            return $"{xxHash3.ComputeHash(data, data.Length)}";
+        }
+
+        /// <summary>
+        /// Remove white spaces.
+        /// </summary>
+        /// <param name="self"></param>
+        /// <returns></returns>
+        public static string RemoveWhiteSpace(this string self)
+        {
+            return new string(self.Where(c => !Char.IsWhiteSpace(c)).ToArray());
         }
     }
 }

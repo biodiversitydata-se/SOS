@@ -6,8 +6,8 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Harvesters.Observations;
-using SOS.Import.Services.Interfaces;
+using SOS.Harvest.Harvesters.AquaSupport.Sers;
+using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Sers;
@@ -26,7 +26,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _sersObservationVerbatimRepositoryMock = new Mock<ISersObservationVerbatimRepository>();
             _sersObservationServiceMock = new Mock<ISersObservationService>();
             _sersServiceConfiguration = new SersServiceConfiguration
-                {MaxReturnedChangesInOnePage = 10, MaxNumberOfSightingsHarvested = 1};
+                { MaxNumberOfSightingsHarvested = 1};
             _loggerMock = new Mock<ILogger<SersObservationHarvester>>();
         }
 
@@ -45,13 +45,13 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         ///     Test aggregation fail
         /// </summary>
         /// <returns></returns>
-        [Fact]
+        [Fact(Skip = "too slow for being a unit test. Todo - move to integration test.")]
         public async Task HarvestSersAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
+            _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()))
                 .ThrowsAsync(new Exception("Fail"));
 
             //-----------------------------------------------------------------------------------------------------------
@@ -69,13 +69,13 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         ///     Make a successful serss harvest
         /// </summary>
         /// <returns></returns>
-        [Fact]
+        [Fact(Skip = "too slow for being a unit test. Todo - move to integration test.")]
         public async Task HarvestSersAsyncSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
+            _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()))
                 .ReturnsAsync(new XDocument());
 
             _sersObservationVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())

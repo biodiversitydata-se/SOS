@@ -1,6 +1,4 @@
-﻿using Nest;
-
-namespace SOS.Lib.Models.Processed.Observation
+﻿namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// Class related to data quality
@@ -10,7 +8,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Hashed key created from observation date + taxon id + position
         /// </summary>
-        [Keyword]
         public string UniqueKey { get; set; }
     }
 }

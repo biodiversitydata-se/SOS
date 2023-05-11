@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
@@ -27,7 +28,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             var observations = new List<Observation>();
             var observation = new Observation
             {
-                Location = new Location
+                Location = new Location(LocationType.Point)
                 {
                     DecimalLatitude = Coordinates.BorgholmMunicipality.Latitude,
                     DecimalLongitude = Coordinates.BorgholmMunicipality.Longitude
@@ -38,7 +39,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddAreaDataToProcessedObservations(observations);
+            _fixture.AreaHelper.AddAreaDataToProcessedLocations(observations.Select(o => o.Location));
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -57,7 +58,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             var observations = new List<Observation>();
             var observation = new Observation
             {
-                Location = new Location
+                Location = new Location(LocationType.Point)
                 {
                     DecimalLatitude = Coordinates.KalmarMunicipality.Latitude,
                     DecimalLongitude = Coordinates.KalmarMunicipality.Longitude
@@ -68,7 +69,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddAreaDataToProcessedObservations(observations);
+            _fixture.AreaHelper.AddAreaDataToProcessedLocations(observations.Select(o => o.Location));
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -87,7 +88,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             var observation = new Observation
             {
-                Location = new Location
+                Location = new Location(LocationType.Point)
                 {
                     DecimalLatitude = Coordinates.KirunaMunicipality.Latitude,
                     DecimalLongitude = Coordinates.KirunaMunicipality.Longitude
@@ -97,7 +98,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddAreaDataToProcessedObservation(observation);
+            _fixture.AreaHelper.AddAreaDataToProcessedLocation(observation.Location);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

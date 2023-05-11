@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using NetTopologySuite.Geometries;
+using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
 {
@@ -11,13 +9,20 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
     /// </summary>
     public class Site
     {
-        private GeoJsonGeometry _point;
-        private GeoJsonGeometry _pointWithBuffer;
-
         /// <summary>
         ///     Accuracy in meters
         /// </summary>
         public int Accuracy { get; set; }
+
+        /// <summary>
+        /// Bird validation areas
+        /// </summary>
+        public ICollection<string> BirdValidationAreaIds { get; set; }
+
+        /// <summary>
+        ///     Country Region
+        /// </summary>
+        public GeographicalArea CountryRegion { get; set; }
 
         /// <summary>
         ///     County of site
@@ -30,14 +35,19 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string CountyPartIdByCoordinate { get; set; }
 
         /// <summary>
-        ///     Country Region
+        ///     Diffused Point (WGS84)
         /// </summary>
-        public GeographicalArea CountryRegion { get; set; }
+        public GeoJsonGeometry<GeoJson2DCoordinates> DiffusedPoint { get; set; }
 
         /// <summary>
-        /// Bird validation areas
+        ///   Diffused Point with accuracy buffer (WGS84)
         /// </summary>
-        public ICollection<string> BirdValidationAreaIds { get; set; }
+        public GeoJsonGeometry<GeoJson2DCoordinates> DiffusedPointWithBuffer { get; set; }
+
+        /// <summary>
+        ///     Id of diffusion, 0 if no diffusion
+        /// </summary>
+        public int DiffusionId { get; set; }
 
         /// <summary>
         ///     External Id of site
@@ -45,9 +55,24 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string ExternalId { get; set; }
 
         /// <summary>
+        /// Tru if site has a geometry 
+        /// </summary>
+        public bool HasGeometry { get; set; }
+
+        /// <summary>
         ///     Id of site
         /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Included by site id property
+        /// </summary>
+        public int? IncludedBySiteId { get; set; }
+
+        /// <summary>
+        /// Bird sites are public
+        /// </summary>
+        public bool IsPrivate { get; set; }
 
         /// <summary>
         ///     Name of site
@@ -72,36 +97,12 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Point (WGS84)
         /// </summary>
-        public GeoJsonGeometry Point
-        {
-            get
-            {
-                if (_point == null)
-                {
-                    InitGeometries();
-                }
-
-                return _point;
-            }
-            set => _point = value;
-        }
+        public GeoJsonGeometry<GeoJson2DCoordinates> Point { get; set; }
 
         /// <summary>
         ///     Point with accuracy buffer (WGS84)
         /// </summary>
-        public GeoJsonGeometry PointWithBuffer
-        {
-            get
-            {
-                if (_pointWithBuffer == null)
-                {
-                    InitGeometries();
-                }
-
-                return _pointWithBuffer;
-            }
-            set => _pointWithBuffer = value;
-        }
+        public GeoJsonGeometry<GeoJson2DCoordinates> PointWithBuffer { get; set; }
 
         /// <summary>
         ///     Protected Nature
@@ -117,6 +118,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// 
         /// </summary>
         public string ProvincePartIdByCoordinate { get; set; }
+        
+        /// <summary>
+        /// Id of project
+        /// </summary>
+        public int? ProjectId { get; set; }
 
         /// <summary>
         ///     Special Protection Area, Natura 2000, Birds Directive
@@ -127,7 +133,6 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         ///     X coordinate of site
         /// </summary>
         public int XCoord { get; set; }
-
 
         /// <summary>
         ///     Y coordinate of site
@@ -150,16 +155,5 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         ///     Name of the parent site
         /// </summary>
         public string ParentSiteName { get; set; }
-
-        private void InitGeometries()
-        {
-            if (XCoord > 0 && YCoord > 0)
-            {
-                var webMercatorPoint = new Point(XCoord, YCoord);
-                var wgs84Point = (Point) webMercatorPoint.Transform(VerbatimCoordinateSystem, CoordinateSys.WGS84);
-                _point = wgs84Point?.ToGeoJson();
-                _pointWithBuffer = wgs84Point?.ToCircle(Accuracy)?.ToGeoJson();
-            }
-        }
     }
 }

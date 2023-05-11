@@ -67,7 +67,7 @@ namespace SOS.Lib.Services
                     return false;
                 }
 
-                var targetBlobClient = GetBlobClient(sourceContainer, sourceFileName);
+                var targetBlobClient = GetBlobClient(targetContainer, targetFileName);
 
                 await  targetBlobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
                 await using var sourceStream = sourceBlobClient.OpenRead(new BlobOpenReadOptions(false));

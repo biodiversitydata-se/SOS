@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using Nest;
+using System.Text.Json.Serialization;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -30,7 +31,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     (zoological) or accepted (botanical) taxon.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string AcceptedNameUsageID { get; set; }
+        public string AcceptedNameUsageId { get; set; }
 
         /// <summary>
         /// Taxon attributes.
@@ -40,7 +41,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Part of bird directive?
         /// </summary>
-        public bool? BirdDirective { get; set; }
+        public bool BirdDirective { get; set; }
 
         /// <summary>        
         ///     The full scientific name of the class in which
@@ -104,7 +105,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     See nameAccordingTo.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string NameAccordingToID { get; set; }
+        public string NameAccordingToId { get; set; }
 
         /// <summary>
         ///     A reference for the publication in which the
@@ -203,7 +204,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     IdentificationQualifier term.
         ///     Currently scientific name without author is provided.
         /// </summary>
-        [Keyword]
         public string ScientificName { get; set; }
 
         /// <summary>
@@ -292,5 +292,15 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     A common or vernacular name.
         /// </summary>
         public string VernacularName { get; set; }
+
+        /// <summary>
+        /// Verbatim id 
+        /// </summary>
+        public string VerbatimId { get; set; }
+
+        /// <summary>
+        /// Verbatim name 
+        /// </summary>
+        public string VerbatimName { get; set; }
     }
 }

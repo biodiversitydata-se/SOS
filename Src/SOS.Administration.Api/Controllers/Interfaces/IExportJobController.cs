@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Administration.Api.Controllers.Interfaces
 {
@@ -36,5 +36,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <param name="fileName"></param>
         /// <returns></returns>
         IActionResult RunExportToDoi([FromRoute] string fileName);
+
+        /// <summary>
+        /// Schedule export file to DOI job
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="cronExpression"></param>
+        /// <returns></returns>
+        IActionResult ScheduleExportToDoi([FromRoute] string fileName, string cronExpression);
     }
 }

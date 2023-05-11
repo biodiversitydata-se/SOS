@@ -1,21 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
-    <PackageReference Include="Hangfire.Core" Version="1.7.25" />
-    <PackageReference Include="MessagePack" Version="2.3.85" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="MongoDB.Driver" Version="2.19.1" />
+		<PackageReference Include="Hangfire.Core" Version="1.7.34" />
+		<PackageReference Include="MessagePack" Version="2.5.108" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="IO\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="IO\" />
+	</ItemGroup>
 
 </Project>

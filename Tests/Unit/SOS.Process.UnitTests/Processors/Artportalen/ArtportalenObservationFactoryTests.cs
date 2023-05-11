@@ -3,12 +3,10 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Process.Processors.Artportalen;
-using System;
+using SOS.Harvest.Processors.Artportalen;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SOS.Lib.Configuration.Process;
+using SOS.Harvest.Managers;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors.Artportalen
@@ -23,13 +21,18 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------            
             //Mock<
             var dataProvider = new DataProvider();
+            var processConfiguration = new ProcessConfiguration();
             var factory = new ArtportalenObservationFactory(
                 dataProvider, 
                 new Dictionary<int, Taxon>(),
                 new Dictionary<VocabularyId, IDictionary<object, int>>(),
-                false);
+                new Dictionary<int, ArtportalenObservationFactory.DatasetMapping>(),
+                false,
+                "https://artportalen-st.artdata.slu.se",
+                new ProcessTimeManager(processConfiguration),
+                processConfiguration);
             ArtportalenObservationVerbatim verbatimObservation = new ArtportalenObservationVerbatim();
-            verbatimObservation.Activity = new MetadataWithCategory(1, 1);
+            verbatimObservation.Activity = new MetadataWithCategory<int>(1, 1);
             Taxon taxon = new Taxon();
             taxon.Attributes = new TaxonAttributes();
             taxon.Attributes.OrganismGroup = "fåglar";

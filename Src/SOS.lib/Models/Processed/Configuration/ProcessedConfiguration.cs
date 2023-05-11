@@ -5,7 +5,7 @@ namespace SOS.Lib.Models.Processed.Configuration
     /// <summary>
     ///     Process configuration
     /// </summary>
-    public class ProcessedConfiguration : IEntity<byte>
+    public class ProcessedConfiguration : IEntity<string>
     {
         /// <summary>
         ///     Active instance 0 or 1
@@ -15,6 +15,6 @@ namespace SOS.Lib.Models.Processed.Configuration
         /// <summary>
         ///     Id of configuration (always 0)
         /// </summary>
-        public byte Id { get; set; }
+        public string Id { get; set; }
     }
 }

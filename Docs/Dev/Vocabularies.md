@@ -18,7 +18,7 @@ public enum VocabularyId
     LifeStage = 6,
     Biotope = 7,
     Substrate = 8,
-    ValidationStatus = 9,
+    VerificationStatus = 9,
     Institution = 10,
     Unit = 11,
     BasisOfRecord = 12,
@@ -52,7 +52,7 @@ Their values are stored as JSON files in the _Src\SOS.Import\Resources\Vocabular
 
 **Process [Vocabulary]**
 1.  Add a property of type _VocabularyValue_ to the _Observation_ class (or one that is referenced by the _Observation_ class) , for the new field.
-2.  Update the process for the data providers that support this field. For Artportalen, the _SOS.Process.Processors.Artportalen.ArtportalenProcessor_ class needs to be updated.
+2.  Update the process for the data providers that support this field. For Artportalen, the _SOS.Harvest.Processors.Artportalen.ArtportalenObservationProcessor_ class needs to be updated.
 
 **Resolve vocabulary values**<br/>
 Add the new field name to the following classes when resolving field mapped values:

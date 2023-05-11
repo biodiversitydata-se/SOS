@@ -8,6 +8,7 @@ This page provides information about how to use the search filter parameters.
   * [OnlyStartDate filter type](#onlystartdate-filter-type)
   * [OnlyEndDate filter type](#onlyenddate-filter-type)
   * [TimeRanges](#timeranges)
+  * [Modified date filter](#modifieddate)
 - [Geographics filter](#geographics-filter)
   * [Search for observations in area](#search-for-observations-in-area)
   * [Search for observations in multiple areas of same type](#search-for-observations-in-multiple-areas-of-same-type)
@@ -23,9 +24,10 @@ This page provides information about how to use the search filter parameters.
   * [Taxon lists](#taxon-lists)
   * [Search for observations with taxon lists - merge](#search-for-observations-with-taxon-lists---merge)
   * [Search for observations with taxon lists - filter](#search-for-observations-with-taxon-lists---filter)
+  * [Search for observations with taxon categories](#search-for-observations-with-taxon-categories)
 - [Projects filter](#projects-filter)
 - [Occurrence status filter](#occurrence-status-filter)
-- [Validation status filter](#validation-status-filter)
+- [Verification status filter](#verification-status-filter)
 - [Determination filter](#determination-filter)
 - [NotRecovered filter](#notrecovered-filter)
 - [BirdNestActivityLimit filter](#birdnestactivitylimit-filter)
@@ -159,6 +161,17 @@ This filter will return observations where the hour part of `observation.event.s
 | Afternoon | 18:00-23:00 |
 | Evening | 23:00-04:00 |
 
+### ModifiedDate
+
+This filter will return observations that is modified between `2021-01-01` and `2021-02-31`.
+```json
+{        
+  "modifiedDate": {
+    "from": "2021-01-01",
+    "to": "2021-02-31"
+  }
+}
+```
 
 ## Geographics filter
 
@@ -400,12 +413,24 @@ The following taxon lists exists:
 | 10 	| 8 	| Habitats directive Annex 2, priority species 	| Habitatdirektivets bilaga 2 (prioriterad art) 	|
 | 11 	| 8 	| Habitats directive Annex 4 	| Habitatdirektivets bilaga 4 	|
 | 12 	| 8 	| Habitats directive Annex 5 	| Habitatdirektivets bilaga 5 	|
-| 13 	|  	| Birds 	| Fåglar 	|
+| 13 	|  	| Birds Directive	| Fågeldirektivet 	|
 | 14 	| 13 	| Priority birds 	| Prioriterade fåglar 	|
 | 15 	| 13 	| Birds directive - Annex 1 	| Fågeldirektivet - bilaga 1 	|
 | 16 	| 13 	| Birds directive - Annex 2 	| Fågeldirektivet - bilaga 2 	|
 | 17 	|  	| Action plan 	| Åtgärdsprogram 	|
 | 18 	|  	| Swedish forest agency nature conservation species 	| Skogsstyrelsens naturvårdsarter 	|
+| 19 	| 6	| Risk assessment - Severe impact 	| Risklista - Mycket hög risk (SE) 	|
+| 20 	| 6	| Risk assessment - High impact 	| Risklista - Hög risk (HI) 	|
+| 21 	| 6	| Risk assessment - Potentially high impact 	| Risklista - Potentiellt hög risk (PH) 	|
+| 22 	| 6	| Risk assessment - Low impact 	| Risklista - Låg risk (LO) 	|
+| 23 	| 6	| Risk assessment - No known impact 	| Risklista - Ingen känd risk (NK) 	|
+| 24 	| 7	| Red listed species - Near threatened (NT) | Rödlista - Nära hotad (NT) 	|
+| 25 	| 7	| Red listed species - Vulnerable (VU) | Rödlista - Sårbar (VU)	|
+| 26 	| 7	| Red listed species - Endangered (EN) | Rödlista - Starkt hotad (EN) |
+| 27 	| 7	| Red listed species - Critically endangered (CR) | Rödlista - Akut hotad (CR) |
+| 28 	| 7	| Red listed species - Nationally extinct (RE) | Rödlista - Nationellt utdöd (RE) |
+| 29 	| 7	| Red listed species - Data deficient  (DD) | Rödlista - Kunskapsbrist (DD) |
+
 
 ### Search for observations with taxon lists - merge
 
@@ -435,6 +460,19 @@ This filter will return observations for mammal (TaxonId=4000107) species that a
 }
 ```
 
+### Search for observations with taxon categories
+
+This filter will return observations for bird species. The taxon categories can be found [here](Vocabularies.md#taxonCategory).
+```json
+{        
+    "taxon" : {
+        "ids": [4000104],
+        "includeUnderlyingTaxa": true,
+        "taxonCategories": [17]
+    }
+}
+```
+
 ## Projects filter
 This filter will return observations in the project ArtArken
 ```json
@@ -459,18 +497,18 @@ This filter will return observations with occurrenceStatus "absent"
 }
 ```
 
-## Validation status filter
-This filter will return only validated observations.
+## Verification status filter
+This filter will return only verified observations.
 ```json
 {
-    "validationStatus": "Validated"
+    "verificationStatus": "Verified"
 }
 ```
 
-This filter will return only non validated observations.
+This filter will return only non verified observations.
 ```json
 {
-    "validationStatus": "NotValidated"
+    "verificationStatus": "NotVerified"
 }
 ```
 
@@ -497,12 +535,21 @@ This filter will only return observations where `observation.occurrence.isNotRed
 }
 ```
 
-This filter will only return observations where `observation.occurrence.isNotRediscoveredObservation=true`.
+This filter will only return observations where `observation.occurrence.isNotRediscoveredObservation=true`. About 230k observations.
 ```json
 {
     "notRecoveredFilter": "OnlyNotRecovered"
 }
 ```
+
+Don't apply this filter (default)
+```json
+{
+    "notRecoveredFilter": "NoFilter"
+}
+```
+
+`occurrence.isNotRediscoveredObservation` - *Indicates if this observation is a not rediscovered observation. "Not rediscovered observation" is an observation that says that the specified species was not found in a location where it has previously been observed.*
 
 ## BirdNestActivityLimit filter
 This filter returns observations where `observation.occurrence.birdNestActivityId` is lower than or equal to the filter value.
@@ -532,7 +579,7 @@ This filter returns observations that are observed by the user specified in the 
 With output you can specify which fields that should be included in the result. The default is the `Minimum` field set (the 22 most important fields). Fields with null value are never returned.
 
 ### fieldSet
-There are four predefined field sets to choose from: [Minimum](FieldSets.md#Minimum), [Extended](FieldSets.md#Extended), [AllWithKnownValues](FieldSets.md#AllWithKnownValues) and [All](FieldSets.md#All). They are described on the [FieldSet documentation page](FieldSets.md)
+There are four predefined field sets to choose from: [Minimum](FieldSets.md#Minimum), [Extended](FieldSets.md#Extended), [AllWithValues](FieldSets.md#AllWithValues) and [All](FieldSets.md#All). They are described on the [FieldSet documentation page](FieldSets.md)
 
 This filter will return all fields defined in the [Extended](FieldSets.md#Extended) field set.
 ```json
@@ -589,8 +636,8 @@ If you specify `fields` without specifying `fieldSet`, you will retrieve only th
             "occurrenceId": "urn:lsid:artportalen.se:Sighting:15959565"
         },
         "event": {
-            "endDate": "2014-06-06T22:00:00Z",
-            "startDate": "2014-06-06T22:00:00Z"
+            "endDate": "2014-06-07T00:00:00+02:00",
+            "startDate": "2014-06-07T00:00:00+02:00"
         }
     }]
 }

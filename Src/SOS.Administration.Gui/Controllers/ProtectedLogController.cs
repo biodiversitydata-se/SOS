@@ -69,6 +69,7 @@ namespace SOS.Administration.Gui.Controllers
                 csvWriter.WriteField("Taxon Name");
                 csvWriter.WriteField("Taxon Scientific Name");
                 csvWriter.WriteField("Taxon Protection Level");
+                csvWriter.WriteField("Taxon Sensitivity Category");
                 csvWriter.NextRecord();
 
                 foreach (var logRow in logData)
@@ -91,6 +92,7 @@ namespace SOS.Administration.Gui.Controllers
                         csvWriter.WriteField(obs.TaxonCommonName);
                         csvWriter.WriteField(obs.TaxonScientificName);
                         csvWriter.WriteField(obs.TaxonProtectionLevel?.ToString());
+                        csvWriter.WriteField(obs.TaxonSensitivityCategory?.ToString());
                         csvWriter.NextRecord();
                     }
                 }

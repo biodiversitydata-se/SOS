@@ -16,6 +16,14 @@
     public class Organism
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public Organism()
+        {
+
+        }
+
+        /// <summary>
         ///     An identifier for the Organism instance (as opposed to a particular digital record of the Organism).
         ///     May be a globally unique identifier or an identifier specific to the data set.
         /// </summary>

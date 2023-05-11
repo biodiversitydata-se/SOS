@@ -1,5 +1,4 @@
-﻿using SOS.Lib.Models.Search;
-using SOS.Lib.Models.Shared;
+﻿using SOS.Lib.Models.Shared;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,6 +10,7 @@ using Newtonsoft.Json;
 using Microsoft.Extensions.Options;
 using SOS.Administration.Gui.Dtos;
 using SOS.Administration.Gui.Dtos.Enum;
+using SOS.Lib.Models.Search.Result;
 
 namespace SOS.Administration.Gui.Services
 {

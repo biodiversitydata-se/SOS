@@ -3,7 +3,7 @@ Several endpoints supports specifying which fields in an observation you want to
 
 - [Minimum (default)](#Minimum)
 - [Extended](#Extended) 
-- [AllWithKnownValues](#All)
+- [AllWithValues](#All)
 - [All](#All)
 
 ## Minimum
@@ -21,14 +21,16 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;occurrence.organismQuantityInt | int32 | 1 |
 | &nbsp;&nbsp;occurrence.organismQuantityUnit | VocabularyValue[\<unit\>](Vocabularies.md#unit) | \{ "id":1, "value":"plantor/tuvor" \} |
 | **Event** 	| 	|  	|  	|
-| &nbsp;&nbsp;event.startDate | DateTime? | "2008-07-07T09:00:00Z" |
-| &nbsp;&nbsp;event.endDate | DateTime? | "2008-07-07T10:30:00Z" |
+| &nbsp;&nbsp;event.startDate | DateTime? | "2008-07-07T11:00:00+02:00" |
+| &nbsp;&nbsp;event.endDate | DateTime? | "2008-07-07T12:30:00+02:00" |
 | **Identification** 	| 	|  	|  	|
-| &nbsp;&nbsp;identification.validated | boolean | true |
+| &nbsp;&nbsp;identification.verified | boolean | true |
 | &nbsp;&nbsp;identification.uncertainIdentification | boolean | false |
 | **Location** 	| 	|  	|  	|
 | &nbsp;&nbsp;location.decimalLatitude | double? | 57.4303 |
 | &nbsp;&nbsp;location.decimalLongitude | double? | 16.66547 |
+| &nbsp;&nbsp;location.Sweref99TmX | double? | 661035 |
+| &nbsp;&nbsp;location.Sweref99TmY | double? | 6569227 |
 | &nbsp;&nbsp;location.coordinateUncertaintyInMeters | int32? | 100 |
 | &nbsp;&nbsp;location.county | Area[\<county\>](Areas.md#County-Län) | \{ "featureId":"8", "name":"Kalmar" \} |
 | &nbsp;&nbsp;location.municipality | Area[\<municipality\>](Areas.md#Municipality-Kommun) | \{ "featureId":"882", "name":"Oskarshamn" \} |
@@ -50,7 +52,7 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;ownerInstitutionCode | string | "SLU Artdatabanken" |
 | &nbsp;&nbsp;basisOfRecord | VocabularyValue[\<basisOfRecord\>](Vocabularies.md#basisOfRecord) | \{ "id":0, "value":"HumanObservation" \} |
 | &nbsp;&nbsp;rightsHolder 	| string | "Landsorts fågelstation" |
-| &nbsp;&nbsp;modified 	| DateTime?	| "2008-07-18T13:19:00Z" |
+| &nbsp;&nbsp;modified 	| DateTime?	| "2008-07-18T15:19:00+02:00" |
 | &nbsp;&nbsp;measurementOrFacts\[\]<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementID<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementType<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementValue<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementUnit | Collection[\<ExtendedMeasurementOrFact\>](https://tools.gbif.org/dwca-validator/extension.do?id=http://rs.iobis.org/obis/terms/ExtendedMeasurementOrFact) | [\{<br/>&nbsp;"measurementID" : "3503-592",<br/>&nbsp;"measurementType" : "Typ av substrat",<br/>&nbsp;"measurementValue" : "silt/lera"<br/>\}] |
 | &nbsp;&nbsp;projects\[\]<br/>&nbsp;&nbsp;&nbsp;&nbsp;.id<br/>&nbsp;&nbsp;&nbsp;&nbsp;.name<br/>&nbsp;&nbsp;&nbsp;&nbsp;.owner<br/>&nbsp;&nbsp;&nbsp;&nbsp;.projectParameters\[\] | Collection\<Project\> | [\{<br/>&nbsp;&nbsp;"id" : 774,<br/>&nbsp;&nbsp;"name" : "Inventering av vedsvampar",<br/>&nbsp;&nbsp;"owner" : "Tom Volgers",<br/>&nbsp;&nbsp;"projectParameters" : [\{<br/>&nbsp;&nbsp;&nbsp;&nbsp;"id" : 18,<br/>&nbsp;&nbsp;&nbsp;&nbsp;"name" : "Trädvitalitet",<br/>&nbsp;&nbsp;&nbsp;&nbsp;"value" : "Naturlig låga"<br/>&nbsp;&nbsp;&nbsp;&nbsp;"dataType" : "string"<br/>&nbsp;\}]<br/>\}] |
 | **Occurrence** 	| 	|  	|  	|
@@ -72,7 +74,7 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;occurrence.lifeStage | VocabularyValue[\<lifeStage\>](Vocabularies.md#lifeStage) | \{ "id":24, "value":"larv/nymf" \} |
 | &nbsp;&nbsp;occurrence.reproductiveCondition | VocabularyValue[\<reproductiveCondition\>](Vocabularies.md#reproductiveCondition) | \{ "id":13, "value":"ruvfläckar" \} |
 | &nbsp;&nbsp;occurrence.sex | VocabularyValue[\<sex\>](Vocabularies.md#sex) | \{ "id":2, "value":"hona" \} |
-| &nbsp;&nbsp;occurrence.protectionLevel | int32 | 1 |
+| &nbsp;&nbsp;occurrence.sensitivityCategory | int32 | 1 |
 | &nbsp;&nbsp;occurrence.isNaturalOccurrence | boolean | true |
 | &nbsp;&nbsp;occurrence.isNeverFoundObservation | boolean | false |
 | &nbsp;&nbsp;occurrence.isNotRediscoveredObservation | boolean | false |
@@ -81,8 +83,12 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;occurrence.length	| int32	| 487 |
 | &nbsp;&nbsp;occurrence.weight	| int32	| 900 |
 | **Event** 	| 	|  	|  	|
-| &nbsp;&nbsp;event.startDate | DateTime? | "2008-07-07T09:00:00Z" |
-| &nbsp;&nbsp;event.endDate | DateTime? | "2008-07-07T10:30:00Z" |
+| &nbsp;&nbsp;event.startDate 	| DateTime? 	| "2008-07-07T11:00:00+02:00" 	|
+| &nbsp;&nbsp;event.endDate 	| DateTime? 	| "2008-07-07T12:30:00+02:00" 	|
+| &nbsp;&nbsp;event.plainStartDate 	| string 	| "2008-07-07" 	|
+| &nbsp;&nbsp;event.plainEndDate 	| string 	| "2008-07-07" 	|
+| &nbsp;&nbsp;event.plainStartTime 	| string 	| "11:00" 	|
+| &nbsp;&nbsp;event.plainEndTime 	| string 	| "12:30" 	|
 | &nbsp;&nbsp;event.habitat | string | "Åker" |
 | &nbsp;&nbsp;event.eventRemarks | string | "Tall herbs and young trees mixed with old oaks." |
 | &nbsp;&nbsp;event.samplingEffort | string | "1 day survey of a 100 m^2 area" |
@@ -91,9 +97,9 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;event.sampleSizeValue | string | "100" |
 | &nbsp;&nbsp;event.measurementOrFacts\[\]<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementID<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementType<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementValue<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementUnit | Collection[\<ExtendedMeasurementOrFact\>](https://tools.gbif.org/dwca-validator/extension.do?id=http://rs.iobis.org/obis/terms/ExtendedMeasurementOrFact) | [\{<br/>&nbsp;"measurementType" : "Vegetationsyteareal",<br/>&nbsp;"measurementValue" : "100",<br/>&nbsp;"measurementUnit" : "m^2"<br/>\}] |
 | **Identification** 	| 	|  	|  	|
-| &nbsp;&nbsp;identification.validated | boolean | true |
+| &nbsp;&nbsp;identification.verified | boolean | true |
 | &nbsp;&nbsp;identification.uncertainIdentification | boolean | false |
-| &nbsp;&nbsp;identification.validationStatus | VocabularyValue[\<validationStatus\>](Vocabularies.md#validationStatus) | \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \} |
+| &nbsp;&nbsp;identification.verificationStatus | VocabularyValue[\<verificationStatus\>](Vocabularies.md#verificationStatus) | \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \} |
 | &nbsp;&nbsp;identification.confirmedBy | string | "Gerhard Boré" |
 | &nbsp;&nbsp;identification.identifiedBy | string | "Mårten Ilidasch" |
 | &nbsp;&nbsp;identification.verifiedBy | string | "Lennart Lasseman" |
@@ -121,11 +127,16 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;taxon.phylum | string | "Tracheophyta" |
 | &nbsp;&nbsp;taxon.kingdom | string | "Plantae" |
 | &nbsp;&nbsp;taxon.taxonId | string | "urn:lsid:dyntaxa.se:Taxon:221501" |
-| &nbsp;&nbsp;taxon.attributes.protectionLevel | VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel) | \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \} |
+| &nbsp;&nbsp;taxon.attributes.sensitivityCategory | VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel) | \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \} |
 | &nbsp;&nbsp;taxon.attributes.redlistCategory | string | "LC" |
-| &nbsp;&nbsp;taxon.attributes.protectedByLaw | boolean? | true |
+| &nbsp;&nbsp;taxon.attributes.isRedlisted | boolean | true |
+| &nbsp;&nbsp;taxon.attributes.isInvasiveInSweden | boolean	| true	|
+| &nbsp;&nbsp;taxon.attributes.isInvasiveAccordingToEuRegulation | boolean	| true	|
+| &nbsp;&nbsp;taxon.attributes.invasiveRiskAssessmentCategory | string	| SE	|
+| &nbsp;&nbsp;taxon.attributes.protectedByLaw | boolean | true |
+| &nbsp;&nbsp;taxon.attributes.taxonCategory | VocabularyValue[\<taxonCategory\>](Vocabularies.md#taxonCategory)	| \{ "id":17, "value":"Art" \}	|
 
-## AllWithKnownValues
+## AllWithValues
 All fields that are described on the [Observation documentation page](Observation.md) where there exist at least one value, i.e. all that contain an example value.
 
 ## All

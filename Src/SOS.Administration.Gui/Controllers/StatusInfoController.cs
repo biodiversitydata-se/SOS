@@ -49,11 +49,13 @@ namespace SOS.Administration.Gui.Controllers
         public IEnumerable<ProcessInfoDto> GetProcessInfo()
         {
             var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
-            var collection = database.GetCollection<ProcessInfoDto>("ProcessInfo");
-            var providers = collection.Find(new BsonDocument());
-            var providerList = providers.SortByDescending(p => p.End).ToList();
-            providerList.Where(g => g.ProvidersInfo != null).ToList();
-            return providerList;
+            var queryBuilder = Builders<ProcessInfoDto>.Filter;
+            var query = queryBuilder.Regex(pi => pi.Id, @"observation-\d");
+            var processInfos = database.GetCollection<ProcessInfoDto>("ProcessInfo")
+            .Find(query)
+            .SortByDescending(p => p.End);
+
+            return processInfos?.ToList();
         }
         [HttpGet]
         [Route("activeinstance")]
@@ -61,8 +63,8 @@ namespace SOS.Administration.Gui.Controllers
         {
             var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
             var collection = database.GetCollection<ActiveInstanceInfoDto>("ProcessedConfiguration");
-            var instance = collection.Find(new BsonDocument()).ToList();
-            return instance.FirstOrDefault();
+            var instance = collection.Find(new BsonDocument())?.ToList();
+            return instance.FirstOrDefault(i => i.Id.Equals("Observation", System.StringComparison.CurrentCultureIgnoreCase));
         }
         [HttpGet]
         [Route("processing")]

@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Moq;
-using SOS.Import.Entities.Artportalen;
-using SOS.Import.Repositories.Source.Artportalen;
-using SOS.Import.Services.Interfaces;
+using SOS.Harvest.Entities.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
@@ -48,12 +46,15 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetChunkAsync(0, 10);
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetChunkAsync(0, 10);
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
@@ -97,12 +98,15 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetIdSpanAsync();
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetIdSpanAsync();
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().Be((0,0));
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>

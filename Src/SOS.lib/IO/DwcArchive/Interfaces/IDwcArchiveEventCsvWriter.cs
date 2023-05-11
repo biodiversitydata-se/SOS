@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using SOS.Export.Models;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.IO.DwcArchive.Interfaces
@@ -21,10 +21,10 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<bool> CreateEventCsvFileAsync(
-            FilterBase filter,
+            SearchFilter filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IJobCancellationToken cancellationToken);
 
         /// <summary>

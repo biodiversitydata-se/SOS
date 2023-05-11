@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Enums;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers.Interfaces
 {
@@ -14,5 +15,12 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="cache"></param>
         /// <returns></returns>
         IActionResult DeleteCache(Cache cache);
+
+        /// <summary>
+        /// Get a cache.
+        /// </summary>
+        /// <param name="cache"></param>
+        /// <returns></returns>
+        public Task<IActionResult> GetCache([FromRoute] Cache cache);
     }
 }

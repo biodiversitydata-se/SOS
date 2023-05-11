@@ -10,10 +10,15 @@ namespace SOS.Lib.Services
     public class FileService : IFileService
     {
         /// <inheritdoc />
+        public void CompressDirectory(string folderPath, string targetPath)
+        {
+            ZipFile.CreateFromDirectory(folderPath, targetPath);
+        }
+
         public string CompressFolder(string path, string folderName)
         {
             var zipFilePath = Path.Join(path, $"{folderName}.zip");
-            ZipFile.CreateFromDirectory($"{path}/{folderName}", zipFilePath);
+            CompressDirectory($"{path}/{folderName}", zipFilePath);
             return zipFilePath;
         }
 

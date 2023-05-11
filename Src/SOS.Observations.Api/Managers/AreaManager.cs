@@ -17,7 +17,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
@@ -69,7 +69,7 @@ namespace SOS.Observations.Api.Managers
                 };
 
                 var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
-                serializeOptions.Converters.Add(new GeometryConverter());
+                serializeOptions.Converters.Add(new GeoJsonConverter(true)); // Länsstyrelsen fix. Expects capital letter.
                 serializeOptions.Converters.Add(new JsonStringEnumConverter());
 
                 var areaString = JsonSerializer.Serialize(externalArea, serializeOptions);
@@ -79,81 +79,6 @@ namespace SOS.Observations.Api.Managers
             {
                 _logger.LogError(e, "Failed to get area");
                 return null;
-            }
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="areaCache"></param>
-        /// <param name="logger"></param>
-        public AreaManager(
-        IAreaCache areaCache,
-        ILogger<AreaManager> logger)
-        {
-            _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
-
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<AreaBaseDto>> GetAreasAsync(IEnumerable<(AreaTypeDto, string)> areaKeys)
-        {
-            try
-            {
-                var areas = await _areaCache.GetAreasAsync(areaKeys.Select(k => ((AreaType)k.Item1, k.Item2)));
-
-                return areas?.Select(a => new AreaBaseDto{ AreaType = (AreaTypeDto)a.AreaType, FeatureId = a.FeatureId, Name = a.Name, BoundingBox = a.BoundingBox });
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get paged list of areas");
-                return null;
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<PagedResult<AreaBaseDto>> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes,
-            string searchString, int skip, int take)
-        {
-            try
-            {
-                var result = await _areaCache.GetAreasAsync(areaTypes.Select(at => (AreaType)at), searchString, skip, take);
-
-                return new PagedResult<AreaBaseDto>
-                {
-                    Records = result.Records.Select(r => new AreaBaseDto
-                    {
-                        AreaType = (AreaTypeDto)r.AreaType,
-                        BoundingBox = r.BoundingBox,
-                        FeatureId = r.FeatureId,
-                        Name = r.Name
-                    }),
-                    Skip = result.Skip,
-                    Take = result.Take,
-                    TotalCount = result.TotalCount
-                };
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get paged list of areas");
-                return null;
-            }
-        }
-
-        public async Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId, AreaExportFormat format)
-        {
-            switch (format)
-            {
-                case AreaExportFormat.Json:
-                    return await GetZippedAreaAsJsonAsync(areaType, featureId);
-                case AreaExportFormat.GeoJson:
-                    return await GetZippedAreaAsGeoJsonAsync(areaType, featureId);
-                case AreaExportFormat.Wkt:
-                    return await GetZippedAreaAsWktAsync(areaType, featureId);
-                default:
-                    throw new ArgumentException(
-                        $"{MethodBase.GetCurrentMethod()?.Name}() does not support the value {areaType}", nameof(areaType));
             }
         }
 
@@ -221,6 +146,103 @@ namespace SOS.Observations.Api.Managers
             {
                 _logger.LogError(e, "Failed to get area");
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="areaCache"></param>
+        /// <param name="logger"></param>
+        public AreaManager(
+        IAreaCache areaCache,
+        ILogger<AreaManager> logger)
+        {
+            _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
+
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<AreaBaseDto>> GetAreasAsync(IEnumerable<(AreaTypeDto, string)> areaKeys)
+        {
+            try
+            {
+                var areas = await _areaCache.GetAreasAsync(areaKeys.Select(k => ((AreaType)k.Item1, k.Item2)));
+
+                return areas?.Select(a => new AreaBaseDto{ AreaType = (AreaTypeDto)a.AreaType, FeatureId = a.FeatureId, Name = a.Name, BoundingBox = a.BoundingBox });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get paged list of areas");
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<PagedResult<AreaBaseDto>> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes,
+            string searchString, int skip, int take)
+        {
+            try
+            {
+                var result = await _areaCache.GetAreasAsync(areaTypes.Select(at => (AreaType)at), searchString, skip, take);
+
+                return new PagedResult<AreaBaseDto>
+                {
+                    Records = result.Records.Select(r => new AreaBaseDto
+                    {
+                        AreaType = (AreaTypeDto)r.AreaType,
+                        BoundingBox = r.BoundingBox,
+                        FeatureId = r.FeatureId,
+                        Name = r.Name
+                    }),
+                    Skip = result.Skip,
+                    Take = result.Take,
+                    TotalCount = result.TotalCount
+                };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get paged list of areas");
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<AreaBaseDto> GetAreaAsync(AreaTypeDto areaType, string featureId)
+        {
+            try
+            {
+                var result = await _areaCache.GetAsync((AreaType)areaType, featureId);
+
+                return result == null ? null : new AreaBaseDto
+                {
+                    AreaType = (AreaTypeDto)result.AreaType,
+                    BoundingBox = result.BoundingBox,
+                    FeatureId = result.FeatureId,
+                    Name = result.Name
+                };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get area from cache");
+                return null;
+            }
+        }
+
+        public async Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId, AreaExportFormat format)
+        {
+            switch (format)
+            {
+                case AreaExportFormat.Json:
+                    return await GetZippedAreaAsJsonAsync(areaType, featureId);
+                case AreaExportFormat.GeoJson:
+                    return await GetZippedAreaAsGeoJsonAsync(areaType, featureId);
+                case AreaExportFormat.Wkt:
+                    return await GetZippedAreaAsWktAsync(areaType, featureId);
+                default:
+                    throw new ArgumentException(
+                        $"{MethodBase.GetCurrentMethod()?.Name}() does not support the value {areaType}", nameof(areaType));
             }
         }
 

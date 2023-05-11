@@ -76,6 +76,8 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// </summary>
         public DateTime? LatestIncrementalStart { get; set; }
 
+        public int? ProcessFailCount { get; set; }
+
         /// <summary>
         ///     Number of public observations processed
         /// </summary>

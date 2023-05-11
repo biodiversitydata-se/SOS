@@ -35,6 +35,11 @@
         public string TaxonRemarks { get; set; }
 
         /// <summary>
+        /// Valid for sighting
+        /// </summary>
+        public bool ValidForSighting { get; set; }
+
+        /// <summary>
         ///     Vernacular Name
         /// </summary>
         public string VernacularName { get; set; }

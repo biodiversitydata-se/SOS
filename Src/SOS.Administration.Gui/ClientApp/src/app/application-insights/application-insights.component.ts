@@ -27,9 +27,10 @@ export class ApplicationInsightsComponent {
     { prop: 'success', name: 'Sucess' },
     { prop: 'httpResponseCode', name: 'Http response code' },
     { prop: 'duration', name: 'Duration' },
-    { prop: 'responseCount', name: 'Count' },
+    { prop: 'observationCount', name: 'Count' },
     { prop: 'accountId', name: 'APIM account id' },
-    { prop: 'userId', name: 'User admin id' }
+    { prop: 'userId', name: 'User admin id' },
+    { prop: 'requestingSystem', name: 'Requesting system' }
   ];
   logRows: ILogRow[];
 
@@ -75,7 +76,8 @@ interface ILogRow {
   method: string;
   protectedObservations: string;
   requestBody: string;
-  responseCount: string;
+  requestingSystem: string;  
+  observationCount: string;
   success: boolean;
   userId: string;
 }

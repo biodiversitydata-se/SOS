@@ -5,7 +5,12 @@ namespace SOS.Lib.Models.Cache
     public class PositionLocation
     {
         /// <summary>
-        ///     County property
+        ///     Country region property
+        /// </summary>
+        public Area CountryRegion { get; set; }
+
+        /// <summary>
+        /// County property
         /// </summary>
         public Area County { get; set; }
 

@@ -18,25 +18,24 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Jobs;
-using SOS.Process.Managers.Interfaces;
-using SOS.Process.Processors.Artportalen.Interfaces;
-using SOS.Process.Processors.ClamPortal.Interfaces;
-using SOS.Process.Processors.FishData.Interfaces;
-using SOS.Process.Processors.Interfaces;
-using SOS.Process.Processors.Kul.Interfaces;
-using SOS.Process.Processors.Mvm.Interfaces;
-using SOS.Process.Processors.Nors.Interfaces;
-using SOS.Process.Processors.ObservationDatabase.Interfaces;
-using SOS.Process.Processors.Sers.Interfaces;
-using SOS.Process.Processors.Shark.Interfaces;
-using SOS.Process.Processors.VirtualHerbarium.Interfaces;
+using SOS.Harvest.Jobs;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
+using SOS.Harvest.Processors.FishData.Interfaces;
+using SOS.Harvest.Processors.Kul.Interfaces;
+using SOS.Harvest.Processors.Mvm.Interfaces;
+using SOS.Harvest.Processors.Nors.Interfaces;
+using SOS.Harvest.Processors.ObservationDatabase.Interfaces;
+using SOS.Harvest.Processors.Sers.Interfaces;
+using SOS.Harvest.Processors.Shark.Interfaces;
+using SOS.Harvest.Processors.VirtualHerbarium.Interfaces;
 using Xunit;
+using SOS.Lib.Repositories.Processed;
 
 namespace SOS.Process.UnitTests.Jobs
 {
@@ -50,14 +49,18 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         public ProcessJobTests()
         {
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
+            _userObservationRepositoryMock = new Mock<IUserObservationRepository>();
+            _observationDatasetRepository = new Mock<IDatasetRepository>();
+            _observationEventRepository = new Mock<IEventRepository>();
             _processInfoRepository = new Mock<IProcessInfoRepository>();
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
+            _cacheManager = new Mock<ICacheManager>();
             _instanceManager = new Mock<IInstanceManager>();
+            _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _validationManager = new Mock<IValidationManager>();
             _taxonCache =new Mock<ICache<int, Taxon>>();
             _processTaxaJob = new Mock<IProcessTaxaJob>();
-            _clamPortalProcessor = new Mock<IClamPortalObservationProcessor>();
             _fishDataProcessor = new Mock<IFishDataObservationProcessor>();
             _kulProcessor = new Mock<IKulObservationProcessor>();
             _mvmProcessor = new Mock<IMvmObservationProcessor>();
@@ -68,18 +71,24 @@ namespace SOS.Process.UnitTests.Jobs
             _virtualHerbariumProcessor = new Mock<IVirtualHerbariumObservationProcessor>();
             _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
             _areaHelper = new Mock<IAreaHelper>();
-            _loggerMock = new Mock<ILogger<ProcessJob>>();
+            _loggerMock = new Mock<ILogger<ProcessObservationsJob>>();
             _dwcaObservationProcessor = new Mock<IDwcaObservationProcessor>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _dataProviderCache = new Mock<IDataProviderCache>();
             _processConfigurationMock = new Mock<ProcessConfiguration>();
+            _dwcaDatasetProcessorMock = new Mock<IDwcaDatasetProcessor>();
+            _artportalenDatasetProcessorMock = new Mock<IArtportalenDatasetProcessor>();
+            _dwcaEventProcessorMock = new Mock<IDwcaEventProcessor>();
+            _artportalenEventProcessorMock = new Mock<IArtportalenEventProcessor>();
         }
 
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IUserObservationRepository> _userObservationRepositoryMock;
+        private readonly Mock<IDatasetRepository> _observationDatasetRepository;
+        private readonly Mock<IEventRepository> _observationEventRepository;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
         private readonly Mock<IProcessTaxaJob> _processTaxaJob;
-        private readonly Mock<IClamPortalObservationProcessor> _clamPortalProcessor;
         private readonly Mock<IFishDataObservationProcessor> _fishDataProcessor;
         private readonly Mock<IKulObservationProcessor> _kulProcessor;
         private readonly Mock<IMvmObservationProcessor> _mvmProcessor;
@@ -90,21 +99,26 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IVirtualHerbariumObservationProcessor> _virtualHerbariumProcessor;
         private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
         private readonly Mock<ICache<int, Taxon>> _taxonCache;
+        private readonly Mock<ICacheManager> _cacheManager;
+        private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
         private readonly Mock<IValidationManager> _validationManager;
         private readonly Mock<IInstanceManager> _instanceManager;
         private readonly Mock<IDataProviderCache> _dataProviderCache;
         private readonly Mock<IDwcaObservationProcessor> _dwcaObservationProcessor;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
-        private readonly Mock<ILogger<ProcessJob>> _loggerMock;
+        private readonly Mock<IDwcaDatasetProcessor> _dwcaDatasetProcessorMock;
+        private readonly Mock<IArtportalenDatasetProcessor> _artportalenDatasetProcessorMock;
+        private readonly Mock<IArtportalenEventProcessor> _artportalenEventProcessorMock;
+        private readonly Mock<IDwcaEventProcessor> _dwcaEventProcessorMock;
+        private readonly Mock<ILogger<ProcessObservationsJob>> _loggerMock;
         private readonly Mock<ProcessConfiguration> _processConfigurationMock;
 
-        private ProcessJob TestObject => new ProcessJob(
+        private ProcessObservationsJob TestObject => new ProcessObservationsJob(
             _processedObservationRepositoryMock.Object,
             _processInfoRepository.Object,
             _harvestInfoRepository.Object,
             _artportalenProcessor.Object,
-            _clamPortalProcessor.Object,
             _fishDataProcessor.Object,
             _kulProcessor.Object,
             _mvmProcessor.Object,
@@ -116,12 +130,20 @@ namespace SOS.Process.UnitTests.Jobs
             _dwcaObservationProcessor.Object,
             _taxonCache.Object,
             _dataProviderCache.Object,
-            _instanceManager.Object,
+            _cacheManager.Object,
+            _processTimeManagerMock.Object,
             _validationManager.Object,
             _processTaxaJob.Object,
             _areaHelper.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processConfigurationMock.Object,
+            _userObservationRepositoryMock.Object,
+            _observationDatasetRepository.Object,
+            _observationEventRepository.Object,
+            _dwcaDatasetProcessorMock.Object,
+            _artportalenDatasetProcessorMock.Object,
+            _artportalenEventProcessorMock.Object,
+            _dwcaEventProcessorMock.Object,
             _loggerMock.Object);
 
         /// <summary>
@@ -196,26 +218,19 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(true);
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(DateTime.Now));
+                .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now));
             _artportalenProcessor.Setup(r =>
                     r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),  JobRunModes.Full, JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen,
-                    DataProviderType.ArtportalenObservations, DateTime.Now, DateTime.Now, 1, 1));
-
-            _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ClamObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(DateTime.Now));
-            _clamPortalProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),  JobRunModes.Full, JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.ClamGateway,
-                    DataProviderType.ClamPortalObservations, DateTime.Now, DateTime.Now, 1, 1));
+                    DataProviderType.ArtportalenObservations, DateTime.Now, DateTime.Now, 1, 1, 0));
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(KulObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(
+                .ReturnsAsync(new HarvestInfo("Identifier",
                     DateTime.Now));
             _kulProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),JobRunModes.Full, JobCancellationToken.Null))
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),JobRunModes.Full,  JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.KUL, DataProviderType.KULObservations,
-                    DateTime.Now, DateTime.Now, 1, 1));
+                    DateTime.Now, DateTime.Now, 1, 1, 0));
 
             _processedObservationRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()));
             _processInfoRepository.Setup(r => r.VerifyCollectionAsync());
@@ -233,7 +248,7 @@ namespace SOS.Process.UnitTests.Jobs
             var result = await TestObject.RunAsync(
                 new List<string>
                 {
-                    DataProviderIdentifiers.Artportalen, DataProviderIdentifiers.ClamGateway,
+                    DataProviderIdentifiers.Artportalen, 
                     DataProviderIdentifiers.KUL
                 },
                 JobRunModes.Full,

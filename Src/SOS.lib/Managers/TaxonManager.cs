@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Factories;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -19,12 +18,32 @@ namespace SOS.Lib.Managers
     /// </summary>
     public class TaxonManager : ITaxonManager
     {
-        private static readonly object InitLock = new object();
+        private static readonly object InitTaxonTreeLock = new object();
+        private static readonly object InitTaxonListLock = new object();
         private readonly ILogger<TaxonManager> _logger;
         private readonly ITaxonRepository _processedTaxonRepository;
         private readonly ITaxonListRepository _taxonListRepository;
         private readonly IClassCache<TaxonTree<IBasicTaxon>> _taxonTreeCache;
         private readonly IClassCache<TaxonListSetsById> _taxonListSetsByIdCache;
+
+        private void OnTaxonTreeCacheReleased(object sender, EventArgs e)
+        {
+            PopulateTaxonTreeCache();
+        }
+
+        /// <summary>
+        /// Populate taxon tree cache
+        /// </summary>
+        /// <returns></returns>
+        private TaxonTree<IBasicTaxon> PopulateTaxonTreeCache()
+        {
+            lock (InitTaxonTreeLock)
+            {
+                var taxonTree = GetTaxonTreeAsync().Result;
+                _taxonTreeCache.Set(taxonTree);
+                return taxonTree;
+            }
+        }
 
         /// <summary>
         /// Constructor
@@ -48,6 +67,8 @@ namespace SOS.Lib.Managers
             _taxonTreeCache = taxonTreeCache ?? throw new ArgumentNullException(nameof(taxonTreeCache));
             _taxonListSetsByIdCache = taxonListSetsByIdCache ?? throw new ArgumentNullException(nameof(taxonListSetsByIdCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _taxonTreeCache.CacheReleased += OnTaxonTreeCacheReleased;
         }
 
         /// <summary>
@@ -56,34 +77,24 @@ namespace SOS.Lib.Managers
         {
             get
             {
-                var taxonTree = _taxonTreeCache.Get();
-                if (taxonTree == null)
-                {
-                    lock (InitLock)
-                    {
-                        taxonTree = GetTaxonTreeAsync().Result;
-                        _taxonTreeCache.Set(taxonTree);
-                    }
-                }
-
-                return taxonTree;
+                return _taxonTreeCache.Get() ?? PopulateTaxonTreeCache();
             }
         }
 
-        public Dictionary<int, HashSet<int>> TaxonListSetById
+        public Dictionary<int, (HashSet<int> Taxa, HashSet<int> WithUnderlyingTaxa)> TaxonListSetById
         {
             get
             {
                 var taxonListSetsById = _taxonListSetsByIdCache.Get();
                 if (taxonListSetsById == null)
                 {
-                    lock (InitLock)
+                    lock (InitTaxonListLock)
                     {
                         taxonListSetsById = GetTaxonListSetsAsync().Result;
                         _taxonListSetsByIdCache.Set(taxonListSetsById);
                     }
                 }
-
+                
                 return taxonListSetsById;
             }
         }
@@ -94,37 +105,42 @@ namespace SOS.Lib.Managers
             var taxonLists = await _taxonListRepository.GetAllAsync();
             foreach (var taxonList in taxonLists)
             {
-                taxonListSetById.Add(taxonList.Id, new HashSet<int>());
-                foreach (var taxon in taxonList.Taxa)
-                {
-                    taxonListSetById[taxonList.Id].Add(taxon.Id);
-                }
+                var tuple = (Taxa: new HashSet<int>(), WithUnderlyingTaxa: new HashSet<int>());
+                tuple.Taxa = taxonList.Taxa.Select(m => m.Id).ToHashSet();
+                tuple.WithUnderlyingTaxa = TaxonTree.GetUnderlyingTaxonIds(tuple.Taxa, true).ToHashSet();
+                taxonListSetById.Add(taxonList.Id, tuple);
             }
-
+            
             return taxonListSetById;
         }
 
         private async Task<TaxonTree<IBasicTaxon>> GetTaxonTreeAsync()
         {
             var taxa = await GetBasicTaxaAsync();
-            var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
+            var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa?.ToDictionary(t => t.Id, t => t));
             return taxonTree;
         }
 
-        private async Task<IEnumerable<BasicTaxon>> GetBasicTaxaAsync()
+        private async Task<IEnumerable<IBasicTaxon>> GetBasicTaxaAsync()
         {
             try
             {
-                const int batchSize = 200000;
+                var taxaCount = await _processedTaxonRepository.CountAllDocumentsAsync();
+                const int batchSize = 10000;
                 var skip = 0;
-                var tmpTaxa = await _processedTaxonRepository.GetBasicTaxonChunkAsync(skip, batchSize);
-                var taxa = new List<BasicTaxon>();
-
-                while (tmpTaxa?.Any() ?? false)
+                var tasks = new List<Task<IEnumerable<IBasicTaxon>>>();
+               
+                while(skip < taxaCount)
                 {
-                    taxa.AddRange(tmpTaxa);
-                    skip += tmpTaxa.Count();
-                    tmpTaxa = await _processedTaxonRepository.GetBasicTaxonChunkAsync(skip, batchSize);
+                    tasks.Add(_processedTaxonRepository.GetBasicTaxonChunkAsync(skip, batchSize));
+                    skip += batchSize;
+                }
+           
+                await Task.WhenAll(tasks);
+                var taxa = new List<IBasicTaxon>();
+                foreach (var task in tasks)
+                {
+                    taxa.AddRange(task.Result);
                 }
 
                 return taxa;

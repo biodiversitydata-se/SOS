@@ -9,18 +9,18 @@ using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Nest;
 using Newtonsoft.Json.Converters;
 using NLog.Web;
 using SOS.Export.IoC.Modules;
 using SOS.Hangfire.JobServer.Configuration;
-using SOS.Import.IoC.Modules;
+using SOS.Harvest.IoC.Modules;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Export;
@@ -33,7 +33,11 @@ using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
-using SOS.Process.IoC.Modules;
+using MassTransit;
+using SOS.Hangfire.JobServer.ServiceBus.Consumers;
+using SOS.Lib.ApplicationInsights;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using SOS.Lib.Context;
 
 namespace SOS.Hangfire.JobServer
 {
@@ -43,6 +47,8 @@ namespace SOS.Hangfire.JobServer
     public class Program
     {
         private static string _env;
+        private static ApiManagementServiceConfiguration _apiManagementServiceConfiguration;
+        private static CryptoConfiguration _cryptoConfiguration;
         private static HangfireDbConfiguration _hangfireDbConfiguration;
         private static MongoDbConfiguration _verbatimDbConfiguration;
         private static MongoDbConfiguration _processDbConfiguration;
@@ -54,6 +60,7 @@ namespace SOS.Hangfire.JobServer
         private static DataCiteServiceConfiguration _dataCiteServiceConfiguration;
         private static ApplicationInsightsConfiguration _applicationInsightsConfiguration;
         private static SosApiConfiguration _sosApiConfiguration;
+        private static UserServiceConfiguration _userServiceConfiguration;
 
         /// <summary>
         ///     Application entry point
@@ -72,6 +79,7 @@ namespace SOS.Hangfire.JobServer
             if (new[] { "local", "dev", "st", "prod", "at" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
             {
                 var host = CreateHostBuilder(args).Build();
+                HangfireJobServerContext.Host = host;
                 LogStartupSettings(host.Services.GetService<ILogger<Program>>());
                 await host.RunAsync();
             }
@@ -131,8 +139,11 @@ namespace SOS.Hangfire.JobServer
                                         MigrationStrategy = new MigrateMongoMigrationStrategy(),
                                         BackupStrategy = new CollectionMongoBackupStrategy()
                                     },
+                                    CheckQueuedJobsStrategy = _hangfireDbConfiguration.Hosts.Length == 1 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
+                                    QueuePollInterval = TimeSpan.FromSeconds(1),
                                     Prefix = "hangfire",
                                     CheckConnection = true,
+                                    JobExpirationCheckInterval = TimeSpan.FromMinutes(10)
                                 })
                     );
                     GlobalJobFilters.Filters.Add(
@@ -156,6 +167,8 @@ namespace SOS.Hangfire.JobServer
                         t => true);
 
                     // Get configuration
+                    _apiManagementServiceConfiguration = hostContext.Configuration.GetSection("ApiManagementServiceConfiguration").Get<ApiManagementServiceConfiguration>();
+                    _cryptoConfiguration = hostContext.Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>(); 
                     _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
                     _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
                     _searchDbConfiguration = hostContext.Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
@@ -173,21 +186,41 @@ namespace SOS.Hangfire.JobServer
                         .Get<ApplicationInsightsConfiguration>();
                     _sosApiConfiguration = hostContext.Configuration.GetSection(nameof(SosApiConfiguration))
                         .Get<SosApiConfiguration>();
-                    
+                    _userServiceConfiguration = hostContext.Configuration.GetSection(nameof(UserServiceConfiguration))
+                        .Get<UserServiceConfiguration>();
+
                     services.AddSingleton(_searchDbConfiguration);
                     services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(_searchDbConfiguration));
+
+                    var jobServerConfiguration = hostContext.Configuration.GetSection("JobServerConfiguration").Get<JobServerConfiguration>(); 
+                    if (jobServerConfiguration.EnableBusHarvest)
+                    {
+                        services.AddMassTransit(cfg =>
+                        {
+                            cfg.AddConsumer<ArtportalenConsumer>();
+                            cfg.UsingAzureServiceBus((context, cfg) =>
+                            {
+                                var busConfiguration = hostContext.Configuration.GetSection("BusConfiguration").Get<BusConfiguration>();
+                                cfg.Host($"Endpoint={busConfiguration.Host};SharedAccessKeyName={busConfiguration.SharedAccessKeyName};SharedAccessKey={busConfiguration.SharedAccessKey}");
+                                cfg.ReceiveEndpoint(busConfiguration.Queue, e =>
+                                {
+                                    e.MaxConcurrentCalls = 1;
+                                    e.ConfigureConsumer<ArtportalenConsumer>(context);
+                                });
+                            });
+                        });
+                    }
                 })
                 .UseServiceProviderFactory(hostContext =>
                     {
                         return new AutofacServiceProviderFactory(builder =>
                             builder
-                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration) })
-                                .RegisterModule(new ProcessModule { Configurations = (_processConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
-                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _dataCiteServiceConfiguration) })
+                                .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
+                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration,  _processDbConfiguration, _blobStorageConfiguration, _cryptoConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration) })
                         );
                     }
                 )
-                .UseNLog();
+                .UseNLog();            
         }
 
         private static void LogStartupSettings(ILogger<Program> logger)
@@ -223,13 +256,11 @@ namespace SOS.Hangfire.JobServer
 
             sb.AppendLine($"[FishDataServiceConfiguration].[BaseAddress]: {_importConfiguration.FishDataServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[FishDataServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.FishDataServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            sb.AppendLine($"[FishDataServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.FishDataServiceConfiguration.MaxReturnedChangesInOnePage}");
             sb.AppendLine($"[FishDataServiceConfiguration].[StartHarvestYear]: {_importConfiguration.FishDataServiceConfiguration.StartHarvestYear}");
             sb.AppendLine("");
 
             sb.AppendLine($"[KulServiceConfiguration].[BaseAddress]: {_importConfiguration.KulServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[KulServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            sb.AppendLine($"[KulServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.KulServiceConfiguration.MaxReturnedChangesInOnePage}");
             sb.AppendLine($"[KulServiceConfiguration].[StartHarvestYear]: {_importConfiguration.KulServiceConfiguration.StartHarvestYear}");
             sb.AppendLine("");
 
@@ -239,13 +270,11 @@ namespace SOS.Hangfire.JobServer
 
             sb.AppendLine($"[NorsServiceConfiguration].[BaseAddress]: {_importConfiguration.NorsServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[NorsServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.NorsServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            sb.AppendLine($"[NorsServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.NorsServiceConfiguration.MaxReturnedChangesInOnePage}");
             sb.AppendLine($"[NorsServiceConfiguration].[StartHarvestYear]: {_importConfiguration.NorsServiceConfiguration.StartHarvestYear}");
             sb.AppendLine("");
 
             sb.AppendLine($"[SersServiceConfiguration].[BaseAddress]: {_importConfiguration.SersServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[SersServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.SersServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            sb.AppendLine($"[SersServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.SersServiceConfiguration.MaxReturnedChangesInOnePage}");
             sb.AppendLine($"[SersServiceConfiguration].[StartHarvestYear]: {_importConfiguration.SersServiceConfiguration.StartHarvestYear}");
             sb.AppendLine("");
 

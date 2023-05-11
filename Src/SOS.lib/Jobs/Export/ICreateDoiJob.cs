@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.Jobs.Export
 {
@@ -16,6 +16,7 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="emailAddress"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [JobDisplayName("Create a DwC-A file using passed filter and give it a DOI")]
         [Queue("medium")]
         Task<bool> RunAsync(SearchFilter filter, string emailAddress, IJobCancellationToken cancellationToken);
     }

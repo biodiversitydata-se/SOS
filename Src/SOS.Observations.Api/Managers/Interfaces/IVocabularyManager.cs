@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.TaxonListService;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {
@@ -12,12 +10,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
     /// </summary>
     public interface IVocabularyManager
     {
-        /// <summary>
-        ///     Get vocabularies.
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<ProjectInfo>> GetProjectsAsync();
-
         /// <summary>
         ///     Get vocabularies.
         /// </summary>

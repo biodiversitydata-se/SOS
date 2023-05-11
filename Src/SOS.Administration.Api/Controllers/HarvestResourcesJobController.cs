@@ -89,5 +89,26 @@ namespace SOS.Administration.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("HarvestArtportalenDatasetMetadata/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunHarvestArtportalenDatasetMetadataJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IArtportalenDatasetMetadataHarvestJob>(job => job.RunAsync());
+                return new OkObjectResult("Artportalen dataset metadata harvest job was enqueued to Hangfire.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Enqueuing Artportalen dataset metadata harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

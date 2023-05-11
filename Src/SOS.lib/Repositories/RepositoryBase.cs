@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
@@ -36,16 +37,18 @@ namespace SOS.Lib.Repositories
         }
 
         /// <summary>
+        /// Add batch of items to mongodb
         /// </summary>
         /// <param name="batch"></param>
         /// <param name="mongoCollection"></param>
+        /// <param name="attempt"></param>
         /// <returns></returns>
-        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection)
+        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection, byte attempt = 1)
         {
             var items = batch?.ToArray();
             try
             {
-                await mongoCollection.InsertManyAsync(batch,
+                await mongoCollection.InsertManyAsync(items,
                     new InsertManyOptions { IsOrdered = false, BypassDocumentValidation = true });
                 return true;
             }
@@ -55,15 +58,15 @@ namespace SOS.Lib.Repositories
                 {
                     case 16500: //Request Rate too Large
                         // If attempt failed, try split items in half and try again
-                        var batchCount = batch.Count() / 2;
+                        var batchCount = items.Length / 2;
 
                         // If we are down to less than 10 items something must be wrong
                         if (batchCount > 5)
                         {
                             var addTasks = new List<Task<bool>>
                             {
-                                AddBatchAsync(batch.Take(batchCount)),
-                                AddBatchAsync(batch.Skip(batchCount))
+                                AddBatchAsync(items.Take(batchCount)),
+                                AddBatchAsync(items.Skip(batchCount))
                             };
 
                             // Run all tasks async
@@ -80,8 +83,16 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                throw ;
+                if (attempt < 3)
+                {
+                    Logger.LogWarning($"Add batch to mongodb collection ({MongoCollection}). Attempt {attempt} failed. Tries again...");
+                    Thread.Sleep(attempt * 1000);
+                    attempt++;
+                    return await AddBatchAsync(items, mongoCollection, attempt);
+                }
+
+                Logger.LogError(e, $"Failed to add batch to mongodb collection ({MongoCollection})");
+                throw;
             }
         }
 
@@ -127,12 +138,26 @@ namespace SOS.Lib.Repositories
         }
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
         protected RepositoryBase(
             IMongoDbClient client,
+            ILogger logger
+        ) : this(client, typeof(TEntity).Name, logger)
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="collectionName"></param>
+        /// <param name="logger"></param>
+        protected RepositoryBase(
+            IMongoDbClient client,
+            string collectionName,
             ILogger logger
         )
         {
@@ -145,8 +170,9 @@ namespace SOS.Lib.Repositories
             BatchSizeWrite = client.WriteBatchSize;
 
             // Clean name from non alfa numeric chats
-            _collectionName = typeof(TEntity).Name.UntilNonAlfanumeric();
+            _collectionName = collectionName.UntilNonAlfanumeric();
         }
+
 
         /// <summary>
         ///     Get client
@@ -155,13 +181,13 @@ namespace SOS.Lib.Repositories
         protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(CollectionName);
 
         /// <inheritdoc />
-        public async Task<bool> AddAsync(TEntity item)
+        public virtual async Task<bool> AddAsync(TEntity item)
         {
             return await AddAsync(item, MongoCollection);
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddAsync(TEntity item, IMongoCollection<TEntity> mongoCollection)
+        public virtual async Task<bool> AddAsync(TEntity item, IMongoCollection<TEntity> mongoCollection)
         {
             try
             {
@@ -169,20 +195,20 @@ namespace SOS.Lib.Repositories
 
                 return true;
             }
-            catch (MongoWriteException)
+            catch (MongoWriteException e)
             {
-                // Item allready exists
+                Logger.LogError("Failed to add item", e);
                 return true;
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                return false;
+                Logger.LogError("Failed to add item", e);
+                throw;
             }
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddCollectionAsync()
+        public virtual async Task<bool> AddCollectionAsync()
         {
             return await AddCollectionAsync(CollectionName);
         }
@@ -194,18 +220,25 @@ namespace SOS.Lib.Repositories
             {
                 // Create the collection
                 await Database.CreateCollectionAsync(collectionName);
+                Logger.LogInformation($"The following MongoDB collection was created: [{collectionName}]");
 
                 return true;
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                return false;
+                Logger.LogError("Failed to add collection", e);
+                throw;
             }
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddManyAsync(IEnumerable<TEntity> items)
+        public async Task AddIndexes(IEnumerable<CreateIndexModel<TEntity>> indexModels)
+        {
+            await MongoCollection.Indexes.CreateManyAsync(indexModels);
+        }
+
+        /// <inheritdoc />
+        public virtual async Task<bool> AddManyAsync(IEnumerable<TEntity> items)
         {
             return await AddManyAsync(items, MongoCollection);
         }
@@ -213,14 +246,14 @@ namespace SOS.Lib.Repositories
         /// <inheritdoc />
         public async Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
         {
-            var entities = items?.ToArray();
-            if (!entities?.Any() ?? true)
+            if (!items?.Any() ?? true)
             {
-                return false;
+                return true;
             }
 
             var success = true;
             var count = 0;
+            var entities = items.ToArray();
             var batch = entities.Skip(0).Take(BatchSizeWrite)?.ToArray();
 
             while (batch?.Any() ?? false)
@@ -234,9 +267,8 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddOrUpdateAsync(TEntity item)
+        public virtual async Task<bool> AddOrUpdateAsync(TEntity item)
         {
-            
             return await AddOrUpdateAsync(item, MongoCollection);
         }
 
@@ -261,7 +293,7 @@ namespace SOS.Lib.Repositories
         public int BatchSizeWrite { get; set; }
 
         /// <inheritdoc />
-        public async Task<bool> CheckIfCollectionExistsAsync()
+        public virtual async Task<bool> CheckIfCollectionExistsAsync()
         {
             return await CheckIfCollectionExistsAsync(CollectionName);
         }
@@ -281,7 +313,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteAsync(TKey id)
+        public virtual async Task<bool> DeleteAsync(TKey id)
         {
             return await DeleteAsync(id, MongoCollection);
         }
@@ -298,14 +330,14 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to delete item", e);
 
-                return false;
+                throw; 
             }
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteCollectionAsync()
+        public virtual async Task<bool> DeleteCollectionAsync()
         {
             return await DeleteCollectionAsync(CollectionName);
         }
@@ -317,18 +349,19 @@ namespace SOS.Lib.Repositories
             {
                 // Create the collection
                 await Database.DropCollectionAsync(collectionName);
+                Logger.LogInformation($"The following MongoDB collection was deleted: [{collectionName}]");
 
                 return true;
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                return false;
+                Logger.LogError("Failed to delete collection", e);
+                throw;
             }
         }
 
         /// <inheritdoc />
-        public async Task<long> CountAllDocumentsAsync()
+        public virtual async Task<long> CountAllDocumentsAsync()
         {
             return await CountAllDocumentsAsync(MongoCollection);
         }
@@ -336,11 +369,19 @@ namespace SOS.Lib.Repositories
         /// <inheritdoc />
         public async Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection)
         {
-            return await mongoCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
+            try
+            {
+                return await mongoCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
+            }
+            catch
+            {
+                return 0;
+            }
+            
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteManyAsync(IEnumerable<TKey> ids)
+        public virtual async Task<bool> DeleteManyAsync(IEnumerable<TKey> ids)
         {
             return await DeleteManyAsync(ids, MongoCollection);
         }
@@ -365,9 +406,9 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to delete batch", e);
 
-                return false;
+                throw;
             }
         }
 
@@ -379,7 +420,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<TEntity> GetAsync(TKey id)
+        public virtual async Task<TEntity> GetAsync(TKey id)
         {
             try
             {
@@ -388,28 +429,28 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                return default;
+                Logger.LogError("Failed to get item by id", e);
+                throw;
             }
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetAsync(IEnumerable<TKey> ids)
+        public virtual async Task<IEnumerable<TEntity>> GetAsync(IEnumerable<TKey> ids)
         {
             try
             {
-               return await MongoCollection.Find(x => ids.Contains(x.Id)).ToListAsync();
+                return await MongoCollection.Find(x => ids.Contains(x.Id)).ToListAsync();
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to get many by id's", e);
 
-                return null;
+                throw;
             }
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetBatchAsync(int skip)
+        public virtual async Task<IEnumerable<TEntity>> GetBatchAsync(int skip)
         {
             return await GetBatchAsync(skip, MongoCollection);
         }
@@ -430,9 +471,9 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to get batch", e);
 
-                return default;
+                throw;
             }
         }
 
@@ -465,7 +506,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId)
+        public virtual async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId)
         {
             return await GetBatchAsync(startId, endId, MongoCollection);
         }
@@ -490,14 +531,14 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to get batch", e);
 
-                return default;
+                throw;
             }
         }
 
         /// <inheritdoc />
-        public async Task<TKey> GetMaxIdAsync()
+        public virtual async Task<TKey> GetMaxIdAsync()
         {
             return await GetMaxIdAsync(MongoCollection);
         }
@@ -507,6 +548,7 @@ namespace SOS.Lib.Repositories
         {
             try
             {
+                Logger.LogDebug($"Try to get max id for ({mongoCollection.CollectionNamespace})");
                 var max = await mongoCollection
                     .Find(FilterDefinition<TEntity>.Empty)
                     .Project(d => d.Id)
@@ -518,9 +560,9 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to get max id", e);
 
-                return default;
+                throw;
             }
         }
 
@@ -528,7 +570,23 @@ namespace SOS.Lib.Repositories
         public JobRunModes Mode { get; set; }
 
         /// <inheritdoc />
-        public async Task<bool> UpdateAsync(TKey id, TEntity entity)
+        public virtual async Task<IEnumerable<TEntity>> QueryAsync(FilterDefinition<TEntity> filter)
+        {
+            try
+            {
+                return await MongoCollection
+                    .Find(filter)
+                    .ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public virtual async Task<bool> UpdateAsync(TKey id, TEntity entity)
         {
             return await UpdateAsync(id, entity, MongoCollection);
         }
@@ -546,11 +604,9 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                return false;
+                Logger.LogError("Failed to update entity", e);
+                throw;
             }
         }
-
-       
     }
 }

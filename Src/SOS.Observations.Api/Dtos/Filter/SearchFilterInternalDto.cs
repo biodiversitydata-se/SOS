@@ -13,6 +13,6 @@
         /// <summary>
         /// Response output settings
         /// </summary>
-        public OutputFilterDto Output { get; set; }
+        public OutputFilterExtendedDto Output { get; set; }
     }
 }

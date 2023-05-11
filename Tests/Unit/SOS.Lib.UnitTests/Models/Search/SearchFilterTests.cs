@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
-using MongoDB.Bson;
 using Nest;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.Search
@@ -18,7 +17,7 @@ namespace SOS.Lib.UnitTests.Models.Search
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var currentDate = DateTime.Now;
-            var filter = new SearchFilter
+            var filter = new SearchFilter(0)
             {
                 Location = new LocationFilter
                 {
@@ -42,8 +41,8 @@ namespace SOS.Lib.UnitTests.Models.Search
                             }
                         }
                     }
-                }, 
-                EndDate = currentDate
+                },
+                Date = new DateFilter { EndDate = currentDate }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -65,7 +64,7 @@ namespace SOS.Lib.UnitTests.Models.Search
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var currentDate = DateTime.Now;
-            var filter = new SearchFilter
+            var filter = new SearchFilter(0)
             {
                 Location = new LocationFilter
                 {
@@ -90,7 +89,7 @@ namespace SOS.Lib.UnitTests.Models.Search
                         }
                     }
                 },
-                EndDate = currentDate
+                Date = new DateFilter { EndDate = currentDate }
             };
 
             //-----------------------------------------------------------------------------------------------------------

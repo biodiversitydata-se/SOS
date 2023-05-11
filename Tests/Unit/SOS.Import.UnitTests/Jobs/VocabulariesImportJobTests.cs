@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Harvesters.Interfaces;
-using SOS.Import.Jobs;
+using SOS.Harvest.Harvesters.Interfaces;
+using SOS.Harvest.Jobs;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
@@ -67,7 +67,7 @@ namespace SOS.Import.UnitTests.Jobs
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _vocabularyHarvesterMock.Setup(ts => ts.HarvestAsync())
-                .ReturnsAsync(new HarvestInfo(DateTime.Now) {Status = RunStatus.Failed});
+                .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now) {Status = RunStatus.Failed});
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ namespace SOS.Import.UnitTests.Jobs
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _vocabularyHarvesterMock.Setup(ts => ts.HarvestAsync())
-                .ReturnsAsync(new HarvestInfo(DateTime.Now) {Status = RunStatus.Success, Count = 1 });
+                .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now) {Status = RunStatus.Success, Count = 1 });
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------

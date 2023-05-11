@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Import.Harvesters;
-using SOS.Import.Services;
+using SOS.Harvest.Harvesters;
+using SOS.Harvest.Services;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
@@ -25,7 +26,7 @@ namespace SOS.Import.IntegrationTests.Harvesters
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var importConfiguration = GetImportConfiguration();
-            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
+            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration, new NullLogger<ArtportalenDataService>());
 
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var areaVerbatimRepository = new Lib.Repositories.Resource.AreaRepository(
@@ -39,11 +40,10 @@ namespace SOS.Import.IntegrationTests.Harvesters
             cacheManager.Setup(cm => cm.ClearAsync(Cache.Area)).ReturnsAsync(true);
 
             var areaHarvester = new AreaHarvester(
-                new Import.Repositories.Source.Artportalen.AreaRepository(artportalenDataService, new Mock<ILogger<Import.Repositories.Source.Artportalen.AreaRepository>>().Object),
+                new Harvest.Repositories.Source.Artportalen.AreaRepository(artportalenDataService, new Mock<ILogger<Harvest.Repositories.Source.Artportalen.AreaRepository>>().Object),
                 areaVerbatimRepository,
                 new AreaHelper(new Mock<IAreaRepository>().Object),
                 new GeoRegionApiService(new GeoRegionApiConfiguration {ApiUrl = "https://georegionapi-dev.artdata.slu.se/"}), 
-                new AreaHarvestConfiguration {UseGeoRegionApiHarvest = true},
                 cacheManager.Object, 
                 new Mock<ILogger<AreaHarvester>>().Object);
 
@@ -66,7 +66,7 @@ namespace SOS.Import.IntegrationTests.Harvesters
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var importConfiguration = GetImportConfiguration();
-            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
+            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration, new NullLogger<ArtportalenDataService>());
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var areaVerbatimRepository = new Lib.Repositories.Resource.AreaRepository(
                 new ProcessClient(
@@ -80,11 +80,10 @@ namespace SOS.Import.IntegrationTests.Harvesters
             cacheManagerMock.Setup(cm => cm.ClearAsync(Cache.Area)).ReturnsAsync(true);
 
             var areaHarvester = new AreaHarvester(
-                new Import.Repositories.Source.Artportalen.AreaRepository(artportalenDataService, new Mock<ILogger<Import.Repositories.Source.Artportalen.AreaRepository>>().Object),
+                new Harvest.Repositories.Source.Artportalen.AreaRepository(artportalenDataService, new Mock<ILogger<Harvest.Repositories.Source.Artportalen.AreaRepository>>().Object),
                 areaVerbatimRepository,
                 new AreaHelper(new Mock<IAreaRepository>().Object),
                 new GeoRegionApiService(new GeoRegionApiConfiguration { ApiUrl = "https://georegionapi-dev.artdata.slu.se/" }),
-                new AreaHarvestConfiguration { UseGeoRegionApiHarvest = true },
                 cacheManagerMock.Object,
                 new Mock<ILogger<AreaHarvester>>().Object);
 

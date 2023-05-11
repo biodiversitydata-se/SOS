@@ -8,11 +8,10 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -30,34 +29,35 @@ namespace SOS.Lib.IO.DwcArchive
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="stream"></param>
-        /// <param name="fieldDescriptions"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>True if any records is written to the file; otherwise false.</returns>
+        /// <param name="isEventCore"></param>
+        /// <returns></returns>
         public async Task<bool> CreateCsvFileAsync(
-            FilterBase filter,
+            SearchFilterBase filter,
             Stream stream,
-            IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
-            IJobCancellationToken cancellationToken)
+            IProcessedObservationCoreRepository processedObservationRepository,
+            IJobCancellationToken cancellationToken,
+            bool isEventCore = false)
         {
             try
             {
-                var scrollResult = await processedObservationRepository.ScrollMeasurementOrFactsAsync(filter, null);
-                if (!scrollResult?.Records?.Any() ?? true) return false;
+                var searchResult = await processedObservationRepository.GetMeasurementOrFactsBySearchAfterAsync(filter);
+                if (!searchResult?.Records?.Any() ?? true) return false;
 
                 using var csvFileHelper = new CsvFileHelper();
                 csvFileHelper.InitializeWrite(stream, "\t");
 
                 // Write header row
-                WriteHeaderRow(csvFileHelper);
+                WriteHeaderRow(csvFileHelper, isEventCore);
 
-                while (scrollResult.Records.Any())
+                while (searchResult.Records.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+                    var searchResultTask = processedObservationRepository.GetMeasurementOrFactsBySearchAfterAsync(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
 
                     // Fetch observations from ElasticSearch.
-                    var emofRows = scrollResult.Records.ToArray();
+                    var emofRows = searchResult.Records.ToArray();
 
                     // Write occurrence rows to CSV file.
                     foreach (var emofRow in emofRows)
@@ -66,8 +66,8 @@ namespace SOS.Lib.IO.DwcArchive
                     }
                     await csvFileHelper.FlushAsync();
 
-                    // Get next batch of observations.
-                    scrollResult = await processedObservationRepository.ScrollMeasurementOrFactsAsync(filter, scrollResult.ScrollId);
+                    // Get next batch of data.
+                    searchResult = await searchResultTask;
                 }
 
                 csvFileHelper.FinishWrite();
@@ -111,7 +111,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to create Emof CSV file.");
+                _logger.LogError(e, "Failed to create Emof txt file.");
                 throw;
             }
         }
@@ -147,17 +147,17 @@ namespace SOS.Lib.IO.DwcArchive
             if (writeEventId) csvFileHelper.WriteField(emofRow.EventId);
             csvFileHelper.WriteField(emofRow.OccurrenceID);
             csvFileHelper.WriteField(emofRow.MeasurementID);
-            csvFileHelper.WriteField(emofRow.MeasurementType.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementType);
             csvFileHelper.WriteField(emofRow.MeasurementTypeID);
-            csvFileHelper.WriteField(emofRow.MeasurementValue.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementValue);
             csvFileHelper.WriteField(emofRow.MeasurementValueID);
-            csvFileHelper.WriteField(emofRow.MeasurementAccuracy.RemoveNewLineTabs());
-            csvFileHelper.WriteField(emofRow.MeasurementUnit.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementAccuracy);
+            csvFileHelper.WriteField(emofRow.MeasurementUnit);
             csvFileHelper.WriteField(emofRow.MeasurementUnitID);
             csvFileHelper.WriteField(emofRow.MeasurementDeterminedDate);
-            csvFileHelper.WriteField(emofRow.MeasurementDeterminedBy.RemoveNewLineTabs());
-            csvFileHelper.WriteField(emofRow.MeasurementRemarks.RemoveNewLineTabs());
-            csvFileHelper.WriteField(emofRow.MeasurementMethod.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementDeterminedBy);
+            csvFileHelper.WriteField(emofRow.MeasurementRemarks);
+            csvFileHelper.WriteField(emofRow.MeasurementMethod);
 
             csvFileHelper.NextRecord();
         }

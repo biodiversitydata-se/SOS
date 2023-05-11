@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DwC_A;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using SOS.Import.DarwinCore;
+using SOS.Harvest.DarwinCore;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using Xunit;
@@ -31,7 +30,7 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             string filePath = @"C:\TEMP\gbif-observations-dwca.zip";
             string pattern = @",SE,";
-            Regex countryRegex = new Regex(pattern);
+            var countryRegex = new Regex(pattern);
             int nrObservations = 0;
             int nrSwedishObservations = 0;
             var stopwatch = Stopwatch.StartNew();
@@ -41,9 +40,9 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             using (FileStream zipToOpen = new FileStream(filePath, FileMode.Open))
             {
-                using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
+                using (var archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
                 {
-                    foreach (ZipArchiveEntry entry in archive.Entries)
+                    foreach (var entry in archive.Entries)
                     {
                         if (entry.FullName.Equals("observations.csv", StringComparison.InvariantCultureIgnoreCase))
                         {

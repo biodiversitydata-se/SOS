@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Entities.Artportalen;
-using SOS.Import.Repositories.Source.Artportalen;
-using SOS.Import.Services.Interfaces;
+using SOS.Harvest.Entities.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
@@ -46,12 +46,15 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetAsync(new[] {1, 2});
+            Func<Task> act = async () =>
+            {
+                var result = await TestObject.GetAsync(new[] { 1, 2 });
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
 

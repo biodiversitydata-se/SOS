@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Observations.Api.Dtos.Vocabulary;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -22,18 +23,23 @@ namespace SOS.Observations.Api.Controllers
     public class VocabulariesController : ControllerBase
     {
         private readonly IVocabularyManager _vocabularyManager;
+        private readonly IProjectManager _projectManager;
         private readonly ILogger<VocabulariesController> _logger;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="vocabularyManager"></param>
+        /// <param name="_projectManager"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public VocabulariesController(
             IVocabularyManager vocabularyManager,
+            IProjectManager projectManager,
             ILogger<VocabulariesController> logger)
         {
             _vocabularyManager = vocabularyManager ?? throw new ArgumentNullException(nameof(vocabularyManager));
+            _projectManager = projectManager ?? throw new ArgumentNullException(nameof(projectManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -49,7 +55,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var projects = await _vocabularyManager.GetProjectsAsync();
+                var projects = await _projectManager.GetAllAsync();
 
                 if (!projects?.Any() ?? true)
                 {
@@ -200,6 +206,8 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var vocabularies = await _vocabularyManager.GetVocabulariesAsync();
+                if (vocabularyId == VocabularyIdDto.VerificationStatus) vocabularyId = VocabularyIdDto.VerificationStatus;
+                if (vocabularyId == VocabularyIdDto.SensitivityCategory) vocabularyId = VocabularyIdDto.SensitivityCategory;
                 var vocabulary = vocabularies.FirstOrDefault(f => f.Id == (VocabularyId)vocabularyId);
 
                 if (vocabulary == null)

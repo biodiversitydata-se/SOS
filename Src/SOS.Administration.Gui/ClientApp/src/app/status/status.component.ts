@@ -5,14 +5,14 @@ import { compareAsc } from 'date-fns/esm';
 import { ActiveInstanceInfo } from '../models/activeinstanceinfo';
 import { FunctionalTest } from '../models/functionaltest';
 import { HangfireJob } from '../models/hangfirejob';
-import { LoadTestMetrics, LoadTestResult } from '../models/loadtestmetrics';
+import { LoadTestResult } from '../models/loadtestmetrics';
 import { LogEntries } from '../models/logentries';
 import { MongoDbInfo } from '../models/mongodbinfo';
 import { PerformanceData } from '../models/performancedata';
-import { ProcessInfo } from '../models/providerinfo';
+import { ProcessInfo } from '../models/processinfo';
 import { SearchIndexInfo } from '../models/searchindexinfo';
 import { TestResults } from '../models/testresults';
-
+import { environment } from '../../environments/environment';
 
 function dateFormatter(params) {
   if (params.value) {
@@ -106,12 +106,13 @@ export class StatusComponent implements OnInit {
   failedTests: number = 0;
   totalRuntimeMs: number = 0;
   hostingenvironment: Environment;
-  dataComparison: DataCompare[] = [];
+  dataComparison: ProcessCompare[] = [];
   totalDataDifference: number = 0;
   performanceComparison: DataCompare[] = [];
   failedCalls: FailedCalls[] = [];
   sumFailedCalls: number = 0;
-  activeInstanceHarvestIsOlderThanOneDay = false;
+  activeInstanceIsExpired = false;
+  inActiveInstanceIsExpired = false;
   logDescription: string;
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
 
@@ -124,34 +125,43 @@ export class StatusComponent implements OnInit {
       this.http.get<ProcessInfo[]>(this.baseUrl + 'statusinfo/process').subscribe(result => {
         this.processInfo = result;
         this.totalDataDifference = 0;
+
         let active = this.processInfo.find(p => p.id.endsWith(this.activeInstance));
         var activeEndDate = parseISO(active.end);
-        var oneDayAgo = subHours(new Date(), 24);
-        if (compareAsc(activeEndDate, oneDayAgo) == -1) {
-          this.activeInstanceHarvestIsOlderThanOneDay = true;
-        }
-        else {
-          this.activeInstanceHarvestIsOlderThanOneDay = false;
-        }
+        var activeExpireDate = subHours(new Date(), environment.lastHarvestHourLimit);
+        this.activeInstanceIsExpired = compareAsc(activeEndDate, activeExpireDate) == -1;
+        
         let inactive = this.processInfo.find(p => !p.id.endsWith(this.activeInstance) && p.id.includes("observation"));
+        var inactiveEndDate = parseISO(inactive.end);
+        var inActiveExpireDate = subHours(new Date(), environment.lastHarvestHourLimit * 2);
+        this.inActiveInstanceIsExpired = compareAsc(inactiveEndDate, inActiveExpireDate) == -1;
+       
         for (let provider of active.providersInfo) {
-          let compare = new DataCompare();
+          let compare = new ProcessCompare();
           compare.source = provider.dataProviderIdentifier;
-          compare.today = provider.publicProcessCount + provider.protectedProcessCount;
+          compare.publicToday = provider.publicProcessCount
+          compare.protectedToday = provider.protectedProcessCount;
+          compare.failedToday = provider.processFailCount;
 
           if (inactive) {
             let inactiveprovider = inactive.providersInfo.find(p => p.dataProviderId == provider.dataProviderId);
 
             if (inactiveprovider) {
-              compare.yesterday = inactiveprovider.publicProcessCount + inactiveprovider.protectedProcessCount;
+              compare.publicYesterday = inactiveprovider.publicProcessCount;
+              compare.protectedYesterday = inactiveprovider.protectedProcessCount;
+              compare.failedYesterday = inactiveprovider.processFailCount ?? 0;
             } else {
-              compare.yesterday = 0;
+              compare.publicYesterday = 0;
+              compare.protectedYesterday = 0;
+              compare.failedYesterday = 0;
             }
           } else {
-            compare.yesterday = 0;
+              compare.publicYesterday = 0;
+              compare.protectedYesterday = 0;
+              compare.failedYesterday = 0;
           }
 
-          this.totalDataDifference += compare.today - compare.yesterday;
+          this.totalDataDifference += (compare.publicToday + compare.protectedToday) - (compare.publicYesterday + compare.protectedYesterday);
           this.dataComparison.push(compare);
         }
       }, error => console.error(error));
@@ -217,7 +227,21 @@ export class StatusComponent implements OnInit {
    this.healthStatus = result;
    }, error => console.error(error));
   }
+  getStatusFillColor(processInfo: ProcessInfo) {
+    if (processInfo.status === 'Success') {
+      let isActive = this.isActiveProvider(processInfo.id);
+      if (
+        (isActive && !this.activeInstanceIsExpired) ||
+        (!isActive && !this.inActiveInstanceIsExpired)
+      ) {
+        return 'green';
+      }
 
+      return 'gold';
+    }
+
+    return 'red';
+  }
   formatDate(param) {
     return format(parseISO(param), 'yyyy-MM-dd HH:mm:ss');
   }
@@ -341,6 +365,15 @@ export class StatusComponent implements OnInit {
 
     }, error => console.error(error));
   }
+}
+class ProcessCompare {
+  source: string;
+  publicToday: number;
+  publicYesterday: number;
+  protectedToday: number;
+  protectedYesterday: number;
+  failedToday: number;
+  failedYesterday: number;
 }
 class DataCompare {
   source: string;

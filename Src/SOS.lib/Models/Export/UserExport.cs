@@ -13,7 +13,7 @@ namespace SOS.Lib.Models.Export
         /// </summary>
         public UserExport()
         {
-            OnGoingJobIds = new List<string>();
+            Jobs = new List<ExportJobInfo>();
         }
 
         /// <summary>
@@ -27,8 +27,8 @@ namespace SOS.Lib.Models.Export
         public int Limit { get; set; }
 
         /// <summary>
-        /// On going export jobs
+        /// Jobs information
         /// </summary>
-        public ICollection<string> OnGoingJobIds { get; set; }
-    }
+        public ICollection<ExportJobInfo> Jobs { get; set; }
+    }   
 }

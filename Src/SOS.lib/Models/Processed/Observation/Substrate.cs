@@ -1,12 +1,18 @@
-﻿using Nest;
-
-namespace SOS.Lib.Models.Processed.Observation
+﻿namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// Substrate info.
     /// </summary>
     public class Substrate
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public Substrate()
+        {
+
+        }
+
         /// <summary>
         ///     Description of substrate.
         /// </summary>
@@ -23,7 +29,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Name { get; set; }
 
         /// <summary>
@@ -50,5 +55,10 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Vernacular name of substrate species.
         /// </summary>
         public string SpeciesVernacularName { get; set; }
+
+        /// <summary>
+        /// Description of substrate
+        /// </summary>
+        public string SubstrateDescription { get; set; }
     }
 }

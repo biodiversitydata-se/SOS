@@ -1,5 +1,6 @@
-﻿using System.Threading.Tasks;
-using SOS.Lib.Models.Search;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.Managers.Interfaces
@@ -26,14 +27,34 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="authorizationUseDisturbanceRadius"></param>
         /// <param name="setDefaultProviders"></param>
         /// <returns></returns>
-        Task PrepareFilter(
+        Task PrepareFilterAsync(
             int? roleId,
             string authorizationApplicationIdentifier, 
-            FilterBase filter,
+            SearchFilterBase filter,
             string authorityIdentity = "Sighting",
             int? areaBuffer = 0, 
             bool? authorizationUsePointAccuracy = false, 
             bool? authorizationUseDisturbanceRadius = false, 
             bool? setDefaultProviders = true);
+
+        /// <summary>
+        /// Add additional information if necessary
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task PrepareFilterAsync(ChecklistSearchFilter filter);
+
+        /// <summary>
+        /// Prepare taxon filter
+        /// </summary>
+        /// <param name="filter"></param>
+        void PrepareTaxonFilter(TaxonFilter filter);
+
+        /// <summary>
+        /// Get taxon ids from filter.
+        /// </summary>
+        /// <param name="filter">The taxon filter.</param>
+        /// <returns></returns>
+        HashSet<int> GetTaxonIdsFromFilter(TaxonFilter filter);
     }
 }

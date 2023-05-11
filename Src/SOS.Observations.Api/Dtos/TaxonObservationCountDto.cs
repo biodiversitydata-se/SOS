@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using SOS.Lib.Extensions;
-using SOS.Lib.Models.Shared;
-using SOS.Observations.Api.Extensions;
+﻿using System;
 
 namespace SOS.Observations.Api.Dtos
 {
@@ -14,11 +10,16 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         /// The Taxon Id.
         /// </summary>
-        public int TaxonId { get; set; }
+        public int TaxonId { get; set; }        
 
         /// <summary>
-        /// Count.
+        /// Observation count.
         /// </summary>
-        public int Count { get; set; }
+        public int ObservationCount { get; set; }
+
+        /// <summary>
+        /// Province count.
+        /// </summary>
+        public int ProvinceCount { get; set; }
     }
 }

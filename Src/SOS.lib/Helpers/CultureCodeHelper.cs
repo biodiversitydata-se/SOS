@@ -11,7 +11,9 @@ namespace SOS.Lib.Helpers
     /// </summary>
     public static class CultureCodeHelper
     {
-        private const string DefaultCultureCode = "sv-SE";
+        public const string DefaultCultureCode = "sv-SE";
+        public const int SwedishCultureId = 175;
+        public const int EnglishCultureId = 49;
 
         /// <summary>
         /// Resolve culture code.
@@ -28,6 +30,18 @@ namespace SOS.Lib.Helpers
             }
 
             return DefaultCultureCode;
+        }
+
+        /// <summary>
+        /// Get culture id.
+        /// </summary>
+        /// <param name="cultureCode"></param>
+        /// <returns></returns>
+        public static int GetCultureId(string cultureCode)
+        {
+            string resolvedCultureCode = GetCultureCode(cultureCode);
+            if (resolvedCultureCode == "en-GB") return EnglishCultureId;
+            return SwedishCultureId;
         }
 
         private static readonly Dictionary<string, string> CultureCodeMappings = new()

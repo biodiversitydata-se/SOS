@@ -10,7 +10,8 @@ namespace SOS.Observations.Api.Dtos.Filter
             DoNotShowMerged,
             ShowOnlyMerged,
             ShowBoth,
-            DoNotShowSightingsInMerged
+            DoNotShowSightingsInMerged,
+            DoNotShowMergedIncludeReplacementChilds
         }
 
         public enum SightingUnspontaneousFilterDto
@@ -26,12 +27,23 @@ namespace SOS.Observations.Api.Dtos.Filter
             IncludeNotPresent
         }
 
-        public enum MonthsFilterComparisonDto
+        public enum DateFilterComparisonDto
         {
             StartDate,
             EndDate,
-            BothStartDateAndEndDate
+            BothStartDateAndEndDate,
+            StartDateEndDateMonthRange
         }
+
+        /// <summary>
+        /// Checklist Id
+        /// </summary>
+        public int? ChecklistId { get; set; }
+
+        /// <summary>
+        /// Field diary group Id's
+        /// </summary>
+        public IEnumerable<int> FieldDiaryGroupIds { get; set; }
 
         /// <summary>
         /// Reported by Artportalen user id.
@@ -81,15 +93,20 @@ namespace SOS.Observations.Api.Dtos.Filter
         
         public bool UsePeriodForAllYears { get; set; }
         public IEnumerable<int> Months { get; set; }
-        public MonthsFilterComparisonDto MonthsComparison { get; set; } = MonthsFilterComparisonDto.StartDate;
+        public DateFilterComparisonDto MonthsComparison { get; set; } = DateFilterComparisonDto.StartDate;
         public IEnumerable<int> DiscoveryMethodIds { get; set; }
 
         public IEnumerable<int> LifeStageIds { get; set; }
 
         public IEnumerable<int> ActivityIds { get; set; }
 
-        public bool HasTriggerdValidationRule { get; set; }
-        public bool HasTriggerdValidationRuleWithWarning { get; set; }
+
+        /*[Obsolete]
+        public bool? HasTriggerdValidationRule { get; set; }
+        [Obsolete]
+        public bool? HasTriggerdValidationRuleWithWarning { get; set; }*/
+        public bool HasTriggeredVerificationRule { get; set; }
+        public bool HasTriggeredVerificationRuleWithWarning { get; set; }
 
         public int? Length { get; set; }
         public string LengthOperator { get; set; }
@@ -99,8 +116,13 @@ namespace SOS.Observations.Api.Dtos.Filter
         public int? Quantity { get; set; }
         public string QuantityOperator { get; set; }
 
+        /*[Obsolete]
         public IEnumerable<int> ValidationStatusIds { get; set; }
-        public IEnumerable<int> ExcludeValidationStatusIds { get; set; }
+        [Obsolete]
+        public IEnumerable<int> ExcludeValidationStatusIds { get; set; }*/
+
+        public IEnumerable<int> VerificationStatusIds { get; set; }
+        public IEnumerable<int> ExcludeVerificationStatusIds { get; set; }
 
         public SightingUnspontaneousFilterDto UnspontaneousFilter { get; set; }
 
@@ -123,13 +145,26 @@ namespace SOS.Observations.Api.Dtos.Filter
 
         public IEnumerable<int> RegionalSightingStateIdsFilter { get; set; }
 
+        public IEnumerable<int> TriggeredObservationRuleFrequencyIds { get; set; }
+
+        public IEnumerable<int> TriggeredObservationRuleReproductionIds { get; set; }
+
         public IEnumerable<int> SiteIds { get; set; }
+
+        public IEnumerable<int> SiteProjectIds { get; set; }
 
         public IEnumerable<int> SpeciesFactsIds { get; set; }
         public string InstitutionId { get; set; }
 
         public IEnumerable<int> DatasourceIds { get; set; }
 
+        /*[Obsolete("Use geographics.locationNameFilter")]
         public string LocationNameFilter { get; set; }
+        */
+        public IEnumerable<int> Years { get; set; }
+
+        public DateFilterComparisonDto YearsComparison { get; set; } = DateFilterComparisonDto.StartDate;
+
+        public IEnumerable<int> SightingTypeSearchGroupIds { get; set; }
     }
 }

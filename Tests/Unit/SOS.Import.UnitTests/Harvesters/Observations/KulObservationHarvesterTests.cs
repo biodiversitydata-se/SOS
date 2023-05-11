@@ -6,8 +6,8 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Harvesters.Observations;
-using SOS.Import.Services.Interfaces;
+using SOS.Harvest.Harvesters.AquaSupport.Kul;
+using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Kul;
@@ -50,7 +50,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _kulObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<long>()))
+            _kulObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<long>()))
                 .ThrowsAsync(new Exception("Fail"));
 
             //-----------------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _kulObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<long>()))
+            _kulObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<long>()))
                 .ReturnsAsync(new XDocument());
 
             _kulObservationVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())

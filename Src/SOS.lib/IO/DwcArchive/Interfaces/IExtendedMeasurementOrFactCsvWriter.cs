@@ -2,10 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
-using SOS.Export.Models;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.IO.DwcArchive.Interfaces
@@ -17,14 +16,14 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="stream"></param>
-        /// <param name="fieldDescriptions"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="isEventCore"></param>
         /// <returns></returns>
-        Task<bool> CreateCsvFileAsync(FilterBase filter, Stream stream,
-            IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
-            IJobCancellationToken cancellationToken);
+        Task<bool> CreateCsvFileAsync(SearchFilterBase filter, Stream stream,
+            IProcessedObservationCoreRepository processedObservationRepository,
+            IJobCancellationToken cancellationToken,
+            bool isEventCore = false);
 
         /// <summary>
         /// Create a headerless Emof CSV file.

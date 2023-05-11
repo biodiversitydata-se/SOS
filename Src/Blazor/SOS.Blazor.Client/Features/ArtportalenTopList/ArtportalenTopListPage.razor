@@ -1,0 +1,93 @@
+﻿@page "/artportalentoplist"
+@inject HttpClient _httpClient
+@inject NavigationManager _navManager
+
+<h3>Artportalens topplista</h3>
+<div class="mb-3">
+    @if (_provinces != null)
+    {
+        <select class="form-select" @onchange="@(async args => await OnSelectProvinceChange(args))">
+            <option value="">--Filtrera på provins--</option>
+            @foreach (var item in _provinces)
+            {
+                <option value="@item.FeatureId">@item.Name</option>
+            }
+        </select>
+    }
+</div>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" @bind="_useCache">
+    <label class="form-check-label" for="flexCheckChecked">
+        Använd cache
+    </label>
+</div>
+
+<div class="page-size-chooser">
+    Sidstorlek:
+    <select @bind="@_pagination.ItemsPerPage">
+        <option>10</option>
+        <option>20</option>
+        <option>30</option>
+    </select>
+</div>
+
+<div class="grid">
+    <QuickGrid ItemsProvider="@_userStatisticsProvider" Pagination="@_pagination" @ref="myGrid">
+        <PropertyColumn Property="@(u => u.UserId)"/>
+        <PropertyColumn Property="@(u => u.SpeciesCount)"/>
+        <PropertyColumn Property="@(u => u.ObservationCount)"/>
+    </QuickGrid>
+</div>
+<Paginator Value="@_pagination"/>
+
+<p>Response time: @_responseTime ms</p>
+
+@code {
+    QuickGrid<UserStatisticsItem> myGrid;
+    GridItemsProvider<UserStatisticsItem> _userStatisticsProvider;
+    PaginationState _pagination = new PaginationState { ItemsPerPage = 20 };
+    private static IEnumerable<Area> _provinces;
+    private string _selectedProvinceFeatureId;
+    private bool _useCache = true;
+    private double _responseTime;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var provincesResponse = await _httpClient.GetFromJsonAsync<PagedResult<Area>>("areas?skip=0&take=100&areaType=Province");
+        _provinces = provincesResponse?.Records.OrderBy(area => Convert.ToInt32(area.FeatureId)).ToList();
+        _userStatisticsProvider = async req =>
+        {
+            return await GetUserStatisticsAsync(req);
+        };
+    }
+
+    private async Task OnSelectProvinceChange(ChangeEventArgs e)
+    {
+        _selectedProvinceFeatureId = e?.Value?.ToString();
+        await myGrid.RefreshDataAsync();
+        StateHasChanged();
+    }
+
+    private async Task<GridItemsProviderResult<UserStatisticsItem>> GetUserStatisticsAsync(GridItemsProviderRequest<UserStatisticsItem> request)
+    {
+        var url = _navManager.GetUriWithQueryParameters("userstatistics/pagedspeciescountaggregation", new Dictionary<string, object> {
+                { "skip", request.StartIndex },
+                { "take", request.Count },
+                { "useCache", _useCache}
+                });
+        var query = new SpeciesCountUserStatisticsQuery();
+        if (!string.IsNullOrEmpty(_selectedProvinceFeatureId))
+        {
+            query.AreaType = AreaType.Province;
+            query.FeatureId = _selectedProvinceFeatureId;
+        }
+        var response = await _httpClient.PostAsJsonAsync(url, query);
+        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<UserStatisticsItem>>();
+        _responseTime = pagedResult.ResponseTime;
+        StateHasChanged();
+        return GridItemsProviderResult.From(
+            items: pagedResult!.Records.ToList(),
+            totalItemCount: (int)pagedResult!.TotalCount
+        );
+    }
+}

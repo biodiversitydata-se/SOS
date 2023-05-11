@@ -23,7 +23,17 @@ namespace SOS.Lib.Configuration.Import
         /// <summary>
         ///     The number of observations that will be fetched in each loop.
         /// </summary>
-        public int ChunkSize { get; set; } = 1000000;
+        public int ChunkSize { get; set; } = 100000;
+
+        /// <summary>
+        ///     The number of observations that will be fetched in each loop.
+        /// </summary>
+        public int IncrementalChunkSize { get; set; } = 25000;
+
+        /// <summary>
+        ///     The number of checklists that will be fetched in each loop.
+        /// </summary>
+        public int ChunkSizeChecklists { get; set; } = 100;
 
         /// <summary>
         ///     The number of sightings that should be harvested.
@@ -31,6 +41,15 @@ namespace SOS.Lib.Configuration.Import
         /// </summary>
         public int? MaxNumberOfSightingsHarvested { get; set; } = null;
 
+        /// <summary>
+        ///     The number of checklists that should be harvested.
+        ///     If set to null all checklists will be fetched.
+        /// </summary>
+        public int? MaxNumberOfChecklistsHarvested { get; set; } = null;
+
+        /// <summary>
+        /// No of threads to run
+        /// </summary>
         public int NoOfThreads { get; set; } = 2;
 
         /// <summary>
@@ -52,5 +71,10 @@ namespace SOS.Lib.Configuration.Import
         /// Time to sleep after a batch has run (ms) 
         /// </summary>
         public int SleepAfterBatch { get; set; }
+
+        /// <summary>
+        /// Use triggered observation rule if set
+        /// </summary>
+        public bool UseTriggeredObservationRule { get; set; }
     }
 }

@@ -33,7 +33,11 @@ namespace SOS.Lib.Enums
         /// <summary>
         /// 
         /// </summary>
-        SpeciesSightingsListTaxonCount = 5
+        SpeciesSightingsListTaxonCount = 5,
+        /// <summary>
+        /// Special case where every month is divided in 4 weeks, total 48 weeks a year
+        /// </summary>
+        SightingsPerWeek48 = 6
     }
 
     public static class AggregationTypeExtension
@@ -46,6 +50,25 @@ namespace SOS.Lib.Enums
                 AggregationType.QuantityPerYear,
                 AggregationType.SightingsPerWeek,
                 AggregationType.SightingsPerYear
+            }.Contains(aggregationType);
+        }
+
+        public static bool IsYearHistogram(this AggregationType aggregationType)
+        {
+            return new List<AggregationType>
+            {
+                AggregationType.QuantityPerYear,
+                AggregationType.SightingsPerYear
+            }.Contains(aggregationType);
+        }
+
+        public static bool IsWeekHistogram(this AggregationType aggregationType)
+        {
+            return new List<AggregationType>
+            {
+                AggregationType.QuantityPerWeek,
+                AggregationType.SightingsPerWeek,
+                AggregationType.SightingsPerWeek48
             }.Contains(aggregationType);
         }
 

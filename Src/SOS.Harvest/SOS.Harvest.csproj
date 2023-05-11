@@ -1,0 +1,128 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Autofac" Version="7.0.1" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="2.38.1" />
+		<PackageReference Include="Dapper" Version="2.0.123" />
+		<PackageReference Include="Hangfire.Core" Version="1.7.34" />
+		<PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
+		<PackageReference Include="MongoDB.Driver" Version="2.19.1" />
+		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.19.1" />
+		<PackageReference Include="NetTopologySuite" Version="2.5.0" />
+		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="3.0.0" />
+		<PackageReference Include="System.ServiceModel.Duplex" Version="4.10.2" />
+		<PackageReference Include="System.ServiceModel.Http" Version="4.10.2" />
+		<PackageReference Include="System.ServiceModel.NetTcp" Version="4.10.2" />
+		<PackageReference Include="System.ServiceModel.Security" Version="4.10.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\External\DwC-A_dotnet\DwC-A_dotnet.csproj" />
+		<ProjectReference Include="..\SOS.lib\SOS.Lib.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Resources\Gis\swedenExtentSimplified.geojson">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\TaxonProtection.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\CountyNameMapper.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\ProvinceNameMapper.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Sweden-grids\Sweden_Grid_10km_Wgs84.geojson">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\AccessRightsVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\ActivityVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\AreaTypeVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\BasisOfRecordVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\BehaviorVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\BiotopeVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\BirdNestActivityVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\ContinentVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\CountryVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\DeterminationMethodVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\DiscoveryMethodVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\EstablishmentMeansVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\InstitutionVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\LifeStageVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\OccurrenceStatusVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\ReproductiveCondition.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\SensitivityCategoryVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\SexVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\SubstrateVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\TaxonCategoryVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\TypeVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\UnitVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\Vocabularies\VerificationStatusVocabulary.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>

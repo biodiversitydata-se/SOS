@@ -175,5 +175,92 @@ namespace SOS.Lib.Models.TaxonTree
                 currentNode = currentNode.Parent;
             }
         }
+
+        public static HashSet<TaxonTreeEdge<T>> GetParentsEdges<T>(
+            this TaxonTreeNode<T> treeNode,
+            bool includeSecondaryParents = false)
+        {
+            HashSet<TaxonTreeEdge<T>> edgeSet = new HashSet<TaxonTreeEdge<T>>();
+            HashSet<TaxonTreeNode<T>> visitedNodesSet = new HashSet<TaxonTreeNode<T>>();
+            Stack<TaxonTreeNode<T>> nodesStack = new Stack<TaxonTreeNode<T>>();
+            nodesStack.Push(treeNode);
+
+            while (nodesStack.Any())
+            {
+                var node = nodesStack.Pop();
+                if (node.Parent != null)
+                {
+                    var mainEdge = new TaxonTreeEdge<T> { Parent = node.Parent, Child = node, IsMainRelation = true };
+                    edgeSet.Add(mainEdge);
+
+                    if (!visitedNodesSet.Contains(node.Parent))
+                    {
+                        nodesStack.Push(node.Parent);
+                    }
+                }
+
+                if (includeSecondaryParents && node.SecondaryParents != null && node.SecondaryParents.Count > 0)
+                {
+                    foreach (var secondaryParent in node.SecondaryParents)
+                    {
+                        var secondaryEdge = new TaxonTreeEdge<T> { Parent = secondaryParent, Child = node, IsMainRelation = false };                        
+                        edgeSet.Add(secondaryEdge);
+                        if (!visitedNodesSet.Contains(secondaryParent))
+                        {
+                            nodesStack.Push(secondaryParent);
+                        }                        
+                    }
+                }
+
+                visitedNodesSet.Add(node);
+            }
+
+            return edgeSet;
+        }
+
+        public static HashSet<TaxonTreeEdge<T>> GetChildEdges<T>(
+            this TaxonTreeNode<T> treeNode,
+            bool includeSecondaryChildren = false)
+        {
+            HashSet<TaxonTreeEdge<T>> edgeSet = new HashSet<TaxonTreeEdge<T>>();
+            HashSet<TaxonTreeNode<T>> visitedNodesSet = new HashSet<TaxonTreeNode<T>>();
+            Stack<TaxonTreeNode<T>> nodesStack = new Stack<TaxonTreeNode<T>>();
+            nodesStack.Push(treeNode);
+
+            while (nodesStack.Any())
+            {
+                var node = nodesStack.Pop();
+                if (node.MainChildren != null && node.MainChildren.Count > 0)
+                {
+                    foreach (var child in node.MainChildren)
+                    {
+                        var mainEdge = new TaxonTreeEdge<T> { Parent = node, Child = child, IsMainRelation = true };
+                        edgeSet.Add(mainEdge);
+
+                        if (!visitedNodesSet.Contains(child))
+                        {
+                            nodesStack.Push(child);
+                        }
+                    }                     
+                }
+
+                if (includeSecondaryChildren && node.SecondaryChildren != null && node.SecondaryChildren.Count > 0)
+                {
+                    foreach (var secondaryChild in node.SecondaryChildren)
+                    {
+                        var secondaryEdge = new TaxonTreeEdge<T> { Parent = node, Child = secondaryChild, IsMainRelation = false };
+                        edgeSet.Add(secondaryEdge);
+                        if (!visitedNodesSet.Contains(secondaryChild))
+                        {
+                            nodesStack.Push(secondaryChild);
+                        }
+                    }
+                }
+
+                visitedNodesSet.Add(node);
+            }
+
+            return edgeSet;
+        }
     }
 }

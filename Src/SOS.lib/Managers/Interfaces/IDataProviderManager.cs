@@ -23,6 +23,8 @@ namespace SOS.Lib.Managers.Interfaces
         /// <returns></returns>
         Task<Result<string>> InitDefaultDataProviders(bool forceOverwriteIfCollectionExist);
 
+        Task<Result<string>> InitDefaultDataProvider(string dataProviderIdOrIdentifier);
+
         /// <summary>
         /// Reset eml to default
         /// </summary>

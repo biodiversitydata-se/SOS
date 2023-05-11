@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Cronos;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -21,6 +22,11 @@ namespace SOS.Lib.Models.Shared
         public ContactPerson ContactPerson { get; set; }
 
         /// <summary>
+        /// Default coordinate uncertainty in meters
+        /// </summary>
+        public int CoordinateUncertaintyInMeters { get; set; }
+
+        /// <summary>
         ///     Decides whether the data provider should be included in search when no data provider filter is set.
         /// </summary>
         public bool IncludeInSearchByDefault { get; set; }
@@ -31,14 +37,14 @@ namespace SOS.Lib.Models.Shared
         public string DownloadUrl { get; set; }
 
         /// <summary>
-        ///     Descriptions of the data provider 
+        ///     Download URL's
         /// </summary>
-        public IEnumerable<VocabularyValueTranslation> Descriptions { get; set; }
+        public IEnumerable<DownloadUrl> DownloadUrls { get; set; }
 
         /// <summary>
-        ///    URL to data provider EML file
+        ///     Descriptions of the data provider 
         /// </summary>
-        public string DownloadUrlEml { get; set; }
+        public IEnumerable<VocabularyValueTranslation> Descriptions { get; set; }        
 
         /// <summary>
         /// Indicates that failure in harvest for this provider will stop job from processing
@@ -100,6 +106,32 @@ namespace SOS.Lib.Models.Shared
         /// Time stamp according to data source, used to see if data set has changed
         /// </summary>
         public DateTime? SourceDate { get; set; }
+
+        /// <summary>
+        /// True if checklist harvest is supported
+        /// </summary>
+        public bool SupportChecklists { get; set; } = false;
+
+        /// <summary>
+        /// True if dataset harvest is supported
+        /// </summary>
+        public bool SupportDatasets { get; set; }
+
+        /// <summary>
+        /// True if event harvest is supported
+        /// </summary>
+        public bool SupportEvents { get; set; }
+
+        /// <summary>
+        /// A event based DwC will be created when provider data i processed if this is set to true
+        /// </summary>
+        public bool CreateEventDwC { get; set; }
+
+        /// <summary>
+        /// Get identifier used for checklists
+        /// </summary>
+        [JsonIgnore]
+        public string ChecklistIdentifier => $"{Identifier}-Checklist";
 
         /// <summary>
         /// Support dynamic update of eml meta data
@@ -218,7 +250,8 @@ namespace SOS.Lib.Models.Shared
                     Email = ""
                 },
                 Url = "",
-                DownloadUrl = ""
+                DownloadUrl = "",
+                DownloadUrls = null
             };
 
         /// <summary>
@@ -246,7 +279,8 @@ namespace SOS.Lib.Models.Shared
                     Email = ""
                 },
                 Url = "",
-                DownloadUrl = ""
+                DownloadUrl = "",
+                DownloadUrls = null
             };
     }
 }

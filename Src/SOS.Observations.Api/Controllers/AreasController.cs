@@ -4,7 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
@@ -51,6 +51,22 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Error getting areas");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet("{areaType}/{featureId}")]
+        [ProducesResponseType(typeof(AreaBaseDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetArea([FromRoute] AreaTypeDto areaType, [FromRoute] string featureId)
+        {
+            try
+            {
+                return new OkObjectResult(await _areaManager.GetAreaAsync(areaType, featureId));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Error getting area {areaType} {featureId}");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 

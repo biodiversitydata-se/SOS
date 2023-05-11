@@ -65,12 +65,13 @@ namespace SOS.Lib.Configuration.Shared
             var mongoSettings = new MongoClientSettings
             {
                 ReadPreference = ReadPreference.PrimaryPreferred,
-                UseTls = UseTls,
+                Servers = Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)).ToArray(),
                 SslSettings = UseTls ? new SslSettings
                     {
                         EnabledSslProtocols = SslProtocols.Tls12
                     }
-                    : null
+                    : null,
+                UseTls = UseTls
             };
 
             // Add authentication if requested
@@ -84,14 +85,13 @@ namespace SOS.Lib.Configuration.Shared
             // Set server/s and connection mode based on number of hosts 
             if (Hosts.Length == 1)
             {
-                mongoSettings.Server =
-                    Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)).FirstOrDefault();
                 mongoSettings.ConnectionMode = ConnectionMode.Standalone;
+               // mongoSettings.DirectConnection = true;
             }
             else
             {
-                mongoSettings.Servers = Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)).ToArray();
                 mongoSettings.ConnectionMode = ConnectionMode.ReplicaSet;
+              //  mongoSettings.DirectConnection = false;
                 mongoSettings.ReplicaSetName = ReplicaSetName;
                 mongoSettings.ReadPreference = ReadPreference.PrimaryPreferred;
             }

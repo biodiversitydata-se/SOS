@@ -1,7 +1,128 @@
 # Changelog
 
-## [1.0.3]
-**Test**: 2021-10-05 
+## [2023.04.18]
+**Prod**: 2023-04-18
+### `Added`
+ - Data Stewardship API.
+ - Analysis API.
+ - External Health Check.
+ - Possibility to exclude observations in search criteria.
+ - Added possibility to change column order in exports.
+
+### `Changed`
+ - Improved support for harvesting events.
+ - InstitutionCode field is now set to "SLU Artdatabanken" in Artportalen DwC-A export.
+ - Upgrade to .Net 7.
+
+### `Fixed`
+ - Application Insights Observation Count logging bug.
+ - Elasticsearch memory bug.
+
+
+## [2023.01.31] - Hotfix
+**Prod**: 2023-03-14
+### `Added`
+ - `SearchFilterInternal.SightingTypeSearchGroupIds` filter.
+
+### `Changed`
+ - Artportalen harvest SQL query optimization.
+ - Set `datasetName` to english data provider name (if missing)
+
+ ### `Fixed`
+ - Taxon sum aggregation cache conccurrency issue.
+ - Sweden area bug.
+
+
+## [2023.01.31]
+**Prod**: 2023-01-31
+### `Changed`
+ - Deprecated properties removed.
+ - Added Elasticsearch shard replication
+
+ ### `Fixed`
+ - Taxon cache validation issue.
+ - ETRS89 was using wrong EPSG code
+
+
+## [2022.11.17]
+**Prod**: 2022-11-17
+### `Changed`
+ - Improved user role information by adding information about authorities and areas in the endpoint `/User/Information`.
+
+ ### `Fixed`
+ - Some taxa hade wrong `ProtectedByLaw` value.
+ - Improved GeoJSON serialization to encode å ä ö properly.
+
+## [2022.10.17]
+**Prod**: 2022-10-17 
+ ### `Fixed`
+ - When searching with `TaxonListIds` underlying taxa will be added if `IncludeUnderlyingTaxa=true`.
+ - TimeRange file order bug.
+ - Aggregation by day bug.
+
+## [2022.05.24]
+**Prod**: 2022-05-24 
+
+### `Added`
+- Artportalen Checklist support. New endpoints: `GET Checklists/{id}`, `POST Checklists/CalculateTrend`
+- `Observations/MetricGridAggregation` endpoint that creates grid aggregations using SWEREF99 TM coordinate system.
+- `SOS.Elasticsarch.Proxy` service that is used by WFS service (GeoServer).
+- New observation properties: `Location.Sweref99TmX`, `Location.Sweref99TmY`, `Location.Attributes.ExternalId`, `Location.Attributes.ProjectId`, `Taxon.Attributes.TaxonCategory`, `Taxon.Attributes.IsRedlisted`, `Taxon.Attributes.IsInvasiveInSweden`, `Taxon.Attributes.IsInvasiveAccordingToEuRegulation`, `Taxon.Attributes.InvasiveRiskAssessmentCategory`
+- Application insights harvest health check
+
+
+### `Changed`
+ - The following fields are replaced
+    - `protected` replaced by `sensitive`
+    - `occurrence.protectectionLevel` replaced by `occurrence.sensitivityCategory`
+    - `taxon.attributes.protectionLevel` replaced by `taxon.attributes.sensitivityCategory`
+    - `identification.validated` replaced by `identification.verified`
+    - `identification.validationStatus` replaced by `identification.verificationStatus`
+
+### `Fixed`
+- DwC-A file text encoding label typo
+- Duplicates when observation has changed during harvest
+
+
+
+## [2022.03.08]
+
+**Prod**: 2022-03-08
+
+### `Added`
+- Support for response compression. Use header : `Accept-Encoding: br` for Brotli compression or `Accept-Encoding: gzip` for GZIP compression. Brotli compression is usually the faster than GZIP.
+- New parameter `gzip=true` or `gzip=false` to the `/Exports/Download` endpoints to enable retrieving Excel, GeoJSON and CSV files without GZIP compression.
+- `ProvinceCount` property to `CachedCount` endpoint.
+
+## [2021.12.02]
+
+**Prod**: 2021-12-02
+
+### `Added`
+- New date and time properties : `Event.PlainStartTime`, `Event.PlainEndTime`, `Event.PlainStartDate`, `Event.PlainEndDate`. 
+- Export to CSV.
+- New endpoint for observation count that uses caching for improved performance.
+- Support for Elasticsearch clusters.
+
+### `Changed`
+- Changed time format to use W. Europe Standard Time with time zone included. Example: "2016-01-17T11:00:00+01:00".
+- Change property names (the replaced names will still be available until next version, 1.5, of the API)
+  - `Sensitive` (replaces `Protected`)
+  - `Occurrence.SensitiviyCategory` (replaces `Occurrence.ProtectionLevel`)
+  - `Taxon.Attributes.SensitivityCategory` (replaces `Taxon.Attributes.ProtectionLevel`)
+  - `Identification.Verified` (replaces `Identification.Validated`)
+  - `Identification.VerificationStatus` (replaces `Identification.ValidationStatus`)
+  - `ArtportalenInternal.HasAnyTriggeredVerificationRuleWithWarning` (replaces `ArtportalenInternal.HasAnyTriggeredValidationRuleWithWarning`)
+  - `ArtportalenInternal.HasTriggeredVerificationRules` (replaces `ArtportalenInternal.HasTriggeredValidationRules`)
+- Hangfire jobs now uses two queues. One with high priority (observation processing) and one with normal priority (file orders).
+- Limit the number of simultaneous file orders per user to 5.
+
+### `Fixed`
+- Added a new date format in order to parse the TUVA dataset.
+- Changed SHARK OccurrenceId value in order to get unique keys.
+- 
+
+## [2021.10.05]
 
 **Prod**: 2021-10-05
 
@@ -19,11 +140,9 @@
 ### `Fixed`
 - DwC-A time parsing bug in the harvest step.
 
-## [1.0.2]
+## [2021.06.17]
 
 ### Releases
-
-**Test**:  2021-06-08
 
 **Prod**: 2021-06-17
 
@@ -49,14 +168,11 @@
 - Areas => Geographics.Areas
 - OnlyValidated => ValidationStatus (enum)
 
-## [1.0.1]
+## [2021.04.08]
 
 ### Releases
 
-**Test**: 2021-03-23
-
 **Prod**: 2021-04-08
-
 
 ### `Changed`
 
@@ -158,11 +274,9 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 - `Occurrence.OrganismQuantityInt` field removed.
 
 
-## [1.0.0] - 2021-01-21
+## [2021.01.21]
 
 ### Releases
-
-**Test**: 2021-01-21
 
 **Prod**: 2021-01-21
 
@@ -217,11 +331,9 @@ OutputFields är borttagen från aggregerade sökningar då den inte fyllde någ
 SearchAggregatedInternal
 SortBy, sortOrder borttagna då den inte fyllde någon funktion
 
-## [0.9.1] - 2020-11-30
+## [2020.11.30] - 2020-11-30
 
 ### Releases
-
-**Test**: 2020-11-30
 
 **Prod**: 2020-11-30
 

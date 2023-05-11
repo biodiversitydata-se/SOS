@@ -16,16 +16,18 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Factories;
+using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.IO.DwcArchive
 {
-    public class DwcArchiveFileWriter : IDwcArchiveFileWriter
+    public class DwcArchiveFileWriter : FileWriterBase, IDwcArchiveFileWriter
     {
         private readonly IDwcArchiveOccurrenceCsvWriter _dwcArchiveOccurrenceCsvWriter;
         private readonly IExtendedMeasurementOrFactCsvWriter _extendedMeasurementOrFactCsvWriter;
@@ -35,7 +37,7 @@ namespace SOS.Lib.IO.DwcArchive
         private readonly ILogger<DwcArchiveFileWriter> _logger;
 
         /// <summary>
-        /// Constructor.
+        /// Constructor
         /// </summary>
         /// <param name="dwcArchiveOccurrenceCsvWriter"></param>
         /// <param name="extendedMeasurementOrFactCsvWriter"></param>
@@ -43,12 +45,13 @@ namespace SOS.Lib.IO.DwcArchive
         /// <param name="fileService"></param>
         /// <param name="dataProviderRepository"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DwcArchiveFileWriter(IDwcArchiveOccurrenceCsvWriter dwcArchiveOccurrenceCsvWriter,
             IExtendedMeasurementOrFactCsvWriter extendedMeasurementOrFactCsvWriter,
             ISimpleMultimediaCsvWriter simpleMultimediaCsvWriter,
             IFileService fileService,
             IDataProviderRepository dataProviderRepository,
-            ILogger<DwcArchiveFileWriter> logger)
+            ILogger<DwcArchiveFileWriter> logger) 
         {
             _dwcArchiveOccurrenceCsvWriter = dwcArchiveOccurrenceCsvWriter ??
                                              throw new ArgumentNullException(nameof(dwcArchiveOccurrenceCsvWriter));
@@ -63,11 +66,11 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         /// <inheritdoc />
-        public async Task<string> CreateDwcArchiveFileAsync(
+        public async Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider,
-            FilterBase filter,
+            SearchFilter filter,
             string fileName,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken)
@@ -86,11 +89,11 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         /// <inheritdoc />
-        public async Task<string> CreateDwcArchiveFileAsync(
+        public async Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider,
-            FilterBase filter,
+            SearchFilter filter,
             string fileName,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
             ProcessInfo processInfo,
             string exportFolderPath,
@@ -102,19 +105,21 @@ namespace SOS.Lib.IO.DwcArchive
             {
                 temporaryZipExportFolderPath = Path.Combine(exportFolderPath, fileName);
                 _fileService.CreateFolder(temporaryZipExportFolderPath);
-                var occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.csv");
-                var emofCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "extendedMeasurementOrFact.csv");
-                var multimediaCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "multimedia.csv");
+                var occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.txt");
+                var emofCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "extendedMeasurementOrFact.txt");
+                var multimediaCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "multimedia.txt");
                 var metaXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "meta.xml");
                 var emlXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "eml.xml");
                 var processInfoXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "processinfo.xml");
                 bool emofFileCreated = false;
                 bool multimediaFileCreated = false;
+                int nrObservations = 0;
+                var expectedNoOfObservations = await processedObservationRepository.GetMatchCountAsync(filter);
 
-                // Create Occurrence.csv
+                // Create Occurrence.txt
                 using (var fileStream = File.Create(occurrenceCsvFilePath, 128 * 1024))
                 {
-                    await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                    nrObservations = await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                         filter,
                         fileStream,
                         fieldDescriptions,
@@ -122,24 +127,28 @@ namespace SOS.Lib.IO.DwcArchive
                         cancellationToken);
                 }
 
-                // Create ExtendedMeasurementOrFact.csv
+                // If less tha 99% of expected observations where fetched, something is wrong
+                if (nrObservations < expectedNoOfObservations * 0.99)
+                {
+                    throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
+                }
+
+                // Create ExtendedMeasurementOrFact.txt
                 using (var fileStream = File.Create(emofCsvFilePath))
                 {
                     emofFileCreated = await _extendedMeasurementOrFactCsvWriter.CreateCsvFileAsync(
                         filter,
                         fileStream,
-                        fieldDescriptions,
                         processedObservationRepository,
                         cancellationToken);
                 }
 
-                // Create multimedia.csv
+                // Create multimedia.txt
                 using (var fileStream = File.Create(multimediaCsvFilePath))
                 {
                     multimediaFileCreated = await _simpleMultimediaCsvWriter.CreateCsvFileAsync(
                         filter,
                         fileStream,
-                        fieldDescriptions,
                         processedObservationRepository,
                         cancellationToken);
                 }
@@ -179,7 +188,11 @@ namespace SOS.Lib.IO.DwcArchive
 
                 var zipFilePath = _fileService.CompressFolder(exportFolderPath, fileName);
                 _fileService.DeleteFolder(temporaryZipExportFolderPath);
-                return zipFilePath;
+                return new FileExportResult
+                {
+                    FilePath = zipFilePath,
+                    NrObservations = nrObservations
+                };                
             }
             catch (JobAbortedException)
             {
@@ -198,8 +211,10 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         public async Task WriteHeaderlessDwcaFiles(
+            DataProvider dataProvider,
             ICollection<Observation> processedObservations,
-            Dictionary<DwcaFilePart, string> filePathByFilePart)
+            Dictionary<DwcaFilePart, string> filePathByFilePart,
+            bool checkForIllegalCharacters = false)
         {
             if (!processedObservations?.Any() ?? true)
             {
@@ -208,18 +223,21 @@ namespace SOS.Lib.IO.DwcArchive
 
             var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
 
-            // Create Occurrence CSV file
+            // Create Occurrence txt file
             string occurrenceCsvFilePath = filePathByFilePart[DwcaFilePart.Occurrence];
-            var dwcObservations = processedObservations.ToDarwinCore();
+            bool fixSbdiArtportalenInstitutionCode = dataProvider.Id == 1;
+            var dwcObservations = processedObservations.ToDarwinCore(fixSbdiArtportalenInstitutionCode);
+            if (checkForIllegalCharacters) ValidateObservations(dwcObservations);
             await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
             await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
                 dwcObservations,
                 occurrenceFileStream,
                 fieldDescriptions);
 
-            // Create EMOF CSV file
+            // Create EMOF txt file
             string emofCsvFilePath = filePathByFilePart[DwcaFilePart.Emof];
             var emofRows = processedObservations.ToExtendedMeasurementOrFactRows();
+            if (checkForIllegalCharacters) ValidateEmofRows(emofRows);
             if (emofRows != null && emofRows.Any())
             {
                 await using StreamWriter emofFileStream = File.AppendText(emofCsvFilePath);
@@ -228,9 +246,10 @@ namespace SOS.Lib.IO.DwcArchive
                     emofFileStream);
             }
 
-            // Create Multimedia CSV file
+            // Create Multimedia txt file
             string multimediaCsvFilePath = filePathByFilePart[DwcaFilePart.Multimedia];
             var multimediaRows = processedObservations.ToSimpleMultimediaRows();
+            if (checkForIllegalCharacters) ValidateMultimediaRows(multimediaRows);
             if (multimediaRows != null && multimediaRows.Any())
             {
                 await using var multimediaFileStream = File.AppendText(multimediaCsvFilePath);
@@ -238,6 +257,42 @@ namespace SOS.Lib.IO.DwcArchive
                 _simpleMultimediaCsvWriter.WriteHeaderlessCsvFile(
                     multimediaRows,
                     multimediaFileStream);
+            }
+        }
+
+        private void ValidateObservations(IEnumerable<DarwinCore> dwcObservations)
+        {
+            foreach (var dwcObservation in dwcObservations)
+            {
+                string validation = DwcaFileValidator.Validate(dwcObservation);
+                if (validation != null)
+                {
+                    _logger.LogInformation(validation);
+                }
+            }
+        }
+
+        private void ValidateEmofRows(IEnumerable<ExtendedMeasurementOrFactRow> emofRows)
+        {
+            foreach (var emofRow in emofRows)
+            {
+                string validation = DwcaFileValidator.Validate(emofRow);
+                if (validation != null)
+                {
+                    _logger.LogInformation(validation);
+                }
+            }
+        }
+
+        private void ValidateMultimediaRows(IEnumerable<SimpleMultimediaRow> multimediaRows)
+        {
+            foreach (var multimediaRow in multimediaRows)
+            {
+                string validation = DwcaFileValidator.Validate(multimediaRow);
+                if (validation != null)
+                {
+                    _logger.LogInformation(validation);
+                }
             }
         }
 
@@ -310,7 +365,7 @@ namespace SOS.Lib.IO.DwcArchive
             await CreateDwcArchiveFileAsync(dataProvider, new[] { dwcaFilePartsInfo }, tempFilePath);
         }
 
-        private async Task CreateDwcArchiveFileAsync(DataProvider dataProvider,
+        public async Task CreateDwcArchiveFileAsync(DataProvider dataProvider,
             IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos, string tempFilePath)
         {
             if (dataProvider.UseVerbatimFileInExport)
@@ -318,21 +373,20 @@ namespace SOS.Lib.IO.DwcArchive
                 return;
             }
 
-            var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().ToList();
             using var archive = ZipFile.Open(tempFilePath, ZipArchiveMode.Create);
-            
-            // Create meta.xml
             var dwcExtensions = new List<DwcaFilePart>();
 
-            // Create occurrence.csv
+            // Create occurrence.txt
             var occurrenceFilePaths = GetFilePaths(dwcaFilePartsInfos, "occurrence*");
-            await using var occurrenceFileStream = archive.CreateEntry("occurrence.csv", CompressionLevel.Optimal).Open();
+            await using var occurrenceFileStream = archive.CreateEntry("occurrence.txt", CompressionLevel.Optimal).Open();
 
             using var csvFileHelper = new CsvFileHelper();
             csvFileHelper.InitializeWrite(occurrenceFileStream, "\t");
 
             _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvFileHelper,
                 FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions());
+            await csvFileHelper.FlushAsync();
+            
             foreach (var filePath in occurrenceFilePaths)
             {
                 await using var readStream = File.OpenRead(filePath);
@@ -342,14 +396,15 @@ namespace SOS.Lib.IO.DwcArchive
             csvFileHelper.FinishWrite();
             occurrenceFileStream.Close();
 
-            // Create emof.csv
+            // Create emof.txt
             var emofFilePaths = GetFilePaths(dwcaFilePartsInfos, "emof*");
             if (emofFilePaths.Any())
             {
                 dwcExtensions.Add(DwcaFilePart.Emof);
-                await using var extendedMeasurementOrFactFileStream = archive.CreateEntry("extendedMeasurementOrFact.csv", CompressionLevel.Optimal).Open();
+                await using var extendedMeasurementOrFactFileStream = archive.CreateEntry("extendedMeasurementOrFact.txt", CompressionLevel.Optimal).Open();
                 csvFileHelper.InitializeWrite(extendedMeasurementOrFactFileStream, "\t");
                 _extendedMeasurementOrFactCsvWriter.WriteHeaderRow(csvFileHelper);
+                await csvFileHelper.FlushAsync();
                 foreach (var filePath in emofFilePaths)
                 {
                     await using var readStream = File.OpenRead(filePath);
@@ -360,14 +415,15 @@ namespace SOS.Lib.IO.DwcArchive
                 extendedMeasurementOrFactFileStream.Close();
             }
 
-            // Create multimedia.csv
+            // Create multimedia.txt
             var multimediaFilePaths = GetFilePaths(dwcaFilePartsInfos, "multimedia*");
             if (multimediaFilePaths.Any())
             {
                 dwcExtensions.Add(DwcaFilePart.Multimedia);
-                await using var multimediaFileStream = archive.CreateEntry("multimedia.csv", CompressionLevel.Optimal).Open();
+                await using var multimediaFileStream = archive.CreateEntry("multimedia.txt", CompressionLevel.Optimal).Open();
                 csvFileHelper.InitializeWrite(multimediaFileStream, "\t");
-                _simpleMultimediaCsvWriter.WriteHeaderRow(csvFileHelper);
+                _simpleMultimediaCsvWriter.WriteHeaderRow(csvFileHelper, false);
+                await csvFileHelper.FlushAsync();
                 foreach (var filePath in multimediaFilePaths)
                 {
                     await using var readStream = File.OpenRead(filePath);
@@ -379,6 +435,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
 
             // Create meta.xml
+            var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().ToList();
             await using var metaFileStream = archive.CreateEntry("meta.xml", CompressionLevel.Optimal).Open();
             DwcArchiveMetaFileWriter.CreateMetaXmlFile(metaFileStream, fieldDescriptions.ToList(), dwcExtensions);
             metaFileStream.Close();
@@ -404,10 +461,13 @@ namespace SOS.Lib.IO.DwcArchive
             var filePaths = new List<string>();
             foreach (var dwcaFilePartsInfo in dwcaFilePartsInfos)
             {
-                filePaths.AddRange(Directory.EnumerateFiles(
+                if (Directory.Exists(dwcaFilePartsInfo.ExportFolder))
+                {
+                    filePaths.AddRange(Directory.EnumerateFiles(
                     dwcaFilePartsInfo.ExportFolder,
                     searchPattern,
                     SearchOption.TopDirectoryOnly));
+                }    
             }
 
             return filePaths;

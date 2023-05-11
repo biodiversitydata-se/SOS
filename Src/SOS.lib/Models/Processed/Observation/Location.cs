@@ -1,5 +1,7 @@
 ﻿using Nest;
+using SOS.Lib.Enums;
 using SOS.Lib.Swagger;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -9,11 +11,20 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Location
     {
         /// <summary>
+        /// Constructor shoud only be used by reflection
+        /// </summary>
+        public Location() : this(LocationType.Unknown)
+        {
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
-        public Location()
+        /// <param name="type"></param>
+        public Location(LocationType type)
         {
             Attributes = new LocationAttributes();
+            Type = type;
         }
 
         /// <summary>
@@ -31,7 +42,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Continent { get; set; }
 
         /// <summary>
@@ -59,7 +69,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Country { get; set; }
 
         /// <summary>
@@ -71,12 +80,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public string CountryCode { get; set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public Area CountryRegion { get; set; }
+
+        /// <summary>
         ///     The full, unabbreviated name of the next smaller
         ///     administrative region than stateProvince(county, shire,
         ///     department, etc.) in which the Location occurs
         ///     ('län' in swedish).
         /// </summary>
-        [Object]
         public Area County { get; set; }
 
         /// <summary>
@@ -84,13 +97,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     administrative region than county (city, municipality, etc.)
         ///     in which the Location occurs.
         /// </summary>
-        [Object]
         public Area Municipality { get; set; }
 
         /// <summary>
         ///     Parish ('socken' in swedish).
         /// </summary>
-        [Object]
         public Area Parish { get; set; }
 
         /// <summary>       
@@ -99,7 +110,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     in which the Location occurs.
         ///     ('landskap' in swedish). Darwin Core term name: stateProvince.
         /// </summary>
-        [Object]
         public Area Province { get; set; }
 
         /// <summary>
@@ -120,6 +130,16 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     and 180, inclusive.
         /// </summary>
         public double? DecimalLongitude { get; set; }
+
+        /// <summary>
+        /// X coordinate in ETRS89.
+        /// </summary>
+        public double? Etrs89X { get; set; }
+
+        /// <summary>
+        /// Y coordinate in ETRS89.
+        /// </summary>
+        public double? Etrs89Y { get; set; }
 
         /// <summary>
         ///     The ratio of the area of the footprint (footprintWKT)
@@ -232,7 +252,14 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     such as the Getty Thesaurus of Geographic Names.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string HigherGeographyID { get; set; }
+        public string HigherGeographyId { get; set; }
+
+        /// <summary>
+        ///     Internal flag used in validation. must be true to be stored in processed data
+        /// </summary>
+        [JsonIgnore]
+        [SwaggerExclude]
+        public bool IsInEconomicZoneOfSweden { get; set; }
 
         /// <summary>
         ///     The name of the island on or near which the Location occurs.
@@ -257,7 +284,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     from the original to correct perceived errors or
         ///     standardize the description.
         /// </summary>
-        [Keyword]
         public string Locality { get; set; }
 
         /// <summary>
@@ -273,7 +299,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     May be a global unique identifier or an identifier
         ///     specific to the data set.
         /// </summary>
-        [Keyword]
         public string LocationId { get; set; }
 
         /// <summary>
@@ -330,25 +355,25 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Point (WGS84).
         /// </summary>
-        [GeoShape, SwaggerExclude]
+        [SwaggerExclude]
         public PointGeoShape Point { get; set; }
 
         /// <summary>
         ///     Point used in distance from point search.
         /// </summary>
-        [GeoPoint, SwaggerExclude]
+        [SwaggerExclude]
         public GeoLocation PointLocation { get; set; }
 
         /// <summary>
         ///     Point with accuracy buffer (WGS84).
         /// </summary>
-        [GeoShape, SwaggerExclude]
+        [SwaggerExclude]
         public PolygonGeoShape PointWithBuffer { get; set; }
 
         /// <summary>
         /// Point with disturbance buffer
         /// </summary>
-        [GeoShape, SwaggerExclude]
+        [SwaggerExclude]
         public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }
         
         /// <summary>
@@ -368,6 +393,18 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     the pointRadiusSpatialFit is 1.
         /// </summary>
         public string PointRadiusSpatialFit { get; set; }
+
+        /// <summary>
+        /// X coordinate in SWEREF99 TM.
+        /// </summary>
+        public double? Sweref99TmX { get; set; }
+
+        /// <summary>
+        /// Y coordinate in SWEREF99 TM.
+        /// </summary>
+        public double? Sweref99TmY { get; set; }
+
+        public LocationType Type { get; set; }
 
         /// <summary>
         ///     The verbatim original spatial coordinates of the Location.

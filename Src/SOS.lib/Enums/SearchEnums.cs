@@ -38,12 +38,17 @@ namespace SOS.Lib.Enums
         /// <summary>
         /// All properties where we know there exist at least one observation with a value.
         /// </summary>
-        AllWithKnownValues,
+        AllWithValues,
 
         /// <summary>
         /// All properties exported
         /// </summary>
-        All
+        All,
+
+        /// <summary>
+        /// The field doesn't belong to any field set.
+        /// </summary>
+        None
     }
 
     /// <summary>
@@ -98,10 +103,29 @@ namespace SOS.Lib.Enums
         IncludeNotPresent
     }
 
-    public enum MonthsFilterComparison
+    public enum DateFilterComparison
     {
         StartDate,
         EndDate,
-        BothStartDateAndEndDate
+        BothStartDateAndEndDate,
+        StartDateEndDateMonthRange
+    }
+
+    public enum ProtectionFilter
+    {
+        /// <summary>
+        /// Public observations
+        /// </summary>
+        Public = 0,
+
+        /// <summary>
+        /// Sensitive observations
+        /// </summary>
+        Sensitive,
+
+        /// <summary>
+        /// Both public and sensitive observations
+        /// </summary>
+        BothPublicAndSensitive
     }
 }

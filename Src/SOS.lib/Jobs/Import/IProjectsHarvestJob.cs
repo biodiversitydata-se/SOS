@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Hangfire;
 
 namespace SOS.Lib.Jobs.Import
@@ -10,7 +9,7 @@ namespace SOS.Lib.Jobs.Import
         ///     Run harvest projects vocabulary job.
         /// </summary>
         /// <returns></returns>
-        [DisplayName("Harvest projects from Artportalen db")]
+        [JobDisplayName("Harvest projects from Artportalen db")]
         [Queue("high")]
         Task<bool> RunHarvestProjectsAsync();
     }

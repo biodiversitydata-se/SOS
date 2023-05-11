@@ -28,6 +28,11 @@ namespace SOS.Lib.Models.Processed
         }
 
         /// <summary>
+        ///     Number of faild to process
+        /// </summary>
+        public int FailedCount { get; set; }
+
+        /// <summary>
         ///     Number of items
         /// </summary>
         public int ProtectedCount { get; set; }
@@ -71,13 +76,15 @@ namespace SOS.Lib.Models.Processed
             DateTime start,
             DateTime end,
             int publicCount,
-            int protectedCount)
+            int protectedCount,
+            int failedCount)
         {
             return new ProcessingStatus(dataProviderIdentifier, type)
             {
                 Status = RunStatus.Success,
                 Start = start,
                 End = end,
+                FailedCount = failedCount,
                 PublicCount = publicCount,
                 ProtectedCount = protectedCount
             };

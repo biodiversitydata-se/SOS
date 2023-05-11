@@ -1,14 +1,16 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.IO
 {
     public class FileWriterBase
     {
+       
         /// <summary>
         /// Store filter in folder o zip
         /// </summary>

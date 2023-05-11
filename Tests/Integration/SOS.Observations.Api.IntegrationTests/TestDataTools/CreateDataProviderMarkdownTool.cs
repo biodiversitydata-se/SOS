@@ -71,13 +71,16 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
 
         private string CreateMarkdown(List<DataProviderDto> dataProviders)
         {
+            int totalCount=0;
             var sb = new StringBuilder();
             sb.AppendLine("| Id 	| Name 	| Organization 	| Number of observations 	|");
             sb.AppendLine("|:---	|:---	|:--- |---:	|");
             foreach (var dataProvider in dataProviders)
             {
                 sb.AppendLine($"| {dataProvider.Id} | [{dataProvider.Name}]({dataProvider.Url}) | {dataProvider.Organization} | {(dataProvider.PublicObservations + dataProvider.ProtectedObservations):N0} |");
+                totalCount += (dataProvider.PublicObservations + dataProvider.ProtectedObservations);
             }
+            sb.AppendLine($"|  |  |  | **{totalCount:N0}** |");
 
             return sb.ToString();
         }

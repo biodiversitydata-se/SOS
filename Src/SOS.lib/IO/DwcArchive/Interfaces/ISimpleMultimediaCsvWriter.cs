@@ -2,10 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
-using SOS.Export.Models;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.IO.DwcArchive.Interfaces
@@ -20,29 +19,29 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="stream"></param>
-        /// <param name="fieldDescriptions"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> CreateCsvFileAsync(FilterBase filter, Stream stream,
-            IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
+        Task<bool> CreateCsvFileAsync(SearchFilterBase filter, Stream stream,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IJobCancellationToken cancellationToken);
 
         /// <summary>
-        /// Create a headerless Simple Multimedia extension CSV file.
+        ///  Create a headerless Simple Multimedia extension CSV file.
         /// </summary>
         /// <param name="multimediaRows"></param>
         /// <param name="streamWriter"></param>
-        /// <returns></returns>
+        /// <param name="eventBased"></param>
         void WriteHeaderlessCsvFile(
             IEnumerable<SimpleMultimediaRow> multimediaRows,
-            StreamWriter streamWriter);
+            StreamWriter streamWriter,
+            bool eventBased = false);
 
         /// <summary>
         /// Write Simple multimedia extension header row.
         /// </summary>
         /// <param name="csvFileHelper"></param>
-        void WriteHeaderRow(CsvFileHelper csvFileHelper);
+        /// <param name="eventBased"></param>
+        void WriteHeaderRow(CsvFileHelper csvFileHelper, bool eventBased);
     }
 }

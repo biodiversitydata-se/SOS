@@ -192,11 +192,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Birds"
+                "Value": "Birds Directive"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Fåglar"
+                "Value": "Fågeldirektivet"
             }
         ],
         "TaxonIds": []
@@ -278,5 +278,182 @@
             }
         ],
         "TaxonIds": []
+    },
+    {
+        "Id": 19,
+        "ParentId": 6,
+        "TaxonListServiceId": 39,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Risk assessment - Severe impact"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Risklista - Mycket hög risk (SE)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 20,
+        "ParentId": 6,
+        "TaxonListServiceId": 40,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Risk assessment - High impact"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Risklista - Hög risk (HI)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 21,
+        "ParentId": 6,
+        "TaxonListServiceId": 41,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Risk assessment - Potentially high impact"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Risklista - Potentiellt hög risk (PH)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 22,
+        "ParentId": 6,
+        "TaxonListServiceId": 42,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Risk assessment - Low impact"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Risklista - Låg risk (LO)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 23,
+        "ParentId": 6,
+        "TaxonListServiceId": 43,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Risk assessment - No known impact"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Risklista - Ingen känd risk (NK)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 24,
+        "ParentId": 7,
+        "TaxonListServiceId": 233,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Near Threatened (NT)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Nära hotad (NT)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 25,
+        "ParentId": 7,
+        "TaxonListServiceId": 232,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Vulnerable (VU)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Sårbar (VU)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 26,
+        "ParentId": 7,
+        "TaxonListServiceId": 231,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Endangered (EN)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Starkt hotad (EN)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 27,
+        "ParentId": 7,
+        "TaxonListServiceId": 230,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Critically Endangered (CR)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Akut hotad (CR)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 28,
+        "ParentId": 7,
+        "TaxonListServiceId": 229,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Regionally Extinct (RE)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Nationellt utdöd (RE)"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 29,
+        "ParentId": 7,
+        "TaxonListServiceId": 228,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Data Deficient (DD)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Kunskapsbrist (DD)"
+            }
+        ],
+        "TaxonIds": []
     }
+
 ]

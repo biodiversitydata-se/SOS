@@ -17,8 +17,8 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Managers.Interfaces;
-using SOS.Process.Processors.Sers;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Sers;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors
@@ -35,10 +35,11 @@ namespace SOS.Process.UnitTests.Processors
         {
             _sersObservationVerbatimRepositoryMock = new Mock<ISersObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
-            _processedObservationRepository = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepository = new Mock<IProcessedObservationCoreRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _processManagerMock = new Mock<IProcessManager>();
+            _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _validationManagerMock = new Mock<IValidationManager>();
             _diffusionManagerMock = new Mock<IDiffusionManager>();
             _loggerMock = new Mock<ILogger<SersObservationProcessor>>();
@@ -46,12 +47,13 @@ namespace SOS.Process.UnitTests.Processors
 
         private readonly Mock<ISersObservationVerbatimRepository> _sersObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepository;
+        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepository;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IProcessManager> _processManagerMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<IDiffusionManager> _diffusionManagerMock;
+        private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
         private readonly Mock<ILogger<SersObservationProcessor>> _loggerMock;
 
         private SersObservationProcessor TestObject => new SersObservationProcessor(
@@ -61,6 +63,7 @@ namespace SOS.Process.UnitTests.Processors
             _vocabularyResolverMock.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processManagerMock.Object,
+            _processTimeManagerMock.Object,
             _validationManagerMock.Object,
             _diffusionManagerMock.Object,
             new ProcessConfiguration(),
@@ -147,7 +150,7 @@ namespace SOS.Process.UnitTests.Processors
             _sersObservationVerbatimRepositoryMock.Setup(r => r.GetAllByCursorAsync())
                 .ReturnsAsync(mockCursor.Object);
 
-            _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<Observation>>()));
+            _areaHelper.Setup(r => r.AddAreaDataToProcessedLocations(It.IsAny<IEnumerable<Location>>()));
 
             _processedObservationRepository.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>()))
                 .ReturnsAsync(true);

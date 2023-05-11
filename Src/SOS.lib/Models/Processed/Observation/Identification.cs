@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using System;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -7,6 +7,14 @@ namespace SOS.Lib.Models.Processed.Observation
     /// </summary>
     public class Identification
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public Identification()
+        {
+
+        }
+
         /// <summary>
         /// Confirmed by.
         /// </summary>
@@ -55,8 +63,15 @@ namespace SOS.Lib.Models.Processed.Observation
 
         /// <summary>
         ///     True if sighting is validated.
+        /// This property is deprecated and replaced by the Verified property.
         /// </summary>
-        public bool Validated { get; set; }
+        [Obsolete("Replaced by Verified")]
+        public bool Validated => Verified;
+
+        /// <summary>
+        ///     True if sighting is verified (validated).
+        /// </summary>
+        public bool Verified { get; set; }
 
         /// <summary>
         ///     A categorical indicator of the extent to which the taxonomic
@@ -65,8 +80,17 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
-        public VocabularyValue ValidationStatus { get; set; }
+        [Obsolete("Replaced by VerificationStatus")]
+        public VocabularyValue ValidationStatus => VerificationStatus;
+
+        /// <summary>
+        ///     A categorical indicator of the extent to which the taxonomic
+        ///     identification has been verified to be correct.
+        /// </summary>
+        /// <remarks>
+        ///     This field uses a controlled vocabulary.
+        /// </remarks>
+        public VocabularyValue VerificationStatus { get; set; }
 
         /// <summary>
         ///     A list (concatenated and separated) of names of people,
@@ -90,7 +114,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///    Method used in species determination.
         /// </summary>
-        [Object]
         public VocabularyValue DeterminationMethod { get; set; }
 
         /// <summary>

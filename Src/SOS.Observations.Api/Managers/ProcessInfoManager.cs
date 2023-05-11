@@ -51,6 +51,7 @@ namespace SOS.Observations.Api.Managers
                 PublicProcessCount = providerInfo.PublicProcessCount,
                 ProtectedProcessCount = providerInfo.ProtectedProcessCount,
                 ProcessEnd = providerInfo.ProcessEnd,
+                ProcessFailCount = providerInfo.ProcessFailCount,
                 ProcessStart = providerInfo.ProcessStart,
                 ProcessStatus = providerInfo.ProcessStatus?.ToString()
             };
@@ -72,11 +73,11 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<ProcessInfoDto> GetProcessInfoAsync(bool active)
+        public async Task<ProcessInfoDto> GetProcessInfoAsync(string id)
         {
             try
             {
-                var processInfo = await _processInfoRepository.GetProcessInfoAsync(active);
+                var processInfo = await _processInfoRepository.GetAsync(id);
 
                 return processInfo == null ? null : CastToProcessInfoDto(processInfo);
             }

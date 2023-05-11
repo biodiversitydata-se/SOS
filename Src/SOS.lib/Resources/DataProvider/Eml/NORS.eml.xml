@@ -1,130 +1,153 @@
-<?xml version="1.0" encoding="utf-8"?>
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
-         xmlns:dc="http://purl.org/dc/terms/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:sos="https://sos-search.artdata.slu.se/"
-         xmlns:gbif="http://gbif.org/"
+         xmlns:dc="https://purl.org/dc/terms/"
+         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+		 xmlns:sos="https://sos-search.artdata.slu.se/"
+         xmlns:gbif="https://gbif.org/"
          xmlns:snd="https://snd.gu.se/"
-         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
-         packageId="33f2c3d3-aac3-f4d3-347b-baba45536879" system="https://sos-search.artdata.slu.se/" scope="system"
-         xml:lang="en">
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+         packageId="5f501df0-0c61-11dd-84ce-b8a03c50a862" system="https://sos-search.artdata.slu.se/" scope="system"
+         xml:lang="eng">
+
 	<dataset>
-		<identifier>33f2c3d3-aac3-f4d3-347b-baba45536879</identifier>
-        <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:NORS</alternateIdentifier>
-        <title>The National Register of Survey test-fishing (NORS)</title>
+		<alternateIdentifier>5f501df0-0c61-11dd-84ce-b8a03c50a862</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=fiv-nors</alternateIdentifier>
+		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:NORS</alternateIdentifier>
+		<title xml:lang="eng">SLU Aqua Institute of Freshwater Research National register of survey test-fishing - NORS</title>
 		<creator>
+			<individualName>
+				<givenName>Anders</givenName>
+				<surName>Kinnerbäck</surName>
+			</individualName>
 			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Administrator</positionName>
 			<address>
-				<city>Lysekil</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress></electronicMailAddress>
-            <onlineUrl>http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/</onlineUrl>
-            <sos:contactNameType>Organizational</sos:contactNameType>
+			<electronicMailAddress>Anders.Kinnerback@slu.se</electronicMailAddress>
 		</creator>
 		<metadataProvider>
+			<individualName>
+				<givenName>Anders</givenName>
+				<surName>Kinnerbäck</surName>
+			</individualName>
 			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Administrator</positionName>
 			<address>
-				<city>Lysekil</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-            <electronicMailAddress></electronicMailAddress>
-            <onlineUrl></onlineUrl>
-		</metadataProvider>		
-		<pubDate>      
+			<electronicMailAddress>Anders.Kinnerback@slu.se</electronicMailAddress>
+		</metadataProvider>
+		<pubDate>
 		</pubDate>
-		<language>ENGLISH</language>
-        <licenseName></licenseName>
+		<language>eng</language>
 		<abstract>
-			<para>The database called NORS contains data from netfishing in Swedish lakes.</para>
+			<para>
+				Standardized test-fishing with Nordic multi-mesh gillnets is a widely used method in Sweden to investigate the fish fauna in a lake. In 2005 the method became an European standard (EN 14757). Standardized test-fishing catch most of the Swedish species in a representative way, giving a good estimate of species abundance and size distribution. The results are generally used for purposes of environmental protection and fishery management.
+				NORS consists of thousands of test-fishing occasions back to the 1950’s. The Department of Aquatic Resources (SLU Aqua) at the Swedish University of Agricultural Sciences is responsible of collecting and checking test-fishing data generated in national and regional environmental programs, on behalf of the Swedish Agency for Marine and Water Management. SLU Aqua also collect test-fishing data from several other types of investigations in order to create a database as representative as possible. The purpose is to facilitate obtaining data of high quality for research, national investigations and reports. The database also serves as a reference for local and regional investigations. All data is available for the public.
+			</para>
 		</abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
-			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
 		</keywordSet>
 		<keywordSet>
 			<keyword>Observation</keyword>
-			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Sweden</keyword>
+			<keyword>Pisces</keyword>
+			<keyword>Fish</keyword>
+			<keyword>Freshwater</keyword>
+			<keyword>Lakes</keyword>
+			<keywordThesaurus>Not Applicable</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
 		</keywordSet>
 		<intellectualRights>
-			<para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="https://creativecommons.org/publicdomain/zero/1.0/legalcode">
 					<citetitle>Public Domain (CC0 1.0)</citetitle>
-				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
 		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">https://www.slu.se/en/departments/aquatic-resources/databases/national-register-of-survey-test-fishing-nors/</url>
+			</online>
+		</distribution>
 		<coverage>
 			<geographicCoverage>
-				<geographicDescription>This resource covers Sweden.</geographicDescription>
+				<geographicDescription>Sweden</geographicDescription>
 				<boundingCoordinates>
-					<westBoundingCoordinate>0.0</westBoundingCoordinate>
-					<eastBoundingCoordinate>0.0</eastBoundingCoordinate>
-					<northBoundingCoordinate>0.0</northBoundingCoordinate>
-					<southBoundingCoordinate>0.0</southBoundingCoordinate>
+					<westBoundingCoordinate>10.03</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.17</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.07</northBoundingCoordinate>
+					<southBoundingCoordinate>54.96</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
-            <temporalCoverage>
+			<temporalCoverage>
                 <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
                 <sos:LivingTimePeriod></sos:LivingTimePeriod>
-                <sos:StartDate></sos:StartDate>
+                <sos:StartDate>1952</sos:StartDate>
                 <sos:EndDate></sos:EndDate>
             </temporalCoverage>
-            <taxonomicCoverage>
-                <sos:TaxonomicDescription>Fish</sos:TaxonomicDescription>
-                <taxonId>6000995</taxonId>
-                <sos:TaxonList></sos:TaxonList>
-            </taxonomicCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>Pisces</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Pisces</taxonRankValue>
+				</taxonomicClassification>
+			</taxonomicCoverage>
 		</coverage>
 		<maintenance>
 			<description>
-				<para/>
+				<para></para>
 			</description>
-			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+			<maintenanceUpdateFrequency>irregular</maintenanceUpdateFrequency>
 		</maintenance>
 		<contact>
-            <individualName>
-                <givenName>Anders</givenName>
-                <surName>Kinnerbäck</surName>
-            </individualName>
-            <electronicMailAddress>anders.kinnerback@slu.se</electronicMailAddress>
-            <organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<individualName>
+				<givenName>Anders</givenName>
+				<surName>Kinnerback</surName>
+			</individualName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Administrator</positionName>
 			<address>
-				<city>Lysekil</city>
+				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-            <onlineUrl>http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/</onlineUrl>
-            <sos:contactNameType>Personal</sos:contactNameType>
+			<electronicMailAddress>Anders.Kinnerback@slu.se</electronicMailAddress>
 		</contact>
-        <sos:resourceType>occurrence data</sos:resourceType>
-        <sos:dataAccessibilityLevel></sos:dataAccessibilityLevel>
-        <sos:datsetSubtype>census data</sos:datsetSubtype>
-        <gbif:MetadataLanguage>ENGLISH</gbif:MetadataLanguage>
-        <gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
-        <project>
-            <sos:projectTitle></sos:projectTitle>
-            <funding></funding>
-            <funderIdentifier></funderIdentifier>
-            <dc:funderIdentifierType></dc:funderIdentifierType>
-            <designDescription></designDescription>
-        </project>
-        <samplingMethods>
-            <studyExtent></studyExtent>
-            <samplingDescription></samplingDescription>
-            <methodStep></methodStep>
-            <qualityControl></qualityControl>
-        </samplingMethods>
-        <additionalMetadata>
-            <metadata>
-                <gettingStarted></gettingStarted>
-                <purpose></purpose>
-                <sos>
-                    <sos:PersonalData></sos:PersonalData>
-                    <sos:SensitiveData></sos:SensitiveData>
-                    <sos:SensitiveDataDescription></sos:SensitiveDataDescription>
-                </sos>
-                <snd:dataFormat></snd:dataFormat>
-            </metadata>
-        </additionalMetadata>
-        <citations>
-            <sos:ResourceCitation></sos:ResourceCitation>
-        </citations>
+		<contact>
+			<individualName>
+				<givenName>Malin</givenName>
+				<surName>Werner</surName>
+			</individualName>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<city>Uppsala</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>malin.werner@slu.se</electronicMailAddress>
+		</contact>
+		<sos:resourceType>occurrence data</sos:resourceType>		
+		<sos:datsetSubtype>census data</sos:datsetSubtype>
 	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2015-07-15T02:11:55.647+02:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Kinnerbäck A (2023). SLU Aqua Institute of Freshwater Research National register of survey test-fishing - NORS. Department of Aquatic resources. https://www.slu.se/sjoprovfiskedatabasen [yyyy-mm-dd].</citation>
+				<formationPeriod>1952-current</formationPeriod>
+				<livingTimePeriod>1952-current</livingTimePeriod>				
+			</gbif>
+		</metadata>
+	</additionalMetadata>
 </eml:eml>

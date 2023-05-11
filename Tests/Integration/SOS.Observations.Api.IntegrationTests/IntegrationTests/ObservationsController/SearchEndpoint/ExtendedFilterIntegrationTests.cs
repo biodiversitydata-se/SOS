@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using SOS.Lib.Enums;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
@@ -41,9 +40,9 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 ExtendedFilter = new ExtendedFilterDto()
                 {
                     Months = new List<int> {1,2,4},
-                    MonthsComparison = ExtendedFilterDto.MonthsFilterComparisonDto.BothStartDateAndEndDate
+                    MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.BothStartDateAndEndDate
                 },
-                Output = new OutputFilterDto{ Fields = new[] { "Event" } } 
+                Output = new OutputFilterExtendedDto{ Fields = new[] { "Event" } } 
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -78,6 +77,56 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
+        public async Task Test_search_female_taxa()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var searchFilter = new SearchFilterInternalDto()
+            {
+                DataProvider = new DataProviderFilterDto
+                {
+                    Ids = new List<int>() {1}
+                },
+                //Date = new DateFilterDto()
+                //{
+                //    StartDate = new DateTime(2016, 1, 1),
+                //    EndDate = new DateTime(2017, 12, 31),
+                //    DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
+                //},
+                //Date = new DateFilterDto()
+                //{
+                //    StartDate = new DateTime(2018, 1, 1),
+                //    EndDate = new DateTime(2022, 12, 31),
+                //    DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
+                //},
+                Taxon = new TaxonFilterDto()
+                {
+                    IncludeUnderlyingTaxa = true,
+                    Ids = new int[] { 103046}
+                },
+                ExtendedFilter = new ExtendedFilterDto()
+                {
+                    SexIds = new List<int> { (int)SexId.Female }
+                },
+                IncludeRealCount = true
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.ObservationsBySearchInternal(null, null, searchFilter, 0, 10);
+            var result = response.GetResult<PagedResultDto<Observation>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.TotalCount.Should().BeGreaterOrEqualTo(100);
+        }
+
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
         public async Task Search_with_months_consider_startDate()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -94,9 +143,9 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 ExtendedFilter = new ExtendedFilterDto()
                 {
                     Months = new List<int> { 1, 2, 4 },
-                    MonthsComparison = ExtendedFilterDto.MonthsFilterComparisonDto.StartDate
+                    MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.StartDate
                 },
-                Output = new OutputFilterDto{ Fields = new[] { "Event" } } 
+                Output = new OutputFilterExtendedDto { Fields = new[] { "Event" } } 
             };
 
             //-----------------------------------------------------------------------------------------------------------

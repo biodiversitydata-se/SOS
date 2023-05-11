@@ -7,7 +7,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
-using SOS.Import.Harvesters.Interfaces;
+using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
 

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Swagger;
+using SOS.Lib.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {

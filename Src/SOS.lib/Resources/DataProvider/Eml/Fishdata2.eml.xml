@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
-         xmlns:dc="http://purl.org/dc/terms/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:dc="https://purl.org/dc/terms/"
+         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
          xmlns:sos="https://sos-search.artdata.slu.se/"
-         xmlns:gbif="http://gbif.org/"
+         xmlns:gbif="https://gbif.org/"
          xmlns:snd="https://snd.gu.se/"
-         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
          packageId="334f890c-ca33-56f4-0094-1efb44c15eab" system="https://sos-search.artdata.slu.se/" scope="system"
          xml:lang="en">
 	<dataset>
@@ -41,32 +41,32 @@
 		</abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
-			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
 		</keywordSet>
 		<keywordSet>
 			<keyword>Observation</keyword>
-			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
 		</keywordSet>
 		<intellectualRights>
-			<para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+			<para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="https://creativecommons.org/publicdomain/zero/1.0/legalcode">
 					<citetitle>Public Domain (CC0 1.0)</citetitle>
 				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
 		</intellectualRights>
 		<coverage>
 			<geographicCoverage>
-				<geographicDescription>This resource covers Sweden.</geographicDescription>
+				<geographicDescription>This resource covers areas of the Skagerrak and Kattegat off the West coast of Sweden.</geographicDescription>
 				<boundingCoordinates>
-					<westBoundingCoordinate>0.0</westBoundingCoordinate>
-					<eastBoundingCoordinate>0.0</eastBoundingCoordinate>
-					<northBoundingCoordinate>0.0</northBoundingCoordinate>
-					<southBoundingCoordinate>0.0</southBoundingCoordinate>
+					<westBoundingCoordinate>10.10</westBoundingCoordinate>
+					<eastBoundingCoordinate>12.90</eastBoundingCoordinate>
+					<northBoundingCoordinate>58.67</northBoundingCoordinate>
+					<southBoundingCoordinate>55.75</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
             <temporalCoverage>
                 <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
                 <sos:LivingTimePeriod></sos:LivingTimePeriod>
-                <sos:StartDate></sos:StartDate>
-                <sos:EndDate></sos:EndDate>
+                <sos:StartDate>2010-01-01</sos:StartDate>
+                <sos:EndDate>2010-12-31</sos:EndDate>
             </temporalCoverage>
             <taxonomicCoverage>
                 <sos:TaxonomicDescription>Fish</sos:TaxonomicDescription>

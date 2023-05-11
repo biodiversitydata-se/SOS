@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -11,7 +12,7 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.JsonConverters;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
@@ -114,6 +115,11 @@ namespace SOS.Lib.Repositories.Resource
             if (areaTypes?.Any() ?? false)
             {
                 filters.Add(Builders<Area>.Filter.In(a => a.AreaType, areaTypes));
+            }
+            else
+            {
+                // Make sure economic zone of sweden is NOT matched
+                filters.Add(Builders<Area>.Filter.In(a => a.AreaType, ((AreaType[])Enum.GetValues(typeof(AreaType))).Where(at => at != AreaType.EconomicZoneOfSweden))); 
             }
 
             if (!string.IsNullOrEmpty(searchString))

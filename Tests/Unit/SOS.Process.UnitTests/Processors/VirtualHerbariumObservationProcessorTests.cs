@@ -17,8 +17,8 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Managers.Interfaces;
-using SOS.Process.Processors.VirtualHerbarium;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.VirtualHerbarium;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors
@@ -36,12 +36,13 @@ namespace SOS.Process.UnitTests.Processors
             _virtualHerbariumObservationVerbatimRepositoryMock =
                 new Mock<IVirtualHerbariumObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _validationManagerMock = new Mock<IValidationManager>();
             _processManagerMock = new Mock<IProcessManager>();
             _diffusionManagerMock = new Mock<IDiffusionManager>();
+            _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _loggerMock = new Mock<ILogger<VirtualHerbariumObservationProcessor>>();
         }
 
@@ -49,12 +50,13 @@ namespace SOS.Process.UnitTests.Processors
             _virtualHerbariumObservationVerbatimRepositoryMock;
 
         private readonly Mock<IAreaHelper> _areaHelper;
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IProcessManager> _processManagerMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<IDiffusionManager> _diffusionManagerMock;
+        private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
         private readonly Mock<ILogger<VirtualHerbariumObservationProcessor>> _loggerMock;
 
         private VirtualHerbariumObservationProcessor TestObject => new VirtualHerbariumObservationProcessor(
@@ -66,6 +68,7 @@ namespace SOS.Process.UnitTests.Processors
             _processManagerMock.Object,
             _validationManagerMock.Object,
             _diffusionManagerMock.Object,
+            _processTimeManagerMock.Object,
             new ProcessConfiguration{Diffusion = false},
             _loggerMock.Object);
 
@@ -127,7 +130,7 @@ namespace SOS.Process.UnitTests.Processors
             _virtualHerbariumObservationVerbatimRepositoryMock.Setup(r => r.GetAllByCursorAsync())
                 .ReturnsAsync(mockCursor.Object);
 
-            _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<Observation>>()));
+            _areaHelper.Setup(r => r.AddAreaDataToProcessedLocations(It.IsAny<IEnumerable<Location>>()));
 
             _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>()))
                 .ReturnsAsync(true);

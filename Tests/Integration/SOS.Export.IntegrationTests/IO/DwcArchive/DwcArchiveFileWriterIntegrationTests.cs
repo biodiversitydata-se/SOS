@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.ApplicationInsights;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -16,8 +14,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Managers;
-using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Models.Shared;
@@ -62,16 +59,13 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                 new VocabularyConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
         }
 
-        private static ProcessedObservationRepository CreateProcessedObservationRepository(ProcessClient processClient, ElasticSearchConfiguration elasticConfiguration)
+        private static ProcessedObservationCoreRepository CreateProcessedObservationRepository(ProcessClient processClient, ElasticSearchConfiguration elasticConfiguration)
         {
-            var processedObservationRepository = new ProcessedObservationRepository(
-                new ElasticClientManager(elasticConfiguration, true),
-                processClient,
+            var processedObservationRepository = new ProcessedObservationCoreRepository(
+                new ElasticClientManager(elasticConfiguration),
                 elasticConfiguration,
-                new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryDistributedCacheOptions())),
-                new TelemetryClient(),
-                new HttpContextAccessor(),
-                new Mock<ILogger<ProcessedObservationRepository>>().Object);
+                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
             return processedObservationRepository;
 
         }
@@ -93,16 +87,16 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var processedObservationRepository = CreateProcessedObservationRepository(exportClient, elasticConfiguration);
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository =
-                new ProcessInfoRepository(exportClient, elasticConfiguration, new Mock<ILogger<ProcessInfoRepository>>().Object);
-            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstanceName);
+                new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
+            var processInfo = await processInfoRepository.GetAsync(processedObservationRepository.PublicIndexName);
             var filename = FilenameHelper.CreateFilenameWithDate("sos_dwc_archive_with_all_data");
             //var filter = new AdvancedFilter();
-            var filter = new SearchFilter { Taxa = new TaxonFilter{ Ids = new[] { 102951 } } };
+            var filter = new SearchFilter(0) { Taxa = new TaxonFilter{ Ids = new[] { 102951 } } };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+            var fileExportResult = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 DataProvider.FilterSubsetDataProvider,
                 filter,
                 filename,
@@ -114,7 +108,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            var fileExists = File.Exists(zipFilePath);
+            var fileExists = File.Exists(fileExportResult.FilePath);
             fileExists.Should().BeTrue("because the zip file should have been generated");
         }
 
@@ -131,20 +125,21 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var exportConfiguration = GetExportConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
             var exportFolderPath = exportConfiguration.FileDestination.Path;
+            var processedObservationRepository = CreateProcessedObservationRepository(exportClient, elasticConfiguration);
             var processedDarwinCoreRepositoryStub =
                 ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository =
-                new ProcessInfoRepository(exportClient, elasticConfiguration, new Mock<ILogger<ProcessInfoRepository>>().Object);
-            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstanceName);
+                new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
+            var processInfo = await processInfoRepository.GetAsync(processedObservationRepository.PublicIndexName);
             var filename = FilenameHelper.CreateFilenameWithDate("sos_dwc_archive_with_ten_observations");
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+            var fileExportResult = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 DataProvider.FilterSubsetDataProvider,
-                new SearchFilter(),
+                new SearchFilter(0),
                 filename,
                 processedDarwinCoreRepositoryStub.Object,
                 processInfo,
@@ -154,7 +149,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            var fileExists = File.Exists(zipFilePath);
+            var fileExists = File.Exists(fileExportResult.FilePath);
             fileExists.Should().BeTrue("because the zip file should have been generated");
         }
     }

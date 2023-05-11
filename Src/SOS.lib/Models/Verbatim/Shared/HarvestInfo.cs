@@ -10,11 +10,13 @@ namespace SOS.Lib.Models.Verbatim.Shared
     public class HarvestInfo : IEntity<string>
     {
         /// <summary>
-        ///     Constructor
+        ///  Constructor
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="start"></param>
-        public HarvestInfo(DateTime start)
+        public HarvestInfo(string id, DateTime start)
         {
+            Id = id;
             Start = start;
         }
 

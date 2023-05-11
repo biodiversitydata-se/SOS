@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Nest;
+using NetTopologySuite.Features;
+using NetTopologySuite.IO;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Extensions;
@@ -29,7 +33,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            ExportFilterDto searchFilter = new ExportFilterDto
+            var searchFilter = new SearchFilterDto
             {
                 Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
                 Geographics = new GeographicsFilterDto
@@ -48,14 +52,21 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                     },
                     ConsiderObservationAccuracy = true
                 },
-                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
+                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.Extended, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcelAsync(
+                null,
+                null,
+                searchFilter, 
+                OutputFieldSet.Minimum,
+                false,
+                PropertyLabelType.Swedish, 
+                "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -75,7 +86,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            ExportFilterDto searchFilter = new ExportFilterDto
+            var searchFilter = new SearchFilterDto()
             {
                 ProjectIds = new List<int> {2976},
                 Date = new DateFilterDto()
@@ -88,7 +99,14 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.AllWithKnownValues, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcelAsync(
+                null,
+                null,
+                searchFilter, 
+                OutputFieldSet.Minimum,
+                false,
+                PropertyLabelType.Swedish, 
+                "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -101,5 +119,108 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             await System.IO.File.WriteAllBytesAsync(filePath, bytes);
         }
 
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Export_to_Excel_No_gzip()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var searchFilter = new SearchFilterDto
+            {
+                DataProvider = new DataProviderFilterDto()
+                {
+                    Ids = new List<int> { 1 }
+                },
+                Date = new DateFilterDto()
+                {
+                    StartDate = new DateTime(2021, 4, 23),
+                    EndDate = new DateTime(2021, 4, 23),
+                }
+            };
+
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ExportsController.DownloadExcelAsync(
+                null,
+                null,
+                searchFilter,
+                OutputFieldSet.Minimum,
+                false,
+                PropertyLabelType.Swedish, 
+                "sv-SE", 
+                false);                
+            var bytes = response.GetFileContentResult();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            bytes.Length.Should().BeGreaterThan(0);
+
+            var filename = FilenameHelper.CreateFilenameWithDate("excel_export", "xlsx");
+            var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
+            await System.IO.File.WriteAllBytesAsync(filePath, bytes);
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Export_to_Excel_bug()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            string geojsonFilePath = @"C:\GIS\Uppsala kommun.geojson";
+            var feature = LoadFeature(geojsonFilePath);
+            var geometry = feature.Geometry;
+            var geoShape = geometry.ToGeoShape();
+
+            var searchFilter = new SearchFilterDto
+            {
+                Geographics = new GeographicsFilterDto
+                {
+                    Geometries = new List<IGeoShape>()
+                    {
+                        geoShape
+                    }                    
+                },
+                Taxon = new TaxonFilterDto()
+                {
+                    Ids = new List<int> { 3000293 },
+                    IncludeUnderlyingTaxa = true
+                }
+            };            
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ExportsController.DownloadExcelAsync(
+                null,
+                null,
+                searchFilter, 
+                OutputFieldSet.Minimum,
+                false,
+                PropertyLabelType.Swedish, 
+                "sv-SE");
+            var bytes = response.GetFileContentResult();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            bytes.Length.Should().BeGreaterThan(0);
+
+            var filename = FilenameHelper.CreateFilenameWithDate("excel_export", "zip");
+            var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
+            await System.IO.File.WriteAllBytesAsync(filePath, bytes);
+        }
+
+        private static Feature LoadFeature(string filePath)
+        {
+            var geoJsonReader = new GeoJsonReader();
+            var str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
+            var feature = geoJsonReader.Read<Feature>(str);
+            return feature;
+        }
     }
 }

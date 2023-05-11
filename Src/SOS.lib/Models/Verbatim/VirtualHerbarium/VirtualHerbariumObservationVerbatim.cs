@@ -18,6 +18,11 @@ namespace SOS.Lib.Models.Verbatim.VirtualHerbarium
         public string Collector { get; set; }
 
         /// <summary>
+        /// True if coordinates are from district 
+        /// </summary>
+        public bool CoordinateOverrideDistrict { get; set; }
+
+        /// <summary>
         ///     Coordinate Precision
         /// </summary>
         public int? CoordinatePrecision { get; set; }
@@ -26,6 +31,11 @@ namespace SOS.Lib.Models.Verbatim.VirtualHerbarium
         ///     Coordinate Source
         /// </summary>
         public string CoordinateSource { get; set; }
+
+        /// <summary>
+        /// Coordinate value
+        /// </summary>
+        public string CoordinateValue { get; set; }
 
         /// <summary>
         ///     Collector number

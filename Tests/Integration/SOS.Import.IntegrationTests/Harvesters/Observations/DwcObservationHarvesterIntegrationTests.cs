@@ -1,25 +1,24 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using DwC_A;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
-using SOS.Import.DarwinCore;
-using SOS.Import.Harvesters.Observations;
-using SOS.Import.Services;
+using SOS.Harvest.DarwinCore;
+using SOS.Harvest.DarwinCore.Interfaces;
+using SOS.Harvest.Harvesters.DwC;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
-using SOS.Lib.Managers;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource;
-using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Harvesters.Observations
 {
     public class DwcObservationHarvesterIntegrationTests : TestBase
-    {
+    {       
         [Fact]
         public async Task Harvest_occurrence_dwc_archive_with_emof_extension()
         {
@@ -194,12 +193,11 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             );
 
             var dwcObservationHarvester = new DwcObservationHarvester(
-                importClient,
-                new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
+                importClient,                
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), 
-                new DwcaConfiguration {ImportPath = @"C:\Temp"},
+                new DwcaConfiguration {ImportPath = @"C:\Temp", BatchSize=100},
                 new NullLogger<DwcObservationHarvester>());
             return dwcObservationHarvester;
         }

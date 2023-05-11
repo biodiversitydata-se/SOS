@@ -16,6 +16,12 @@ namespace SOS.Lib.Repositories.Verbatim.Interfaces
         Task<bool> PermanentizeCollectionAsync();
 
         /// <summary>
+        /// Make collection permanent
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> PermanentizeCollectionAsync(bool? tempMode = null);
+
+        /// <summary>
         /// Get source file for provider
         /// </summary>
         /// <param name="providerId"></param>

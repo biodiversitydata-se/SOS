@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -10,12 +9,19 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Occurrence
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public Occurrence()
+        {
+
+        }
+
+        /// <summary>
         ///     Activity property.
         /// </summary>
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue
             Activity { get; set; }
 
@@ -60,7 +66,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Behavior { get; set; }
 
         /// <summary>
@@ -69,7 +74,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Biotope { get; set; }
 
         /// <summary>
@@ -107,7 +111,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue EstablishmentMeans { get; set; }
 
         /// <summary>
@@ -124,13 +127,14 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     identifier or an identifier specific to a data set.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string IndividualID { get; set; }
+       // [Obsolete("This property is deprecated in Darwin Core")]
+       // public string IndividualId { get; set; }
 
         /// <summary>
         ///     Indicates if this species occurrence is natural or
         ///     if it is a result of human activity.
         /// </summary>
-        public bool? IsNaturalOccurrence { get; set; }
+        public bool IsNaturalOccurrence { get; set; }
 
         /// <summary>
         ///     Indicates if this observation is a never found observation.
@@ -138,7 +142,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     that the specified species was not found in a location
         ///     deemed appropriate for the species.
         /// </summary>
-        public bool? IsNeverFoundObservation { get; set; }
+        public bool IsNeverFoundObservation { get; set; }
 
         /// <summary>
         ///     Indicates if this observation is a
@@ -147,14 +151,14 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     that the specified species was not found in a location
         ///     where it has previously been observed.
         /// </summary>
-        public bool? IsNotRediscoveredObservation { get; set; }
+        public bool IsNotRediscoveredObservation { get; set; }
 
         /// <summary>
         ///     Indicates if this observation is a positive observation.
         ///     "Positive observation" is a normal observation indicating
         ///     that a species has been seen at a specified location.
         /// </summary>
-        public bool? IsPositiveObservation { get; set; }
+        public bool IsPositiveObservation { get; set; }
 
         /// <summary>
         ///     The age class or life stage of the biological individual(s)
@@ -164,13 +168,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue LifeStage { get; set; }
 
         /// <summary>
         ///     Media associated with the observation
         /// </summary>
-        [Nested]
         public ICollection<Multimedia> Media { get; set; }
 
         /// <summary>
@@ -179,7 +181,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// identifiers in the record that will most closely make the occurrenceID globally unique.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        [Keyword]
         public string OccurrenceId { get; set; }
 
         /// <summary>
@@ -195,7 +196,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue OccurrenceStatus { get; set; }
 
         /// <summary>
@@ -216,6 +216,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     r (organismQuantity) with BraunBlanquetScale (organismQuantityType).
         /// </example>
         public string OrganismQuantity { get; set; }
+
+        /// <summary>
+        /// Organism quantity used in aggregations
+        /// </summary>
+        public int? OrganismQuantityAggregation { get; set; }
 
         /// <summary>
         ///     The quantity of organisms as integer. This field is necessary because we want to be able to do range-querys against quantities. 
@@ -247,8 +252,17 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Information about how protected information about a species is in Sweden.
         /// This is a value between 1 to 5.
         /// 1 indicates public access and 5 is the highest used security level.
+        /// This property is deprecated and replaced by the SensitivityCategory property.
         /// </summary>
-        public int ProtectionLevel { get; set; }
+        //[Obsolete("Replaced by SensitivityCategory")]
+        //public int ProtectionLevel { get; set; }
+
+        /// <summary>
+        /// Information about how protected information about a species is in Sweden.
+        /// This is a value between 1 to 5.
+        /// 1 indicates public access and 5 is the highest used security level.
+        /// </summary>
+        public int SensitivityCategory { get; set; }
 
         /// <summary>
         ///     A list (concatenated and separated) of names of people,
@@ -269,13 +283,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Name of the person that reported the species observation.
         /// </summary>
-        [Keyword]
         public string ReportedBy { get; set; }
 
         /// <summary>
         ///     Date and time when the species observation was reported (UTC).
         /// </summary>
-        [Date]
         public DateTime? ReportedDate { get; set; }
 
         /// <summary>
@@ -284,7 +296,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue ReproductiveCondition { get; set; }
 
         /// <summary>
@@ -295,13 +306,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Sex { get; set; }
 
         /// <summary>
         /// Substrate.
         /// </summary>
-        [Object]
         public Substrate Substrate { get; set; }
 
         /// <summary>
