@@ -110,9 +110,7 @@ namespace SOS.Lib.Helpers
 
                     builder.Append(GetField(i));
                 }
-
                 var row = builder.Replace("\"", "'").ToString();
-
                 records.Add(parser.Parse(row));
             }
 
