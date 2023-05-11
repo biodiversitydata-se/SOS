@@ -90,9 +90,7 @@ namespace SOS.Lib.Helpers
         /// <param name="mapping"></param>
         /// <returns></returns>
         public IEnumerable<T> GetRecords<T>(IVariableLengthReaderBuilder<T> mapping)
-
         { 
-
             var builder = new StringBuilder();
             const string delimiter = "\t";
             var parser = mapping.Build(delimiter);
