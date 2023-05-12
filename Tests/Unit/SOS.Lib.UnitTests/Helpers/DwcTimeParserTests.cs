@@ -79,27 +79,27 @@ namespace SOS.Lib.UnitTests.Helpers
                 new object[] {"a", "b", "c", "d", "time", false, null, null},
                 new object[]
                 {
-                    "1971", "1971", "", "", "time", true, new DateTime(1971, 1, 1), new DateTime(1971, 12, 31)
+                    "1971", "1971", "", "", "time", true, new DateTime(1971, 1, 1), new DateTime(1971, 12, 31, 23, 59, 59)
                 }, // 1971 (some time in the year 1971)
                 new object[]
                 {
-                    "", "1971", "", "", "time", true, new DateTime(1971, 1, 1), new DateTime(1971, 12, 31)
+                    "", "1971", "", "", "time", true, new DateTime(1971, 1, 1), new DateTime(1971, 12, 31, 23, 59, 59)
                 }, // 1971 (some time in the year 1971)
                 new object[]
                 {
-                    null, "1971", "", "", "time", true, new DateTime(1971, 1, 1), new DateTime(1971, 12, 31)
+                    null, "1971", "", "", "time", true, new DateTime(1971, 1, 1), new DateTime(1971, 12, 31, 23, 59, 59)
                 }, // 1971 (some time in the year 1971)
                 new object[]
                 {
-                    "1906-06", "1906", "6", "", "time", true, new DateTime(1906, 6, 1), new DateTime(1906, 6, 30)
+                    "1906-06", "1906", "6", "", "time", true, new DateTime(1906, 6, 1), new DateTime(1906, 6, 30, 23, 59, 59)
                 }, // 1906-06 (some time in June 1906)
                 new object[]
                 {
-                    "", "1906", "6", "", "time", true, new DateTime(1906, 6, 1), new DateTime(1906, 6, 30)
+                    "", "1906", "6", "", "time", true, new DateTime(1906, 6, 1), new DateTime(1906, 6, 30, 23, 59, 59)
                 }, // 1906-06 (some time in June 1906)
                 new object[]
                 {
-                    "1809-02-12", "1809", "02", "12", "time", true, new DateTime(1809, 2, 12), new DateTime(1809, 2, 12)
+                    "1809-02-12", "1809", "02", "12", "time", true, new DateTime(1809, 2, 12), new DateTime(1809, 2, 12, 23, 59, 59)
                 }, // 1809-02-12 (some time during 12 February 1809)
                 new object[]
                 {
@@ -113,7 +113,7 @@ namespace SOS.Lib.UnitTests.Helpers
                 }, // 2010-06-13 12:50:00+02/13:35:00+02
                 new object[]
                 {
-                    "12/02/1809", "1809", "02", "12", "time", true, new DateTime(1809, 2, 12), new DateTime(1809, 2, 12)
+                    "12/02/1809", "1809", "02", "12", "time", true, new DateTime(1809, 2, 12), new DateTime(1809, 2, 12, 23, 59, 59)
                 }, // 1809-02-12 (some time during 12 February 1809)
                 new object[]
                 {
@@ -121,7 +121,7 @@ namespace SOS.Lib.UnitTests.Helpers
                 }, // Can't decide if the format is MM/dd/yyyy or dd/MM/yyyy.
                 new object[]
                 {
-                    "", "1809", "02", "12", "time", true, new DateTime(1809, 2, 12), new DateTime(1809, 2, 12)
+                    "", "1809", "02", "12", "time", true, new DateTime(1809, 2, 12), new DateTime(1809, 2, 12, 23, 59, 59)
                 }, // 1809-02-12 (some time during 12 February 1809)
                 new object[]
                 {
@@ -144,11 +144,11 @@ namespace SOS.Lib.UnitTests.Helpers
                 }, // 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC).
                 new object[]
                 {
-                    "1900/1909", "", "", "", "time", true, new DateTime(1900, 1, 1), new DateTime(1909, 12, 31)
+                    "1900/1909", "", "", "", "time", true, new DateTime(1900, 1, 1), new DateTime(1909, 12, 31, 23, 59, 59)
                 }, // 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909).
                 new object[]
                 {
-                    "2007-11-13/15", "", "", "", "time", true, new DateTime(2007, 11, 13), new DateTime(2007, 11, 15)
+                    "2007-11-13/15", "", "", "", "time", true, new DateTime(2007, 11, 13), new DateTime(2007, 11, 15, 23, 59, 59)
                 }, // 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).
                 new object[]
                 {
