@@ -1448,7 +1448,7 @@
         "SwedishTitle": "Lokaltyp",
         "EnglishTitle": "Location type",
         "DwcName": "",
-        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/waterBody",
+        "DwcIdentifier": "",
         "DependsOn": "Location.Type",
         "FieldSet": "AllWithValues"
     },
@@ -4761,8 +4761,8 @@
         "DataTypeIsNullable": false,
         "SwedishTitle": "",
         "EnglishTitle": "",
-        "DwcName": "Inkrementellt skördad",
-        "DwcIdentifier": "Incrementa lHarvested",
+        "DwcName": "",
+        "DwcIdentifier": "",
         "DependsOn": "ArtportalenInternal.IncrementalHarvested",
         "FieldSet": ""
     },

@@ -74,21 +74,24 @@ namespace SOS.Harvest.Harvesters
                 }
 
                 // Check that data seems to be correct
-                var dataIsOk = conservationLists.Count != 0;
+                var dataIsOk = conservationLists.Count != 0;                
+                var listsWithNoTaxa = new List<TaxonList>();
                 if (dataIsOk)
-                {
-                    foreach (var list in conservationLists)
+                {                    
+                    foreach (var taxonList in taxonLists)
                     {
-                        if (list.TaxonInformation == null || list.TaxonInformation.Count == 0)
+                        if (taxonList.Taxa == null || taxonList.Taxa.Count == 0)
                         {
+                            listsWithNoTaxa.Add(taxonList);
                             dataIsOk = false;
-                            break;
                         }
                     }
                 }
 
                 if (!dataIsOk)
                 {
+                    string strErrorSummary = string.Join(Environment.NewLine, listsWithNoTaxa.Select(m => $"Id:{m.Id}, TaxonListServiceId: {m.TaxonListServiceId}, Title: {m.Names.First().Value}"));
+                    _logger.LogError($"One or more TaxonLists are missing taxa: {strErrorSummary}");
                     harvestInfo.Status = RunStatus.Failed;
                     return harvestInfo;
                 }
