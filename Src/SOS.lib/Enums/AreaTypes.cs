@@ -19,6 +19,7 @@
         Sci = 26,
         WaterArea = 27,
         Atlas5x5 = 29,
-        Atlas10x10 = 30
+        Atlas10x10 = 30,
+        SfvDistricts = 34
     }
 }
