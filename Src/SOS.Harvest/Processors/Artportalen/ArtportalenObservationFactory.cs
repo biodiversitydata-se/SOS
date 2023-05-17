@@ -311,7 +311,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Type = null;
 
                 // Event
-                obs.Event = new Event(startDate, endDate);
+                obs.Event = new Event(startDate, verbatimObservation.StartTime,  endDate, verbatimObservation.EndTime);
                 var eventId = $"{verbatimObservation.Site?.Id ?? 0}:{$"{(startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : "")}{(endDate.HasValue ? $"-{endDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}" : "")}"}:{(obs.Projects?.Any() ?? false ? string.Join(',', obs.Projects.Select(p => p.Id)) : "N/A")}".ToHash();
                 obs.Event.EventId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}:event:{eventId}";
                 obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation.DiscoveryMethod, VocabularyId.DiscoveryMethod);
