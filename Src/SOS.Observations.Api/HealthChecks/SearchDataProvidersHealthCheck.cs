@@ -37,7 +37,7 @@ namespace SOS.Observations.Api.HealthChecks
                     DataProviderIds = new List<int>{ provider.Id },
                     Output = new OutputFilter
                     {
-                        Fields = new[] { "taxon.id" }
+                        Fields = new List<string> { "taxon.id" }
                     }
                 };
                 providerSearchTasks.Add(provider, _observationManager.GetChunkAsync(0, null, searchFilter, 0, 1));

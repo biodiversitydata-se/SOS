@@ -148,7 +148,7 @@ namespace SOS.Export.IntegrationTests.Managers
                         DataProviderIds = new List<int> { 1 },
                         Output = new OutputFilter
                         {
-                            Fields = new [] {
+                            Fields = new List<string> {
                                 "datasetName",
                                 "event.startDate",
                                 "event.endDate",
@@ -201,7 +201,7 @@ namespace SOS.Export.IntegrationTests.Managers
                     DataProviderIds = new List<int> { 1 },
                     Output = new OutputFilter
                     {
-                        Fields = new[] {
+                        Fields = new List<string> {
                             "datasetName",
                             "event.startDate",
                             "event.endDate",

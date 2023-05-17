@@ -63,7 +63,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="hiddenByProviderUntil"></param>
         /// <param name="protectedBySystem"></param>
         /// <returns></returns>
-        private int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, DateTime? hiddenByProviderUntil, bool protectedBySystem)
+        private int CalculateSensitivityCategory(Lib.Models.Processed.Observation.Taxon taxon, DateTime? hiddenByProviderUntil, bool protectedBySystem)
         {
             var hiddenByProvider = hiddenByProviderUntil.HasValue && hiddenByProviderUntil.Value >= DateTime.Now;
             var taxonProtectionLevel = taxon?.Attributes?.SensitivityCategory?.Id ?? 3;
@@ -389,7 +389,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
                 obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
                 //obs.Occurrence.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
-                obs.Occurrence.SensitivityCategory = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
+                obs.Occurrence.SensitivityCategory = CalculateSensitivityCategory(taxon!, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.Occurrence.ReportedBy = verbatimObservation.ReportedBy;
                 obs.Occurrence.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
                 obs.Occurrence.RecordedBy = verbatimObservation.Observers;

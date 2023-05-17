@@ -2,6 +2,7 @@
 using SOS.Lib.Models.Search.Filters;
 using SOS.Observations.Api.Managers.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +35,7 @@ namespace SOS.Observations.Api.HealthChecks
                 PositiveSightings = true,
                 Output = new OutputFilter
                 {
-                    Fields = new[] { "taxon.id" }
+                    Fields = new List<string> { "taxon.id" }
                 }
             };
 

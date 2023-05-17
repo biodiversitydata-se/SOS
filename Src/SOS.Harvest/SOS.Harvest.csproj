@@ -42,7 +42,10 @@
 		<None Update="Resources\Gis\swedenExtentSimplified.geojson">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Resources\TaxonProtection.json">
+		<None Update="Resources\RegionalTaxonSensitiveCategories.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\TaxonProtectedByLaw.json">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="Resources\CountyNameMapper.json">

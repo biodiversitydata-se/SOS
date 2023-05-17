@@ -43,7 +43,7 @@ namespace SOS.Harvest.Processors
             public int TaxonId { get; set; }
         }
 
-        private readonly IDictionary<int, HashSet<string>> _protectedTaxa;
+        private readonly IDictionary<int, HashSet<string>> _taxaProtectedByLaw;
         private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificName { get; }
         private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificNameAuthor { get; }
         private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymName { get; }
@@ -95,10 +95,10 @@ namespace SOS.Harvest.Processors
             return null!;
         }
 
-        private IDictionary<int, HashSet<string>> LoadTaxonProtection()
+        private IDictionary<int, HashSet<string>> LoadTaxonProtectedByLaw()
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath!, @"Resources/TaxonProtection.json");
+            var filePath = Path.Combine(assemblyPath!, @"Resources/TaxonProtectedByLaw.json");
             using (var fs = FileSystemHelper.WaitForFile(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 var taxonProtection = JsonSerializer.DeserializeAsync<IEnumerable<ProtectedTaxon>>(fs, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Result;
@@ -144,7 +144,7 @@ namespace SOS.Harvest.Processors
                 }
             }
 
-            _protectedTaxa = LoadTaxonProtection();
+            _taxaProtectedByLaw = LoadTaxonProtectedByLaw();
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace SOS.Harvest.Processors
 
             if (observation?.Taxon?.Attributes?.ProtectedByLaw ?? false && observation.Location != null)
             {
-                if (_protectedTaxa.TryGetValue(observation.Taxon.Id, out var areas))
+                if (_taxaProtectedByLaw.TryGetValue(observation.Taxon.Id, out var areas))
                 {
                     if (!(
                         areas.Contains(GetAreaKey(AreaType.CountryRegion, observation.Location.CountryRegion?.FeatureId)) ||
@@ -223,7 +223,7 @@ namespace SOS.Harvest.Processors
                         )
                     )
                     {
-                        // observation.taxon should already be cloned to a unique object
+                        // observation.taxon should already have been cloned to a unique object
                         //observation.Taxon = observation.Taxon.Clone();
                         observation.Taxon.Attributes.ProtectedByLaw = false;
                     }

@@ -19,7 +19,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// For example, to retrieve only basic observation data, specify:
         /// ["event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.recordedBy", "occurrence.occurrenceStatus"]. 
         /// </summary>
-        public ICollection<string> Fields { get; set; }
+        public List<string> Fields { get; set; }
 
         /// <summary>
         /// Result sort orders
