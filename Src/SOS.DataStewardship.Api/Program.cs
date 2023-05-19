@@ -25,6 +25,7 @@ try
     //builder.Services.Configure<RouteHandlerOptions>(o => o.ThrowOnBadRequest = true); // uncomment to debug bad requests
     builder.Services.AddEndpointDefinitions(typeof(IEndpointDefinition));
     builder.SetupJsonSerialization();
+    builder.SetupMongoDbConventions();
 
     // This registration is needed to get Swagger enums to use strings instead of ints.
     builder.Services.Configure<JsonOptions>(options =>
