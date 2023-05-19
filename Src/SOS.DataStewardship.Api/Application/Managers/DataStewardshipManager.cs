@@ -27,7 +27,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         }
     };
 
-    private readonly ICollection<string> _observationEventOutputFields = new[]
+    private readonly List<string> _observationEventOutputFields = new List<string>
        {
             "dataStewardship",
             "event.eventId",
@@ -43,7 +43,7 @@ public class DataStewardshipManager : IDataStewardshipManager
             "occurrence.RecordedBy"
         };
 
-    private readonly ICollection<string> _observationOccurrenceOutputFields = new[]
+    private readonly List<string> _observationOccurrenceOutputFields = new List<string>
     {
         "basisOfRecord",
         "dataStewardship",
