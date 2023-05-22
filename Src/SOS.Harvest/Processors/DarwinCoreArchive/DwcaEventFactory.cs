@@ -46,21 +46,28 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         public Lib.Models.Processed.DataStewardship.Event.Event CreateEventObservation(DwcEventOccurrenceVerbatim verbatim)
         {
             try
-            {                
+            {
                 DwcParser.TryParseEventDate(
-                verbatim.EventDate,
-                verbatim.Year,
-                verbatim.Month,
-                verbatim.Day,
-                verbatim.EventTime,
-                out var startDate,
-                out var endDate);
+                    verbatim.EventDate,
+                    verbatim.Year,
+                    verbatim.Month,
+                    verbatim.Day,
+                    verbatim.EventTime,
+                    out var startDate,
+                    out var endDate,
+                    out var startTime,
+                    out var endTime);
 
+                var obsEvent = new Event(startDate, startTime, endDate, endTime);
                 var processedEvent = new Lib.Models.Processed.DataStewardship.Event.Event();
                 processedEvent.Created = DateTime.Now.ToUniversalTime();
                 processedEvent.DataProviderId = DataProvider.Id;
-                processedEvent.StartDate = startDate.HasValue ? startDate.Value.ToUniversalTime() : null; 
-                processedEvent.EndDate = endDate.HasValue ? endDate.Value.ToUniversalTime() : null;
+                processedEvent.StartDate = obsEvent.StartDate;
+                processedEvent.EndDate = obsEvent.EndDate;
+                processedEvent.PlainStartDate = obsEvent.PlainStartDate;
+                processedEvent.PlainEndDate = obsEvent.PlainEndDate;
+                processedEvent.PlainStartTime = obsEvent.PlainStartTime;
+                processedEvent.PlainEndTime = obsEvent.PlainEndTime;
                 processedEvent.EventId = verbatim.EventID;
                 processedEvent.ParentEventId = verbatim.ParentEventID;
                 processedEvent.EventRemarks = verbatim.EventRemarks?.Clean();

@@ -50,12 +50,32 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Event
         /// Date and Time for when the survey started (local time).
         /// </summary>
         /// <value>Date and Time for when the survey started (local time).</value>        
-        public DateTime? StartDate { get; set; }
+        public DateTime? StartDate { get; set; }        
 
         /// <summary>
         /// Date and Time for when the survey ended (local time).
         /// </summary>        
         public DateTime? EndDate { get; set; }
+
+        /// <summary>
+        ///     Start date of the event in the format yyyy-MM-dd.
+        /// </summary>
+        public string PlainStartDate { get; set; }
+
+        /// <summary>
+        ///     End date of the event in the format yyyy-MM-dd.
+        /// </summary>
+        public string PlainEndDate { get; set; }
+
+        /// <summary>
+        ///     Start time of the event in W. Europe Standard Time formatted as hh:mm.
+        /// </summary>
+        public string PlainStartTime { get; set; }
+
+        /// <summary>
+        ///     End time of the event in W. Europe Standard Time formatted as hh:mm. 
+        /// </summary>
+        public string PlainEndTime { get; set; }
 
         /// <summary>
         /// States whether the position of a location is protected. The true position for a protected location is shown only to authorized persons. To others the position is shown with diffused coordinates. Other information about a protected location can also be limited.

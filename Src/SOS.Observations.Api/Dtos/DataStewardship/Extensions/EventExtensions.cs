@@ -139,6 +139,10 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             ev.Dataset = observationEvent?.DataStewardship.ToDto();
             ev.EventStartDate = observationEvent.StartDate;
             ev.EventEndDate = observationEvent.EndDate;
+            ev.PlainStartDate = observationEvent.PlainStartDate;
+            ev.PlainEndDate = observationEvent.PlainEndDate;
+            ev.PlainStartTime = observationEvent.PlainStartTime;
+            ev.PlainEndTime = observationEvent.PlainEndTime;
             ev.SamplingProtocol = observationEvent.SamplingProtocol;
             ev.SurveyLocation = observationEvent?.Location?.ToDto(responseCoordinateSystem);
             ev.EventType = observationEvent?.EventType;
