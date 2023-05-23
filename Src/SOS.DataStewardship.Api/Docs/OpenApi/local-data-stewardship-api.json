@@ -1,0 +1,4722 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "SOS.DataStewardship.Api",
+    "version": "1.0"
+  },
+  "paths": {
+    "/caches/{cache}": {
+      "delete": {
+        "tags": [
+          "Caches"
+        ],
+        "description": "Clear Cache",
+        "operationId": "ClearCache",
+        "parameters": [
+          {
+            "name": "cache",
+            "in": "path",
+            "description": "The cache",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datastewardship/datasets/{id}": {
+      "get": {
+        "tags": [
+          "DataStewardship"
+        ],
+        "description": "Get dataset by id. Example: Artportalen - Fladdermöss",
+        "operationId": "GetDatasetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The dataset id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "exportMode",
+            "in": "query",
+            "description": "The export mode",
+            "schema": {
+              "$ref": "#/components/schemas/ExportMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dataset"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - The requested dataset doesn't exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datastewardship/datasets": {
+      "post": {
+        "tags": [
+          "DataStewardship"
+        ],
+        "description": "Get datasets by search.",
+        "operationId": "GetDatasetsBySearch",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "Pagination start index.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "description": "Number of items to return. 1000 items is the max to return in one call.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "exportMode",
+            "in": "query",
+            "description": "The export mode",
+            "schema": {
+              "$ref": "#/components/schemas/ExportMode"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The search filter",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatasetFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetPagedResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datastewardship/events/{id}": {
+      "get": {
+        "tags": [
+          "DataStewardship"
+        ],
+        "description": "Get event by Id. Example: urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10002293427000658739",
+        "operationId": "GetEventById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The event id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "exportMode",
+            "in": "query",
+            "description": "The export mode",
+            "schema": {
+              "$ref": "#/components/schemas/ExportMode"
+            }
+          },
+          {
+            "name": "responseCoordinateSystem",
+            "in": "query",
+            "description": "The response coordinate system",
+            "schema": {
+              "$ref": "#/components/schemas/CoordinateSystem"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - The requested event doesn't exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datastewardship/events": {
+      "post": {
+        "tags": [
+          "DataStewardship"
+        ],
+        "description": "Get events by search.",
+        "operationId": "GetEventsBySearch",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "Pagination start index.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "description": "Number of items to return. 1000 items is the max to return in one call.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "exportMode",
+            "in": "query",
+            "description": "The export mode",
+            "schema": {
+              "$ref": "#/components/schemas/ExportMode"
+            }
+          },
+          {
+            "name": "responseCoordinateSystem",
+            "in": "query",
+            "description": "The response coordinate system",
+            "schema": {
+              "$ref": "#/components/schemas/CoordinateSystem"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The search filter",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventsFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventPagedResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/external/Health": {
+      "get": {
+        "tags": [
+          "External"
+        ],
+        "description": "Get current system health status",
+        "operationId": "GetHealthCheck",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dataset"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datastewardship/occurrences/{id}": {
+      "get": {
+        "tags": [
+          "DataStewardship"
+        ],
+        "description": "Get occurrence by Id. Example: urn:lsid:artportalen.se:sighting:98571689",
+        "operationId": "GetOccurrenceById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The occurrence id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "exportMode",
+            "in": "query",
+            "description": "The export mode",
+            "schema": {
+              "$ref": "#/components/schemas/ExportMode"
+            }
+          },
+          {
+            "name": "responseCoordinateSystem",
+            "in": "query",
+            "description": "The response coordinate system",
+            "schema": {
+              "$ref": "#/components/schemas/CoordinateSystem"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Occurrence"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datastewardship/occurrences": {
+      "post": {
+        "tags": [
+          "DataStewardship"
+        ],
+        "description": "Get occurrences by search.",
+        "operationId": "GetOccurrencesBySearch",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "Pagination start index.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "description": "Number of items to return. 1000 items is the max to return in one call.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "exportMode",
+            "in": "query",
+            "description": "The export mode",
+            "schema": {
+              "$ref": "#/components/schemas/ExportMode"
+            }
+          },
+          {
+            "name": "responseCoordinateSystem",
+            "in": "query",
+            "description": "The response coordinate system",
+            "schema": {
+              "$ref": "#/components/schemas/CoordinateSystem"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The search filter",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OccurrenceFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OccurrencePagedResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccessRights": {
+        "enum": [
+          "Publik",
+          "Begränsad",
+          "EjOffentlig"
+        ],
+        "type": "string",
+        "description": "Information about whether the whole, parts of, or nothing in the dataset is publically available."
+      },
+      "Activity": {
+        "enum": [
+          "AnväntBo",
+          "AvledningsbeteendeEnum",
+          "BesökerBebottBo",
+          "BoHördaUngar",
+          "BoÄggUngar",
+          "Bobesök",
+          "Bobygge",
+          "DräktigHona",
+          "Död",
+          "Fragment",
+          "Friflygande",
+          "FrispringandeKrypande",
+          "FärskaGnagspår",
+          "FödaÅtUngar",
+          "Födosökande",
+          "Förbiflygande",
+          "IVattenSimmande",
+          "IngetKriteriumAngivet",
+          "LockläteÖvrigaLäten",
+          "MisslyckadHäckning",
+          "ObsIHäcktidLämpligBiotop",
+          "ParILämpligHäckbiotop",
+          "Parning",
+          "PermanentRevir",
+          "PulliNyligenFlyggaUngar",
+          "PåÖvervintringsplats",
+          "Rastande",
+          "Revirhävdande",
+          "Ruvande",
+          "SannoliktEjHäckande",
+          "SpelSång",
+          "SpelSångEjHäckning",
+          "Stationär",
+          "Sträckande",
+          "UpprördVarnande",
+          "Vilande",
+          "Äggläggande",
+          "Äggskal",
+          "ÄldreGnagspår",
+          "Exkrementsäck"
+        ],
+        "type": "string",
+        "description": "Activity or behavior of the observed organism."
+      },
+      "AssociatedMedia": {
+        "required": [
+          "license"
+        ],
+        "type": "object",
+        "properties": {
+          "associatedMediaName": {
+            "type": "string",
+            "description": "Name of attachment.",
+            "nullable": true
+          },
+          "associatedMediaType": {
+            "$ref": "#/components/schemas/AssociatedMediaType"
+          },
+          "associatedMediaLink": {
+            "type": "string",
+            "description": "Link to attachment.",
+            "nullable": true
+          },
+          "license": {
+            "minLength": 1,
+            "type": "string",
+            "description": "States which Creative Commons license that is applied to the attachment."
+          },
+          "rightsHolder": {
+            "type": "string",
+            "description": "States who the creator of the attachment is.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Associate Media"
+      },
+      "AssociatedMediaType": {
+        "enum": [
+          "Bild",
+          "Film",
+          "Ljud",
+          "Pdf"
+        ],
+        "type": "string",
+        "description": "Format of attachment, e.g. image, video, sound, pdf etc."
+      },
+      "BasisOfRecord": {
+        "enum": [
+          "FysisktProv",
+          "MaskinellObservation",
+          "MänskligObservation",
+          "Okänt"
+        ],
+        "type": "string",
+        "description": "The type of species observation the record deals with (e.g. human observation, material sample etc.)"
+      },
+      "Cache": {
+        "enum": [
+          "Area",
+          "DataProviders",
+          "ProcessedConfiguration",
+          "Projects",
+          "TaxonLists",
+          "Vocabulary"
+        ],
+        "type": "string"
+      },
+      "Cloudiness": {
+        "enum": [
+          "Halvklart3Till5Av8",
+          "Klart0Av8",
+          "Molnigt6Till7Av8",
+          "Mulet8Av8",
+          "NästanKlart1Till2Av8",
+          "Växlande0Till8Av8"
+        ],
+        "type": "string",
+        "description": "States the cloud condtions during the survey event."
+      },
+      "CoordinateSystem": {
+        "enum": [
+          "EPSG4326",
+          "EPSG3006",
+          "EPSG4619",
+          "EPSG3857",
+          "EPSG4258"
+        ],
+        "type": "string",
+        "description": "Coordinate system for the (X, Y) coordinates of the geometry."
+      },
+      "County": {
+        "enum": [
+          "StockholmsLän",
+          "UppsalaLän",
+          "SödermanlandsLän",
+          "ÖstergötlandsLän",
+          "JönköpingsLän",
+          "KronobergsLän",
+          "KalmarLän",
+          "GotlandsLän",
+          "BlekingeLän",
+          "SkåneLän",
+          "HallandsLän",
+          "VästraGötalandsLän",
+          "VärmlandsLän",
+          "ÖrebroLän",
+          "VästmanlandsLän",
+          "DalarnasLän",
+          "GävleborgsLän",
+          "VästernorrlandsLän",
+          "JämtlandsLän",
+          "VästerbottensLän",
+          "NorrbottensLän"
+        ],
+        "type": "string",
+        "description": "County"
+      },
+      "Dataset": {
+        "required": [
+          "accessRights",
+          "assigner",
+          "creator",
+          "dataStewardship",
+          "description",
+          "identifier",
+          "language",
+          "license",
+          "metadatalanguage",
+          "methodology",
+          "ownerinstitutionCode",
+          "programmeArea",
+          "publisher",
+          "purpose",
+          "spatial",
+          "startDate",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The dataset id-number within the metadata catalogue administered by the authority that is responsible for the information."
+          },
+          "license": {
+            "minLength": 1,
+            "type": "string",
+            "description": "States which Creative Commons license that is applied to the dataset.  Note that any attachments included in the dataset have their own separate licenses."
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Name of the dataset. Can sometimes be the same as the name of the project."
+          },
+          "project": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            },
+            "description": "Project",
+            "nullable": true
+          },
+          "programmeArea": {
+            "$ref": "#/components/schemas/ProgrammeArea"
+          },
+          "assigner": {
+            "$ref": "#/components/schemas/Organisation"
+          },
+          "creator": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Organisation"
+            },
+            "description": "The organisation responsible for the data collection. More than  one organisation can be given here."
+          },
+          "ownerinstitutionCode": {
+            "$ref": "#/components/schemas/Organisation"
+          },
+          "publisher": {
+            "$ref": "#/components/schemas/Organisation"
+          },
+          "dataStewardship": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Name of the data stewardship within which the dataset is handled."
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/Purpose"
+          },
+          "description": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Short description of the dataset or the context for collection of the data included in the dataset. The structure and content of the description is governed by the requirements from the respective metadata catalogues."
+          },
+          "methodology": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Methodology"
+            },
+            "description": "The methodology that is used for the data collection, e.g. as described by one or more monitoring manuals. Can contain a range of methods for the same and/or different parts of the data collection."
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Start date for the dataset.",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "End date for the dataset.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "spatial": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The country in which the data in the dataset were collected in."
+          },
+          "accessRights": {
+            "$ref": "#/components/schemas/AccessRights"
+          },
+          "descriptionAccessRights": {
+            "type": "string",
+            "description": "When the dataset is not public or access is restricted  (see the property accessRights), how and/or why is described here.",
+            "nullable": true
+          },
+          "metadatalanguage": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The language that is used when writing metadata about the dataset."
+          },
+          "language": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The language used in the dataset."
+          },
+          "eventIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "A list of unique identites for surveys that is part of the dataset.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Metadata about a dataset."
+      },
+      "DatasetFilter": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "$ref": "#/components/schemas/GeographicsFilter"
+          },
+          "datasetIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "DatasetIds filter",
+            "nullable": true
+          },
+          "dateFilter": {
+            "$ref": "#/components/schemas/DateFilter"
+          },
+          "taxon": {
+            "$ref": "#/components/schemas/TaxonFilter"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Dataset filter"
+      },
+      "DatasetInfo": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "Identifier",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "description": "Title",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Dataset info"
+      },
+      "DatasetPagedResult": {
+        "type": "object",
+        "properties": {
+          "skip": {
+            "type": "integer",
+            "description": "Ignores the specified number of items and returns a sequence starting at the item after the last skipped item.",
+            "format": "int32"
+          },
+          "take": {
+            "type": "integer",
+            "description": "The number of records requested.",
+            "format": "int32"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of records returned.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "description": "The total number of records matching the query.",
+            "format": "int32"
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Dataset"
+            },
+            "description": "The records.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result returned by paged query."
+      },
+      "DateFilter": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "description": "Event start date specified in the ISO 8601 standard. If no timezone is specified, GMT+1 (CEST) is assumed",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Event end date specified in the ISO 8601 standard. If no timezone is specified, GMT+1 (CEST) is assumed",
+            "format": "date-time",
+            "nullable": true
+          },
+          "dateFilterType": {
+            "$ref": "#/components/schemas/DateFilterType"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Date filter"
+      },
+      "DateFilterType": {
+        "enum": [
+          "OverlappingStartDateAndEndDate",
+          "BetweenStartDateAndEndDate",
+          "OnlyStartDate",
+          "OnlyEndDate"
+        ],
+        "type": "string",
+        "description": "Date filter type."
+      },
+      "Event": {
+        "required": [
+          "eventEndDate",
+          "eventID",
+          "eventStartDate",
+          "locationProtected",
+          "surveyLocation"
+        ],
+        "type": "object",
+        "properties": {
+          "eventID": {
+            "minLength": 1,
+            "type": "string",
+            "description": "A unique id for the survey event within a specific dataset hosted by the respective datahosts. A survey event is usually a visit to a survey area/site. A survey event can also be a visit to a smaller defined part of a survey area/site or one of several samples from the same place. The term survey event can also represent a specific period or season. What eventID is representing is given in the attribute eventType."
+          },
+          "eventType": {
+            "type": "string",
+            "description": "States what the survey event (eventID) is representing, e.g. a visit, part visit, sample, period, season etc.",
+            "nullable": true
+          },
+          "parentEventID": {
+            "type": "string",
+            "description": "A unique id that groups several related visits, e.g. all visits to the different subparts within a survey location, or all visits to all survey locations that were made during a season. Example: EventID for a survey event at a location becomes the parentID for all the visits to the different subparts. EventID for a season becomes the parentID for all the visits to all locations within the survey programme.",
+            "nullable": true
+          },
+          "eventStartDate": {
+            "type": "string",
+            "description": "Date and Time for when the survey started (local time).",
+            "format": "date-time"
+          },
+          "eventEndDate": {
+            "type": "string",
+            "description": "Date and Time for when the survey ended (local time).",
+            "format": "date-time"
+          },
+          "plainStartDate": {
+            "type": "string",
+            "description": "Start date of the event in the format yyyy-MM-dd.",
+            "nullable": true
+          },
+          "plainEndDate": {
+            "type": "string",
+            "description": "End date of the event in the format yyyy-MM-dd.",
+            "nullable": true
+          },
+          "plainStartTime": {
+            "type": "string",
+            "description": "Start time of the event in W. Europe Standard Time formatted as hh:mm.",
+            "nullable": true
+          },
+          "plainEndTime": {
+            "type": "string",
+            "description": "End time of the event in W. Europe Standard Time formatted as hh:mm.",
+            "nullable": true
+          },
+          "locationProtected": {
+            "type": "boolean",
+            "description": "States whether the position of a location is protected. The true position for a protected location is shown only to authorized persons. To others the position is shown with diffused coordinates. Other information about a protected location can also be limited."
+          },
+          "surveyLocation": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "recorderCode": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Name or code for the person conducting the survey. Several names or codes can be given.",
+            "nullable": true
+          },
+          "recorderOrganisation": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Organisation"
+            },
+            "description": "The organisation that the surveyor represents. Several organisations can be given.",
+            "nullable": true
+          },
+          "samplingProtocol": {
+            "type": "string",
+            "description": "The survey method used at the specific survey event. The monitoring manual or equivalent methodology is referenced in Dataset C.1.2.",
+            "nullable": true
+          },
+          "weather": {
+            "$ref": "#/components/schemas/WeatherVariable"
+          },
+          "eventRemarks": {
+            "type": "string",
+            "description": "Comment (freetext) about the survey event.",
+            "nullable": true
+          },
+          "noObservations": {
+            "type": "boolean",
+            "description": "States whether any of the sought after organisms were observed during the survey event or not. True means that none of the sought after organisms were observed at all."
+          },
+          "associatedMedia": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociatedMedia"
+            },
+            "description": "Attached information about the survey event, e.g. media files like images, sound recordings, maps etc.",
+            "nullable": true
+          },
+          "dataset": {
+            "$ref": "#/components/schemas/DatasetInfo"
+          },
+          "occurrenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "A list of unique identities of the occurances made during an event",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A specified event when organisms were surveyed according to a specified methodology at a specific place."
+      },
+      "EventPagedResult": {
+        "type": "object",
+        "properties": {
+          "skip": {
+            "type": "integer",
+            "description": "Ignores the specified number of items and returns a sequence starting at the item after the last skipped item.",
+            "format": "int32"
+          },
+          "take": {
+            "type": "integer",
+            "description": "The number of records requested.",
+            "format": "int32"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of records returned.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "description": "The total number of records matching the query.",
+            "format": "int32"
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            },
+            "description": "The records.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result returned by paged query."
+      },
+      "EventsFilter": {
+        "type": "object",
+        "properties": {
+          "exportMode": {
+            "$ref": "#/components/schemas/ExportMode"
+          },
+          "datasetIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "DatasetIds filter",
+            "nullable": true
+          },
+          "eventIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "EventIds filter",
+            "nullable": true
+          },
+          "dateFilter": {
+            "$ref": "#/components/schemas/DateFilter"
+          },
+          "taxon": {
+            "$ref": "#/components/schemas/TaxonFilter"
+          },
+          "area": {
+            "$ref": "#/components/schemas/GeographicsFilter"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Events search filter"
+      },
+      "ExportMode": {
+        "enum": [
+          "Json",
+          "Csv"
+        ],
+        "type": "string",
+        "description": "json or csv"
+      },
+      "GeographicsFilter": {
+        "type": "object",
+        "properties": {
+          "county": {
+            "$ref": "#/components/schemas/County"
+          },
+          "geometry": {
+            "$ref": "#/components/schemas/GeometryFilter"
+          },
+          "municipality": {
+            "$ref": "#/components/schemas/Municipality"
+          },
+          "parish": {
+            "$ref": "#/components/schemas/Parish"
+          },
+          "province": {
+            "$ref": "#/components/schemas/Province"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Geographics filter"
+      },
+      "GeometryFilter": {
+        "type": "object",
+        "properties": {
+          "geographicArea": {
+            "$ref": "#/components/schemas/IGeoShape"
+          },
+          "maxDistanceFromGeometries": {
+            "type": "number",
+            "description": "The offset in meters from the geometries. This variable is required if geometries type is point",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Geometry filter"
+      },
+      "HttpValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": { }
+      },
+      "IGeoShape": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LifeStage": {
+        "enum": [
+          "_1K",
+          "_1KPlus",
+          "_2K",
+          "_2KPlus",
+          "_3K",
+          "_3KPlus",
+          "_3KMinus",
+          "_4K",
+          "_4KPlus",
+          "_4KMinus",
+          "Adult",
+          "Blomning",
+          "EjBestämdÅlder",
+          "FulltUtveckladeBlad",
+          "GulnadeLövBlad",
+          "ImagoAdult",
+          "Juvenil",
+          "Knoppbristning",
+          "Larv",
+          "LarvNymf",
+          "MedGroddkorn",
+          "MedHonorgan",
+          "MedKapsel",
+          "Pulli",
+          "Puppa",
+          "Subadult",
+          "UtanKapsel",
+          "Vilstadium",
+          "Ägg",
+          "Årsunge",
+          "Årsyngel",
+          "Överblommad"
+        ],
+        "type": "string",
+        "description": "Age category or development stage of the observed organism."
+      },
+      "Location": {
+        "required": [
+          "county",
+          "emplacement",
+          "locationID",
+          "municipality"
+        ],
+        "type": "object",
+        "properties": {
+          "locationID": {
+            "minLength": 1,
+            "type": "string",
+            "description": "A unique id-number for a place, e.g. a survey site or a subsite. Should be the id-number from Stationsregistret where relevant."
+          },
+          "locality": {
+            "type": "string",
+            "description": "The name of a survey site or a subsite.",
+            "nullable": true
+          },
+          "locationType": {
+            "$ref": "#/components/schemas/LocationType"
+          },
+          "emplacement": {
+            "$ref": "#/components/schemas/IGeoShape"
+          },
+          "county": {
+            "$ref": "#/components/schemas/County"
+          },
+          "province": {
+            "$ref": "#/components/schemas/Province"
+          },
+          "municipality": {
+            "$ref": "#/components/schemas/Municipality"
+          },
+          "parish": {
+            "$ref": "#/components/schemas/Parish"
+          },
+          "locationRemarks": {
+            "type": "string",
+            "description": "Comment (freetext) from the survey event about the site.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Information about a place that has been surveyed."
+      },
+      "LocationType": {
+        "enum": [
+          "Block",
+          "Linje",
+          "Linjetransekt",
+          "Polygon",
+          "Provyta",
+          "Punkt",
+          "Punktlokal",
+          "Ruta",
+          "Rutt",
+          "Räkningssektor",
+          "Räkningszon",
+          "Segment",
+          "Slinga",
+          "Transportsträcka",
+          "Ö"
+        ],
+        "type": "string",
+        "description": "\"The type of survey site that was surveyed, e.g. square, segment, point site, counting zone, route etc.\""
+      },
+      "Methodology": {
+        "required": [
+          "methodologyDescription",
+          "methodologyLink",
+          "methodologyName",
+          "speciesList"
+        ],
+        "type": "object",
+        "properties": {
+          "methodologyName": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The title or name of a methodology, e.g. a monitoring manual."
+          },
+          "methodologyDescription": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Short description of a methodology, e.g. a monitoring manual."
+          },
+          "methodologyLink": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Persistent link to description of a methodology, e.g. a monitoring manual."
+          },
+          "speciesList": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Persistent link to published species list for the dataset."
+          }
+        },
+        "additionalProperties": false,
+        "description": "The methodology that is used for the data collection, e.g. as described by one or more monitoring manuals. Can contain a range of methods for the same and/or different parts of the data collection."
+      },
+      "Municipality": {
+        "enum": [
+          "UpplandsVäsby",
+          "Vallentuna",
+          "Österåker",
+          "Värmdö",
+          "Järfälla",
+          "Ekerö",
+          "Huddinge",
+          "Botkyrka",
+          "Salem",
+          "Haninge",
+          "Tyresö",
+          "UpplandsBro",
+          "Nykvarn",
+          "Täby",
+          "Danderyd",
+          "Sollentuna",
+          "Stockholm",
+          "Södertälje",
+          "Nacka",
+          "Sundbyberg",
+          "Solna",
+          "Lidingö",
+          "Vaxholm",
+          "Norrtälje",
+          "Sigtuna",
+          "Nynäshamn",
+          "Håbo",
+          "Älvkarleby",
+          "Knivsta",
+          "Heby",
+          "Tierp",
+          "Uppsala",
+          "Enköping",
+          "Östhammar",
+          "Vingåker",
+          "Gnesta",
+          "Nyköping",
+          "Oxelösund",
+          "Flen",
+          "Katrineholm",
+          "Eskilstuna",
+          "Strängnäs",
+          "Trosa",
+          "Ödeshög",
+          "Ydre",
+          "Kinda",
+          "Boxholm",
+          "Åtvidaberg",
+          "Finspång",
+          "Valdemarsvik",
+          "Linköping",
+          "Norrköping",
+          "Söderköping",
+          "Motala",
+          "Vadstena",
+          "Mjölby",
+          "Aneby",
+          "Gnosjö",
+          "Mullsjö",
+          "Habo",
+          "Gislaved",
+          "Vaggeryd",
+          "Jönköping",
+          "Nässjö",
+          "Värnamo",
+          "Sävsjö",
+          "Vetlanda",
+          "Eksjö",
+          "Tranås",
+          "Uppvidinge",
+          "Lessebo",
+          "Tingsryd",
+          "Alvesta",
+          "Älmhult",
+          "Markaryd",
+          "Växjö",
+          "Ljungby",
+          "Högsby",
+          "Torsås",
+          "Mörbylånga",
+          "Hultsfred",
+          "Mönsterås",
+          "Kalmar",
+          "Nybro",
+          "Oskarshamn",
+          "Västervik",
+          "Vimmerby",
+          "Borgholm",
+          "Gotland",
+          "Olofström",
+          "Sjöbo",
+          "Karlskrona",
+          "Ronneby",
+          "Karlshamn",
+          "Sölvesborg",
+          "Svalöv",
+          "Staffanstorp",
+          "Burlöv",
+          "Vellinge",
+          "ÖstraGöinge",
+          "Örkelljunga",
+          "Bjuv",
+          "Kävlinge",
+          "Lomma",
+          "Svedala",
+          "Skurup",
+          "Hörby",
+          "Höör",
+          "Tomelilla",
+          "Bromölla",
+          "Osby",
+          "Perstorp",
+          "Klippan",
+          "Åstorp",
+          "Båstad",
+          "Malmö",
+          "Lund",
+          "Landskrona",
+          "Helsingborg",
+          "Höganäs",
+          "Eslöv",
+          "Ystad",
+          "Trelleborg",
+          "Kristianstad",
+          "Simrishamn",
+          "Ängelholm",
+          "Hässleholm",
+          "Hylte",
+          "Halmstad",
+          "Laholm",
+          "Falkenberg",
+          "Varberg",
+          "Kungsbacka",
+          "Härryda",
+          "Partille",
+          "Öckerö",
+          "Stenungsund",
+          "Tjörn",
+          "Orust",
+          "Sotenäs",
+          "Munkedal",
+          "Tanum",
+          "DalsEd",
+          "Färgelanda",
+          "Ale",
+          "Lerum",
+          "Vårgårda",
+          "Bollebygd",
+          "Grästorp",
+          "Essunga",
+          "Karlsborg",
+          "Gullspång",
+          "Tranemo",
+          "Bengtsfors",
+          "Mellerud",
+          "LillaEdet",
+          "Mark",
+          "Svenljunga",
+          "Herrljunga",
+          "Vara",
+          "Götene",
+          "Tibro",
+          "Töreboda",
+          "Göteborg",
+          "Mölndal",
+          "Kungälv",
+          "Lysekil",
+          "Uddevalla",
+          "Strömstad",
+          "Vänersborg",
+          "Trollhättan",
+          "Alingsås",
+          "Borås",
+          "Ulricehamn",
+          "Åmål",
+          "Mariestad",
+          "Lidköping",
+          "Skara",
+          "Skövde",
+          "Hjo",
+          "Tidaholm",
+          "Falköping",
+          "Kil",
+          "Eda",
+          "Torsby",
+          "Storfors",
+          "Hammarö",
+          "Munkfors",
+          "Forshaga",
+          "Grums",
+          "Årjäng",
+          "Sunne",
+          "Karlstad",
+          "Kristinehamn",
+          "Filipstad",
+          "Hagfors",
+          "Arvika",
+          "Säffle",
+          "Lekeberg",
+          "Laxå",
+          "Hallsberg",
+          "Degerfors",
+          "Hällefors",
+          "Örebro",
+          "Kumla",
+          "Askersund",
+          "Karlskoga",
+          "Nora",
+          "Lindesberg",
+          "Ljusnarsberg",
+          "Skinnskatteberg",
+          "Surahammar",
+          "Kungsör",
+          "Hallstahammar",
+          "Norberg",
+          "Västerås",
+          "Sala",
+          "Fagersta",
+          "Köping",
+          "Arboga",
+          "Vansbro",
+          "MalungSälen",
+          "Gagnef",
+          "Leksand",
+          "Rättvik",
+          "Orsa",
+          "Älvdalen",
+          "Smedjebacken",
+          "Mora",
+          "Falun",
+          "Borlänge",
+          "Säter",
+          "Hedemora",
+          "Avesta",
+          "Ludvika",
+          "Ockelbo",
+          "Hofors",
+          "Ovanåker",
+          "Nordanstig",
+          "Ljusdal",
+          "Gävle",
+          "Sandviken",
+          "Söderhamn",
+          "Bollnäs",
+          "Hudiksvall",
+          "Ånge",
+          "Timrå",
+          "Härnösand",
+          "Sundsvall",
+          "Kramfors",
+          "Sollefteå",
+          "Örnsköldsvik",
+          "Ragunda",
+          "Bräcke",
+          "Krokom",
+          "Strömsund",
+          "Åre",
+          "Berg",
+          "Härjedalen",
+          "Östersund",
+          "Nordmaling",
+          "Bjurholm",
+          "Vindeln",
+          "Robertsfors",
+          "Norsjö",
+          "Malå",
+          "Storuman",
+          "Sorsele",
+          "Dorotea",
+          "Vännäs",
+          "Vilhelmina",
+          "Åsele",
+          "Umeå",
+          "Lycksele",
+          "Skellefteå",
+          "Arvidsjaur",
+          "Arjeplog",
+          "Jokkmokk",
+          "Överkalix",
+          "Kalix",
+          "Övertorneå",
+          "Pajala",
+          "Gällivare",
+          "Älvsbyn",
+          "Luleå",
+          "Piteå",
+          "Boden",
+          "Haparanda",
+          "Kiruna"
+        ],
+        "type": "string",
+        "description": "Municipality"
+      },
+      "Occurrence": {
+        "required": [
+          "basisOfRecord",
+          "occurrenceID",
+          "occurrenceStatus",
+          "taxon"
+        ],
+        "type": "object",
+        "properties": {
+          "occurrenceID": {
+            "minLength": 1,
+            "type": "string",
+            "description": "An identifier for the Occurrence (as opposed to a particular digital record of the occurrence). In the absence of a persistent global unique identifier, construct one from a combination of identifiers in the record that will most closely make the occurrenceID globally unique. (Source: Darwin Core quick reference guide)"
+          },
+          "basisOfRecord": {
+            "$ref": "#/components/schemas/BasisOfRecord"
+          },
+          "observationTime": {
+            "type": "string",
+            "description": "The specific time for the specific species observation (local time). (A general time/date for all species observations made during a survey event is given in the object inventeringstillfälle.)",
+            "format": "date-time",
+            "nullable": true
+          },
+          "eventStartDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "eventEndDate": {
+            "type": "string",
+            "description": "Date and Time for when the survey ended (local time).",
+            "format": "date-time",
+            "nullable": true
+          },
+          "observationPoint": {
+            "$ref": "#/components/schemas/IGeoShape"
+          },
+          "taxon": {
+            "$ref": "#/components/schemas/Taxon"
+          },
+          "occurrenceStatus": {
+            "$ref": "#/components/schemas/OccurrenceStatus"
+          },
+          "quantityVariable": {
+            "$ref": "#/components/schemas/QuantityVariable"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Amount of organisms of a certain unit (given in the attribute unit).",
+            "format": "double"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/Unit"
+          },
+          "organism": {
+            "$ref": "#/components/schemas/OrganismVariable"
+          },
+          "occurrenceRemarks": {
+            "type": "string",
+            "description": "Comment (freetext) about the species observation.",
+            "nullable": true
+          },
+          "observationCertainty": {
+            "type": "number",
+            "description": "States the radius within which the actual observation was made from the most specific coordinates given, i.e. the coordinates for the site, subsite or observation point.",
+            "format": "double",
+            "nullable": true
+          },
+          "identificationVerificationStatus": {
+            "type": "string",
+            "description": "States the quality of a species observation, i.e. whether its verified by an expert or similar.",
+            "nullable": true
+          },
+          "associatedMedia": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociatedMedia"
+            },
+            "description": "Attached information about the species observation, e.g. media files like images, sound recordings etc. Can also be collected physical samples that can be referenced.",
+            "nullable": true
+          },
+          "eventID": {
+            "type": "string",
+            "description": "A unique identity of the event where the observation were made.",
+            "nullable": true
+          },
+          "dataset": {
+            "$ref": "#/components/schemas/DatasetInfo"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A specific observation of an organism or a uniform group of organisms made at an event."
+      },
+      "OccurrenceFilter": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "$ref": "#/components/schemas/GeographicsFilter"
+          },
+          "datasetIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "DatasetIds filter.",
+            "nullable": true
+          },
+          "dateFilter": {
+            "$ref": "#/components/schemas/DateFilter"
+          },
+          "eventIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "EventIds filter.",
+            "nullable": true
+          },
+          "taxon": {
+            "$ref": "#/components/schemas/TaxonFilter"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Occurrence search filter."
+      },
+      "OccurrencePagedResult": {
+        "type": "object",
+        "properties": {
+          "skip": {
+            "type": "integer",
+            "description": "Ignores the specified number of items and returns a sequence starting at the item after the last skipped item.",
+            "format": "int32"
+          },
+          "take": {
+            "type": "integer",
+            "description": "The number of records requested.",
+            "format": "int32"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of records returned.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "description": "The total number of records matching the query.",
+            "format": "int32"
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Occurrence"
+            },
+            "description": "The records.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result returned by paged query."
+      },
+      "OccurrenceStatus": {
+        "enum": [
+          "InteObserverad",
+          "Observerad"
+        ],
+        "type": "string",
+        "description": "States whether a specific taxon was observed or not. Observations with \\\"Förekomst\\\" = \\\"inte observerad\\\" are so called zero observations."
+      },
+      "Organisation": {
+        "required": [
+          "organisationCode"
+        ],
+        "type": "object",
+        "properties": {
+          "organisationCode": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The name of an organisation."
+          },
+          "organisationID": {
+            "type": "string",
+            "description": "The id-number of an organisation.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Organisation"
+      },
+      "OrganismVariable": {
+        "type": "object",
+        "properties": {
+          "sex": {
+            "$ref": "#/components/schemas/Sex"
+          },
+          "lifeStage": {
+            "$ref": "#/components/schemas/LifeStage"
+          },
+          "activity": {
+            "$ref": "#/components/schemas/Activity"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Observed attributes and other variables linked to a certain individual or uniform group of individuals, e.g. sex, age, behavior."
+      },
+      "Parish": {
+        "enum": [
+          "Adelsö",
+          "Angarn",
+          "Björkö_Arholma",
+          "Blidö",
+          "Boo",
+          "Botkyrka",
+          "Bro_AB",
+          "Dalarö",
+          "Danderyd",
+          "Djurö",
+          "Ed_AB",
+          "Edebo",
+          "Edsbro",
+          "Ekerö",
+          "Estuna",
+          "Fasterna",
+          "Fresta",
+          "Frösunda",
+          "Frötuna",
+          "Färentuna",
+          "Gottröra",
+          "Grödinge",
+          "Gustavsberg",
+          "Haga",
+          "Hammarby_AB",
+          "Hilleshög",
+          "Huddinge",
+          "Husby_Sjuhundra",
+          "Husby_Ärlinghundra",
+          "Håbo_Tibble",
+          "Håtuna",
+          "Häverö",
+          "Hölö",
+          "Ingarö",
+          "Järfälla",
+          "Kårsta",
+          "Lidingö",
+          "Ljusterö",
+          "Lohärad",
+          "Lovö",
+          "Lunda_AB",
+          "Låssa",
+          "Länna_AB",
+          "Malsta",
+          "Markim",
+          "Munsö",
+          "Muskö",
+          "Möja",
+          "Mörkö",
+          "Nacka",
+          "Norrsunda",
+          "Norrtälje",
+          "Nynäshamn",
+          "Nämdö",
+          "Närtuna",
+          "Odensala",
+          "Orkesta",
+          "Ornö",
+          "Riala",
+          "Rimbo",
+          "Roslags_Bro",
+          "Roslags_Kulla",
+          "Rådmansö",
+          "Rö",
+          "Salem",
+          "Sigtuna",
+          "Singö",
+          "Skederid",
+          "Skepptuna",
+          "Skå",
+          "Skånela",
+          "Sollentuna",
+          "Solna",
+          "Sorunda",
+          "Stockholm",
+          "Kungsängen",
+          "Sundbyberg",
+          "Sånga_AB",
+          "Söderby_Karl",
+          "Södertälje",
+          "Taxinge",
+          "Torö",
+          "Turinge",
+          "Tveta_AB",
+          "Tyresö",
+          "Täby_AB",
+          "Ununge",
+          "Utö",
+          "Vada",
+          "Vallentuna",
+          "Vaxholm",
+          "Vidbo",
+          "Vårdinge",
+          "Väddö",
+          "Värmdö",
+          "Västerhaninge",
+          "Västra_Ryd_AB",
+          "Vätö",
+          "Ytterenhörna",
+          "Ytterjärna",
+          "Ösmo",
+          "Össeby_Garn",
+          "Österhaninge",
+          "Östertälje",
+          "Österåker_AB",
+          "Östra_Ryd_AB",
+          "Överenhörna",
+          "Överjärna",
+          "Bjurholm",
+          "Bureå",
+          "Burträsk",
+          "Bygdeå",
+          "Byske",
+          "Degerfors_AC",
+          "Dorotea",
+          "Fredrika",
+          "Holmön",
+          "Hörnefors",
+          "Jörn",
+          "Umeå_socken",
+          "Lycksele",
+          "Lövånger",
+          "Malå",
+          "Nordmaling",
+          "Norsjö",
+          "Nysätra_AC",
+          "Skellefteå_socken",
+          "Skellefteå_stad",
+          "Sorsele",
+          "Stensele",
+          "Sävar",
+          "Tärna_AC",
+          "Umeå_stad",
+          "Vilhelmina",
+          "Vännäs",
+          "Åsele",
+          "Örträsk",
+          "Arjeplog",
+          "Arvidsjaur",
+          "Edefors",
+          "Gällivare",
+          "Hietaniemi",
+          "Hortlax",
+          "Jokkmokk",
+          "Jukkasjärvi",
+          "Junosuando",
+          "Karesuando",
+          "Karl_Gustav_BD",
+          "Korpilombolo",
+          "Luleå",
+          "Nederkalix",
+          "Nederluleå",
+          "Nedertorneå",
+          "Norrfjärden",
+          "Pajala",
+          "Piteå_stad",
+          "Råneå",
+          "Tärendö",
+          "Töre",
+          "Älvsby",
+          "Piteå_socken",
+          "Överkalix",
+          "Överluleå",
+          "Övertorneå",
+          "Almunge",
+          "Alsike",
+          "Altuna",
+          "Alunda",
+          "Balingsta",
+          "Biskopskulla",
+          "Björklinge",
+          "Bladåker",
+          "Boglösa",
+          "Bred",
+          "Bälinge_C",
+          "Börje",
+          "Börstil",
+          "Dalby_C",
+          "Danmark",
+          "Dannemora",
+          "Ekeby_C",
+          "Enköping",
+          "Enköpings_Näs",
+          "Faringe",
+          "Film",
+          "Fittja",
+          "Forsmark",
+          "Fröslunda",
+          "Frösthult",
+          "Funbo",
+          "Giresta",
+          "Gryta",
+          "Gräsö",
+          "Hacksta",
+          "Hagby_C",
+          "Harg",
+          "Hjälsta",
+          "Holm_C",
+          "Husby_Långhundra",
+          "Husby_Sjutolft",
+          "Hållnäs",
+          "Häggeby",
+          "Härkeberga",
+          "Härnevi",
+          "Hökhuvud",
+          "Jumkil",
+          "Järlåsa",
+          "Kalmar_C",
+          "Knivsta",
+          "Knutby",
+          "Kulla",
+          "Kungs_Husby",
+          "Lagga",
+          "Lena_C",
+          "Lillkyrka_C",
+          "Litslena",
+          "Långtora",
+          "Läby",
+          "Löt_C",
+          "Morkarla",
+          "Nysätra_C",
+          "Ramsta",
+          "Rasbo",
+          "Rasbokil",
+          "Simtuna",
+          "Skogs_Tibble",
+          "Skokloster",
+          "Skuttunge",
+          "Skäfthammar",
+          "Sparrsätra",
+          "Stavby",
+          "Svinnegarn",
+          "Söderfors",
+          "Teda",
+          "Tegelsmora",
+          "Tensta",
+          "Tierp",
+          "Tillinge",
+          "Tolfta",
+          "Torstuna",
+          "Torsvi",
+          "Tuna_C",
+          "Uppsala",
+          "Uppsala_Näs",
+          "Vaksala",
+          "Vallby_C",
+          "Valö",
+          "Vassunda",
+          "Veckholm",
+          "Vendel",
+          "Viksta",
+          "Villberga",
+          "Vårfrukyrka",
+          "Vänge_C",
+          "Västeråker",
+          "Västland",
+          "Yttergran",
+          "Åkerby",
+          "Åland",
+          "Älvkarleby",
+          "Ärentuna",
+          "Öregrund",
+          "Österlövsta",
+          "Österunda",
+          "Östhammar",
+          "Östuna",
+          "Övergran",
+          "Aspö_D",
+          "Barva",
+          "Bergshammar",
+          "Bettna",
+          "Björkvik",
+          "Björnlunda",
+          "Blacksta",
+          "Bogsta",
+          "Bälinge_S",
+          "Bärbo",
+          "Dunker",
+          "Eskilstuna",
+          "Flen",
+          "Floda_D",
+          "Fogdö",
+          "Forssa",
+          "Frustuna",
+          "Gillberga_D",
+          "Gryt_D",
+          "Gåsinge_Dillnäs",
+          "Halla_D",
+          "Hammarby_D",
+          "Helgarö",
+          "Helgesta",
+          "Helgona",
+          "Husby_Oppunda",
+          "Husby_Rekarne",
+          "Hyltinge",
+          "Härad",
+          "Julita",
+          "Jäder",
+          "Katrineholm",
+          "Kattnäs",
+          "Kila_D",
+          "Kjula",
+          "Kärnbo",
+          "Lerbo",
+          "Lid",
+          "Lilla_Malma",
+          "Lista",
+          "Ludgo",
+          "Lunda_D",
+          "Länna_D",
+          "Lästringe",
+          "Mariefred",
+          "Mellösa",
+          "Nykyrka_D",
+          "Nyköping",
+          "Näshulta",
+          "Oxelösund",
+          "Ripsa",
+          "Runtuna",
+          "Råby_Rekarne",
+          "Råby_Rönö",
+          "Sköldinge",
+          "Spelvik",
+          "Stenkvista",
+          "Stigtomta",
+          "Stora_Malm",
+          "Strängnäs",
+          "Sundby",
+          "Svärta",
+          "Sättersta",
+          "Toresund",
+          "Torshälla",
+          "Torsåker_D",
+          "Trosa_stad",
+          "Trosa_Vagnhärad",
+          "Tumbo",
+          "Tuna_D",
+          "Tunaberg",
+          "Tystberga",
+          "Vadsbro",
+          "Vallby_D",
+          "Vansö",
+          "Vrena",
+          "Västerljung",
+          "Västermo",
+          "Västra_Vingåker",
+          "Ytterselö",
+          "Åker_D",
+          "Årdala",
+          "Ärla",
+          "Öja_D",
+          "Österåker_D",
+          "Östra_Vingåker",
+          "Överselö",
+          "Allhelgona",
+          "Appuna",
+          "Asby",
+          "Ask_E",
+          "Askeby",
+          "Bankekind",
+          "Bjälbo",
+          "Björkeberg",
+          "Björsäter_E",
+          "Blåvik",
+          "Brunneby",
+          "Börrum",
+          "Dagsberg",
+          "Drothem",
+          "Ekeby_E",
+          "Ekebyborna",
+          "Fivelstad",
+          "Flistad_E",
+          "Fornåsa",
+          "Furingstad",
+          "Gammalkil",
+          "Gistad",
+          "Godegård",
+          "Grebo",
+          "Gryt_E",
+          "Gårdeby",
+          "Gärdserum",
+          "Hagebyhöga",
+          "Hannäs",
+          "Heda",
+          "Herrberga",
+          "Herrestad_E",
+          "Hogstad",
+          "Horn_E_",
+          "Hov_E",
+          "Hycklinge",
+          "Hägerstad",
+          "Hällestad_E",
+          "Häradshammar",
+          "Högby_E",
+          "Jonsberg",
+          "Järstad",
+          "Kaga",
+          "Kimstad",
+          "Kisa",
+          "Klockrike",
+          "Konungsund",
+          "Kristberg",
+          "Krokek",
+          "Kuddby",
+          "Kullerstad",
+          "Kumla_E",
+          "Kvarsebo",
+          "Kvillinge",
+          "Källstad",
+          "Kärna",
+          "Kättilstad",
+          "Landeryd",
+          "Ledberg",
+          "Lillkyrka_E",
+          "Linköping",
+          "Ljung_E",
+          "Lönsås",
+          "Malexander",
+          "Mjölby",
+          "Mogata",
+          "Motala",
+          "Normlösa",
+          "Norra_Vi",
+          "Norrköping",
+          "Nykil",
+          "Nässja",
+          "Oppeby",
+          "Orlunda",
+          "Rappestad",
+          "Regna",
+          "Ringarum",
+          "Rinna",
+          "Risinge",
+          "Rogslösa",
+          "Rystad",
+          "Rök",
+          "Rönö",
+          "Sankt_Anna",
+          "Simonstorp",
+          "Sjögestad",
+          "Skeda",
+          "Skedevi",
+          "Skeppsås",
+          "Skällvik",
+          "Skänninge",
+          "Skärkind",
+          "Skönberga",
+          "Slaka",
+          "Stjärnorp",
+          "Stora_Åby",
+          "Strå",
+          "Styra",
+          "Styrstad",
+          "Sund",
+          "Svanshals",
+          "Svinhult",
+          "Sya",
+          "Söderköping",
+          "Tidersrum",
+          "Tingstad",
+          "Tjällmo",
+          "Tjärstad",
+          "Torpa_H",
+          "Trehörna",
+          "Tryserum",
+          "Tåby",
+          "Törnevalla",
+          "Ulrika",
+          "Vadstena",
+          "Vallerstad",
+          "Varv_E",
+          "Veta",
+          "Viby_E",
+          "Vikingstad",
+          "Vist",
+          "Vreta_kloster",
+          "Vånga_E",
+          "Vårdnäs",
+          "Vårdsberg",
+          "Väderstad",
+          "Värna",
+          "Västerlösa",
+          "Västra_Eneby",
+          "Västra_Harg",
+          "Västra_Husby",
+          "Västra_Ny",
+          "Västra_Ryd_E",
+          "Västra_Stenby",
+          "Västra_Tollstad",
+          "Väversunda",
+          "Yxnerum",
+          "Å",
+          "Åsbo",
+          "Åtvid",
+          "Älvestad",
+          "Ödeshög",
+          "Örberga",
+          "Örtomta",
+          "Östra_Ed",
+          "Östra_Harg",
+          "Östra_Husby",
+          "Östra_Ny",
+          "Östra_Ryd_E",
+          "Östra_Skrukeby",
+          "Östra_Stenby",
+          "Östra_Tollstad",
+          "Adelöv",
+          "Almesåkra",
+          "Alseda",
+          "Anderstorp",
+          "Angerdshestra",
+          "Askeryd",
+          "Bankeryd",
+          "Barkeryd",
+          "Barnarp",
+          "Bellö",
+          "Björkö",
+          "Bondstorp",
+          "Bosebo",
+          "Bottnaryd",
+          "Bredaryd",
+          "Bredestad",
+          "Bringetofta",
+          "Burseryd",
+          "Byarum",
+          "Båraryd",
+          "Bäckaby",
+          "Bäckseda",
+          "Bälaryd",
+          "Dannäs",
+          "Edshult",
+          "Eksjö",
+          "Femsjö",
+          "Flisby",
+          "Forserum",
+          "Forsheda",
+          "Frinnaryd",
+          "Fryele",
+          "Fröderyd",
+          "Färgaryd",
+          "Gnosjö",
+          "Gryteryd",
+          "Gränna",
+          "Gällaryd",
+          "Hagshult",
+          "Hakarp",
+          "Haurida",
+          "Hjälmseryd",
+          "Hult",
+          "Hultsjö",
+          "Huskvarna",
+          "Hylletofta",
+          "Hånger",
+          "Hässleby",
+          "Höreda",
+          "Ingatorp",
+          "Jälluntofta",
+          "Järsnäs",
+          "Järstorp",
+          "Jönköping",
+          "Karlstorp",
+          "Korsberga_F",
+          "Kråkshult",
+          "Kulltorp",
+          "Kållerstad",
+          "Källeryd",
+          "Kärda",
+          "Kävsjö",
+          "Lannaskede",
+          "Lekeryd",
+          "Lemnhult",
+          "Linderås",
+          "Lommaryd",
+          "Långaryd",
+          "Malmbäck",
+          "Marbäck_F",
+          "Mellby_F",
+          "Mulseryd",
+          "Myresjö",
+          "Månsarp",
+          "Norra_Hestra",
+          "Norra_Sandsjö",
+          "Norra_Solberga",
+          "Norra_Unnaryd",
+          "Nydala",
+          "Nye",
+          "Näsby_F",
+          "Näshult",
+          "Nässjö",
+          "Nävelsjö",
+          "Ramkvilla",
+          "Reftele",
+          "Rogberga",
+          "Rydaholm",
+          "Sandvik",
+          "Skede",
+          "Skepperstad",
+          "Skirö",
+          "Skärstad",
+          "Stenberga",
+          "Stengårdshult",
+          "Stockaryd",
+          "Svarttorp",
+          "Svenarum",
+          "Sävsjö",
+          "Södra_Hestra",
+          "Södra_Solberga",
+          "Södra_Unnaryd",
+          "Tofteryd",
+          "Torskinge",
+          "Tranås_F",
+          "Tånnö",
+          "Valdshult",
+          "Vetlanda",
+          "Villstad",
+          "Vireda",
+          "Visingsö",
+          "Voxtorp_F",
+          "Vrigstad",
+          "Våthult",
+          "Värnamo",
+          "Åker_F",
+          "Ås_F",
+          "Åsenhöga",
+          "Ödestugu",
+          "Öggestorp",
+          "Ökna",
+          "Ölmstad",
+          "Öreryd",
+          "Agunnaryd",
+          "Almundsryd",
+          "Aneboda",
+          "Angelstad",
+          "Annerstad",
+          "Aringsås",
+          "Asa",
+          "Berg_G",
+          "Berga_G",
+          "Bergunda",
+          "Blädinge",
+          "Bolmsö",
+          "Drev",
+          "Dädesjö",
+          "Dänningelanda",
+          "Dörarp",
+          "Ekeberga",
+          "Furuby",
+          "Granhult",
+          "Gårdsby",
+          "Göteryd",
+          "Hallaryd",
+          "Hamneda",
+          "Hemmesjö",
+          "Herråkra",
+          "Hinneryd",
+          "Hjortsberga_G",
+          "Hornaryd",
+          "Hovmantorp",
+          "Härlunda_G",
+          "Härlöv",
+          "Jät",
+          "Kalvsvik",
+          "Kvenneberga",
+          "Kånna",
+          "Lekaryd",
+          "Lenhovda",
+          "Lidhult",
+          "Linneryd",
+          "Ljuder",
+          "Ljungby_G",
+          "Markaryd",
+          "Mistelås",
+          "Moheda",
+          "Nottebäck",
+          "Nöbbele",
+          "Nöttja",
+          "Odensjö",
+          "Ormesberga",
+          "Pjätteryd",
+          "Ryssby_G",
+          "Sjösås",
+          "Skatelöv",
+          "Slätthög",
+          "Stenbrohult",
+          "Södra_Ljunga",
+          "Södra_Sandsjö",
+          "Söraby",
+          "Tannåker",
+          "Tegnaby",
+          "Tingsås",
+          "Tjureda",
+          "Tolg",
+          "Torpa_G",
+          "Traryd",
+          "Tutaryd",
+          "Tävelsås",
+          "Urshult",
+          "Uråsa",
+          "Vederslöv",
+          "Virestad",
+          "Vislanda",
+          "Vittaryd",
+          "Vrå",
+          "Väckelsång",
+          "Västra_Torsås",
+          "Växjö",
+          "Åseda",
+          "Älghult",
+          "Älmeboda",
+          "Öja_G",
+          "Öjaby",
+          "Ör_G",
+          "Östra_Torsås",
+          "Alböke",
+          "Algutsboda",
+          "Algutsrum",
+          "Arby",
+          "Blackstad",
+          "Borgholm",
+          "Bredsätra",
+          "Bäckebo",
+          "Böda",
+          "Dalhem_H",
+          "Djursdala",
+          "Döderhult",
+          "Dörby",
+          "Egby",
+          "Fagerhult",
+          "Fliseryd",
+          "Frödinge",
+          "Fågelfors",
+          "Föra",
+          "Förlösa",
+          "Gamleby",
+          "Gladhammar",
+          "Glömminge",
+          "Gräsgård",
+          "Gullabo",
+          "Gårdby",
+          "Gårdveda",
+          "Gärdslösa",
+          "Hagby_H",
+          "Hallingeberg",
+          "Halltorp",
+          "Hjorted",
+          "Hossmo",
+          "Hulterstad",
+          "Hälleberga",
+          "Högby_H",
+          "Högsby",
+          "Högsrum",
+          "Järeda",
+          "Kalmar_H",
+          "Karlslunda",
+          "Kastlösa",
+          "Kläckeberga",
+          "Kristdala",
+          "Kristvalla",
+          "Kråksmåla",
+          "Källa",
+          "Köping_H",
+          "Ljungby_H",
+          "Locknevi",
+          "Lofta",
+          "Loftahammar",
+          "Långasjö",
+          "Långemåla",
+          "Långlöt",
+          "Lönneberga",
+          "Löt_H",
+          "Madesjö",
+          "Misterhult",
+          "Mortorp",
+          "Målilla",
+          "Mönsterås",
+          "Mörbylånga",
+          "Mörlunda",
+          "Norra_Möckleby",
+          "Nybro",
+          "Odensvi_H",
+          "Oskar",
+          "Oskarshamn",
+          "Pelarne",
+          "Persnäs",
+          "Resmo",
+          "Rumskulla",
+          "Runsten",
+          "Ryssby_H",
+          "Räpplinge",
+          "Sandby",
+          "Sankt_Sigfrid",
+          "Segerstad_H",
+          "Smedby",
+          "Stenåsa",
+          "Söderåkra",
+          "Södra_Möckleby",
+          "Södra_Vi",
+          "Torslunda",
+          "Torsås",
+          "Tuna_H",
+          "Tveta_H",
+          "Törnsfall",
+          "Ukna",
+          "Vena",
+          "Ventlinge",
+          "Vickleby",
+          "Vimmerby",
+          "Virserum",
+          "Vissefjärda",
+          "Voxtorp_H",
+          "Västervik",
+          "Västra_Ed",
+          "Västrum",
+          "Åby",
+          "Ålem",
+          "Ås_H",
+          "Örsjö_H",
+          "Överum",
+          "Akebäck",
+          "Ala",
+          "Alskog",
+          "Alva",
+          "Anga",
+          "Ardre",
+          "Atlingbo",
+          "Barlingbo",
+          "Björke",
+          "Boge",
+          "Bro_I",
+          "Bunge",
+          "Burs",
+          "Buttle",
+          "Bäl",
+          "Dalhem_I",
+          "Eke",
+          "Ekeby_I",
+          "Eksta",
+          "Endre",
+          "Eskelhem",
+          "Etelhem",
+          "Fardhem",
+          "Fide",
+          "Fleringe",
+          "Fole",
+          "Follingbo",
+          "Fröjel",
+          "Fårö",
+          "Gammelgarn",
+          "Ganthem",
+          "Garde",
+          "Gerum",
+          "Gothem",
+          "Grötlingbo",
+          "Guldrupe",
+          "Hablingbo",
+          "Hall",
+          "Halla_I",
+          "Hamra",
+          "Hangvar",
+          "Havdhem",
+          "Hejde",
+          "Hejdeby",
+          "Hejnum",
+          "Hellvi",
+          "Hemse",
+          "Hogrän",
+          "Hörsne",
+          "Klinte",
+          "Kräklingbo",
+          "Källunge",
+          "Lau",
+          "Levide",
+          "Linde_I",
+          "Lojsta",
+          "Lokrume",
+          "Lummelunda",
+          "Lye",
+          "Lärbro",
+          "Martebo",
+          "Mästerby",
+          "Norrlanda",
+          "När",
+          "Näs_I",
+          "Othem",
+          "Roma",
+          "Rone",
+          "Rute",
+          "Sanda",
+          "Silte",
+          "Sjonhem",
+          "Sproge",
+          "Stenkumla",
+          "Stenkyrka_I",
+          "Stånga",
+          "Sundre",
+          "Tingstäde",
+          "Tofta_I",
+          "Träkumla",
+          "Vall",
+          "Vallstena",
+          "Vamlingbo",
+          "Viklau",
+          "Visby",
+          "Vänge_I",
+          "Väskinde",
+          "Västergarn",
+          "Västerhejde",
+          "Väte",
+          "Öja_I",
+          "Östergarn",
+          "Asarum",
+          "Aspö_K",
+          "Augerum",
+          "Backaryd",
+          "Bräkne_Hoby",
+          "Edestad",
+          "Elleholm",
+          "Eringsboda",
+          "Fridlevstad",
+          "Förkärla",
+          "Gammalstorp",
+          "Hasslö",
+          "Hjortsberga_K",
+          "Hällaryd",
+          "Jämjö",
+          "Jämshög",
+          "Karlshamn",
+          "Karlskrona",
+          "Kristianopel",
+          "Kyrkhult",
+          "Listerby",
+          "Lösen",
+          "Mjällby",
+          "Mörrum",
+          "Nättraby",
+          "Ramdala",
+          "Ringamåla",
+          "Ronneby",
+          "Rödeby",
+          "Sillhövda",
+          "Sturkö",
+          "Sölvesborg",
+          "Tjurkö",
+          "Torhamn",
+          "Tving",
+          "Ysane",
+          "Åryd",
+          "Öljehult",
+          "Andrarum",
+          "Ausås",
+          "Barkåkra",
+          "Benestad",
+          "Björnekulla",
+          "Bollerup",
+          "Bolshög",
+          "Borrby",
+          "Brönnestad",
+          "Brösarp",
+          "Båstad",
+          "Degeberga",
+          "Djurröd",
+          "Eljaröd",
+          "Emmislöv",
+          "Everöd",
+          "Farstorp",
+          "Finja",
+          "Fjälkestad",
+          "Fjälkinge",
+          "Fågeltofta",
+          "Färingtofta",
+          "Färlöv",
+          "Förslöv",
+          "Gladsax",
+          "Glemminge",
+          "Glimåkra",
+          "Grevie",
+          "Gryt_M",
+          "Klippan",
+          "Gualöv",
+          "Gumlösa",
+          "Gustav_Adolf_M",
+          "Hammenhög",
+          "Hannas",
+          "Hjärnarp",
+          "Hjärsås",
+          "Hov_M",
+          "Huaröd",
+          "Häglinge",
+          "Hässleholm",
+          "Hästveda",
+          "Höja",
+          "Hörja",
+          "Hörröd",
+          "Hörup",
+          "Ignaberga",
+          "Ingelstorp",
+          "Ivetofta",
+          "Ivö",
+          "Järrestad",
+          "Kiaby",
+          "Knislinge",
+          "Kristianstad",
+          "Kvidinge",
+          "Kviinge",
+          "Kverrestad",
+          "Källna",
+          "Köpinge",
+          "Linderöd",
+          "Loshult",
+          "Lyngsjö",
+          "Löderup",
+          "Maglehem",
+          "Matteröd",
+          "Munka_Ljungby",
+          "Norra_Mellby",
+          "Norra_Sandby",
+          "Norra_Strö",
+          "Norra_Åkarp",
+          "Nosaby",
+          "Nymö",
+          "Näsum",
+          "Nävlinge",
+          "Oderljunga",
+          "Onslunda",
+          "Oppmanna",
+          "Osby",
+          "Perstorp",
+          "Ramsåsa",
+          "Ravlunda",
+          "Rebbelberga",
+          "Rinkaby_M",
+          "Riseberga",
+          "Rya",
+          "Röke",
+          "Rörum",
+          "Sankt_Olof_M",
+          "Simris",
+          "Simrishamn",
+          "Skepparslöv",
+          "Skånes_Fagerhult",
+          "Smedstorp",
+          "Spjutstorp",
+          "Starby",
+          "Stiby",
+          "Stoby",
+          "Strövelstorp",
+          "Södra_Mellby",
+          "Sörby_M",
+          "Torekov",
+          "Tosterup",
+          "Tranås_M",
+          "Trolle_Ljungby",
+          "Tryde",
+          "Träne",
+          "Tåssjö",
+          "Tåstarp",
+          "Ullstorp",
+          "Vallby_M",
+          "Valleberga",
+          "Vankiva",
+          "Vedby",
+          "Verum",
+          "Vinslöv",
+          "Visseltofta",
+          "Vitaby",
+          "Vittsjö",
+          "Vittskövle",
+          "Vånga_M",
+          "Vä",
+          "Västra_Broby",
+          "Västra_Karup",
+          "Västra_Sönnarslöv",
+          "Västra_Torup",
+          "Västra_Vram",
+          "Åhus",
+          "Ängelholm",
+          "Äsphult",
+          "Önnestad",
+          "Örkelljunga",
+          "Örkened",
+          "Össjö",
+          "Österslöv",
+          "Östra_Broby",
+          "Östra_Herrestad",
+          "Östra_Hoby",
+          "Östra_Ingelstad",
+          "Östra_Karup",
+          "Östra_Ljungby",
+          "Östra_Nöbbelöv",
+          "Östra_Sönnarslöv",
+          "Östra_Tommarp",
+          "Östra_Vemmerlöv",
+          "Östra_Vram",
+          "Övraby_M",
+          "Allerum",
+          "Anderslöv",
+          "Annelöv",
+          "Arrie",
+          "Ask_M",
+          "Asmundtorp",
+          "Baldringe",
+          "Balkåkra",
+          "Bara",
+          "Barsebäck",
+          "Billeberga",
+          "Billinge",
+          "Bjuv",
+          "Bjällerup",
+          "Bjäresjö",
+          "Bjärshög",
+          "Björka",
+          "Blentarp",
+          "Bodarp",
+          "Bonderup",
+          "Borgeby",
+          "Borlunda",
+          "Borrie",
+          "Bosarp",
+          "Bosjökloster",
+          "Brandstad",
+          "Bromma",
+          "Brunnby",
+          "Brågarp",
+          "Bunkeflo",
+          "Burlöv",
+          "Bårslöv",
+          "Börringe",
+          "Bösarp",
+          "Dagstorp",
+          "Dalby_M",
+          "Dalköpinge",
+          "Ekeby_M",
+          "Esarp",
+          "Eskilstorp",
+          "Eslöv",
+          "Everlöv",
+          "Farhult",
+          "Felestad",
+          "Fjelie",
+          "Fjärestad",
+          "Flackarp",
+          "Fleninge",
+          "Flädie",
+          "Frillestad",
+          "Fru_alstad",
+          "Fränninge",
+          "Fuglie",
+          "Fulltofta",
+          "Genarp",
+          "Gislöv",
+          "Glostorp",
+          "Glumslöv",
+          "Grönby",
+          "Gudmundtorp",
+          "Gylle",
+          "Gårdstånga",
+          "Gärdslöv",
+          "Gässie",
+          "Gödelöv",
+          "Görslöv",
+          "Hallaröd",
+          "Halmstad_M",
+          "Hammarlunda",
+          "Hammarlöv",
+          "Hardeberga",
+          "Harlösa",
+          "Skurup_M_Sk",
+          "Hedeskoga",
+          "Hemmesdynge",
+          "Hofterup",
+          "Holmby",
+          "Hurva",
+          "Hyby",
+          "Håslöv",
+          "Håstad",
+          "Hällestad_M",
+          "Helsingborg",
+          "Härslöv",
+          "Hässlunda",
+          "Hög_M",
+          "Höganäs",
+          "Högestad",
+          "Högseröd",
+          "Hököpinge",
+          "Hörby",
+          "Höör",
+          "Igelösa",
+          "Ilstorp",
+          "Jonstorp",
+          "Katslösa",
+          "Kattarp",
+          "Knästorp",
+          "Konga",
+          "Kropp",
+          "Kvistofta",
+          "Kyrkheddinge",
+          "Kyrkoköpinge",
+          "Kågeröd",
+          "Källs_Nöbbelöv",
+          "Källstorp",
+          "Kävlinge",
+          "Lackalänga",
+          "Landskrona",
+          "Lilla_Beddinge",
+          "Lilla_Harrie",
+          "Lilla_Isie",
+          "Lilla_Slågarp",
+          "Lockarp",
+          "Lomma",
+          "Lund",
+          "Lyby",
+          "Lyngby",
+          "Långaröd",
+          "Löddeköpinge",
+          "Lövestad",
+          "Maglarp",
+          "Malmö",
+          "Mellan_Grevie",
+          "Munkarp",
+          "Mölleberga",
+          "Mörarp",
+          "Nevishög",
+          "Norra_Nöbbelöv",
+          "Norra_Rörum",
+          "Norra_Skrävlinge",
+          "Norra_Vram",
+          "Norrvidinge",
+          "Odarslöv",
+          "Ottarp",
+          "Oxie",
+          "Remmarlöv",
+          "Reslöv",
+          "Revinge",
+          "Risekatslösa",
+          "Räng",
+          "Röddinge",
+          "Röstånga",
+          "Sankt_Ibb",
+          "Saxtorp",
+          "Silvåkra",
+          "Simlinge",
+          "Sireköpinge",
+          "Sjörup",
+          "Skabersjö",
+          "Skanör_m_Falsterbo",
+          "Skarhult",
+          "Skeglinge",
+          "Skegrie",
+          "Skivarp",
+          "Skurup_M",
+          "Skårby",
+          "Slimminge",
+          "Snårestad",
+          "Solberga_M",
+          "Stehag",
+          "Stenestad",
+          "Stora_Hammar",
+          "Stora_Harrie",
+          "Stora_Herrestad",
+          "Stora_Köpinge",
+          "Stora_Råby",
+          "Stora_Slågarp",
+          "Stångby",
+          "Stävie",
+          "Svalöv",
+          "Svedala",
+          "Svensköp",
+          "Svenstorp",
+          "Säby_M",
+          "Särslöv",
+          "Södervidinge",
+          "Södra_Rörum",
+          "Södra_Sandby",
+          "Södra_Vram",
+          "Södra_Åby",
+          "Södra_Åkarp",
+          "Södra_Åsum",
+          "Sövde",
+          "Sövestad",
+          "Tirup",
+          "Tjörnarp",
+          "Tofta_M",
+          "Tolånga",
+          "Torrlösa",
+          "Tottarp",
+          "Trelleborg",
+          "Trollenäs",
+          "Tullstorp",
+          "Tygelsjö",
+          "Törringe",
+          "Uppåkra",
+          "Vadensjö",
+          "Vallkärra",
+          "Vanstad",
+          "Veberöd",
+          "Vellinge",
+          "Viken",
+          "Villie",
+          "Virke",
+          "Vollsjö",
+          "Vomb",
+          "Välinge",
+          "Välluv",
+          "Väsby",
+          "Västerstad",
+          "Västra_Alstad",
+          "Västra_Hoby",
+          "Västra_Ingelstad",
+          "Västra_Karaby",
+          "Västra_Klagstorp",
+          "Västra_Kärrstorp",
+          "Västra_Nöbbelöv",
+          "Västra_Strö",
+          "Västra_Tommarp",
+          "Västra_Vemmenhög",
+          "Västra_Vemmerlöv",
+          "Ystad",
+          "Äspinge",
+          "Äspö",
+          "Öja_M",
+          "Önnarp",
+          "Örja",
+          "Örsjö_M",
+          "Örtofta",
+          "Östra_Grevie",
+          "Östra_Karaby",
+          "Östra_Klagstorp",
+          "Östra_Kärrstorp",
+          "Östra_Sallerup",
+          "Östra_Strö",
+          "Östra_Torp",
+          "Östra_Vemmenhög",
+          "Östraby",
+          "Öved",
+          "Abild",
+          "Alfshög",
+          "Asige",
+          "Askome",
+          "Breared",
+          "Dagsås",
+          "Drängsered",
+          "Eftra",
+          "Eldsberga",
+          "Enslöv",
+          "Fagered",
+          "Falkenberg",
+          "Fjärås",
+          "Frillesås",
+          "Förlanda",
+          "Getinge",
+          "Grimeton",
+          "Grimmared",
+          "Gunnarp",
+          "Gunnarsjö",
+          "Gällared",
+          "Gällinge",
+          "Gödestad",
+          "Halmstad_N",
+          "Hanhals",
+          "Harplinge",
+          "Hasslöv",
+          "Hishult",
+          "Holm_N",
+          "Hunnestad",
+          "Idala",
+          "Karl_Gustav_N",
+          "Kinnared",
+          "Knäred",
+          "Krogsered",
+          "Kungsbacka",
+          "Kungsäter",
+          "Kvibille",
+          "Källsjö",
+          "Köinge",
+          "Laholm",
+          "Landa_N",
+          "Lindberg",
+          "Ljungby_N",
+          "Morup",
+          "Nösslinge",
+          "Okome",
+          "Onsala",
+          "Rolfstorp",
+          "Ränneslöv",
+          "Rävinge",
+          "Sibbarp",
+          "Skrea",
+          "Skummeslöv",
+          "Skällinge",
+          "Släp",
+          "Slättåkra",
+          "Slöinge",
+          "Snöstorp",
+          "Spannarp",
+          "Stafsinge",
+          "Stamnared",
+          "Steninge",
+          "Stråvalla",
+          "Svartrå",
+          "Sällstorp",
+          "Söndrum",
+          "Tjärby",
+          "Torpa_N",
+          "Torup",
+          "Träslöv",
+          "Trönninge",
+          "Tvååker",
+          "Tölö",
+          "Tönnersjö",
+          "Ullared",
+          "Valinge",
+          "Vallda",
+          "Vapnö",
+          "Varberg",
+          "Veddige",
+          "Veinge",
+          "Vessige",
+          "Vinberg",
+          "Våxtorp",
+          "Värö",
+          "Ysby",
+          "Årstad",
+          "Ås_N",
+          "Älvsered",
+          "Älvsåker",
+          "Ölmevalla",
+          "Övraby_N",
+          "Angered",
+          "Askim",
+          "Askum",
+          "Bergum",
+          "Björketorp",
+          "Björlanda",
+          "Bokenäs",
+          "Bottna",
+          "Brastad",
+          "Bro_O",
+          "Bärfendal",
+          "Dragsmark",
+          "Forshälla",
+          "Foss",
+          "Grinneröd",
+          "Gullholmen",
+          "Göteborg",
+          "Harestad",
+          "Hede_O",
+          "Herrestad_O",
+          "Hogdal",
+          "Håby",
+          "Hålta",
+          "Härryda",
+          "Högås",
+          "Jörlanda",
+          "Kareby",
+          "Klädesholmen",
+          "Klövedal",
+          "Krokstad",
+          "Kungälv",
+          "Kville",
+          "Kållered",
+          "Käringön",
+          "Landvetter",
+          "Lane_Ryr",
+          "Lindome",
+          "Ljung_O",
+          "Lommeland",
+          "Lur",
+          "Lycke",
+          "Lyse",
+          "Lysekil",
+          "Långelanda",
+          "Marstrand",
+          "Mo_O_Ta",
+          "Mollösund",
+          "Morlanda",
+          "Myckleby",
+          "Mölndal",
+          "Naverstad",
+          "Norum",
+          "Näsinge",
+          "Partille",
+          "Resteröd",
+          "Romelanda",
+          "Råda_O_Hä",
+          "Rödbo",
+          "Rönnäng",
+          "Röra",
+          "Sanne",
+          "Skaftö",
+          "Skee",
+          "Skredsvik",
+          "Solberga_O_Ku",
+          "Spekeröd",
+          "Stala",
+          "Stenkyrka_O",
+          "Strömstad",
+          "Styrsö",
+          "Svarteborg",
+          "Svenneby",
+          "Säve",
+          "Tanum",
+          "Tegneby",
+          "Tjärnö",
+          "Torp_O_Or",
+          "Torsby",
+          "Torslanda",
+          "Tossene",
+          "Tuve",
+          "Ucklum",
+          "Uddevalla",
+          "Valbo_Ryr",
+          "Valla",
+          "Ytterby",
+          "Öckerö",
+          "Ödsmål",
+          "Alboga",
+          "Ale_Skövde",
+          "Algutstorp",
+          "Alingsås",
+          "Ambjörnarp",
+          "Asklanda",
+          "Berghem",
+          "Bergstena",
+          "Blidsberg",
+          "Bollebygd",
+          "Bolstad",
+          "Borgstena",
+          "Borås",
+          "Bredared",
+          "Broddarp",
+          "Brålanda",
+          "Bråttensby",
+          "Brämhult",
+          "Bäcke",
+          "Böne",
+          "Dals_Ed",
+          "Dalskog",
+          "Dalstorp",
+          "Dalum",
+          "Dannike",
+          "Edsleskog",
+          "Eggvena",
+          "Eriksberg",
+          "Erikstad",
+          "Erska",
+          "Finnekumla",
+          "Fors_O",
+          "Fotskäl",
+          "Fristad",
+          "Fritsla",
+          "Frändefors",
+          "Fröskog",
+          "Fullestad",
+          "Fuxerna",
+          "Fänneslunda",
+          "Färgelanda",
+          "Fölene",
+          "Gestad",
+          "Gesäter",
+          "Gingri",
+          "Grinstad",
+          "Grovare",
+          "Grude",
+          "Grönahög",
+          "Gullered",
+          "Gunnarsnäs",
+          "Gällstad",
+          "Gärdhem",
+          "Hajom",
+          "Hemsjö",
+          "Herrljunga",
+          "Hillared",
+          "Hjärtum",
+          "Hol",
+          "Holm_O",
+          "Holsljunga",
+          "Horla",
+          "Horred",
+          "Hov_O",
+          "Hudene",
+          "Hulared",
+          "Humla",
+          "Hyssna",
+          "Håbol",
+          "Håcksvik",
+          "Hålanda",
+          "Hällstad",
+          "Härna",
+          "Högsäter",
+          "Hössna",
+          "Istorp",
+          "Jällby",
+          "Järbo_O",
+          "Järn",
+          "Kalv",
+          "Kilanda",
+          "Kinna",
+          "Kinnarumma",
+          "Knätte",
+          "Kullings_Skövde",
+          "Kvinnestad",
+          "Källunga",
+          "Kärråkra",
+          "Kölaby",
+          "Kölingared",
+          "Lagmansered",
+          "Landa_O",
+          "Laxarby",
+          "Lena_O",
+          "Lerdal",
+          "Lerum",
+          "Liared",
+          "Södra_Åsarp",
+          "Ljungsarp",
+          "Ljur",
+          "Ljushult",
+          "Långared",
+          "Länghem",
+          "Magra",
+          "Marbäck_O",
+          "Mjäldrunga",
+          "Mjöbäck",
+          "Mo_O_Åm",
+          "Molla",
+          "Mossebo",
+          "Murum",
+          "Månstad",
+          "Mårdaklev",
+          "Möne",
+          "Nittorp",
+          "Norra_Björke",
+          "Norra_Säm",
+          "Norra_Åsarp",
+          "Nårunga",
+          "Nödinge",
+          "Nössemark",
+          "Od",
+          "Ornunga",
+          "Redslared",
+          "Remmene",
+          "Revesjö",
+          "Roasjö",
+          "Rommele",
+          "Råggärd",
+          "Rångedala",
+          "Rännelanda",
+          "Rölanda",
+          "Sandhult",
+          "Sankt_Peder",
+          "Seglora",
+          "Sexdrega",
+          "Siene",
+          "Sjötofta",
+          "Skallsjö",
+          "Skephult",
+          "Skepplanda",
+          "Skogsbygden",
+          "Skållerud",
+          "Skölvene",
+          "Smula",
+          "Solberga_O_Fa",
+          "Starrkärr",
+          "Steneby",
+          "Stora_Lundby",
+          "Stora_Mellby",
+          "Strängsered",
+          "Sundals_Ryr",
+          "Surteby_Kattunga",
+          "Svenljunga",
+          "Sätila",
+          "Södra_Björke",
+          "Södra_Härene",
+          "Södra_Säm",
+          "Södra_Ving",
+          "Södra_Vånga",
+          "Tarsled",
+          "Timmele",
+          "Tisselskog",
+          "Toarp",
+          "Torestorp",
+          "Torp_O_Fä",
+          "Torrskog",
+          "Tostared",
+          "Tranemo",
+          "Trollhättan",
+          "Tumberg",
+          "Tunge",
+          "Tvärred",
+          "Tydje",
+          "Tämta",
+          "Tärby",
+          "Töftedal",
+          "Töllsjö",
+          "Tösse",
+          "Ullasjö",
+          "Ulricehamn",
+          "Upphärad",
+          "Varnum",
+          "Vesene",
+          "Vårvik",
+          "Väne_Ryr",
+          "Väne_Åsaka",
+          "Vänersborg",
+          "Vänersnäs",
+          "Vänga",
+          "Västerlanda",
+          "Västra_Tunhem",
+          "Åmål",
+          "Ånimskog",
+          "Åsbräcka",
+          "Älekulla",
+          "Ärtemark",
+          "Äspered",
+          "Ödeborg",
+          "Ödenäs",
+          "Ödskölt",
+          "Ölsremma",
+          "Ör_O",
+          "Öra",
+          "Örby",
+          "Örsås",
+          "Östad",
+          "Östra_Frölunda",
+          "Öxabäck",
+          "Öxnevalla",
+          "Acklinga",
+          "Agnetorp",
+          "Amnehärad",
+          "Baltak",
+          "Barne_Åsaka",
+          "Beateberg",
+          "Berg_O",
+          "Berga_O",
+          "Binneberg",
+          "Bjurbäck",
+          "Bjurum",
+          "Bjärby",
+          "Bjärka",
+          "Töreboda",
+          "Björsäter_O",
+          "Bolum",
+          "Borgunda",
+          "Brandstorp",
+          "Bredsäter",
+          "Brevik",
+          "Brismene",
+          "Broby",
+          "Broddetorp",
+          "Brunnhem",
+          "Bäck",
+          "Bällefors",
+          "Bäreberg",
+          "Böja",
+          "Börstig",
+          "Dala",
+          "Daretorp",
+          "Dimbo",
+          "Edsvära",
+          "Edåsa",
+          "Eggby",
+          "Ek",
+          "Ekby",
+          "Ekeskog",
+          "Eling",
+          "Enåsa",
+          "Essunga",
+          "Falköping",
+          "Fivlered",
+          "Flakeberg",
+          "Flistad_O",
+          "Flo",
+          "Floby",
+          "Forsby",
+          "Forshem",
+          "Fredsberg",
+          "Fridene",
+          "Friel",
+          "Friggeråker",
+          "Främmestad",
+          "Fröjered",
+          "Frösve",
+          "Fullösa",
+          "Fyrunga",
+          "Fåglum",
+          "Fägre",
+          "Färed",
+          "Gillstad",
+          "Grevbäck",
+          "Grolanda",
+          "Grästorp",
+          "Gudhem",
+          "Gustav_Adolf_O",
+          "Gökhem",
+          "Gösslunda",
+          "Götene",
+          "Göteve",
+          "Götlunda_O",
+          "Habo",
+          "Hagelberg",
+          "Halna",
+          "Hangelösa",
+          "Hassle",
+          "Hasslösa",
+          "Hjo",
+          "Hjälstad",
+          "Holmestad",
+          "Horn_O",
+          "Hornborga",
+          "Hova",
+          "Hovby",
+          "Husaby",
+          "Hyringa",
+          "Håkantorp",
+          "Håle",
+          "Hångsdala",
+          "Häggesled",
+          "Häggum",
+          "Hällestad_O",
+          "Hällum",
+          "Händene",
+          "Härja",
+          "Härjevad",
+          "Härlunda_O",
+          "Högstena",
+          "Hömb",
+          "Istrum",
+          "Jung",
+          "Jäla",
+          "Järpås",
+          "Karaby",
+          "Karleby",
+          "Karlsborg",
+          "Kestad",
+          "Kinne_Kleva",
+          "Kinne_Vedum",
+          "Kinneved",
+          "Korsberga_O",
+          "Kungslena",
+          "Kvänum",
+          "Kymbo",
+          "Kyrkås_O",
+          "Kållands_Åsaka",
+          "Källby",
+          "Kälvene",
+          "Larv",
+          "Laske_Vedum",
+          "Lavad",
+          "Ledsjö",
+          "Leksberg",
+          "Lekåsa",
+          "Lerdala",
+          "Levene",
+          "Lidköping",
+          "Lindärva",
+          "Ljunghem",
+          "Locketorp",
+          "Long",
+          "Lugnås",
+          "Luttra",
+          "Lyrestad",
+          "Låstad",
+          "Längjum",
+          "Längnum",
+          "Malma",
+          "Mariestad",
+          "Marka",
+          "Marum",
+          "Medelplana",
+          "Mellby_O",
+          "Mo_O_Tö",
+          "Mofalla",
+          "Mularp",
+          "Mölltorp",
+          "Naum",
+          "Norra_Fågelås",
+          "Norra_Härene",
+          "Norra_Kedum",
+          "Norra_Kyrketorp",
+          "Norra_Lundby",
+          "Norra_Ving",
+          "Norra_Vånga",
+          "Nykyrka_O",
+          "Näs_O",
+          "Odensåker",
+          "Otterstad",
+          "Ottravad",
+          "Ova",
+          "Rackeby",
+          "Ransberg",
+          "Ryd",
+          "Ryda",
+          "Råda_O_Li",
+          "Rådene",
+          "Sal",
+          "Saleby",
+          "Sandhem",
+          "Segerstad_O",
+          "Sil",
+          "Sjogerstad",
+          "Skallmeja",
+          "Skalunda",
+          "Skara",
+          "Skarstad",
+          "Skeby",
+          "Skånings_Åsaka",
+          "Skälvum",
+          "Skärv",
+          "Skörstorp",
+          "Skövde",
+          "Slädene",
+          "Slöta",
+          "Sparlösa",
+          "Stenstorp",
+          "Stenum",
+          "Strö",
+          "Sunnersberg",
+          "Suntak",
+          "Sveneby",
+          "Sventorp",
+          "Synnerby",
+          "Särestad",
+          "Säter_O",
+          "Sätuna",
+          "Sävare",
+          "Södra_Fågelås",
+          "Södra_Kedum",
+          "Södra_Kyrketorp",
+          "Södra_Lundby",
+          "Södra_Råda",
+          "Söne",
+          "Sörby_O",
+          "Tengene",
+          "Tiarp",
+          "Tibro",
+          "Tidaholm",
+          "Tidavad",
+          "Timmersdala",
+          "Torbjörntorp",
+          "Torsö",
+          "Tranum",
+          "Tråvad",
+          "Trässberg",
+          "Trästena",
+          "Trävattna",
+          "Trökörna",
+          "Tun",
+          "Tådene",
+          "Täng",
+          "Ugglum",
+          "Ullene",
+          "Ullervad",
+          "Undenäs",
+          "Utby",
+          "Utvängstorp",
+          "Uvered",
+          "Vad",
+          "Valstad",
+          "Valtorp",
+          "Vara",
+          "Varnhem",
+          "Varola",
+          "Vartofta_Åsaka",
+          "Varv_O",
+          "Velinga",
+          "Vilske_Kleva",
+          "Vinköl",
+          "Vistorp",
+          "Våmb",
+          "Vårkumla",
+          "Väla",
+          "Väring",
+          "Värsås",
+          "Västerbitterna",
+          "Västerplana",
+          "Västra_Gerum",
+          "Vättak",
+          "Vättlösa",
+          "Yllestad",
+          "Ås_O",
+          "Åsle",
+          "Älgarås",
+          "Öglunda",
+          "Önum",
+          "Örslösa",
+          "Österbitterna",
+          "Österplana",
+          "Östra_Gerum",
+          "Östra_Tunhem",
+          "Öttum",
+          "Alster",
+          "Arvika",
+          "Bjurtjärn",
+          "Blomskog",
+          "Boda_S",
+          "Bogen",
+          "Borgvik",
+          "Botilsäter",
+          "Brattfors",
+          "Bro_S",
+          "Brunskog",
+          "Dalby_S",
+          "Ed_S",
+          "Eda",
+          "Ekshärad",
+          "Eskilsäter",
+          "Filipstad",
+          "Forshaga",
+          "Frykerud",
+          "Fryksände",
+          "Färnebo",
+          "Gillberga_S",
+          "Glava",
+          "Grava",
+          "Grums",
+          "Gräsmark",
+          "Gunnarskog",
+          "Gustav_Adolf_S",
+          "Gåsborn",
+          "Hagfors",
+          "Hammarö",
+          "Holmedal",
+          "Huggenäs",
+          "Högerud",
+          "Järnskog",
+          "Karlanda",
+          "Karlstad",
+          "Kila_S",
+          "Kristinehamn",
+          "Kroppa",
+          "Köla",
+          "Lekvattnet",
+          "Lungsund",
+          "Lysvik",
+          "Långserud",
+          "Mangskog",
+          "Millesvik",
+          "Nedre_Ullerud",
+          "Nor",
+          "Nordmark",
+          "Norra_Finnskoga",
+          "Norra_Ny",
+          "Norra_Råda",
+          "Ny",
+          "Nyed",
+          "Nyskoga",
+          "Ransäter",
+          "Rudskoga",
+          "Rämmen",
+          "Segerstad_S",
+          "Silbodal",
+          "Sillerud",
+          "Skillingmark",
+          "Stavnäs",
+          "Stora_Kil",
+          "Sunne_S",
+          "Sunnemo",
+          "Svanskog",
+          "Södra_Finnskoga",
+          "Södra_Ny",
+          "Trankil",
+          "Töcksmark",
+          "Visnum",
+          "Visnums_Kil",
+          "Vitsand",
+          "Värmskog",
+          "Väse",
+          "Västra_Fågelvik",
+          "Västra_Ämtervik",
+          "Älgå",
+          "Älvsbacka",
+          "Ölme",
+          "Ölserud",
+          "Östervallskog",
+          "Östmark",
+          "Östra_Fågelvik",
+          "Östra_Ämtervik",
+          "Övre_Ullerud",
+          "Asker",
+          "Askersund",
+          "Axberg",
+          "Bo",
+          "Degerfors_T",
+          "Edsberg",
+          "Ekeby_T",
+          "Ervalla",
+          "Fellingsbro",
+          "Finnerödja",
+          "Glanshammar",
+          "Grythyttan",
+          "Gräve",
+          "Gällersta",
+          "Götlunda_U",
+          "Hackvad",
+          "Hallsberg",
+          "Hammar",
+          "Hardemo",
+          "Hidinge",
+          "Hjulsjö",
+          "Hovsta",
+          "Hällefors",
+          "Järnboås",
+          "Karlskoga",
+          "Kil",
+          "Knista",
+          "Laxå",
+          "Kräcklinge",
+          "Kumla_T",
+          "Kvistbro",
+          "Näsby_T",
+          "Lerbäck",
+          "Lillkyrka_T",
+          "Linde_T",
+          "Lindesberg",
+          "Ljusnarsberg",
+          "Lännäs",
+          "Mosjö",
+          "Nora_T",
+          "Norrbyås",
+          "Nysund",
+          "Ramsberg",
+          "Rinkaby_T",
+          "Skagershult",
+          "Sköllersta",
+          "Snavlunda",
+          "Stora_Mellösa",
+          "Svennevad",
+          "Tived",
+          "Tysslinge",
+          "Tångeråsa",
+          "Täby_T",
+          "Viby_T",
+          "Viker",
+          "Vintrosa",
+          "Ödeby",
+          "Örebro",
+          "Arboga_stad",
+          "Berg_U",
+          "Björksta",
+          "Björskog",
+          "Dingtuna",
+          "Enåker",
+          "Fagersta",
+          "Fläckebo",
+          "Gunnilbo",
+          "Haraker",
+          "Harbo",
+          "Hed",
+          "Himmeta",
+          "Hubbo",
+          "Huddunge",
+          "Irsta",
+          "Karbenning",
+          "Kila_U",
+          "Kolbäck",
+          "Kolsva",
+          "Kumla_U",
+          "Kung_Karl",
+          "Kungs_Barkarö",
+          "Kungsåra",
+          "Kärrbo",
+          "Köping_U",
+          "Lillhärad",
+          "Medåker",
+          "Munktorp",
+          "Möklinta",
+          "Nora_C",
+          "Norberg",
+          "Norrby",
+          "Odensvi_U",
+          "Ramnäs",
+          "Romfartuna",
+          "Rytterne",
+          "Sala_stad",
+          "Sevalla",
+          "Skinnskatteberg",
+          "Skultuna",
+          "Sura",
+          "Svedvi",
+          "Säby_U",
+          "Tillberga",
+          "Torpa_U",
+          "Tortuna",
+          "Tärna_U",
+          "Vittinge",
+          "Västerfärnebo",
+          "Västerlövsta",
+          "Västervåla",
+          "Västerås",
+          "Västerås_Barkarö",
+          "Västra_Skedvi",
+          "Ängsö",
+          "Östervåla",
+          "Aspeboda",
+          "Avesta",
+          "Bjursås",
+          "Boda_W",
+          "Borlänge",
+          "By_W",
+          "Enviken",
+          "Falun",
+          "Floda_W",
+          "Folkärna",
+          "Gagnef",
+          "Garpenberg",
+          "Grangärde",
+          "Grytnäs",
+          "Gustafs",
+          "Hedemora",
+          "Husby",
+          "Idre",
+          "Järna",
+          "Leksand",
+          "Lima",
+          "Ludvika",
+          "Malingsbo",
+          "Malung",
+          "Mora",
+          "Norrbärke",
+          "Nås",
+          "Ore",
+          "Orsa",
+          "Rättvik",
+          "Siljansnäs",
+          "Silvberg",
+          "Sollerön",
+          "Stora_Kopparberg",
+          "Stora_Skedvi",
+          "Stora_Tuna",
+          "Sundborn",
+          "Svartnäs",
+          "Svärdsjö",
+          "Säfsnäs",
+          "Särna",
+          "Säter_W",
+          "Söderbärke",
+          "Torsång",
+          "Transtrand",
+          "Vika",
+          "Våmhus",
+          "Vänjan",
+          "Ål",
+          "Älvdalen",
+          "Äppelbo",
+          "Alfta",
+          "Arbrå",
+          "Bergsjö",
+          "Bjuråker",
+          "Bollnäs",
+          "Delsbo",
+          "Enånger",
+          "Forsa",
+          "Färila",
+          "Gnarp",
+          "Gävle",
+          "Nianfors",
+          "Hamrånge",
+          "Hanebo",
+          "Harmånger",
+          "Hassela",
+          "Hedesunda",
+          "Hille",
+          "Hudiksvall",
+          "Hälsingtuna",
+          "Hög_X",
+          "Idenor",
+          "Ilsbo",
+          "Järbo_X",
+          "Järvsö",
+          "Jättendal",
+          "Ljusdal",
+          "Los",
+          "Mo_X",
+          "Njutånger",
+          "Norrala",
+          "Norrbo",
+          "Ockelbo",
+          "Ovansjö",
+          "Ovanåker",
+          "Ramsjö",
+          "Rengsjö",
+          "Rogsta",
+          "Sandviken",
+          "Segersta",
+          "Skog",
+          "Söderala",
+          "Söderhamn",
+          "Torsåker_X",
+          "Trönö",
+          "Undersvik",
+          "Valbo",
+          "Voxna",
+          "Årsunda",
+          "Österfärnebo",
+          "Alnö",
+          "Anundsjö",
+          "Arnäs",
+          "Attmar",
+          "Bjärtrå",
+          "Björna",
+          "Bodum",
+          "Borgsjö",
+          "Boteå",
+          "Dal",
+          "Ed_Y",
+          "Edsele",
+          "Fjällsjö",
+          "Gideå",
+          "Graninge",
+          "Grundsunda",
+          "Haverö",
+          "Helgum",
+          "Hemsö",
+          "Holm_Y",
+          "Häggdånger",
+          "Härnösand",
+          "Hässjö",
+          "Högsjö",
+          "Indal",
+          "Junsele",
+          "Kramfors",
+          "Liden",
+          "Ljustorp",
+          "Långsele",
+          "Mo_Y",
+          "Njurunda",
+          "Nora_Y",
+          "Nordingrå",
+          "Nätra",
+          "Ramsele",
+          "Resele",
+          "Selånger",
+          "Sidensjö",
+          "Själevad",
+          "Skog_",
+          "Skorped",
+          "Skön",
+          "Sollefteå",
+          "Stigsjö",
+          "Styrnäs",
+          "Stöde",
+          "Sundsvall",
+          "Sånga_Y",
+          "Säbrå",
+          "Sättna",
+          "Timrå",
+          "Torp_Y",
+          "Torsåker_Y",
+          "Trehörningsjö",
+          "Tuna_Y",
+          "Tynderö",
+          "Tåsjö",
+          "Ullånger",
+          "Vibyggerå",
+          "Viksjö",
+          "Ytterlännäs",
+          "Ådals_Liden",
+          "Örnsköldsvik",
+          "Överlännäs",
+          "Alanäs",
+          "Alsen",
+          "Aspås",
+          "Berg_Z",
+          "Bodsjö",
+          "Borgvattnet",
+          "Brunflo",
+          "Bräcke",
+          "Fors_Z",
+          "Frostviken",
+          "Frösö",
+          "Föllinge",
+          "Gåxsjö",
+          "Hackås",
+          "Hallen",
+          "Hammerdal",
+          "Hede_Z",
+          "Hotagen",
+          "Håsjö",
+          "Häggenås",
+          "Hällesjö",
+          "Kall",
+          "Klövsjö",
+          "Kyrkås_Z",
+          "Laxsjö",
+          "Lillhärdal",
+          "Linsell",
+          "Lit",
+          "Lockne",
+          "Marby",
+          "Marieby",
+          "Mattmar",
+          "Myssjö",
+          "Mörsil",
+          "Norderö",
+          "Nyhem",
+          "Näs_Z",
+          "Näskott",
+          "Offerdal",
+          "Oviken",
+          "Ragunda",
+          "Revsund",
+          "Rätan",
+          "Rödön",
+          "Storsjö",
+          "Ström",
+          "Stugun",
+          "Sundsjö",
+          "Sunne_Z",
+          "Sveg",
+          "Tännäs",
+          "Undersåker",
+          "Vemdalen",
+          "Ytterhogdal",
+          "Åre",
+          "Ås_Z",
+          "Åsarne",
+          "Älvros",
+          "Ängersjö",
+          "Östersund",
+          "Överhogdal",
+          "Sandseryd",
+          "Sankt_Olof_AB",
+          "Sankt_Per_AB",
+          "By_S",
+          "Tveta_S",
+          "Multrå",
+          "Rödene",
+          "Bälinge_O",
+          "Sankt_Per_E",
+          "Arboga_socken",
+          "Sala_socken",
+          "Laholms_stad",
+          "Valdemarsvik"
+        ],
+        "type": "string",
+        "description": "Parish"
+      },
+      "Precipitation": {
+        "enum": [
+          "KraftigtRegn",
+          "KraftigtSnöfall",
+          "LättRegn",
+          "LättSnöfall",
+          "MåttligtRegn",
+          "MåttligtSnöfall",
+          "Regnskurar",
+          "Uppehåll"
+        ],
+        "type": "string",
+        "description": "States the precipitation conditions during the survey event."
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
+      },
+      "ProgrammeArea": {
+        "enum": [
+          "BiogeografiskUppföljningAvNaturtyperOchArter",
+          "Fjäll",
+          "Jordbruksmark",
+          "KustOchHav",
+          "Landskap",
+          "Skog"
+        ],
+        "type": "string",
+        "description": "The program area within environmental monitoring that the dataset belongs to."
+      },
+      "Project": {
+        "required": [
+          "projectCode",
+          "projectType"
+        ],
+        "type": "object",
+        "properties": {
+          "projectID": {
+            "type": "string",
+            "description": "Unique id for the project within which the dataset was collected.",
+            "nullable": true
+          },
+          "projectCode": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Name of the project within which the dataset was collected. Can sometimes be the same as the name of the dataset."
+          },
+          "projectType": {
+            "$ref": "#/components/schemas/ProjectType"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Project"
+      },
+      "ProjectType": {
+        "enum": [
+          "Artportalenprojekt",
+          "Delprogram",
+          "Delsystem",
+          "GemensamtDelprogram"
+        ],
+        "type": "string",
+        "description": "Type of project that the dataset was collected within, e.g. 'delprogram', 'gemensamt delprogram'."
+      },
+      "Province": {
+        "enum": [
+          "Skåne",
+          "Blekinge",
+          "Småland",
+          "Öland",
+          "Gotland",
+          "Halland",
+          "Bohuslän",
+          "Dalsland",
+          "Västergötland",
+          "Närke",
+          "Östergötland",
+          "Södermanland",
+          "Uppland",
+          "Västmanland",
+          "Värmlands",
+          "Dalarna",
+          "Gästrikland",
+          "Hälsingland",
+          "Medelpad",
+          "Ångermanland",
+          "Västerbotten",
+          "Norrbotten",
+          "Härjedalen",
+          "Jämtland",
+          "Åsele_lappmark",
+          "Lycksele_lappmark",
+          "Pite_lappmark",
+          "Lule_lappmark",
+          "Torne_lappmark",
+          "Bottenviken",
+          "Bottenhavet",
+          "Östersjön",
+          "Kattegatt",
+          "Skagerrak"
+        ],
+        "type": "string",
+        "description": "County"
+      },
+      "Purpose": {
+        "enum": [
+          "NationellMiljöövervakning",
+          "RegionalMiljöövervakning",
+          "BiogeografiskUppföljning"
+        ],
+        "type": "string",
+        "description": "The purpose of the data collection (e.g. national or regional environmental monitoring)."
+      },
+      "QuantityVariable": {
+        "enum": [
+          "AntalIndivider",
+          "AntalFruktkroppar",
+          "AntalKapslar",
+          "AntalPlantorTuvor",
+          "AntalStjälkarStrånSkott",
+          "AntalÄggklumpar",
+          "Täckningsgrad",
+          "Yttäckning"
+        ],
+        "type": "string",
+        "description": "States how the quantity of the observed species (or other taxonomic rank) was counted or measured."
+      },
+      "Sex": {
+        "enum": [
+          "Hane",
+          "Hona",
+          "IPar"
+        ],
+        "type": "string",
+        "description": "Sex of the observed organism."
+      },
+      "SnowCover": {
+        "enum": [
+          "Barmark",
+          "SnötäcktMark",
+          "MycketTuntSnötäckeEllerFläckvisSnötäcke"
+        ],
+        "type": "string",
+        "description": "States the snow conditions on the ground during the survey event."
+      },
+      "Taxon": {
+        "required": [
+          "scientificName",
+          "taxonID",
+          "taxonRank"
+        ],
+        "type": "object",
+        "properties": {
+          "taxonID": {
+            "minLength": 1,
+            "pattern": "/(urn:lsid:dyntaxa.se:Taxon:\\S+)/",
+            "type": "string",
+            "description": "Unique id for species or other given taxon rank according to Dyntaxa."
+          },
+          "vernacularName": {
+            "type": "string",
+            "description": "The Swedish name according to Dyntaxa for the observed organism, at the given taxonomic level.",
+            "nullable": true
+          },
+          "scientificName": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The scientific name according to Dyntaxa for the observed organism, at the given taxonomic level."
+          },
+          "taxonRank": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The taxonomic level according to Dyntaxa at which the species identification is given."
+          },
+          "verbatimName": {
+            "type": "string",
+            "description": "The Swedish name for the observed organism, at the given taxonomic level, as reported by the surveyor. Can be different from now valid taxonomy. (For traceability.)",
+            "nullable": true
+          },
+          "verbatimTaxonID": {
+            "type": "string",
+            "description": "The id for species or other given level of taxonomy as reported by the surveyor. Can be different from now valid taxonomy. (For traceability.)",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Taxonomic information about the observation. States which species (or subspecies, species aggregation, genus, family etc) was observed and identified."
+      },
+      "TaxonFilter": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Dyntaxa taxon ids to match.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Taxon filter."
+      },
+      "Unit": {
+        "enum": [
+          "Percent",
+          "Cm2",
+          "Cm3",
+          "Dm2",
+          "Kompassgrader",
+          "Ms",
+          "M2",
+          "Styck",
+          "GraderCelsius"
+        ],
+        "type": "string",
+        "description": "Unit for a certain amount of organisms (given in the attribute quantity) or\r\nUnit for a reported measurement (given in the attribute \"vädermått\").."
+      },
+      "Visibility": {
+        "enum": [
+          "Dimma1Km",
+          "Dis1Till4Km",
+          "God10Till20Km",
+          "MycketGod20Km",
+          "Måttlig4Till10Km"
+        ],
+        "type": "string",
+        "description": "States the visibility conditions during the survey event."
+      },
+      "WeatherMeasuring": {
+        "required": [
+          "unit",
+          "weatherMeasure"
+        ],
+        "type": "object",
+        "properties": {
+          "weatherMeasure": {
+            "type": "number",
+            "description": "Value for measured weather variable.",
+            "format": "double"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/Unit"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Weather variable reported as a measurement and a unit."
+      },
+      "WeatherVariable": {
+        "type": "object",
+        "properties": {
+          "snowCover": {
+            "$ref": "#/components/schemas/SnowCover"
+          },
+          "sunshine": {
+            "$ref": "#/components/schemas/WeatherMeasuring"
+          },
+          "airTemperature": {
+            "$ref": "#/components/schemas/WeatherMeasuring"
+          },
+          "windDirectionCompass": {
+            "$ref": "#/components/schemas/WindDirectionCompass"
+          },
+          "windDirectionDegrees": {
+            "$ref": "#/components/schemas/WeatherMeasuring"
+          },
+          "windSpeed": {
+            "$ref": "#/components/schemas/WeatherMeasuring"
+          },
+          "windStrength": {
+            "$ref": "#/components/schemas/WindStrength"
+          },
+          "precipitation": {
+            "$ref": "#/components/schemas/Precipitation"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility"
+          },
+          "cloudiness": {
+            "$ref": "#/components/schemas/Cloudiness"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Weather variable"
+      },
+      "WindDirectionCompass": {
+        "enum": [
+          "Nord",
+          "Nordost",
+          "Nordväst",
+          "Ost",
+          "Syd",
+          "Sydost",
+          "Sydväst",
+          "Väst"
+        ],
+        "type": "string",
+        "description": "States the wind direction during the survey event as a compass direction."
+      },
+      "WindStrength": {
+        "enum": [
+          "_0Beaufort",
+          "_1Beaufort",
+          "_2Beaufort",
+          "_3Beaufort",
+          "_4Beaufort",
+          "_5Beaufort",
+          "_6Beaufort",
+          "_7Beaufort",
+          "_8Beaufort",
+          "_9Beaufort",
+          "_10Beaufort",
+          "_11Beaufort",
+          "_12Beaufort",
+          "Vindstilla1Ms",
+          "SvagVind1Till3Ms",
+          "MåttligVind4Till7Ms",
+          "FriskVind8Till13Ms",
+          "HårdVind14Till19Ms",
+          "MycketHårdVind20Till24Ms",
+          "Storm25Till32Ms",
+          "Orkan33Ms"
+        ],
+        "type": "string",
+        "description": "States the strength of the wind during the survey event."
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "JWT Authorization header using the Bearer scheme.",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}
