@@ -110,6 +110,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string LocationContinent => _observation?.Location?.Continent?.ToString();
         public int? LocationContinentId => _observation?.Location?.Continent?.Id;
         public string LocationContinentValue => _observation?.Location?.Continent?.Value;
+        public string LocationType => _observation?.Location?.Type.ToString();
         public double? LocationCoordinatePrecision => _observation?.Location?.CoordinatePrecision;
         public double? LocationCoordinateUncertaintyInMeters => _observation?.Location?.CoordinateUncertaintyInMeters;
         public string LocationCountry => _observation?.Location?.Country?.ToString();
@@ -506,6 +507,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "location.verbatimdepth" => LocationVerbatimDepth,
                 "location.verbatimelevation" => LocationVerbatimElevation,
                 "location.verbatimlocality" => LocationVerbatimLocality,
+                "location.type" => LocationType,
                 "occurrence" => "Please specify which occurrence properties you need",
                 "occurrence.recordedby" => OccurrenceRecordedBy,
                 "occurrence.reportedby" => OccurrenceReportedBy,
