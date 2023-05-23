@@ -1,7 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "SOS.DataStewardship.Api",
+    "title": "Data Stewardship API",
+    "description": "The Data Stewardship API contains endpoints for querying datasets, events and occurrences.",
     "version": "v1"
   },
   "servers": [
