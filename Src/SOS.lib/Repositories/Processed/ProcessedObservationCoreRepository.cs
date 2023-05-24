@@ -381,22 +381,22 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="clusterCount"></param>
         private void CheckNodes(int clusterCount)
         {
-            CheckNode(PublicIndexName, clusterCount);
-            CheckNode(ProtectedIndexName, clusterCount);
+            CheckNode(PublicIndexName, Math.Max(1, clusterCount-1)); // Subtract 1 since we are using replicas in prod
+            CheckNode(ProtectedIndexName, Math.Max(1, clusterCount - 1)); // Subtract 1 since we are using replicas in prod
         }
 
         /// <summary>
         /// Make sure all clusters are available
         /// </summary>
         /// <param name="indexName"></param>
-        /// <param name="clusterCount"></param>
+        /// <param name="minClusterCount"></param>
         /// <exception cref="Exception"></exception>
-        private void CheckNode(string indexName, int clusterCount)
+        private void CheckNode(string indexName, int minClusterCount)
         {
             var health = Client.Cluster.Health(indexName);
-            if (health.NumberOfDataNodes != clusterCount)
+            if (health.NumberOfDataNodes < minClusterCount)
             {
-                throw new Exception($"Expected {clusterCount} nodes, found {health.NumberOfDataNodes}.");
+                throw new Exception($"Expected at least {minClusterCount} nodes, found {health.NumberOfDataNodes}.");
             }
         }
 
