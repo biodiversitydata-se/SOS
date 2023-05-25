@@ -269,7 +269,7 @@ namespace SOS.Lib.Helpers
             foreach (var outputField in outputFields)
             {
                 if (ExportFormatFieldByJsonFormatField.TryGetValue(outputField.ToLower(), out string exportField))
-                {
+                {                    
                     fieldsSet.Add(exportField);
                 }
                 else
@@ -283,7 +283,10 @@ namespace SOS.Lib.Helpers
             {
                 if (FieldByPropertyPath.TryGetValue(field.ToLower(), out var propertyField))
                 {
-                    propertyFields.Add(propertyField);
+                    if (propertyField.FieldSetEnum != OutputFieldSet.None) // If its not part of a field set, then the value isn't mapped in FlatObservation.
+                    {
+                        propertyFields.Add(propertyField);
+                    }
                 }
             }
 
