@@ -25,36 +25,36 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         
         /// <summary>
         /// Date and Time for when the survey started (local time).
-        /// </summary>  
-        [Required]
-        public DateTime EventStartDate { get; set; }
+        /// </summary>          
+        public DateTime EventStartDateTime { get; set; }
 
         /// <summary>
         /// Date and Time for when the survey ended (local time).
+        /// </summary>        
+        public DateTime EventEndDateTime { get; set; }
+
+        /// <summary>
+        /// Date for when the survey started (local time).
+        /// </summary>  
+        [Required]
+        public DateOnly EventStartDate { get; set; }
+
+        /// <summary>
+        /// Date for when the survey ended (local time).
         /// </summary>
         [Required]
-        public DateTime EventEndDate { get; set; }
+        public DateOnly EventEndDate { get; set; }
 
         /// <summary>
-        ///     Start date of the event in the format yyyy-MM-dd.
-        /// </summary>
-        public string PlainStartDate { get; set; }
+        /// Time for when the survey started (local time).
+        /// </summary>          
+        public TimeOnly? EventStartTime { get; set; }
 
         /// <summary>
-        ///     End date of the event in the format yyyy-MM-dd.
-        /// </summary>
-        public string PlainEndDate { get; set; }
-
-        /// <summary>
-        ///     Start time of the event in W. Europe Standard Time formatted as hh:mm.
-        /// </summary>
-        public string PlainStartTime { get; set; }
-
-        /// <summary>
-        ///     End time of the event in W. Europe Standard Time formatted as hh:mm. 
-        /// </summary>
-        public string PlainEndTime { get; set; }
-
+        /// Time for when the survey ended (local time).
+        /// </summary>        
+        public TimeOnly? EventEndTime { get; set; }
+        
         /// <summary>
         /// States whether the position of a location is protected. The true position for a protected location is shown only to authorized persons. To others the position is shown with diffused coordinates. Other information about a protected location can also be limited.
         /// </summary>
