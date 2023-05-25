@@ -1022,35 +1022,43 @@
             "description": "A unique id that groups several related visits, e.g. all visits to the different subparts within a survey location, or all visits to all survey locations that were made during a season. Example: EventID for a survey event at a location becomes the parentID for all the visits to the different subparts. EventID for a season becomes the parentID for all the visits to all locations within the survey programme.",
             "nullable": true
           },
-          "eventStartDate": {
+          "eventStartDateTime": {
             "type": "string",
             "description": "Date and Time for when the survey started (local time).",
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2020-04-15T14:00:00+02:00"
+          },
+          "eventEndDateTime": {
+            "type": "string",
+            "description": "Date and Time for when the survey ended (local time).",
+            "format": "date-time",
+            "example": "2020-04-15T15:45:00+02:00"
+          },
+          "eventStartDate": {
+            "type": "string",
+            "description": "Date for when the survey started (local time).",
+            "format": "date",
+            "example": "2020-04-15"
           },
           "eventEndDate": {
             "type": "string",
-            "description": "Date and Time for when the survey ended (local time).",
-            "format": "date-time"
+            "description": "Date for when the survey ended (local time).",
+            "format": "date",
+            "example": "2020-04-15"
           },
-          "plainStartDate": {
+          "eventStartTime": {
             "type": "string",
-            "description": "Start date of the event in the format yyyy-MM-dd.",
-            "nullable": true
+            "description": "Time for when the survey started (local time).",
+            "format": "time",
+            "nullable": true,
+            "example": "14:00:00"
           },
-          "plainEndDate": {
+          "eventEndTime": {
             "type": "string",
-            "description": "End date of the event in the format yyyy-MM-dd.",
-            "nullable": true
-          },
-          "plainStartTime": {
-            "type": "string",
-            "description": "Start time of the event in W. Europe Standard Time formatted as hh:mm.",
-            "nullable": true
-          },
-          "plainEndTime": {
-            "type": "string",
-            "description": "End time of the event in W. Europe Standard Time formatted as hh:mm.",
-            "nullable": true
+            "description": "Time for when the survey ended (local time).",
+            "format": "time",
+            "nullable": true,
+            "example": "15:45:00"
           },
           "locationProtected": {
             "type": "boolean",
@@ -1153,9 +1161,6 @@
       "EventsFilter": {
         "type": "object",
         "properties": {
-          "exportMode": {
-            "$ref": "#/components/schemas/ExportMode"
-          },
           "datasetIds": {
             "type": "array",
             "items": {
