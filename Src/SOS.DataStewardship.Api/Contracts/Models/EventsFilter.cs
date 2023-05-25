@@ -7,12 +7,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
 	/// Events search filter
 	/// </summary>
     public class EventsFilter
-    {        
-        /// <summary>
-		/// Export mode
-		/// </summary>
-        public ExportMode ExportMode { get; set; }
-        
+    {                
         /// <summary>
 		/// DatasetIds filter
 		/// </summary>
