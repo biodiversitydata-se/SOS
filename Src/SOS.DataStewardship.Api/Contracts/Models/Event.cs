@@ -22,37 +22,43 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// A unique id that groups several related visits, e.g. all visits to the different subparts within a survey location, or all visits to all survey locations that were made during a season. Example: EventID for a survey event at a location becomes the parentID for all the visits to the different subparts. EventID for a season becomes the parentID for all the visits to all locations within the survey programme.
         /// </summary>        
         public string ParentEventID { get; set; }
-        
+
         /// <summary>
         /// Date and Time for when the survey started (local time).
         /// </summary>          
+        /// <example>2020-04-15T14:00:00+02:00</example>
         public DateTime EventStartDateTime { get; set; }
 
         /// <summary>
         /// Date and Time for when the survey ended (local time).
         /// </summary>        
+        /// <example>2020-04-15T15:45:00+02:00</example>
         public DateTime EventEndDateTime { get; set; }
 
         /// <summary>
         /// Date for when the survey started (local time).
-        /// </summary>  
+        /// </summary>
+        /// <example>2020-04-15</example>
         [Required]
         public DateOnly EventStartDate { get; set; }
 
         /// <summary>
         /// Date for when the survey ended (local time).
         /// </summary>
+        /// <example>2020-04-15</example>
         [Required]
         public DateOnly EventEndDate { get; set; }
 
         /// <summary>
         /// Time for when the survey started (local time).
-        /// </summary>          
+        /// </summary>
+        /// <example>14:00:00</example>
         public TimeOnly? EventStartTime { get; set; }
 
         /// <summary>
         /// Time for when the survey ended (local time).
-        /// </summary>        
+        /// </summary>
+        /// <example>15:45:00</example>
         public TimeOnly? EventEndTime { get; set; }
         
         /// <summary>
