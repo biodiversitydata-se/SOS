@@ -55,7 +55,17 @@ namespace SOS.Lib.Repositories.Processed
                         .KeyWordLowerCase(kwlc => kwlc.SamplingEffort, false)
                         .KeyWordLowerCase(kwlc => kwlc.SampleSizeValue, false)
                         .KeyWordLowerCase(kwlc => kwlc.SampleSizeUnit, false)
+                        .KeyWordLowerCase(kwlc => kwlc.PlainStartDate)
+                        .KeyWordLowerCase(kwlc => kwlc.PlainStartTime, false)
+                        .KeyWordLowerCase(kwlc => kwlc.PlainEndDate)
+                        .KeyWordLowerCase(kwlc => kwlc.PlainEndTime, false)                        
                         .KeyWordLowerCase(kwlc => kwlc.Habitat, false)
+                        .Date(d => d
+                            .Name(nm => nm.EndDate)
+                        )
+                        .Date(d => d
+                            .Name(nm => nm.StartDate)
+                        )
                         .Text(t => t
                             .Name(nm => nm.EventRemarks)
                             .IndexOptions(IndexOptions.Docs)

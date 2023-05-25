@@ -1,4 +1,5 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
@@ -11,7 +12,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// <summary>
         /// An identifier for the Occurrence (as opposed to a particular digital record of the occurrence). In the absence of a persistent global unique identifier, construct one from a combination of identifiers in the record that will most closely make the occurrenceID globally unique. (Source: Darwin Core quick reference guide)
         /// </summary>
-        [Required]
+        [Required]        
         public string OccurrenceID { get; set; }
 
         /// <summary>
@@ -26,14 +27,12 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         public DateTime? ObservationTime { get; set; }
 
         /// <summary>
-        /// Date and Time for when the survey started (local time).
-        [Required]
+        /// Date and Time for when the survey started (local time).        
         public DateTime? EventStartDate { get; set; }
 
         /// <summary>
         /// Date and Time for when the survey ended (local time).
-        /// </summary>
-        [Required]
+        /// </summary>        
         public DateTime? EventEndDate { get; set; }
 
         /// <summary>
@@ -61,7 +60,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// <summary>
         /// Amount of organisms of a certain unit (given in the attribute unit).
         /// </summary>
-        public double? Quantity { get; set; }
+        public double Quantity { get; set; }
 
         /// <summary>
         /// Unit for a certain amount of organisms (given in the attribute quantity).

@@ -1441,16 +1441,16 @@
       "FieldSet": "AllWithValues"
     },
     {
-        "PropertyName": "LocationType",
-        "PropertyPath": "Location.Type",
-        "DataType": "Int32",
-        "DataTypeIsNullable": false,
-        "SwedishTitle": "Lokaltyp",
-        "EnglishTitle": "Location type",
-        "DwcName": "",
-        "DwcIdentifier": "",
-        "DependsOn": "Location.Type",
-        "FieldSet": "AllWithValues"
+      "PropertyName": "LocationType",
+      "PropertyPath": "Location.Type",
+      "DataType": "String",
+      "DataTypeIsNullable": false,
+      "SwedishTitle": "Lokaltyp",
+      "EnglishTitle": "Location type",
+      "DwcName": "",
+      "DwcIdentifier": "",
+      "DependsOn": "Location.Type",
+      "FieldSet": "AllWithValues"
     },
     {
         "PropertyName": "CoordinatePrecision",

@@ -115,7 +115,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Naturalis
             var filter = new SearchFilterInternal(0);
             filter.DataProviderIds = new List<int>(){ 1 };
             filter.OnlyWithMedia = true;
-            filter.Output.Fields = new[] {
+            filter.Output.Fields = new List<string> {
                 "event.plainStartDate",
                 "event.plainStartTime",
                 "location.decimalLongitude",

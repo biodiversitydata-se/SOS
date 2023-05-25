@@ -25,22 +25,46 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         
         /// <summary>
         /// Date and Time for when the survey started (local time).
-        /// </summary>        
-        public DateTime? EventStartDate { get; set; }
-        
+        /// </summary>  
+        [Required]
+        public DateTime EventStartDate { get; set; }
+
         /// <summary>
         /// Date and Time for when the survey ended (local time).
         /// </summary>
-        public DateTime? EventEndDate { get; set; }
-        
+        [Required]
+        public DateTime EventEndDate { get; set; }
+
+        /// <summary>
+        ///     Start date of the event in the format yyyy-MM-dd.
+        /// </summary>
+        public string PlainStartDate { get; set; }
+
+        /// <summary>
+        ///     End date of the event in the format yyyy-MM-dd.
+        /// </summary>
+        public string PlainEndDate { get; set; }
+
+        /// <summary>
+        ///     Start time of the event in W. Europe Standard Time formatted as hh:mm.
+        /// </summary>
+        public string PlainStartTime { get; set; }
+
+        /// <summary>
+        ///     End time of the event in W. Europe Standard Time formatted as hh:mm. 
+        /// </summary>
+        public string PlainEndTime { get; set; }
+
         /// <summary>
         /// States whether the position of a location is protected. The true position for a protected location is shown only to authorized persons. To others the position is shown with diffused coordinates. Other information about a protected location can also be limited.
         /// </summary>
-        public bool? LocationProtected { get; set; }
-        
+        [Required]
+        public bool LocationProtected { get; set; }
+
         /// <summary>
         /// Information about the survey area/site (geodata).
         /// </summary>
+        [Required]
         public Location SurveyLocation { get; set; }
         
         /// <summary>
@@ -71,7 +95,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// <summary>
         /// States whether any of the sought after organisms were observed during the survey event or not. True means that none of the sought after organisms were observed at all.
         /// </summary>
-        public bool? NoObservations { get; set; }
+        public bool NoObservations { get; set; }
         
         /// <summary>
         /// Attached information about the survey event, e.g. media files like images, sound recordings, maps etc.

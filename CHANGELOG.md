@@ -1,5 +1,14 @@
 # Changelog
 
+## [2023.05.23] - Hotfix
+**Prod**: 2023-05-23
+
+### `Added`
+ - Add `Type` property to the `LocationDto` model used in the `/Locations` endpoint.
+
+### `Fixed`
+ - `OutputFilter.Fields` could generate exceptions in certain circumstances.
+
 ## [2023.04.18]
 **Prod**: 2023-04-18
 ### `Added`

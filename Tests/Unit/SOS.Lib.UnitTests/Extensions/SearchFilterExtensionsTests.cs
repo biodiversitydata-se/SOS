@@ -65,7 +65,7 @@ namespace SOS.Lib.UnitTests.Extensions
             {
                 Output = new OutputFilter
                 {
-                    Fields = new[] { "Occurrence.OccurrenceId", "Event.StartDate", "Location.Municipality" }
+                    Fields = new List<string> { "Occurrence.OccurrenceId", "Event.StartDate", "Location.Municipality" }
                 }
             };
 
@@ -97,7 +97,7 @@ namespace SOS.Lib.UnitTests.Extensions
             {
                 Output = new OutputFilter
                 {
-                    Fields = new[] { "Occurrence.OccurrenceId", "Event.PlainStartTime" }
+                    Fields = new List<string> { "Occurrence.OccurrenceId", "Event.PlainStartTime" }
                 }
             };
 

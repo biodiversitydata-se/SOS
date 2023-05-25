@@ -11,7 +11,7 @@ internal static class JsonSerializationExtensions
         webApplicationBuilder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
         {
             options.SerializerOptions.AllowTrailingCommas = true;
-            options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
             options.SerializerOptions.PropertyNameCaseInsensitive = true;
             options.SerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());

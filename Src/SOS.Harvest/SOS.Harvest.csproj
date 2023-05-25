@@ -17,9 +17,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="7.0.1" />
-		<PackageReference Include="CSharpFunctionalExtensions" Version="2.38.1" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="2.39.0" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
-		<PackageReference Include="Hangfire.Core" Version="1.7.34" />
+		<PackageReference Include="Hangfire.Core" Version="1.8.1" />
 		<PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
@@ -27,10 +27,10 @@
 		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.19.1" />
 		<PackageReference Include="NetTopologySuite" Version="2.5.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="3.0.0" />
-		<PackageReference Include="System.ServiceModel.Duplex" Version="4.10.2" />
-		<PackageReference Include="System.ServiceModel.Http" Version="4.10.2" />
-		<PackageReference Include="System.ServiceModel.NetTcp" Version="4.10.2" />
-		<PackageReference Include="System.ServiceModel.Security" Version="4.10.2" />
+		<PackageReference Include="System.ServiceModel.Duplex" Version="6.0.0" />
+		<PackageReference Include="System.ServiceModel.Http" Version="6.0.0" />
+		<PackageReference Include="System.ServiceModel.NetTcp" Version="6.0.0" />
+		<PackageReference Include="System.ServiceModel.Security" Version="6.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -42,7 +42,7 @@
 		<None Update="Resources\Gis\swedenExtentSimplified.geojson">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Resources\TaxonProtection.json">
+		<None Update="Resources\TaxonProtectedByLaw.json">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="Resources\CountyNameMapper.json">

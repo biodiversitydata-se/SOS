@@ -22,14 +22,17 @@ namespace SOS.Lib.Extensions
             //ev.AssociatedMedia = observation.Event.Media.ToAssociatedMedias(); // todo
             ev.DataStewardship = new DataStewardshipInfo
             {
-                DatasetIdentifier = observation.DataStewardship?.DatasetIdentifier
-                //Title = // need to lookup this from Dataset index or store this information in Observation/Event
-            };
-
+                DatasetIdentifier = observation.DataStewardship?.DatasetIdentifier,
+                DatasetTitle = observation.DataStewardship?.DatasetTitle
+            };            
             ev.Created = DateTime.Now;
             ev.DataProviderId = dataProviderId;
             ev.StartDate = observation.Event.StartDate;
             ev.EndDate = observation.Event.EndDate;
+            ev.PlainStartDate = observation.Event.PlainStartDate;
+            ev.PlainEndDate = observation.Event.PlainEndDate;
+            ev.PlainStartTime = observation.Event.PlainStartTime;
+            ev.PlainEndTime = observation.Event.PlainEndTime;
             ev.SamplingProtocol = observation.Event.SamplingProtocol;
             ev.SamplingEffort = observation.Event.SamplingEffort;
             ev.SampleSizeValue = observation.Event.SampleSizeValue;

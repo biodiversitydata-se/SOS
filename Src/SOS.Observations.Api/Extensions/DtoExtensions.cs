@@ -91,7 +91,7 @@ namespace SOS.Observations.Api.Extensions
             filter.Output = new OutputFilter();
             if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
             {
-                filter.Output.Fields = searchFilterDto.Output?.Fields?.ToArray();
+                filter.Output.Fields = searchFilterDto.Output?.Fields?.ToList();
                 filter.Output.PopulateFields(searchFilterDto.Output?.FieldSet);
             }
 
@@ -103,7 +103,7 @@ namespace SOS.Observations.Api.Extensions
                 if (searchFilterBaseDto is SearchFilterInternalDto searchFilterInternalDto)
                 {
                     filterInternal.IncludeRealCount = searchFilterInternalDto.IncludeRealCount;
-                    filterInternal.Output.Fields = searchFilterInternalDto.Output?.Fields?.ToArray();
+                    filterInternal.Output.Fields = searchFilterInternalDto.Output?.Fields?.ToList();
                     filterInternal.Output.PopulateFields(searchFilterInternalDto.Output?.FieldSet);
                     filterInternal.Output.SortOrders = searchFilterInternalDto.Output?.SortOrders?.Select(so => new SortOrderFilter { SortBy = so.SortBy, SortOrder = so.SortOrder });
                 }

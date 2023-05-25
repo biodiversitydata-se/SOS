@@ -111,13 +111,17 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.ParentEventID = observationEvent.ParentEventId;
             ev.EventRemarks = observationEvent.EventRemarks;
             ev.AssociatedMedia = observationEvent.Media.ToAssociatedMedias();
-            ev.Dataset = observationEvent?.DataStewardship.ToDatasetInfo();            
-            ev.EventStartDate = observationEvent.StartDate;
-            ev.EventEndDate = observationEvent.EndDate;
+            ev.Dataset = observationEvent?.DataStewardship.ToDatasetInfo();
+            ev.EventStartDate = observationEvent.StartDate.Value;
+            ev.EventEndDate = observationEvent.EndDate.Value;
+            ev.PlainStartDate = observationEvent.PlainStartDate;
+            ev.PlainEndDate = observationEvent.PlainEndDate;
+            ev.PlainStartTime = observationEvent.PlainStartTime;
+            ev.PlainEndTime = observationEvent.PlainEndTime;
             ev.SamplingProtocol = observationEvent.SamplingProtocol;
             ev.SurveyLocation = observationEvent?.Location?.ToLocation(responseCoordinateSystem);
             ev.EventType = observationEvent?.EventType;
-            ev.LocationProtected = observationEvent?.LocationProtected;
+            ev.LocationProtected = observationEvent.LocationProtected.GetValueOrDefault(false);
             ev.Weather = observationEvent?.Weather?.ToWeatherVariable();
             ev.RecorderCode = observationEvent.RecorderCode;
             ev.RecorderOrganisation = observationEvent?.RecorderOrganisation?.Select(m => m.ToOrganisation()).ToList();
@@ -214,12 +218,16 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.AssociatedMedia = observation.Event.Media.ToAssociatedMedias();
             ev.Dataset = new DatasetInfo
             {
-                Identifier = observation.DataStewardship?.DatasetIdentifier
-                //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event
+                Identifier = observation.DataStewardship?.DatasetIdentifier,
+                Title = observation.DataStewardship?.DatasetTitle                
             };
 
-            ev.EventStartDate = observation.Event.StartDate;
-            ev.EventEndDate = observation.Event.EndDate;
+            ev.EventStartDate = observation.Event.StartDate.Value;
+            ev.EventEndDate = observation.Event.EndDate.Value;
+            ev.PlainStartDate = observation.Event.PlainStartDate;
+            ev.PlainEndDate = observation.Event.PlainEndDate;
+            ev.PlainStartTime = observation.Event.PlainStartTime;
+            ev.PlainEndTime = observation.Event.PlainEndTime;
             ev.SamplingProtocol = observation.Event.SamplingProtocol;
             ev.SurveyLocation = observation.Location.ToLocation(responseCoordinateSystem);            
             //ev.LocationProtected = ?
@@ -343,7 +351,7 @@ namespace SOS.DataStewardship.Api.Extensions
             occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
             occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
             occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? OccurrenceStatus.Observerad : OccurrenceStatus.InteObserverad;
-            occurrence.Quantity = Convert.ToDouble(observation.Occurrence.OrganismQuantityInt);
+            occurrence.Quantity = observation.Occurrence.OrganismQuantityInt != null ? Convert.ToDouble(observation.Occurrence.OrganismQuantityInt) : 0;
             if (observation?.Occurrence?.OrganismQuantityUnit?.Id != null)
             {
                 occurrence.QuantityVariable = GetQuantityVariableEnum((UnitId)observation.Occurrence.OrganismQuantityUnit.Id);
