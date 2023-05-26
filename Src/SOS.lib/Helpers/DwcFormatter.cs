@@ -39,25 +39,58 @@ namespace SOS.Lib.Helpers
                 return null;
             }
 
-            string format = "yyyy-MM-dd";
-            if (!date2.HasValue || date1 == date2)
+            string startDateFormat = "yyyy-MM-dd";
+            if (date1.Value.TimeOfDay.TotalSeconds > 0)
             {
-                if (date1.Value.TimeOfDay.TotalSeconds > 0)
-                {
-                    format = "yyyy-MM-dd'T'HH:mm:ssK";
-                }
-                return date1.Value.ToString(format, CultureInfo.InvariantCulture);
+                startDateFormat = "yyyy-MM-dd'T'HH:mm:ssK";
             }
 
-            if (date1.Value.TimeOfDay.TotalSeconds > 0 || date2.Value.TimeOfDay.TotalSeconds > 0)
+            if (!date2.HasValue || date1 == date2)
+            {                
+                return date1.Value.ToString(startDateFormat, CultureInfo.InvariantCulture);
+            }
+
+            string endDateFormat = "yyyy-MM-dd";
+            if (date2.Value.TimeOfDay.TotalSeconds > 0)
             {
-                format = "yyyy-MM-dd'T'HH:mm:ssK";
+                endDateFormat = "yyyy-MM-dd'T'HH:mm:ssK";
             }
 
             return string.Format(
                 "{0}/{1}",
-                date1.Value.ToString(format, CultureInfo.InvariantCulture),
-                date2.Value.ToString(format, CultureInfo.InvariantCulture));
+                date1.Value.ToString(startDateFormat, CultureInfo.InvariantCulture),
+                date2.Value.ToString(endDateFormat, CultureInfo.InvariantCulture));
+        }
+
+        public static string CreateDateIntervalString(DateTime? startDate, TimeSpan? startTime, DateTime? endDate, TimeSpan? endTime)
+        {
+            if (!startDate.HasValue)
+            {
+                return null;
+            }
+
+            string startDateFormat = "yyyy-MM-dd";
+            if (startTime.HasValue && startTime.Value != TimeSpan.Zero)
+            {
+                startDateFormat = "yyyy-MM-dd'T'HH:mm:ssK";
+            }
+
+            if (!endDate.HasValue || startDate == endDate 
+                || startDate.Value.Year == endDate.Value.Year && startDate.Value.Month == endDate.Value.Month && startDate.Value.Day == endDate.Value.Day && startTime == endTime)
+            {                
+                return startDate.Value.ToString(startDateFormat, CultureInfo.InvariantCulture);
+            }
+
+            string endDateFormat = "yyyy-MM-dd";
+            if (endTime.HasValue && endTime.Value != TimeSpan.Zero)
+            {
+                endDateFormat = "yyyy-MM-dd'T'HH:mm:ssK";
+            }
+
+            return string.Format(
+                "{0}/{1}",
+                startDate.Value.ToString(startDateFormat, CultureInfo.InvariantCulture),
+                endDate.Value.ToString(endDateFormat, CultureInfo.InvariantCulture));
         }
 
         /// <summary>

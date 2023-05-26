@@ -154,7 +154,14 @@ namespace SOS.Lib.Helpers
                 if (TryParseEventDate(eventDate, year, month, day, out startDate, out endDate))
                 {
                     startTime = startDate != null && startDate.Value.TimeOfDay.Ticks > 0 ? startDate.Value.TimeOfDay : null;
-                    endTime = endDate != null && endDate.Value.TimeOfDay.Ticks > 0 ? endDate.Value.TimeOfDay : null;
+                    if (startTime == null)
+                    {
+                        endTime = null;
+                    }
+                    else
+                    {
+                        endTime = endDate != null && endDate.Value.TimeOfDay.Ticks > 0 ? endDate.Value.TimeOfDay : null;
+                    }
                     return true;
                 }
 
@@ -236,7 +243,7 @@ namespace SOS.Lib.Helpers
             startDate = ParseDate(eventDate, "yyyy");
             if (startDate.HasValue) // start date is year
             {
-                endDate = new DateTime(startDate.Value.Year, 12, 31);
+                endDate = new DateTime(startDate.Value.Year, 12, 31, 23, 59, 59);
                 return true;
             }
 
@@ -244,7 +251,14 @@ namespace SOS.Lib.Helpers
             if (startDate.HasValue) // start date is year and month
             {
                 endDate = new DateTime(startDate.Value.Year, startDate.Value.Month,
-                    DateTime.DaysInMonth(startDate.Value.Year, startDate.Value.Month));
+                    DateTime.DaysInMonth(startDate.Value.Year, startDate.Value.Month), 23, 59, 59);
+                return true;
+            }
+
+            startDate = ParseDate(eventDate, "yyyy-MM-dd");
+            if (startDate.HasValue) // start date is year and month
+            {
+                endDate = new DateTime(startDate.Value.Year, startDate.Value.Month, startDate.Value.Day, 23, 59, 59);
                 return true;
             }
 
@@ -282,7 +296,7 @@ namespace SOS.Lib.Helpers
                 if (parsedYear.HasValue && parsedMonth.HasValue && parsedDay.HasValue)
                 {
                     startDate = new DateTime(parsedYear.Value, parsedMonth.Value, parsedDay.Value);
-                    endDate = new DateTime(parsedYear.Value, parsedMonth.Value, parsedDay.Value);
+                    endDate = new DateTime(parsedYear.Value, parsedMonth.Value, parsedDay.Value, 23, 59, 59);
                     return true;
                 }
 
@@ -290,14 +304,14 @@ namespace SOS.Lib.Helpers
                 {
                     startDate = new DateTime(parsedYear.Value, parsedMonth.Value, 1);
                     endDate = new DateTime(parsedYear.Value, parsedMonth.Value,
-                        DateTime.DaysInMonth(parsedYear.Value, parsedMonth.Value));
+                        DateTime.DaysInMonth(parsedYear.Value, parsedMonth.Value), 23, 59, 59);
                     return true;
                 }
 
                 if (parsedYear.HasValue)
                 {
                     startDate = new DateTime(parsedYear.Value, 1, 1);
-                    endDate = new DateTime(parsedYear.Value, 12, 31);
+                    endDate = new DateTime(parsedYear.Value, 12, 31, 23, 59, 59);
                     return true;
                 }
 
@@ -333,15 +347,19 @@ namespace SOS.Lib.Helpers
                 endDate = ParseDate(strEndDate, "yyyy");
                 if (endDate.HasValue) // end date is year
                 {
-                    endDate = new DateTime(endDate.Value.Year, 12, 31);
+                    endDate = new DateTime(endDate.Value.Year, 12, 31, 23, 59, 59);
                     return true;
                 }
 
-                endDate = ParseDate(strEndDate);
+                endDate = ParseDate(strEndDate);                
                 if (!endDate.HasValue)
                 {
                     startDate = null;
                     return false;
+                }
+                if (endDate.Value.TimeOfDay == TimeSpan.Zero)
+                {
+                    endDate = endDate.Value + new TimeSpan(23, 59, 59);
                 }
 
                 return true;
@@ -365,7 +383,7 @@ namespace SOS.Lib.Helpers
             {
                 try
                 {
-                    endDate = new DateTime(startDate.Value.Year, startDate.Value.Month, endDate.Value.Day);
+                    endDate = new DateTime(startDate.Value.Year, startDate.Value.Month, endDate.Value.Day, 23, 59, 59);
                     return true;
                 }
                 catch (ArgumentOutOfRangeException) // handle invalid day value
@@ -381,6 +399,10 @@ namespace SOS.Lib.Helpers
             {
                 startDate = null;
                 return false;
+            }
+            if (endDate.Value.TimeOfDay == TimeSpan.Zero)
+            {
+                endDate = endDate.Value + new TimeSpan(23, 59, 59);
             }
 
             return true;
