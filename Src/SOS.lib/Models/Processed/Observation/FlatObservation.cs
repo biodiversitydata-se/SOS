@@ -310,6 +310,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public bool? TaxonAttributesIsInvasiveInSweden => _observation?.Taxon?.Attributes?.IsInvasiveInSweden;
         public string TaxonAttributesRiskAssessmentCategory => _observation?.Taxon?.Attributes?.InvasiveRiskAssessmentCategory;
         public string TaxonAttributesRedlistCategory => _observation?.Taxon?.Attributes?.RedlistCategory;
+        public string TaxonAttributesRedlistCategoryDerived => _observation?.Taxon?.Attributes?.RedlistCategoryDerived;
         public int? TaxonAttributesSortOrder => _observation?.Taxon?.Attributes?.SortOrder;
         public string TaxonAttributesSwedishHistory => _observation?.Taxon?.Attributes?.SwedishHistory;
         public string TaxonAttributesSwedishOccurrence => _observation?.Taxon?.Attributes?.SwedishOccurrence;
@@ -652,6 +653,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "taxon.attributes.sensitivitycategory.id" => TaxonAttributesSensitivityCategoryId,
                 "taxon.attributes.sensitivitycategory.value" => TaxonAttributesSensitivityCategoryValue,
                 "taxon.attributes.redlistcategory" => TaxonAttributesRedlistCategory,
+                "taxon.attributes.redlistcategoryderived" => TaxonAttributesRedlistCategoryDerived,
                 "taxon.attributes.sortorder" => TaxonAttributesSortOrder,
                 "taxon.attributes.swedishhistory" => TaxonAttributesSwedishHistory,
                 "taxon.attributes.swedishoccurrence" => TaxonAttributesSwedishOccurrence,

@@ -16,6 +16,7 @@ namespace SOS.Lib.Extensions
             new ConcurrentDictionary<int, VocabularyValue>();
 
         private static HashSet<string> _isInvasiveInSwedenCategories = new HashSet<string>() { "5", "7", "8", "9" };
+        private static HashSet<string> _redlistCategories = new HashSet<string>() { "cr", "en", "vu", "nt" };
 
         /// <summary>
         /// Update red list category derivied
@@ -51,6 +52,9 @@ namespace SOS.Lib.Extensions
                     // If taxon is evaluated or no parent evaluation was found, Set derivied rlc to current 
                     taxon.Attributes.RedlistCategoryDerived = taxon.Attributes.RedlistCategory;
                 }
+
+                // Set IsRedlisted value
+                taxon.Attributes.IsRedlisted = _redlistCategories.Contains(taxon.Attributes.RedlistCategoryDerived?.ToLower() ?? string.Empty);
             }
 
             return taxa;
@@ -61,7 +65,7 @@ namespace SOS.Lib.Extensions
             var taxa = sourceTaxa?.Select(t => t.ToProcessedTaxon());
             return PopulateDeriviedRedListCategory(taxa?.ToDictionary(t => t.Id, t => t));
         }
-
+        
         public static Taxon ToProcessedTaxon(this DarwinCoreTaxon sourceTaxon)
         {
             var taxon = new Taxon();
