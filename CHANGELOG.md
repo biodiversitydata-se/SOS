@@ -1,7 +1,14 @@
 # Changelog
 
+## [2023.05.30] - Hotfix
+
+### `Changed`
+ - Changed the default value for `excludeNullValues` from `true` to `false`.
+
+### `Fixed`
+ - `IsRedlisted` field always had the value `false` in certain exports.
+
 ## [2023.05.23] - Hotfix
-**Prod**: 2023-05-23
 
 ### `Added`
  - Add `Type` property to the `LocationDto` model used in the `/Locations` endpoint.
@@ -10,7 +17,7 @@
  - `OutputFilter.Fields` could generate exceptions in certain circumstances.
 
 ## [2023.04.18]
-**Prod**: 2023-04-18
+
 ### `Added`
  - Data Stewardship API.
  - Analysis API.
@@ -29,7 +36,7 @@
 
 
 ## [2023.01.31] - Hotfix
-**Prod**: 2023-03-14
+
 ### `Added`
  - `SearchFilterInternal.SightingTypeSearchGroupIds` filter.
 
@@ -43,7 +50,7 @@
 
 
 ## [2023.01.31]
-**Prod**: 2023-01-31
+
 ### `Changed`
  - Deprecated properties removed.
  - Added Elasticsearch shard replication
@@ -54,7 +61,7 @@
 
 
 ## [2022.11.17]
-**Prod**: 2022-11-17
+
 ### `Changed`
  - Improved user role information by adding information about authorities and areas in the endpoint `/User/Information`.
 
@@ -63,14 +70,13 @@
  - Improved GeoJSON serialization to encode å ä ö properly.
 
 ## [2022.10.17]
-**Prod**: 2022-10-17 
+
  ### `Fixed`
  - When searching with `TaxonListIds` underlying taxa will be added if `IncludeUnderlyingTaxa=true`.
  - TimeRange file order bug.
  - Aggregation by day bug.
 
 ## [2022.05.24]
-**Prod**: 2022-05-24 
 
 ### `Added`
 - Artportalen Checklist support. New endpoints: `GET Checklists/{id}`, `POST Checklists/CalculateTrend`
@@ -96,16 +102,12 @@
 
 ## [2022.03.08]
 
-**Prod**: 2022-03-08
-
 ### `Added`
 - Support for response compression. Use header : `Accept-Encoding: br` for Brotli compression or `Accept-Encoding: gzip` for GZIP compression. Brotli compression is usually the faster than GZIP.
 - New parameter `gzip=true` or `gzip=false` to the `/Exports/Download` endpoints to enable retrieving Excel, GeoJSON and CSV files without GZIP compression.
 - `ProvinceCount` property to `CachedCount` endpoint.
 
 ## [2021.12.02]
-
-**Prod**: 2021-12-02
 
 ### `Added`
 - New date and time properties : `Event.PlainStartTime`, `Event.PlainEndTime`, `Event.PlainStartDate`, `Event.PlainEndDate`. 
@@ -133,8 +135,6 @@
 
 ## [2021.10.05]
 
-**Prod**: 2021-10-05
-
 ### `Added`
 - New search parameter : `ReportedByMe`. Requires authorization token.
 - New search parameter : `ObservedByMe`. Requires authorization token.
@@ -152,8 +152,6 @@
 ## [2021.06.17]
 
 ### Releases
-
-**Prod**: 2021-06-17
 
 ### `Added`
 - New search filter: `BirdNestActivityLimit`
@@ -180,8 +178,6 @@
 ## [2021.04.08]
 
 ### Releases
-
-**Prod**: 2021-04-08
 
 ### `Changed`
 
@@ -287,8 +283,6 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 
 ### Releases
 
-**Prod**: 2021-01-21
-
 ### `Added`
 - New field: `Observation.Occurrence.ReproductiveCondition`
 - New vocabularies: `ReproductiveCondition` and `Behavior`
@@ -343,9 +337,6 @@ SortBy, sortOrder borttagna då den inte fyllde någon funktion
 ## [2020.11.30] - 2020-11-30
 
 ### Releases
-
-**Prod**: 2020-11-30
-
 
 Initial release
 
