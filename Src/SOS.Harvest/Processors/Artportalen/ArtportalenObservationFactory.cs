@@ -567,21 +567,30 @@ namespace SOS.Harvest.Processors.Artportalen
         {
             // Add time to start date if it exists
             startDateResult = startDate.HasValue && startTime.HasValue
-                ? startDate.Value.ToLocalTime() + startTime
-                : startDate;
+                ? startDate.Value.ToLocalTime().Date + startTime
+                : startDate.Value.ToLocalTime().Date;
 
             // Add time to end date if it exists
             if (endDate.HasValue && endTime.HasValue)
             {
-                endDateResult = endDate.Value.ToLocalTime() + endTime;
+                endDateResult = endDate.Value.ToLocalTime().Date + endTime;
             }
             else if (endDate.HasValue && !endTime.HasValue)
             {
-                endDateResult = endDate.Value.ToLocalTime().Add(new TimeSpan(23, 59, 59));
+                endDateResult = endDate.Value.ToLocalTime().Date.Add(new TimeSpan(23, 59, 59));
             }
             else
             {
                 endDateResult = null;
+            }            
+
+            if (startDateResult.HasValue && startDateResult.Value.Kind == DateTimeKind.Unspecified)
+            {
+                startDateResult = DateTime.SpecifyKind(startDateResult.Value, DateTimeKind.Local);
+            }
+            if (endDateResult.HasValue && endDateResult.Value.Kind == DateTimeKind.Unspecified)
+            {
+                endDateResult = DateTime.SpecifyKind(endDateResult.Value, DateTimeKind.Local);
             }
         }
 

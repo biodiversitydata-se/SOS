@@ -10,6 +10,8 @@ using SOS.Observations.Api.Dtos;
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.ObservationsBySearchEndpoint
 {
@@ -18,20 +20,27 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
     {
         private readonly IntegrationTestFixture _fixture;
 
-        private async Task PopulateDataAsync()
+        private async Task<List<ArtportalenObservationVerbatim>> PopulateDataAsync()
         {
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All()
                 .HaveValuesFromPredefinedObservations()
-                .TheFirst(20)
-                    .IsInDateSpan(DateTime.Parse("2000-01-01T00:00:00"), DateTime.Parse("2000-01-31T23:59:59"))
+                .TheFirst(20)                    
+                    .IsInDateSpan(
+                        DateTime.SpecifyKind(DateTime.Parse("2000-01-01T00:00:00"), DateTimeKind.Local),
+                        DateTime.SpecifyKind(DateTime.Parse("2000-01-31T23:59:59"), DateTimeKind.Local))
                 .TheNext(60)
-                    .IsInDateSpan(DateTime.Parse("2000-02-01T00:00:00"), DateTime.Parse("2000-02-29T23:59:59"))
+                    .IsInDateSpan(
+                        DateTime.SpecifyKind(DateTime.Parse("2000-02-01T00:00:00"), DateTimeKind.Local),
+                        DateTime.SpecifyKind(DateTime.Parse("2000-02-29T23:59:59"), DateTimeKind.Local))
                 .TheNext(20)
-                    .IsInDateSpan(DateTime.Parse("2000-03-01T00:00:00"), DateTime.Parse("2000-03-31T23:59:59"))
+                    .IsInDateSpan(
+                        DateTime.SpecifyKind(DateTime.Parse("2000-03-01T00:00:00"), DateTimeKind.Local),
+                        DateTime.SpecifyKind(DateTime.Parse("2000-03-31T23:59:59"), DateTimeKind.Local))
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+            return verbatimObservations.ToList();
         }
 
         public DateFilterTests(IntegrationTestFixture fixture)
@@ -158,7 +167,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
             //-----------------------------------------------------------------------------------------------------------            
-            await PopulateDataAsync();
+            List<ArtportalenObservationVerbatim> allVerbatimObservations = await PopulateDataAsync();            
 
             var searchFilter = new SearchFilterDto
             {
@@ -179,13 +188,29 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 searchFilter,
                 0,
                 100);
-            var result = response.GetResult<PagedResultDto<Observation>>();
+            var result = response.GetResult<PagedResultDto<Observation>>();            
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------            
+            //await DebugTestOnlyEndDateFilter(allVerbatimObservations, result.Records);
             result.Should().NotBeNull();
             result.TotalCount.Should().Be(60);
+        }
+
+        private async Task DebugTestOnlyEndDateFilter(
+            IList<ArtportalenObservationVerbatim> verbatimObservations,
+            IEnumerable<Observation> resultObservations)
+        {
+            var testResultItems = await _fixture.CreateTestResultSummary(verbatimObservations, resultObservations);
+            foreach (var item in testResultItems)
+            {
+                item.VerbatimValue = item.VerbatimObservation.EndDate.Value;
+                item.ProcessedValue = item.ProcessedObservation.Event.EndDate.Value;
+            }
+            testResultItems = testResultItems
+                .OrderBy(m => m.ProcessedObservation.Event.EndDate.Value)
+                .ToList();
         }
     }
 }

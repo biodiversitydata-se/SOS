@@ -101,7 +101,34 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
                     new TimeSpan(12, 0, 0), // endTime
                     DateTime.SpecifyKind(new DateTime(2009, 2, 20), DateTimeKind.Local).Add(new TimeSpan(10, 15, 0)), // expectedStartDate
                     DateTime.SpecifyKind(new DateTime(2009, 2, 20), DateTimeKind.Local).Add(new TimeSpan(12, 0, 0)) // expectedEndDate
-                },           
+                },                
+                new object[] // Only startDate with time in the Date
+                {
+                    DateTime.SpecifyKind(new DateTime(2009, 2, 20, 12, 10, 0), DateTimeKind.Local), // startDate
+                    null, // startTime
+                    null, // endDate
+                    null, // endTime
+                    DateTime.SpecifyKind(new DateTime(2009, 2, 20, 0, 0, 0), DateTimeKind.Local), // expectedStartDate
+                    null // expectedEndDate
+                },
+                new object[] // startDate and endDate with time in the Date
+                {
+                    DateTime.SpecifyKind(new DateTime(2009, 2, 20, 12, 10, 0), DateTimeKind.Local), // startDate
+                    null, // startTime
+                    DateTime.SpecifyKind(new DateTime(2009, 2, 20, 14, 30, 0), DateTimeKind.Local), // endDate
+                    null, // endTime
+                    DateTime.SpecifyKind(new DateTime(2009, 2, 20, 0, 0, 0), DateTimeKind.Local), // expectedStartDate
+                    DateTime.SpecifyKind(new DateTime(2009, 2, 20), DateTimeKind.Local).Add(new TimeSpan(23, 59, 59)) // expectedEndDate
+                },
+                new object[] // startDate and endDate with time in the date in UTC format
+                {
+                    DateTime.SpecifyKind(new DateTime(2009, 2, 20, 0, 0, 0), DateTimeKind.Local).ToUniversalTime(), // startDate
+                    new TimeSpan(10, 15, 0), // startTime
+                    DateTime.SpecifyKind(new DateTime(2009, 2, 20, 23, 59, 59), DateTimeKind.Local).ToUniversalTime(), // endDate
+                    new TimeSpan(12, 0, 0), // endTime
+                    DateTime.SpecifyKind(new DateTime(2009, 2, 20), DateTimeKind.Local).Add(new TimeSpan(10, 15, 0)), // expectedStartDate
+                    DateTime.SpecifyKind(new DateTime(2009, 2, 20), DateTimeKind.Local).Add(new TimeSpan(12, 0, 0)) // expectedEndDate
+                }
             };
     }
 }
