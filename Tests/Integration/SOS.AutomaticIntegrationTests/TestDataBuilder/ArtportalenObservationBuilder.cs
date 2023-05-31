@@ -312,7 +312,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.TaxonId = sourceObservation.TaxonId;
                 obs.Unit = sourceObservation.Unit;
                 obs.Unspontaneous = sourceObservation.Unspontaneous;
-                obs.UnsureDetermination = sourceObservation.UnsureDetermination;
+                obs.UnsureDetermination = false;
                 obs.ValidationStatus = sourceObservation.ValidationStatus;
                 obs.ReportedBy = sourceObservation.ReportedBy;
                 obs.ReportedByUserId = sourceObservation.ReportedByUserId;
