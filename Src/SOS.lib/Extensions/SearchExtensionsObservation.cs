@@ -640,7 +640,7 @@ namespace SOS.Lib
                     _ => 365
                 };
 
-                query.AddScript($@" (doc['event.endDate'].value.toInstant().toEpochMilli() - doc['event.startDate'].value.toInstant().toEpochMilli()) / 1000 / 86400 < {maxDuration} ");
+                query.AddScript($@"ChronoUnit.DAYS.between(doc['event.startDate'].value, doc['event.endDate'].value) <= {maxDuration}");
             }
 
             if (aggregationType.IsSpeciesSightingsList())
