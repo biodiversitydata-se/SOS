@@ -101,12 +101,13 @@ namespace SOS.Harvest.Harvesters.Shark
 
                         foreach (var propertyMapping in propertyMappings)
                         {
-                            if (new[] { parameterIndex, valueIndex, unitIndex }.Contains(propertyMapping.Value))
+                            var rowIndex = propertyMapping.Value;
+                            if (new[] { parameterIndex, valueIndex, unitIndex }.Contains(propertyMapping.Value) || rowIndex >= row.Count)
                             {
                                 continue;
                             }
 
-                            var propertyValue = Utf8Encoder.GetString(Utf8Encoder.GetBytes(row[propertyMapping.Value]));
+                            var propertyValue = Utf8Encoder.GetString(Utf8Encoder.GetBytes(row[rowIndex]));
 
                             if (string.IsNullOrEmpty(propertyValue))
                             {
