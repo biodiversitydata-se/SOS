@@ -93,7 +93,7 @@ namespace SOS.Lib.Configuration.Shared
                 mongoSettings.ConnectionMode = ConnectionMode.ReplicaSet;
               //  mongoSettings.DirectConnection = false;
                 mongoSettings.ReplicaSetName = ReplicaSetName;
-                mongoSettings.ReadPreference = ReadPreference.PrimaryPreferred;
+                mongoSettings.ReadPreference = ReadPreference.SecondaryPreferred;
             }
 
             return mongoSettings;
