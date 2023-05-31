@@ -41,8 +41,17 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <param name="endDate"></param>
         public Event(DateTime? startDate, DateTime? endDate)
         {
+            if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
+            {
+                startDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Local);
+            }
+            if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
+            {
+                endDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Local);
+            }
+
             EndDate = endDate?.ToUniversalTime();
-            StartDate = startDate?.ToUniversalTime();
+            StartDate = startDate?.ToUniversalTime();            
             VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
 
             if (startDate != null)
@@ -76,8 +85,18 @@ namespace SOS.Lib.Models.Processed.Observation
         public Event(DateTime? startDate, TimeSpan? startTime, DateTime? endDate, TimeSpan? endTime) : this(startDate, endDate)
         {
             // Override start/end time 
+            if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
+            {
+                startDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Local);
+            }
+            if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
+            {
+                endDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Local);
+            }
+
             PlainStartTime = startTime?.ToString("hh\\:mm");
             PlainEndTime = endTime?.ToString("hh\\:mm");
+            VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), startTime, endDate?.ToLocalTime(), endTime);
         }
         
         /// <summary>

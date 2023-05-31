@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 
 namespace SOS.Lib.Models.Processed.Observation
@@ -27,9 +28,15 @@ namespace SOS.Lib.Models.Processed.Observation
             {
                 var date = _observation?.Event?.StartDate;
                 if (date == null) return null;
-                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
-                return swedenDate;
-                //return _observation?.Event?.StartDate;
+                if (date.Value.Kind == DateTimeKind.Utc)
+                {
+                    return TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
+                }
+                else
+                {
+                    return date;
+                    //TimeZoneInfo.ConvertTime(date.Value, swedenTimeZone);
+                }
             }
         }
         public DateTime? EventEndDate
@@ -38,9 +45,15 @@ namespace SOS.Lib.Models.Processed.Observation
             {
                 var date = _observation?.Event?.EndDate;
                 if (date == null) return null;
-                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
-                return swedenDate;
-                //return _observation?.Event?.EndDate;
+                if (date.Value.Kind == DateTimeKind.Utc)
+                {
+                    return TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
+                }
+                else
+                {
+                    return date;
+                    //TimeZoneInfo.ConvertTime(date.Value, swedenTimeZone);
+                }
             }
         }
 
@@ -110,6 +123,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string LocationContinent => _observation?.Location?.Continent?.ToString();
         public int? LocationContinentId => _observation?.Location?.Continent?.Id;
         public string LocationContinentValue => _observation?.Location?.Continent?.Value;
+        public string LocationType => _observation?.Location?.Type.ToString();
         public double? LocationCoordinatePrecision => _observation?.Location?.CoordinatePrecision;
         public double? LocationCoordinateUncertaintyInMeters => _observation?.Location?.CoordinateUncertaintyInMeters;
         public string LocationCountry => _observation?.Location?.Country?.ToString();
@@ -230,9 +244,15 @@ namespace SOS.Lib.Models.Processed.Observation
             {
                 var date = _observation?.Occurrence?.ReportedDate;
                 if (date == null) return null;
-                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
-                return swedenDate;
-                //return _observation?.Occurrence?.ReportedDate;
+                if (date.Value.Kind == DateTimeKind.Utc)
+                {
+                    return TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
+                }
+                else
+                {
+                    return date;
+                    //TimeZoneInfo.ConvertTime(date.Value, swedenTimeZone);
+                }
             }
         }
         public string OccurrenceReproductiveCondition => _observation?.Occurrence?.ReproductiveCondition?.ToString();
@@ -290,6 +310,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public bool? TaxonAttributesIsInvasiveInSweden => _observation?.Taxon?.Attributes?.IsInvasiveInSweden;
         public string TaxonAttributesRiskAssessmentCategory => _observation?.Taxon?.Attributes?.InvasiveRiskAssessmentCategory;
         public string TaxonAttributesRedlistCategory => _observation?.Taxon?.Attributes?.RedlistCategory;
+        public string TaxonAttributesRedlistCategoryDerived => _observation?.Taxon?.Attributes?.RedlistCategoryDerived;
         public int? TaxonAttributesSortOrder => _observation?.Taxon?.Attributes?.SortOrder;
         public string TaxonAttributesSwedishHistory => _observation?.Taxon?.Attributes?.SwedishHistory;
         public string TaxonAttributesSwedishOccurrence => _observation?.Taxon?.Attributes?.SwedishOccurrence;
@@ -357,9 +378,15 @@ namespace SOS.Lib.Models.Processed.Observation
             {
                 var date = _observation?.Modified;
                 if (date == null) return null;
-                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
-                return swedenDate;
-                //return _observation?.Modified;
+                if (date.Value.Kind == DateTimeKind.Utc)
+                {
+                    return TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
+                }
+                else
+                {
+                    return date;
+                    //TimeZoneInfo.ConvertTime(date.Value, swedenTimeZone);
+                }
             }
         }
         public string OwnerInstitutionCode => _observation?.OwnerInstitutionCode;
@@ -506,6 +533,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "location.verbatimdepth" => LocationVerbatimDepth,
                 "location.verbatimelevation" => LocationVerbatimElevation,
                 "location.verbatimlocality" => LocationVerbatimLocality,
+                "location.type" => LocationType,
                 "occurrence" => "Please specify which occurrence properties you need",
                 "occurrence.recordedby" => OccurrenceRecordedBy,
                 "occurrence.reportedby" => OccurrenceReportedBy,
@@ -625,6 +653,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "taxon.attributes.sensitivitycategory.id" => TaxonAttributesSensitivityCategoryId,
                 "taxon.attributes.sensitivitycategory.value" => TaxonAttributesSensitivityCategoryValue,
                 "taxon.attributes.redlistcategory" => TaxonAttributesRedlistCategory,
+                "taxon.attributes.redlistcategoryderived" => TaxonAttributesRedlistCategoryDerived,
                 "taxon.attributes.sortorder" => TaxonAttributesSortOrder,
                 "taxon.attributes.swedishhistory" => TaxonAttributesSwedishHistory,
                 "taxon.attributes.swedishoccurrence" => TaxonAttributesSwedishOccurrence,
@@ -685,8 +714,26 @@ namespace SOS.Lib.Models.Processed.Observation
                 "organism.associatedorganisms" => OrganismAssociatedOrganisms,
                 "organism.previousidentifications" => OrganismPreviousIdentifications,
                 "organism.organismremarks" => OrganismOrganismRemarks,
+                "location.pointradiusspatialfit" => _observation?.Location?.PointRadiusSpatialFit,                
                 _ => throw new ArgumentException($"Field is not mapped: \"{propertyField.PropertyPath}\"")
             };
+        }
+
+        public string GetStringValue(PropertyFieldDescription propertyField)
+        {
+            var value = GetValue(propertyField);
+            var stringValue = value == null ? string.Empty : propertyField.DataTypeEnum switch
+            {
+                PropertyFieldDataType.Boolean => ((bool?)value)?.ToString(CultureInfo.InvariantCulture),
+                PropertyFieldDataType.DateTime => ((DateTime?)value)?.ToShortDateString(),
+                PropertyFieldDataType.Double => ((double)value).ToString(CultureInfo.InvariantCulture),
+                PropertyFieldDataType.Int32 => ((int)value).ToString(),
+                PropertyFieldDataType.Int64 => ((long)value).ToString(),
+                PropertyFieldDataType.TimeSpan => ((TimeSpan?)value)?.ToString("hh\\:mm"),
+                _ => (string)value
+            };
+
+            return stringValue;
         }
     }
 }

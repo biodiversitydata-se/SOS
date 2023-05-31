@@ -106,7 +106,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="propertyLabelType">The label type to use if flat=false.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
-        /// <param name="excludeNullValues">Exclude properties with null values.</param>
+        /// <param name="excludeNullValues">Exclude properties with null values. Applies when <paramref name="flat"/>=true.</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
@@ -119,7 +119,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flat = true,
-            bool excludeNullValues = true,
+            bool excludeNullValues = false,
             bool gzip = true,
             bool sensitiveObservations = false);
 
@@ -236,9 +236,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
         /// <param name="propertyLabelType">The label type to use if flat=false.</param>
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
-        /// <param name="excludeNullValues">Exclude properties with null values.</param>
+        /// <param name="excludeNullValues">Exclude properties with null values. Applies when <paramref name="flat"/>=true.</param>
         /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
-
         /// <returns></returns>
         Task<IActionResult> OrderGeoJsonAsync(
             int? roleId,
@@ -253,7 +252,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string encryptPassword = "",
             string confirmEncryptPassword = "",
             bool flat = true,
-            bool excludeNullValues = true,
+            bool excludeNullValues = false,
             string cultureCode = "sv-SE");
 
         /// <summary>
@@ -333,7 +332,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="propertyLabelType">The label type to use if flat=false.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
-        /// <param name="excludeNullValues">Exclude properties with null values.</param>
+        /// <param name="excludeNullValues">Exclude properties with null values. Applies when <paramref name="flat"/>=true.</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
@@ -346,7 +345,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flat = true,
-            bool excludeNullValues = true,
+            bool excludeNullValues = false,
             bool gzip = true,
             bool sensitiveObservations = false);
 
@@ -463,9 +462,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
         /// <param name="propertyLabelType">The label type to use if flat=false.</param>
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
-        /// <param name="excludeNullValues">Exclude properties with null values.</param>
+        /// <param name="excludeNullValues">Exclude properties with null values. Applies when <paramref name="flat"/>=true.</param>
         /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
-
         /// <returns></returns>
         Task<IActionResult> OrderGeoJsonInternalAsync(
             int? roleId,
@@ -480,7 +478,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string encryptPassword = "",
             string confirmEncryptPassword = "",
             bool flat = true,
-            bool excludeNullValues = true,
+            bool excludeNullValues = false,
             string cultureCode = "sv-SE");
     }
 }

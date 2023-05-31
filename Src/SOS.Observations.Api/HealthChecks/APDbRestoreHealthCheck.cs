@@ -42,14 +42,15 @@ namespace SOS.Observations.Api.HealthChecks
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public async Task<HealthCheckResult> CheckHealthAsync(
-        HealthCheckContext context,
-        CancellationToken cancellationToken = default(CancellationToken))
+            HealthCheckContext context,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.UniquePublicIndexName);
+                if (processInfo == null) return new HealthCheckResult(HealthStatus.Unhealthy, "Artportalen database backup restore health check failed. processInfo=null.");
 
-                var apInfo = processInfo.ProvidersInfo.FirstOrDefault(pi => pi.DataProviderId.Equals(1));
+                var apInfo = processInfo.ProvidersInfo.FirstOrDefault(pi => pi.DataProviderId.Equals(1));                
 
                 var regex = new Regex(@"\d\d\d\d-\d\d-\d\d\s\d\d:\d\d:\d\d");
                 var match = regex.Match(apInfo?.HarvestNotes ?? string.Empty);

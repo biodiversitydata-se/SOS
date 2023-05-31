@@ -22,25 +22,55 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// A unique id that groups several related visits, e.g. all visits to the different subparts within a survey location, or all visits to all survey locations that were made during a season. Example: EventID for a survey event at a location becomes the parentID for all the visits to the different subparts. EventID for a season becomes the parentID for all the visits to all locations within the survey programme.
         /// </summary>        
         public string ParentEventID { get; set; }
-        
+
         /// <summary>
         /// Date and Time for when the survey started (local time).
-        /// </summary>        
-        public DateTime? EventStartDate { get; set; }
-        
+        /// </summary>          
+        /// <example>2020-04-15T14:00:00+02:00</example>
+        public DateTime EventStartDateTime { get; set; }
+
         /// <summary>
         /// Date and Time for when the survey ended (local time).
+        /// </summary>        
+        /// <example>2020-04-15T15:45:00+02:00</example>
+        public DateTime EventEndDateTime { get; set; }
+
+        /// <summary>
+        /// Date for when the survey started (local time).
         /// </summary>
-        public DateTime? EventEndDate { get; set; }
+        /// <example>2020-04-15</example>
+        [Required]
+        public DateOnly EventStartDate { get; set; }
+
+        /// <summary>
+        /// Date for when the survey ended (local time).
+        /// </summary>
+        /// <example>2020-04-15</example>
+        [Required]
+        public DateOnly EventEndDate { get; set; }
+
+        /// <summary>
+        /// Time for when the survey started (local time).
+        /// </summary>
+        /// <example>14:00:00</example>
+        public TimeOnly? EventStartTime { get; set; }
+
+        /// <summary>
+        /// Time for when the survey ended (local time).
+        /// </summary>
+        /// <example>15:45:00</example>
+        public TimeOnly? EventEndTime { get; set; }
         
         /// <summary>
         /// States whether the position of a location is protected. The true position for a protected location is shown only to authorized persons. To others the position is shown with diffused coordinates. Other information about a protected location can also be limited.
         /// </summary>
-        public bool? LocationProtected { get; set; }
-        
+        [Required]
+        public bool LocationProtected { get; set; }
+
         /// <summary>
         /// Information about the survey area/site (geodata).
         /// </summary>
+        [Required]
         public Location SurveyLocation { get; set; }
         
         /// <summary>
@@ -71,7 +101,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// <summary>
         /// States whether any of the sought after organisms were observed during the survey event or not. True means that none of the sought after organisms were observed at all.
         /// </summary>
-        public bool? NoObservations { get; set; }
+        public bool NoObservations { get; set; }
         
         /// <summary>
         /// Attached information about the survey event, e.g. media files like images, sound recordings, maps etc.

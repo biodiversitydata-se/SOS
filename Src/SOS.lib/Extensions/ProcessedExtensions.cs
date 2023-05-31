@@ -23,10 +23,13 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
+            TimeSpan? startTime, endTime;
+            ParseEventTimes(source, out startTime, out endTime);
+
             return new DarwinCoreEvent
             {
-                EventDate = DwcFormatter.CreateDateIntervalString(source.StartDate, source.EndDate),
-                EventTime = DwcFormatter.CreateTimeIntervalString(source.StartDate, source.EndDate),
+                EventDate = DwcFormatter.CreateDateIntervalString(source.StartDate?.ToLocalTime(), startTime, source.EndDate?.ToLocalTime(), endTime),
+                EventTime = DwcFormatter.CreateTimeIntervalString(source.StartDate?.ToLocalTime(), source.EndDate?.ToLocalTime()),
                 Habitat = source.Habitat,
                 SamplingProtocol = source.SamplingProtocol,
                 VerbatimEventDate = source.VerbatimEventDate,
@@ -44,6 +47,27 @@ namespace SOS.Lib.Extensions
                 SampleSizeValue = source.SampleSizeValue,
                 SamplingEffort = source.SamplingEffort
             };
+        }
+
+        private static void ParseEventTimes(Event source, out TimeSpan? startTime, out TimeSpan? endTime)
+        {
+            startTime = null;
+            if (source.PlainStartTime != null)
+            {
+                if (TimeSpan.TryParse(source.PlainStartTime, out var parsedStartTime))
+                {
+                    startTime = parsedStartTime;
+                }
+            }
+
+            endTime = null;
+            if (source.PlainEndTime != null)
+            {
+                if (TimeSpan.TryParse(source.PlainEndTime, out var parsedEndTime))
+                {
+                    endTime = parsedEndTime;
+                }
+            }
         }
 
         #endregion Event

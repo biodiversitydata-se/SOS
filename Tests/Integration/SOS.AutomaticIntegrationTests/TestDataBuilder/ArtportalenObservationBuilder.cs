@@ -490,11 +490,11 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             builder.With((obs, index) =>
             {
                 var startDate = spanStartDate.AddMinutes(randomTest.Next(1, startMinutes));
-                obs.StartDate = startDate;
-                obs.StartTime = null;
+                obs.StartDate = startDate;                
+                obs.StartTime = obs.StartDate.Value.TimeOfDay;
                 var endMinutes = (int)(spanEndDate - startDate).TotalMinutes;
                 obs.EndDate = startDate.AddMinutes(randomTest.Next(0, endMinutes));
-                obs.EndTime = null;
+                obs.EndTime = obs.EndDate.Value.TimeOfDay;
             });
 
             return operable;

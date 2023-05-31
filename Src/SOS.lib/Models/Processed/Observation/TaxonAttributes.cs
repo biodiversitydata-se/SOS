@@ -56,9 +56,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public string InvasiveRiskAssessmentCategory { get; set; }
 
         /// <summary>
-        /// True if derivied redlist category is one of CR, EN, VU, NT.
+        /// True if derived redlist category is one of CR, EN, VU, NT.
         /// </summary>
-        public bool IsRedlisted => _redlistCategories.Contains(RedlistCategoryDerived?.ToLower() ?? string.Empty);
+        public bool IsRedlisted { get; set; }
 
         /// <summary>
         /// Natura 2000, Habitats directive article 2.

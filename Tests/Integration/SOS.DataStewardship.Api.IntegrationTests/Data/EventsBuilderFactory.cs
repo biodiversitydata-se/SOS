@@ -12,7 +12,11 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
                  .All()
                     .With(m => m.EventId = DataHelper.RandomString(8))
                     .With(m => m.StartDate = DateTime.Now)
-                    .With(m => m.EndDate = DateTime.Now)                        
+                    .With(m => m.EndDate = DateTime.Now)
+                    .With(m => m.PlainStartDate = DateTime.Now.ToString("yyyy-MM-dd"))
+                    .With(m => m.PlainEndDate = DateTime.Now.ToString("yyyy-MM-dd"))
+                    .With(m => m.PlainStartTime = DateTime.Now.ToString("HH:mm:ss"))
+                    .With(m => m.PlainEndTime = DateTime.Now.ToString("HH:mm:ss"))
                     .With(m => m.DataStewardship = new DataStewardshipInfo
                     {
                         DatasetIdentifier = DataHelper.RandomString(8)

@@ -10,6 +10,8 @@ using SOS.Observations.Api.Dtos;
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.ObservationsBySearchInternalEndpoint
 {
@@ -1019,6 +1021,10 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 {
                     Months = new[] { 1, 6 },
                     MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.StartDateEndDateMonthRange
+                },
+                Output = new OutputFilterExtendedDto
+                {
+                    FieldSet = Lib.Enums.OutputFieldSet.All
                 }
             };
 
@@ -1036,8 +1042,24 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------            
+            //await DebugGetObservationsWithStartDateEndDateMonthRange(verbatimObservations, result.Records);
             result.Should().NotBeNull();
             result.TotalCount.Should().Be(60);
+        }
+
+        private async Task DebugGetObservationsWithStartDateEndDateMonthRange(
+            IList<ArtportalenObservationVerbatim> verbatimObservations,
+            IEnumerable<Observation> resultObservations)
+        {
+            var testResultItems = await _fixture.CreateTestResultSummary(verbatimObservations, resultObservations);
+            foreach (var item in testResultItems)
+            {                
+                item.VerbatimValue = $"StartDate={item.VerbatimObservation.StartDate.Value.ToShortDateString()}, EndDate={item.VerbatimObservation.EndDate.Value.ToShortDateString()}";
+                item.ProcessedValue = $"StartMonth={item.ProcessedObservation.Event.StartMonth}, EndMonth={item.ProcessedObservation.Event.EndMonth}, StartDate={item.ProcessedObservation.Event.StartDate.Value.ToShortDateString()}, EndDate={item.ProcessedObservation.Event.EndDate.Value.ToShortDateString()}";
+            }
+            testResultItems = testResultItems
+                .OrderBy(m => m.ProcessedObservation.Event.EndDate.Value)
+                .ToList();
         }
 
         [Fact]

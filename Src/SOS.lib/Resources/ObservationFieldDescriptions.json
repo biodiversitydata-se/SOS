@@ -1441,16 +1441,16 @@
       "FieldSet": "AllWithValues"
     },
     {
-        "PropertyName": "LocationType",
-        "PropertyPath": "Location.Type",
-        "DataType": "Int32",
-        "DataTypeIsNullable": false,
-        "SwedishTitle": "Lokaltyp",
-        "EnglishTitle": "Location type",
-        "DwcName": "",
-        "DwcIdentifier": "",
-        "DependsOn": "Location.Type",
-        "FieldSet": "AllWithValues"
+      "PropertyName": "LocationType",
+      "PropertyPath": "Location.Type",
+      "DataType": "String",
+      "DataTypeIsNullable": false,
+      "SwedishTitle": "Lokaltyp",
+      "EnglishTitle": "Location type",
+      "DwcName": "",
+      "DwcIdentifier": "",
+      "DependsOn": "Location.Type",
+      "FieldSet": "AllWithValues"
     },
     {
         "PropertyName": "CoordinatePrecision",
@@ -3253,16 +3253,28 @@
         "FieldSet": "AllWithValues"
     },
     {
-        "PropertyName": "RedlistCategory",
-        "PropertyPath": "Taxon.Attributes.RedlistCategory",
+      "PropertyName": "RedlistCategory",
+      "PropertyPath": "Taxon.Attributes.RedlistCategory",
+      "DataType": "String",
+      "DataTypeIsNullable": false,
+      "SwedishTitle": "Rödlistekategori",
+      "EnglishTitle": "Redlist Category",
+      "DwcName": "",
+      "DwcIdentifier": "",
+      "DependsOn": "Taxon.Attributes.RedlistCategory",
+      "FieldSet": "Extended"
+    },
+    {
+        "PropertyName": "RedlistCategoryDerived",
+        "PropertyPath": "Taxon.Attributes.RedlistCategoryDerived",
         "DataType": "String",
         "DataTypeIsNullable": false,
-        "SwedishTitle": "Rödlistekategori",
-        "EnglishTitle": "Redlist Category",
+        "SwedishTitle": "Rödlistekategori (ärvd)",
+        "EnglishTitle": "Redlist Category (derived)",
         "DwcName": "",
         "DwcIdentifier": "",
-        "DependsOn": "Taxon.Attributes.RedlistCategory",
-        "FieldSet": "Extended"
+        "DependsOn": "Taxon.Attributes.RedlistCategoryDerived",
+        "FieldSet": "AllWithValues"
     },
     {
         "PropertyName": "SortOrder",

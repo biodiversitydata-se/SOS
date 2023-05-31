@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
@@ -17,6 +18,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson.Serialization.Conventions;
 using Moq;
+using SOS.AutomaticIntegrationTests.Extensions;
+using SOS.AutomaticIntegrationTests.Models;
 using SOS.Harvest.Extensions;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.Artportalen;
@@ -56,6 +59,8 @@ using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Controllers;
+using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -765,5 +770,54 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
 
             return processedObservations;
         }
+
+        public async Task<List<TestResultItem>> CreateTestResultSummary(
+            IList<ArtportalenObservationVerbatim> verbatimObservations,
+            IEnumerable<Observation> resultObservations)
+        {
+            List<TestResultItem> testResultItems = new List<TestResultItem>();
+            var allProcessedObservations = await GetAllProcessedObservationsAsync();
+            foreach (var item in allProcessedObservations)
+            {
+                int sightingId = GetSightingIdFromOccurrenceId(item.Occurrence.OccurrenceId);
+                var verbatim = verbatimObservations.Single(m => m.SightingId == sightingId);
+                bool hit = resultObservations.Any(m => m.Occurrence.OccurrenceId == item.Occurrence.OccurrenceId);
+                testResultItems.Add(new TestResultItem
+                {
+                    Hit = hit,
+                    ProcessedObservation = item,
+                    VerbatimObservation = verbatim
+                });
+            }
+
+            return testResultItems;
+        }
+
+        private int GetSightingIdFromOccurrenceId(string occurrenceId)
+        {
+            string lastInteger = Regex.Match(occurrenceId, @"\d+", RegexOptions.RightToLeft).Value;
+            return int.Parse(lastInteger);
+        }
+
+        private async Task<List<Observation>> GetAllProcessedObservationsAsync()
+        {
+            var searchFilter = new SearchFilterDto 
+            {
+                Output = new OutputFilterDto
+                {
+                    FieldSet = Lib.Enums.OutputFieldSet.All
+                }
+            };
+
+            var response = await ObservationsController.ObservationsBySearch(
+                null,
+                null,
+                searchFilter,
+                0,
+                1000);
+            var result = response.GetResult<PagedResultDto<Observation>>();
+
+            return result.Records.ToList();
+        }        
     }
 }

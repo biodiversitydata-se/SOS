@@ -256,7 +256,11 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Returns a list of data provider datasets (DwC-A) available for download. 
+        /// A file is usually created once a day for each dataset.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("Datasets")]
         [ProducesResponseType(typeof(IEnumerable<Lib.Models.Misc.File>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
@@ -281,7 +285,10 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Get all exports for a user
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("My")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(IEnumerable<ExportJobInfoDto>), (int)HttpStatusCode.OK)]
@@ -307,7 +314,11 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Get export by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("My/{id}")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(ExportJobInfoDto), (int)HttpStatusCode.OK)]
@@ -333,8 +344,19 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-
-        /// <inheritdoc />
+        /// <summary>
+        ///  Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
         [HttpPost("Download/Csv")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -401,7 +423,16 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Download DwC export file. The limit is 25 000 observations. If you need to download more observations, use the OrderDwC endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter"></param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
         [HttpPost("Download/DwC")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
@@ -464,7 +495,19 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///  Download Excel export file. The limit is 25 000 observations. If you need to download more observations, use the OrderExcel endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
         [HttpPost("Download/Excel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
@@ -532,7 +575,21 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Download GeoJson export file. The limit is 25 000 observations. If you need to download more observations, use the OrderGeoJson endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The label type to use if flat=false.</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
+        /// <param name="excludeNullValues">Exclude properties with null values. Applies when <paramref name="flat"/>=true.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
         [HttpPost("Download/GeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
@@ -545,7 +602,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flat = true,
-            [FromQuery] bool excludeNullValues = true,
+            [FromQuery] bool excludeNullValues = false,
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
@@ -602,7 +659,25 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Starts the process of creating a Csv file with observations based on provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <returns></returns>
         [HttpPost("Order/Csv")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -672,7 +747,23 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Starts the process of creating a DwC-A file with observations based on provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <returns></returns>
         [HttpPost("Order/DwC")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
@@ -739,7 +830,25 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Starts the process of creating a Excel file with observations based on provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <returns></returns>
         [HttpPost("Order/Excel")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -811,7 +920,27 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Starts the process of creating a GeoJSON file with observations based on the provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="description">A description of your download. Will be displayed in the email.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <param name="propertyLabelType">The label type to use if flat=false.</param>
+        /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
+        /// <param name="excludeNullValues">Exclude properties with null values. Applies when <paramref name="flat"/>=true.</param>
+        /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
+        /// <returns></returns>
         [HttpPost("Order/GeoJson")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -832,8 +961,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string encryptPassword = "",
             [FromQuery] string confirmEncryptPassword = "",
             [FromQuery] bool flat = true,
-            [FromQuery] bool excludeNullValues = true,
-            [FromQuery] string cultureCode = "sv-SE"            )
+            [FromQuery] bool excludeNullValues = false,
+            [FromQuery] string cultureCode = "sv-SE")
         {
             try
             {
@@ -885,7 +1014,19 @@ namespace SOS.Observations.Api.Controllers
         }
 
         #region Internal
-        /// <inheritdoc />
+        /// <summary>
+        ///  Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
         [HttpPost("Internal/Download/Csv")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -952,7 +1093,16 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Download DwC export file. The limit is 25 000 observations. If you need to download more observations, use the OrderDwC endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter"></param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
         [HttpPost("Internal/Download/DwC")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -1010,7 +1160,19 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///  Download Excel export file. The limit is 25 000 observations. If you need to download more observations, use the OrderExcel endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
         [HttpPost("Internal/Download/Excel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -1078,7 +1240,21 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Download GeoJson export file. The limit is 25 000 observations. If you need to download more observations, use the OrderGeoJson endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The label type to use if flat=false.</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
+        /// <param name="excludeNullValues">Exclude properties with null values. Applies when <paramref name="flat"/>=true.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <returns></returns>
         [HttpPost("Internal/Download/GeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -1092,7 +1268,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flat = true,
-            [FromQuery] bool excludeNullValues = true,
+            [FromQuery] bool excludeNullValues = false,
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
@@ -1148,7 +1324,25 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Starts the process of creating a Csv file with observations based on provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <returns></returns>
         [HttpPost("Internal/Order/Csv")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -1219,7 +1413,23 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Starts the process of creating a DwC-A file with observations based on provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="eventBased">Event based Darwin Core if true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <returns></returns>
         [HttpPost("Internal/Order/DwC")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -1286,7 +1496,25 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Starts the process of creating a Excel file with observations based on provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <returns></returns>
         [HttpPost("Internal/Order/Excel")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -1357,7 +1585,27 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Starts the process of creating a GeoJSON file with observations based on the provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="description">A description of your download. Will be displayed in the email.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">Include sensitive observations if true</param>
+        /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
+        /// <param name="encryptPassword">Password used to encrypt file</param>
+        /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
+        /// <param name="propertyLabelType">The label type to use if flat=false.</param>
+        /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
+        /// <param name="excludeNullValues">Exclude properties with null values. Applies when <paramref name="flat"/>=true.</param>
+        /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
+        /// <returns></returns>
         [HttpPost("Internal/Order/GeoJson")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -1379,7 +1627,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string encryptPassword = "",
             [FromQuery] string confirmEncryptPassword = "",
             [FromQuery] bool flat = true,
-            [FromQuery] bool excludeNullValues = true,
+            [FromQuery] bool excludeNullValues = false,
             [FromQuery] string cultureCode = "sv-SE")
         {
             try

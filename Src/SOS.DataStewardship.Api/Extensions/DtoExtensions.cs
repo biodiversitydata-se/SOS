@@ -105,19 +105,35 @@ namespace SOS.DataStewardship.Api.Extensions
         public static Contracts.Models.Event ToEventModel(this ProcessedDataStewardship.Event.Event observationEvent, CoordinateSystem responseCoordinateSystem)
         {
             if (observationEvent == null) return null;
+            
+            GetEventDates(
+                observationEvent.StartDate.Value,
+                observationEvent.EndDate.Value,
+                observationEvent.PlainStartDate,
+                observationEvent.PlainEndDate,
+                observationEvent.PlainStartTime,
+                observationEvent.PlainEndTime,
+                out DateOnly startDate, 
+                out DateOnly endDate, 
+                out TimeOnly? startTime, 
+                out TimeOnly? endTime);
 
             var ev = new Contracts.Models.Event();
             ev.EventID = observationEvent.EventId;
             ev.ParentEventID = observationEvent.ParentEventId;
             ev.EventRemarks = observationEvent.EventRemarks;
             ev.AssociatedMedia = observationEvent.Media.ToAssociatedMedias();
-            ev.Dataset = observationEvent?.DataStewardship.ToDatasetInfo();            
-            ev.EventStartDate = observationEvent.StartDate;
-            ev.EventEndDate = observationEvent.EndDate;
+            ev.Dataset = observationEvent?.DataStewardship.ToDatasetInfo();
+            ev.EventStartDateTime = observationEvent.StartDate.Value;
+            ev.EventEndDateTime = observationEvent.EndDate.Value;
+            ev.EventStartDate = startDate;
+            ev.EventEndDate = endDate;
+            ev.EventStartTime = startTime;
+            ev.EventEndTime = endTime;
             ev.SamplingProtocol = observationEvent.SamplingProtocol;
             ev.SurveyLocation = observationEvent?.Location?.ToLocation(responseCoordinateSystem);
             ev.EventType = observationEvent?.EventType;
-            ev.LocationProtected = observationEvent?.LocationProtected;
+            ev.LocationProtected = observationEvent.LocationProtected.GetValueOrDefault(false);
             ev.Weather = observationEvent?.Weather?.ToWeatherVariable();
             ev.RecorderCode = observationEvent.RecorderCode;
             ev.RecorderOrganisation = observationEvent?.RecorderOrganisation?.Select(m => m.ToOrganisation()).ToList();
@@ -126,6 +142,69 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
 
             return ev;
+        }
+        
+        private static void GetEventDates(
+            DateTime startDate,
+            DateTime endDate,
+            string plainStartDate,
+            string plainEndDate,
+            string plainStartTime,
+            string plainEndTime,
+            out DateOnly startDateResult, 
+            out DateOnly endDateResult, 
+            out TimeOnly? startTimeResult, 
+            out TimeOnly? endTimeResult)
+        {
+            if (!string.IsNullOrEmpty(plainStartDate) && DateOnly.TryParse(plainStartDate, out startDateResult))
+            {                
+            }
+            else
+            {
+                var localStartDate = startDate.ToLocalTime();
+                startDateResult = new DateOnly(localStartDate.Year, localStartDate.Month, localStartDate.Day);
+            }
+
+            if (!string.IsNullOrEmpty(plainEndDate) && DateOnly.TryParse(plainEndDate, out endDateResult))
+            {                
+            }
+            else
+            {
+                var localEndDate = endDate.ToLocalTime();
+                endDateResult = new DateOnly(localEndDate.Year, localEndDate.Month, localEndDate.Day);
+            }
+
+            if (string.IsNullOrEmpty(plainStartTime))
+            {
+                startTimeResult = null;
+            }
+            else 
+            {
+                if (TimeOnly.TryParse(plainStartTime, out var startTimeRes))
+                {
+                    startTimeResult = startTimeRes;
+                }
+                else
+                {
+                    startTimeResult = null;
+                }
+            }
+
+            if (string.IsNullOrEmpty(plainEndTime))
+            {
+                endTimeResult = null;
+            }
+            else
+            {
+                if (TimeOnly.TryParse(plainEndTime, out var endTimeRes))
+                {
+                    endTimeResult = endTimeRes;
+                }
+                else
+                {
+                    endTimeResult = null;
+                }
+            }            
         }
 
         public static WeatherVariable ToWeatherVariable(this ProcessedDataStewardship.Event.WeatherVariable source)
@@ -206,7 +285,20 @@ namespace SOS.DataStewardship.Api.Extensions
 
         public static Contracts.Models.Event ToEventModel(this Observation observation, IEnumerable<string> occurrenceIds, CoordinateSystem responseCoordinateSystem)
         {
-            if (observation == null) return null;            
+            if (observation == null) return null;
+
+            GetEventDates(
+                observation.Event.StartDate.Value,
+                observation.Event.EndDate.Value,
+                observation.Event.PlainStartDate,
+                observation.Event.PlainEndDate,
+                observation.Event.PlainStartTime,
+                observation.Event.PlainEndTime,
+                out DateOnly startDate,
+                out DateOnly endDate,
+                out TimeOnly? startTime,
+                out TimeOnly? endTime);
+
             var ev = new Contracts.Models.Event();
             ev.EventID = observation.Event.EventId;
             ev.ParentEventID = observation.Event.ParentEventId;
@@ -214,12 +306,16 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.AssociatedMedia = observation.Event.Media.ToAssociatedMedias();
             ev.Dataset = new DatasetInfo
             {
-                Identifier = observation.DataStewardship?.DatasetIdentifier
-                //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event
+                Identifier = observation.DataStewardship?.DatasetIdentifier,
+                Title = observation.DataStewardship?.DatasetTitle                
             };
 
-            ev.EventStartDate = observation.Event.StartDate;
-            ev.EventEndDate = observation.Event.EndDate;
+            ev.EventStartDateTime = observation.Event.StartDate.Value;
+            ev.EventEndDateTime = observation.Event.EndDate.Value;
+            ev.EventStartDate = startDate;
+            ev.EventEndDate = endDate;
+            ev.EventStartTime = startTime;
+            ev.EventEndTime = endTime;
             ev.SamplingProtocol = observation.Event.SamplingProtocol;
             ev.SurveyLocation = observation.Location.ToLocation(responseCoordinateSystem);            
             //ev.LocationProtected = ?
@@ -231,9 +327,9 @@ namespace SOS.DataStewardship.Api.Extensions
             };
             if (observation?.InstitutionCode?.Value != null || !string.IsNullOrEmpty(observation.InstitutionId))
             {
-                ev.RecorderOrganisation = new List<SOS.DataStewardship.Api.Contracts.Models.Organisation>
+                ev.RecorderOrganisation = new List<Contracts.Models.Organisation>
                 {
-                    new SOS.DataStewardship.Api.Contracts.Models.Organisation
+                    new Contracts.Models.Organisation
                     {
                         OrganisationID = observation?.InstitutionId,
                         OrganisationCode = observation?.InstitutionCode?.Value
@@ -343,7 +439,7 @@ namespace SOS.DataStewardship.Api.Extensions
             occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
             occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
             occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? OccurrenceStatus.Observerad : OccurrenceStatus.InteObserverad;
-            occurrence.Quantity = Convert.ToDouble(observation.Occurrence.OrganismQuantityInt);
+            occurrence.Quantity = observation.Occurrence.OrganismQuantityInt != null ? Convert.ToDouble(observation.Occurrence.OrganismQuantityInt) : 0;
             if (observation?.Occurrence?.OrganismQuantityUnit?.Id != null)
             {
                 occurrence.QuantityVariable = GetQuantityVariableEnum((UnitId)observation.Occurrence.OrganismQuantityUnit.Id);
