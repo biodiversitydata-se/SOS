@@ -49,6 +49,7 @@ namespace SOS.Lib.Enums
                 AggregationType.QuantityPerWeek,
                 AggregationType.QuantityPerYear,
                 AggregationType.SightingsPerWeek,
+                AggregationType.SightingsPerWeek48,
                 AggregationType.SightingsPerYear
             }.Contains(aggregationType);
         }
