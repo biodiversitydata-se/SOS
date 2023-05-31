@@ -71,9 +71,10 @@ namespace SOS.Lib.IO.GeoJson
             try
             {
                 var nrObservations = 0;
-                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
+                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);                
                 var propertyFields =
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
+                EnsureCoordinatesAreRetrievedFromDb(filter.Output);                
                 JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
@@ -174,6 +175,21 @@ namespace SOS.Lib.IO.GeoJson
             finally
             {
                 _fileService.DeleteFolder(temporaryZipExportFolderPath);
+            }
+        }
+
+        private void EnsureCoordinatesAreRetrievedFromDb(OutputFilter outputFilter)
+        {
+            if (outputFilter?.Fields == null) return;
+            if (outputFilter.Fields.Any(f => f.Equals("location", StringComparison.CurrentCultureIgnoreCase))) return;
+            if (!outputFilter.Fields.Any(f => f.Equals("location.decimallatitude", StringComparison.CurrentCultureIgnoreCase)))
+            {
+                outputFilter.Fields.Add("location.decimalLatitude");
+            }
+
+            if (!outputFilter.Fields.Any(f => f.Equals("location.decimallongitude", StringComparison.CurrentCultureIgnoreCase)))
+            {
+                outputFilter.Fields.Add("location.decimalLongitude");
             }
         }
 

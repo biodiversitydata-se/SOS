@@ -261,9 +261,9 @@ namespace SOS.Lib.Helpers
             return fields;
         }
 
-        public static IEnumerable<PropertyFieldDescription> GetExportFieldsFromOutputFields(IEnumerable<string> outputFields)
+        public static List<PropertyFieldDescription> GetExportFieldsFromOutputFields(IEnumerable<string> outputFields)
         {
-            if (!outputFields?.Any() ?? true) return FieldsByFieldSet[OutputFieldSet.AllWithValues];
+            if (!outputFields?.Any() ?? true) return FieldsByFieldSet[OutputFieldSet.AllWithValues].ToList();
 
             var fieldsSet = new HashSet<string>();
             foreach (var outputField in outputFields)
