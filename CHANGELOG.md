@@ -1,5 +1,11 @@
 # Changelog
 
+## [2023.05.31] - Hotfix
+
+### `Fixed`
+ - GeoJSON exports bug when selecting only specific fields.
+ - Histogram days fix.
+
 ## [2023.05.30] - Hotfix
 
 ### `Changed`
