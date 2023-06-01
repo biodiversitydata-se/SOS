@@ -37,6 +37,10 @@ namespace SOS.Lib.HangfireAttributes
 
         private async Task UpdateJobInfoError(int userId, string jobId, string errorMsg)
         {
+            if (HangfireJobServerContext.Host == null)
+            {
+                return;
+            }
             var userExportRepository = HangfireJobServerContext.Host.Services.GetService(typeof(IUserExportRepository)) as IUserExportRepository;
             var userExport = await userExportRepository.GetAsync(userId);
             var jobInfo = userExport.Jobs.FirstOrDefault(m => m.Id == jobId);
