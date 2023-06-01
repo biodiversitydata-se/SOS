@@ -12,7 +12,7 @@
 		<identifier></identifier>
 		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:iNaturalist</alternateIdentifier>
 		<title>iNaturalist Sverige</title>
-			<creator>
+		<creator>
 			<organizationName>SLU Swedish Species Information Centre (SLU Artdatabanken)</organizationName>
 			<individualName>
 				<givenName>Johan</givenName>
@@ -22,6 +22,13 @@
             <onlineUrl>https://www.inaturalist.se/</onlineUrl>
             <sos:contactNameType>Organizational</sos:contactNameType>
 		</creator>
+			<metadataProvider>
+			<individualName>
+				<givenName>Johan</givenName>
+				<surName>Liljebld</surName>
+			</individualName>
+			<organizationName>SLU Artdatabanken</organizationName>
+		</metadataProvider>
 		<abstract>
 			<para>iNaturalist.Se är en online-community där naturälskare över hela världen kan lära sig om arter på ett roligt sätt tillsammans. De laddar upp bilder på sina artobservationer och låter andra art- och naturintresserade hjälpa till med artbestämningen. De kan hålla koll på sina och andras fynd, läs fakta om arterna och lär sig känna igen fler arter i Sveriges natur.</para>
 			<para>Fynd som tillhandahålls här är bara de som uppnått forskningsklass – d.v.s. att de uppfyller ett antal kriterier, varav ett är att minst 2/3 av de användare som bidrar med artbestämning är överens. De skördas dagligen från GBIF som i sin tur får exporter från iNaturalist.org en gång per vecka.</para>
@@ -54,7 +61,7 @@
 			<temporalCoverage>
 				<rangeOfDates>
 					<beginDate>
-						<calendarDate>2014</calendarDate>
+						<calendarDate>2009</calendarDate>
 					</beginDate>
 					<endDate>
 						<calendarDate>current</calendarDate>
@@ -108,7 +115,7 @@
 			</online>
 		</distribution>
 		<maintenance>
-			<maintenanceUpdateFrequency>unknown</maintenanceUpdateFrequency>
+			<maintenanceUpdateFrequency></maintenanceUpdateFrequency>
 		</maintenance>
 		<sos:resourceHomepage>https://www.inaturalist.se/</sos:resourceHomepage>
 	</dataset>
