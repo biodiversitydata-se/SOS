@@ -627,7 +627,7 @@ namespace SOS.Lib
         /// <returns></returns>
         public static void AddAggregationFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, AggregationType aggregationType)
         {
-            if (aggregationType.IsDateHistogram())
+            if (aggregationType.IsDateHistogram() || aggregationType == AggregationType.SightingsPerWeek48)
             {
                 // Do only include sightings whose period don't exceeds one week/year
                 var maxDuration = aggregationType switch
