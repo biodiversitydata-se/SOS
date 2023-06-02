@@ -78,7 +78,7 @@ namespace SOS.Lib.Jobs.Import
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]
         Task<bool> RunHarvestArtportalenObservationsAsync(
-            IEnumerable<int> sightingIds,
+            List<int> sightingIds,
             IJobCancellationToken cancellationToken);
     }
 }

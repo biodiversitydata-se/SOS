@@ -148,7 +148,7 @@ namespace SOS.Administration.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public IActionResult RunIncrementalArtportalenObservationHarvestAndProcessJob([FromBody] IEnumerable<int> ids)
+        public IActionResult RunIncrementalArtportalenObservationHarvestAndProcessJob([FromBody] List<int> ids)
         {
             try
             {

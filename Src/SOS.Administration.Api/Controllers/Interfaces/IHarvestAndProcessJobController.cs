@@ -45,7 +45,7 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// Run incremaental harvest and processing of specified Artportalen observations
         /// </summary>
         /// <returns></returns>
-        IActionResult RunIncrementalArtportalenObservationHarvestAndProcessJob(IEnumerable<int> ids);
+        IActionResult RunIncrementalArtportalenObservationHarvestAndProcessJob(List<int> ids);
 
         /// <summary>
         ///  Incremental harvest and processing
