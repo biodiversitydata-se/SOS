@@ -233,7 +233,6 @@ namespace SOS.Lib.Extensions
             }
 
             var sortDescriptor = new SortDescriptor<T>();
-
             foreach (var sorting in sortings)
             {
                 var sortBy = sorting.SortBy;
@@ -289,9 +288,11 @@ namespace SOS.Lib.Extensions
                         }
                     }
                 }
-
-                sortDescriptor = sortDescriptor.Field(sortBy,
-                    sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending);
+                sortDescriptor = sortDescriptor.Field(f => f
+                    .Field(sortBy)
+                    .Order(sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending)
+                    .Missing(sortOrder == SearchSortOrder.Desc ? "_last" : "_first")
+                );
             }
 
             return sortDescriptor;

@@ -11,7 +11,6 @@
     scope="system" xml:lang="en">
 	<dataset>
 		<identifier>38b4c89f-584c-41bb-bd8f-cd1def33e92f</identifier>
-		<alternateIdentifier>38b4c89f-584c-41bb-bd8f-cd1def33e92f</alternateIdentifier>
 		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=artdata</alternateIdentifier>
 		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:Artportalen</alternateIdentifier>
 		<title>Artportalen (Swedish Species Observation System)</title>

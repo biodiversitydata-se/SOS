@@ -10,30 +10,39 @@ namespace SOS.Lib.Services
 {
     public class CryptoService : ICryptoService
     {
-        private byte[] _iv = 
-        {
-            0x48, 0xC2, 0xA3, 0x6C, 0x61, 0x56, 0x40, 0x72,
-            0x76, 0x31, 0x52, 0x75, 0x6E, 0x74, 0x3A, 0x29
-        };
-
+        private readonly byte[] _iv;
         private readonly byte[] _key;
 
 
         /// <summary>
-        /// Create key from password
+        ///  Create key from password
         /// </summary>
         /// <param name="password"></param>
+        /// <param name="salt"></param>
+        /// <param name="desiredKeyLength"></param>
         /// <returns></returns>
-        private byte[] DeriveKeyFromPassword(string password, string salt)
+        private byte[] DeriveFromPassword(string password, string salt, int desiredKeyLength)
         {
             var iterations = 1000;
-            var desiredKeyLength = 16; // 16 bytes equal 128 bits.
             var hashMethod = HashAlgorithmName.SHA384;
+
             return Rfc2898DeriveBytes.Pbkdf2(Encoding.Unicode.GetBytes(password),
                     Encoding.Unicode.GetBytes(salt),
                     iterations,
                     hashMethod,
                     desiredKeyLength);
+        }
+
+        /// <summary>
+        /// Initialize aes
+        /// </summary>
+        /// <param name="aes"></param>
+        private void InitializeAes(Aes aes)
+        {
+            aes.Padding = PaddingMode.PKCS7;
+            aes.Mode = CipherMode.CBC;
+            aes.Key = _key;
+            aes.IV = _iv;
         }
 
         /// <summary>
@@ -46,42 +55,47 @@ namespace SOS.Lib.Services
                 throw new ArgumentNullException(nameof(cryptoConfiguration));
             }
 
-            _key = DeriveKeyFromPassword(cryptoConfiguration.Password, cryptoConfiguration.Salt);
+            _iv = DeriveFromPassword(cryptoConfiguration.Password, cryptoConfiguration.Salt, 16);
+            _key = DeriveFromPassword(cryptoConfiguration.Password, cryptoConfiguration.Salt, 32);
         }
 
         /// <inheritdoc/>
         public async Task<string> DecryptAsync(string encrypted)
         {
-            if (string.IsNullOrEmpty(encrypted))
+            if (string.IsNullOrEmpty(encrypted?.Trim()))
             {
                 return null!;
             }
             using Aes aes = Aes.Create();
-            aes.Key = _key;
-            aes.IV = _iv;
-            using MemoryStream input = new(Encoding.Unicode.GetBytes(encrypted));
+            InitializeAes(aes);
+            // using MemoryStream input = new(Encoding.Unicode.GetBytes(encrypted));
+            using MemoryStream input = new(Convert.FromBase64String(encrypted));
             using CryptoStream cryptoStream = new(input, aes.CreateDecryptor(), CryptoStreamMode.Read);
             using MemoryStream output = new();
             await cryptoStream.CopyToAsync(output);
             return Encoding.Unicode.GetString(output.ToArray());
         }
 
+       
+
         /// <inheritdoc/>
         public async Task<string> EncryptAsync(string clearText)
         {
-            if (string.IsNullOrEmpty(clearText))
+            if (string.IsNullOrEmpty(clearText?.Trim()))
             {
                 return null!;
             }
 
             using Aes aes = Aes.Create();
-            aes.Key = _key;
-            aes.IV = _iv;
+            InitializeAes(aes);
             using MemoryStream output = new();
             using CryptoStream cryptoStream = new(output, aes.CreateEncryptor(), CryptoStreamMode.Write);
-            await cryptoStream.WriteAsync(Encoding.Unicode.GetBytes(clearText));
+            var textBytes = Encoding.Unicode.GetBytes(clearText);
+            await cryptoStream.WriteAsync(textBytes);
             await cryptoStream.FlushFinalBlockAsync();
-            return Encoding.Unicode.GetString(output.ToArray());
+
+            return Convert.ToBase64String(output.ToArray());
+            //return Encoding.Unicode.GetString(output.ToArray());
         }
     }
 }

@@ -81,15 +81,15 @@
 			</online>
 		</distribution>
 		<coverage>
-			<geographicCoverage>
-				<geographicDescription>Sweden</geographicDescription>
-				<boundingCoordinates>
-					<westBoundingCoordinate>10.03</westBoundingCoordinate>
-					<eastBoundingCoordinate>24.17</eastBoundingCoordinate>
-					<northBoundingCoordinate>69.07</northBoundingCoordinate>
-					<southBoundingCoordinate>54.96</southBoundingCoordinate>
-				</boundingCoordinates>
-			</geographicCoverage>
+				<geographicCoverage>
+					<geographicDescription>This resource covers Sweden.</geographicDescription>
+					<boundingCoordinates>
+						<westBoundingCoordinate>10.13</westBoundingCoordinate>
+						<eastBoundingCoordinate>24.59</eastBoundingCoordinate>
+						<northBoundingCoordinate>69.3</northBoundingCoordinate>
+						<southBoundingCoordinate>55.11</southBoundingCoordinate>
+					</boundingCoordinates>
+				</geographicCoverage>
 			<temporalCoverage>
                 <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
                 <sos:LivingTimePeriod></sos:LivingTimePeriod>
