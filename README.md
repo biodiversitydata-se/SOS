@@ -7,6 +7,7 @@ Species Observation System collects species observations from a number of data s
 Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and subscribe to the [Species Observations - multiple data resources](https://api-portal.artdatabanken.se/products/sos) product. Then you will get a description of all endpoints and you will also get an API key to use in your requests.
 
 ## API usage documentation
+- [Client development](Docs/ClientDevelopment.md)
 - [Endpoints](Docs/Endpoints.md)
 - [Search filter parameters](Docs/SearchFilter.md)
 - [Exports](Docs/Exports.md)
