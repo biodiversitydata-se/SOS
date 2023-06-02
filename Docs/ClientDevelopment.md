@@ -51,6 +51,9 @@ var jsonSerializerOptions = new JsonSerializerOptions {
 }
 ```
 
+**Client robustness**<br/>
+If you anticipate retrieving a nullable property but find that the property is absent in the JSON result, it is recommended to treat the value as `null`.
+
 
 ### Observation endpoints
 The SOS system uses **Elasticsearch** as search database for Observations, Events and Datasets. Elasticsearch doesn't store null values, and since the SOS API allows you to specify what fields you want to return, properties with null values will be omitted in the response.
