@@ -3305,6 +3305,52 @@
 					"response": []
 				}
 			]
+		},
+    {
+			"name": "JSON Serialization",
+			"item": [
+				{
+					"name": "TaxonLists - Null values",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Init variables",
+									"const taxonLists = pm.response.json();",
+									"const fridlystaArter = taxonLists.find(d => d.id == 1);",
+									"",
+									"// Tests",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});   ",
+									"",
+									"pm.test(\"Null values are returned and not omitted\", function () {",
+									"    pm.expect(fridlystaArter.parentId).to.be.null;    ",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{testUrl}}/TaxonLists",
+							"host": [
+								"{{testUrl}}"
+							],
+							"path": [
+								"TaxonLists"
+							]
+						},
+						"description": "Hämta alla aktiva dataset"
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
