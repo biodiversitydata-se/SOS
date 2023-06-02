@@ -1073,6 +1073,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Source(source => source
                     .Includes(fieldsDescriptor => fieldsDescriptor
                         .Field("occurrence.occurrenceId")
+                        .Field("event.eventId")
                         .Field("measurementOrFacts"))), 
                 pointInTimeId, 
                 searchAfter
