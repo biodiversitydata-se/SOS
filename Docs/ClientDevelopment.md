@@ -1,6 +1,14 @@
 # SOS Client Development
 This document contains some basic information about SOS and tips on what to consider when developing a consumer of the SOS API.
 
+- [Basics](#basics)
+- [Case sensitivity](#case-sensitivity)
+- [Null values](#null-values)
+- [Headers](#headers)
+- [Resources](#resources)
+- [Versioning](#versioning)
+
+
 ## Basics
 Regardless of whether you are developing a web, app or desktop solution, it is best practice to communicate with SOS through a dedicated backend and not access the API directly from the web browser or phone app. This way, you only need to make changes in one place, the App Backend, if there are structural changes in the SOS API.
 ```mermaid
@@ -138,7 +146,7 @@ If you have authorization associated with a role in SLU's authorization system, 
 This header is for future version control of SOS. You don't need to specify any value for now.
 
 
-## Resource Grouping
+## Resources
 The SOS API is divided into different resource groups to group related functionality. Currently, the following resource groups are available.
 
 ### Areas
