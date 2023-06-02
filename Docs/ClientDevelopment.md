@@ -79,7 +79,7 @@ The SOS system uses **Elasticsearch** as search database for Observations, Event
 ```
 
 ### Export endpoints
-When exporting observations to CSV, Excel and GeoJSON a flat observation structure will be used in where null values will be included by default.
+When exporting observations to CSV, Excel and GeoJSON a [flat observation](FlatObservation.md) structure will be used in where `null` values will be included by default.
 
 **Request**
 `POST Exports/Download/GeoJSON`
@@ -101,8 +101,8 @@ When exporting observations to CSV, Excel and GeoJSON a flat observation structu
 }
 ```
 
-**Request with excludeNullValues=true**
-Explicitly exclude null values
+**Request with excludeNullValues=true**<br/>
+Explicitly exclude null values<br/>
 `POST Exports/Download/GeoJSON?excludeNullValues=true`
 ```json
 {
@@ -154,7 +154,7 @@ Environment describes the current environment in which SOS is operated.
 SOS is a REST API and is not intended to be used as a data source for bulk downloads. If you are interested in large data sets, we recommend using exports. There are pre-built datasets available in DwC-A format for all DataProviders, and you can also define custom queries to download larger datasets in various formats. Currently, you can directly generate files with up to 100,000 observations. If you need more data, you can request files with up to 2,000,000 observations.
 
 ### Jobs
-When placing a file order, you receive a job ID as a receipt. This ID can be used to check the status of the job that generates the file.
+When placing a file order, you receive a job ID. This ID can be used to check the status of the job that generates the file.
 
 ### Locations
 Information about occurrence locations can be found under Locations.
@@ -178,7 +178,7 @@ If you include a Bearer Authentication token in your requests, you can use this 
 Swedish and English are the languages supported by SOS for metadata currently. The vocabulary used by SOS can be downloaded here. There are also resources available to display project information and more regarding the field sets that can be used in SOS.
 
 ## Versioning
-Managing multiple versions of an API is complex and costly, so we strive to make all changes backward compatible. We follow [DIGG's guidelines](https://dev.dataportal.se/rest-api-profil/versionhantering)) on what is considered backward compatible changes.
+Managing multiple versions of an API is complex and costly, so we strive to make all changes backward compatible. We follow [DIGG's guidelines](https://dev.dataportal.se/rest-api-profil/versionhantering) on what is considered backward compatible changes.
 
 *An API should, as far as possible, have a loose coupling between the producer and the consumer. Therefore, backward compatibility is an important aspect of an API. With a backward-compatible API, changes can be made to the API without affecting the consumer of the API.*
 
@@ -196,99 +196,3 @@ Managing multiple versions of an API is complex and costly, so we strive to make
 - *Removal of support for media types.*
 
 *As a producer of an API, one SHOULD avoid introducing non-backward compatible changes in their API, although sometimes it is unavoidable. As a consumer, one SHOULD always be tolerant, expect, and handle unexpected responses in a message. This creates robustness.*
-
-
-
-
-
-
-
-
-
-
-
-# Mats text
-
-# Sammanfattning
-
-Det här dokumentet innehåller lite grundläggande angående SOS och tips på vad som är bra att tänka på om man utvecklar en konsument av data från systemet.
-
-# Grundläggande
-
-Oberoende om man utvecklar en webb eller klientbaserad lösning är det ”best practice” att man kommunicerar med SOS via en egen back-end. På så sätt behöver man bara ändra på ett ställe om det blir strukturella förändringar i framtiden.
-
-Använd ”case insensitive” vid serialisering av json-data från SOS. Det förhindrar fel som kan vara svåra att hitta.
-
-Istället för att sätta json-properties till null eller tom/t object/array, kan man utelämna propertyn helt. Det medför att man skickar mindre data och det förenklar vid eventuell felsökning då det blir lättare att se de relevanta delarna.
-
-## Headers
-
-När man anropar SOS så kan man skicka med vissa värden i headern på anropet. Detta är i många fall inte nödvändigt, men för viss funktionalitet krävs det att korrekt information finns med och i andra fall förenklar det till exempel felsökning. Nedan kan du läsa lite om olika värden man skicka med i sina anrop.
-
-### X-Requesting-System
-
-I den här headern anger man vilket system det är som anropar SOS. Med hjälp av den informationen är det lättare för oss att hjälpa er att felsöka om ni får problem med en fråga
-
-### X-Requesting-System
-
-Denna header är för framtida versionshantering av SOS
-
-### X-Authorization-Application-Identifier
-
-Om man har behörighet kopplad till en viss applikation inom SLU, kan man ange det här för att returnerad data ska baseras på de rättigheter man har i aktuell applikation.
-
-### X-Authorization-Role-Id
-
-Om man har behörighet kopplad till en roll i SLU’s behörighetssystem så anger man ID’et på rollen för att returnerat data ska spegla rollens behörighet.
-
-# Resursgruppering
-
-SOS API är uppdelat i olika resursgrupper för att gruppera närliggande funktionalitet. I nuläget finns följande resursgrupper.
-
-## Areas
-
-Areor används för att definiera olika geografiska områden. Kommun, län och socken är exempel på olika områden som SOS använder.
-
-## DataProviders
-
-Information om de olika leverantörerna av data till SOS kan man hitta under DataProviders.
-
-## Environment
-
-Environment beskriver aktuell miljö som SOS driftas i.
-
-## Exports
-
-SOS är ett REST-API. Det är inte tänkt att användas som datakälla för att ”tanka” ner allt. Ar man intresserad av stora datamängder hänvisar vi er till exporter. Dels finns det färdiga data-set i DwC-A format att ladda ner för alla DataProviders, men man kan också definiera egna frågor för att tanka hem större datamängder i olika format. I nuläget kan man direkt-generera filer med upp till 100 000 observationer. Behöver man data än så kan man beställa filer med upp till 2 000 000 observationer.
-
-## Jobs
-
-Om man gör en filbeställning så får man ett jobb-ID som kvittens när man gör sin beställning. Detta ID kan man använda för att se vilken status jobbet som genererar filen är i.
-
-## Locations
-
-Information om fyndplatser hittar man under Locations
-
-## Observations
-
-Fyndrelaterad data återfinns under Observations. Här kan man söka efter fynd eller använda någon av de aggregerade resurserna som finns.
-
-### Filter
-
-Vissa resurser tillåter att man anger vilka fält man vill ha tillbaka. Dels kan man ange en fördefinierad fältuppsättning (fieldset) (se mer under Vocabularies nedan), men man kan även specificera exakt vad man vill ha tillbaka. Genom att använda denna funktionalitet minimerar man trafiken på nätverket och optimerar prestandan på sina frågor. När man anger vilka fält man vill returnera är det viktigt att man anger dem med på samma sätt som de returneras. Vill man t.ex. returnera startdatum för en observation så anger man ”event.startDate” i output.fields. Det är möjligt att ange ett fieldset och komplettera med enskilda fält.
-
-## Systems
-
-Vill man veta mer om när SOS-databasen uppdaterades, eller hur många observationer som finns i databasen är det här man ska titta.
-
-## TaxonLists
-
-Listor med rödlistade arter, signalarter eller andra grupperingar kan man hitta under TaxonLists. ID’n på listor kan användas i vissa sökningar.
-
-## User
-
-Om man skickar med en Bearer Authentication token i sina anrop, kan man använda denna resurs för att se vilka roller och behörigheter användaren har.
-
-## Vocabularies.
-
-Svenska och engelska är de språk som SOS stödjer för meta data i nuläget. Den ordlista som SOS använder går att ladda ner här. Det finns även resurser för att visa projektinformation och mer gällande de fältuppsättningar som går att använda i SOS.
