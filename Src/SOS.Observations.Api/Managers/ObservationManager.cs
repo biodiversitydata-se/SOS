@@ -401,7 +401,7 @@ namespace SOS.Observations.Api.Managers
         /// <inheritdoc />
         public async Task<dynamic> GetObservationAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet,
             string translationCultureCode, bool protectedObservations, bool includeInternalFields, bool ensureArtportalenUpdated = false)
-        {
+        {            
             if (ensureArtportalenUpdated && (occurrenceId?.Contains("artportalen", StringComparison.CurrentCultureIgnoreCase) ?? false))
             {
                 var regex = new Regex(@"\d+$");
@@ -409,7 +409,7 @@ namespace SOS.Observations.Api.Managers
                 if (int.TryParse(match.Value, out var sightingId))
                 {
                     var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(
-                        job => job.RunHarvestArtportalenObservationsAsync(new[] { sightingId },
+                        job => job.RunHarvestArtportalenObservationsAsync(new List<int> { sightingId },
                         JobCancellationToken.Null));
 
                     using var connection = JobStorage.Current?.GetConnection();

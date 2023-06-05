@@ -458,7 +458,7 @@ namespace SOS.Harvest.Jobs
 
         /// <inheritdoc />
         public async Task<bool> RunHarvestArtportalenObservationsAsync(
-            IEnumerable<int> sightingIds,
+            List<int> sightingIds,
             IJobCancellationToken cancellationToken)
         {
             var harvester = _harvestersByType[DataProviderType.ArtportalenObservations] as IArtportalenObservationHarvester;
