@@ -412,11 +412,11 @@ namespace SOS.Observations.Api.Managers
                         job => job.RunHarvestArtportalenObservationsAsync(new[] { sightingId },
                         JobCancellationToken.Null));
 
-                    using var connection = JobStorage.Current.GetConnection();
-                    var stateData = connection.GetStateData(jobId);
+                    using var connection = JobStorage.Current?.GetConnection();
+                    var stateData = connection?.GetStateData(jobId);
 
-                    while (stateData.Name.Equals("Enqueued", StringComparison.CurrentCultureIgnoreCase) ||
-                           stateData.Name.Equals("Processing", StringComparison.CurrentCultureIgnoreCase))
+                    while ((stateData?.Name?.Equals("Enqueued", StringComparison.CurrentCultureIgnoreCase) ?? false) ||
+                            (stateData?.Name?.Equals("Processing", StringComparison.CurrentCultureIgnoreCase) ?? false))
                     {
                         Thread.Sleep(100);
                         stateData = connection.GetStateData(jobId);
