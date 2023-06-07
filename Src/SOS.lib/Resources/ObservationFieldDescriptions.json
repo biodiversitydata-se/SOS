@@ -793,6 +793,102 @@
     "FieldSet": "AllWithValues"
   },
   {
+    "PropertyName": "StartYear",
+    "PropertyPath": "Event.StartYear",
+    "DataType": "Int32",
+    "DataTypeIsNullable": true,
+    "SwedishTitle": "Startdatum (År)",
+    "EnglishTitle": "Start date (Year)",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Event.StartYear",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "StartMonth",
+    "PropertyPath": "Event.StartMonth",
+    "DataType": "Int32",
+    "DataTypeIsNullable": true,
+    "SwedishTitle": "Startdatum (Månad)",
+    "EnglishTitle": "Start date (Month)",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Event.StartMonth",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "StartDay",
+    "PropertyPath": "Event.StartDay",
+    "DataType": "Int32",
+    "DataTypeIsNullable": true,
+    "SwedishTitle": "Startdatum (Dag)",
+    "EnglishTitle": "Start date (Day)",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Event.StartDay",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "EndYear",
+    "PropertyPath": "Event.EndYear",
+    "DataType": "Int32",
+    "DataTypeIsNullable": true,
+    "SwedishTitle": "Slutdatum (År)",
+    "EnglishTitle": "End date (Year)",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Event.EndYear",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "EndMonth",
+    "PropertyPath": "Event.EndMonth",
+    "DataType": "Int32",
+    "DataTypeIsNullable": true,
+    "SwedishTitle": "Slutdatum (Månad)",
+    "EnglishTitle": "End date (Month)",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Event.EndMonth",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "EndDay",
+    "PropertyPath": "Event.EndDay",
+    "DataType": "Int32",
+    "DataTypeIsNullable": true,
+    "SwedishTitle": "Slutdatum (Dag)",
+    "EnglishTitle": "End date (Day)",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Event.EndDay",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "StartHistogramWeek",
+    "PropertyPath": "Event.StartHistogramWeek",
+    "DataType": "Int32",
+    "DataTypeIsNullable": true,
+    "SwedishTitle": "Startdatum (Histogramvecka)",
+    "EnglishTitle": "Start date (Histogram week)",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Event.StartHistogramWeek",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "EndHistogramWeek",
+    "PropertyPath": "Event.EndHistogramWeek",
+    "DataType": "Int32",
+    "DataTypeIsNullable": true,
+    "SwedishTitle": "Slutdatum (Histogramvecka)",
+    "EnglishTitle": "End date (Histogram week)",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Event.EndHistogramWeek",
+    "FieldSet": "AllWithValues"
+  },
+  {
     "PropertyName": "Identification",
     "PropertyPath": "Identification",
     "DataType": "",
@@ -1667,6 +1763,18 @@
     "DwcIdentifier": "",
     "DependsOn": "Location.Attributes",
     "FieldSet": ""
+  },
+  {
+    "PropertyName": "ProjectId",
+    "PropertyPath": "Location.Attributes.ProjectId",
+    "DataType": "Int32",
+    "DataTypeIsNullable": true,
+    "SwedishTitle": "Plats ProjektID",
+    "EnglishTitle": "Location ProjectID",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Location.Attributes.ProjectId",
+    "FieldSet": "AllWithValues"
   },
   {
     "PropertyName": "CountyPartIdByCoordinate",
@@ -3376,12 +3484,24 @@
     "PropertyName": "VernacularNames",
     "PropertyPath": "Taxon.Attributes.VernacularNames",
     "DataType": "String",
-    "DataTypeIsNullable": null,
+    "DataTypeIsNullable": false,
     "SwedishTitle": "Trivialnamn",
     "EnglishTitle": "Vernacular names",
     "DwcName": "",
     "DwcIdentifier": "",
     "DependsOn": "Taxon.Attributes.VernacularNames",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "GbifTaxonId",
+    "PropertyPath": "Taxon.Attributes.GbifTaxonId",
+    "DataType": "Int32",
+    "DataTypeIsNullable": true,
+    "SwedishTitle": "GBIF TaxonID",
+    "EnglishTitle": "GBIF TaxonID",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Taxon.Attributes.GbifTaxonId",
     "FieldSet": "AllWithValues"
   },
   {
@@ -4167,6 +4287,30 @@
     "FieldSet": "AllWithValues"
   },
   {
+    "PropertyName": "DatasetIdentifier",
+    "PropertyPath": "DataStewardship.DatasetIdentifier",
+    "DataType": "String",
+    "DataTypeIsNullable": false,
+    "SwedishTitle": "Dataset Identifierare",
+    "EnglishTitle": "Dataset Identifier",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "DataStewardship.DatasetIdentifier",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "DatasetTitle",
+    "PropertyPath": "DataStewardship.DatasetTitle",
+    "DataType": "String",
+    "DataTypeIsNullable": false,
+    "SwedishTitle": "Dataset titel",
+    "EnglishTitle": "Dataset title",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "DataStewardship.DatasetTitle",
+    "FieldSet": "AllWithValues"
+  },
+  {
     "PropertyName": "Created",
     "PropertyPath": "Created",
     "DataType": "DateTime",
@@ -4879,7 +5023,7 @@
     "PropertyPath": "ArtportalenInternal.ReportedByUserServiceUserId",
     "DataType": "Int32",
     "DataTypeIsNullable": true,
-    "SwedishTitle": "Rapportör användartjäst-ID",
+    "SwedishTitle": "Rapportör användartjänst-ID",
     "EnglishTitle": "Reported By User Service User Id",
     "DwcName": "",
     "DwcIdentifier": "",
