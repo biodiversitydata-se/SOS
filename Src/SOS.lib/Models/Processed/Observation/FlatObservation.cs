@@ -405,6 +405,17 @@ namespace SOS.Lib.Models.Processed.Observation
         public string TypeValue => _observation?.Type?.Value;
         public string MeasurementOrFacts => _observation?.MeasurementOrFacts == null ? null : string.Join(", ", _observation.MeasurementOrFacts.Select(m => m.ToString()));
         public string Projects => _observation?.Projects == null ? null : string.Join(", ", _observation.Projects.Select(m => m.ToString()));
+        public int? Project1Id => _observation?.ProjectsSummary?.Project1Id;
+        public string Project1Name => _observation?.ProjectsSummary?.Project1Name;
+        public string Project1Category => _observation?.ProjectsSummary?.Project1Category;
+        public string Project1Url => _observation?.ProjectsSummary?.Project1Url;
+        public string Project1Values => _observation?.ProjectsSummary?.Project1Values;
+        public int? Project2Id => _observation?.ProjectsSummary?.Project2Id;
+        public string Project2Name => _observation?.ProjectsSummary?.Project2Name;
+        public string Project2Category => _observation?.ProjectsSummary?.Project2Category;
+        public string Project2Url => _observation?.ProjectsSummary?.Project2Url;
+        public string Project2Values => _observation?.ProjectsSummary?.Project2Values;
+
 
         public string TaxonSecondaryParentDyntaxaTaxonIds => _observation?.Taxon?.SecondaryParentDyntaxaTaxonIds == null
             ? null
@@ -684,6 +695,16 @@ namespace SOS.Lib.Models.Processed.Observation
                 "type.value" => TypeValue,
                 "measurementorfacts" => MeasurementOrFacts,
                 "projects" => Projects,
+                "projectssummary.project1id" => Project1Id,
+                "projectssummary.project1name" => Project1Name,
+                "projectssummary.project1category" => Project1Category,
+                "projectssummary.project1url" => Project1Url,
+                "projectssummary.project1values" => Project1Values,
+                "projectssummary.project2id" => Project2Id,
+                "projectssummary.project2name" => Project2Name,
+                "projectssummary.project2category" => Project2Category,
+                "projectssummary.project2url" => Project2Url,
+                "projectssummary.project2values" => Project2Values,
                 "geologicalcontext" => "Please specify which geologicalcontext properties you need",
                 "geologicalcontext.bed" => GeologicalContextBed,
                 "geologicalcontext.earliestageorloweststage" => GeologicalContextEarliestAgeOrLowestStage,
