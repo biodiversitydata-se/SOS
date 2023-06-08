@@ -1326,6 +1326,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public async Task<IActionResult> MetricGridAggregationInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
