@@ -72,6 +72,14 @@ namespace SOS.Lib.Models.Processed.Observation
         public string EventVerbatimEventDate => _observation?.Event?.VerbatimEventDate;
         public string EventMedia => _observation?.Event?.Media == null ? null : string.Join(", ", _observation?.Event?.Media.Select(m => m.ToString()));
         public string EventMeasurementOrFacts => _observation?.Event?.MeasurementOrFacts == null ? null : string.Join(", ", _observation?.Event?.MeasurementOrFacts.Select(m => m.ToString()));
+        public int? EventStartHistogramWeek => _observation?.Event?.StartHistogramWeek;
+        public int? EventEndHistogramWeek => _observation?.Event?.EndHistogramWeek;
+        public int? EventStartYear => _observation.Event?.StartYear;
+        public int? EventStartMonth => _observation.Event?.StartMonth;
+        public int? EventStartDay => _observation.Event?.StartDay;
+        public int? EventEndYear => _observation.Event?.EndYear;
+        public int? EventEndMonth => _observation.Event?.EndMonth;
+        public int? EventEndDay => _observation.Event?.EndDay;
         public string GeologicalContextBed => _observation?.GeologicalContext?.Bed;
         public string GeologicalContextEarliestAgeOrLowestStage => _observation?.GeologicalContext?.EarliestAgeOrLowestStage;
         public string GeologicalContextEarliestEonOrLowestEonothem => _observation?.GeologicalContext?.EarliestEonOrLowestEonothem;
@@ -185,6 +193,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string LocationVerbatimLongitude => _observation?.Location?.VerbatimLongitude;
         public string LocationVerbatimSRS => _observation?.Location?.VerbatimSRS;
         public string LocationWaterBody => _observation?.Location?.WaterBody;
+        public int? LocationAttributesProjectId => _observation?.Location?.Attributes?.ProjectId;
         public string MaterialSampleMaterialSampleId => _observation?.MaterialSample?.MaterialSampleId;
         public string OccurrenceActivity => _observation?.Occurrence?.Activity?.ToString();
         public int? OccurrenceActivityId => _observation?.Occurrence?.Activity?.Id;
@@ -309,6 +318,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public bool? TaxonAttributesIsInvasiveAccordingToEuRegulation => _observation?.Taxon?.Attributes?.IsInvasiveAccordingToEuRegulation;
         public bool? TaxonAttributesIsInvasiveInSweden => _observation?.Taxon?.Attributes?.IsInvasiveInSweden;
         public string TaxonAttributesRiskAssessmentCategory => _observation?.Taxon?.Attributes?.InvasiveRiskAssessmentCategory;
+        public int? TaxonAttributesGbifTaxonId => _observation?.Taxon?.Attributes?.GbifTaxonId;
         public string TaxonAttributesRedlistCategory => _observation?.Taxon?.Attributes?.RedlistCategory;
         public string TaxonAttributesRedlistCategoryDerived => _observation?.Taxon?.Attributes?.RedlistCategoryDerived;
         public int? TaxonAttributesSortOrder => _observation?.Taxon?.Attributes?.SortOrder;
@@ -405,6 +415,18 @@ namespace SOS.Lib.Models.Processed.Observation
         public string TypeValue => _observation?.Type?.Value;
         public string MeasurementOrFacts => _observation?.MeasurementOrFacts == null ? null : string.Join(", ", _observation.MeasurementOrFacts.Select(m => m.ToString()));
         public string Projects => _observation?.Projects == null ? null : string.Join(", ", _observation.Projects.Select(m => m.ToString()));
+        public int? Project1Id => _observation?.ProjectsSummary?.Project1Id;
+        public string Project1Name => _observation?.ProjectsSummary?.Project1Name;
+        public string Project1Category => _observation?.ProjectsSummary?.Project1Category;
+        public string Project1Url => _observation?.ProjectsSummary?.Project1Url;
+        public string Project1Values => _observation?.ProjectsSummary?.Project1Values;
+        public int? Project2Id => _observation?.ProjectsSummary?.Project2Id;
+        public string Project2Name => _observation?.ProjectsSummary?.Project2Name;
+        public string Project2Category => _observation?.ProjectsSummary?.Project2Category;
+        public string Project2Url => _observation?.ProjectsSummary?.Project2Url;
+        public string Project2Values => _observation?.ProjectsSummary?.Project2Values;
+        public string DatasetIdentifier => _observation?.DataStewardship?.DatasetIdentifier;
+        public string DatasetTitle => _observation?.DataStewardship?.DatasetTitle;
 
         public string TaxonSecondaryParentDyntaxaTaxonIds => _observation?.Taxon?.SecondaryParentDyntaxaTaxonIds == null
             ? null
@@ -454,6 +476,14 @@ namespace SOS.Lib.Models.Processed.Observation
                 "event.fieldnumber" => EventFieldNumber,
                 "event.parenteventid" => EventParentEventId,
                 "event.verbatimeventdate" => EventVerbatimEventDate,
+                "event.starthistogramweek" => EventStartHistogramWeek,
+                "event.endhistogramweek" => EventEndHistogramWeek,
+                "event.startyear" => EventStartYear,
+                "event.startmonth" => EventStartMonth,
+                "event.startday" => EventStartDay,
+                "event.endyear" => EventEndYear,
+                "event.endmonth" => EventEndMonth,
+                "event.endday" => EventEndDay,
                 "identification" => "Please specify which identification properties you need",
                 "identification.verified" => IdentificationVerified,
                 "identification.verificationstatus" => IdentificationVerificationStatus,
@@ -533,6 +563,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "location.verbatimdepth" => LocationVerbatimDepth,
                 "location.verbatimelevation" => LocationVerbatimElevation,
                 "location.verbatimlocality" => LocationVerbatimLocality,
+                "location.attributes.projectid" => LocationAttributesProjectId,
                 "location.type" => LocationType,
                 "occurrence" => "Please specify which occurrence properties you need",
                 "occurrence.recordedby" => OccurrenceRecordedBy,
@@ -666,6 +697,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "taxon.attributes.isinvasiveaccordingtoeuregulation" => TaxonAttributesIsInvasiveAccordingToEuRegulation,
                 "taxon.attributes.isinvasiveinsweden" => TaxonAttributesIsInvasiveInSweden,
                 "taxon.attributes.invasiveriskassessmentcategory" => TaxonAttributesRiskAssessmentCategory,
+                "taxon.attributes.gbiftaxonid" => TaxonAttributesGbifTaxonId,
                 "datasetid" => DatasetId,
                 "dynamicproperties" => DynamicProperties,
                 "institutionid" => InstitutionId,
@@ -684,6 +716,18 @@ namespace SOS.Lib.Models.Processed.Observation
                 "type.value" => TypeValue,
                 "measurementorfacts" => MeasurementOrFacts,
                 "projects" => Projects,
+                "projectssummary.project1id" => Project1Id,
+                "projectssummary.project1name" => Project1Name,
+                "projectssummary.project1category" => Project1Category,
+                "projectssummary.project1url" => Project1Url,
+                "projectssummary.project1values" => Project1Values,
+                "projectssummary.project2id" => Project2Id,
+                "projectssummary.project2name" => Project2Name,
+                "projectssummary.project2category" => Project2Category,
+                "projectssummary.project2url" => Project2Url,
+                "projectssummary.project2values" => Project2Values,
+                "datastewardship.datasetidentifier" => DatasetIdentifier,
+                "datastewardship.datasettitle" => DatasetTitle,
                 "geologicalcontext" => "Please specify which geologicalcontext properties you need",
                 "geologicalcontext.bed" => GeologicalContextBed,
                 "geologicalcontext.earliestageorloweststage" => GeologicalContextEarliestAgeOrLowestStage,
