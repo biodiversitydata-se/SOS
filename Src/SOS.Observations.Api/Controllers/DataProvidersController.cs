@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -23,7 +22,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class DataProvidersController : ControllerBase, IDataProviderController
+    public class DataProvidersController : ControllerBase
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly IObservationManager _observationManager;
@@ -55,12 +54,19 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Get all data providers.
+        /// </summary>
+        /// <param name="cultureCode">Culture code.</param>
+        /// <param name="includeProvidersWithNoObservations">If false, data providers with no observations are excluded from the result.</param>
+        /// <returns>List of data providers.</returns>
         [HttpGet]
         [ProducesResponseType(typeof(List<DataProviderDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDataProvidersAsync([FromQuery] string cultureCode = "sv-SE", [FromQuery] bool includeProvidersWithNoObservations = false)
+        public async Task<IActionResult> GetDataProvidersAsync(
+            [FromQuery] string cultureCode = "sv-SE", 
+            [FromQuery] bool includeProvidersWithNoObservations = false)
         {
             try
             {
@@ -80,7 +86,12 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-        /// <inheritdoc/>
+
+        /// <summary>
+        /// Get latest modified date for a data provider.
+        /// </summary>
+        /// <param name="providerId">The data provider ID.</param>
+        /// <returns></returns>
         [HttpGet("{providerId}/LastModified")]
         [ProducesResponseType(typeof(IEnumerable<DateTime>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -103,7 +114,11 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Get provider EML file.
+        /// </summary>
+        /// <param name="providerId">The data provider ID.</param>
+        /// <returns></returns>
         [HttpGet("{providerId}/EML")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -154,6 +169,10 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Make dataproviders health check.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("Health")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

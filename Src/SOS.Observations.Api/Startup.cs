@@ -206,8 +206,7 @@ namespace SOS.Observations.Api
                 services.BuildServiceProvider().GetService<IApiVersionDescriptionProvider>();
             services.AddSwaggerGen(
                 swagger =>
-                {
-                    swagger.UseInlineDefinitionsForEnums();
+                {                    
                     foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
                     {
                         swagger.SwaggerDoc(

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
-using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -18,7 +17,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class AreasController : ControllerBase, IAreasController
+    public class AreasController : ControllerBase
     {
         private readonly IAreaManager _areaManager;
         private readonly ILogger<AreasController> _logger;
@@ -36,7 +35,14 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Search for areas (regions).
+        /// </summary>
+        /// <param name="areaTypes">Filter used to limit number of areas returned</param>
+        /// <param name="searchString">Filter used to limit number of areas returned</param>
+        /// <param name="skip">Start index of returned areas</param>
+        /// <param name="take">Number of areas to return</param>
+        /// <returns>List of areas</returns>
         [HttpGet()]
         [ProducesResponseType(typeof(PagedResult<AreaBaseDto>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
@@ -54,6 +60,12 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Get a single area
+        /// </summary>
+        /// <param name="areaType">The area type.</param>
+        /// <param name="featureId">The feature id.</param>
+        /// <returns></returns>
         [HttpGet("{areaType}/{featureId}")]
         [ProducesResponseType(typeof(AreaBaseDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -70,13 +82,21 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-
-        /// <inheritdoc />
+        /// <summary>
+        ///     Get an area as a zipped JSON file including its polygon.
+        /// </summary>
+        /// <param name="areaType">The area type.</param>
+        /// <param name="featureId">The FeatureId.</param>
+        /// <param name="format">Export format.</param>
+        /// <returns></returns>
         [HttpGet("{areaType}/{featureId}/Export")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public async Task<IActionResult> GetExport([FromRoute] AreaTypeDto areaType, [FromRoute] string featureId, [FromQuery] AreaExportFormatDto format = AreaExportFormatDto.Json)
+        public async Task<IActionResult> GetExport(
+            [FromRoute] AreaTypeDto areaType, 
+            [FromRoute] string featureId, 
+            [FromQuery] AreaExportFormatDto format = AreaExportFormatDto.Json)
         {
             try
             {

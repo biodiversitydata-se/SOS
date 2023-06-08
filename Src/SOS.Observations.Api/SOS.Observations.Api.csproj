@@ -71,6 +71,9 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Docs\OpenAPI\" />
+    </ItemGroup>
     <ProjectExtensions>
         <VisualStudio>
             <UserProperties properties_4launchsettings_1json__JsonSchema="" appsettings_1local_1json__JsonSchema="UseTls" />

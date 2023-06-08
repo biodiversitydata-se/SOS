@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Hangfire;
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,7 +12,6 @@ using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -26,7 +24,7 @@ namespace SOS.Observations.Api.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize/*(Roles = "Privat")*/]
-    public class DOIsController : ObservationBaseController, IDOIsController
+    public class DOIsController : ObservationBaseController
     {
         private readonly IDataCiteService _dataCiteService;
         private readonly IBlobStorageService _blobStorageService;
@@ -59,7 +57,11 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Create a DOI based on provided filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns>Object with these properties: fileName, jobId</returns>
         [HttpPost]
         [ProducesResponseType(typeof(object), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
@@ -104,6 +106,14 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Get batch of DOI's
+        /// </summary>
+        /// <param name="take"></param>
+        /// <param name="page"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="sortOrder"></param>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -122,7 +132,12 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///  Get DOI download URL
+        /// </summary>
+        /// <param name="prefix"></param>
+        /// <param name="suffix"></param>
+        /// <returns></returns>
         [HttpGet("{prefix}/{suffix}/URL")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -141,7 +156,12 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///  Get DOI meta data
+        /// </summary>
+        /// <param name="prefix"></param>
+        /// <param name="suffix"></param>
+        /// <returns></returns>
         [HttpGet("{prefix}/{suffix}")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -166,6 +186,11 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Search for DOI's
+        /// </summary>
+        /// <param name="searchFor"></param>
+        /// <returns></returns>
         [HttpGet("search")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
