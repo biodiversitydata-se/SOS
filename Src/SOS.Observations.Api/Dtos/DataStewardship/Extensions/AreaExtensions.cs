@@ -4,7 +4,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
 {
     public static class AreaExtensions
     {
-        public static County? GetCounty(this string countyId)
+        public static DsCounty? GetCounty(this string countyId)
         {
             if (string.IsNullOrEmpty(countyId)) return null;
 
@@ -13,7 +13,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
                 return null;
             }
 
-            return (County)id;
+            return (DsCounty)id;
         }
 
         public static Municipality? GetMunicipality(this string municipalityId)
@@ -28,7 +28,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             return (Municipality)id;
         }
 
-        public static Parish? GetParish(this string parishId)
+        public static DsParish? GetParish(this string parishId)
         {
             if (string.IsNullOrEmpty(parishId)) return null;
 
@@ -37,10 +37,10 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
                 return null;
             }
 
-            return (Parish)id;
+            return (DsParish)id;
         }
 
-        public static Province? GetProvince(this string provinceId)
+        public static DsProvince? GetProvince(this string provinceId)
         {
             if (string.IsNullOrEmpty(provinceId)) return null;
 
@@ -49,7 +49,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
                 return null;
             }
 
-            return (Province)id;
+            return (DsProvince)id;
         }
     }
 }

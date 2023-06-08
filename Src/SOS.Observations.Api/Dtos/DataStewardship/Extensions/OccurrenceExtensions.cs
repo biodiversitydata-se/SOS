@@ -12,159 +12,159 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
 {
     public static class OccurrenceExtensions
     {
-        private static Activity? GetActivityEnum(ActivityId? activityId)
+        private static DsActivity? GetActivityEnum(ActivityId? activityId)
         {
             if (activityId == null) return null;
 
             return activityId.Value switch
             {
-                ActivityId.AgitatedBehaviour => Activity.UpprördVarnande,
-                ActivityId.BreedingFailed => Activity.MisslyckadHäckning,
-                ActivityId.BuildingNestOrUsedNestOrNest => Activity.Bobygge,
-                ActivityId.Call => Activity.LockläteÖvrigaLäten,
-                ActivityId.CarryingFoodForYoung => Activity.FödaÅtUngar,
-                ActivityId.DeadCollidedWithAeroplane => Activity.Död,
-                ActivityId.DeadCollidedWithFence => Activity.Död,
-                ActivityId.DeadCollidedWithLighthouse => Activity.Död,
-                ActivityId.DeadCollidedWithPowerLine => Activity.Död,
-                ActivityId.DeadCollidedWithWindMill => Activity.Död,
-                ActivityId.DeadCollidedWithWindow => Activity.Död,
-                ActivityId.DeadDueToDiseaseOrStarvation => Activity.Död,
-                ActivityId.Display => Activity.SpelSång,
-                ActivityId.DisplayOrSong => Activity.SpelSång,
-                ActivityId.DisplayOrSongOutsideBreeding => Activity.SpelSångEjHäckning,
-                ActivityId.DisputeBetweenMales => Activity.Revirhävdande,
-                ActivityId.DistractionDisplay => Activity.AvledningsbeteendeEnum,
-                ActivityId.Dormant => Activity.Vilande,
-                ActivityId.EggLaying => Activity.Äggläggande,
-                ActivityId.EggShells => Activity.Äggskal,
-                ActivityId.FlyingOverhead => Activity.Förbiflygande,
-                ActivityId.Foraging => Activity.Födosökande,
-                ActivityId.FoundDead => Activity.Död,
-                ActivityId.Fragment => Activity.Fragment,
-                ActivityId.Freeflying => Activity.Friflygande,
-                ActivityId.FreshGnaw => Activity.FärskaGnagspår,
-                ActivityId.Gnaw => Activity.ÄldreGnagspår,
-                ActivityId.Incubating => Activity.Ruvande,
-                ActivityId.InNestingHabitat => Activity.ObsIHäcktidLämpligBiotop,
-                ActivityId.InWater => Activity.IVattenSimmande,
-                ActivityId.InWaterOrSwimming => Activity.IVattenSimmande,
-                ActivityId.KilledByElectricity => Activity.Död,
-                ActivityId.KilledByOil => Activity.Död,
-                ActivityId.KilledByPredator => Activity.Död,
-                ActivityId.MatingOrMatingCeremonies => Activity.Parning,
-                ActivityId.Migrating => Activity.Sträckande,
-                ActivityId.MigratingE => Activity.Sträckande,
-                ActivityId.MigratingFish => Activity.Sträckande,
-                ActivityId.MigratingN => Activity.Sträckande,
-                ActivityId.MigratingNE => Activity.Sträckande,
-                ActivityId.MigratingNW => Activity.Sträckande,
-                ActivityId.MigratingS => Activity.Sträckande,
-                ActivityId.MigratingSE => Activity.Sträckande,
-                ActivityId.MigratingSW => Activity.Sträckande,
-                ActivityId.MigratingW => Activity.Sträckande,
-                ActivityId.NestBuilding => Activity.Bobygge,
-                ActivityId.NestWithChickHeard => Activity.BoHördaUngar,
-                ActivityId.NestWithEgg => Activity.BoÄggUngar,
-                ActivityId.OldNest => Activity.AnväntBo,
-                ActivityId.PairInSuitableHabitat => Activity.ParILämpligHäckbiotop,
-                ActivityId.PermanentTerritory => Activity.PermanentRevir,
-                ActivityId.PregnantFemale => Activity.DräktigHona,
-                ActivityId.RecentlyFledgedYoung => Activity.PulliNyligenFlyggaUngar,
-                ActivityId.RecentlyUsedNest => Activity.AnväntBo,
-                ActivityId.RoadKill => Activity.Död,
-                ActivityId.RunningOrCrawling => Activity.FrispringandeKrypande,
-                ActivityId.ShotOrKilled => Activity.Död,
-                ActivityId.SignsOfGnawing => Activity.FärskaGnagspår,
-                ActivityId.Staging => Activity.Rastande,
-                ActivityId.Stationary => Activity.Stationär,
-                ActivityId.Territorial => Activity.Revirhävdande,
-                ActivityId.TerritoryOutsideBreeding => Activity.Revirhävdande,
-                ActivityId.VisitingOccupiedNest => Activity.BesökerBebottBo,
-                ActivityId.VisitPossibleNest => Activity.Bobesök,
-                ActivityId.WinterHabitat => Activity.PåÖvervintringsplats,
+                ActivityId.AgitatedBehaviour => DsActivity.UpprördVarnande,
+                ActivityId.BreedingFailed => DsActivity.MisslyckadHäckning,
+                ActivityId.BuildingNestOrUsedNestOrNest => DsActivity.Bobygge,
+                ActivityId.Call => DsActivity.LockläteÖvrigaLäten,
+                ActivityId.CarryingFoodForYoung => DsActivity.FödaÅtUngar,
+                ActivityId.DeadCollidedWithAeroplane => DsActivity.Död,
+                ActivityId.DeadCollidedWithFence => DsActivity.Död,
+                ActivityId.DeadCollidedWithLighthouse => DsActivity.Död,
+                ActivityId.DeadCollidedWithPowerLine => DsActivity.Död,
+                ActivityId.DeadCollidedWithWindMill => DsActivity.Död,
+                ActivityId.DeadCollidedWithWindow => DsActivity.Död,
+                ActivityId.DeadDueToDiseaseOrStarvation => DsActivity.Död,
+                ActivityId.Display => DsActivity.SpelSång,
+                ActivityId.DisplayOrSong => DsActivity.SpelSång,
+                ActivityId.DisplayOrSongOutsideBreeding => DsActivity.SpelSångEjHäckning,
+                ActivityId.DisputeBetweenMales => DsActivity.Revirhävdande,
+                ActivityId.DistractionDisplay => DsActivity.AvledningsbeteendeEnum,
+                ActivityId.Dormant => DsActivity.Vilande,
+                ActivityId.EggLaying => DsActivity.Äggläggande,
+                ActivityId.EggShells => DsActivity.Äggskal,
+                ActivityId.FlyingOverhead => DsActivity.Förbiflygande,
+                ActivityId.Foraging => DsActivity.Födosökande,
+                ActivityId.FoundDead => DsActivity.Död,
+                ActivityId.Fragment => DsActivity.Fragment,
+                ActivityId.Freeflying => DsActivity.Friflygande,
+                ActivityId.FreshGnaw => DsActivity.FärskaGnagspår,
+                ActivityId.Gnaw => DsActivity.ÄldreGnagspår,
+                ActivityId.Incubating => DsActivity.Ruvande,
+                ActivityId.InNestingHabitat => DsActivity.ObsIHäcktidLämpligBiotop,
+                ActivityId.InWater => DsActivity.IVattenSimmande,
+                ActivityId.InWaterOrSwimming => DsActivity.IVattenSimmande,
+                ActivityId.KilledByElectricity => DsActivity.Död,
+                ActivityId.KilledByOil => DsActivity.Död,
+                ActivityId.KilledByPredator => DsActivity.Död,
+                ActivityId.MatingOrMatingCeremonies => DsActivity.Parning,
+                ActivityId.Migrating => DsActivity.Sträckande,
+                ActivityId.MigratingE => DsActivity.Sträckande,
+                ActivityId.MigratingFish => DsActivity.Sträckande,
+                ActivityId.MigratingN => DsActivity.Sträckande,
+                ActivityId.MigratingNE => DsActivity.Sträckande,
+                ActivityId.MigratingNW => DsActivity.Sträckande,
+                ActivityId.MigratingS => DsActivity.Sträckande,
+                ActivityId.MigratingSE => DsActivity.Sträckande,
+                ActivityId.MigratingSW => DsActivity.Sträckande,
+                ActivityId.MigratingW => DsActivity.Sträckande,
+                ActivityId.NestBuilding => DsActivity.Bobygge,
+                ActivityId.NestWithChickHeard => DsActivity.BoHördaUngar,
+                ActivityId.NestWithEgg => DsActivity.BoÄggUngar,
+                ActivityId.OldNest => DsActivity.AnväntBo,
+                ActivityId.PairInSuitableHabitat => DsActivity.ParILämpligHäckbiotop,
+                ActivityId.PermanentTerritory => DsActivity.PermanentRevir,
+                ActivityId.PregnantFemale => DsActivity.DräktigHona,
+                ActivityId.RecentlyFledgedYoung => DsActivity.PulliNyligenFlyggaUngar,
+                ActivityId.RecentlyUsedNest => DsActivity.AnväntBo,
+                ActivityId.RoadKill => DsActivity.Död,
+                ActivityId.RunningOrCrawling => DsActivity.FrispringandeKrypande,
+                ActivityId.ShotOrKilled => DsActivity.Död,
+                ActivityId.SignsOfGnawing => DsActivity.FärskaGnagspår,
+                ActivityId.Staging => DsActivity.Rastande,
+                ActivityId.Stationary => DsActivity.Stationär,
+                ActivityId.Territorial => DsActivity.Revirhävdande,
+                ActivityId.TerritoryOutsideBreeding => DsActivity.Revirhävdande,
+                ActivityId.VisitingOccupiedNest => DsActivity.BesökerBebottBo,
+                ActivityId.VisitPossibleNest => DsActivity.Bobesök,
+                ActivityId.WinterHabitat => DsActivity.PåÖvervintringsplats,
                 _ => null
             };
         }
 
-        private static BasisOfRecord GetBasisOfRecordEnum(BasisOfRecordId? basisOfRecordId)
+        private static DsBasisOfRecord GetBasisOfRecordEnum(BasisOfRecordId? basisOfRecordId)
         {
             return basisOfRecordId switch
             {
-                BasisOfRecordId.HumanObservation => BasisOfRecord.MänskligObservation,
-                BasisOfRecordId.MachineObservation => BasisOfRecord.MaskinellObservation,
-                BasisOfRecordId.MaterialSample => BasisOfRecord.FysisktProv,
-                _ => BasisOfRecord.Okänt
+                BasisOfRecordId.HumanObservation => DsBasisOfRecord.MänskligObservation,
+                BasisOfRecordId.MachineObservation => DsBasisOfRecord.MaskinellObservation,
+                BasisOfRecordId.MaterialSample => DsBasisOfRecord.FysisktProv,
+                _ => DsBasisOfRecord.Okänt
             };
         }
 
-        private static LifeStage? GetLifeStageEnum(LifeStageId? lifeStageId)
+        private static DsLifeStage? GetLifeStageEnum(LifeStageId? lifeStageId)
         {
             if (lifeStageId == null) return null;
 
             return lifeStageId switch
             {
-                LifeStageId.Adult => LifeStage.Adult,
-                LifeStageId.AtLeast1StCalendarYear => LifeStage._1KPlus,
-                LifeStageId.AtLeast2NdCalendarYear => LifeStage._2KPlus,
-                LifeStageId.AtLeast3RdCalendarYear => LifeStage._3KPlus,
-                LifeStageId.AtLeast4ThCalendarYear => LifeStage._4KPlus,
-                LifeStageId.BudBurst => LifeStage.Knoppbristning,
-                LifeStageId.Cub => LifeStage.Årsunge,
-                LifeStageId.Egg => LifeStage.Ägg,
-                LifeStageId.FirstCalendarYear => LifeStage._1K,
-                LifeStageId.Flowering => LifeStage.Blomning,
-                LifeStageId.FourthCalendarYear => LifeStage._4K,
-                LifeStageId.FourthCalendarYearOrYounger => LifeStage._4KMinus,
-                LifeStageId.FullyDevelopedLeaf => LifeStage.FulltUtveckladeBlad,
-                LifeStageId.ImagoOrAdult => LifeStage.ImagoAdult,
-                LifeStageId.Juvenile => LifeStage.Juvenil,
-                LifeStageId.Larvae => LifeStage.Larv,
-                LifeStageId.LarvaOrNymph => LifeStage.LarvNymf,
-                LifeStageId.LeafCutting => LifeStage.GulnadeLövBlad,
-                LifeStageId.Nestling => LifeStage.Pulli,
-                LifeStageId.OnePlus => LifeStage._1KPlus,
-                LifeStageId.Overblown => LifeStage.Överblommad,
-                LifeStageId.Pupa => LifeStage.Puppa,
-                LifeStageId.Rest => LifeStage.Vilstadium,
-                LifeStageId.SecondCalendarYear => LifeStage._2K,
-                LifeStageId.Sprout => LifeStage.MedGroddkorn,
-                LifeStageId.ThirdCalendarYear => LifeStage._3K,
-                LifeStageId.ThirdCalendarYearOrYounger => LifeStage._3KMinus,
-                LifeStageId.WithCapsule => LifeStage.MedKapsel,
-                LifeStageId.WithFemaleParts => LifeStage.MedHonorgan,
-                LifeStageId.WithoutCapsule => LifeStage.UtanKapsel,
-                LifeStageId.YellowingLeaves => LifeStage.GulnadeLövBlad,
-                LifeStageId.ZeroPlus => LifeStage.Årsyngel,
+                LifeStageId.Adult => DsLifeStage.Adult,
+                LifeStageId.AtLeast1StCalendarYear => DsLifeStage._1KPlus,
+                LifeStageId.AtLeast2NdCalendarYear => DsLifeStage._2KPlus,
+                LifeStageId.AtLeast3RdCalendarYear => DsLifeStage._3KPlus,
+                LifeStageId.AtLeast4ThCalendarYear => DsLifeStage._4KPlus,
+                LifeStageId.BudBurst => DsLifeStage.Knoppbristning,
+                LifeStageId.Cub => DsLifeStage.Årsunge,
+                LifeStageId.Egg => DsLifeStage.Ägg,
+                LifeStageId.FirstCalendarYear => DsLifeStage._1K,
+                LifeStageId.Flowering => DsLifeStage.Blomning,
+                LifeStageId.FourthCalendarYear => DsLifeStage._4K,
+                LifeStageId.FourthCalendarYearOrYounger => DsLifeStage._4KMinus,
+                LifeStageId.FullyDevelopedLeaf => DsLifeStage.FulltUtveckladeBlad,
+                LifeStageId.ImagoOrAdult => DsLifeStage.ImagoAdult,
+                LifeStageId.Juvenile => DsLifeStage.Juvenil,
+                LifeStageId.Larvae => DsLifeStage.Larv,
+                LifeStageId.LarvaOrNymph => DsLifeStage.LarvNymf,
+                LifeStageId.LeafCutting => DsLifeStage.GulnadeLövBlad,
+                LifeStageId.Nestling => DsLifeStage.Pulli,
+                LifeStageId.OnePlus => DsLifeStage._1KPlus,
+                LifeStageId.Overblown => DsLifeStage.Överblommad,
+                LifeStageId.Pupa => DsLifeStage.Puppa,
+                LifeStageId.Rest => DsLifeStage.Vilstadium,
+                LifeStageId.SecondCalendarYear => DsLifeStage._2K,
+                LifeStageId.Sprout => DsLifeStage.MedGroddkorn,
+                LifeStageId.ThirdCalendarYear => DsLifeStage._3K,
+                LifeStageId.ThirdCalendarYearOrYounger => DsLifeStage._3KMinus,
+                LifeStageId.WithCapsule => DsLifeStage.MedKapsel,
+                LifeStageId.WithFemaleParts => DsLifeStage.MedHonorgan,
+                LifeStageId.WithoutCapsule => DsLifeStage.UtanKapsel,
+                LifeStageId.YellowingLeaves => DsLifeStage.GulnadeLövBlad,
+                LifeStageId.ZeroPlus => DsLifeStage.Årsyngel,
                 _ => null
             };
         }
 
-        private static QuantityVariable? GetQuantityVariableEnum(UnitId unitId)
+        private static DsQuantityVariable? GetQuantityVariableEnum(UnitId unitId)
         {
             return unitId switch
             {
-                UnitId.CoverClass => QuantityVariable.Yttäckning,
-                UnitId.CoverPercentage => QuantityVariable.Täckningsgrad,
-                UnitId.Individuals => QuantityVariable.AntalIndivider,
-                UnitId.Fruitbodies => QuantityVariable.AntalFruktkroppar,
-                UnitId.Capsules => QuantityVariable.AntalKapslar,
-                UnitId.Plants => QuantityVariable.AntalPlantorTuvor,
-                UnitId.Stems => QuantityVariable.AntalStjälkarStrånSkott,
-                UnitId.EggClusters => QuantityVariable.AntalÄggklumpar,
+                UnitId.CoverClass => DsQuantityVariable.Yttäckning,
+                UnitId.CoverPercentage => DsQuantityVariable.Täckningsgrad,
+                UnitId.Individuals => DsQuantityVariable.AntalIndivider,
+                UnitId.Fruitbodies => DsQuantityVariable.AntalFruktkroppar,
+                UnitId.Capsules => DsQuantityVariable.AntalKapslar,
+                UnitId.Plants => DsQuantityVariable.AntalPlantorTuvor,
+                UnitId.Stems => DsQuantityVariable.AntalStjälkarStrånSkott,
+                UnitId.EggClusters => DsQuantityVariable.AntalÄggklumpar,
                 _ => null
             };
         }
 
-        private static Sex? GetSexEnum(SexId? sexId)
+        private static DsSex? GetSexEnum(SexId? sexId)
         {
             if (sexId == null) return null;
 
             return sexId.Value switch
             {
-                SexId.Male => Sex.Hane,
-                SexId.Female => Sex.Hona,
-                SexId.InPair => Sex.IPar,
+                SexId.Male => DsSex.Hane,
+                SexId.Female => DsSex.Hona,
+                SexId.InPair => DsSex.IPar,
                 _ => null!
             };
         }
@@ -174,7 +174,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
         /// </summary>
         /// <param name="occurrence"></param>
         /// <returns></returns>
-        public static byte[] ToCsv(this OccurrenceDto occurrence)
+        public static byte[] ToCsv(this DsOccurrenceDto occurrence)
         {
             if (occurrence == null)
             {
@@ -189,7 +189,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
         /// </summary>
         /// <param name="occurrences"></param>
         /// <returns></returns>
-        public static byte[] ToCsv(this IEnumerable<OccurrenceDto> occurrences)
+        public static byte[] ToCsv(this IEnumerable<DsOccurrenceDto> occurrences)
         {
             if (!occurrences?.Any() ?? true)
             {
@@ -256,9 +256,9 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             return csv;
         }
 
-        public static OccurrenceDto ToDto(this Lib.Models.Processed.Observation.Observation observation, CoordinateSys responseCoordinateSystem)
+        public static DsOccurrenceDto ToDto(this Lib.Models.Processed.Observation.Observation observation, CoordinateSys responseCoordinateSystem)
         {
-            var occurrence = new OccurrenceDto();
+            var occurrence = new DsOccurrenceDto();
             occurrence.AssociatedMedia = observation.Occurrence?.Media.ToDtos();
             if (observation?.BasisOfRecord?.Id != null)
             {
@@ -266,7 +266,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             }
 
             occurrence.EventID = observation.Event.EventId;
-            occurrence.Dataset ??= new DatasetInfoDto();
+            occurrence.Dataset ??= new DsDatasetInfoDto();
             occurrence.Dataset.Identifier = observation?.DataStewardship?.DatasetIdentifier;
             occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
             occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
@@ -276,7 +276,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;
             occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
             occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
-            occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? OccurrenceStatus.Observerad : OccurrenceStatus.InteObserverad;
+            occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? DsOccurrenceStatus.Observerad : DsOccurrenceStatus.InteObserverad;
             occurrence.Quantity = Convert.ToDouble(observation.Occurrence.OrganismQuantityInt);
             if (observation?.Occurrence?.OrganismQuantityUnit?.Id != null)
             {
@@ -285,7 +285,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             occurrence.Taxon = observation?.Taxon?.ToDto();
 
             //occurrence.Unit = ?
-            occurrence.Organism = new OrganismVariableDto
+            occurrence.Organism = new DsOrganismVariableDto
             {
                 Sex = observation?.Occurrence?.Sex?.Id == null ? null : GetSexEnum((SexId)observation.Occurrence.Sex.Id),
                 Activity = observation?.Occurrence?.Activity?.Id == null ? null : GetActivityEnum((ActivityId)observation.Occurrence.Activity.Id),

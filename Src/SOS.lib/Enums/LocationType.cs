@@ -1,9 +1,16 @@
-﻿namespace SOS.Lib.Enums
+﻿//using Elasticsearch.Net;
+//using System.Runtime.Serialization;
+
+namespace SOS.Lib.Enums
 {
+    //[StringEnum]
     public enum LocationType
     {
-        Unknown = 0,
-        Point = 1,
-        Polygon = 2
+        //  [EnumMember(Value = "Unknown")]
+        Unknown,
+        //  [EnumMember(Value = "Point")]
+        Point,
+        //  [EnumMember(Value = "Polygon")]
+        Polygon
     }
 }

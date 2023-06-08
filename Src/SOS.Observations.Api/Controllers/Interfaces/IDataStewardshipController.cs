@@ -16,7 +16,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="id"></param>
         /// <param name="exportMode"></param>
         /// <returns></returns>
-        Task<IActionResult> GetDatasetByIdAsync(int? roleId, string authorizationApplicationIdentifier, string id, ExportMode exportMode);
+        Task<IActionResult> GetDatasetByIdAsync(int? roleId, string authorizationApplicationIdentifier, string id, DsExportMode exportMode);
 
         /// <summary>
         /// Search for datasets
@@ -29,7 +29,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="take"></param>
         /// <param name="exportMode"></param>
         /// <returns></returns>
-        Task<IActionResult> GetDatasetsBySearchAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBaseDto filter, bool validateSearchFilter, int skip, int take, ExportMode exportMode);
+        Task<IActionResult> GetDatasetsBySearchAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBaseDto filter, bool validateSearchFilter, int skip, int take, DsExportMode exportMode);
 
         /// <summary>
         /// Get a single event by id
@@ -40,7 +40,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="responseCoordinateSystem"></param>
         /// <param name="exportMode"></param>
         /// <returns></returns>
-        Task<IActionResult> GetEventByIdAsync(int? roleId, string authorizationApplicationIdentifier, string id, CoordinateSys responseCoordinateSystem, ExportMode exportMode);
+        Task<IActionResult> GetEventByIdAsync(int? roleId, string authorizationApplicationIdentifier, string id, CoordinateSys responseCoordinateSystem, DsExportMode exportMode);
 
         /// <summary>
         /// Search for events
@@ -54,7 +54,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="responseCoordinateSystem"></param>
         /// <param name="exportMode"></param>
         /// <returns></returns>
-        Task<IActionResult> GetEventsBySearchAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBaseDto filter, bool validateSearchFilter, int skip, int take, CoordinateSys responseCoordinateSystem, ExportMode exportMode);
+        Task<IActionResult> GetEventsBySearchAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBaseDto filter, bool validateSearchFilter, int skip, int take, CoordinateSys responseCoordinateSystem, DsExportMode exportMode);
 
         /// <summary>
         /// Get a occurrence by id
@@ -65,7 +65,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="responseCoordinateSystem"></param>
         /// <param name="exportMode"></param>
         /// <returns></returns>
-        Task<IActionResult> GetOccurrenceByIdAsync(int? roleId, string authorizationApplicationIdentifier, string id, CoordinateSys responseCoordinateSystem, ExportMode exportMode);
+        Task<IActionResult> GetOccurrenceByIdAsync(int? roleId, string authorizationApplicationIdentifier, string id, CoordinateSys responseCoordinateSystem, DsExportMode exportMode);
 
         /// <summary>
         /// Search for occurrences
@@ -79,6 +79,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="responseCoordinateSystem"></param>
         /// <param name="exportMode"></param>
         /// <returns></returns>
-        Task<IActionResult> GetOccurrencesBySearchAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBaseDto filter, bool validateSearchFilter, int skip, int take, CoordinateSys responseCoordinateSystem, ExportMode exportMode);
+        Task<IActionResult> GetOccurrencesBySearchAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBaseDto filter, bool validateSearchFilter, int skip, int take, CoordinateSys responseCoordinateSystem, DsExportMode exportMode);
     }
 }
