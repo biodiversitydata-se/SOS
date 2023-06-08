@@ -3,7 +3,6 @@ using System.Net;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Observations.Api.Controllers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -12,7 +11,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class JobsController : ControllerBase, IJobsController
+    public class JobsController : ControllerBase
     {
 
         private readonly ILogger<ExportsController> _logger;
@@ -26,7 +25,11 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Get status of job
+        /// </summary>
+        /// <param name="jobId">Job id returned when export was requested</param>
+        /// <returns></returns>
         [HttpGet("{jobId}/Status")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]

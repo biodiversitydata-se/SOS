@@ -20,7 +20,6 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Export;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Enum;
@@ -30,11 +29,11 @@ using SOS.Observations.Api.Managers.Interfaces;
 namespace SOS.Observations.Api.Controllers
 {
     /// <summary>
-    ///     Import job controller
+    /// Exports controller.
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class ExportsController : ObservationBaseController, IExportsController
+    public class ExportsController : ObservationBaseController
     {
         private readonly IBlobStorageManager _blobStorageManager;
         private readonly ICryptoService _cryptoService;
@@ -82,11 +81,11 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-            /// <summary>
-            /// Get user export info
-            /// </summary>
-            /// <returns></returns>
-            private async Task<UserExport> GetUserExportsAsync()
+        /// <summary>
+        /// Get user export info
+        /// </summary>
+        /// <returns></returns>
+        private async Task<UserExport> GetUserExportsAsync()
         {
             var userExport = await _userExportRepository.GetAsync(UserId);
             return userExport ?? new UserExport { Id = UserId, Limit = _defaultUserExportLimit };

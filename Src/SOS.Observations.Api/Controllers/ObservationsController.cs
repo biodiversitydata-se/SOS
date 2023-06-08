@@ -18,7 +18,6 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
@@ -35,7 +34,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class ObservationsController : ObservationBaseController, IObservationsController
+    public class ObservationsController : ObservationBaseController
     {
         private readonly ITaxonSearchManager _taxonSearchManager;
         private readonly int _tilesLimit;
@@ -1706,7 +1705,16 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Signal search
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="areaBuffer">Are buffer 0 to 100m.</param>
+        /// <param name="onlyAboveMyClearance">If true, get signal only above users clearance.</param>
+        /// <returns></returns>
         [HttpPost("Internal/SignalSearch")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -1980,6 +1988,12 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Count current users observations group by year
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <returns></returns>
         [HttpPost("Internal/CurrentUser/YearCount")]
         [ProducesResponseType(typeof(IEnumerable<YearCountResultDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -2030,6 +2044,12 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Count current users observations group by year and month
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <returns></returns>
         [HttpPost("Internal/CurrentUser/YearMonthCount")]
         [ProducesResponseType(typeof(IEnumerable<YearMonthCountResultDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -2080,6 +2100,13 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Count current users observations group by year, month and day
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="validateSearchFilter"></param>
         [HttpPost("Internal/CurrentUser/YearMonthDayCount")]
         [ProducesResponseType(typeof(IEnumerable<YearMonthDayCountResultDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
