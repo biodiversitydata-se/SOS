@@ -34,7 +34,7 @@ namespace SOS.Lib.HangfireAttributes
                 var distributedLock = filterContext.Connection.AcquireDistributedLock(resource, TimeSpan.FromSeconds(_timeoutSeconds));
                 filterContext.Items[DistributedLock] = distributedLock;
             }
-            catch (Exception ex)
+            catch
             {
                 filterContext.Canceled = true;
             }
