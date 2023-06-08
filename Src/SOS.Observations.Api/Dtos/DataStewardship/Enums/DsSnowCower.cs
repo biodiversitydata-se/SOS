@@ -5,7 +5,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Enums
     /// <summary>
     /// States the snow conditions on the ground during the survey event.
     /// </summary>
-    public enum SnowCover
+    public enum DsSnowCover
     {
         /// <summary>
         /// barmark

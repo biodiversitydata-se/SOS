@@ -10,7 +10,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship
         /// <summary>
         /// States the snow conditions on the ground during the survey event.
         /// </summary>
-        public SnowCover? SnowCover { get; set; }
+        public DsSnowCover? SnowCover { get; set; }
 
         /// <summary>
         /// States the amount of sunshine during the survey event.

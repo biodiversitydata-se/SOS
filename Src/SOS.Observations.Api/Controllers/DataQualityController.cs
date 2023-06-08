@@ -34,7 +34,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Data quality report.
         /// </summary>
-        /// <param name="organismGroup">OrganismgGroup filter.</param>
+        /// <param name="organismGroup">Organism group filter.</param>
         /// <returns>List of observations that can be duplicates</returns>
         [HttpGet("report/{organismGroup}")]
         [ProducesResponseType(typeof(DataQualityReport), (int) HttpStatusCode.OK)]
