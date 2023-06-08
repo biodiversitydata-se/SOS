@@ -201,7 +201,7 @@ namespace SOS.Observations.Api
                     // can also be used to control the format of the API version in route templates
                     options.SubstituteApiVersionInUrl = true;
                 });
-
+            
             var apiVersionDescriptionProvider =
                 services.BuildServiceProvider().GetService<IApiVersionDescriptionProvider>();
             services.AddSwaggerGen(
@@ -226,8 +226,9 @@ namespace SOS.Observations.Api
                                 Title = $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}",
                                 Version = description.ApiVersion.ToString(),
                                 Description = "Species Observation System (SOS) - Observations API. Public API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
-                            });
-                        swagger.CustomSchemaIds(type => type.ToString());
+                            });                        
+                        //var schemaHelper = new SwashbuckleSchemaHelper();
+                        //swagger.CustomSchemaIds(type => schemaHelper.GetSchemaId(type)); // temporarily used when checking for schema duplicates.
                         swagger.CustomOperationIds(apiDesc =>
                         {
                             apiDesc.TryGetMethodInfo(out MethodInfo methodInfo);

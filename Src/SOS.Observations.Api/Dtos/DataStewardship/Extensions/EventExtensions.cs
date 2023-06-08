@@ -14,7 +14,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
-        public static byte[] ToCsv(this EventDto @event)
+        public static byte[] ToCsv(this DsEventDto @event)
         {
             if (@event == null)
             {
@@ -29,7 +29,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
         /// </summary>
         /// <param name="events"></param>
         /// <returns></returns>
-        public static byte[] ToCsv(this IEnumerable<EventDto> events)
+        public static byte[] ToCsv(this IEnumerable<DsEventDto> events)
         {
             if (!events?.Any() ?? true)
             {
@@ -84,15 +84,15 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             return csv;
         }
 
-        public static EventDto ToEventDto(this Lib.Models.Processed.Observation.Observation observation, IEnumerable<string> occurrenceIds, CoordinateSys responseCoordinateSystem)
+        public static DsEventDto ToEventDto(this Lib.Models.Processed.Observation.Observation observation, IEnumerable<string> occurrenceIds, CoordinateSys responseCoordinateSystem)
         {
             if (observation == null) return null;
-            var ev = new EventDto();
+            var ev = new DsEventDto();
             ev.EventID = observation.Event.EventId;
             ev.ParentEventID = observation.Event.ParentEventId;
             ev.EventRemarks = observation.Event.EventRemarks;
             ev.AssociatedMedia = observation.Event.Media.ToDtos();
-            ev.Dataset = new DatasetInfoDto
+            ev.Dataset = new DsDatasetInfoDto
             {
                 Identifier = observation.DataStewardship?.DatasetIdentifier
                 //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event
@@ -111,9 +111,9 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             };
             if (observation?.InstitutionCode?.Value != null || !string.IsNullOrEmpty(observation.InstitutionId))
             {
-                ev.RecorderOrganisation = new List<OrganisationDto>
+                ev.RecorderOrganisation = new List<DsOrganisationDto>
                 {
-                    new OrganisationDto
+                    new DsOrganisationDto
                     {
                         OrganisationID = observation?.InstitutionId,
                         OrganisationCode = observation?.InstitutionCode?.Value
@@ -127,11 +127,11 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             return ev;
         }
 
-        public static EventDto ToEventDto(this Event observationEvent, CoordinateSys responseCoordinateSystem)
+        public static DsEventDto ToEventDto(this Event observationEvent, CoordinateSys responseCoordinateSystem)
         {
             if (observationEvent == null) return null;
 
-            var ev = new EventDto();
+            var ev = new DsEventDto();
             ev.EventID = observationEvent.EventId;
             ev.ParentEventID = observationEvent.ParentEventId;
             ev.EventRemarks = observationEvent.EventRemarks;

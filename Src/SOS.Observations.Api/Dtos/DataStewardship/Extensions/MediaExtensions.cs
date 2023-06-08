@@ -23,16 +23,16 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             return AssociatedMediaType.Bild; // default
         }
 
-        public static List<AssociatedMediaDto> ToDtos(this IEnumerable<Multimedia> multimedias)
+        public static List<DsAssociatedMediaDto> ToDtos(this IEnumerable<Multimedia> multimedias)
         {
             if (multimedias == null || !multimedias.Any()) return null;
             return multimedias.Select(m => m.ToDto()).ToList();
         }
 
-        public static AssociatedMediaDto ToDto(this Multimedia multimedia)
+        public static DsAssociatedMediaDto ToDto(this Multimedia multimedia)
         {
             if (multimedia == null) return null;
-            return new AssociatedMediaDto
+            return new DsAssociatedMediaDto
             {
                 AssociatedMediaName = multimedia.Title,
                 AssociatedMediaType = GetAssociatedMediaTypeEnum(multimedia.Format),

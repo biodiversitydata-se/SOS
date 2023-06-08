@@ -4,9 +4,9 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
 {
     public static class TaxonExtensions
     {
-        public static TaxonDto ToDto(this Taxon taxon)
+        public static DsTaxonDto ToDto(this Taxon taxon)
         {
-            return new TaxonDto
+            return new DsTaxonDto
             {
                 ScientificName = taxon.ScientificName,
                 TaxonID = taxon.Id.ToString(),

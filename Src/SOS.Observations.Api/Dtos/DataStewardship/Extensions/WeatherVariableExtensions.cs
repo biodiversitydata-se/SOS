@@ -5,14 +5,14 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
 {
     public static class WeatherVariableExtensions
     {
-        private static Cloudiness ToCloudiness(this Lib.Models.Processed.DataStewardship.Enums.Cloudiness source)
+        private static DsCloudiness ToCloudiness(this Lib.Models.Processed.DataStewardship.Enums.Cloudiness source)
         {
-            return (Cloudiness)source;
+            return (DsCloudiness)source;
         }
 
-        private static Precipitation ToPrecipitation(this Lib.Models.Processed.DataStewardship.Enums.Precipitation source)
+        private static DsPrecipitation ToPrecipitation(this Lib.Models.Processed.DataStewardship.Enums.Precipitation source)
         {
-            return (Precipitation)source;
+            return (DsPrecipitation)source;
         }
 
         private static SnowCover ToSnowCover(this Lib.Models.Processed.DataStewardship.Enums.SnowCover source)
@@ -20,42 +20,42 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             return (SnowCover)source;
         }
 
-        private static Unit ToUnit(this Lib.Models.Processed.DataStewardship.Enums.Unit source)
+        private static DsUnit ToUnit(this Lib.Models.Processed.DataStewardship.Enums.Unit source)
         {
-            return (Unit)source;
+            return (DsUnit)source;
         }
 
-        private static Visibility ToVisibility(this Lib.Models.Processed.DataStewardship.Enums.Visibility source)
+        private static DsVisibility ToVisibility(this Lib.Models.Processed.DataStewardship.Enums.Visibility source)
         {
-            return (Visibility)source;
+            return (DsVisibility)source;
         }
 
-        private static WeatherMeasuringDto ToWeatherMeasuring(this WeatherMeasuring source)
+        private static DsWeatherMeasuringDto ToWeatherMeasuring(this WeatherMeasuring source)
         {
             if (source == null) return null;
 
-            return new WeatherMeasuringDto
+            return new DsWeatherMeasuringDto
             {
                 Unit = source.Unit?.ToUnit(),
                 WeatherMeasure = source.WeatherMeasure
             };
         }
 
-        private static WindDirectionCompass ToWindDirectionCompass(this Lib.Models.Processed.DataStewardship.Enums.WindDirectionCompass source)
+        private static DsWindDirectionCompass ToWindDirectionCompass(this Lib.Models.Processed.DataStewardship.Enums.WindDirectionCompass source)
         {
-            return (WindDirectionCompass)source;
+            return (DsWindDirectionCompass)source;
         }
 
-        private static WindStrength ToWindStrength(this Lib.Models.Processed.DataStewardship.Enums.WindStrength source)
+        private static DsWindStrength ToWindStrength(this Lib.Models.Processed.DataStewardship.Enums.WindStrength source)
         {
-            return (WindStrength)source;
+            return (DsWindStrength)source;
         }
 
-        public static WeatherVariableDto ToDto(this WeatherVariable source)
+        public static DsWeatherVariableDto ToDto(this WeatherVariable source)
         {
             if (source == null) return null;
 
-            return new WeatherVariableDto
+            return new DsWeatherVariableDto
             {
 
                 SnowCover = source.SnowCover?.ToSnowCover(),

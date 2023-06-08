@@ -57,14 +57,14 @@ namespace SOS.Observations.Api.Controllers
 
         /// <inheritdoc/>
         [HttpGet("datasets/{id}")]
-        [ProducesResponseType(typeof(DatasetDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(DsDatasetDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetDatasetByIdAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromRoute] string id, 
-            [FromQuery] ExportMode exportMode = ExportMode.Json
+            [FromQuery] DsExportMode exportMode = DsExportMode.Json
         )
         {
             try
@@ -72,7 +72,7 @@ namespace SOS.Observations.Api.Controllers
                 var dataset = await _dataStewardshipManager.GetDatasetByIdAsync(id);
                 if (dataset == null) return new StatusCodeResult((int)HttpStatusCode.NoContent);
 
-                return exportMode.Equals(ExportMode.Csv) ?
+                return exportMode.Equals(DsExportMode.Csv) ?
                     File(dataset.ToCsv(), "text/tab-separated-values", "dataset.csv") :
                     new OkObjectResult(dataset);
             }
@@ -96,7 +96,7 @@ namespace SOS.Observations.Api.Controllers
 
         // <inheritdoc/>
         [HttpPost("datasets")]
-        [ProducesResponseType(typeof(IEnumerable<DatasetDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<DsDatasetDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetDatasetsBySearchAsync(
@@ -106,7 +106,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] int skip = 0, 
             [FromQuery] int take = 100,
-            [FromQuery] ExportMode exportMode = ExportMode.Json
+            [FromQuery] DsExportMode exportMode = DsExportMode.Json
         )
         {
             try
@@ -124,7 +124,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var result = await _dataStewardshipManager.GetDatasetsBySearchAsync(searchFilter, skip, take);
 
-                return exportMode.Equals(ExportMode.Csv) ?
+                return exportMode.Equals(DsExportMode.Csv) ?
                     File(result.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") :
                     new OkObjectResult(result);
             }
@@ -148,7 +148,7 @@ namespace SOS.Observations.Api.Controllers
 
         // <inheritdoc/>
         [HttpGet("events/{id}")]
-        [ProducesResponseType(typeof(EventDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(DsEventDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetEventByIdAsync(
@@ -156,7 +156,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromRoute] string id,
             [FromQuery] CoordinateSys responseCoordinateSystem = CoordinateSys.WGS84,
-            [FromQuery] ExportMode exportMode = ExportMode.Json
+            [FromQuery] DsExportMode exportMode = DsExportMode.Json
         )
         {
             try
@@ -164,7 +164,7 @@ namespace SOS.Observations.Api.Controllers
                 var @event = await _dataStewardshipManager.GetEventByIdAsync(id, responseCoordinateSystem);
                 if (@event == null) return new StatusCodeResult((int)HttpStatusCode.NoContent);
 
-                return exportMode.Equals(ExportMode.Csv) ?
+                return exportMode.Equals(DsExportMode.Csv) ?
                     File(@event.ToCsv(), "text/tab-separated-values", "event.csv") :
                     new OkObjectResult(@event);
             }
@@ -188,7 +188,7 @@ namespace SOS.Observations.Api.Controllers
 
         // <inheritdoc/>
         [HttpPost("events")]
-        [ProducesResponseType(typeof(IEnumerable<EventDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<DsEventDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetEventsBySearchAsync(
@@ -199,7 +199,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
             [FromQuery] CoordinateSys responseCoordinateSystem = CoordinateSys.WGS84,
-            [FromQuery] ExportMode exportMode = ExportMode.Json
+            [FromQuery] DsExportMode exportMode = DsExportMode.Json
         )
         {
             try
@@ -217,7 +217,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var result = await _dataStewardshipManager.GetEventsBySearchAsync(searchFilter, skip, take, responseCoordinateSystem);
 
-                return exportMode.Equals(ExportMode.Csv) ?
+                return exportMode.Equals(DsExportMode.Csv) ?
                     File(result.Records.ToCsv(), "text/tab-separated-values", "events.csv") :
                     new OkObjectResult(result);
             }
@@ -241,7 +241,7 @@ namespace SOS.Observations.Api.Controllers
 
         // <inheritdoc/>
         [HttpGet("occurrences/{id}")]
-        [ProducesResponseType(typeof(OccurrenceDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(DsOccurrenceDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetOccurrenceByIdAsync(
@@ -249,7 +249,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromRoute] string id,
             [FromQuery] CoordinateSys responseCoordinateSystem = CoordinateSys.WGS84,
-            [FromQuery] ExportMode exportMode = ExportMode.Json
+            [FromQuery] DsExportMode exportMode = DsExportMode.Json
         )
         {
             try
@@ -257,7 +257,7 @@ namespace SOS.Observations.Api.Controllers
                 var occurrence = await _dataStewardshipManager.GetOccurrenceByIdAsync(id, responseCoordinateSystem);
                 if (occurrence == null) return new StatusCodeResult((int)HttpStatusCode.NoContent);
 
-                return exportMode.Equals(ExportMode.Csv) ?
+                return exportMode.Equals(DsExportMode.Csv) ?
                     File(occurrence.ToCsv(), "text/tab-separated-values", "event.csv") :
                     new OkObjectResult(occurrence);
             }
@@ -281,7 +281,7 @@ namespace SOS.Observations.Api.Controllers
 
         // <inheritdoc/>
         [HttpPost("occurrences")]
-        [ProducesResponseType(typeof(IEnumerable<OccurrenceDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<DsOccurrenceDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetOccurrencesBySearchAsync(
@@ -292,7 +292,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
             [FromQuery] CoordinateSys responseCoordinateSystem = CoordinateSys.WGS84,
-            [FromQuery] ExportMode exportMode = ExportMode.Json
+            [FromQuery] DsExportMode exportMode = DsExportMode.Json
         )
         {
             try
@@ -310,7 +310,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var result = await _dataStewardshipManager.GetOccurrencesBySearchAsync(searchFilter, skip, take, responseCoordinateSystem);
 
-                return exportMode.Equals(ExportMode.Csv) ?
+                return exportMode.Equals(DsExportMode.Csv) ?
                     File(result.Records.ToCsv(), "text/tab-separated-values", "occurrences.csv") :
                     new OkObjectResult(result);
             }
