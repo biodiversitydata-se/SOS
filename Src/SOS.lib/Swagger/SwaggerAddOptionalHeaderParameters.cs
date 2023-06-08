@@ -23,7 +23,11 @@ namespace SOS.Lib.Swagger
                 Name = "X-Requesting-System",
                 Description = "Name of system doing the request",
                 In = ParameterLocation.Header,
-                Required = false
+                Required = false,
+                Schema = new OpenApiSchema()
+                {
+                    Type = "string"                    
+                }
             });
         }
     }
