@@ -57,7 +57,7 @@ namespace SOS.Harvest.Jobs
                 _logger.LogInformation($"Stop harvest job ({mode}) since processing is running.");
                 cancellationToken = new JobCancellationToken(true);
                 cancellationToken.ThrowIfCancellationRequested();
-            }; 
+            };
         }
 
         private async Task<bool> RunAsync(JobRunModes mode, 
