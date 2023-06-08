@@ -2,6 +2,7 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Swagger;
 using System.Text.Json.Serialization;
+using static SOS.Lib.Swagger.UseSchema;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -404,6 +405,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public double? Sweref99TmY { get; set; }
 
+        [UseSchema(SchemaDataType.Integer)]
         public LocationType Type { get; set; }
 
         /// <summary>
