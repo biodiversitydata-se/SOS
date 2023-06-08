@@ -5,14 +5,14 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
 {
     public static class LocationExtensions
     {
-        public static LocationDto ToDto(this Lib.Models.Processed.Observation.Location location, CoordinateSys responseCoordinateSystem)
+        public static DsLocationDto ToDto(this Lib.Models.Processed.Observation.Location location, CoordinateSys responseCoordinateSystem)
         {
-            County? county = location?.County?.FeatureId?.GetCounty();
+            DsCounty? county = location?.County?.FeatureId?.GetCounty();
             Municipality? municipality = location?.Municipality?.FeatureId?.GetMunicipality();
-            Parish? parish = location?.Parish?.FeatureId?.GetParish();
-            Province? province = location?.Province?.FeatureId?.GetProvince();
+            DsParish? parish = location?.Parish?.FeatureId?.GetParish();
+            DsProvince? province = location?.Province?.FeatureId?.GetProvince();
 
-            return new LocationDto()
+            return new DsLocationDto()
             {
                 County = county.Value,
                 Province = province.Value,

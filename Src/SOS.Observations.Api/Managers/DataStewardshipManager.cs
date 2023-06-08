@@ -89,7 +89,7 @@ namespace SOS.Observations.Api.Managers
             return JsonSerializer.Deserialize<Observation>(JsonSerializer.Serialize(dynamicObject, _jsonSerializerOptions), _jsonSerializerOptions);
         }
 
-        private async Task<EventDto> GetEventByIdFromObservationIndexAsync(string id, CoordinateSys responseCoordinateSystem)
+        private async Task<DsEventDto> GetEventByIdFromObservationIndexAsync(string id, CoordinateSys responseCoordinateSystem)
         {
             var filter = new SearchFilter(0);
             filter.EventIds = new List<string> { id };
@@ -105,7 +105,7 @@ namespace SOS.Observations.Api.Managers
             return ev;
         }
 
-        private async Task<EventDto> GetEventByIdFromEventIndexAsync(string id, CoordinateSys responseCoordinateSystem)
+        private async Task<DsEventDto> GetEventByIdFromEventIndexAsync(string id, CoordinateSys responseCoordinateSystem)
         {
             var observationEvents = await _observationEventRepository.GetEventsByIds(new List<string> { id });
 
@@ -118,7 +118,7 @@ namespace SOS.Observations.Api.Managers
         /// <remarks>
         /// This search uses the Observation index.
         /// </remarks>
-        private async Task<PagedResultDto<EventDto>> GetEventsBySearchFromObservationIndexAsync(SearchFilter filter,
+        private async Task<PagedResultDto<DsEventDto>> GetEventsBySearchFromObservationIndexAsync(SearchFilter filter,
             int skip,
             int take,
             CoordinateSys responseCoordinateSystem)
@@ -134,7 +134,7 @@ namespace SOS.Observations.Api.Managers
 
             var firstOccurrenceIdInEvents = eventIds.Select(m => m.Value.First());
             var observations = await _processedObservationCoreRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
-            var events = new List<EventDto>();
+            var events = new List<DsEventDto>();
             foreach (var observation in observations)
             {
                 var occurrenceIds = occurrenceIdsByEventId[observation.Event.EventId.ToLower()];
@@ -145,7 +145,7 @@ namespace SOS.Observations.Api.Managers
             int totalCount = eventOccurrenceIds.Count;
             var records = events;
 
-            return new PagedResultDto<EventDto>()
+            return new PagedResultDto<DsEventDto>()
             {
                 Skip = skip,
                 Take = take,
@@ -157,7 +157,7 @@ namespace SOS.Observations.Api.Managers
         /// <remarks>
         /// This search uses the Event index.
         /// </remarks>
-        private async Task<PagedResultDto<EventDto>> GetEventsBySearchFromEventIndexAsync(SearchFilter filter,
+        private async Task<PagedResultDto<DsEventDto>> GetEventsBySearchFromEventIndexAsync(SearchFilter filter,
             int skip,
             int take,
             CoordinateSys responseCoordinateSystem)
@@ -170,7 +170,7 @@ namespace SOS.Observations.Api.Managers
                 Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);
             int count = eventIdPageResult.Records.Count();
             int totalCount = Convert.ToInt32(eventIdPageResult.TotalCount);
-            var records = Enumerable.Empty<EventDto>();
+            var records = Enumerable.Empty<DsEventDto>();
             if (eventIdPageResult.Records.Any())
             {
                 var sortOrders = new List<SortOrderFilter>
@@ -183,7 +183,7 @@ namespace SOS.Observations.Api.Managers
                 records = events;
             }
 
-            return new PagedResultDto<EventDto>()
+            return new PagedResultDto<DsEventDto>()
             {
                 Skip = skip,
                 Take = take,
@@ -192,13 +192,13 @@ namespace SOS.Observations.Api.Managers
             };
         }
 
-        private async Task<PagedResultDto<EventDto>> GetEventsBySearchFromEventIndexSortByDateAsync(SearchFilter filter,
+        private async Task<PagedResultDto<DsEventDto>> GetEventsBySearchFromEventIndexSortByDateAsync(SearchFilter filter,
             int skip,
             int take,
             CoordinateSys responseCoordinateSystem)
         {
             await _filterManager.PrepareFilterAsync(null, null, filter);
-            var records = Enumerable.Empty<EventDto>();
+            var records = Enumerable.Empty<DsEventDto>();
             var allEventIds = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "event.eventId");
             int totalCount = allEventIds.Count();
             if (allEventIds.Any())
@@ -217,7 +217,7 @@ namespace SOS.Observations.Api.Managers
                     .ToList();
             }
 
-            return new PagedResultDto<EventDto>()
+            return new PagedResultDto<DsEventDto>()
             {
                 Skip = skip,
                 Take = take,
@@ -239,7 +239,7 @@ namespace SOS.Observations.Api.Managers
             _logger = logger;
         }
 
-        public async Task<DatasetDto> GetDatasetByIdAsync(string id)
+        public async Task<DsDatasetDto> GetDatasetByIdAsync(string id)
         {
             if (string.IsNullOrEmpty(id)) return null;
             var observationDataset = await _observationDatasetRepository.GetDatasetsByIds(new string[] { id });
@@ -253,7 +253,7 @@ namespace SOS.Observations.Api.Managers
             return dataset;
         }
 
-        public async Task<PagedResultDto<DatasetDto>> GetDatasetsBySearchAsync(SearchFilter filter, int skip, int take)
+        public async Task<PagedResultDto<DsDatasetDto>> GetDatasetsBySearchAsync(SearchFilter filter, int skip, int take)
         {
             await _filterManager.PrepareFilterAsync(null, null, filter);
             var aggregationResult = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter,
@@ -263,7 +263,7 @@ namespace SOS.Observations.Api.Managers
                 Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);
 
             int totalCount = Convert.ToInt32(aggregationResult.TotalCount);
-            var records = Enumerable.Empty<DatasetDto>();
+            var records = Enumerable.Empty<DsDatasetDto>();
             if (aggregationResult.Records.Any())
             {
                 var sortOrders = new List<SortOrderFilter>
@@ -275,7 +275,7 @@ namespace SOS.Observations.Api.Managers
                 records = observationDatasets.Select(m => m.ToDto()).ToList();
             }
 
-            return new PagedResultDto<DatasetDto>()
+            return new PagedResultDto<DsDatasetDto>()
             {
                 Skip = skip,
                 Take = take,
@@ -284,7 +284,7 @@ namespace SOS.Observations.Api.Managers
             };
         }
 
-        public async Task<EventDto> GetEventByIdAsync(string id, CoordinateSys responseCoordinateSystem)
+        public async Task<DsEventDto> GetEventByIdAsync(string id, CoordinateSys responseCoordinateSystem)
         {
             var evnt = await GetEventByIdFromEventIndexAsync(id, responseCoordinateSystem);
 
@@ -296,7 +296,7 @@ namespace SOS.Observations.Api.Managers
             return evnt;
         }
 
-        public async Task<PagedResultDto<EventDto>> GetEventsBySearchAsync(SearchFilter filter,
+        public async Task<PagedResultDto<DsEventDto>> GetEventsBySearchAsync(SearchFilter filter,
             int skip,
             int take,
             CoordinateSys responseCoordinateSystem)
@@ -306,7 +306,7 @@ namespace SOS.Observations.Api.Managers
             // return await GetEventsBySearchFromObservationIndexAsync(eventsFilter, skip, take);
         }
 
-        public async Task<OccurrenceDto> GetOccurrenceByIdAsync(string id, CoordinateSys responseCoordinateSystem)
+        public async Task<DsOccurrenceDto> GetOccurrenceByIdAsync(string id, CoordinateSys responseCoordinateSystem)
         {
             var filter = new SearchFilter(0)
             {
@@ -328,7 +328,7 @@ namespace SOS.Observations.Api.Managers
             return occurrence;
         }
 
-        public async Task<PagedResultDto<OccurrenceDto>> GetOccurrencesBySearchAsync(SearchFilter filter, int skip, int take, CoordinateSys responseCoordinateSystem)
+        public async Task<PagedResultDto<DsOccurrenceDto>> GetOccurrencesBySearchAsync(SearchFilter filter, int skip, int take, CoordinateSys responseCoordinateSystem)
         {
             filter.IsPartOfDataStewardshipDataset = true;
             filter.Output.Fields = _observationOccurrenceOutputFields?.ToList();
@@ -337,7 +337,7 @@ namespace SOS.Observations.Api.Managers
             var observations = CastDynamicsToObservations(pageResult.Records);
             var occurrences = observations.Select(o => o.ToDto(responseCoordinateSystem)).ToList();
 
-            return new PagedResultDto<OccurrenceDto>()
+            return new PagedResultDto<DsOccurrenceDto>()
             {
                 Skip = skip,
                 Take = take,

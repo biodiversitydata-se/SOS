@@ -11,34 +11,34 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
 {
     public static class DatasetExtensions
     {
-        private static ApiEnums.AccessRights? ToDto(this LibEnums.AccessRights? accessRightsEnum)
+        private static ApiEnums.DsAccessRights? ToDto(this LibEnums.AccessRights? accessRightsEnum)
         {
             if (accessRightsEnum == null) return null;
-            return (ApiEnums.AccessRights)accessRightsEnum;
+            return (ApiEnums.DsAccessRights)accessRightsEnum;
         }
 
-        private static IEnumerable<MethodologyDto> ToDtos(this IEnumerable<Methodology> methodologies)
+        private static IEnumerable<DsMethodologyDto> ToDtos(this IEnumerable<Methodology> methodologies)
         {
             if (methodologies == null || !methodologies.Any()) return null;
             return methodologies.Select(m => m.ToDto());
         }
 
-        private static ApiEnums.ProgrammeArea? ToDto(this LibEnums.ProgrammeArea? programmeArea)
+        private static ApiEnums.DsProgrammeArea? ToDto(this LibEnums.ProgrammeArea? programmeArea)
         {
             if (programmeArea == null) return null;
-            return (ApiEnums.ProgrammeArea)programmeArea;
+            return (ApiEnums.DsProgrammeArea)programmeArea;
         }
 
-        private static ApiEnums.Purpose? ToDatasetPurposeEnum(this LibEnums.Purpose? purposeEnum)
+        private static ApiEnums.DsPurpose? ToDatasetPurposeEnum(this LibEnums.Purpose? purposeEnum)
         {
             if (purposeEnum == null) return null;
-            return (ApiEnums.Purpose)purposeEnum;
+            return (ApiEnums.DsPurpose)purposeEnum;
         }
 
-        private static MethodologyDto ToDto(this Methodology methodology)
+        private static DsMethodologyDto ToDto(this Methodology methodology)
         {
             if (methodology == null) return null;
-            return new MethodologyDto
+            return new DsMethodologyDto
             {
                 MethodologyDescription = methodology.MethodologyDescription,
                 MethodologyLink = methodology.MethodologyLink,
@@ -52,7 +52,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
         /// </summary>
         /// <param name="dataset"></param>
         /// <returns></returns>
-        public static byte[] ToCsv(this DatasetDto dataset)
+        public static byte[] ToCsv(this DsDatasetDto dataset)
         {
             if (dataset == null)
             {
@@ -67,7 +67,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
         /// </summary>
         /// <param name="datasets"></param>
         /// <returns></returns>
-        public static byte[] ToCsv(this IEnumerable<DatasetDto> datasets)
+        public static byte[] ToCsv(this IEnumerable<DsDatasetDto> datasets)
         {
             if (!datasets?.Any() ?? true)
             {
@@ -134,21 +134,21 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             return csv;
         }
 
-        public static DatasetInfoDto ToDto(this DataStewardshipInfo source)
+        public static DsDatasetInfoDto ToDto(this DataStewardshipInfo source)
         {
             if (source == null) return null;
-            return new DatasetInfoDto
+            return new DsDatasetInfoDto
             {
                 Identifier = source.DatasetIdentifier,
                 Title = source.DatasetTitle,
             };
         }
 
-        public static DatasetDto ToDto(this Dataset dataset)
+        public static DsDatasetDto ToDto(this Dataset dataset)
         {
             if (dataset == null) return null;
 
-            return new DatasetDto
+            return new DsDatasetDto
             {
                 AccessRights = dataset.AccessRights.ToDto(),
                 DescriptionAccessRights = dataset.DescriptionAccessRights,
