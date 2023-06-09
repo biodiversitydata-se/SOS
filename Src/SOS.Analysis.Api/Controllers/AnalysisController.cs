@@ -7,7 +7,6 @@ using SOS.Analysis.Api.Dtos.Search;
 using SOS.Analysis.Api.Extensions.Dto;
 using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
@@ -35,14 +34,12 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="analysisManager"></param>
         /// <param name="areaCache"></param>
         /// <param name="analysisConfiguration"></param>
-        /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public AnalysisController(
             IAnalysisManager analysisManager,
             IAreaCache areaCache,
             AnalysisConfiguration analysisConfiguration,
-            ElasticSearchConfiguration elasticConfiguration,
             ILogger<AnalysisController> logger) : base(areaCache, analysisConfiguration?.ProtectedScope!, 350000)
         {
             _analysisManager = analysisManager ?? throw new ArgumentNullException(nameof(analysisManager));
