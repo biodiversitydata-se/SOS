@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Swagger;
-using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Checklist;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
@@ -22,7 +21,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class ChecklistsController : ControllerBase, IChecklistsController
+    public class ChecklistsController : ControllerBase
     {
         private readonly IChecklistManager _checklistManager;
         private readonly ITaxonManager _taxonManager;
@@ -59,7 +58,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Calculate species trend as a quotient. Species trend = (Number of present observations) / (Number of present and absent observations)
         /// </summary>
-        /// <param name="filter"></param>
+        /// <param name="filter">The search filter.</param>
         /// <returns></returns>
         [HttpPost("CalculateTrend")]
         [ProducesResponseType(typeof(TaxonTrendResult), (int)HttpStatusCode.OK)]
@@ -108,6 +107,11 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Get a checklist by eventId.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("internal")]
         [ProducesResponseType(typeof(ChecklistInternalDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -124,6 +128,5 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-       
     }
 }

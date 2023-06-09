@@ -9,7 +9,6 @@ using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
-using SOS.Observations.Api.Controllers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -18,7 +17,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class CachesController : ControllerBase, ICachesController
+    public class CachesController : ControllerBase
     {
         private readonly IAreaCache _areaCache;
         private readonly IDataProviderCache _dataProvidersCache;
@@ -57,7 +56,11 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Clear a cache
+        /// </summary>
+        /// <param name="cache">The cache to clear.</param>
+        /// <returns></returns>
         [HttpDelete("{cache}")]
         [ProducesResponseType(typeof(bool), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
@@ -98,7 +101,11 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />        
+        /// <summary>
+        /// Get a cache.
+        /// </summary>
+        /// <param name="cache"></param>
+        /// <returns></returns> 
         [HttpGet("{cache}")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

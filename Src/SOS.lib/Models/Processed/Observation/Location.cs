@@ -405,7 +405,10 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public double? Sweref99TmY { get; set; }
 
-        [UseSchema(SchemaDataType.Integer)]
+        /// <summary>
+        /// Location type. 1=Point, 2=Polygon.
+        /// </summary>        
+        [UseSchema(SchemaDataType.Integer, "Location type. 1=Point, 2=Polygon.")]
         public LocationType Type { get; set; }
 
         /// <summary>

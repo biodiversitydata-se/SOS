@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
@@ -22,7 +21,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class LocationsController : SearchBaseController, ILocationsController
+    public class LocationsController : SearchBaseController
     {
         private readonly ILocationManager _locationManager;
         private readonly ILogger<LocationsController> _logger;
@@ -46,7 +45,11 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Get locations by id
+        /// </summary>
+        /// <param name="locationIds"></param>
+        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(LocationDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -76,6 +79,16 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Search for locations
+        /// </summary>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="skip">Pagination start index.</param>
+        /// <param name="take">Number of items to return.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="roleId">Limit user authorization too specified role.</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <returns></returns>
         [HttpPost("search")]
         [ProducesResponseType(typeof(IEnumerable<LocationSearchResultDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]

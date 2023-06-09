@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Swagger;
-using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -17,7 +16,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class SystemsController : ControllerBase, ISystemsController
+    public class SystemsController : ControllerBase
     {
         private readonly IDevOpsManager _devOpsManager;
         private readonly IProcessInfoManager _processInfoManager;
@@ -63,7 +62,11 @@ namespace SOS.Observations.Api.Controllers
             }
         }
         */
-        /// <inheritdoc />
+        
+        /// <summary>
+        /// Get copyright including system build time
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("Copyright")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -81,7 +84,11 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Get information about observation processing
+        /// </summary>
+        /// <param name="active">True: get information about last processing, false get information about previous processing</param>
+        /// <returns>Meta data about processing. E.g, Start time, end time, number of observations processed...</returns>
         [HttpGet("ProcessInformation")]
         [ProducesResponseType(typeof(ProcessInfoDto), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]

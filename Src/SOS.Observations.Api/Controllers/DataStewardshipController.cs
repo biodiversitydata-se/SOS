@@ -9,7 +9,6 @@ using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.DataStewardship;
 using SOS.Observations.Api.Dtos.DataStewardship.Enums;
 using SOS.Observations.Api.Dtos.DataStewardship.Extensions;
@@ -26,13 +25,13 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class DataStewardshipController : ObservationBaseController, IDataStewardshipController
+    public class DataStewardshipController : ObservationBaseController
     {
         private readonly IDataStewardshipManager _dataStewardshipManager;
         private readonly ILogger<DataStewardshipController> _logger;
 
         /// <summary>
-        /// 
+        /// Constructor.
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="taxonManager"></param>
@@ -55,7 +54,14 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Get a single dataset by id
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role.</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="id">The dataset id.</param>
+        /// <param name="exportMode">The export mode.</param>
+        /// <returns></returns>
         [HttpGet("datasets/{id}")]
         [ProducesResponseType(typeof(DsDatasetDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -94,7 +100,17 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        // <inheritdoc/>
+        /// <summary>
+        /// Search for datasets
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role.</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="skip">Pagination start index.</param>
+        /// <param name="take">Number of items to return.</param>
+        /// <param name="exportMode">The export mode.</param>
+        /// <returns></returns>
         [HttpPost("datasets")]
         [ProducesResponseType(typeof(IEnumerable<DsDatasetDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -146,7 +162,15 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        // <inheritdoc/>
+        /// <summary>
+        /// Get a single event by id.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role.</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="id">The event ID.</param>
+        /// <param name="responseCoordinateSystem"></param>
+        /// <param name="exportMode">The export mode.</param>
+        /// <returns></returns>
         [HttpGet("events/{id}")]
         [ProducesResponseType(typeof(DsEventDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -186,7 +210,18 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        // <inheritdoc/>
+        /// <summary>
+        /// Search for events
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role.</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="skip">Pagination start index.</param>
+        /// <param name="take">Number of items to return.</param>
+        /// <param name="responseCoordinateSystem"></param>
+        /// <param name="exportMode">The export mode.</param>
+        /// <returns></returns>
         [HttpPost("events")]
         [ProducesResponseType(typeof(IEnumerable<DsEventDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -239,7 +274,15 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        // <inheritdoc/>
+        /// <summary>
+        /// Get a occurrence by id
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role.</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="id">The occurrence id.</param>
+        /// <param name="responseCoordinateSystem"></param>
+        /// <param name="exportMode">The export mode.</param>
+        /// <returns></returns>
         [HttpGet("occurrences/{id}")]
         [ProducesResponseType(typeof(DsOccurrenceDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -279,7 +322,18 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        // <inheritdoc/>
+        /// <summary>
+        /// Search for occurrences
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role.</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="skip">Pagination start index.</param>
+        /// <param name="take">Number of items to return.</param>
+        /// <param name="responseCoordinateSystem"></param>
+        /// <param name="exportMode">The export mode.</param>
+        /// <returns></returns>
         [HttpPost("occurrences")]
         [ProducesResponseType(typeof(IEnumerable<DsOccurrenceDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]

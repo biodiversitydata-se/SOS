@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DataQuality;
-using SOS.Observations.Api.Controllers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -14,7 +13,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class DataQualityController : ControllerBase, IDataQualityController
+    public class DataQualityController : ControllerBase
     {
         private readonly IDataQualityManager _dataQualityManager;
         private readonly ILogger<DataQualityController> _logger;
@@ -32,7 +31,11 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Data quality report.
+        /// </summary>
+        /// <param name="organismGroup">Organism group filter.</param>
+        /// <returns>List of observations that can be duplicates</returns>
         [HttpGet("report/{organismGroup}")]
         [ProducesResponseType(typeof(DataQualityReport), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]

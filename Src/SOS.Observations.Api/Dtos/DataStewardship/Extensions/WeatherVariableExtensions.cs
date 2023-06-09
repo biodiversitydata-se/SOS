@@ -15,9 +15,9 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             return (DsPrecipitation)source;
         }
 
-        private static SnowCover ToSnowCover(this Lib.Models.Processed.DataStewardship.Enums.SnowCover source)
+        private static DsSnowCover ToSnowCover(this Lib.Models.Processed.DataStewardship.Enums.SnowCover source)
         {
-            return (SnowCover)source;
+            return (DsSnowCover)source;
         }
 
         private static DsUnit ToUnit(this Lib.Models.Processed.DataStewardship.Enums.Unit source)

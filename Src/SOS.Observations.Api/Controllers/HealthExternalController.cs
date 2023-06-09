@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.Linq;
-using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -18,7 +17,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class HealthExternalController : ControllerBase, IHealthExternalController
+    public class HealthExternalController : ControllerBase
     {
         private readonly HealthCheckService _healthCheckService;
         private readonly IProcessInfoManager _processInfoManager;
@@ -45,7 +44,10 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Get system health status
+        /// </summary>
+        /// <returns></returns>
         [HttpGet()]
         [ProducesResponseType(typeof(object), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
