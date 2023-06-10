@@ -39,6 +39,9 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.TaxonListService;
+using SOS.Analysis.Api.ApplicationInsights;
+using SOS.Lib.Middleware;
+using SOS.Analysis.Api.Middleware;
 
 namespace SOS.Analysis.Api
 {
@@ -52,6 +55,7 @@ namespace SOS.Analysis.Api
         private const string InternalApiPrefix = "Internal";
 
         private bool _isDevelopment;
+        private IWebHostEnvironment CurrentEnvironment { get; set; }
 
         /// <summary>
         ///     Start up
@@ -60,6 +64,7 @@ namespace SOS.Analysis.Api
         public Startup(IWebHostEnvironment env)
         {
             var environment = env.EnvironmentName.ToLower();
+            CurrentEnvironment = env;
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -67,7 +72,7 @@ namespace SOS.Analysis.Api
                 .AddJsonFile($"appsettings.{environment}.json", true)
                 .AddEnvironmentVariables();
 
-            _isDevelopment = environment.Equals("local");
+            _isDevelopment = CurrentEnvironment.IsEnvironment("local") || CurrentEnvironment.IsEnvironment("dev") || CurrentEnvironment.IsEnvironment("st");
             if (_isDevelopment)
             {
                 // If Development mode, add secrets stored on developer machine 
@@ -127,8 +132,9 @@ namespace SOS.Analysis.Api
             services.AddApplicationInsightsTelemetry(Configuration);
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<ApplicationInsights>());
+            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
             services.AddApiVersioning(o =>
             {
@@ -316,7 +322,7 @@ namespace SOS.Analysis.Api
             IWebHostEnvironment env, 
             IApiVersionDescriptionProvider apiVersionDescriptionProvider, 
             TelemetryConfiguration configuration, 
-            ApplicationInsights applicationInsightsConfiguration, 
+            Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration, 
             AnalysisConfiguration statisticsConfiguration)
         {
             if (statisticsConfiguration.EnableResponseCompression)
@@ -335,6 +341,12 @@ namespace SOS.Analysis.Api
 #if DEBUG
             configuration.DisableTelemetry = true;
 #endif
+            if (applicationInsightsConfiguration.EnableRequestBodyLogging)
+            {
+                app.UseMiddleware<EnableRequestBufferingMiddelware>();
+                app.UseMiddleware<StoreRequestBodyMiddleware>();
+            }
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
