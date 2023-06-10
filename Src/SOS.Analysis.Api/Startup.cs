@@ -292,7 +292,7 @@ namespace SOS.Analysis.Api
             // Add managers
             services.AddScoped<IAnalysisManager, AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
-            services.AddScoped<ITaxonManager, TaxonManager>();
+            services.AddSingleton<ITaxonManager, TaxonManager>();
            
             // Add repositories
             services.AddScoped<IAreaRepository, AreaRepository>();
@@ -338,9 +338,12 @@ namespace SOS.Analysis.Api
             {
                 app.UseHsts();
             }
-#if DEBUG
-            configuration.DisableTelemetry = true;
-#endif
+
+            if (_isDevelopment)
+            {
+                configuration.DisableTelemetry = true;
+            }
+
             if (applicationInsightsConfiguration.EnableRequestBodyLogging)
             {
                 app.UseMiddleware<EnableRequestBufferingMiddelware>();
