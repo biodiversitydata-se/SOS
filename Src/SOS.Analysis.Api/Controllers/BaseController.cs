@@ -168,7 +168,7 @@ namespace SOS.Analysis.Api.Controllers
             if (fields?.Any() ?? false)
             {
                 errors.AddRange(fields
-                    .Where(f => !ObservationPropertyFieldDescriptionHelper.FieldByPropertyPath.ContainsKey(f))
+                    .Where(f => !ObservationPropertyFieldDescriptionHelper.FieldByPropertyPath.ContainsKey(f.ToLower()))
                     .Select(f => $"Field doesn't exist ({f})"));
             }
 
