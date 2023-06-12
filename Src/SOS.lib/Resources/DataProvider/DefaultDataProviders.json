@@ -1528,5 +1528,68 @@
       "HarvestSchedule": "* * * * *",
       "SupportDatasets": false,
       "SupportEvents": false
+    },
+    {
+      "Id": 25,
+      "Identifier": "NILS",
+      "IsActive": false,
+      "IncludeInScheduledHarvest": false,
+      "IncludeInHealthCheck": true,
+      "IncludeInSearchByDefault": true,
+      "SupportIncrementalHarvest": false,
+      "SupportDynamicEml": false,
+      "HarvestFailPreventProcessing": false,
+      "UseVerbatimFileInExport": false,
+      "CoordinateUncertaintyInMeters": 5000,
+      "Type": "DwcA",
+      "Names": [
+        {
+          "CultureCode": "en-GB",
+          "Value": "National Inventories of Landscapes in Sweden (NILS)"
+        },
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Nationella inventeringar av landskapet i Sverige (NILS)"
+        }
+      ],
+      "Descriptions": [
+        {
+          "CultureCode": "en-GB",
+          "Value": "The National Inventories of Landscapes in Sweden (NILS) is an environmental monitoring program. Monitoring biophysical conditions and changes in deciduous forests, grasslands, alpine habitats and seashores for reporting within the EU’s Species and Habitats Directive."
+        },
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Nationella inventeringar av landskapet i Sverige (NILS) är ett paraply för nationella miljöövervakningsprogram med ett flertal inventeringar vars syfte är att samla, analysera och presentera data om hur landskap ser ut och förändras över tid. Inventeringarna samlar in data som ligger till grund för Artikel 17 rapporteringen samt uppföljningen av miljökvalitetsmål såväl som Agenda 2030 målen."
+        }
+      ],
+      "Organizations": [
+        {
+          "CultureCode": "en-GB",
+          "Value": "SLU"
+        },
+        {
+          "CultureCode": "sv-SE",
+          "Value": "SLU"
+        }
+      ],
+      "Paths": [
+        {
+          "CultureCode": "en-GB",
+          "path": [ "SLU", "National Inventories of Landscapes in Sweden" ]
+        },
+        {
+          "CultureCode": "sv-SE",
+          "path": [ "SLU", "Nationella inventeringar av landskapet i Sverige (NILS)" ]
+        }
+      ],
+      "Url": "https://www.slu.se/centrumbildningar-och-projekt/nils/",
+      "ContactPerson": {
+        "FirstName": "Marcus",
+        "LastName": "Andersson",
+        "Email": "marcus.andersson@slu.se"
+      },
+      "HarvestSchedule": "* * * * *",
+      "SupportDatasets": true,
+      "SupportEvents": true
     }
 ]

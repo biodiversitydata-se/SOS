@@ -38,7 +38,7 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddSingleton<IAuthorizationProvider, CurrentUserAuthorization>();
 
         // Managers
-        webApplicationBuilder.Services.AddScoped<ITaxonManager, TaxonManager>();
+        webApplicationBuilder.Services.AddSingleton<ITaxonManager, TaxonManager>();
         webApplicationBuilder.Services.AddScoped<IDataStewardshipManager, DataStewardshipManager>();
         webApplicationBuilder.Services.AddScoped<IFilterManager, FilterManager>();
 
