@@ -14,10 +14,12 @@ namespace SOS.Lib.Exceptions
         public AuthenticationRequiredException(string message) : base(message)
         {
         }
+
         /// <summary>
-        /// Standard constructor
+        ///  Standard constructor
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="innerException"></param>
         public AuthenticationRequiredException(string message, Exception innerException) : base(message, innerException)
         {
         }

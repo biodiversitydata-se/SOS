@@ -88,17 +88,6 @@
         public string IndividualCount { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: individualID.
-        ///     An identifier for an individual or named group of
-        ///     individual organisms represented in the Occurrence.
-        ///     Meant to accommodate resampling of the same individual
-        ///     or group for monitoring purposes. May be a global unique
-        ///     identifier or an identifier specific to a data set.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        //public string IndividualID { get; set; }
-
-        /// <summary>
         ///     Darwin Core term name: lifeStage.
         ///     The age class or life stage of the biological individual(s)
         ///     at the time the Occurrence was recorded.

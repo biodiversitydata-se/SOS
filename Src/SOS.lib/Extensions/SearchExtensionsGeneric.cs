@@ -675,8 +675,10 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Add time range filters
         /// </summary>
+        /// <typeparam name="TQueryContainer"></typeparam>
         /// <param name="query"></param>
         /// <param name="filter"></param>
+        /// <param name="field"></param>
         public static void TryAddTimeRangeFilters<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, DateFilter filter, string field) where TQueryContainer : class
         {
             if (!filter?.TimeRanges?.Any() ?? true)

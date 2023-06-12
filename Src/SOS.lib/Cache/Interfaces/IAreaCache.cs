@@ -46,6 +46,7 @@ namespace SOS.Lib.Cache.Interfaces
         /// <returns></returns>
         Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId);
 
+        /// <summary>
         /// Get multiple geometries
         /// </summary>
         /// <param name="areaKeys"></param>

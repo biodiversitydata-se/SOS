@@ -9,7 +9,9 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 
 namespace SOS.Analysis.Api.Managers
 {
@@ -70,7 +72,7 @@ namespace SOS.Analysis.Api.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<PagedAggregationResultDto<UserAggregationResponseDto>> AggregateByUserFieldAsync(
+        public async Task<PagedAggregationResultDto<UserAggregationResponseDto>?> AggregateByUserFieldAsync(
             int? roleId,
             string? authorizationApplicationIdentifier,
             SearchFilter filter, 
@@ -91,6 +93,21 @@ namespace SOS.Analysis.Api.Managers
                     UniqueTaxon = (int)r.UniqueTaxon
                 })!
             };
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<AggregationItemDto>?> AggregateByUserFieldAsync(
+            int? roleId,
+            string? authorizationApplicationIdentifier,
+            SearchFilter filter,
+            string aggregationField,
+            int take = 65536,
+            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
+        {
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            var result = await _processedObservationRepository.GetAggregationItemsAsync(filter, aggregationField, take, sortOrder);
+
+            return result?.Select(i => new AggregationItemDto { AggregationKey = i.AggregationKey, DocCount = i.DocCount })!;
         }
 
         /// <inheritdoc/>

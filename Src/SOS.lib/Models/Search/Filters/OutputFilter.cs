@@ -13,7 +13,7 @@ namespace SOS.Lib.Models.Search.Filters
             SortOrders = new SortOrderFilter[0];
         }
 
-        // <summary>
+        /// <summary>
         /// This parameter allows you to decide what fields should be returned, using a projection.
         /// Omit this parameter and you will receive the complete collection of fields.
         /// For example, to retrieve only basic observation data, specify:

@@ -8,7 +8,7 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Enums
     public enum WindStrength
     {
         /// <summary>
-        ///  vindstilla, <1 m/s
+        ///  vindstilla, mindre än 1 m/s
         /// </summary>
         [EnumMember(Value = "vindstilla, <1 m/s")]
         Vindstilla1Ms = 0,

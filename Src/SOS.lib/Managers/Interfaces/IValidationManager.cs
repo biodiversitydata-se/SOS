@@ -38,10 +38,11 @@ namespace SOS.Lib.Managers.Interfaces
         ICollection<InvalidEvent> ValidateEvents(ref ICollection<Models.Processed.DataStewardship.Event.Event> events, DataProvider dataProvider);
 
         /// <summary>
-        ///     Validate event.
-        /// </summary>        
+        /// Validate event.
+        /// </summary>
+        /// <param name="ev"></param>
         /// <param name="dataProvider"></param>
-        /// <returns>Invalid items</returns>
+        /// <returns></returns>
         InvalidEvent ValidateEvent(Models.Processed.DataStewardship.Event.Event ev, DataProvider dataProvider);
 
         /// <summary>

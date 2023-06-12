@@ -3,7 +3,6 @@
     /// <summary>
     ///     Result returned year month aggregation
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public class YearCountResult
     {
         /// <summary>

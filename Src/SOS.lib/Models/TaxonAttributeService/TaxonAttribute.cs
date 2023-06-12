@@ -5,7 +5,6 @@ namespace SOS.Lib.Models.TaxonAttributeService
     /// <summary>
     ///     Taxon attribute model
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public class TaxonAttribute
     {
         /// <summary>

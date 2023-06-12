@@ -120,17 +120,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string IndividualCount { get; set; }
 
         /// <summary>
-        ///     An identifier for an individual or named group of
-        ///     individual organisms represented in the Occurrence.
-        ///     Meant to accommodate resampling of the same individual
-        ///     or group for monitoring purposes. May be a global unique
-        ///     identifier or an identifier specific to a data set.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-       // [Obsolete("This property is deprecated in Darwin Core")]
-       // public string IndividualId { get; set; }
-
-        /// <summary>
         ///     Indicates if this species occurrence is natural or
         ///     if it is a result of human activity.
         /// </summary>
@@ -247,15 +236,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     and preservation methods for a specimen.
         /// </summary>
         public string Preparations { get; set; }
-
-        /// <summary>
-        /// Information about how protected information about a species is in Sweden.
-        /// This is a value between 1 to 5.
-        /// 1 indicates public access and 5 is the highest used security level.
-        /// This property is deprecated and replaced by the SensitivityCategory property.
-        /// </summary>
-        //[Obsolete("Replaced by SensitivityCategory")]
-        //public int ProtectionLevel { get; set; }
 
         /// <summary>
         /// Information about how protected information about a species is in Sweden.

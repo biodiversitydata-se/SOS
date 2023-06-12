@@ -109,14 +109,15 @@ namespace SOS.Lib.Models.Processed.Observation
         #region Record level
 
         /// <summary>
-        ///     Information about who can access the resource or
-        ///     an indication of its security status.
-        ///     Access Rights may include information regarding
-        ///     access or restrictions based on privacy, security,
-        ///     or other policies.
+        /// Information about who can access the resource or
+        /// an indication of its security status.
+        /// Access Rights may include information regarding
+        /// access or restrictions based on privacy, security,
+        /// or other policies.
         /// </summary>
         /// <remarks>
-        ///     This field uses a controlled vocabulary.
+        /// This field uses a controlled vocabulary.
+        /// </remarks>
         public VocabularyValue AccessRights { get; set; }
 
         /// <summary>

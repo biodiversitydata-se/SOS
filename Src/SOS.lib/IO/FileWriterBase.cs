@@ -23,7 +23,7 @@ namespace SOS.Lib.IO
             {
                 await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "filter.json"));
                 await using var streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
-                var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+                var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
                 serializeOptions.Converters.Add(new JsonStringEnumConverter());
 
                 var filterString = JsonSerializer.Serialize(filter, serializeOptions);

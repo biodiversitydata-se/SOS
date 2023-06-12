@@ -708,12 +708,12 @@ namespace SOS.Lib.Extensions
             }
         }
 
-        
+
 
         /// <summary>
-        ///     Cast geo shape to geo json geometry
+        ///  Cast geo shape to geo json geometry
         /// </summary>
-        /// <param name="geometry"></param>
+        /// <param name="geoShape"></param>
         /// <returns></returns>
         public static GeoJsonGeometry<GeoJson2DCoordinates> ToGeoJson(this IGeoShape geoShape)
         {

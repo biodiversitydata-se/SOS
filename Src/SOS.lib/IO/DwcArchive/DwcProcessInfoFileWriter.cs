@@ -58,11 +58,12 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         /// <summary>
-        ///     Create a provider information node
+        ///  Create a provider information node
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="nodeName"></param>
         /// <param name="providerInfo"></param>
+        /// <param name="metadataInfo"></param>
         /// <returns></returns>
         private static XmlNode CreateProviderInfoNode(XmlDocument doc, string nodeName, ProviderInfo providerInfo, IEnumerable<ProcessInfo> metadataInfo)
         {

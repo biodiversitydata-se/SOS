@@ -1,6 +1,7 @@
 ﻿using NetTopologySuite.Features;
 using SOS.Analysis.Api.Dtos.Search;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Analysis.Api.Managers.Interfaces
@@ -17,13 +18,31 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="afterKey"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<PagedAggregationResultDto<UserAggregationResponseDto>> AggregateByUserFieldAsync(
+        Task<PagedAggregationResultDto<UserAggregationResponseDto>?> AggregateByUserFieldAsync(
             int? roleId,
             string? authorizationApplicationIdentifier,
             SearchFilter filter, 
             string aggregationField,
             string? afterKey, 
             int? take);
+
+        /// <summary>
+        /// Aggregate by user passed field
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="aggregationField"></param>
+        /// <param name="take"></param>
+        /// <param name="sortOrder"></param>
+        /// <returns></returns>
+        Task<IEnumerable<AggregationItemDto>?> AggregateByUserFieldAsync(
+            int? roleId,
+            string? authorizationApplicationIdentifier,
+            SearchFilter filter,
+            string aggregationField,
+            int take,
+            AggregationSortOrder sortOrder);
 
         /// <summary>
         /// Calculate AOO and EOO

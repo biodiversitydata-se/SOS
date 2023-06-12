@@ -36,7 +36,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
             DwcaFilePartsInfo dwcaFilePartsInfo);
 
         /// <summary>
-        ///     Creates a Darwin Core Archive file where the specified fields in <paramref name="fieldDescriptions" /> are used.
+        ///     Creates a Darwin Core Archive file where the specified fields in fieldDescriptions are used.
         ///     The file is stored in a random generated name in the exportPath folder.
         ///     The full path is returned by this function.
         /// </summary>

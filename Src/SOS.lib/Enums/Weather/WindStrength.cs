@@ -73,7 +73,7 @@ namespace SOS.Lib.Enums.Weather
         [EnumMember(Value = "12 Beaufort")]
         _12Beaufort = 12,
         /// <summary>
-        ///  vindstilla, <1 m/s
+        ///  vindstilla, mindr än 1 m/s
         /// </summary>
         [EnumMember(Value = "vindstilla, <1 m/s")]
         Calm1Ms = 100,

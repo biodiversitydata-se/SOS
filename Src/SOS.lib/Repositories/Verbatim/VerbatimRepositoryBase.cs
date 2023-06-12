@@ -153,7 +153,7 @@ namespace SOS.Lib.Repositories.Verbatim
 
                 return fileStream;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

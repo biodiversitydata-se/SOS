@@ -64,21 +64,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? FieldDiaryGroupId { get; set; }
 
         /// <summary>
-        ///     Has Triggered Validation Rules
-        /// </summary>
-        //[Obsolete("Replaced by HasTriggeredVerificationRules")]
-        //public bool HasTriggeredValidationRules => HasTriggeredVerificationRules;
-
-        /// <summary>
         ///     Has Triggered Verification Rules
         /// </summary>
         public bool HasTriggeredVerificationRules { get; set; }
-
-        /// <summary>
-        ///     Has any Triggered Validation Rule with Warning
-        /// </summary>
-        //[Obsolete("Replaced by HasAnyTriggeredVerificationRuleWithWarning")]
-        //public bool HasAnyTriggeredValidationRuleWithWarning => HasAnyTriggeredVerificationRuleWithWarning;
 
         /// <summary>
         ///     Has any Triggered Verification Rule with Warning
@@ -89,12 +77,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     HasUserComments
         /// </summary>
         public bool HasUserComments { get; set; }
-
-        /// <summary>
-        ///     ExternalId of Site in Artportalen.
-        /// </summary>
-        //[Obsolete("Use Location.Attributes.ExternalId")]
-        //public string LocationExternalId { get; set; }
 
         /// <summary>
         ///     Note of Interest.
@@ -125,18 +107,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Ids of Species Facts connected to Taxon
         /// </summary>
         public IEnumerable<int> SpeciesFactsIds { get; set; }
-
-        /// <summary>
-        /// Species group id.
-        /// </summary>
-        //[Obsolete("Replaced by taxon.SpeciesGroup (Enum)")]
-        //public int? SpeciesGroupId { get; set; }
-
-        /// <summary>
-        ///     Id of sightings RegionalSightingState
-        /// </summary>
-        //[Obsolete("This is too be deleted")]
-        //public int? RegionalSightingStateId { get; set; }
 
         /// <summary>
         ///     Id of publishing types.

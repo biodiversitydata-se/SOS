@@ -49,7 +49,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <summary>
         /// Write Occurrence CSV header row.
         /// </summary>
-        /// <param name="csvWriter"></param>
+        /// <param name="csvFileHelper"></param>
         /// <param name="fieldDescriptions"></param>
         void WriteHeaderRow(
             CsvFileHelper csvFileHelper, 

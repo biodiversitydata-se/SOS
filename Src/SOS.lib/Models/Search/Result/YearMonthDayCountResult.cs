@@ -5,7 +5,6 @@ namespace SOS.Lib.Models.Search.Result
     /// <summary>
     ///     Result returned year month aggregation
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public class YearMonthDayCountResult : YearMonthCountResult
     {
         /// <summary>

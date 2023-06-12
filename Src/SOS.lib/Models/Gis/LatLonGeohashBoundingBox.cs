@@ -8,7 +8,7 @@ namespace SOS.Lib.Models.Gis
     {
         public string Geohash { get; set; }
 
-        public new static Result<LatLonGeohashBoundingBox> Create(
+        public static Result<LatLonGeohashBoundingBox> Create(
             string geohash,
             double? left,
             double? top,
@@ -61,7 +61,7 @@ namespace SOS.Lib.Models.Gis
             return Result.Success(bbox);
         }
 
-        public new static Result<LatLonGeohashBoundingBox> CreateFromGeohash(string geohash)
+        public static Result<LatLonGeohashBoundingBox> CreateFromGeohash(string geohash)
         {
             try
             {

@@ -10,6 +10,7 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Swagger;
 using System.Net;
 using Result = CSharpFunctionalExtensions.Result;
@@ -96,6 +97,55 @@ namespace SOS.Analysis.Api.Controllers
             }
         }
 
+        [HttpPost("/internal/aggregation_simple")]
+        [ProducesResponseType(typeof(IEnumerable<AggregationItemDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> AggregateByUserFieldAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto searchFilter,
+            [FromQuery] string aggregationField,
+            [FromQuery] int take = 10,
+            [FromQuery] AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
+        {
+            try
+            {
+                CheckAuthorization(searchFilter.ProtectionFilter);
+                searchFilter = await InitializeSearchFilterAsync(searchFilter);
+
+                var validationResult = Result.Combine(ValidateSearchFilter(searchFilter!), ValidateFields(new[] { aggregationField }), ValidateInt(take, 1, 250, "take"));
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
+
+                var result = await _analysisManager.AggregateByUserFieldAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    filter,
+                    aggregationField,
+                    take,
+                    sortOrder
+                );
+
+                return new OkObjectResult(result!);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Aggregate by user field error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
 
         /// <summary>
         /// Calculate AOO and EOO and get geometry showing coverage 

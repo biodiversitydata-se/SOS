@@ -27,7 +27,7 @@ namespace SOS.Lib.Services
             {
                 var options = new JsonSerializerOptions
                 {
-                    IgnoreNullValues = true,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     PropertyNamingPolicy = null,
                     WriteIndented = true,
                     PropertyNameCaseInsensitive = true

@@ -14,9 +14,10 @@ namespace SOS.Lib.Models.Shared
         public Geometry Geometry { get; set; }
 
         /// <summary>
-        /// Constructor.
+        /// Constructor
         /// </summary>
         /// <param name="areaType"></param>
+        /// <param name="featureId"></param>
         public AreaWithGeometry(AreaType areaType, string featureId) : base(areaType, featureId)
         {
         }

@@ -75,7 +75,6 @@ namespace SOS.Lib.Helpers
         /// <summary>
         /// Get field by index
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="fieldIndex"></param>
         /// <returns></returns>
         public string GetField(int fieldIndex)

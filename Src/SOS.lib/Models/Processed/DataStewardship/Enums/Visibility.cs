@@ -8,7 +8,7 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Enums
     public enum Visibility
     {
         /// <summary>
-        /// dimma, <1 km
+        /// dimma, mindre än 1 km
         /// </summary>
         [EnumMember(Value = "dimma, <1 km")]
         Dimma1Km = 0,
@@ -23,7 +23,7 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Enums
         [EnumMember(Value = "god, 10-20 km")]
         God10Till20Km = 2,
         /// <summary>
-        /// mycket god, >20 km
+        /// mycket god, mer än 20 km
         /// </summary>
         [EnumMember(Value = "mycket god, >20 km")]
         MycketGod20Km = 3,

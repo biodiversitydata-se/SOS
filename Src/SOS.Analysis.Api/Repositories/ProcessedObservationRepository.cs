@@ -8,6 +8,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Filters;
 using Nest;
 using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Models.Search.Enums;
 
 namespace SOS.Analysis.Api.Repositories
 {

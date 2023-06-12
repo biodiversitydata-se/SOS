@@ -28,7 +28,9 @@ namespace SOS.Lib.Factories
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="apiManagementUserService"></param>
         /// <param name="userService"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public UsageStatisticsFactory(IApiManagementUserService apiManagementUserService, IUserService userService)
         {
             _apiManagementUserService = apiManagementUserService ??
@@ -118,7 +120,7 @@ namespace SOS.Lib.Factories
                     UserName = user?.UserName
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }

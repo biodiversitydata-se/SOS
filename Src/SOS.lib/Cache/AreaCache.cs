@@ -32,7 +32,10 @@ namespace SOS.Lib.Cache
             _geometryCache = new ConcurrentDictionary<(AreaType, string), IGeoShape>();
         }
 
-        public void Clear()
+        /// <summary>
+        /// Clear cache
+        /// </summary>
+        public new void Clear()
         {
             base.Clear();
             _geometryCache.Clear();

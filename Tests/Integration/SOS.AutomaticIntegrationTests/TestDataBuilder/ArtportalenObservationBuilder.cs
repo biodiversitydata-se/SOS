@@ -32,7 +32,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             (6, 0.05f)
         };
 
-        public static List<ArtportalenObservationVerbatim> VerbatimArtportalenObservationsFromJsonFile(bool sensitive)
+        public static List<ArtportalenObservationVerbatim>? VerbatimArtportalenObservationsFromJsonFile(bool sensitive)
         {
             if (_verbatimArtportalenObservationsFromJsonFile == null || !sensitive.Equals(_sensitiveLoaded))
             {
@@ -180,9 +180,9 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 DateTime reportedDate = endDate.Add(_faker.Date.Timespan(TimeSpan.FromDays(5)));
                 DateTime editDate = reportedDate;
                 List<UserInternal> verifiedByInternal = GetRandomUserInternals(_verifiersProbability);
-                string verifiedBy = verifiedByInternal == null ? null : string.Join(", ", verifiedByInternal.Select(m => m.UserAlias));
+                string? verifiedBy = verifiedByInternal == null ? null : string.Join(", ", verifiedByInternal.Select(m => m.UserAlias));
                 List<UserInternal> observersInternal = GetRandomUserInternals(_verifiersProbability);
-                string observers = observersInternal == null ? null : string.Join(", ", observersInternal.Select(m => m.UserAlias));
+                string? observers = observersInternal == null ? null : string.Join(", ", observersInternal.Select(m => m.UserAlias));
                 UserInternal reportedByInternal = GetRandomUserInternal();
 
                 obs.Id = _faker.IndexVariable++;

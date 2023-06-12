@@ -60,7 +60,6 @@ namespace SOS.Lib.IO.Excel
         /// <param name="processedObservationRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
-        /// <param name="telemetry"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ExcelFileWriter(IProcessedObservationCoreRepository processedObservationRepository, 

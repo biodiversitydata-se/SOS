@@ -1,13 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Analysis.Api.Dtos.Filter;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Search.Enums;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Analysis.Api.Controllers.Interfaces
 {
     public interface IAnalysisController
     {
         /// <summary>
-        ///  Aggregate by user passed filed
+        ///  Aggregate by user passed filed, paging functionality
         /// </summary>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
@@ -23,6 +25,24 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             string aggregationField,
             string? afterKey,
             int? take);
+
+        /// <summary>
+        ///  Aggregate by user passed filed
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="aggregationField"></param>
+        /// <param name="take"></param>
+        /// <param name="sortOrder"></param>
+        /// <returns></returns>
+        Task<IActionResult> AggregateByUserFieldAsync(
+            int? roleId,
+            string? authorizationApplicationIdentifier,
+            SearchFilterInternalDto filter,
+            string aggregationField,
+            int take,
+            AggregationSortOrder sortOrder);
 
         /// <summary>
         /// Calculate AOO and EOO and get geometry showing coverage 

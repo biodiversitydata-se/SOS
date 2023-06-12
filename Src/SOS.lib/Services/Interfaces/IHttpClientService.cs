@@ -41,7 +41,6 @@ namespace SOS.Lib.Services.Interfaces
         /// <typeparam name="T"></typeparam>
         /// <param name="requestUri"></param>
         /// <param name="model"></param>
-        /// <param name="contentType"></param>
         /// <returns></returns>
         Task<T> PostDataAsync<T>(Uri requestUri, object model);
 

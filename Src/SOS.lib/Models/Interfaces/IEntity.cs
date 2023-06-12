@@ -3,7 +3,7 @@
     /// <summary>
     ///     IEntity interface
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TKey"></typeparam>
     public interface IEntity<TKey>
     {
         /// <summary>

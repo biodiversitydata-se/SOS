@@ -657,13 +657,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string LocationRemarks { get; set; }
 
         /// <summary>
-        /// Web address that leads to more information about the
-        /// location. The information should be accessible
-        /// from the most commonly used web browsers.
-        /// </summary>
-        //public string LocationURL { get; set; }
-
-        /// <summary>
         ///     Darwin Core term name: maximumDepthInMeters.
         ///     The greater depth of a range of depth below
         ///     the local surface, in meters.
@@ -731,12 +724,7 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// </summary>
         public string Municipality { get; set; }
 
-        /// <summary>
-        /// Parish where the species observation where made.
-        /// 'Socken/församling' in swedish.
-        /// </summary>
-        //public string Parish { get; set; }
-
+        
         /// <summary>
         ///     Darwin Core term name: pointRadiusSpatialFit.
         ///     The ratio of the area of the point-radius

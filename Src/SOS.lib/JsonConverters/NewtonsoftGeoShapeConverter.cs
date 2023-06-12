@@ -98,7 +98,7 @@ namespace SOS.Lib.JsonConverters
             writer.WriteEndArray();
         }
 
-        public override void WriteJson(JsonWriter writer, IGeoShape? value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, IGeoShape value, JsonSerializer serializer)
         {
             if (value == null)
             {
@@ -138,7 +138,7 @@ namespace SOS.Lib.JsonConverters
             writer.WriteEndObject();
         }
 
-        public override IGeoShape? ReadJson(JsonReader reader, Type objectType, IGeoShape? existingValue, bool hasExistingValue,
+        public override IGeoShape ReadJson(JsonReader reader, Type objectType, IGeoShape existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.StartObject)

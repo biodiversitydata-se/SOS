@@ -8,7 +8,7 @@ namespace SOS.Lib.Enums.Weather
     public enum Visibility
     {
         /// <summary>
-        /// dimma, <1 km
+        /// dimma, mindr än 1 km
         /// </summary>
         [EnumMember(Value = "dimma, <1 km")]
         Fog1Km = 0,
@@ -28,7 +28,7 @@ namespace SOS.Lib.Enums.Weather
         [EnumMember(Value = "god, 10-20 km")]
         Good10To20Km = 3,
         /// <summary>
-        /// mycket god, >20 km
+        /// mycket god, mer än 20 km
         /// </summary>
         [EnumMember(Value = "mycket god, >20 km")]
         VeryGood20Km = 4

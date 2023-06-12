@@ -152,7 +152,7 @@ namespace SOS.Lib.Factories
 
                 return topoSortByTaxonId;
             }
-            catch (Exception ex) 
+            catch (Exception) 
             {
                 // Temporary catch exceptions as long as the graph isn't a directed acyclic graph (DAG)
                 return new Dictionary<int, int>();
