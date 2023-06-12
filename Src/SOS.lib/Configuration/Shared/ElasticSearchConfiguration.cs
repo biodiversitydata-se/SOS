@@ -85,6 +85,7 @@ namespace SOS.Lib.Configuration.Shared
                     .RequestTimeout(TimeSpan.FromSeconds(RequestTimeout ?? 60))
                     .SniffOnStartup(true)
                     .SniffOnConnectionFault(true)
+                    .SniffLifeSpan(new TimeSpan(0, 30, 0))
                     .ServerCertificateValidationCallback(CertificateValidations.AllowAll);
              
                 if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
@@ -7,6 +8,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Amazon.Runtime.Internal.Transform;
 using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
@@ -400,7 +402,7 @@ namespace SOS.Observations.Api
                 healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
                 healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] { "wfs" }); // add this to ST environment when we have a GeoServer test environment.
             }
-
+           
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
@@ -563,14 +565,14 @@ namespace SOS.Observations.Api
                 endpoints.MapHealthChecks("/health", new HealthCheckOptions()
                 {
                     Predicate = _ => false,
-                    ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.Latest)
+                    ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.LatestNoWfs)
                 });
                 endpoints.MapHealthChecks("/health-json", new HealthCheckOptions()
                 {
                     Predicate = _ => false,
                     ResponseWriter = async (context, _) =>
                     {
-                        var report = HealthReportCachePublisher.Latest;
+                        var report = HealthReportCachePublisher.LatestAll;
                         var result = report == null ? "{}" : JsonConvert.SerializeObject(
                             new
                             {
@@ -593,6 +595,11 @@ namespace SOS.Observations.Api
                         context.Response.ContentType = MediaTypeNames.Application.Json;
                         await context.Response.WriteAsync(result);
                     }
+                });
+                endpoints.MapHealthChecks("/health-wfs", new HealthCheckOptions()
+                {
+                    Predicate = _ => false,
+                    ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.LatestOnlyWfs)
                 });
             });
 

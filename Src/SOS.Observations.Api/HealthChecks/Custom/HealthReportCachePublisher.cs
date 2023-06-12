@@ -1,6 +1,10 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using HealthChecks.UI.Client;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace SOS.Observations.Api.HealthChecks.Custom
 {
@@ -14,7 +18,17 @@ namespace SOS.Observations.Api.HealthChecks.Custom
         /// <summary>
         /// The latest health report which got published
         /// </summary>
-        public static HealthReport Latest { get; set; }
+        public static HealthReport LatestAll { get; set; }
+
+        /// <summary>
+        /// The latest health report which got published withosut wfs entry
+        /// </summary>
+        public static HealthReport LatestNoWfs { get; set; }
+
+        /// <summary>
+        /// The latest health report which got published with only wfs entry
+        /// </summary>
+        public static HealthReport LatestOnlyWfs { get; set; }
 
         /// <summary>
         /// Publishes a provided report
@@ -24,7 +38,24 @@ namespace SOS.Observations.Api.HealthChecks.Custom
         /// <returns></returns>
         public Task PublishAsync(HealthReport report, CancellationToken cancellationToken)
         {
-            Latest = report;
+            LatestAll = report;
+
+            var noWfsEntries = report?.Entries?.Where(e => !e.Key.Equals("WFS"));
+
+            if (noWfsEntries?.Any() ?? false)
+            {
+                var dictionaryEntries = new Dictionary<string, HealthReportEntry>(noWfsEntries);
+                LatestNoWfs = new HealthReport(new ReadOnlyDictionary<string, HealthReportEntry>(dictionaryEntries), new System.TimeSpan(dictionaryEntries.Sum(e => e.Value.Duration.Ticks)) );
+            }
+
+            var wfsEntries = report?.Entries?.Where(e => e.Key.Equals("WFS"));
+
+            if (wfsEntries?.Any() ?? false)
+            {
+                var dictionaryEntries = new Dictionary<string, HealthReportEntry>(wfsEntries);
+                LatestOnlyWfs = new HealthReport(new ReadOnlyDictionary<string, HealthReportEntry>(dictionaryEntries), new System.TimeSpan(dictionaryEntries.Sum(e => e.Value.Duration.Ticks)));
+            }
+
             return Task.CompletedTask;
         }
     }
