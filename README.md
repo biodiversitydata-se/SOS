@@ -23,7 +23,7 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 - [Observation](Docs/Observation.md)
 - [Observation (flat structure)](Docs/FlatObservation.md)
 - [Field sets](Docs/FieldSets.md)
-- [Data providers](Docs/DataProviders.md)
+- [Data providers & dataset](Docs/DataProviders.md)
 - [Vocabularies](Docs/Vocabularies.md)
 - [Areas](Docs/Areas.md)
 
