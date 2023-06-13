@@ -23,6 +23,7 @@
         BirdsDirectiveAnnex1 = 15,
         BirdsDirectiveAnnex2 = 16,
         ActionPlan = 17,
-        SwedishForestAgencyNatureConservationSpecies = 18
+        SwedishForestAgencyNatureConservationSpecies = 18,
+        HabitatsDirective2023 = 30
     }
 }
