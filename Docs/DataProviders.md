@@ -1,5 +1,5 @@
-# Data providers
-The following data providers are harvested once a day by SOS. Use the endpoint `/DataProviders` *(DataProviders_GetDataProviders)* to get up to date information. More data providers are added continuously.
+# Data providers & dataset
+The following data provideded datasets are harvested once a day by SOS. Use the endpoint `/DataProviders` *(DataProviders_GetDataProviders)* to get up to date information. More data providers are added continuously.
 
 *Latest updated 2022-05-27*
 
