@@ -42,7 +42,7 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 RecurringJob.AddOrUpdate<IApiUsageStatisticsHarvestJob>(nameof(IApiUsageStatisticsHarvestJob), job => job.RunHarvestStatisticsAsync(),
-                    $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                    $"0 {minute} {hour} * * ?", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
                 return new OkObjectResult("API statistics harvest job added");
             }
             catch (Exception e)

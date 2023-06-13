@@ -13,7 +13,6 @@ using Hangfire.Mongo.Migration.Strategies.Backup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -68,23 +67,6 @@ namespace SOS.Administration.Api
         /// </summary>
         public ILifetimeScope AutofacContainer { get; private set; }
 
-        private static MongoStorageOptions MongoStorageOptions
-        {
-            get
-            {
-                
-                var migrationOptions = new MongoMigrationOptions
-                {
-                    MigrationStrategy = new MigrateMongoMigrationStrategy(),
-                    BackupStrategy = new CollectionMongoBackupStrategy()
-                };
-
-                var storageOptions = new MongoStorageOptions {MigrationOptions = migrationOptions};
-                return storageOptions;
-            }
-        }
-
-
         /// <summary>
         ///     This method gets called by the runtime. Use this method to add services to the container.
         /// </summary>
@@ -138,7 +120,7 @@ namespace SOS.Administration.Api
                     });
                 });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddMvc();//.SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Hangfire
             var hangfireDbConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();

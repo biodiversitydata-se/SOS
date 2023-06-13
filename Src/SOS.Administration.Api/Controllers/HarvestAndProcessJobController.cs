@@ -44,7 +44,8 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 RecurringJob.AddOrUpdate<IObservationsHarvestJob>($"{nameof(IObservationsHarvestJob)}-Full",
-                    job => job.RunFullAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                    job => job.RunFullAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+                
                 return new OkObjectResult("Observations harvest and process job added");
             }
             catch (Exception e)
@@ -181,7 +182,7 @@ namespace SOS.Administration.Api.Controllers
 
                 RecurringJob.AddOrUpdate<IObservationsHarvestJob>(
                     $"{nameof(IObservationsHarvestJob)}-Incremental", job => job.RunIncrementalActiveAsync(null, JobCancellationToken.Null),
-                    $"*/{runIntervalInMinutes} * * * *", TimeZoneInfo.Local);
+                    $"*/{runIntervalInMinutes} * * * *", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
 
                 return new OkObjectResult("Incremental observation Harvest and process job scheduled");
             }
@@ -201,7 +202,7 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 RecurringJob.AddOrUpdate<IChecklistsHarvestJob>($"{nameof(IChecklistsHarvestJob)}-Full",
-                    job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                    job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
                 return new OkObjectResult("Check lists harvest and process job added");
             }
             catch (Exception e)

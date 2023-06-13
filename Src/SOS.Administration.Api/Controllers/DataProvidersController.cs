@@ -74,6 +74,7 @@ namespace SOS.Administration.Api.Controllers
         ///     If the DataProvider already exists, set
         ///     forceOverwriteIfCollectionExist to true if you want to overwrite this record with default data.
         /// </param>
+        /// <param name="dataProviderIdOrIdentifier">Name or identifier of dataprovider</param>
         /// <returns></returns>
         [HttpPost("ImportDefaultDataProvider")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]

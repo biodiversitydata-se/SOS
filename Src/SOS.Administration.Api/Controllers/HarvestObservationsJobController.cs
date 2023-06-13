@@ -124,7 +124,7 @@ namespace SOS.Administration.Api.Controllers
                     job => job.RunHarvestObservationsAsync(
                         parsedDataProvidersResult.Select(providerResult => providerResult.Value.Identifier).ToList(),
                         JobCancellationToken.Null),
-                    $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                    $"0 {minute} {hour} * * ?", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
 
                 return new OkObjectResult(
                     $"Scheduled harvest observations job enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, parsedDataProvidersResult.Select(res => " - " + res.Value))}");

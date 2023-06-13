@@ -80,7 +80,7 @@ namespace SOS.Administration.Api.Controllers
 
                 RecurringJob.AddOrUpdate<IExportAndStoreJob>(nameof(IExportAndStoreJob),
                     job => job.RunAsync(filter, blobStorageContainer, fileName, JobCancellationToken.Null),
-                    $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                    $"0 {minute} {hour} * * ?", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
                 return new OkObjectResult("Export Darwin Core Job Scheduled.");
             }
             catch (Exception e)
@@ -134,7 +134,7 @@ namespace SOS.Administration.Api.Controllers
 
                 RecurringJob.AddOrUpdate<IExportToDoiJob>(nameof(IExportToDoiJob),
                     job => job.RunAsync(fileName, JobCancellationToken.Null),
-                    cronExpression, TimeZoneInfo.Local);
+                    cronExpression, new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
 
                 return new OkObjectResult("Export To DOI Job Scheduled.");
             }
