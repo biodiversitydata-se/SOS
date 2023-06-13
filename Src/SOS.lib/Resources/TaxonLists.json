@@ -454,6 +454,196 @@
             }
         ],
         "TaxonIds": []
+    },
+    {
+        "Id": 30,
+        "TaxonListServiceId": 265,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Habitats directive species 2023"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Habitatdirektivet 2023"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 31,
+        "ParentId": 30,
+        "TaxonListServiceId": 266,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Preservation status"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Bevarandestatus"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 32,
+        "ParentId": 31,
+        "TaxonListServiceId": 268,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Prosperous Preservation Status"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Gynnsamma bevarandestatus"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 33,
+        "ParentId": 31,
+        "TaxonListServiceId": 269,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Unsatisfactory Preservation Status"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Otillfredställande bevarandestatus"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 34,
+        "ParentId": 31,
+        "TaxonListServiceId": 270,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Bad Preservation Status"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Dålig bevarandestatus"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 35,
+        "ParentId": 31,
+        "TaxonListServiceId": 271,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Unknown Preservation Status"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Okänd bevarandestatus"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 36,
+        "ParentId": 30,
+        "TaxonListServiceId": 267,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Trend"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Trend"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 37,
+        "ParentId": 36,
+        "TaxonListServiceId": 272,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Positiv"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Positiv"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 38,
+        "ParentId": 36,
+        "TaxonListServiceId": 273,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Negativ"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Negativ"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 39,
+        "ParentId": 36,
+        "TaxonListServiceId": 274,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Stable"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Stabil"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 40,
+        "ParentId": 36,
+        "TaxonListServiceId": 275,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Unknown"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Okänd"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 41,
+        "ParentId": 36,
+        "TaxonListServiceId": 276,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Unsure"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Osäker"
+            }
+        ],
+        "TaxonIds": []
     }
-
 ]
