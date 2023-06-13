@@ -644,6 +644,7 @@
                 "Value": "Osäker"
             }
         ],
-        "TaxonIds": []
+        "TaxonIds": [],
+        "AllowNotaxa":  true
     }
 ]

@@ -32,5 +32,10 @@ namespace SOS.Lib.Models.Shared
         /// The taxa in this taxon list.
         /// </summary>
         public ICollection<TaxonListTaxonInformation> Taxa { get; set; }
+
+        /// <summary>
+        /// This must be true if no taxon is connected to this list
+        /// </summary>
+        public bool AllowNotaxa { get; set; }
     }
 }

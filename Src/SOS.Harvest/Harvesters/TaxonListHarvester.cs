@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Harvest.Harvesters.Interfaces;
@@ -80,7 +76,7 @@ namespace SOS.Harvest.Harvesters
                 {                    
                     foreach (var taxonList in taxonLists)
                     {
-                        if (taxonList.Taxa == null || taxonList.Taxa.Count == 0)
+                        if (!taxonList.AllowNotaxa && !(taxonList.Taxa?.Any() ?? false))
                         {
                             listsWithNoTaxa.Add(taxonList);
                             dataIsOk = false;
