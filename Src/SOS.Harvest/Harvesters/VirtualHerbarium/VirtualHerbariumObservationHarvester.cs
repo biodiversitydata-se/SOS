@@ -53,7 +53,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                 var localitiesXml = await _virtualHerbariumObservationService.GetLocalitiesAsync();
                 Logger.LogDebug($"Finish getting Localities for Virtual Herbarium");
 
-                var verbatimFactory = new VirtualHerbariumHarvestFactory(localitiesXml);
+                var verbatimFactory = new VirtualHerbariumHarvestFactory(localitiesXml!);
                 var pageIndex = 1;
                 var fromDate = new DateTime(1628, 1, 1);
                 
@@ -65,7 +65,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
 
                     cancellationToken?.ThrowIfCancellationRequested();
                     Logger.LogDebug($"Start casting Virtual Herbarium observations page: {pageIndex}");
-                    var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(observations))?.ToArray();
+                    var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(observations!))?.ToArray();
                     observations = null;
                     Logger.LogDebug($"Finish casting Virtual Herbarium observations page: {pageIndex}");
 
@@ -74,11 +74,11 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                         break;
                     }
 
-                    harvestCount += verbatims.Count();
+                    harvestCount += verbatims!.Count();
 
                     // Remove duplicates
                     var distinctVerbatims = new HashSet<VirtualHerbariumObservationVerbatim>();
-                    foreach (var verbatim in verbatims)
+                    foreach (var verbatim in verbatims!)
                     {
                         var occurrenceId = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}";
                         if (occurrenceIdsSet.Contains(occurrenceId))
@@ -123,13 +123,15 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
             DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
+            return null!;
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
+            return null!;
         }
     }
 }

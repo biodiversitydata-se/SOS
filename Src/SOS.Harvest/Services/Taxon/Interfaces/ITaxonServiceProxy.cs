@@ -15,6 +15,6 @@
         /// <param name="url"></param>
         /// <param name="taxonIds"></param>
         /// <returns></returns>
-        Task<string> GetTaxonAsync(string url, IEnumerable<int> taxonIds);
+        Task<string?> GetTaxonAsync(string url, IEnumerable<int> taxonIds);
     }
 }

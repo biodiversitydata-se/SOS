@@ -5,6 +5,10 @@
     /// </summary>
     public class MetadataWithCategoryEntity<T> : MetadataEntity<T>
     {
+        public MetadataWithCategoryEntity(T id) : base(id)
+        {
+        } 
+
         /// <summary>
         ///     Id of category
         /// </summary>

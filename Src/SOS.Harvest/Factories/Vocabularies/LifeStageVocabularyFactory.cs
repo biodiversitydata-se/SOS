@@ -34,11 +34,12 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override VocabularyId FieldId => VocabularyId.LifeStage;
         protected override bool Localized => true;
 
-        protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
+        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
         {
             var stages = await _metadataRepository.GetStagesAsync();
-            var vocabularyValues = base.ConvertToLocalizedVocabularyValues(stages.ToArray());
-            int id = vocabularyValues.Max(f => f.Id);
+            var vocabularyValues = base.ConvertToLocalizedVocabularyValues(stages.ToArray()) ?? new List<VocabularyValueInfo>();
+            
+            int id = vocabularyValues!.Max(f => f.Id);
             vocabularyValues.Add(CreateVocabularyValue(++id, "Nauplius larva", "Nauplius larv"));
             vocabularyValues.Add(CreateVocabularyValue(++id, "Copepodite", "Copepodit"));
             vocabularyValues.Add(CreateVocabularyValue(++id, "Sub adult"));
@@ -51,18 +52,22 @@ namespace SOS.Harvest.Factories.Vocabularies
             vocabularyValues.Add(CreateVocabularyValue(++id, "gametophyte"));
             vocabularyValues.Add(CreateVocabularyValue(++id, "sperm"));
             vocabularyValues.Add(CreateVocabularyValue(++id, "dormant"));
-            
 
             return vocabularyValues;
         }
 
-        protected override List<ExternalSystemMapping> GetExternalSystemMappings(
-           ICollection<VocabularyValueInfo> vocabularyValues)
+        protected override List<ExternalSystemMapping>? GetExternalSystemMappings(
+           ICollection<VocabularyValueInfo>? vocabularyValues)
         {
+            if (!vocabularyValues?.Any() ?? true)
+            {
+                return null;
+            }
+
             return new List<ExternalSystemMapping>
             {
-                GetArtportalenExternalSystemMapping(vocabularyValues),
-                GetDarwinCoreExternalSystemMapping(vocabularyValues)
+                GetArtportalenExternalSystemMapping(vocabularyValues!),
+                GetDarwinCoreExternalSystemMapping(vocabularyValues!)
             };
         }
 

@@ -35,7 +35,7 @@ namespace SOS.Harvest.Services
                 _logger.LogDebug(
                     $"´Finish getting observations from MVM Service: From id: {getFromId}");
 
-                return (result.MaxChangeId, result.CreatedSpeciesObservations);
+                return (result?.MaxChangeId ?? 0, result?.CreatedSpeciesObservations ?? new WebSpeciesObservation[0]);
             }
             catch (FaultException e)
             {

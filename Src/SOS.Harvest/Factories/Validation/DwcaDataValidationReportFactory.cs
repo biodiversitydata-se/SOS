@@ -22,7 +22,7 @@ namespace SOS.Harvest.Factories.Validation
     /// </summary>
     public class DwcaDataValidationReportFactory : DataValidationReportFactoryBase<DwcObservationVerbatim>
     {
-        private DwcaObservationFactory _dwcaObservationFactory;
+        private DwcaObservationFactory? _dwcaObservationFactory;
         private readonly IVerbatimClient _verbatimClient;
         private readonly ILoggerFactory _loggerFactory;
 
@@ -62,11 +62,14 @@ namespace SOS.Harvest.Factories.Validation
             return await dwcArchiveVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override async Task<Observation> CreateProcessedObservationAsync(DwcObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override async Task<Observation?> CreateProcessedObservationAsync(DwcObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
-            _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
-            return processedObservation;
+            return await Task.Run(() =>
+            {
+                var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
+                _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
+                return processedObservation;
+            }); 
         }
 
         protected override void ValidateVerbatimTaxon(
@@ -119,7 +122,7 @@ namespace SOS.Harvest.Factories.Validation
             {
                 var dwcaVocabularyById = DwcaObservationFactory.GetVocabulariesDictionary(
                     ExternalSystemId.DarwinCore,
-                    _vocabularyById.Values,
+                    _vocabularyById!.Values,
                     true);
 
                 _dwcaObservationFactory = new DwcaObservationFactory(

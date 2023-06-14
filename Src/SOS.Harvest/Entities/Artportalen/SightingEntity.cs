@@ -18,7 +18,7 @@
         /// <summary>
         ///     Description of biotope
         /// </summary>
-        public string BiotopeDescription { get; set; }
+        public string? BiotopeDescription { get; set; }
 
         /// <summary>
         /// Id of checklist
@@ -28,7 +28,7 @@
         /// <summary>
         ///     SightingCommentPublic comment
         /// </summary>
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         /// <summary>
         /// Data source id
@@ -181,7 +181,7 @@
         /// <summary>
         ///     Rights holder
         /// </summary>
-        public string RightsHolder { get; set; }
+        public string? RightsHolder { get; set; }
 
         /// <summary>
         ///     Id of site
@@ -211,12 +211,12 @@
         /// <summary>
         ///     Description of substrate
         /// </summary>
-        public string SubstrateDescription { get; set; }
+        public string? SubstrateDescription { get; set; }
 
         /// <summary>
         ///     Description of substrate species
         /// </summary>
-        public string SubstrateSpeciesDescription { get; set; }
+        public string? SubstrateSpeciesDescription { get; set; }
 
         /// <summary>
         ///     Substrate taxon id
@@ -226,7 +226,7 @@
         /// <summary>
         /// Sighting summary
         /// </summary>
-        public string Summary { get; set; }
+        public string? Summary { get; set; }
 
         /// <summary>
         ///     Id of taxon
@@ -251,7 +251,7 @@
         /// <summary>
         ///     SightingBarcode url
         /// </summary>
-        public string SightingBarcodeURL { get; set; }
+        public string? SightingBarcodeURL { get; set; }
 
         /// <summary>
         ///     Validation status id
@@ -285,9 +285,9 @@
 
         public bool? TriggeredObservationRuleUnspontaneous { get; set; }
 
-        public string SightingPublishTypeIds { get; set; }
+        public string? SightingPublishTypeIds { get; set; }
 
-        public string SpeciesFactsIds { get; set; }
+        public string? SpeciesFactsIds { get; set; }
 
     }
 }

@@ -19,6 +19,6 @@ namespace SOS.Harvest.Services.Interfaces
         /// <param name="query"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null);
+        Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic? parameters = null);
     }
 }

@@ -154,7 +154,8 @@ namespace SOS.Harvest.Harvesters.DwC
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestChecklistsAsync(IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for DwcA files");
+            await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
+            return null!;
         }
 
         /// inheritdoc />
@@ -181,7 +182,7 @@ namespace SOS.Harvest.Harvesters.DwC
                     if (emlDocument != null)
                     {
                         if (DateTime.TryParse(
-                            emlDocument.Root.Element("dataset").Element("pubDate").Value,
+                            emlDocument!.Root?.Element("dataset")?.Element("pubDate")?.Value,
                             out var pubDate))
                         {
                             // If data set not has changed since last harvest, don't harvest again

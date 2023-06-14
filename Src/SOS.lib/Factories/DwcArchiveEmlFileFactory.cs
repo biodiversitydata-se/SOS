@@ -123,26 +123,29 @@ namespace SOS.Lib.Factories
         /// <returns></returns>
         public static async Task<XDocument> CreateEmlXmlFileAsync(DataProvider dataProvider)
         {
-            if (dataProvider == null)
+            return await Task.Run(() =>
             {
-                return null;
-            }
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var emlTemplatePath = Path.Combine(assemblyPath, @"Resources\DarwinCore\eml.xml");
-            var xDoc = XDocument.Load(emlTemplatePath);
-            var dataset = xDoc.Root.Element("dataset");
+                if (dataProvider == null)
+                {
+                    return null;
+                }
+                var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                var emlTemplatePath = Path.Combine(assemblyPath, @"Resources\DarwinCore\eml.xml");
+                var xDoc = XDocument.Load(emlTemplatePath);
+                var dataset = xDoc.Root.Element("dataset");
 
-            SetPubDateToCurrentDate(dataset);
-            GetElement(dataset, "identifier").SetValue(new Guid().ToString());
-            GetElement(dataset, "alternateIdentifier").SetValue($"urn:lsid:artdata.slu.se:SOS:{dataProvider.Identifier}");
-            
-            GetElement(dataset,"title").SetValue(dataProvider.Names.Translate("en-GB") ?? "N/A");
-            GetElement(GetElement(dataset, "abstract"), "para").SetValue(dataProvider.Descriptions?.Translate("en-GB") ?? "N/A");
-            SetContact(dataset, dataProvider);
+                SetPubDateToCurrentDate(dataset);
+                GetElement(dataset, "identifier").SetValue(new Guid().ToString());
+                GetElement(dataset, "alternateIdentifier").SetValue($"urn:lsid:artdata.slu.se:SOS:{dataProvider.Identifier}");
 
-            GetElement(dataset, sosNs + "resourceHomepage").SetValue(dataProvider.Url ?? "N/A");
+                GetElement(dataset, "title").SetValue(dataProvider.Names.Translate("en-GB") ?? "N/A");
+                GetElement(GetElement(dataset, "abstract"), "para").SetValue(dataProvider.Descriptions?.Translate("en-GB") ?? "N/A");
+                SetContact(dataset, dataProvider);
 
-            return xDoc;
+                GetElement(dataset, sosNs + "resourceHomepage").SetValue(dataProvider.Url ?? "N/A");
+
+                return xDoc;
+            });
         }
 
         /// <summary>

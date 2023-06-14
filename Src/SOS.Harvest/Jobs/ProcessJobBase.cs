@@ -42,7 +42,7 @@ namespace SOS.Harvest.Jobs
                 return;
             }
 
-            foreach (var jobId in jobIds)
+            foreach (var jobId in jobIds!)
             {
                 BackgroundJob.Delete(jobId);
                 Thread.Sleep(30000); // Sleep 30s to let job finish

@@ -11,18 +11,18 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         ///     Get all projects
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<ProjectEntity>> GetProjectsAsync();
+        Task<IEnumerable<ProjectEntity>?> GetProjectsAsync();
         /// <summary>
         ///     Get a project
         /// </summary>
         /// <returns></returns>
-        Task<ProjectEntity> GetProjectAsync(int projectId);
+        Task<ProjectEntity?> GetProjectAsync(int projectId);
 
         /// <summary>
         /// Get all project parameters for passed sightings
         /// </summary>
         /// <param name="sightingIds"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProjectParameterEntity>> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds);
+        Task<IEnumerable<ProjectParameterEntity>?> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds);
     }
 }

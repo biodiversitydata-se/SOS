@@ -11,7 +11,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// </summary>
         /// <param name="project"></param>
         /// <returns></returns>
-        public static Lib.Models.Processed.Observation.Project CreateProcessedProject(Project project)
+        public static Lib.Models.Processed.Observation.Project? CreateProcessedProject(Project project)
         {
             if (project == null) return null;
 
@@ -64,7 +64,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// </summary>
         /// <param name="projectParameter"></param>
         /// <returns></returns>
-        public static Lib.Models.Processed.Observation.ProjectParameter CreateProcessedProjectParameter(ProjectParameter projectParameter)
+        public static Lib.Models.Processed.Observation.ProjectParameter? CreateProcessedProjectParameter(ProjectParameter projectParameter)
         {
             if (projectParameter == null)
             {

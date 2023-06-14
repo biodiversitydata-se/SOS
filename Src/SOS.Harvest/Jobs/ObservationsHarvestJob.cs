@@ -462,7 +462,7 @@ namespace SOS.Harvest.Jobs
             IJobCancellationToken cancellationToken)
         {
             var harvester = _harvestersByType[DataProviderType.ArtportalenObservations] as IArtportalenObservationHarvester;
-            var verbatims = await harvester.HarvestObservationsAsync(sightingIds, cancellationToken);
+            var verbatims = await harvester!.HarvestObservationsAsync(sightingIds, cancellationToken);
 
             if (!verbatims?.Any() ?? true)
             {
@@ -470,7 +470,7 @@ namespace SOS.Harvest.Jobs
             }
 
             // Fix dates
-            foreach (var obs in verbatims)
+            foreach (var obs in verbatims!)
             {
                 if (obs.StartDate.HasValue)
                     obs.StartDate = DateTime.SpecifyKind(obs.StartDate.Value, DateTimeKind.Local);

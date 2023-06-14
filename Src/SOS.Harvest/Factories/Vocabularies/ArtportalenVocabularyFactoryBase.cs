@@ -28,14 +28,19 @@ namespace SOS.Harvest.Factories.Vocabularies
             return vocabulary;
         }
 
-        protected abstract Task<ICollection<VocabularyValueInfo>> GetVocabularyValues();
+        protected abstract Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues();
 
-        protected virtual ICollection<VocabularyValueInfo> ConvertToLocalizedVocabularyValues(
-            ICollection<MetadataEntity<int>> metadataEntities)
+        protected virtual ICollection<VocabularyValueInfo>? ConvertToLocalizedVocabularyValues(
+            ICollection<MetadataEntity<int>>? metadataEntities)
         {
-            metadataEntities.TrimValues();
-            var vocabularyValues = new List<VocabularyValueInfo>(metadataEntities.Count());
-            foreach (var group in metadataEntities.GroupBy(m => m.Id))
+            if (!metadataEntities?.Any() ?? true)
+            {
+                return null;
+            }
+
+            metadataEntities!.TrimValues();
+            var vocabularyValues = new List<VocabularyValueInfo>(metadataEntities!.Count());
+            foreach (var group in metadataEntities!.GroupBy(m => m.Id))
             {
                 var swedishRecord = group.Single(m => m.CultureCode == Cultures.sv_SE);
                 var englishRecord = group.Single(m => m.CultureCode == Cultures.en_GB);
@@ -136,18 +141,23 @@ namespace SOS.Harvest.Factories.Vocabularies
         }
 
 
-        protected virtual List<ExternalSystemMapping> GetExternalSystemMappings(
-            ICollection<VocabularyValueInfo> vocabularyValues)
+        protected virtual List<ExternalSystemMapping>? GetExternalSystemMappings(
+            ICollection<VocabularyValueInfo>? vocabularyValues)
         {
+            if (!vocabularyValues?.Any() ?? true)
+            {
+                return null;
+            }
+
             return new List<ExternalSystemMapping>
             {
-                GetArtportalenExternalSystemMapping(vocabularyValues)
+                GetArtportalenExternalSystemMapping(vocabularyValues!)
             };
         }
 
 
         protected virtual ExternalSystemMapping GetArtportalenExternalSystemMapping(
-            ICollection<VocabularyValueInfo> vocabularyValues)
+            ICollection<VocabularyValueInfo>? vocabularyValues)
         {
             var artportalenMapping = new ExternalSystemMapping
             {
@@ -163,16 +173,19 @@ namespace SOS.Harvest.Factories.Vocabularies
                 Values = new List<ExternalSystemMappingValue>()
             };
 
-            // 1-1 mapping between Id fields.
-            foreach (var vocabularyValue in vocabularyValues.Where(f => !f.IsCustomValue))
+            if (vocabularyValues?.Any() ?? false)
             {
-                mappingField.Values.Add(new ExternalSystemMappingValue
+                // 1-1 mapping between Id fields.
+                foreach (var vocabularyValue in vocabularyValues!.Where(f => !f.IsCustomValue))
                 {
-                    Value = vocabularyValue.Id,
-                    SosId = vocabularyValue.Id
-                });
+                    mappingField.Values.Add(new ExternalSystemMappingValue
+                    {
+                        Value = vocabularyValue.Id,
+                        SosId = vocabularyValue.Id
+                    });
+                }
             }
-
+           
             artportalenMapping.Mappings.Add(mappingField);
             return artportalenMapping;
         }

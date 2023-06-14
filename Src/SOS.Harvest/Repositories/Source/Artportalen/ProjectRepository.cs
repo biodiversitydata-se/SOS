@@ -54,7 +54,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProjectEntity>> GetProjectsAsync()
+        public async Task<IEnumerable<ProjectEntity>?> GetProjectsAsync()
         {
             try
             {
@@ -68,7 +68,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<ProjectEntity> GetProjectAsync(int projectId)
+        public async Task<ProjectEntity?> GetProjectAsync(int projectId)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProjectParameterEntity>> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds)
+        public async Task<IEnumerable<ProjectParameterEntity>?> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds)
         {
             try
             {

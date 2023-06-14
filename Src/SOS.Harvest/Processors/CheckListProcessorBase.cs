@@ -93,7 +93,7 @@ namespace SOS.Harvest.Processors
 
                 var checklists = new ConcurrentDictionary<string, Checklist>();
 
-                foreach (var verbatimChecklist in verbatimChecklistBatch)
+                foreach (var verbatimChecklist in verbatimChecklistBatch!)
                 {
                     var checklist = checklistFactory.CreateProcessedChecklist(verbatimChecklist);
 
@@ -110,7 +110,7 @@ namespace SOS.Harvest.Processors
 
                 return await ValidateAndStoreChecklists(dataProvider, checklists.Values, $"{startId}-{endId}");
             }
-            catch (JobAbortedException e)
+            catch (JobAbortedException)
             {
                 // Throw cancelation again to let function above handle it
                 throw;
@@ -200,7 +200,7 @@ namespace SOS.Harvest.Processors
                 return 0;
             }
 
-            var processedCount = await CommitBatchAsync(dataProvider, checklists, batchId);
+            var processedCount = await CommitBatchAsync(dataProvider, checklists!, batchId);
 
             return processedCount;
         }

@@ -15,7 +15,7 @@ namespace SOS.Harvest.Harvesters.Shark
         );
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SharkObservationVerbatim>> CastEntitiesToVerbatimsAsync(SharkJsonFile fileData)
+        public async Task<IEnumerable<SharkObservationVerbatim>?> CastEntitiesToVerbatimsAsync(SharkJsonFile fileData)
         {
             return await Task.Run(() =>
             {

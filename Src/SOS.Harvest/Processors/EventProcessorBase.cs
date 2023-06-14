@@ -115,7 +115,7 @@ namespace SOS.Harvest.Processors
 
                 Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 var processedEvents = new ConcurrentDictionary<string, Event>();
-                foreach (var verbatimEvent in verbatimEventsBatch)
+                foreach (var verbatimEvent in verbatimEventsBatch!)
                 {
                     var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
                     if (processedEvent == null) continue;
@@ -125,7 +125,7 @@ namespace SOS.Harvest.Processors
                 Logger.LogDebug($"Event - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 return await ValidateAndStoreEvents(dataProvider, processedEvents.Values, $"{startId}-{endId}");
             }
-            catch (JobAbortedException e)
+            catch (JobAbortedException)
             {
                 // Throw cancelation again to let function above handle it
                 throw;
@@ -226,7 +226,7 @@ namespace SOS.Harvest.Processors
                 return (0, 0, preValidationCount);
             }
 
-            var processedCount = await CommitBatchAsync(dataProvider, events, batchId);
+            var processedCount = await CommitBatchAsync(dataProvider, events!, batchId);
 
             events!.Clear();
             return (processedCount, 0, preValidationCount - processedCount);

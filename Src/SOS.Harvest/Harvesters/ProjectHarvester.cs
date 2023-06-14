@@ -48,13 +48,13 @@ namespace SOS.Harvest.Harvesters
                 _logger.LogDebug("Start getting projects");
 
                 var projectEntities = await _artportalenProjectRepository.GetProjectsAsync();
-                if (!projectEntities.Any())
+                if (!projectEntities?.Any() ?? true)
                 {
                     harvestInfo.Status = RunStatus.Failed;
                     return harvestInfo;
                 }
 
-                var projects = projectEntities
+                var projects = projectEntities!
                     .Where(m => m.IsHideall == false)
                     .Select(CastToProjectInfo)
                     .ToList()

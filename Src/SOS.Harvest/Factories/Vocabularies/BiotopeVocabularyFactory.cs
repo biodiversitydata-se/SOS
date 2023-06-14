@@ -34,7 +34,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override VocabularyId FieldId => VocabularyId.Biotope;
         protected override bool Localized => true;
 
-        protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
+        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
         {
             var biotopes = await _artportalenMetadataRepository.GetBiotopesAsync();
             var vocabularyValues = ConvertToLocalizedVocabularyValues(biotopes.ToArray());

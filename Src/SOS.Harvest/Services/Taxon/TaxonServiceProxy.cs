@@ -27,7 +27,7 @@ namespace SOS.Harvest.Services.Taxon
             return new MemoryStream(bytes);
         }
 
-        public async Task<string> GetTaxonAsync(string url, IEnumerable<int> taxonIds)
+        public async Task<string?> GetTaxonAsync(string url, IEnumerable<int> taxonIds)
         {
             using var client = new HttpClient();
             var body = new GetTaxonBody();
@@ -50,7 +50,7 @@ namespace SOS.Harvest.Services.Taxon
 
         private class GetTaxonBody
         {
-            public IEnumerable<int> TaxonIds { get; set; }
+            public IEnumerable<int>? TaxonIds { get; set; }
         }
     }
 }

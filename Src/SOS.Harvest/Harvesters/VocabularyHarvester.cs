@@ -133,7 +133,11 @@ namespace SOS.Harvest.Harvesters
                 foreach (var fileName in Directory.GetFiles(@"Resources\Vocabularies\"))
                 {
                     var vocabulary = CreateVocabularyFromJsonFile(fileName);
-                    vocabularies.Add(vocabulary);
+
+                    if (vocabulary != null)
+                    {
+                        vocabularies.Add(vocabulary);
+                    }
                 }
 
                 vocabularies = vocabularies.OrderBy(m => m.Id).ToList();
@@ -200,18 +204,23 @@ namespace SOS.Harvest.Harvesters
             return await vocabularyFactory.CreateVocabularyAsync();
         }
 
-        private Vocabulary CreateVocabularyFromJsonFile(string filename)
+        private Vocabulary? CreateVocabularyFromJsonFile(string filename)
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath, filename);
+            var filePath = Path.Combine(assemblyPath!, filename);
             var str = File.ReadAllText(filePath, Encoding.UTF8);
             var vocabulary = JsonConvert.DeserializeObject<Vocabulary>(str);
             ValidateVocabulary(vocabulary);
             return vocabulary;
         }
 
-        private void ValidateVocabulary(Vocabulary vocabulary)
+        private void ValidateVocabulary(Vocabulary? vocabulary)
         {
+            if (vocabulary == null)
+            {
+                return;
+            }
+
             var externalSystemMappingFields = vocabulary?.ExternalSystemsMapping?.SelectMany(mapping => mapping.Mappings);
             if (externalSystemMappingFields == null) return;
 
@@ -225,14 +234,14 @@ namespace SOS.Harvest.Harvesters
                 {
                     if (externalSystemMappingField.Values.Select(m => m.Value.ToString()?.ToLower()).HasDuplicates())
                     {
-                        throw new Exception($"Duplicate mappings exist for field \"{vocabulary.Name}\"");
+                        throw new Exception($"Duplicate mappings exist for field \"{vocabulary?.Name}\"");
                     }
                 }
                 else
                 {
                     if (externalSystemMappingField.Values.Select(m => m.Value).HasDuplicates())
                     {
-                        throw new Exception($"Duplicate mappings exist for field \"{vocabulary.Name}\"");
+                        throw new Exception($"Duplicate mappings exist for field \"{vocabulary?.Name}\"");
                     }
                 }
             }

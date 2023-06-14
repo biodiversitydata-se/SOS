@@ -1,5 +1,4 @@
 ﻿using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 
 namespace SOS.Harvest.Processors.Interfaces
@@ -14,6 +13,6 @@ namespace SOS.Harvest.Processors.Interfaces
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        Dataset CreateProcessedDataset(TEntity verbatim);
+        Dataset? CreateProcessedDataset(TEntity verbatim);
     }
 }

@@ -111,16 +111,6 @@ namespace SOS.Harvest.Processors.Shark
         }
 
         /// <summary>
-        ///     Creates occurrence id.
-        /// </summary>
-        /// <returns>The Catalog Number.</returns>
-        private string GetCatalogNumber(string occurrenceId)
-        {
-            var pos = occurrenceId?.LastIndexOf(":", StringComparison.Ordinal) ?? -1;
-            return pos == -1 ? null : occurrenceId?.Substring(pos + 1);
-        }
-
-        /// <summary>
         ///     Gets the occurrence status. Set to Present if DyntaxaTaxonId from provider is greater than 0 and Absent if
         ///     DyntaxaTaxonId is 0
         /// </summary>

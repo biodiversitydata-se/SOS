@@ -83,30 +83,34 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
                     Logger.LogDebug(
                             $"Fetching NORS observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
 
-                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
-                    // Clean up
-                    xmlDocument = null;
+                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument!);
 
-                    // Add sightings to MongoDb
-                    await VerbatimRepository.AddManyAsync(verbatims);
-
-                    harvestCount += verbatims.Count();
-
-                    Logger.LogDebug($"{harvestCount} NORS observations harvested");
-
-                    var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
-
-                    if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
+                    if (verbatims?.Any() ?? false)
                     {
-                        dataLastModified = batchDataLastModified.Value;
-                    }
+                        // Clean up
+                        xmlDocument = null;
 
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        harvestCount >= _norsServiceConfiguration.MaxNumberOfSightingsHarvested)
-                    {
-                        Logger.LogInformation("Max NORS observations reached");
-                        break;
+                        // Add sightings to MongoDb
+                        await VerbatimRepository.AddManyAsync(verbatims);
+
+                        harvestCount += verbatims?.Count() ?? 0;
+
+                        Logger.LogDebug($"{harvestCount} NORS observations harvested");
+
+                        var batchDataLastModified = verbatims!.Select(a => a.Modified).Max();
+
+                        if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
+                        {
+                            dataLastModified = batchDataLastModified.Value;
+                        }
+
+                        cancellationToken?.ThrowIfCancellationRequested();
+                        if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                            harvestCount >= _norsServiceConfiguration.MaxNumberOfSightingsHarvested)
+                        {
+                            Logger.LogInformation("Max NORS observations reached");
+                            break;
+                        }
                     }
 
                     var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
@@ -138,13 +142,21 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
             DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
     }
 }

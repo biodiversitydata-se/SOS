@@ -35,10 +35,10 @@ namespace SOS.Harvest.Processors.Taxon
                 return;
             }
 
-            var taxaDictonary = taxa.ToDictionary(t => t.Id, t => t);
+            var taxaDictonary = taxa!.ToDictionary(t => t.Id, t => t);
             var currentRedlistPeriodId = await _taxonAttributeService.GetCurrentRedlistPeriodIdAsync();
 
-            var taxonCount = taxa.Count();
+            var taxonCount = taxa!.Count();
             var skip = 0;
             const int take = 500;
 
@@ -58,13 +58,13 @@ namespace SOS.Harvest.Processors.Taxon
 
             var attributeTypes = new Dictionary<int, IDictionary<string, string>>();
 
-            foreach (var factor in taxonAttributes.Factors)
+            foreach (var factor in taxonAttributes!.Factors)
             {
                 if (!factor.AttributeGroup?.AttributeTypes?.Any() ?? true)
                 {
                     continue;
                 }
-                foreach (var attributeType in factor.AttributeGroup.AttributeTypes)
+                foreach (var attributeType in factor.AttributeGroup!.AttributeTypes)
                 {
                     if ((!attributeType.Enumerations?.Any() ?? true) || attributeTypes.ContainsKey(attributeType.AttributeTypeId))
                     {
@@ -86,7 +86,7 @@ namespace SOS.Harvest.Processors.Taxon
 
             while (skip < taxonCount)
             {
-                var taxonIds = taxa.Skip(skip).Take(take).Select(t => t.Id);
+                var taxonIds = taxa!.Skip(skip).Take(take).Select(t => t.Id);
 
                 await _semaphore.WaitAsync();
                 getTaxonAttributesTasks.Add(PopulateDynamicProperties(taxaDictonary, attributeTypes, taxonIds));
@@ -136,10 +136,10 @@ namespace SOS.Harvest.Processors.Taxon
                 }
                 
 
-                foreach (var taxonAttribute in response.TaxonAttributes) {
+                foreach (var taxonAttribute in response!.TaxonAttributes) {
                     var mainField = taxonAttribute.Values?.FirstOrDefault(a => a.AttributeInfo?.IsMainField ?? false);
 
-                    if (!taxaDictonary.TryGetValue(taxonAttribute.TaxonId, out var taxon) || mainField == null)
+                    if (!taxaDictonary.TryGetValue(taxonAttribute.TaxonId, out var taxon) || mainField == null || taxonAttribute?.FactorId == null)
                     {
                         continue;
                     }
@@ -229,24 +229,34 @@ namespace SOS.Harvest.Processors.Taxon
         ///     each nodes parents.
         /// </summary>
         /// <param name="taxa"></param>
-        private void CalculateHigherClassificationField(IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+        private void CalculateHigherClassificationField(IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
             TaxonTree<IBasicTaxon> taxonTree)
-        {            
+        {          
+            if ((!taxa?.Any() ?? true) || taxonTree == null)
+            {
+                return;
+            }
+
             foreach (var treeNode in taxonTree.TreeNodeById.Values)
             {
                 var parentNames = treeNode.AsParentsNodeIterator().Select(m => m.ScientificName);
                 var reversedParentNames = parentNames.Reverse();
                 var higherClassification = string.Join(" | ", reversedParentNames);
 
-                if (taxa.TryGetValue(treeNode.TaxonId, out var taxon))
+                if (taxa!.TryGetValue(treeNode.TaxonId, out var taxon))
                 {
                     taxon.HigherClassification = higherClassification;
                 }
             }
         }
 
-        private async Task PopulateSpeciesGroupField(IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
+        private async Task PopulateSpeciesGroupField(IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa)
         {
+            if (!taxa?.Any() ?? true)
+            {
+                return;
+            }
+
             var apTaxa = await _apTaxonRepository.GetAsync();
           
             if (!apTaxa?.Any() ?? true)
@@ -256,14 +266,14 @@ namespace SOS.Harvest.Processors.Taxon
           
             foreach (var aptaxon in apTaxa!)
             {
-                if (taxa.TryGetValue(aptaxon.Id, out var taxon))
+                if (taxa!.TryGetValue(aptaxon.Id, out var taxon))
                 {
                     taxon.Attributes.SpeciesGroup = (SpeciesGroup)aptaxon.SpeciesGroupId!;
                 }
             }
         }
 
-        private bool ValidateTaxa(IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
+        private bool ValidateTaxa(IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa)
         {
             var success = true;
 
@@ -272,14 +282,14 @@ namespace SOS.Harvest.Processors.Taxon
                 _logger.LogInformation("No taxa to validate");
                 return false;
             }
-            var taxonCount = taxa.Count();
+            var taxonCount = taxa!.Count();
             if (taxonCount < 105000)
             {
                 _logger.LogInformation($"Only {taxonCount} taxon found, expect more than 105 000");
                 return false;
             }
 
-            foreach (var taxon in taxa.Values)
+            foreach (var taxon in taxa!.Values)
             {
                 if (string.IsNullOrEmpty(taxon.ScientificName))
                 {
@@ -355,7 +365,7 @@ namespace SOS.Harvest.Processors.Taxon
                 }
 
                 var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
-                bool isTaxonDataOk = IsTaxonDataOk(taxa.Values, taxonTree);
+                bool isTaxonDataOk = IsTaxonDataOk(taxa?.Values, taxonTree);
                 if (!isTaxonDataOk)
                 {
                     // If there are cycles in the data, use the current information in Taxon collection.
@@ -389,7 +399,7 @@ namespace SOS.Harvest.Processors.Taxon
                 _logger.LogDebug("Finish deleting processed taxa");
 
                 _logger.LogDebug("Start saving processed taxa");
-                var success = await _processedTaxonRepository.AddManyAsync(taxa.Values);
+                var success = await _processedTaxonRepository.AddManyAsync(taxa!.Values);
                 _logger.LogDebug("Finish saving processed taxa");
 
                 return success ? taxa.Count : -1;
@@ -402,7 +412,7 @@ namespace SOS.Harvest.Processors.Taxon
             return -1;
         }
 
-        private bool IsTaxonDataOk(ICollection<Lib.Models.Processed.Observation.Taxon> taxa,
+        private bool IsTaxonDataOk(ICollection<Lib.Models.Processed.Observation.Taxon>? taxa,
             TaxonTree<IBasicTaxon> taxonTree)
         {
             var cycles = TaxonTreeCyclesDetectionHelper.CheckForCycles(taxonTree);

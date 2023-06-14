@@ -64,7 +64,7 @@ namespace SOS.Harvest.Managers
                 return;
             }
 
-            var (mod, add) = GetDiffusionValues(observation.Occurrence?.SensitivityCategory ?? 0);
+            var (mod, add) = GetDiffusionValues(observation!.Occurrence?.SensitivityCategory ?? 0);
 
            
             //transform the point into the same format as Artportalen so that we can use the same diffusion as them
@@ -82,7 +82,7 @@ namespace SOS.Harvest.Managers
             var diffusedPoint =
                 diffusedUntransformedPoint.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);            
             var diffusedPointWithBuffer = ((NetTopologySuite.Geometries.Point)diffusedPoint).ToCircle(newCoordinateUncertaintyInMeters);
-            PolygonGeoShape diffusedPointWithDisturbanceBuffer = null;
+            PolygonGeoShape diffusedPointWithDisturbanceBuffer = null!;
 
             var taxonDisturbanceRadius = observation.Taxon?.Attributes?.DisturbanceRadius ?? 0;
             if (taxonDisturbanceRadius > 0)

@@ -121,7 +121,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _logger.LogDebug($"Start casting checklist entities to verbatim ({batchIndex})");
 
                 // Cast sightings to verbatim observations
-                var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(chekLists);
+                var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(chekLists!);
 
                 _logger.LogDebug($"Finish casting checklist entities to verbatim ({batchIndex})");
 
@@ -248,7 +248,10 @@ namespace SOS.Harvest.Harvesters.Artportalen
         public async Task<HarvestInfo> HarvestChecklistsAsync(DataProvider provider,
             IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() => {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
     }
 }

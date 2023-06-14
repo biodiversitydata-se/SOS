@@ -32,7 +32,7 @@ namespace SOS.Harvest.Services
         }
 
         /// <inheritdoc />
-        public async Task<XDocument> GetAsync(DateTime from, int pageIndex, int pageSize)
+        public async Task<XDocument?> GetAsync(DateTime from, int pageIndex, int pageSize)
         {
             try
             {
@@ -46,7 +46,7 @@ namespace SOS.Harvest.Services
         }
 
         /// <inheritdoc />
-        public async Task<XDocument> GetLocalitiesAsync()
+        public async Task<XDocument?> GetLocalitiesAsync()
         {
             try
             {
@@ -64,7 +64,7 @@ namespace SOS.Harvest.Services
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private async Task<XDocument> GetXDocuemnt(string path)
+        private async Task<XDocument?> GetXDocuemnt(string path)
         {
             await using var fileStream = await _httpClientService.GetFileStreamAsync(new Uri(
                     $"{_virtualHerbariumServiceConfiguration.BaseAddress}/{path}"),
@@ -76,10 +76,10 @@ namespace SOS.Harvest.Services
             }
 
             var encoding = new UTF8Encoding(true, true);
-            using var streamReader = new StreamReader(fileStream, encoding, true);
+            using var streamReader = new StreamReader(fileStream!, encoding, true);
 
             var xmlString = await streamReader.ReadToEndAsync();
-            fileStream.Close();
+            fileStream!.Close();
 
             var xDocument = XDocument.Parse(CleanXml(xmlString, encoding));
 

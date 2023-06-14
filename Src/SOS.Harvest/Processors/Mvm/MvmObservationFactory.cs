@@ -26,7 +26,7 @@ namespace SOS.Harvest.Processors.Mvm
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public MvmObservationFactory(DataProvider dataProvider, 
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa, 
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
@@ -113,7 +113,7 @@ namespace SOS.Harvest.Processors.Mvm
         ///     Creates occurrence id.
         /// </summary>
         /// <returns>The Catalog Number.</returns>
-        private string GetCatalogNumber(string occurrenceId)
+        private string? GetCatalogNumber(string occurrenceId)
         {
             var pos = occurrenceId?.LastIndexOf(":", StringComparison.Ordinal) ?? -1;
             return pos == -1 ? null : occurrenceId?.Substring(pos + 1);

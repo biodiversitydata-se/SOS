@@ -112,7 +112,7 @@ namespace SOS.Harvest.Processors
 
                 var datasets = new ConcurrentDictionary<string, Dataset>();
 
-                foreach (var verbatimDataset in datasetsBatch)
+                foreach (var verbatimDataset in datasetsBatch!)
                 {
                     var dataset = datasetFactory.CreateProcessedDataset(verbatimDataset);                    
 
@@ -129,7 +129,7 @@ namespace SOS.Harvest.Processors
 
                 return await ValidateAndStoreDatasets(dataProvider, datasets.Values, $"{startId}-{endId}");                
             }
-            catch (JobAbortedException e)
+            catch (JobAbortedException)
             {
                 // Throw cancelation again to let function above handle it
                 throw;
@@ -200,7 +200,7 @@ namespace SOS.Harvest.Processors
                 return 0;
             }
 
-            var processedCount = await CommitBatchAsync(dataProvider, datasets, batchId);
+            var processedCount = await CommitBatchAsync(dataProvider, datasets!, batchId);
 
             return processedCount;
         }

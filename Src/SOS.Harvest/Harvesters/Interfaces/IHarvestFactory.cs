@@ -10,6 +10,6 @@
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<IEnumerable<TV>> CastEntitiesToVerbatimsAsync(TE entities);
+        Task<IEnumerable<TV>?> CastEntitiesToVerbatimsAsync(TE entities);
     }
 }

@@ -47,11 +47,11 @@ namespace SOS.Harvest.Managers
 
             //transform the point into the same format as Artportalen so that we can use the same diffusion as them
             NetTopologySuite.Geometries.Point originalPointWgs84 = new NetTopologySuite.Geometries.Point(wgs84Coordinate.lon, wgs84Coordinate.lat);
-            NetTopologySuite.Geometries.Point originalPointWebMercator = (NetTopologySuite.Geometries.Point)originalPointWgs84.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
-            NetTopologySuite.Geometries.Point originalPointSweref99Tm = (NetTopologySuite.Geometries.Point)originalPointWgs84.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
-            NetTopologySuite.Geometries.Point diffusedPointWebMercator = null;
-            NetTopologySuite.Geometries.Point diffusedPointWgs84 = null;
-            NetTopologySuite.Geometries.Point diffusedPointSweref99Tm = null;
+            NetTopologySuite.Geometries.Point originalPointWebMercator = originalPointWgs84.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
+            NetTopologySuite.Geometries.Point originalPointSweref99Tm = originalPointWgs84.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
+            NetTopologySuite.Geometries.Point? diffusedPointWebMercator = null;
+            NetTopologySuite.Geometries.Point? diffusedPointWgs84 = null;
+            NetTopologySuite.Geometries.Point? diffusedPointSweref99Tm = null;
 
             if (diffusionCoordinateSys == CoordinateSys.WebMercator)
             {
@@ -61,12 +61,10 @@ namespace SOS.Harvest.Managers
                     originalPointWebMercator.Coordinates[0].Y - originalPointWebMercator.Coordinates[0].Y % mod +
                     add);
 
-                diffusedPointWgs84 =
-                    (NetTopologySuite.Geometries.Point) diffusedPointWebMercator.Transform(CoordinateSys.WebMercator,
+                diffusedPointWgs84 = diffusedPointWebMercator.Transform(CoordinateSys.WebMercator,
                         CoordinateSys.WGS84);
 
-                diffusedPointSweref99Tm =
-                    (NetTopologySuite.Geometries.Point) diffusedPointWebMercator.Transform(CoordinateSys.WebMercator,
+                diffusedPointSweref99Tm = diffusedPointWebMercator.Transform(CoordinateSys.WebMercator,
                         CoordinateSys.SWEREF99_TM);
             }
             else if (diffusionCoordinateSys == CoordinateSys.SWEREF99_TM)
@@ -75,12 +73,10 @@ namespace SOS.Harvest.Managers
                     originalPointSweref99Tm.Coordinates[0].X - originalPointSweref99Tm.Coordinates[0].X % mod + (mod/2.0),
                     originalPointSweref99Tm.Coordinates[0].Y - originalPointSweref99Tm.Coordinates[0].Y % mod + (mod/2.0));
 
-                diffusedPointWgs84 =
-                    (NetTopologySuite.Geometries.Point)diffusedPointSweref99Tm.Transform(CoordinateSys.SWEREF99_TM,
+                diffusedPointWgs84 = diffusedPointSweref99Tm.Transform(CoordinateSys.SWEREF99_TM,
                         CoordinateSys.WGS84);
 
-                diffusedPointWebMercator =
-                    (NetTopologySuite.Geometries.Point)diffusedPointSweref99Tm.Transform(CoordinateSys.SWEREF99_TM,
+                diffusedPointWebMercator = diffusedPointSweref99Tm.Transform(CoordinateSys.SWEREF99_TM,
                         CoordinateSys.WebMercator);
             }
 
@@ -137,19 +133,19 @@ namespace SOS.Harvest.Managers
 
         public class DiffusedCoordinateInfo
         {
-            public NetTopologySuite.Geometries.Point OriginalPointWgs84 { get; set; }
-            public NetTopologySuite.Geometries.Point OriginalPointSweref99Tm { get; set; }
-            public NetTopologySuite.Geometries.Point OriginalPointWebMercator { get; set; }
-            public NetTopologySuite.Geometries.Point DiffusedPointWgs84 { get; set; }
-            public NetTopologySuite.Geometries.Point DiffusedPointSweref99Tm { get; set; }
-            public NetTopologySuite.Geometries.Point DiffusedPointWebMercator { get; set; }
+            public NetTopologySuite.Geometries.Point? OriginalPointWgs84 { get; set; }
+            public NetTopologySuite.Geometries.Point? OriginalPointSweref99Tm { get; set; }
+            public NetTopologySuite.Geometries.Point? OriginalPointWebMercator { get; set; }
+            public NetTopologySuite.Geometries.Point? DiffusedPointWgs84 { get; set; }
+            public NetTopologySuite.Geometries.Point? DiffusedPointSweref99Tm { get; set; }
+            public NetTopologySuite.Geometries.Point? DiffusedPointWebMercator { get; set; }
             public string OriginalPointSweref99TmString =>
-                $"X={Convert.ToInt32(OriginalPointSweref99Tm.X)},Y={Convert.ToInt32(OriginalPointSweref99Tm.Y)}";
+                $"X={Convert.ToInt32(OriginalPointSweref99Tm?.X)},Y={Convert.ToInt32(OriginalPointSweref99Tm?.Y)}";
             public string DiffusedPointSweref99TmString =>
-                $"X={Convert.ToInt32(DiffusedPointSweref99Tm.X)},Y={Convert.ToInt32(DiffusedPointSweref99Tm.Y)}";
+                $"X={Convert.ToInt32(DiffusedPointSweref99Tm?.X)},Y={Convert.ToInt32(DiffusedPointSweref99Tm?.Y)}";
 
-            public double DistanceBetweenOriginalAndDiffusedSweref99Tm => OriginalPointSweref99Tm.Distance(DiffusedPointSweref99Tm);
-            public double DistanceBetweenOriginalAndDiffusedWebMercator => OriginalPointWebMercator.Distance(DiffusedPointWebMercator);
+            public double DistanceBetweenOriginalAndDiffusedSweref99Tm => OriginalPointSweref99Tm == null || DiffusedPointSweref99Tm == null ? 0 : OriginalPointSweref99Tm.Distance(DiffusedPointSweref99Tm);
+            public double DistanceBetweenOriginalAndDiffusedWebMercator => OriginalPointWebMercator == null || DiffusedPointWebMercator == null ? 0 : OriginalPointWebMercator.Distance(DiffusedPointWebMercator);
         }
         public class DiffusedProtectionLevelStats
         {

@@ -20,7 +20,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// </summary>
         /// <param name="area"></param>
         /// <returns></returns>
-        private static Area CastToArea(GeographicalArea area)
+        private static Area? CastToArea(GeographicalArea area)
         {
             if (area == null)
             {
@@ -66,16 +66,16 @@ namespace SOS.Harvest.Processors.Artportalen
             var point = (Point)verbatim.Site?.Point?.ToGeometry()!;
 
             var site = verbatim.Site;
-            location.Attributes.CountyPartIdByCoordinate = site.CountyPartIdByCoordinate;
-            location.Attributes.ProvincePartIdByCoordinate = site.ProvincePartIdByCoordinate;
-            location.CountryRegion = CastToArea(site?.CountryRegion!);
-            location.County = CastToArea(site?.County!);
-            location.Locality = site.Name.Trim();
-            location.LocationId = $"urn:lsid:artportalen.se:site:{site?.Id}";
-            location.Municipality = CastToArea(site?.Municipality!);
-            location.Parish = CastToArea(site?.Parish!);
-            location.Province = CastToArea(site?.Province!);
-            location.Type = site.HasGeometry ? LocationType.Polygon : LocationType.Point;
+            location.Attributes.CountyPartIdByCoordinate = site!.CountyPartIdByCoordinate;
+            location.Attributes.ProvincePartIdByCoordinate = site!.ProvincePartIdByCoordinate;
+            location.CountryRegion = CastToArea(site!.CountryRegion!);
+            location.County = CastToArea(site!.County!);
+            location.Locality = site!.Name.Trim();
+            location.LocationId = $"urn:lsid:artportalen.se:site:{site!.Id}";
+            location.Municipality = CastToArea(site!.Municipality!);
+            location.Parish = CastToArea(site!.Parish!);
+            location.Province = CastToArea(site!.Province!);
+            location.Type = site!.HasGeometry ? LocationType.Polygon : LocationType.Point;
 
             AddPositionData(location, site.XCoord,
                 site.YCoord,
@@ -104,7 +104,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// </summary>
         /// <param name="verbatimChecklist"></param>
         /// <returns></returns>
-        public Checklist CreateProcessedChecklist(ArtportalenChecklistVerbatim verbatimChecklist)
+        public Checklist? CreateProcessedChecklist(ArtportalenChecklistVerbatim verbatimChecklist)
         {
             try
             {

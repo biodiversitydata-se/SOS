@@ -31,14 +31,14 @@ namespace SOS.Harvest.Services
         }
 
         /// <inheritdoc />
-        public async Task<SharkJsonFile> GetAsync(string dataSetName)
+        public async Task<SharkJsonFile?> GetAsync(string dataSetName)
         {
             return await GetDataAsync(new Uri(
                 $"{_sharkServiceConfiguration.BaseAddress}/datasets/{dataSetName}/data.json?page=1&per_page=1"));
         }
 
         /// <inheritdoc />
-        public async Task<SharkJsonFile> GetDataSetsAsync()
+        public async Task<SharkJsonFile?> GetDataSetsAsync()
         {
             return await GetDataAsync(new Uri($"{_sharkServiceConfiguration.BaseAddress}/datasets/table.json"));
         }
@@ -48,7 +48,7 @@ namespace SOS.Harvest.Services
         /// </summary>
         /// <param name="uri"></param>
         /// <returns></returns>
-        private async Task<SharkJsonFile> GetDataAsync(Uri uri)
+        private async Task<SharkJsonFile?> GetDataAsync(Uri uri)
         {
             try
             {
@@ -60,9 +60,9 @@ namespace SOS.Harvest.Services
                     return null;
                 }
 
-                using var streamReader = new StreamReader(fileStream, Encoding.UTF7);
+                using var streamReader = new StreamReader(fileStream!, Encoding.UTF7);
                 var json = await streamReader.ReadToEndAsync();
-                fileStream.Close();
+                fileStream!.Close();
 
                 return JsonConvert.DeserializeObject<SharkJsonFile>(json);
             }

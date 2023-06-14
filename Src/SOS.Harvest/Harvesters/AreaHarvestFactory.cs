@@ -17,7 +17,7 @@ namespace SOS.Harvest.Harvesters
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Area>> CastEntitiesToVerbatimsAsync(IEnumerable<AreaEntity> entities)
+        public async Task<IEnumerable<Area>?> CastEntitiesToVerbatimsAsync(IEnumerable<AreaEntity> entities)
         {
             return await Task.Run(() =>
             {

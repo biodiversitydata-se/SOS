@@ -7,7 +7,7 @@ namespace SOS.Harvest.DarwinCore.Interfaces
 {
     public interface IDwcArchiveReaderAsDwcObservation
     {
-        IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
+        IAsyncEnumerable<List<DwcObservationVerbatim>?> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple,
             int batchSize);
@@ -18,7 +18,7 @@ namespace SOS.Harvest.DarwinCore.Interfaces
         /// <param name="archiveReader"></param>
         /// <param name="idIdentifierTuple"></param>
         /// <returns></returns>
-        Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEvents(ArchiveReader archiveReader,
+        Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEvents(ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple);
 
         /// <summary>
@@ -26,27 +26,27 @@ namespace SOS.Harvest.DarwinCore.Interfaces
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReader archiveReader);
+        Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReader archiveReader);
 
         /// <summary>
         /// Read data stewardship datasets.
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext);
+        Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext);
 
         /// <summary>
         /// Read occurrences in batches.
         /// </summary>
         /// <param name="archiveReaderContext"></param>
         /// <returns></returns>
-        IAsyncEnumerable<List<DwcObservationVerbatim>> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext);
+        IAsyncEnumerable<List<DwcObservationVerbatim>?> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext);
         
         /// <summary>
         /// Read events.
         /// </summary>
         /// <param name="archiveReaderContext"></param>
         /// <returns></returns>
-        Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext);
+        Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEvents(ArchiveReaderContext archiveReaderContext);
     }
 }

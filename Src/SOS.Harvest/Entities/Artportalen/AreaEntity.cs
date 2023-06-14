@@ -5,7 +5,7 @@
         /// <summary>
         ///     Area geometry
         /// </summary>
-        public string PolygonWKT { get; set; }
+        public string? PolygonWKT { get; set; }
 
         /// <summary>
         ///     Parent Id.

@@ -14,7 +14,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// <param name="maxRows"></param>
         /// <param name="liveData"></param>
         /// <returns></returns>
-        Task<IEnumerable<SightingEntity>> GetChunkAsync(int startId, int maxRows);
+        Task<IEnumerable<SightingEntity>?> GetChunkAsync(int startId, int maxRows);
 
         /// <summary>
         ///     Get sightings for the specified sighting ids. Used for testing purpose for retrieving specific sightings from
@@ -22,7 +22,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         ///     This method should be the same as GetChunkAsync(int startId, int maxRows), with
         ///     the difference that this method uses a list of sighting ids instead of (startId, maxRows).
         /// </summary>
-        Task<IEnumerable<SightingEntity>> GetChunkAsync(IEnumerable<int> sightingIds);
+        Task<IEnumerable<SightingEntity>?> GetChunkAsync(IEnumerable<int> sightingIds);
 
         /// <summary>
         /// Get list of sigthing id's deleted in AP

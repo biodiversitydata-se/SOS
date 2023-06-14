@@ -17,7 +17,7 @@ namespace SOS.Harvest.Services
             _apiUrl = geoRegionApiConfiguration.ApiUrl;
         }
 
-        public async Task<IEnumerable<AreaDataset>> GetAreaDatasets()
+        public async Task<IEnumerable<AreaDataset>?> GetAreaDatasets()
         {
             using var client = new HttpClient();
             using var response = await client.GetAsync($"{_apiUrl}AreaDatasets");
@@ -26,7 +26,7 @@ namespace SOS.Harvest.Services
             return JsonConvert.DeserializeObject<IEnumerable<AreaDataset>>(resultString);
         }
 
-        public async Task<FeatureCollection> GetFeatureCollectionFromZipAsync(IEnumerable<int> areaDatasetIds, int srid = 4326)
+        public async Task<FeatureCollection?> GetFeatureCollectionFromZipAsync(IEnumerable<int> areaDatasetIds, int srid = 4326)
         {
             using var client = new HttpClient();
             client.Timeout = TimeSpan.FromMinutes(5);
@@ -42,15 +42,20 @@ namespace SOS.Harvest.Services
             using var areasReader = new StreamReader(areasFile.Open(), Encoding.UTF8);
             JsonReader jsonReader = new JsonTextReader(areasReader);
             var serializer = GeoJsonSerializer.CreateDefault();
-            FeatureCollection featureCollection = serializer.Deserialize<FeatureCollection>(jsonReader);
-            return featureCollection;
+           
+            return serializer.Deserialize<FeatureCollection>(jsonReader);
         }
 
-        public async Task<FeatureCollection> GetFeatureCollectionWithAllAreasAsync(
+        public async Task<FeatureCollection?> GetFeatureCollectionWithAllAreasAsync(
             int srid = 4326)
         {
             var areaDatasets = await GetAreaDatasets();
-            var featureCollection = await GetFeatureCollectionFromZipAsync(areaDatasets.Select(m => m.Id), srid);
+            if (!areaDatasets?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var featureCollection = await GetFeatureCollectionFromZipAsync(areaDatasets!.Select(m => m.Id), srid);
             return featureCollection;
         }
     }

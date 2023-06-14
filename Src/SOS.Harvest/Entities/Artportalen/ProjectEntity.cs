@@ -10,17 +10,17 @@ namespace SOS.Harvest.Entities.Artportalen
         /// <summary>
         ///     Project category
         /// </summary>
-        public string Category { get; set; }
+        public string? Category { get; set; }
 
         /// <summary>
         ///     Project category in Swedish
         /// </summary>
-        public string CategorySwedish { get; set; }
+        public string? CategorySwedish { get; set; }
 
         /// <summary>
         ///     Project description
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         ///     Project end date
@@ -45,18 +45,18 @@ namespace SOS.Harvest.Entities.Artportalen
         /// <summary>
         ///     Name of project
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         ///     Project owner
         /// </summary>
-        public string Owner { get; set; }
+        public string? Owner { get; set; }
 
         /// <summary>
         ///     Web address that leads to more information about the project.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string ProjectURL { get; set; }
+        public string? ProjectURL { get; set; }
 
         /// <summary>
         ///     Project start date
@@ -66,11 +66,11 @@ namespace SOS.Harvest.Entities.Artportalen
         /// <summary>
         ///     Survey method used
         /// </summary>
-        public string SurveyMethod { get; set; }
+        public string? SurveyMethod { get; set; }
 
         /// <summary>
         ///     Survey method url
         /// </summary>
-        public string SurveyMethodUrl { get; set; }
+        public string? SurveyMethodUrl { get; set; }
     }
 }

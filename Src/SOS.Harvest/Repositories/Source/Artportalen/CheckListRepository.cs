@@ -20,7 +20,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IDictionary<int, ICollection<int>>> GetChecklistsTaxonIdsAsync(
+        public async Task<IDictionary<int, ICollection<int>>?> GetChecklistsTaxonIdsAsync(
             IEnumerable<int> checklistIds)
         {
             var query = $@"
@@ -41,7 +41,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
             var checklistsTaxa = new Dictionary<int, ICollection<int>>();
 
-            foreach (var item in result)
+            foreach (var item in result!)
             {
                 if (!checklistsTaxa.TryGetValue(item.checklistId, out var checklistTaxa))
                 {

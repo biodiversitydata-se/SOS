@@ -22,7 +22,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="taxonIds"></param>
         /// <param name="sightingData"></param>
         /// <returns></returns>
-        private ArtportalenChecklistVerbatim CastEntityToVerbatim(ChecklistEntity entity, Site site, IEnumerable<int> taxonIds, IEnumerable<(int sightingId, int taxonId)> sightingData)
+        private ArtportalenChecklistVerbatim? CastEntityToVerbatim(ChecklistEntity? entity, Site site, IEnumerable<int> taxonIds, IEnumerable<(int sightingId, int taxonId)> sightingData)
         {
             try
             {
@@ -58,7 +58,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to cast Artportalen checklist entity with id:{entity.Id}");
+                _logger.LogError(ex, $"Failed to cast Artportalen checklist entity with id:{entity!.Id}");
                 throw;
             }
         }
@@ -77,7 +77,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             IChecklistRepository checklistRepository,
             ISiteRepository siteRepository,
             ISightingRepository sightingRepository,
-            IEnumerable<ProjectEntity> projectEntities,
+            IEnumerable<ProjectEntity>? projectEntities,
             int noOfThreads,
             ILogger<ArtportalenChecklistHarvester> logger) : base(siteRepository, areaHelper, noOfThreads)
         {
@@ -88,7 +88,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ArtportalenChecklistVerbatim>> CastEntitiesToVerbatimsAsync(ChecklistEntity[] entities)
+        public async Task<IEnumerable<ArtportalenChecklistVerbatim>?> CastEntitiesToVerbatimsAsync(ChecklistEntity[] entities)
         {
             if (!entities?.Any() ?? true)
             {
@@ -97,7 +97,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             var batchSiteIds = new HashSet<int>();
 
-            for (var i = 0; i < entities.Length; i++)
+            for (var i = 0; i < entities!.Length; i++)
             {
                 var entity = entities[i];
                 var siteId = entity.SiteId ?? 0;
@@ -129,9 +129,14 @@ namespace SOS.Harvest.Harvesters.Artportalen
             {
                 var entity = entities[i];
                 sites.TryGetValue(entity.SiteId ?? 0, out var site);
-                checklistsTaxonIds.TryGetValue(entity.Id, out var taxonIds);
+                checklistsTaxonIds!.TryGetValue(entity.Id, out var taxonIds);
                 cheklistsSightingsData.TryGetValue(entity.Id, out var sightingData);
-                verbatims.Add(CastEntityToVerbatim(entity, site, taxonIds, sightingData));
+                var verbatim = CastEntityToVerbatim(entity, site!, taxonIds!, sightingData!);
+
+                if (verbatim != null)
+                {
+                    verbatims.Add(verbatim);
+                }
             }
             // Clean up
             sites.Clear();

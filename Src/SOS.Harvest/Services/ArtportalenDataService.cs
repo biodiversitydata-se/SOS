@@ -46,7 +46,7 @@ namespace SOS.Harvest.Services
 
        
         /// <inheritdoc />
-        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null!, bool live = false)
+        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic? parameters = null, bool live = false)
         {
             try
             {

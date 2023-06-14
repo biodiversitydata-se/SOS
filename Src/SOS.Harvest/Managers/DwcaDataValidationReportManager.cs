@@ -34,10 +34,23 @@ namespace SOS.Harvest.Managers
         private readonly IProcessTimeManager _processTimeManager;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly ILogger<DwcaDataValidationReportManager> _logger;
-        private Dictionary<int, Taxon> _taxonById;
-        private IDictionary<VocabularyId, IDictionary<object, int>> _dwcaVocabularyById;
-        private IDictionary<VocabularyId, Vocabulary> _vocabularyById;
+        private Dictionary<int, Taxon>? _taxonById;
+        private IDictionary<VocabularyId, IDictionary<object, int>>? _dwcaVocabularyById;
+        private IDictionary<VocabularyId, Vocabulary>? _vocabularyById;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dwcArchiveReader"></param>
+        /// <param name="processedVocabularyRepository"></param>
+        /// <param name="validationManager"></param>
+        /// <param name="areaHelper"></param>
+        /// <param name="vocabularyValueResolver"></param>
+        /// <param name="processedTaxonRepository"></param>
+        /// <param name="processTimeManager"></param>
+        /// <param name="processConfiguration"></param>
+        /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DwcaDataValidationReportManager(IDwcArchiveReader dwcArchiveReader,
             IVocabularyRepository processedVocabularyRepository,
             IValidationManager validationManager,
@@ -121,11 +134,16 @@ namespace SOS.Harvest.Managers
             HashSet<string> nonMatchingTaxonIds = new HashSet<string>();
             await foreach (var observationsBatch in observationsBatches)
             {
-                if (nrProcessedObservations >= maxNrObservationsToRead) continue;
+                if (observationsBatch == null || nrProcessedObservations >= maxNrObservationsToRead) continue;
                 foreach (var verbatimObservation in observationsBatch)
                 {
                     if (nrProcessedObservations >= maxNrObservationsToRead) continue;
                     var processedObservation = dwcaObservationFactory.CreateProcessedObservation(verbatimObservation, true);
+                    if (processedObservation == null)
+                    {
+                        continue;
+                    }
+
                     nrProcessedObservations++;
                     LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservation);
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
@@ -170,7 +188,12 @@ namespace SOS.Harvest.Managers
                             });
                         }
 
-                        foreach (var validationDefect in observationValidation.Defects)
+                        if (!observationValidation?.Defects?.Any() ?? true)
+                        {
+                            continue;
+                        }
+
+                        foreach (var validationDefect in observationValidation!.Defects!)
                         {
                             if (validationDefect.DefectType == ObservationDefect.ObservationDefectType.TaxonNotFound)
                             {
@@ -243,7 +266,7 @@ namespace SOS.Harvest.Managers
                             Comment =
                                 "-1 is the Id for custom values. No matching value or synonyme were found in SOS term dictionary."
                         }).ToList(),
-                    SosVocabulary = _vocabularyById[pair.Key].Values
+                    SosVocabulary = _vocabularyById?[pair.Key].Values
                         .Select(v => new VocabularyValue() { Id = v.Id, Value = v.Value }).ToList()
                 }).ToList();
             return distinctValuesSummaries;
@@ -332,7 +355,7 @@ namespace SOS.Harvest.Managers
 
         private void UpdateTaxaStatistics(TaxaStatistics taxaStatistics, Observation processedObservation)
         {
-            if (processedObservation.Taxon == null || !_taxonById.TryGetValue(processedObservation.Taxon.Id, out var taxon)) return;
+            if (processedObservation.Taxon == null || _taxonById == null || !_taxonById.TryGetValue(processedObservation.Taxon.Id, out var taxon)) return;
             
             taxaStatistics.TaxaSet.Add(taxon.Id);
 

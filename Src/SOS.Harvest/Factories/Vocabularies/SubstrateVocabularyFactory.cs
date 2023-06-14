@@ -34,7 +34,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override VocabularyId FieldId => VocabularyId.Substrate;
         protected override bool Localized => true;
 
-        protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
+        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
         {
             var substrates = await _artportalenMetadataRepository.GetSubstratesAsync();
             var vocabularyValues = base.ConvertToLocalizedVocabularyValues(substrates.ToArray());

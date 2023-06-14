@@ -124,9 +124,9 @@ namespace SOS.Export.Managers
                 fileExportResult = exportFormat switch
                 {
                     ExportFormat.Csv => await CreateCsvExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, cancellationToken),
-                    ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), false, cancellationToken),
                     ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken)
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken),
+                    _ => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), false, cancellationToken)
                 };
                 
                 // zend file to user

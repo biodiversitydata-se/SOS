@@ -23,7 +23,6 @@ namespace SOS.Harvest.Processors.Artportalen
     public class ArtportalenEventProcessor : EventProcessorBase<ArtportalenEventProcessor, ArtportalenObservationVerbatim, IVerbatimRepositoryBase<ArtportalenObservationVerbatim, int>>,
         IArtportalenEventProcessor
     {
-        private readonly IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int> _artportalenVerbatimRepository;
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         public override DataProviderType Type => DataProviderType.ArtportalenObservations;
 

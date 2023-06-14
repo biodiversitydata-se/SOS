@@ -43,7 +43,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override VocabularyId FieldId => VocabularyId.TaxonCategory;
         protected override bool Localized => true;
 
-        protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
+        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
         {            
             var dwcTaxa = await _taxonService.GetTaxaAsync();
             var dwcTaxonById = dwcTaxa.ToDictionary(m => m.Id, m => m);

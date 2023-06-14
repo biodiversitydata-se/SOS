@@ -35,7 +35,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override VocabularyId FieldId => VocabularyId.Sex;
         protected override bool Localized => true;
 
-        protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
+        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
         {
             var sexes = await _artportalenMetadataRepository.GetGendersAsync();
             var vocabularyValues = base.ConvertToLocalizedVocabularyValues(sexes?.ToArray());
@@ -43,7 +43,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         }
 
         protected override List<ExternalSystemMapping> GetExternalSystemMappings(
-            ICollection<VocabularyValueInfo> vocabularyValues)
+            ICollection<VocabularyValueInfo>? vocabularyValues)
         {
             return new List<ExternalSystemMapping>
             {
@@ -53,7 +53,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         }
 
         private ExternalSystemMapping GetDarwinCoreExternalSystemMapping(
-            ICollection<VocabularyValueInfo> vocabularyValues)
+            ICollection<VocabularyValueInfo>? vocabularyValues)
         {
             var externalSystemMapping = new ExternalSystemMapping
             {
@@ -62,15 +62,18 @@ namespace SOS.Harvest.Factories.Vocabularies
                 Description = "The Darwin Core format (https://dwc.tdwg.org/terms/)",
                 Mappings = new List<ExternalSystemMappingField>()
             };
-
-            var dwcMappingSynonyms = GetDwcMappingSynonyms();
-            var dwcMappings = CreateDwcMappings(vocabularyValues, dwcMappingSynonyms);
             var mappingField = new ExternalSystemMappingField
             {
                 Key = VocabularyMappingKeyFields.DwcSex,
-                Description = "The sex term (http://rs.tdwg.org/dwc/terms/sex)",
-                Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList()
+                Description = "The sex term (http://rs.tdwg.org/dwc/terms/sex)"
             };
+
+            if (vocabularyValues?.Any() ?? false)
+            {
+                var dwcMappingSynonyms = GetDwcMappingSynonyms();
+                var dwcMappings = CreateDwcMappings(vocabularyValues, dwcMappingSynonyms);
+                mappingField.Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList();
+            }
 
             externalSystemMapping.Mappings.Add(mappingField);
             return externalSystemMapping;

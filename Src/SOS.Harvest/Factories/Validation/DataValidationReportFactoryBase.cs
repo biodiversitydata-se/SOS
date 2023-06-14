@@ -32,8 +32,8 @@ namespace SOS.Harvest.Factories.Validation
         protected readonly IVocabularyRepository _processedVocabularyRepository;
         protected readonly IAreaHelper _areaHelper;
         protected readonly ITaxonRepository _processedTaxonRepository;
-        protected Dictionary<int, Taxon> _taxonById;
-        protected IDictionary<VocabularyId, Vocabulary> _vocabularyById;
+        protected Dictionary<int, Taxon>? _taxonById;
+        protected IDictionary<VocabularyId, Vocabulary>? _vocabularyById;
         protected readonly IProcessTimeManager _processTimeManager;
         protected readonly ProcessConfiguration ProcessConfiguration;
 
@@ -67,7 +67,7 @@ namespace SOS.Harvest.Factories.Validation
 
         protected abstract Task<IAsyncCursor<TVerbatimObservation>> GetAllObservationsByCursorAsync(DataProvider dataProvider);
         protected abstract Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider);
-        protected abstract Task<Observation> CreateProcessedObservationAsync(TVerbatimObservation verbatimObservation, DataProvider dataProvider);
+        protected abstract Task<Observation?> CreateProcessedObservationAsync(TVerbatimObservation verbatimObservation, DataProvider dataProvider);
         protected abstract void ValidateVerbatimData(TVerbatimObservation verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder);
         protected abstract void UpdateTermDictionaryValueSummary(
             Observation processedObservation,
@@ -108,25 +108,25 @@ namespace SOS.Harvest.Factories.Validation
                 if (nrProcessedObservations >= maxNrObservationsToRead) continue;
                 foreach (var verbatimObservation in cursor.Current)
                 {
-                    if (nrProcessedObservations >= maxNrObservationsToRead) continue;
+                    if (verbatimObservation == null || nrProcessedObservations >= maxNrObservationsToRead) continue;
                     var processedObservation = await CreateProcessedObservationAsync(verbatimObservation, dataProvider);
                     nrProcessedObservations++;
                     LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservation);
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
-                            {processedObservation}, true);
+                            {processedObservation!}, true);
                     ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);
-                    UpdateTermDictionaryValueSummary(processedObservation, verbatimObservation, processedFieldValues, verbatimFieldValues);
+                    UpdateTermDictionaryValueSummary(processedObservation!, verbatimObservation, processedFieldValues, verbatimFieldValues);
                     var observationValidation = _validationManager.ValidateObservation(processedObservation, dataProvider);
                     if (observationValidation.IsValid)
                     {
                         nrValidObservations++;
                         if (validObservations.Count < nrValidObservationsInReport)
                         {
-                            var dwcExport = CreateDwcExportObject(processedObservation);
+                            var dwcExport = CreateDwcExportObject(processedObservation!);
                             validObservations.Add(new ValidObservationTuple<object, Observation>
                             {
                                 VerbatimObservation = verbatimObservation,
-                                ProcessedObservation = processedObservation,
+                                ProcessedObservation = processedObservation!,
                                 DwcExport = dwcExport
                             });
                         }
@@ -142,19 +142,21 @@ namespace SOS.Harvest.Factories.Validation
                                 ProcessedObservationDefects = observationValidation.Defects?.Select(d => d.Information).ToList()
                             });
                         }
-
-                        foreach (var validationDefect in observationValidation.Defects)
+                        if (observationValidation.Defects?.Any() ?? false)
                         {
-                            if (validationDefect.DefectType == ObservationDefect.ObservationDefectType.TaxonNotFound)
+                            foreach (var validationDefect in observationValidation.Defects)
                             {
-                                ValidateVerbatimTaxon(verbatimObservation, nonMatchingTaxonIds, nonMatchingScientificNames);
-                            }
-                            if (!observationDefects.ContainsKey(validationDefect.DefectType))
-                            {
-                                observationDefects.Add(validationDefect.DefectType, 0);
-                            }
+                                if (validationDefect.DefectType == ObservationDefect.ObservationDefectType.TaxonNotFound)
+                                {
+                                    ValidateVerbatimTaxon(verbatimObservation, nonMatchingTaxonIds, nonMatchingScientificNames);
+                                }
+                                if (!observationDefects.ContainsKey(validationDefect.DefectType))
+                                {
+                                    observationDefects.Add(validationDefect.DefectType, 0);
+                                }
 
-                            observationDefects[validationDefect.DefectType]++;
+                                observationDefects[validationDefect.DefectType]++;
+                            }
                         }
                     }
 
@@ -185,7 +187,7 @@ namespace SOS.Harvest.Factories.Validation
                             Count = valuePair.Value,
                             Comment = "-1 is the Id for custom values. No matching value or synonyme were found in SOS term dictionary."
                         }).ToList(),
-                    SosVocabulary = _vocabularyById[pair.Key].Values.Select(v => new VocabularyValue() { Id = v.Id, Value = v.Value }).ToList()
+                    SosVocabulary = _vocabularyById![pair.Key].Values.Select(v => new VocabularyValue() { Id = v.Id, Value = v.Value }).ToList()
                 }).ToList();
 
             var remarks = validationRemarksBuilder.CreateRemarks();

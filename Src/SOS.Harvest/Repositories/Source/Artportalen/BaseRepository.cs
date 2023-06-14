@@ -75,7 +75,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters = null!)
+        public async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic? parameters = null!)
         {
             return await DataService.QueryAsync<E>(query, parameters, Live);
         }

@@ -185,7 +185,7 @@ namespace SOS.Harvest.Services.Taxon
             // Merge synonyms into taxa
             foreach (var taxon in taxonByTaxonId.Values)
             {
-                if (synonymsByTaxonId.TryGetValue(taxon.TaxonID, out DarwinCoreTaxon[] synonyms))
+                if (synonymsByTaxonId.TryGetValue(taxon.TaxonID, out var synonyms))
                 {
                     var synonymeNames = new List<DarwinCoreSynonymName>();
                     

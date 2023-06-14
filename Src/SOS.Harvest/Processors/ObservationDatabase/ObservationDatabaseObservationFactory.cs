@@ -147,8 +147,13 @@ namespace SOS.Harvest.Processors.ObservationDatabase
             return obs;
         }
 
-        private VocabularyValue GetActivityValue(ObservationDatabaseVerbatim verbatim, Lib.Models.Processed.Observation.Taxon taxon)
+        private VocabularyValue? GetActivityValue(ObservationDatabaseVerbatim verbatim, Lib.Models.Processed.Observation.Taxon? taxon)
         {
+            if (taxon == null)
+            {
+                return null;
+            }
+
             if (taxon.IsBird())
             {
                 if (!string.IsNullOrEmpty(verbatim.Stadium))

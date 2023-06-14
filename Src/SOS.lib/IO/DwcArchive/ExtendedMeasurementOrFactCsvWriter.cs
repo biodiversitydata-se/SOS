@@ -12,6 +12,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Enums;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -97,16 +98,20 @@ namespace SOS.Lib.IO.DwcArchive
                     return;
                 }
 
-                using var csvFileHelper = new CsvFileHelper();
-                csvFileHelper.InitializeWrite(streamWriter, "\t");
+                await Task.Run(() => {
+                    using var csvFileHelper = new CsvFileHelper();
+                    csvFileHelper.InitializeWrite(streamWriter, "\t");
 
-                // Write Emof rows to CSV file.
-                foreach (var emofRow in emofRows)
-                {
-                    WriteEmofRow(csvFileHelper, emofRow, writeEventId);
-                }
+                    // Write Emof rows to CSV file.
+                    foreach (var emofRow in emofRows)
+                    {
+                        WriteEmofRow(csvFileHelper, emofRow, writeEventId);
+                    }
 
-                csvFileHelper.FinishWrite();
+                    csvFileHelper.FinishWrite();
+                });
+
+                
                 //_logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
             }
             catch (Exception e)

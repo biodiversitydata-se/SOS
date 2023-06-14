@@ -6,7 +6,7 @@ namespace SOS.Harvest.DarwinCore.Factories
 {
     public static class DwcObservationVerbatimFactory
     {
-        public static DwcObservationVerbatim Create(int id, IRow row, IIdIdentifierTuple idIdentifierTuple, int idIndex)
+        public static DwcObservationVerbatim Create(int id, IRow row, IIdIdentifierTuple? idIdentifierTuple, int idIndex)
         {
             var verbatimRecord = new DwcObservationVerbatim{ Id = id };
             if (idIdentifierTuple != null)

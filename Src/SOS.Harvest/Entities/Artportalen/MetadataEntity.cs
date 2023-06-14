@@ -5,6 +5,11 @@
     /// </summary>
     public class MetadataEntity<T>
     {
+        public MetadataEntity(T id)
+        {
+            Id = id;
+        }
+
         /// <summary>
         ///     Culture
         /// </summary>
@@ -13,7 +18,7 @@
         /// <summary>
         ///     Id of item
         /// </summary>
-        public T? Id { get; set; }
+        public T Id { get; set; }
 
         /// <summary>
         ///     Item translation

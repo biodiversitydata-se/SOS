@@ -14,11 +14,11 @@ namespace SOS.Harvest.DarwinCore
     /// </summary>
     public class ArchiveReaderContext
     {
-        public ArchiveReader ArchiveReader { get; set; }
-        public Dictionary<string, DwcVerbatimDataset> DatasetByEventId { get; set; }
-        public Dictionary<string, List<string>> OccurrenceIdsByEventId { get; set; }
-        public List<DwcVerbatimDataset> Datasets { get; set; }
-        public IIdIdentifierTuple DataProvider { get; set; }
+        public ArchiveReader? ArchiveReader { get; set; }
+        public Dictionary<string, DwcVerbatimDataset>? DatasetByEventId { get; set; }
+        public Dictionary<string, List<string>>? OccurrenceIdsByEventId { get; set; }
+        public List<DwcVerbatimDataset>? Datasets { get; set; }
+        public IIdIdentifierTuple? DataProvider { get; set; }
         public int MaxNrObservationsToReturn { get; set; } = int.MaxValue;
         public int BatchSize { get; set; } = 100000;
 

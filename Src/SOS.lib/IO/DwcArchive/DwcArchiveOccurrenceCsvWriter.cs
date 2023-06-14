@@ -246,18 +246,20 @@ namespace SOS.Lib.IO.DwcArchive
         {
             try
             {
-                bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
-                //await using StreamWriter streamWriter = new StreamWriter(stream, Encoding.UTF8);
-                using var csvFileHelper = new CsvFileHelper();
-                csvFileHelper.InitializeWrite(streamWriter, "\t");
+                await Task.Run(() => {
+                    bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
+                    //await using StreamWriter streamWriter = new StreamWriter(stream, Encoding.UTF8);
+                    using var csvFileHelper = new CsvFileHelper();
+                    csvFileHelper.InitializeWrite(streamWriter, "\t");
 
-                // Write occurrence rows to CSV file.
-                foreach (var dwcObservation in dwcObservations)
-                {
-                    WriteOccurrenceRow(csvFileHelper, dwcObservation, fieldsToWriteArray, isEventCore);
-                }
-                csvFileHelper.FinishWrite();
-
+                    // Write occurrence rows to CSV file.
+                    foreach (var dwcObservation in dwcObservations)
+                    {
+                        WriteOccurrenceRow(csvFileHelper, dwcObservation, fieldsToWriteArray, isEventCore);
+                    }
+                    csvFileHelper.FinishWrite();
+                });
+               
                 //_logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
             }
             catch (Exception e)

@@ -56,7 +56,7 @@ namespace SOS.Harvest.Harvesters.Shark
                 else
                 {
                     var datasetNameIndex = -1;
-                    foreach (var header in dataSetsInfo.Header)
+                    foreach (var header in dataSetsInfo!.Header)
                     {
                         datasetNameIndex++;
 
@@ -134,19 +134,32 @@ namespace SOS.Harvest.Harvesters.Shark
             DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
 
-        public async Task<List<string>> GetDatasetsToHarvestAsync()
+        public async Task<List<string>?> GetDatasetsToHarvestAsync()
         {
             List<string> datasets = new List<string>();
             var dataSetsInfo = await _sharkObservationService.GetDataSetsAsync();
+            if (dataSetsInfo == null)
+            {
+                return null;
+            }
+
             var datasetNameIndex = -1;
             foreach (var header in dataSetsInfo.Header)
             {

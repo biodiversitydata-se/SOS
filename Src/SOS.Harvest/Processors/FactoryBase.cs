@@ -50,7 +50,7 @@ namespace SOS.Harvest.Processors
         /// <param name="pointWithBuffer"></param>
         /// <param name="pointWithDisturbanceBuffer"></param>
         /// <param name="coordinateUncertaintyInMeters"></param>
-        private void InitializeLocation(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point, PolygonGeoShape pointWithBuffer, PolygonGeoShape pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
+        private void InitializeLocation(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point, PolygonGeoShape? pointWithBuffer, PolygonGeoShape? pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
         {
             location.Continent = new VocabularyValue { Id = (int)ContinentId.Europe };
             location.CoordinateUncertaintyInMeters = coordinateUncertaintyInMeters;
@@ -167,7 +167,7 @@ namespace SOS.Harvest.Processors
         /// <param name="taxon"></param>
         /// <param name="accessRightsId"></param>
         /// <returns></returns>
-        protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon)
+        protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon? taxon)
         {
             return CalculateProtectionLevel(taxon, null);
         }
@@ -178,7 +178,7 @@ namespace SOS.Harvest.Processors
         /// <param name="taxon"></param>
         /// <param name="accessRightsId"></param>
         /// <returns></returns>
-        protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, AccessRightsId? accessRightsId)
+        protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon? taxon, AccessRightsId? accessRightsId)
         {
             if (accessRightsId is AccessRightsId.FreeUsage) return 1;
             var protectionLevel = taxon?.Attributes?.SensitivityCategory?.Id ?? 1;

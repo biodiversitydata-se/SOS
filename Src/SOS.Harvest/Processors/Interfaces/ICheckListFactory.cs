@@ -13,6 +13,6 @@ namespace SOS.Harvest.Processors.Interfaces
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        Checklist CreateProcessedChecklist(TEntity verbatim);
+        Checklist? CreateProcessedChecklist(TEntity verbatim);
     }
 }

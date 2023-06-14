@@ -39,8 +39,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// <exception cref="ArgumentNullException"></exception>
         public DwcaObservationFactory(
             DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>>? vocabularyById,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
@@ -72,7 +72,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// <param name="verbatim"></param>
         /// <param name="diffuseIfSupported"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(DwcObservationVerbatim verbatim, bool diffuseIfSupported)
+        public Observation? CreateProcessedObservation(DwcObservationVerbatim verbatim, bool diffuseIfSupported)
         {
             if (verbatim == null)
             {
@@ -184,7 +184,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             //    });
         }
 
-        private ICollection<Multimedia> CreateProcessedMultimedia(
+        private ICollection<Multimedia>? CreateProcessedMultimedia(
             ICollection<DwcMultimedia> verbatimMultimedia, 
             ICollection<DwcAudubonMedia> verbatimAudubonMedia)
         {
@@ -287,7 +287,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
         private Identification CreateProcessedIdentification(DwcObservationVerbatim verbatim)
         {
-            string dateIdentifiedString = null;
+            string dateIdentifiedString = null!;
             if (DateTime.TryParse(verbatim.DateIdentified, out var dateIdentified))
             {
                 dateIdentifiedString = dateIdentified.ToUniversalTime().ToString();
@@ -306,7 +306,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             return processedIdentification;
         }
 
-        private bool GetIsValidated(VocabularyValue validationStatus)
+        private bool GetIsValidated(VocabularyValue? validationStatus)
         {
             if (validationStatus == null) return false;
             switch (validationStatus.Id)
@@ -382,7 +382,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         }
 
 
-        private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatim, Lib.Models.Processed.Observation.Taxon taxon, AccessRightsId? accessRightsId)
+        private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatim, Lib.Models.Processed.Observation.Taxon? taxon, AccessRightsId? accessRightsId)
         {
             var processedOccurrence = new Occurrence();            
             processedOccurrence.AssociatedMedia = verbatim.AssociatedMedia;
@@ -419,8 +419,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 verbatim.ReproductiveCondition,
                 _vocabularyById[VocabularyId.Activity]);
             processedOccurrence.Sex = GetSosId(verbatim.Sex, _vocabularyById[VocabularyId.Sex]);
-            processedOccurrence.ReproductiveCondition = GetSosId(verbatim.ReproductiveCondition, _vocabularyById.GetValue(VocabularyId.ReproductiveCondition));
-            processedOccurrence.Behavior = GetSosId(verbatim.Behavior, _vocabularyById.GetValue(VocabularyId.Behavior));
+            processedOccurrence.ReproductiveCondition = GetSosId(verbatim.ReproductiveCondition, _vocabularyById!.GetValue(VocabularyId.ReproductiveCondition));
+            processedOccurrence.Behavior = GetSosId(verbatim.Behavior, _vocabularyById!.GetValue(VocabularyId.Behavior));
             processedOccurrence.IsNaturalOccurrence = true;
             processedOccurrence.IsNeverFoundObservation = false;
             processedOccurrence.IsNotRediscoveredObservation = false;
@@ -469,8 +469,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }, true, verbatim.TaxonID);
         }
 
-        private VocabularyValue GetSosId(string val,
-            IDictionary<object, int> sosIdByValue,
+        private VocabularyValue? GetSosId(string val,
+            IDictionary<object, int>? sosIdByValue,
             int? defaultValue = null,
             MappingNotFoundLogic mappingNotFoundLogic = MappingNotFoundLogic.UseSourceValue)
         {
@@ -494,25 +494,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 {Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
         }
 
-
-        private ProjectParameter CreateProcessedProjectParameter(Lib.Models.Verbatim.Artportalen.ProjectParameter projectParameter)
-        {
-            if (projectParameter == null)
-            {
-                return null;
-            }
-
-            return new ProjectParameter
-            {
-                Value = projectParameter.Value,
-                DataType = projectParameter.DataType,
-                Description = projectParameter.Description,
-                Name = projectParameter.Name,
-                Id = projectParameter.Id,
-                Unit = projectParameter.Unit
-            };
-        }
-
         /// <summary>
         ///     Get vocabulary mappings.
         /// </summary>
@@ -522,19 +503,22 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// <returns></returns>
         public static IDictionary<VocabularyId, IDictionary<object, int>> GetVocabulariesDictionary(
             ExternalSystemId externalSystemId,
-            ICollection<Vocabulary> allVocabularies,
+            ICollection<Vocabulary>? allVocabularies,
             bool convertValuesToLowercase)
         {
             var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
 
-            foreach (var vocabulary in allVocabularies)
+            if (allVocabularies?.Any() ?? false)
             {
-                var vocabularies = vocabulary.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
-                if (vocabularies != null)
+                foreach (var vocabulary in allVocabularies)
                 {
-                    var mapping = vocabularies.Mappings.Single();
-                    var sosIdByValue = mapping.GetIdByValueDictionary(convertValuesToLowercase);
-                    dic.Add(vocabulary.Id, sosIdByValue);
+                    var vocabularies = vocabulary.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
+                    if (vocabularies != null)
+                    {
+                        var mapping = vocabularies.Mappings.Single();
+                        var sosIdByValue = mapping.GetIdByValueDictionary(convertValuesToLowercase);
+                        dic.Add(vocabulary.Id, sosIdByValue);
+                    }
                 }
             }
 

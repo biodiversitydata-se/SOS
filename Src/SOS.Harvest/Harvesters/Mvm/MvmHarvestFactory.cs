@@ -8,7 +8,7 @@ namespace SOS.Harvest.Harvesters.Mvm
     public class MvmHarvestFactory : HarvestBaseFactory, IHarvestFactory<IEnumerable<WebSpeciesObservation>, MvmObservationVerbatim>
     {
         /// <inheritdoc />
-        public async Task<IEnumerable<MvmObservationVerbatim>> CastEntitiesToVerbatimsAsync(IEnumerable<WebSpeciesObservation> entities)
+        public async Task<IEnumerable<MvmObservationVerbatim>?> CastEntitiesToVerbatimsAsync(IEnumerable<WebSpeciesObservation> entities)
         {
             return await Task.Run(() =>
             {
@@ -23,7 +23,7 @@ namespace SOS.Harvest.Harvesters.Mvm
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        private MvmObservationVerbatim CastEntityToVerbatim(WebSpeciesObservation entity)
+        private MvmObservationVerbatim? CastEntityToVerbatim(WebSpeciesObservation entity)
         {
             if (entity == null)
             {

@@ -57,8 +57,13 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <returns></returns>
         private async Task CacheSitesAsync(IEnumerable<int>? siteIds)
         {
+            if (!siteIds?.Any() ?? true)
+            {
+                return;
+            }
+
             var skip = 0;
-            var siteIdBatch = siteIds.Take(SITE_BATCH_SIZE);
+            var siteIdBatch = siteIds!.Take(SITE_BATCH_SIZE);
            
             while (siteIdBatch.Any())
             {
@@ -74,7 +79,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 }
 
                 skip += SITE_BATCH_SIZE;
-                siteIdBatch = siteIds.Skip(skip).Take(SITE_BATCH_SIZE);
+                siteIdBatch = siteIds!.Skip(skip).Take(SITE_BATCH_SIZE);
             }
         }
 
@@ -86,7 +91,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="sitesAreas"></param>
         /// <param name="sitesGeometry"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<Site>> CastSiteEntitiesToVerbatimAsync(IEnumerable<SiteEntity>? siteEntities, IDictionary<int, ICollection<AreaEntityBase>>? sitesAreas, IDictionary<int, string>? sitesGeometry)
+        private IEnumerable<Site> CastSiteEntitiesToVerbatim(IEnumerable<SiteEntity>? siteEntities, IDictionary<int, ICollection<AreaEntityBase>>? sitesAreas, IDictionary<int, string>? sitesGeometry)
         {
             var sites = new HashSet<Site>();
 
@@ -99,7 +104,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             sitesAreas ??= new Dictionary<int, ICollection<AreaEntityBase>>();
             sitesGeometry ??= new Dictionary<int, string>();
 
-            foreach (var siteEntity in siteEntities)
+            foreach (var siteEntity in siteEntities!)
             {
                 sitesAreas.TryGetValue(siteEntity.Id, out var siteAreas);
                 sitesGeometry.TryGetValue(siteEntity.Id, out var geometryWkt);
@@ -209,7 +214,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// </summary>
         /// <param name="siteIds"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<Site>> GetSitesAsync(IEnumerable<int>? siteIds)
+        private async Task<IEnumerable<Site>?> GetSitesAsync(IEnumerable<int>? siteIds)
         {
             if (!siteIds?.Any() ?? true)
             {
@@ -217,7 +222,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
 
             var skip = 0;
-            var siteIdBatch = siteIds.Take(SITE_BATCH_SIZE);
+            var siteIdBatch = siteIds!.Take(SITE_BATCH_SIZE);
             var sites = new List<Site>();
 
             while (siteIdBatch.Any())
@@ -231,7 +236,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 }
                
                 skip += SITE_BATCH_SIZE;
-                siteIdBatch = siteIds.Skip(skip).Take(SITE_BATCH_SIZE);
+                siteIdBatch = siteIds!.Skip(skip).Take(SITE_BATCH_SIZE);
             }
 
             return sites;
@@ -246,15 +251,15 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             try
             {
-                var getSitesTask = _siteRepository.GetByIdsAsync(siteIds);
-                var getSitesAreasTask = _siteRepository.GetSitesAreas(siteIds);
-                var getSitesGeometriesTask = _siteRepository.GetSitesGeometry(siteIds);
+                var getSitesTask = _siteRepository.GetByIdsAsync(siteIds!);
+                var getSitesAreasTask = _siteRepository.GetSitesAreas(siteIds!);
+                var getSitesGeometriesTask = _siteRepository.GetSitesGeometry(siteIds!);
 
                 var siteEntities = await getSitesTask;
                 var siteAreas = await getSitesAreasTask;
                 var sitesGeometry = await getSitesGeometriesTask; // It's faster to get geometries in separate query than join it in site query
 
-                return await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
+                return CastSiteEntitiesToVerbatim(siteEntities?.ToArray(), siteAreas, sitesGeometry);
             }
             catch
             {
@@ -317,7 +322,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <returns></returns>
         protected bool IsSiteLoaded(int siteId) => _cachedSites.ContainsKey(siteId);
 
-        protected Site TryGetSite(int siteId) {
+        protected Site? TryGetSite(int siteId) {
             _cachedSites.TryGetValue(siteId, out var site);
 
             return site;

@@ -14,7 +14,7 @@ namespace SOS.Harvest.DarwinCore.Interfaces
         /// <param name="idIdentifierTuple"></param>
         /// <param name="batchSize"></param>
         /// <returns></returns>
-        IAsyncEnumerable<IEnumerable<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
+        IAsyncEnumerable<IEnumerable<DwcObservationVerbatim>?> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple,
             int batchSize = 100000);
@@ -37,7 +37,7 @@ namespace SOS.Harvest.DarwinCore.Interfaces
         /// <param name="archiveReader"></param>
         /// <param name="idIdentifierTuple"></param>
         /// <returns></returns>
-        Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadSamplingEventArchiveAsync(
+        Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadSamplingEventArchiveAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple);
 
@@ -46,34 +46,34 @@ namespace SOS.Harvest.DarwinCore.Interfaces
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReader archiveReader);
+        Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReader archiveReader);
 
         /// <summary>
         /// Read data stewardship datasets.
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext);
+        Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext);
         
         /// <summary>
         /// Read occurrences.
         /// </summary>
         /// <param name="archiveReaderContext"></param>
         /// <returns></returns>
-        Task<IEnumerable<DwcObservationVerbatim>> ReadOccurrencesAsync(ArchiveReaderContext archiveReaderContext);
+        Task<IEnumerable<DwcObservationVerbatim>?> ReadOccurrencesAsync(ArchiveReaderContext archiveReaderContext);
         
         /// <summary>
         /// Read occurrences in batches.
         /// </summary>
         /// <param name="archiveReaderContext"></param>
         /// <returns></returns>
-        IAsyncEnumerable<IEnumerable<DwcObservationVerbatim>> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext);
+        IAsyncEnumerable<IEnumerable<DwcObservationVerbatim>?> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext);
         
         /// <summary>
         /// Read events.
         /// </summary>
         /// <param name="archiveReaderContext"></param>
         /// <returns></returns>
-        Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEventsAsync(ArchiveReaderContext archiveReaderContext);
+        Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEventsAsync(ArchiveReaderContext archiveReaderContext);
     }
 }

@@ -23,7 +23,7 @@ namespace SOS.Harvest.Factories.Validation
     public class FishDataValidationReportFactory : DataValidationReportFactoryBase<FishDataObservationVerbatim>
     {
         private readonly IFishDataObservationVerbatimRepository _fishDataObservationVerbatimRepository;
-        private FishDataObservationFactory _fishdataObservationFactory;
+        private FishDataObservationFactory? _fishdataObservationFactory;
 
         public FishDataValidationReportFactory(
             IVocabularyRepository processedVocabularyRepository,
@@ -49,11 +49,13 @@ namespace SOS.Harvest.Factories.Validation
             return await _fishDataObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override async Task<Observation> CreateProcessedObservationAsync(FishDataObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override async Task<Observation?> CreateProcessedObservationAsync(FishDataObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
-            _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
-            return processedObservation;
+            return await Task.Run(() => {
+                var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
+                _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
+                return processedObservation;
+            });
         }
 
         protected override void ValidateVerbatimTaxon(

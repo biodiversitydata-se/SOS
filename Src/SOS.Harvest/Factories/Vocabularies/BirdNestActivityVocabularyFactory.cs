@@ -36,7 +36,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override VocabularyId FieldId => VocabularyId.BirdNestActivity;
         protected override bool Localized => true;
 
-        protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
+        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
         {
             var activities = await _artportalenMetadataRepository.GetActivitiesAsync();
             var birdNestActivities = activities.Where(m => m.Id >= BirdNestActivityIdMin && m.Id <= BirdNestActivityIdMax);

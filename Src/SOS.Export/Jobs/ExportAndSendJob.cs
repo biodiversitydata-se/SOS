@@ -147,7 +147,7 @@ namespace SOS.Export.Jobs
                 await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);
                 return response.Success ? true : throw new Exception("Export and send job failed");
             }
-            catch (JobAbortedException e)
+            catch (JobAbortedException)
             {
                 await UpdateJobInfoError(userId, context?.BackgroundJob?.Id, "Export and send job was cancelled.");
                 _logger.LogInformation("Export and send job was cancelled.");

@@ -23,7 +23,7 @@ namespace SOS.Harvest.Factories.Validation
     public class VirtualHerbariumValidationReportFactory : DataValidationReportFactoryBase<VirtualHerbariumObservationVerbatim>
     {
         private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
-        private VirtualHerbariumObservationFactory _virtualHerbariumObservationFactory;
+        private VirtualHerbariumObservationFactory? _virtualHerbariumObservationFactory;
 
         public VirtualHerbariumValidationReportFactory(
             IVocabularyRepository processedVocabularyRepository,
@@ -49,11 +49,14 @@ namespace SOS.Harvest.Factories.Validation
             return await _virtualHerbariumObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override async Task<Observation> CreateProcessedObservationAsync(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override async Task<Observation?> CreateProcessedObservationAsync(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
-            _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
-            return processedObservation;
+            return await Task.Run(() =>
+            {
+                var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
+                _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
+                return processedObservation;
+            });
         }
 
         protected override void ValidateVerbatimTaxon(

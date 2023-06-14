@@ -82,10 +82,14 @@ namespace SOS.Harvest.DarwinCore
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEvents(ArchiveReader archiveReader,
+        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEvents(ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple)
         {
-            throw new NotImplementedException("Not implemented for this reader");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this reader");
+            });
+            return null; ;
         }
 
         /// <summary>
@@ -239,19 +243,23 @@ namespace SOS.Harvest.DarwinCore
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        public async Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
+        public async Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReader archiveReader)
         {
-            return null;
+            return await Task.Run(() => null as List<DwcVerbatimDataset>);
         }
 
-        public async Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
+        public async Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
         {
-            return null;
+            return await Task.Run(() => null as List<DwcVerbatimDataset>);
         }
 
-        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext)
+        public async IAsyncEnumerable<List<DwcObservationVerbatim>?> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext)
         {
-            var occurrenceFileReader = archiveReaderContext.ArchiveReader.GetAsyncCoreFile();
+            if (archiveReaderContext == null)
+            {
+                yield return null;
+            }
+            var occurrenceFileReader = archiveReaderContext!.ArchiveReader!.GetAsyncCoreFile();
             var idIndex = occurrenceFileReader.GetIdIndex();
             var occurrenceRecords = new List<DwcObservationVerbatim>();
 
@@ -272,9 +280,9 @@ namespace SOS.Harvest.DarwinCore
             yield return occurrenceRecords;
         }
 
-        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext)
+        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEvents(ArchiveReaderContext archiveReaderContext)
         {
-            return null;
+            return await Task.Run(Array.Empty<DwcEventOccurrenceVerbatim>);
         }
     }
 }

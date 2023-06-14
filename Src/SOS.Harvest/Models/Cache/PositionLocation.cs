@@ -7,22 +7,22 @@ namespace SOS.Harvest.Models.Cache
         /// <summary>
         ///     County property
         /// </summary>
-        public Area County { get; set; }
+        public Area? County { get; set; }
 
         /// <summary>
         ///     Municipality property
         /// </summary>
-        public Area Municipality { get; set; }
+        public Area? Municipality { get; set; }
 
         /// <summary>
         ///     Parish property
         /// </summary>
-        public Area Parish { get; set; }
+        public Area? Parish { get; set; }
 
         /// <summary>
         ///     Province property
         /// </summary>
-        public Area Province { get; set; }
+        public Area? Province { get; set; }
 
         /// <summary>
         ///     County property

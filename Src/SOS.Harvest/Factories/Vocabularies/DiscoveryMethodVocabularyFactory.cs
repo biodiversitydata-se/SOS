@@ -31,7 +31,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override VocabularyId FieldId => VocabularyId.DiscoveryMethod;
         protected override bool Localized => true;
 
-        protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
+        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
         {
             var discoveryMethods = await _artportalenMetadataRepository.GetDiscoveryMethodsAsync();
             var vocabularyValues = ConvertToLocalizedVocabularyValues(discoveryMethods.ToArray());

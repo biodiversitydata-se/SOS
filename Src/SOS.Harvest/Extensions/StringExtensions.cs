@@ -14,7 +14,7 @@ namespace SOS.Harvest.Extensions
         /// <param name="value">The string.</param>
         /// <param name="maxLength">The max length.</param>
         /// <returns>A truncated string.</returns>
-        public static string WithMaxLength(this string value, int maxLength)
+        public static string? WithMaxLength(this string value, int maxLength)
         {
             if (value == null)
             {

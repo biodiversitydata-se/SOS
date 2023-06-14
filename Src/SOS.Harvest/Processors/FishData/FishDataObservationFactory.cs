@@ -23,7 +23,7 @@ namespace SOS.Harvest.Processors.FishData
         /// <param name="areaHelper"></param>
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public FishDataObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+        public FishDataObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager, 
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
@@ -101,7 +101,7 @@ namespace SOS.Harvest.Processors.FishData
         ///     Creates occurrence id.
         /// </summary>
         /// <returns>The Catalog Number.</returns>
-        private string GetCatalogNumber(string occurrenceId)
+        private string? GetCatalogNumber(string occurrenceId)
         {
             var pos = occurrenceId?.LastIndexOf(":", StringComparison.Ordinal) ?? -1;
             return pos == -1 ? null : occurrenceId?.Substring(pos + 1);

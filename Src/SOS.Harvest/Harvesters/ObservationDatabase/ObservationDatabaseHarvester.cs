@@ -52,14 +52,14 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
                 Logger.LogDebug($"Start casting entities to verbatim ({batchIndex})");
 
                 // Cast sightings to verbatim observations
-                var verbatimObservations = observations.Select(e => CastEntityToVerbatim(e))?.ToArray(); 
+                var verbatimObservations = observations!.Select(e => CastEntityToVerbatim(e))?.ToArray(); 
                 observations = null;
                 Logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
 
                 Logger.LogDebug($"Start storing batch ({batchIndex})");
                 // Add sightings to mongodb
 
-                await VerbatimRepository.AddManyAsync(verbatimObservations);
+                await VerbatimRepository.AddManyAsync(verbatimObservations!);
                 Logger.LogDebug($"Finish storing batch ({batchIndex})");
 
                 return verbatimObservations?.Count() ?? 0;
@@ -84,7 +84,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        private ObservationDatabaseVerbatim CastEntityToVerbatim(ObservationEntity entity)
+        private ObservationDatabaseVerbatim? CastEntityToVerbatim(ObservationEntity entity)
         {
             if (entity == null)
             {
@@ -215,13 +215,21 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
             DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
     }
 }

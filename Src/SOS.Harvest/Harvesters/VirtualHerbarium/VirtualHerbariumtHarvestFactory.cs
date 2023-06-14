@@ -92,27 +92,30 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
 
             // var table = xDocument.Elements(xmlns + "Workbook")?.Elements()?.Elements();
             var workbook = xDocument.Elements(xmlns + "Workbook").FirstOrDefault();
-            var worksheet = workbook.Elements(xmlns + "Worksheet").FirstOrDefault();
-            var table = worksheet.Elements(xmlns + "Table");
+            var worksheet = workbook?.Elements(xmlns + "Worksheet").FirstOrDefault();
+            var table = worksheet?.Elements(xmlns + "Table");
 
-            if (table.FirstOrDefault()?.HasElements ?? false)
+            if (table?.FirstOrDefault()?.HasElements ?? false)
             {
                 // Header data in first row
                 var header = table.Elements().FirstOrDefault();
                 var propertyMapping = new Dictionary<string, int>();
                 var index = 0;
-
-                foreach (var cell in header.Elements())
+                
+                if (header != null)
                 {
-                    if (new[] { "country", "province", "district", "locality", "long", "lat", "coordinate_precision" }.Contains(cell.Value,
-                        StringComparer.CurrentCultureIgnoreCase))
+                    foreach (var cell in header.Elements())
                     {
-                        propertyMapping.Add(cell.Value.ToLower(), index);
+                        if (new[] { "country", "province", "district", "locality", "long", "lat", "coordinate_precision" }.Contains(cell.Value,
+                            StringComparer.CurrentCultureIgnoreCase))
+                        {
+                            propertyMapping.Add(cell.Value.ToLower(), index);
+                        }
+
+                        index++;
                     }
-
-                    index++;
                 }
-
+          
                 // Data in all rows where country is sweden
                 var rows = table.Elements(xmlns + "Row").Where(r =>
                     r.Elements().ToArray()[propertyMapping["country"]].Value
@@ -153,7 +156,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<VirtualHerbariumObservationVerbatim>> CastEntitiesToVerbatimsAsync(XDocument xDocument)
+        public async Task<IEnumerable<VirtualHerbariumObservationVerbatim>?> CastEntitiesToVerbatimsAsync(XDocument xDocument)
         {
             return await Task.Run(() =>
             {
@@ -176,12 +179,15 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                     var propertyMapping = new Dictionary<int, string>();
                     var index = 0;
 
-                    foreach (var cell in header.Elements())
+                    if (header?.HasElements ?? false)
                     {
-                        propertyMapping.Add(index, cell.Value.Replace("_", "").Replace(" ", "").ToLower());
-                        index++;
+                        foreach (var cell in header.Elements())
+                        {
+                            propertyMapping.Add(index, cell.Value.Replace("_", "").Replace(" ", "").ToLower());
+                            index++;
+                        }
                     }
-
+            
                     // Data in all rows except first one
                     var rows = table.Elements(xmlns + "Row").Skip(1);
 

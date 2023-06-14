@@ -111,6 +111,12 @@ namespace SOS.Harvest.Harvesters.DwC
                 await foreach (var verbatimObservationsBatch in observationBatches)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+
+                    if (!verbatimObservationsBatch?.Any() ?? true)
+                    {
+                        continue;
+                    }
+
                     if (_dwcaConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         observationCount >= _dwcaConfiguration.MaxNumberOfSightingsHarvested)
                     {
@@ -118,7 +124,7 @@ namespace SOS.Harvest.Harvesters.DwC
                         break;
                     }
 
-                    observationCount += verbatimObservationsBatch.Count();
+                    observationCount += verbatimObservationsBatch!.Count();
                     await dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
                 }                
 
@@ -174,7 +180,7 @@ namespace SOS.Harvest.Harvesters.DwC
                 await dwcCollectionRepository.DeleteCollectionsAsync();
 
                 // Read datasets
-                List<Lib.Models.Processed.DataStewardship.Dataset.DwcVerbatimDataset> datasets = null!;
+                List<Lib.Models.Processed.DataStewardship.Dataset.DwcVerbatimDataset>? datasets = null;
                 try
                 {
                     datasets = await _dwcArchiveReader.ReadDatasetsAsync(dwcCollectionArchiveReaderContext);
@@ -199,7 +205,7 @@ namespace SOS.Harvest.Harvesters.DwC
                         break;
                     }
 
-                    observationCount += verbatimObservationsBatch.Count();
+                    observationCount += verbatimObservationsBatch!.Count();
                     await dwcCollectionRepository.OccurrenceRepository.AddManyAsync(verbatimObservationsBatch);
                 }
                 await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync();
@@ -275,14 +281,19 @@ namespace SOS.Harvest.Harvesters.DwC
         private async Task<int> CreateAndStoreAbsentObservations(DataProvider dataProvider, DwcCollectionRepository dwcCollectionRepository, List<DwcEventOccurrenceVerbatim>? events)
         {
             try
-            {                
+            {           
+                if (!events?.Any() ?? true)
+                {
+                    return 0;
+                }
+
                 _logger.LogDebug($"Start storing absent DwC-A occurrences for {dataProvider.Identifier}");
                 dwcCollectionRepository.OccurrenceRepository.TempMode = false;
                 int observationCount = 0;
                 var batchAbsentObservations = new List<DwcObservationVerbatim>();
                 var id = await dwcCollectionRepository.OccurrenceRepository.GetMaxIdAsync();
                 _logger.LogDebug($"MaxId={id} before adding absent observations");                
-                for (int i = 0; i < events.Count; i++)
+                for (int i = 0; i < events!.Count; i++)
                 {
                     DwcEventOccurrenceVerbatim? ev = events[i];
                     ev.Observations = null; // todo - handle this logic in the DwC-A parser.
@@ -317,12 +328,14 @@ namespace SOS.Harvest.Harvesters.DwC
             return 0;
         }
 
-
-
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for DwcA files");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for DwcA files");
+            });
+            return null!;
         }
 
         /// inheritdoc />
@@ -330,7 +343,11 @@ namespace SOS.Harvest.Harvesters.DwC
             DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for DwcA files");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for DwcA files");
+            });
+            return null!;
         }
 
         private async Task<int?> GetNumberOfObservationsInExistingCollectionAsync(DataProvider dataProvider)
@@ -362,7 +379,7 @@ namespace SOS.Harvest.Harvesters.DwC
             {
                 Status = RunStatus.Failed
             };
-            XDocument emlDocument = null;
+            XDocument emlDocument = null!;
             _logger.LogInformation($"Start harvesting sightings for {provider.Identifier} data provider.");
 
             var downloadUrlEml = provider.DownloadUrls
@@ -378,7 +395,7 @@ namespace SOS.Harvest.Harvesters.DwC
                     if (emlDocument != null)
                     {
                         if (DateTime.TryParse(
-                            emlDocument.Root.Element("dataset").Element("pubDate").Value,
+                            emlDocument?.Root?.Element("dataset")?.Element("pubDate")?.Value,
                             out var pubDate))
                         {
                             // If dataset not has changed since last harvest and there exist observations in MongoDB, don't harvest again
@@ -429,8 +446,8 @@ namespace SOS.Harvest.Harvesters.DwC
                 File.Delete(path);
             }
 
-            _logger.LogInformation($"Finish harvesting sightings for {provider.Identifier} data provider. Status={harvestInfo.Status}");
-            return harvestInfo;
+            _logger.LogInformation($"Finish harvesting sightings for {provider.Identifier} data provider. Status={harvestInfo?.Status}");
+            return harvestInfo!;
         }
     }
 }

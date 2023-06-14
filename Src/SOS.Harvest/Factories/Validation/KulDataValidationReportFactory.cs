@@ -23,7 +23,7 @@ namespace SOS.Harvest.Factories.Validation
     public class KulDataValidationReportFactory : DataValidationReportFactoryBase<KulObservationVerbatim>
     {
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
-        private KulObservationFactory _kulObservationFactory;
+        private KulObservationFactory? _kulObservationFactory;
 
         public KulDataValidationReportFactory(
             IVocabularyRepository processedVocabularyRepository,
@@ -49,11 +49,14 @@ namespace SOS.Harvest.Factories.Validation
             return await _kulObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override async Task<Observation> CreateProcessedObservationAsync(KulObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override async Task<Observation?> CreateProcessedObservationAsync(KulObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
-            _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
-            return processedObservation;
+            return await Task.Run(() =>
+            {
+                var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
+                _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
+                return processedObservation;
+            });
         }
 
         protected override void ValidateVerbatimTaxon(

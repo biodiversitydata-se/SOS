@@ -9,12 +9,12 @@ namespace SOS.Harvest.Services.Interfaces
         /// </summary>
         /// <param name="dataSetName"></param>
         /// <returns></returns>
-        Task<SharkJsonFile> GetAsync(string dataSetName);
+        Task<SharkJsonFile?> GetAsync(string dataSetName);
 
         /// <summary>
         ///     Get data sets available
         /// </summary>
         /// <returns></returns>
-        Task<SharkJsonFile> GetDataSetsAsync();
+        Task<SharkJsonFile?> GetDataSetsAsync();
     }
 }

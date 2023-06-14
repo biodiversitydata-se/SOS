@@ -22,21 +22,21 @@ namespace SOS.Harvest.Containers
 
         private bool _initilazionInProgress;
 
-        private ConcurrentDictionary<int, MetadataWithCategory<int>> _activities;
-        private ConcurrentDictionary<int, Metadata<int>> _biotopes;
-        private ConcurrentDictionary<int, Metadata<int>> _determinationMethods;
-        private ConcurrentDictionary<(DateTime, int, int), ICollection<DiaryEntry>> _diaryEntries;
-        private ConcurrentDictionary<int, Metadata<int>> _discoveryMethods;
-        private ConcurrentDictionary<int, Metadata<int>> _genders;
-        private ConcurrentDictionary<int, Metadata<int>> _organizations;
-        private ConcurrentDictionary<int, Person> _personsByUserId;
-        private ConcurrentDictionary<int, Project> _projects;
-        private ConcurrentDictionary<string, Metadata<string>> _sharedLabels;
-        private ConcurrentDictionary<int, Metadata<int>> _stages;
-        private ConcurrentDictionary<int, Metadata<int>> _substrates;
-        private ConcurrentDictionary<int, int?> _taxonSpeciesGroups;
-        private ConcurrentDictionary<int, Metadata<int>> _units;
-        private ConcurrentDictionary<int, Metadata<int>> _validationStatus;
+        private ConcurrentDictionary<int, MetadataWithCategory<int>>? _activities;
+        private ConcurrentDictionary<int, Metadata<int>>? _biotopes;
+        private ConcurrentDictionary<int, Metadata<int>>? _determinationMethods;
+        private ConcurrentDictionary<(DateTime, int, int), ICollection<DiaryEntry>>? _diaryEntries;
+        private ConcurrentDictionary<int, Metadata<int>>? _discoveryMethods;
+        private ConcurrentDictionary<int, Metadata<int>>? _genders;
+        private ConcurrentDictionary<int, Metadata<int>>? _organizations;
+        private ConcurrentDictionary<int, Person>? _personsByUserId;
+        private ConcurrentDictionary<int, Project>? _projects;
+        private ConcurrentDictionary<string, Metadata<string>>? _sharedLabels;
+        private ConcurrentDictionary<int, Metadata<int>>? _stages;
+        private ConcurrentDictionary<int, Metadata<int>>? _substrates;
+        private ConcurrentDictionary<int, int?>? _taxonSpeciesGroups;
+        private ConcurrentDictionary<int, Metadata<int>>? _units;
+        private ConcurrentDictionary<int, Metadata<int>>? _validationStatus;
 
         #region Diary Entries
         private async Task PopulateWeatherAsync() 
@@ -80,7 +80,7 @@ namespace SOS.Harvest.Containers
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private IEnumerable<Metadata<T>> CastMetdataEntitiesToVerbatims<T>(IEnumerable<MetadataEntity<T>> entities)
+        private IEnumerable<Metadata<T>> CastMetdataEntitiesToVerbatims<T>(IEnumerable<MetadataEntity<T>> entities) where T : notnull
         {
             if (!entities?.Any() ?? true)
             {
@@ -88,7 +88,7 @@ namespace SOS.Harvest.Containers
             }
 
             var metadataItems = new Dictionary<T, Metadata<T>>();
-            foreach (var entity in entities)
+            foreach (var entity in entities!)
             {
                 if (!metadataItems.ContainsKey(entity.Id))
                 {
@@ -108,7 +108,7 @@ namespace SOS.Harvest.Containers
         /// <param name="entities"></param>
         /// <returns></returns>
         private IEnumerable<MetadataWithCategory<T>> CastMetdataWithCategoryEntityToVerbatim<T>(
-            IEnumerable<MetadataWithCategoryEntity<T>> entities)
+            IEnumerable<MetadataWithCategoryEntity<T>> entities) where T : notnull
         {
             if (!entities?.Any() ?? true)
             {
@@ -116,8 +116,9 @@ namespace SOS.Harvest.Containers
             }
 
             var metadataItems = new Dictionary<T, MetadataWithCategory<T>>();
-            foreach (var entity in entities)
+            foreach (var entity in entities!)
             {
+                
                 if (!metadataItems.ContainsKey(entity.Id))
                 {
                     metadataItems.Add(entity.Id, new MetadataWithCategory<T>(entity.Id, entity.CategoryId));
@@ -147,7 +148,7 @@ namespace SOS.Harvest.Containers
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private IEnumerable<Organization> CastOrganizationEntitiesToVerbatims(IEnumerable<OrganizationEntity> entities)
+        private IEnumerable<Organization>? CastOrganizationEntitiesToVerbatims(IEnumerable<OrganizationEntity> entities)
         {
             if (!entities?.Any() ?? true)
             {
@@ -201,7 +202,7 @@ namespace SOS.Harvest.Containers
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private IEnumerable<Project> CastProjectEntitiesToVerbatim(IEnumerable<ProjectEntity> entities)
+        private IEnumerable<Project> CastProjectEntitiesToVerbatim(IEnumerable<ProjectEntity>? entities)
         {
             if (!entities?.Any() ?? true)
             {
@@ -364,19 +365,19 @@ namespace SOS.Harvest.Containers
         }
 
         /// <inheritdoc />
-        public IDictionary<int, Metadata<int>> Organizations => _organizations;
+        public IDictionary<int, Metadata<int>>? Organizations => _organizations;
 
         /// <inheritdoc />
-        public IDictionary<int, Person> PersonsByUserId => _personsByUserId;
+        public IDictionary<int, Person>? PersonsByUserId => _personsByUserId;
 
         /// <inheritdoc />
         public MetadataWithCategory<int> TryGetActivity(int? id)
         {
-            if (id == null)
+            if (id == null || (!_activities?.Any() ?? true))
             {
                 return null!;
             }
-            _activities.TryGetValue(id ?? 0, out var activity);
+            _activities!.TryGetValue(id ?? 0, out var activity);
 
             return activity!;
         }
@@ -384,11 +385,11 @@ namespace SOS.Harvest.Containers
         /// <inheritdoc />
         public Metadata<int> TryGetBiotope(int? id)
         {
-            if (id == null)
+            if (id == null || (!_biotopes?.Any() ?? true))
             {
                 return null!;
             }
-            _biotopes.TryGetValue(id ?? 0, out var biotope);
+            _biotopes!.TryGetValue(id ?? 0, out var biotope);
 
             return biotope!;
         }
@@ -396,11 +397,11 @@ namespace SOS.Harvest.Containers
         /// <inheritdoc />
         public Metadata<int> TryGetDeterminationMethod(int? id)
         {
-            if (id == null)
+            if (id == null || (!_determinationMethods?.Any() ?? true))
             {
                 return null!;
             }
-            _determinationMethods.TryGetValue(id ?? 0, out var determinationMethod);
+            _determinationMethods!.TryGetValue(id ?? 0, out var determinationMethod);
 
             return determinationMethod!;
         }
@@ -408,7 +409,7 @@ namespace SOS.Harvest.Containers
         /// <inheritdoc />
         public DiaryEntry TryGetDiaryEntry(IEnumerable<int> projectIds, DateTime? startDate, TimeSpan? startTime, int userId, int? siteId, int? controlingOrganisationId)
         {
-            if (!projectIds?.Any() ?? true || !startDate.HasValue)
+            if (!projectIds?.Any() ?? true || !startDate.HasValue || (!_diaryEntries?.Any() ?? true))
             {
                 return null!;
             }
@@ -416,7 +417,7 @@ namespace SOS.Harvest.Containers
             DiaryEntry diaryEntry = null!;
             foreach (var projectId in projectIds!)
             {
-                if (_diaryEntries.TryGetValue((startDate!.Value, projectId, userId), out var dateDiaryEntries))
+                if (_diaryEntries!.TryGetValue((startDate!.Value, projectId, userId), out var dateDiaryEntries))
                 {
                     var matchLevel = -1;
                     foreach (var dateDiaryEntry in dateDiaryEntries)
@@ -453,11 +454,11 @@ namespace SOS.Harvest.Containers
         /// <inheritdoc />
         public Metadata<int> TryGetDiscoveryMethod(int? id)
         {
-            if (id == null)
+            if (id == null || (!_discoveryMethods?.Any() ?? true))
             {
                 return null!;
             }
-            _discoveryMethods.TryGetValue(id ?? 0, out var discoveryMethod);
+            _discoveryMethods!.TryGetValue(id ?? 0, out var discoveryMethod);
 
             return discoveryMethod!;
         }
@@ -465,11 +466,11 @@ namespace SOS.Harvest.Containers
         /// <inheritdoc />
         public Metadata<int> TryGetGender(int? id)
         {
-            if (id == null)
+            if (id == null || (!_genders?.Any() ?? true))
             {
                 return null!;
             }
-            _genders.TryGetValue(id ?? 0, out var gender);
+            _genders!.TryGetValue(id ?? 0, out var gender);
 
             return gender!;
         }
@@ -477,11 +478,11 @@ namespace SOS.Harvest.Containers
         /// <inheritdoc />
         public Metadata<int> TryGetOrganization(int? id)
         {
-            if (id == null)
+            if (id == null || (!_organizations?.Any() ?? true))
             {
                 return null!;
             }
-            _organizations.TryGetValue(id ?? 0, out var organization);
+            _organizations!.TryGetValue(id ?? 0, out var organization);
 
             return organization!;
         }
@@ -489,11 +490,11 @@ namespace SOS.Harvest.Containers
         /// <inheritdoc />
         public async Task<Person> TryGetPersonByUserIdAsync(int? id)
         {
-            if (id == null)
+            if (id == null || (!_personsByUserId?.Any() ?? true))
             {
                 return null!;
             }
-            if (!_personsByUserId.TryGetValue(id ?? 0, out var person))
+            if (!_personsByUserId!.TryGetValue(id ?? 0, out var person))
             {
                 var personEntity = await _personRepository.GetByUserIdAsync(id ?? 0);
                 if (personEntity != null)
@@ -511,12 +512,12 @@ namespace SOS.Harvest.Containers
         /// <inheritdoc />
         public async Task<Project> TryGetProjectAsync(int? id)
         {
-            if (id == null)
+            if (id == null || (!_projects?.Any() ?? true))
             {
                 return null!;
             }
 
-            if (!_projects.TryGetValue(id ?? 0, out var project))
+            if (!_projects!.TryGetValue(id ?? 0, out var project))
             {
                 var projectEntity = await _projectRepository.GetProjectAsync(id ?? 0);
                 if (projectEntity != null)
@@ -533,11 +534,11 @@ namespace SOS.Harvest.Containers
         /// <inheritdoc />
         public Metadata<int> TryGetStage(int? id)
         {
-            if (id == null)
+            if (id == null || (!_stages?.Any() ?? true))
             {
                 return null!;
             }
-            _stages.TryGetValue(id ?? 0, out var stage);
+            _stages!.TryGetValue(id ?? 0, out var stage);
 
             return stage!;
         }
@@ -545,20 +546,20 @@ namespace SOS.Harvest.Containers
         /// <inheritdoc />
         public Metadata<int> TryGetSubstrate(int? id)
         {
-            if (id == null)
+            if (id == null || (!_substrates?.Any() ?? true))
             {
                 return null!;
             }
-            _substrates.TryGetValue(id ?? 0, out var substrate);
+            _substrates!.TryGetValue(id ?? 0, out var substrate);
 
             return substrate!;
         }
 
-        public string TryGetSummary(string source, bool FreeTextSummary)
+        public string? TryGetSummary(string? source, bool FreeTextSummary)
         {
-            if (FreeTextSummary || string.IsNullOrEmpty(source))
+            if (FreeTextSummary || string.IsNullOrEmpty(source) || (!_sharedLabels?.Any() ?? true))
             {
-                return source!;
+                return source;
             }
 
             var regex = new Regex("\\[[^\\]]*\\]\\]");
@@ -568,7 +569,7 @@ namespace SOS.Harvest.Containers
             {
                 var match = matches[i].Value;
 
-                if (_sharedLabels.TryGetValue(match.Replace("[", "").Replace("]", ""), out var label))
+                if (_sharedLabels!.TryGetValue(match.Replace("[", "").Replace("]", ""), out var label))
                 {
                     var value = label.Translate("sv-SE");
                     source = source.Replace(match, value);
@@ -583,35 +584,35 @@ namespace SOS.Harvest.Containers
         /// <inheritdoc />
         public int? TryGetTaxonSpeciesGroupId(int? id)
         {
-            if (id == null)
+            if (id == null || (!_taxonSpeciesGroups?.Any() ?? true))
             {
                 return null!;
             }
-            _taxonSpeciesGroups.TryGetValue(id ?? 0, out var taxonSpeciesGroupId);
+            _taxonSpeciesGroups!.TryGetValue(id ?? 0, out var taxonSpeciesGroupId);
 
             return taxonSpeciesGroupId!;
         }
 
         /// <inheritdoc />
-        public Metadata<int> TryGetUnit(int? id)
+        public Metadata<int>? TryGetUnit(int? id)
         {
-            if (id == null)
+            if (id == null || (!_units?.Any() ?? true))
             {
-                return null!;
+                return null;
             }
-            _units.TryGetValue(id ?? 0, out var unit);
+            _units!.TryGetValue(id ?? 0, out var unit);
 
             return unit!;
         }
 
         /// <inheritdoc />
-        public Metadata<int> TryGetValidationStatus(int? id)
+        public Metadata<int>? TryGetValidationStatus(int? id)
         {
-            if (id == null)
+            if (id == null || (!_validationStatus?.Any() ?? true))
             {
-                return null!;
+                return null;
             }
-            _validationStatus.TryGetValue(id ?? 0, out var validationStatus);
+            _validationStatus!.TryGetValue(id ?? 0, out var validationStatus);
 
             return validationStatus!;
         }

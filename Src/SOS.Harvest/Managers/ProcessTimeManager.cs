@@ -80,7 +80,7 @@ namespace SOS.Harvest.Managers
         }
 
         /// <inheritdoc />
-        public Timer GetTimer(TimerTypes timerType)
+        public Timer? GetTimer(TimerTypes timerType)
         {
             if (_timers.TryGetValue(timerType, out var timer))
             {

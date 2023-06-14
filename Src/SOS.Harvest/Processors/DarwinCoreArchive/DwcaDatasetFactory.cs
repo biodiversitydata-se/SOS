@@ -24,7 +24,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             
         }
 
-        public Dataset CreateProcessedDataset(DwcVerbatimDataset verbatimDataset)
+        public Dataset? CreateProcessedDataset(DwcVerbatimDataset verbatimDataset)
         {
             try
             {

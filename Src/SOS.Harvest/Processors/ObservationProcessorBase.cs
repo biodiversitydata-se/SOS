@@ -138,7 +138,7 @@ namespace SOS.Harvest.Processors
                 return await ProcessBatchAsync(dataProvider, verbatimObservationsBatch, batchId, mode,
                     observationFactory);
             }
-            catch (JobAbortedException e)
+            catch (JobAbortedException)
             {
                 // Throw cancelation again to let function above handle it
                 throw;
@@ -211,7 +211,7 @@ namespace SOS.Harvest.Processors
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
             IProcessTimeManager processTimeManager,
-            IUserObservationRepository userObservationRepository,
+            IUserObservationRepository? userObservationRepository,
             ProcessConfiguration processConfiguration,
             ILogger<TClass> logger) : base(processManager, processTimeManager, processConfiguration, logger)
         {
@@ -226,7 +226,7 @@ namespace SOS.Harvest.Processors
 
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
             _logGarbageCharFields = processConfiguration?.LogGarbageCharFields ?? false;
-            _userObservationRepository = userObservationRepository;
+            _userObservationRepository = userObservationRepository!;
         }
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace SOS.Harvest.Processors
                 var publicObservations = new ConcurrentDictionary<string, Observation>();
                 var protectedObservations = new ConcurrentDictionary<string, Observation>();
 
-                foreach (var verbatimObservation in verbatimObservationsBatch)
+                foreach (var verbatimObservation in verbatimObservationsBatch!)
                 {
                     var processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
                     var observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
@@ -341,7 +341,7 @@ namespace SOS.Harvest.Processors
                         TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
 
                         // If provider don't support diffusion, we provide it for them
-                        if (observation.DiffusionStatus != DiffusionStatus.DiffusedByProvider)
+                        if (observation!.DiffusionStatus != DiffusionStatus.DiffusedByProvider)
                         {
                             var diffuseTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.Diffuse);
 
@@ -395,7 +395,7 @@ namespace SOS.Harvest.Processors
                 
                 return (publicCount, protectedCount, failedCount);
             }
-            catch (JobAbortedException e)
+            catch (JobAbortedException)
             {
                 // Throw cancelation again to let function above handle it
                 throw;

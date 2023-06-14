@@ -11,8 +11,8 @@ namespace SOS.Harvest.Factories
     {
         public static Dictionary<int, PersonSighting>? CreatePersonSightingDictionary(
             ISet<int> sightingIds,
-            IDictionary<int, Person> personsByUserId,
-            IDictionary<int, Metadata<int>> organizations,
+            IDictionary<int, Person>? personsByUserId,
+            IDictionary<int, Metadata<int>>? organizations,
             IDictionary<int, ICollection<SpeciesCollectionItemEntity>> speciesCollectionItemsBySightingId,
             IEnumerable<SightingRelation>? sightingRelations)
         {
@@ -136,13 +136,17 @@ namespace SOS.Harvest.Factories
         }
 
         private static Dictionary<int, string> CreateSpeciesCollectionDictionary(
-            IDictionary<int, Person> personsByUserId,
-            IDictionary<int, Metadata<int>> organizations,
-            IDictionary<int, ICollection<SpeciesCollectionItemEntity>> speciesCollectionItemsBySightingId)
+            IDictionary<int, Person>? personsByUserId,
+            IDictionary<int, Metadata<int>>? organizations,
+            IDictionary<int, ICollection<SpeciesCollectionItemEntity>>? speciesCollectionItemsBySightingId)
         {
             var speciesCollectionBySightingId = new Dictionary<int, string>();
+            if (!speciesCollectionItemsBySightingId?.Any() ?? true)
+            {
+                return speciesCollectionBySightingId;
+            }
 
-            foreach (var item in speciesCollectionItemsBySightingId)
+            foreach (var item in speciesCollectionItemsBySightingId!)
             {
                 foreach (var speciesCollectionItem in item.Value)
                 {
@@ -180,11 +184,11 @@ namespace SOS.Harvest.Factories
             return speciesCollectionBySightingId;
         }
 
-        private static IDictionary<int, (string names, IEnumerable<UserInternal> users)> CreateObserversDictionary(
-            IEnumerable<SightingRelation> sightingRelations,
-            IDictionary<int, Person> personsByUserId)
+        private static IDictionary<int, (string? names, IEnumerable<UserInternal> users)> CreateObserversDictionary(
+            IEnumerable<SightingRelation>? sightingRelations,
+            IDictionary<int, Person>? personsByUserId)
         {
-            var observersBySightingId = new Dictionary<int, (string name, IEnumerable<UserInternal> alias)>();
+            var observersBySightingId = new Dictionary<int, (string? names, IEnumerable<UserInternal> alias)>();
 
             if ((!sightingRelations?.Any() ?? true) || (!personsByUserId?.Any() ?? true))
             {
@@ -216,12 +220,12 @@ namespace SOS.Harvest.Factories
         }
 
         private static IDictionary<int, Person> CreateReportedByDictionary(
-            IEnumerable<SightingRelation> sightingRelations,
-            IDictionary<int, Person> personsByUserId)
+            IEnumerable<SightingRelation>? sightingRelations,
+            IDictionary<int, Person>? personsByUserId)
         {
             var reportedBySightingId = new Dictionary<int, Person>();
 
-            if (!sightingRelations?.Any() ?? true)
+            if ((!sightingRelations?.Any() ?? true) || (!personsByUserId?.Any() ?? true))
             {
                 return reportedBySightingId;
             }
@@ -230,7 +234,7 @@ namespace SOS.Harvest.Factories
                 .Where(y => y.SightingRelationTypeId == (int) SightingRelationTypeId.Reporter && y.IsPublic);
             foreach (var sightingRelation in query)
             {
-                if (personsByUserId.TryGetValue(sightingRelation.UserId, out var person))
+                if (personsByUserId!.TryGetValue(sightingRelation.UserId, out var person))
                 {
                     if (!reportedBySightingId.ContainsKey(sightingRelation.SightingId))
                     {
@@ -245,9 +249,9 @@ namespace SOS.Harvest.Factories
 
         private static Dictionary<int, (string? names, UserInternal? determiner, UserInternal? confirmator)>?
             CreateVerifiedByStringDictionary(
-                IDictionary<int, Person> personsByUserId,
-                IDictionary<int, ICollection<SpeciesCollectionItemEntity>> speciesCollectionItemsBySightingId,
-                IEnumerable<SightingRelation> sightingRelations
+                IDictionary<int, Person>? personsByUserId,
+                IDictionary<int, ICollection<SpeciesCollectionItemEntity>>? speciesCollectionItemsBySightingId,
+                IEnumerable<SightingRelation>? sightingRelations
             )
         {
             var verifiedByDataSightingId = CreateVerifiedByDataDictionary(
@@ -260,9 +264,9 @@ namespace SOS.Harvest.Factories
         }
 
         private static Dictionary<int, VerifiedByData> CreateVerifiedByDataDictionary(
-            IDictionary<int, Person> personsByUserId,
-            IDictionary<int, ICollection<SpeciesCollectionItemEntity>> speciesCollectionItemsBySightingId,
-            IEnumerable<SightingRelation> sightingRelations)
+            IDictionary<int, Person>? personsByUserId,
+            IDictionary<int, ICollection<SpeciesCollectionItemEntity>>? speciesCollectionItemsBySightingId,
+            IEnumerable<SightingRelation>? sightingRelations)
         {
             var verifiedByDataSightingId = new Dictionary<int, VerifiedByData>();
 
@@ -271,7 +275,7 @@ namespace SOS.Harvest.Factories
                 return verifiedByDataSightingId;
             }
 
-            var determinerQuery = sightingRelations.Where(x =>
+            var determinerQuery = sightingRelations!.Where(x =>
                 x.SightingRelationTypeId == (int) SightingRelationTypeId.Determiner
                 && x.IsPublic
                 && x.Sort == 0);
@@ -304,7 +308,7 @@ namespace SOS.Harvest.Factories
                 }
             }
 
-            var confirmatorQuery = sightingRelations.Where(x =>
+            var confirmatorQuery = sightingRelations!.Where(x =>
                 x.SightingRelationTypeId == (int) SightingRelationTypeId.Confirmator
                 && x.IsPublic
                 && x.Sort == 0);
@@ -321,7 +325,7 @@ namespace SOS.Harvest.Factories
                     verifiedByDataSightingId.Add(confirmatorRelation.SightingId, vbd);
                 }
 
-                if (personsByUserId.TryGetValue(confirmatorRelation.UserId, out var person))
+                if (personsByUserId?.TryGetValue(confirmatorRelation.UserId, out var person) ?? false)
                 {
                     vbd.ConfirmatorName = person.FullName;
                     vbd.ConfirmatorInternal = new UserInternal {

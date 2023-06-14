@@ -29,11 +29,17 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override VocabularyId FieldId => VocabularyId.VerificationStatus;
         protected override bool Localized => true;
 
-        protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
+        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
         {
             var validationStatusList = await _artportalenMetadataRepository.GetValidationStatusAsync();
             var vocabularyValues = base.ConvertToLocalizedVocabularyValues(validationStatusList.ToArray());
-            vocabularyValues = vocabularyValues.Where(v => !_excludeArtportalenIds.Contains(v.Id)).ToList();
+
+            if (!vocabularyValues?.Any() ?? true)
+            {
+                return null;
+            }
+
+            vocabularyValues = vocabularyValues!.Where(v => !_excludeArtportalenIds.Contains(v.Id)).ToList();
             //int id = vocabularyValues.Max(f => f.Id);
             vocabularyValues.Add(CreateVocabularyValue(0, "Verified", "Validerad"));
             vocabularyValues.Add(CreateVocabularyValue(1, "Reported by expert", "Rapporterad av expert"));
@@ -46,13 +52,18 @@ namespace SOS.Harvest.Factories.Vocabularies
             50 // Rejected (Underkänd)
         };
 
-        protected override List<ExternalSystemMapping> GetExternalSystemMappings(
-            ICollection<VocabularyValueInfo> vocabularyValues)
+        protected override List<ExternalSystemMapping>? GetExternalSystemMappings(
+            ICollection<VocabularyValueInfo>? vocabularyValues)
         {
+            if (!vocabularyValues?.Any() ?? true)
+            {
+                return null;
+            }
+
             return new List<ExternalSystemMapping>
             {
-                GetArtportalenExternalSystemMapping(vocabularyValues),
-                GetDarwinCoreExternalSystemMapping(vocabularyValues)
+                GetArtportalenExternalSystemMapping(vocabularyValues!),
+                GetDarwinCoreExternalSystemMapping(vocabularyValues!)
             };
         }
 

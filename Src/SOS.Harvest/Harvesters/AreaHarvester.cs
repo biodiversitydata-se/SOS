@@ -63,9 +63,14 @@ namespace SOS.Harvest.Harvesters
                 var featureCollection = await _geoRegionApiService.GetFeatureCollectionFromZipAsync(Enum.GetValues(typeof(AreaType)).Cast<int>(), 4326);
                 _logger.LogDebug("Finish getting areas");
                 
+                if (!featureCollection?.Any() ?? true)
+                {
+                    throw new Exception("Failed to load areas from zip");
+                }
+
                 var areas = new List<Area>();
                 var areaGeometries = new Dictionary<string, Geometry>();
-                foreach (IFeature feature in featureCollection)
+                foreach (IFeature feature in featureCollection!)
                 {
                     var area = new Area((AreaType)Convert.ToInt32(feature.Attributes["AreaDatasetId"]), (string)feature.Attributes["FeatureId"]);
                     area.Name = (string)feature.Attributes["Name"];
@@ -125,12 +130,12 @@ namespace SOS.Harvest.Harvesters
         private void UseSimplifiedEconomicZoneOfSweden(Dictionary<string, Geometry> geometries)
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath, @"Resources\Gis\swedenExtentSimplified.geojson");
+            var filePath = Path.Combine(assemblyPath!, @"Resources\Gis\swedenExtentSimplified.geojson");
             var str = File.ReadAllText(filePath);
             var geoJsonReader = new GeoJsonReader();
             var swedenExtentSimplified = geoJsonReader.Read<FeatureCollection>(str);
             var id = geometries.Keys.FirstOrDefault(m => m.ToLower().Contains(AreaType.EconomicZoneOfSweden.ToString().ToLower()));
-            geometries[id] = swedenExtentSimplified.First().Geometry;
+            geometries[id!] = swedenExtentSimplified.First().Geometry;
         }
     }
 }

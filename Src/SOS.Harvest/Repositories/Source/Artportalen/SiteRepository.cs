@@ -129,7 +129,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 return null;
             }
 
-            return await GetByIdsAsync(ids, 0);
+            return await GetByIdsAsync(ids!, 0);
         }
 
         /// <inheritdoc />

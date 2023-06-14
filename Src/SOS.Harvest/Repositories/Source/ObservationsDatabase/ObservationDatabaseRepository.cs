@@ -18,7 +18,7 @@ namespace SOS.Harvest.Repositories.Source.ObservationsDatabase
         private readonly IObservationDatabaseDataService _observationDatabaseDataService;
 
         
-        private async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters = null)
+        private async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic? parameters = null)
         {
             return await _observationDatabaseDataService.QueryAsync<E>(query, parameters);
         }

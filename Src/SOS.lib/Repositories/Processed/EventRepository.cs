@@ -259,12 +259,14 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<int> AddManyAsync(IEnumerable<Event> items)
         {
-            // Save valid processed data
-            Logger.LogDebug($"Start indexing ObservationEvent batch for searching with {items.Count()} items");
-            var indexResult = WriteToElastic(items);
-            Logger.LogDebug("Finished indexing ObservationEvent batch for searching");
-            if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
-            return items.Count();
+            return await Task.Run(() => {
+                // Save valid processed data
+                Logger.LogDebug($"Start indexing ObservationEvent batch for searching with {items.Count()} items");
+                var indexResult = WriteToElastic(items);
+                Logger.LogDebug("Finished indexing ObservationEvent batch for searching");
+                if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
+                return items.Count();
+            });
         }
 
         public async Task<bool> DeleteAllDocumentsAsync()

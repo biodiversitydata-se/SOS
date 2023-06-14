@@ -161,7 +161,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
         }
 
-        private static IEnumerable<int> ConvertCsvStringToListOfIntegers(string s)
+        private static IEnumerable<int> ConvertCsvStringToListOfIntegers(string? s)
         {
             if (string.IsNullOrEmpty(s))
             {
@@ -277,7 +277,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             // Cast a projects to verbatim
             var sightingsProjects = new Dictionary<int, IDictionary<int, Project>>();
 
-            for (var i = 0; i < sightingProjectIds.Length; i++)
+            for (var i = 0; i < sightingProjectIds!.Length; i++)
             {
                 var (sightingId, projectId) = sightingProjectIds[i];
 
@@ -289,7 +289,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 if (!sightingProjects.ContainsKey(projectId))
                 {
-                    var project = await _artportalenMetadataContainer.TryGetProjectAsync(projectId);
+                    var project = await _artportalenMetadataContainer.TryGetProjectAsync(projectId)!;
                     if (project == null)
                     {
                         continue;
@@ -317,7 +317,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     // Try to get sighting project 
                     if (!sightingProjects.TryGetValue(projectParameterEntity.ProjectId, out var project))
                     {
-                        project = await _artportalenMetadataContainer.TryGetProjectAsync(projectParameterEntity.ProjectId);
+                        project = await _artportalenMetadataContainer.TryGetProjectAsync(projectParameterEntity.ProjectId)!;
                         if (project == null)
                         {
                             continue;
@@ -385,7 +385,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 return speciesCollectionsBySightingId;
             }
 
-            foreach (var speciesCollection in speciesCollections)
+            foreach (var speciesCollection in speciesCollections!)
             {
                 if (!speciesCollectionsBySightingId.TryGetValue(speciesCollection.SightingId, out var sightingSpeciesCollections))
                 {
@@ -438,11 +438,11 @@ namespace SOS.Harvest.Harvesters.Artportalen
         }
         
         /// <inheritdoc />
-        public async Task<IEnumerable<ArtportalenObservationVerbatim>> CastEntitiesToVerbatimsAsync(SightingEntity[] entities)
+        public async Task<IEnumerable<ArtportalenObservationVerbatim>?> CastEntitiesToVerbatimsAsync(SightingEntity[] entities)
         {
             if (!entities?.Any() ?? true)
             {
-                return null!;
+                return null;
             }
 
             var sightingIds = new HashSet<int>();

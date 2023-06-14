@@ -18,6 +18,7 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Search.Filters;
+using Amazon.Runtime.Internal.Util;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -168,16 +169,19 @@ namespace SOS.Lib.IO.DwcArchive
         {
             try
             {
-                bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
-                using var csvFileHelper = new CsvFileHelper();
-                csvFileHelper.InitializeWrite(streamWriter, "\t");
-               
-                // Write occurrence rows to CSV file.
-                foreach (var dwcObservation in dwcObservations)
-                {
-                    WriteEventRow(csvFileHelper, dwcObservation, fieldsToWriteArray);
-                }
-                csvFileHelper.FinishWrite();
+                await Task.Run(() => {
+                    bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
+                    using var csvFileHelper = new CsvFileHelper();
+                    csvFileHelper.InitializeWrite(streamWriter, "\t");
+
+                    // Write occurrence rows to CSV file.
+                    foreach (var dwcObservation in dwcObservations)
+                    {
+                        WriteEventRow(csvFileHelper, dwcObservation, fieldsToWriteArray);
+                    }
+                    csvFileHelper.FinishWrite();
+                });
+                
             }
             catch (Exception e)
             {

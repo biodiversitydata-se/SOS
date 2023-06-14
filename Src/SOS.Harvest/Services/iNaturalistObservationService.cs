@@ -15,11 +15,11 @@ namespace SOS.Harvest.Services
         public bool EndOfRecords { get; set; }
         public int Limit { get; set; }
         public int Offset { get; set; }
-        public IEnumerable<DwcObservationVerbatim> Results { get; set; }
+        public IEnumerable<DwcObservationVerbatim>? Results { get; set; }
     }
     public class StringConverter : System.Text.Json.Serialization.JsonConverter<string>
     {
-        public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
 
             if (reader.TokenType == JsonTokenType.Number)
@@ -74,7 +74,7 @@ namespace SOS.Harvest.Services
                         );
                     var serializerOptions = new JsonSerializerOptions()
                     {
-                        IgnoreNullValues = true,
+                        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
                         PropertyNamingPolicy = null,
                         WriteIndented = true,
                         PropertyNameCaseInsensitive = true
@@ -83,6 +83,12 @@ namespace SOS.Harvest.Services
                     var s = new StreamReader(gbifChunk);
                     var json = await s.ReadToEndAsync();
                     var results = JsonSerializer.Deserialize<GBIFResult>(json, serializerOptions);
+
+                    if (results?.Results == null)
+                    {
+                        endOfChunk = true;
+                        continue;
+                    }
                     observations.AddRange(results.Results);
                     if (results.EndOfRecords)
                     {

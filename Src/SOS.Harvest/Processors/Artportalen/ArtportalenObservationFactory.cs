@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Geometries;
+﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+using NetTopologySuite.Geometries;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
@@ -229,7 +230,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 mappings.Add(new DatasetMapping()
                 {
                     DatasetIdentifier = dataset.Identifier,
-                    ProjectIdsSet = dataset.Projects.Where(m => m.ApProjectId.HasValue).Select(m => m.ApProjectId.Value).ToHashSet(),
+                    ProjectIdsSet = dataset.Projects.Where(p => p.ApProjectId.HasValue).Select(m => m.ApProjectId!.Value).ToHashSet(),
                 });
             }
 
@@ -242,9 +243,19 @@ namespace SOS.Harvest.Processors.Artportalen
             if (datasets == null || !datasets.Any()) return dictionary;
 
             var mappings = GetDatasetMappings(datasets);
-            foreach (var mapping in mappings)
+            if (!mappings?.Any() ?? true)
             {
-                foreach (var projectId in mapping.ProjectIdsSet)
+                return dictionary;
+            }
+
+            foreach (var mapping in mappings!)
+            {
+                if (!mapping?.ProjectIdsSet?.Any() == true)
+                {
+                    continue;
+                }
+
+                foreach (var projectId in mapping!.ProjectIdsSet!)
                 {
                     dictionary.TryAdd(projectId, mapping);
                 }
@@ -399,7 +410,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 Lib.Models.Processed.Observation.Taxon substrateTaxon = null!;
                 if (verbatimObservation.SubstrateSpeciesId.HasValue)
                 {
-                    Taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out substrateTaxon);
+                    Taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out substrateTaxon!);
                 }
 
                 obs.Occurrence.Substrate = new Substrate
@@ -430,7 +441,7 @@ namespace SOS.Harvest.Processors.Artportalen
                             Created = c.CommentCreated
                         }),
                         Created = m.UploadDateTime?.ToShortDateString(),
-                        Format = (m.FileUri?.LastIndexOf('.') ?? -1) > 0 ? m.FileUri.Substring(m.FileUri.LastIndexOf('.'))?.Clean() : string.Empty,
+                        Format = (m.FileUri?.LastIndexOf('.') ?? -1) > 0 ? m.FileUri?.Substring(m.FileUri.LastIndexOf('.'))?.Clean() : string.Empty,
                         Identifier = GetMediaUrl(m.FileUri)?.Clean(),
                         License = string.IsNullOrEmpty(m.CopyrightText) ? "© all rights reserved" : m.CopyrightText?.Clean(),
                         References = $"{_artPortalenUrl}/Image/{m.Id}",
@@ -566,9 +577,18 @@ namespace SOS.Harvest.Processors.Artportalen
             out DateTime? endDateResult)
         {
             // Add time to start date if it exists
-            startDateResult = startDate.HasValue && startTime.HasValue
-                ? startDate.Value.ToLocalTime().Date + startTime
-                : startDate.Value.ToLocalTime().Date;
+            if (startDate.HasValue && startTime.HasValue)
+            {
+                startDateResult = startDate.Value.ToLocalTime().Date + startTime;
+            }
+            else if (startDate.HasValue && !startTime.HasValue)
+            {
+                startDateResult = startDate.Value.ToLocalTime().Date;
+            }
+            else
+            {
+                startDateResult = null;
+            }
 
             // Add time to end date if it exists
             if (endDate.HasValue && endTime.HasValue)
@@ -594,7 +614,7 @@ namespace SOS.Harvest.Processors.Artportalen
             }
         }
 
-        private List<ExtendedMeasurementOrFact> CreateMeasurementOrFacts(string occurrenceId, ArtportalenObservationVerbatim verbatimObservation)
+        private List<ExtendedMeasurementOrFact>? CreateMeasurementOrFacts(string occurrenceId, ArtportalenObservationVerbatim verbatimObservation)
         {
             IEnumerable<Project> projects = verbatimObservation.Projects;
             if (projects == null || !projects.Any()) return null;
@@ -607,7 +627,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     continue;
                 }
 
-                foreach (var projectParameter in project.ProjectParameters)
+                foreach (var projectParameter in project!.ProjectParameters)
                 {
                     var emofRecord = CreateEmofRecordFromProjectParameter(occurrenceId, project, projectParameter);
                     emofCollection.Add(emofRecord);
@@ -653,7 +673,7 @@ namespace SOS.Harvest.Processors.Artportalen
             return emof;
         }
 
-        private string GetMeasurementMethodDescription(Project project)
+        private string? GetMeasurementMethodDescription(Project project)
         {
             if (string.IsNullOrEmpty(project.SurveyMethod) && string.IsNullOrEmpty(project.SurveyMethodUrl))
             {
@@ -673,7 +693,7 @@ namespace SOS.Harvest.Processors.Artportalen
             return $"{project.SurveyMethod} [{project.SurveyMethodUrl}]";
         }
 
-        private string GetMeasurementRemarks(Lib.Models.Verbatim.Artportalen.ProjectParameter projectParameter, Project project)
+        private string? GetMeasurementRemarks(ProjectParameter projectParameter, Project project)
         {
             if (string.IsNullOrWhiteSpace(projectParameter.Description) && string.IsNullOrWhiteSpace(project.Name))
             {
@@ -700,7 +720,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        private string GetMediaUrl(string url)
+        private string? GetMediaUrl(string? url)
         {
             if (url?.StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ?? true)
             {
@@ -718,13 +738,14 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="defaultId"></param>
         /// <param name="setValueToNullIfNoMappingFound"></param>
         /// <returns></returns>
-        public VocabularyValue GetSosIdFromMetadata(
+        public VocabularyValue? GetSosIdFromMetadata(
             Metadata<int> metadata,
             VocabularyId vocabularyId,
             int? defaultId = null,
             bool setValueToNullIfNoMappingFound = false)
         {
-            IDictionary<object, int> sosIdByProviderValue = _vocabularyById.GetValue(vocabularyId);
+
+            var sosIdByProviderValue = _vocabularyById!.GetValue(vocabularyId);
             int? val = metadata?.Id;
             if (!val.HasValue || sosIdByProviderValue == null) return null;
 
@@ -792,7 +813,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="verbatimObservation"></param>
         /// <param name="substrateTaxon"></param>
         /// <returns></returns>
-        private string GetSubstrateDescription(ArtportalenObservationVerbatim verbatimObservation,
+        private string? GetSubstrateDescription(ArtportalenObservationVerbatim verbatimObservation,
             Lib.Models.Processed.Observation.Taxon substrateTaxon)
         {
             if (verbatimObservation == null)
@@ -907,7 +928,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <returns></returns>
         public static IDictionary<VocabularyId, IDictionary<object, int>> GetVocabulariesDictionary(
             ExternalSystemId externalSystemId,
-            ICollection<Vocabulary> allVocabularies)
+            ICollection<Vocabulary>? allVocabularies)
         {
             var dic = new ConcurrentDictionary<VocabularyId, IDictionary<object, int>>();
 
@@ -957,8 +978,8 @@ namespace SOS.Harvest.Processors.Artportalen
 
         public class DatasetMapping
         {
-            public string DatasetIdentifier { get; set; }
-            public HashSet<int> ProjectIdsSet { get; set; }
+            public string? DatasetIdentifier { get; set; }
+            public HashSet<int>? ProjectIdsSet { get; set; }
         }
     }
 }

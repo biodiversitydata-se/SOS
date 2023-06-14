@@ -2,6 +2,10 @@
 {
     public class IdValueEntity<T>
     {
+        public IdValueEntity(T id)
+        {
+            Id = id;
+        }
         /// <summary>
         ///     Id.
         /// </summary>
@@ -10,6 +14,6 @@
         /// <summary>
         ///     Value 
         /// </summary>
-        public string Value { get; set; }
+        public string? Value { get; set; }
     }
 }

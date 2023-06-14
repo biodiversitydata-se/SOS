@@ -111,7 +111,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             return processedLocation;
         }
 
-        private VocabularyValue GetSosId(string val,
+        private VocabularyValue? GetSosId(string val,
             IDictionary<object, int> sosIdByValue,
             int? defaultValue = null,
             MappingNotFoundLogic mappingNotFoundLogic = MappingNotFoundLogic.UseSourceValue)
@@ -195,16 +195,16 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// </summary>
         /// <param name="taxonIdStrings"></param>
         /// <returns></returns>
-        private IEnumerable<int> TryParseTaxonIds(IEnumerable<string> taxonIdStrings)
+        private IEnumerable<int>? TryParseTaxonIds(IEnumerable<string>? taxonIdStrings)
         {
             if (!taxonIdStrings?.Any() ?? true)
             {
-                return null!;
+                return null;
             }
 
             var taxonIds = new HashSet<int>();
 
-            foreach (var taxonIdString in taxonIdStrings)
+            foreach (var taxonIdString in taxonIdStrings!)
             {
                 var taxonId = TryParseTaxonId(taxonIdString);
                 if (taxonId >= 0)
@@ -255,7 +255,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// </summary>
         /// <param name="verbatimChecklist"></param>
         /// <returns></returns>
-        public Checklist CreateProcessedChecklist(DwcEventOccurrenceVerbatim verbatimChecklist)
+        public Checklist? CreateProcessedChecklist(DwcEventOccurrenceVerbatim verbatimChecklist)
         {
             try
             {

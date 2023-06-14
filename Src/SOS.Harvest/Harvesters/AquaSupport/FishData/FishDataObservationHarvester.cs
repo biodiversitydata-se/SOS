@@ -82,32 +82,35 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
                     Logger.LogDebug(
                         $"Fetching Fish data observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
 
-                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
-                    // Clean up
-                    xmlDocument = null;
-
-                    // Add sightings to MongoDb
-                    await VerbatimRepository.AddManyAsync(verbatims);
-
-                    harvestCount += verbatims.Count();
-
-                    Logger.LogDebug($"{harvestCount} Fish data observations harvested");
-
-                    var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
-
-                    if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
+                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument!);
+                    if (verbatims?.Any() ?? false)
                     {
-                        dataLastModified = batchDataLastModified.Value;
-                    }
+                        // Clean up
+                        xmlDocument = null;
 
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        harvestCount >= _fishDataServiceConfiguration.MaxNumberOfSightingsHarvested)
-                    {
-                        Logger.LogInformation("Max Fish data observations reached");
-                        break;
-                    }
+                        // Add sightings to MongoDb
+                        await VerbatimRepository.AddManyAsync(verbatims);
 
+                        harvestCount += verbatims?.Count() ?? 0;
+
+                        Logger.LogDebug($"{harvestCount} Fish data observations harvested");
+
+                        var batchDataLastModified = verbatims!.Select(a => a.Modified).Max();
+
+                        if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
+                        {
+                            dataLastModified = batchDataLastModified.Value;
+                        }
+
+                        cancellationToken?.ThrowIfCancellationRequested();
+                        if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                            harvestCount >= _fishDataServiceConfiguration.MaxNumberOfSightingsHarvested)
+                        {
+                            Logger.LogInformation("Max Fish data observations reached");
+                            break;
+                        }
+                    }
+                    
                     var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
                     if (timeSinceLastCall < 2000)
                     {
@@ -137,13 +140,21 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
             DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace SOS.Harvest.Harvesters.Artportalen.Interfaces
         /// <param name="ids"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<IEnumerable<ArtportalenObservationVerbatim>> HarvestObservationsAsync(IEnumerable<int> ids,
+        Task<IEnumerable<ArtportalenObservationVerbatim>?> HarvestObservationsAsync(IEnumerable<int> ids,
             IJobCancellationToken cancellationToken);
     }
 }

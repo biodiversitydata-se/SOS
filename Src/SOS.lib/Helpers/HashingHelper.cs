@@ -33,16 +33,16 @@ namespace SOS.Lib.Helpers
                     result = MD5.Create();
                     break;
                 case HashingClassAlgorithms.SHA1:
-                    result = SHA1Managed.Create();
+                    result = SHA1.Create();
                     break;
                 case HashingClassAlgorithms.SHA256:
-                    result = SHA256Managed.Create();
+                    result = SHA256.Create();
                     break;
                 case HashingClassAlgorithms.SHA384:
                     result = SHA384.Create();
                     break;
                 case HashingClassAlgorithms.SHA512:
-                    result = SHA512Managed.Create();
+                    result = SHA512.Create();
                     break;
             }
 

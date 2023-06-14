@@ -328,9 +328,9 @@ namespace SOS.Harvest.Jobs
                 return true;
             }
             var success = true;
-            foreach (var currProvider in currentProcessInfo.ProvidersInfo)
+            foreach (var currProvider in currentProcessInfo!.ProvidersInfo)
             {
-                var otherProvider = otherProcessInfo.ProvidersInfo.FirstOrDefault(p => p.DataProviderId.Equals(currProvider.DataProviderId));
+                var otherProvider = otherProcessInfo!.ProvidersInfo.FirstOrDefault(p => p.DataProviderId.Equals(currProvider.DataProviderId));
 
                 if (otherProvider != null)
                 {
@@ -396,11 +396,11 @@ namespace SOS.Harvest.Jobs
             }
 
             var protectedObservations = new Dictionary<string, Observation>();
-            foreach (var rndProObs in rndProObservations)
+            foreach (var rndProObs in rndProObservations!)
             {
                 if (!string.IsNullOrEmpty(rndProObs.Occurrence?.OccurrenceId) && !protectedObservations.ContainsKey(rndProObs.Occurrence.OccurrenceId))
                 {
-                    protectedObservations.Add(rndProObs.Occurrence?.OccurrenceId, rndProObs);
+                    protectedObservations.Add(rndProObs.Occurrence.OccurrenceId, rndProObs);
                 }
             }
 
@@ -419,7 +419,7 @@ namespace SOS.Harvest.Jobs
                 foreach (var protectedObservation in protectedObservations)
                 {
                     // Try to get diffused observation with same occurenceId from public index
-                    if (!diffusedObservations.TryGetValue(protectedObservation.Key, out var publicObservation))
+                    if (!diffusedObservations!.TryGetValue(protectedObservation.Key, out var publicObservation))
                     {
                         continue;
                     }
@@ -595,7 +595,7 @@ namespace SOS.Harvest.Jobs
                             await DisableEsEventIndexingAsync();
                             _logger.LogDebug($"Number of data providers that supports events: {dataProvidersToProcess.Where(m => m.SupportEvents).Count()}");
                             _logger.LogDebug($"Number of data providers that don't supports events: {dataProvidersToProcess.Where(m => !m.SupportEvents).Count()}");
-                            var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
+                            var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken!);
                             //var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
                             var eventSuccess = eventResult == null || eventResult.All(t => t.Value.Status == RunStatus.Success);
                             await EnableEsEventIndexingAsync();
@@ -606,7 +606,7 @@ namespace SOS.Harvest.Jobs
                             //----------------------
                             await InitializeElasticSearchDatasetAsync();
                             await DisableEsDatasetIndexingAsync();
-                            var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken);
+                            var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive), mode, taxonById, cancellationToken!);
                             //var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
                             var datasetSuccess = datasetResult == null || datasetResult.All(t => t.Value.Status == RunStatus.Success);
                             await EnableEsDatasetIndexingAsync();
@@ -769,15 +769,15 @@ namespace SOS.Harvest.Jobs
                         // Process Events
                         await InitializeElasticSearchEventAsync();
                         await DisableEsEventIndexingAsync();
-                        var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
-                        var eventSuccess = eventResult.All(t => t.Value.Status == RunStatus.Success);
+                        var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken!);
+                        var eventSuccess = eventResult?.All(t => t.Value.Status == RunStatus.Success) ?? false;
                         await EnableEsEventIndexingAsync();
 
                         // Process Datasets
                         await InitializeElasticSearchDatasetAsync();
                         await DisableEsDatasetIndexingAsync();
-                        var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
-                        var datasetSuccess = datasetResult.All(t => t.Value.Status == RunStatus.Success);
+                        var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken!);
+                        var datasetSuccess = datasetResult?.All(t => t.Value.Status == RunStatus.Success) ?? false;
                         await EnableEsDatasetIndexingAsync();
 
                     }
@@ -853,10 +853,10 @@ namespace SOS.Harvest.Jobs
             return processTaskByDataProvider.ToDictionary(pt => pt.Key, pt => pt.Value.Result);
         }
 
-        private async Task<IDictionary<DataProvider, ProcessingStatus>> ProcessVerbatimEvents(
+        private async Task<IDictionary<DataProvider, ProcessingStatus>?> ProcessVerbatimEvents(
             IEnumerable<DataProvider> dataProvidersToProcess,
             JobRunModes mode,
-            IDictionary<int, Taxon> taxonById,
+            IDictionary<int, Taxon>? taxonById,
             IJobCancellationToken cancellationToken)
         {
             _logger.LogDebug("Start processing verbatim events");
@@ -879,10 +879,10 @@ namespace SOS.Harvest.Jobs
             return processTaskByDataProvider.ToDictionary(pt => pt.Key, pt => pt.Value.Result);
         }
 
-        private async Task<IDictionary<DataProvider, ProcessingStatus>> ProcessVerbatimDatasets(
+        private async Task<IDictionary<DataProvider, ProcessingStatus>?> ProcessVerbatimDatasets(
             IEnumerable<DataProvider> dataProvidersToProcess,
             JobRunModes mode,
-            IDictionary<int, Taxon> taxonById,
+            IDictionary<int, Taxon>? taxonById,
             IJobCancellationToken cancellationToken)
         {
             _logger.LogDebug("Start processing verbatim datasets");
@@ -938,7 +938,7 @@ namespace SOS.Harvest.Jobs
                 var totalPublicCount = 0;
                 var totalProtectedCount = 0;
 
-                foreach (var taskProvider in processTaskByDataProvider)
+                foreach (var taskProvider in processTaskByDataProvider!)
                 {
                     var provider = taskProvider.Key;
                     var processResult = taskProvider.Value.Result;
@@ -992,7 +992,7 @@ namespace SOS.Harvest.Jobs
             }
             else
             {
-                foreach (var taskProvider in processTaskByDataProvider)
+                foreach (var taskProvider in processTaskByDataProvider!)
                 {
                     var provider = taskProvider.Key;
                     var processResult = taskProvider.Value.Result;
@@ -1230,7 +1230,7 @@ namespace SOS.Harvest.Jobs
             var provider = await _dataProviderCache.GetAsync(1);
             var taxa = await GetTaxaAsync(JobRunModes.IncrementalActiveInstance);
             _processedObservationRepository.LiveMode = true;
-            return await processor.ProcessObservationsAsync(provider, taxa, verbatims);
+            return await processor!.ProcessObservationsAsync(provider, taxa, verbatims);
         }
     }
 }

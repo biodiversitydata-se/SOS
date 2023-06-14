@@ -279,18 +279,21 @@ namespace SOS.Lib.IO.GeoJson
             Utf8JsonWriter jsonWriter,
             JsonSerializerOptions jsonSerializerOptions)
         {
-            jsonWriter.WriteStartObject();
-            jsonWriter.WriteString("type", "Feature");
-            if (!string.IsNullOrEmpty(id))
+            await Task.Run(() =>
             {
-                jsonWriter.WriteString("id", id);
-            }
-            jsonWriter.WritePropertyName("geometry");
-            
-            JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
-            jsonWriter.WritePropertyName("properties");
-            JsonSerializer.Serialize(jsonWriter, attributesTable, jsonSerializerOptions);
-            jsonWriter.WriteEndObject();
+                jsonWriter.WriteStartObject();
+                jsonWriter.WriteString("type", "Feature");
+                if (!string.IsNullOrEmpty(id))
+                {
+                    jsonWriter.WriteString("id", id);
+                }
+                jsonWriter.WritePropertyName("geometry");
+
+                JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
+                jsonWriter.WritePropertyName("properties");
+                JsonSerializer.Serialize(jsonWriter, attributesTable, jsonSerializerOptions);
+                jsonWriter.WriteEndObject();
+            });
         }
 
         private Feature GetFeature(IDictionary<string, object> record, ICollection<string> outputFields) //, bool flattenProperties)

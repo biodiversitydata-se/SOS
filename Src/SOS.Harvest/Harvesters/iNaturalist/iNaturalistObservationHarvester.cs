@@ -45,7 +45,8 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
+            return null!;
         }
 
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)

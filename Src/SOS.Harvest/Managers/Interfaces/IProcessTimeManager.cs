@@ -7,7 +7,7 @@
         /// </summary>
         /// <param name="timerType"></param>
         /// <returns></returns>
-        ProcessTimeManager.Timer GetTimer(ProcessTimeManager.TimerTypes timerType);
+        ProcessTimeManager.Timer? GetTimer(ProcessTimeManager.TimerTypes timerType);
 
         /// <summary>
         /// Get all timers

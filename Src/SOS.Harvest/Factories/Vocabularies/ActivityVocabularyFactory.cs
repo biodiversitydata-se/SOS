@@ -35,25 +35,30 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override VocabularyId FieldId => VocabularyId.Activity;
         protected override bool Localized => true;
 
-        protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
+        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
         {
             var activities = await _artportalenMetadataRepository.GetActivitiesAsync();
             var vocabularyValues = ConvertToVocabularyValuesWithCategory(activities.ToArray());
             return vocabularyValues;
         }
 
-        protected override List<ExternalSystemMapping> GetExternalSystemMappings(
-           ICollection<VocabularyValueInfo> vocabularyValues)
+        protected override List<ExternalSystemMapping>? GetExternalSystemMappings(
+           ICollection<VocabularyValueInfo>? vocabularyValues)
         {
+            if (!vocabularyValues?.Any() ?? true)
+            {
+                return null;
+            }
+
             return new List<ExternalSystemMapping>
             {
-                GetArtportalenExternalSystemMapping(vocabularyValues),
+                GetArtportalenExternalSystemMapping(vocabularyValues!),
                 GetDarwinCoreExternalSystemMapping(vocabularyValues)
             };
         }
 
         private ExternalSystemMapping GetDarwinCoreExternalSystemMapping(
-            ICollection<VocabularyValueInfo> vocabularyValues)
+            ICollection<VocabularyValueInfo>? vocabularyValues)
         {
             var externalSystemMapping = new ExternalSystemMapping
             {
@@ -63,14 +68,17 @@ namespace SOS.Harvest.Factories.Vocabularies
                 Mappings = new List<ExternalSystemMappingField>()
             };
 
-            var dwcMappingSynonyms = GetDwcMappingSynonyms();
-            var dwcMappings = CreateDwcMappings(vocabularyValues, dwcMappingSynonyms);
             var mappingField = new ExternalSystemMappingField
             {
                 Key = VocabularyMappingKeyFields.Activity,
-                Description = "Activity",
-                Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList()
+                Description = "Activity"
             };
+
+            if (vocabularyValues?.Any() ?? false){
+                var dwcMappingSynonyms = GetDwcMappingSynonyms();
+                var dwcMappings = CreateDwcMappings(vocabularyValues, dwcMappingSynonyms);
+                mappingField.Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList();
+            }
 
             externalSystemMapping.Mappings.Add(mappingField);
             return externalSystemMapping;

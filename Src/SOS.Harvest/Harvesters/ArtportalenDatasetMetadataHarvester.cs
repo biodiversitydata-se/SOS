@@ -81,59 +81,69 @@ namespace SOS.Harvest.Harvesters
             return harvestInfo;
         }
 
-        private IEnumerable<ArtportalenDatasetMetadata> CastToArtportalenDatasetVerbatims(DatasetEntities datasetEntities)
+        private IEnumerable<ArtportalenDatasetMetadata>? CastToArtportalenDatasetVerbatims(DatasetEntities datasetEntities)
         {
-            var accessRightsById = datasetEntities.AccessRights.Select(m => CastToAccessRights(m))
+            if (datasetEntities == null)
+            {
+                return null;
+            }
+
+            var accessRightsById = datasetEntities.AccessRights?.Select(m => CastToAccessRights(m))
                 .ToDictionary(m => m.Id, m => m);
-            var organisationById = datasetEntities.Organisations.Select(m => CastToOrganisation(m))
+            var organisationById = datasetEntities.Organisations?.Select(m => CastToOrganisation(m))
                 .ToDictionary(m => m.Id, m => m);
-            var methodologyById = datasetEntities.Methodologies.Select(m => CastToMethodology(m))
+            var methodologyById = datasetEntities.Methodologies?.Select(m => CastToMethodology(m))
                 .ToDictionary(m => m.Id, m => m);
-            var programmeAreaById = datasetEntities.ProgrammeAreas.Select(m => CastToProgrammeArea(m))
+            var programmeAreaById = datasetEntities.ProgrammeAreas?.Select(m => CastToProgrammeArea(m))
                 .ToDictionary(m => m.Id, m => m);
-            var projectTypeById = datasetEntities.ProjectTypes.Select(m => CastToProjectType(m))
+            var projectTypeById = datasetEntities.ProjectTypes?.Select(m => CastToProjectType(m))
                 .ToDictionary(m => m.Id, m => m);
-            var projectById = datasetEntities.Projects.Select(m => CastToProject(m, projectTypeById))
+            var projectById = datasetEntities.Projects?.Select(m => CastToProject(m, projectTypeById))
                 .ToDictionary(m => m.Id, m => m);
-            var purposeById = datasetEntities.Purposes.Select(m => CastToPurpose(m))
+            var purposeById = datasetEntities.Purposes?.Select(m => CastToPurpose(m))
                 .ToDictionary(m => m.Id, m => m);
 
-            var datasets = datasetEntities.Datasets.Select(m => CastToDataset(m,
+            var datasets = datasetEntities.Datasets?.Select(m => CastToDataset(m,
                 organisationById,
                 methodologyById,
                 projectById,
                 accessRightsById,
                 purposeById,
                 programmeAreaById,
-                datasetEntities.DatasetCreatorRelations.Where(d => d.DatasetId == m.Id).Select(x => x.OrganisationId),
-                datasetEntities.DatasetMethodologyRelations.Where(d => d.DatasetId == m.Id).Select(x => x.MethodologyId),
-                datasetEntities.DatasetProjectRelations.Where(d => d.DatasetId == m.Id).Select(x => x.ProjectId)
+                datasetEntities.DatasetCreatorRelations?.Where(d => d.DatasetId == m.Id).Select(x => x.OrganisationId),
+                datasetEntities.DatasetMethodologyRelations?.Where(d => d.DatasetId == m.Id).Select(x => x.MethodologyId),
+                datasetEntities.DatasetProjectRelations?.Where(d => d.DatasetId == m.Id).Select(x => x.ProjectId)
             ));
 
-            return datasets;
+            return datasets!;
         }
 
-        private ArtportalenDatasetMetadata CastToDataset(DatasetEntities.DS_DatasetEntity dsDataset,
-            Dictionary<int, ArtportalenDatasetMetadata.Organisation> organisationById,
-            Dictionary<int, ArtportalenDatasetMetadata.Methodology> methodologyById,
-            Dictionary<int, ArtportalenDatasetMetadata.Project> projectById,
-            Dictionary<int, ArtportalenDatasetMetadata.AccessRights> accessRightsById,
-            Dictionary<int, ArtportalenDatasetMetadata.Purpose> purposeById,
-            Dictionary<int, ArtportalenDatasetMetadata.ProgrammeArea> programmeAreaById,
-            IEnumerable<int> creatorIds,
-            IEnumerable<int> methodologyIds,
-            IEnumerable<int> projectIds)
+        private ArtportalenDatasetMetadata? CastToDataset(DatasetEntities.DS_DatasetEntity? dsDataset,
+            Dictionary<int, ArtportalenDatasetMetadata.Organisation>? organisationById,
+            Dictionary<int, ArtportalenDatasetMetadata.Methodology>? methodologyById,
+            Dictionary<int, ArtportalenDatasetMetadata.Project>? projectById,
+            Dictionary<int, ArtportalenDatasetMetadata.AccessRights>? accessRightsById,
+            Dictionary<int, ArtportalenDatasetMetadata.Purpose>? purposeById,
+            Dictionary<int, ArtportalenDatasetMetadata.ProgrammeArea>? programmeAreaById,
+            IEnumerable<int>? creatorIds,
+            IEnumerable<int>? methodologyIds,
+            IEnumerable<int>? projectIds)
         {
+            if (dsDataset == null)
+            {
+                return null;
+            }
+
             return new ArtportalenDatasetMetadata
             {
-                Id = dsDataset.Id,
-                Assigner = organisationById[dsDataset.AssignerId],
-                OwnerInstitution = organisationById[dsDataset.OwnerinstitutionId],
-                Publisher = organisationById[dsDataset.PublisherId],
-                Creators = creatorIds.Select(m => organisationById[m]),
-                Methodologies = methodologyIds.Select(m => methodologyById[m]),
-                Projects = projectIds.Select(m => projectById[m]),
-                Identifier = dsDataset.Identifier,
+                Id = dsDataset?.Id ?? 0,
+                Assigner = organisationById == null ? null : organisationById[dsDataset!.AssignerId],
+                OwnerInstitution = organisationById?.ContainsKey(dsDataset!.OwnerinstitutionId) ?? false ? organisationById[dsDataset!.OwnerinstitutionId] : null,
+                Publisher = organisationById?.ContainsKey(dsDataset!.PublisherId) ?? false ? organisationById[dsDataset!.PublisherId] : null,
+                Creators = organisationById == null ? null : creatorIds?.Select(m => organisationById[m]),
+                Methodologies = methodologyById == null ? null : methodologyIds?.Select(m => methodologyById[m]),
+                Projects = projectById == null ? null : projectIds?.Select(m => projectById[m]),
+                Identifier = dsDataset!.Identifier,
                 Metadatalanguage = dsDataset.Metadatalanguage,
                 Language = dsDataset.Language,
                 DataStewardship = dsDataset.DataStewardship,
@@ -143,9 +153,9 @@ namespace SOS.Harvest.Harvesters
                 Title = dsDataset.Title,
                 Spatial = dsDataset.Spatial,
                 DescriptionAccessRights = dsDataset.DescriptionAccessRights,        
-                DatasetAccessRights = accessRightsById[dsDataset.AccessRightsId],
-                DatasetPurpose = purposeById[dsDataset.PurposeId],
-                DatasetProgrammeArea = programmeAreaById[dsDataset.ProgrammeAreaId]
+                DatasetAccessRights = accessRightsById?.ContainsKey(dsDataset.AccessRightsId) ?? false ? accessRightsById[dsDataset.AccessRightsId] : null,
+                DatasetPurpose = purposeById?.ContainsKey(dsDataset.PurposeId) ?? false ? purposeById[dsDataset.PurposeId] : null,
+                DatasetProgrammeArea = programmeAreaById?.ContainsKey(dsDataset.ProgrammeAreaId) ?? false ? programmeAreaById[dsDataset.ProgrammeAreaId] : null
             };
         }
 
@@ -198,7 +208,7 @@ namespace SOS.Harvest.Harvesters
         }
 
         private ArtportalenDatasetMetadata.Project CastToProject(DatasetEntities.DS_Project dsProject, 
-            Dictionary<int, ArtportalenDatasetMetadata.ProjectType> projectTypeById)
+            Dictionary<int, ArtportalenDatasetMetadata.ProjectType>? projectTypeById)
         {
             return new ArtportalenDatasetMetadata.Project
             {
@@ -206,7 +216,7 @@ namespace SOS.Harvest.Harvesters
                 ApProjectId = dsProject.ApProjectId,
                 ProjectCode = dsProject.ProjectCode,
                 ProjectId = dsProject.ProjectId,
-                ProjectType = projectTypeById[dsProject.ProjectTypeId]
+                ProjectType = projectTypeById?.ContainsKey(dsProject.ProjectTypeId) ?? false ? projectTypeById[dsProject.ProjectTypeId] : null
             };
         }
 

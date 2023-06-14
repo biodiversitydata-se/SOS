@@ -29,7 +29,7 @@ namespace SOS.Harvest.Factories.Vocabularies
             return vocabularyValues;
         }
 
-        protected override Dictionary<string, int> GetMappingSynonyms()
+        protected override Dictionary<string, int>? GetMappingSynonyms()
         {
             return null;
         }

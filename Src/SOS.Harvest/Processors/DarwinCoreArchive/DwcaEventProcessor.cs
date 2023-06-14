@@ -104,7 +104,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 Logger.LogDebug($"Event - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 return await ValidateAndStoreEvents(dataProvider, processedEvents.Values, $"{startId}-{endId}");
             }
-            catch (JobAbortedException e)
+            catch (JobAbortedException)
             {
                 // Throw cancelation again to let function above handle it
                 throw;

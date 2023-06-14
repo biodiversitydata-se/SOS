@@ -29,18 +29,22 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override VocabularyId FieldId => VocabularyId.Behavior;
         protected override bool Localized => true;
 
-        protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
+        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
         {
             var activities = await _metadataRepository.GetActivitiesAsync();
             var selectedActivities = activities.Where(a => _artportalenIds.Contains(a.Id));
             var vocabularyValues = base.ConvertToLocalizedVocabularyValues(selectedActivities.ToArray());
-            int id = activities.Max(f => f.Id);
-            vocabularyValues.Add(CreateVocabularyValue(++id, "roosting"));
+            if (vocabularyValues?.Any() ?? false)
+            {
+                int id = activities.Max(f => f.Id);
+                vocabularyValues.Add(CreateVocabularyValue(++id, "roosting"));
+            }
+           
             return vocabularyValues;
         }
 
         protected override List<ExternalSystemMapping> GetExternalSystemMappings(
-            ICollection<VocabularyValueInfo> vocabularyValues)
+            ICollection<VocabularyValueInfo>? vocabularyValues)
         {
             return new List<ExternalSystemMapping>
             {
@@ -50,7 +54,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         }
 
         private ExternalSystemMapping GetDarwinCoreExternalSystemMapping(
-            ICollection<VocabularyValueInfo> vocabularyValues)
+            ICollection<VocabularyValueInfo>? vocabularyValues)
         {
             var externalSystemMapping = new ExternalSystemMapping
             {
@@ -59,16 +63,19 @@ namespace SOS.Harvest.Factories.Vocabularies
                 Description = "The Darwin Core format (https://dwc.tdwg.org/terms/)",
                 Mappings = new List<ExternalSystemMappingField>()
             };
-
-            var dwcMappingSynonyms = GetDwcMappingSynonyms();
-            var dwcMappings = CreateDwcMappings(vocabularyValues, dwcMappingSynonyms);
             var mappingField = new ExternalSystemMappingField
             {
                 Key = VocabularyMappingKeyFields.DwcBehavior,
-                Description = "The behavior term (http://rs.tdwg.org/dwc/terms/behavior)",
-                Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList()
+                Description = "The behavior term (http://rs.tdwg.org/dwc/terms/behavior)"
             };
 
+            if (vocabularyValues?.Any() ?? false)
+            {
+                var dwcMappingSynonyms = GetDwcMappingSynonyms();
+                var dwcMappings = CreateDwcMappings(vocabularyValues, dwcMappingSynonyms);
+                mappingField.Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList();
+            }
+           
             externalSystemMapping.Mappings.Add(mappingField);
             return externalSystemMapping;
         }

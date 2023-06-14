@@ -198,7 +198,7 @@ namespace SOS.Harvest.Jobs
 
             var providersInfo = new List<ProviderInfo>();
 
-            foreach (var taskProvider in processTaskByDataProvider)
+            foreach (var taskProvider in processTaskByDataProvider!)
             {
                 var provider = taskProvider.Key;
                 var processResult = taskProvider.Value.Result;
@@ -298,13 +298,13 @@ namespace SOS.Harvest.Jobs
             IEnumerable<DataProvider> dataProvidersToProcess;
             if (dataProviderIdOrIdentifiers?.Any() ?? false)
             {
-                dataProvidersToProcess = checklistDataProviders.Where(dataProvider =>
+                dataProvidersToProcess = checklistDataProviders!.Where(dataProvider =>
                         dataProviderIdOrIdentifiers.Any(dataProvider.EqualsIdOrIdentifier))
                     .ToArray();
             }
             else
             {
-                dataProvidersToProcess = checklistDataProviders
+                dataProvidersToProcess = checklistDataProviders!
                     .ToArray();
             }
 

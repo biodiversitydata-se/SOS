@@ -155,7 +155,7 @@ namespace SOS.Harvest.Jobs
 
             _logger.LogInformation($"Start checklist harvest job");
 
-            var success = await Harvest(dataProviders, cancellationToken);
+            var success = await Harvest(dataProviders!, cancellationToken);
 
             if (!success)
             {
@@ -166,7 +166,7 @@ namespace SOS.Harvest.Jobs
             _logger.LogInformation("Finish checklist harvest job");
             
             return await _processChecklistsJob.RunAsync(
-                dataProviders.Select(dataProvider => dataProvider.Identifier).ToArray(),
+                dataProviders!.Select(dataProvider => dataProvider.Identifier).ToArray(),
                 cancellationToken);
         }
     }

@@ -7,7 +7,7 @@ namespace SOS.Harvest.Entities.Artportalen
         /// <summary>
         /// Name of controlling user
         /// </summary>
-        public string ControllingUser { get; set; }
+        public string? ControllingUser { get; set; }
 
         /// <summary>
         /// Id of controlling user
@@ -35,7 +35,7 @@ namespace SOS.Harvest.Entities.Artportalen
         /// <summary>
         /// Name of checklist
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Occurence x coordinate

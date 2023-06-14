@@ -93,7 +93,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 Logger.LogDebug($"Dataset - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 var datasets = new ConcurrentDictionary<string, Dataset>();
 
-                foreach (var verbatimDataset in datasetsBatch)
+                foreach (var verbatimDataset in datasetsBatch!)
                 {
                     var dataset = datasetFactory.CreateProcessedDataset(verbatimDataset);
 
@@ -110,7 +110,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 Logger.LogDebug($"Dataset - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 return await ValidateAndStoreDatasets(dataProvider, datasets.Values, $"{startId}-{endId}");
             }
-            catch (JobAbortedException e)
+            catch (JobAbortedException)
             {
                 // Throw cancelation again to let function above handle it
                 throw;

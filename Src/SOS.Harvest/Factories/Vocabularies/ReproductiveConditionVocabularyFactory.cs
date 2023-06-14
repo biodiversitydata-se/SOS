@@ -29,13 +29,19 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override VocabularyId FieldId => VocabularyId.ReproductiveCondition;
         protected override bool Localized => true;
 
-        protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
+        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
         {
             var activities = await _metadataRepository.GetActivitiesAsync();
             var selectedActivities = activities.Where(a => _artportalenIds.Contains(a.Id));
             var vocabularyValues = base.ConvertToLocalizedVocabularyValues(selectedActivities.ToArray());
+
+            if (!vocabularyValues?.Any() ?? true)
+            {
+                return null;
+            }
+
             int id = activities.Max(f => f.Id);
-            vocabularyValues.Add(CreateVocabularyValue(++id, "testes developed"));
+            vocabularyValues!.Add(CreateVocabularyValue(++id, "testes developed"));
             vocabularyValues.Add(CreateVocabularyValue(++id, "mating [not bird]"));
             vocabularyValues.Add(CreateVocabularyValue(++id, "not breeding/non-reproductive"));
             vocabularyValues.Add(CreateVocabularyValue(++id, "carrying food for young"));
@@ -44,7 +50,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         }
 
         protected override List<ExternalSystemMapping> GetExternalSystemMappings(
-            ICollection<VocabularyValueInfo> vocabularyValues)
+            ICollection<VocabularyValueInfo>? vocabularyValues)
         {
             return new List<ExternalSystemMapping>
             {
@@ -54,7 +60,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         }
 
         private ExternalSystemMapping GetDarwinCoreExternalSystemMapping(
-            ICollection<VocabularyValueInfo> vocabularyValues)
+            ICollection<VocabularyValueInfo>? vocabularyValues)
         {
             var externalSystemMapping = new ExternalSystemMapping
             {
@@ -64,14 +70,19 @@ namespace SOS.Harvest.Factories.Vocabularies
                 Mappings = new List<ExternalSystemMappingField>()
             };
 
-            var dwcMappingSynonyms = GetDwcMappingSynonyms();
-            var dwcMappings = CreateDwcMappings(vocabularyValues, dwcMappingSynonyms);
+            
             var mappingField = new ExternalSystemMappingField
             {
                 Key = VocabularyMappingKeyFields.DwcReproductiveCondition,
-                Description = "The reproductiveCondition term (http://rs.tdwg.org/dwc/terms/reproductiveCondition)",
-                Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList()
+                Description = "The reproductiveCondition term (http://rs.tdwg.org/dwc/terms/reproductiveCondition)"
             };
+
+            if (vocabularyValues?.Any() ?? false)
+            {
+                var dwcMappingSynonyms = GetDwcMappingSynonyms();
+                var dwcMappings = CreateDwcMappings(vocabularyValues, dwcMappingSynonyms);
+                mappingField.Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList();
+            }
 
             externalSystemMapping.Mappings.Add(mappingField);
             return externalSystemMapping;

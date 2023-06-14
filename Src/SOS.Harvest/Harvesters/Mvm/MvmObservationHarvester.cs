@@ -69,29 +69,32 @@ namespace SOS.Harvest.Harvesters.Mvm
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(result.Observations))?.ToArray();
-                    result.Observations = null;
-
-                    harvestCount += verbatims.Length;
-
-                    // Add sightings to MongoDb
-                    await VerbatimRepository.AddManyAsync(verbatims);
-
-                    var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
-
-                    if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
+                    
+                    if (verbatims?.Any() ?? false)
                     {
-                        dataLastModified = batchDataLastModified.Value;
-                    }
+                        result.Observations = null!;
 
-                    if (_mvmServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        harvestCount >= _mvmServiceConfiguration.MaxNumberOfSightingsHarvested)
-                    {
-                        break;
+                        harvestCount += verbatims.Length;
+
+                        // Add sightings to MongoDb
+                        await VerbatimRepository.AddManyAsync(verbatims);
+
+                        var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
+
+                        if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
+                        {
+                            dataLastModified = batchDataLastModified.Value;
+                        }
+
+                        if (_mvmServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                            harvestCount >= _mvmServiceConfiguration.MaxNumberOfSightingsHarvested)
+                        {
+                            break;
+                        }
                     }
 
                     // Give target service some slack
                     Thread.Sleep(1000);
-
                     result = await _mvmObservationService.GetAsync(result.MaxChangeId + 1);
                 }
             }
@@ -114,13 +117,21 @@ namespace SOS.Harvest.Harvesters.Mvm
             DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
     }
 }

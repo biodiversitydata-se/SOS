@@ -56,12 +56,18 @@ namespace SOS.Harvest.Harvesters
                 _logger.LogDebug("Start getting taxon lists");
 
                 var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var filePath = Path.Combine(assemblyPath, @"Resources\TaxonLists.json");
+                var filePath = Path.Combine(assemblyPath!, @"Resources\TaxonLists.json");
                 var taxonLists =
                     JsonConvert.DeserializeObject<List<TaxonList>>(await File.ReadAllTextAsync(filePath));
-                var taxonListByTaxonListServiceId = taxonLists.ToDictionary(m => m.TaxonListServiceId, m => m);
+
+                if (!taxonLists?.Any() ?? true)
+                {
+                    throw new Exception("Failed to load taxon list json");
+                }
+
+                var taxonListByTaxonListServiceId = taxonLists!.ToDictionary(m => m.TaxonListServiceId, m => m);
                 var conservationLists =
-                    await _taxonListService.GetTaxaAsync(taxonLists.Select(m => m.TaxonListServiceId));
+                    await _taxonListService.GetTaxaAsync(taxonLists!.Select(m => m.TaxonListServiceId));
                 var taxa = (await _taxonRepository.GetAllAsync())?.ToDictionary(t => t.Id, t => t) ?? new Dictionary<int, Taxon>();
                 foreach (var conservationList in conservationLists)
                 {
@@ -74,7 +80,7 @@ namespace SOS.Harvest.Harvesters
                 var listsWithNoTaxa = new List<TaxonList>();
                 if (dataIsOk)
                 {                    
-                    foreach (var taxonList in taxonLists)
+                    foreach (var taxonList in taxonLists!)
                     {
                         if (!taxonList.AllowNotaxa && !(taxonList.Taxa?.Any() ?? false))
                         {

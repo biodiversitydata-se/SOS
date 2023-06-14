@@ -18,7 +18,7 @@
         /// <summary>
         /// External id
         /// </summary>
-        public string ExternalId { get; set; }
+        public string? ExternalId { get; set; }
 
         /// <summary>
         ///     Name of county
@@ -43,12 +43,12 @@
         /// <summary>
         ///     Parent side name
         /// </summary>
-        public string ParentSiteName { get; set; }
+        public string? ParentSiteName { get; set; }
 
         /// <summary>
         ///     Presentation name with Parish
         /// </summary>
-        public string PresentationNameParishRegion { get; set; }
+        public string? PresentationNameParishRegion { get; set; }
 
         /// <summary>
         /// Id of project
@@ -58,7 +58,7 @@
         /// <summary>
         ///     Name of site
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         ///     X coordinate of site

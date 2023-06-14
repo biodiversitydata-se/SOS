@@ -12,7 +12,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <param name="checklistIds"></param>
         /// <returns></returns>
-        Task<IDictionary<int, ICollection<int>>> GetChecklistsTaxonIdsAsync(
+        Task<IDictionary<int, ICollection<int>>?> GetChecklistsTaxonIdsAsync(
             IEnumerable<int> checklistIds);
 
         /// <summary>
@@ -28,10 +28,5 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<(int minId, int maxId)> GetIdSpanAsync();
-
-        /// <summary>
-        /// True if live data base should be used
-        /// </summary>
-        bool Live { get; set; }
     }
 }

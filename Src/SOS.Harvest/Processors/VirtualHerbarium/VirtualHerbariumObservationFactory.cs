@@ -19,8 +19,8 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
     public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObservationFactory<VirtualHerbariumObservationVerbatim>
     {
         private readonly IAreaHelper _areaHelper;
-        private IDictionary<string, (double longitude, double latitude, int precision)> _communities;
-        private IDictionary<string, (double longitude, double latitude, int precision)> _parishes;
+        private IDictionary<string, (double longitude, double latitude, int precision)>? _communities;
+        private IDictionary<string, (double longitude, double latitude, int precision)>? _parishes;
 
         private string GetLocality(VirtualHerbariumObservationVerbatim verbatim)
         {
@@ -100,9 +100,10 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processTimeManager"></param>
+        /// <param name="processConfiguration"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public VirtualHerbariumObservationFactory(DataProvider dataProvider, 
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa, 
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
@@ -116,7 +117,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             _parishes = await GetAreaCentroidsAsync(AreaType.Parish);
         }
 
-        private async Task<IDictionary<string, (double longitude, double latitude, int precision)>> GetCommunitiesAsync()
+        private async Task<IDictionary<string, (double longitude, double latitude, int precision)>?> GetCommunitiesAsync()
         {
             var dic = new Dictionary<string, (double longitude, double latitude, int precision)>();
             IEnumerable<Lib.Models.Shared.Area>? communities = await _areaHelper.GetAreasAsync(AreaType.Community);
@@ -125,7 +126,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 return null;
             }
             var duplictes = new HashSet<string>();
-            foreach (var community in communities)
+            foreach (var community in communities!)
             {
                 var geometry = await _areaHelper.GetGeometryAsync(community.AreaType, community.FeatureId);
                 if (geometry == null)
@@ -163,11 +164,11 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                     continue;
                 }
                 var proviceName = string.Empty;
-                foreach (var feature in features)
+                foreach (var feature in features!)
                 {
                     var attributes = feature.Attributes as AttributesTable;
 
-                    if (((AreaType)attributes["areaType"]) == AreaType.Province)
+                    if (((AreaType)attributes!["areaType"]) == AreaType.Province)
                     {
                         proviceName = attributes["name"]?.ToString();
                         break;
@@ -200,7 +201,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         }
 
 
-        private async Task<IDictionary<string, (double longitude, double latitude, int precision)>> GetAreaCentroidsAsync(AreaType areaType)
+        private async Task<IDictionary<string, (double longitude, double latitude, int precision)>?> GetAreaCentroidsAsync(AreaType areaType)
         {
             IEnumerable<Lib.Models.Shared.Area>? areas = await _areaHelper.GetAreasAsync(areaType);
             var dic = new Dictionary<string, (double longitude, double latitude, int precision)>();
@@ -209,7 +210,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 return null;
             }
             var duplicates = new HashSet<string>();
-            foreach (var area in areas)
+            foreach (var area in areas!)
             {
                 var geometry = await _areaHelper.GetGeometryAsync(area.AreaType, area.FeatureId);
                 if (geometry == null)

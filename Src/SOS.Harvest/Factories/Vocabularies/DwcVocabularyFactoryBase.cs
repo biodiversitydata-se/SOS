@@ -34,7 +34,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         }
 
         protected abstract ICollection<VocabularyValueInfo> GetVocabularyValues();
-        protected abstract Dictionary<string, int> GetMappingSynonyms();
+        protected abstract Dictionary<string, int>? GetMappingSynonyms();
 
         protected virtual List<ExternalSystemMapping> GetExternalSystemMappings(
             ICollection<VocabularyValueInfo> vocabularyValues)

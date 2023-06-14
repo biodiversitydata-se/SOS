@@ -122,7 +122,7 @@ namespace SOS.Harvest.Jobs
 
         public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
-            // todo - implement DwC-A harvest from DataProvider.DownloadUrl
+            await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
             return false;
         }
 

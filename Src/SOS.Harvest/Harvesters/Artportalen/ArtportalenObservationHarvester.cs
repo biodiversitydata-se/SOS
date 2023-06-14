@@ -179,7 +179,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             // Decrease chunk size for incremental harvest since the SQL query is slower 
             var harvestBatchTasks = new List<Task<int>>();
 
-            var idBatch = idsToHarvest.Skip(0).Take(_artportalenConfiguration.IncrementalChunkSize);
+            var idBatch = idsToHarvest!.Skip(0).Take(_artportalenConfiguration.IncrementalChunkSize);
             var batchCount = 0;
 
             // Loop until all sightings are fetched
@@ -196,7 +196,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     _sightingRepository.GetChunkAsync(idBatch),
                     batchCount));
 
-                idBatch = idsToHarvest.Skip(batchCount * _artportalenConfiguration.IncrementalChunkSize).Take(_artportalenConfiguration.IncrementalChunkSize);
+                idBatch = idsToHarvest!.Skip(batchCount * _artportalenConfiguration.IncrementalChunkSize).Take(_artportalenConfiguration.IncrementalChunkSize);
             }
 
             // Execute harvest tasks, no of parallel threads running is handled by semaphore
@@ -223,7 +223,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <exception cref="Exception"></exception>
         private async Task<IEnumerable<ArtportalenObservationVerbatim>?> GetVerbatimBatchAsync(
             ArtportalenHarvestFactory harvestFactory,
-            Task<IEnumerable<SightingEntity>> getChunkTask,
+            Task<IEnumerable<SightingEntity>?> getChunkTask,
             int batchIndex
         )
         {
@@ -261,7 +261,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
         private async Task<int> HarvestBatchAsync(
             ArtportalenHarvestFactory harvestFactory,
-            Task<IEnumerable<SightingEntity>> getChunkTask,
+            Task<IEnumerable<SightingEntity>?> getChunkTask,
             int batchIndex
         )
         {
@@ -373,7 +373,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Not implemented for this provider");
+            await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
+            return null!;
         }
 
         /// inheritdoc />
@@ -424,8 +425,11 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
-        {
-            throw new NotImplementedException("Not implemented for this provider");
+        { 
+            await Task.Run(() => {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
 
         /// inheritdoc />

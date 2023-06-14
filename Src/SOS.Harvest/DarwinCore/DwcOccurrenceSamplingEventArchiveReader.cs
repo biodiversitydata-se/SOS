@@ -332,6 +332,11 @@ namespace SOS.Harvest.DarwinCore
             IEnumerable<DwcEventOccurrenceVerbatim> eventRecords)
         {
             var eventDictionary = eventRecords?.ToDictionary(e => e.RecordId, e => e);
+            if (eventDictionary == null)
+            {
+                return;
+            }
+
             await AddOccurencesDataAsync(eventDictionary, archiveReader);
             await AddEmofExtensionDataAsync(eventDictionary, archiveReader);
             await AddMofExtensionDataAsync(eventDictionary, archiveReader);
@@ -346,8 +351,19 @@ namespace SOS.Harvest.DarwinCore
         private async Task AddDataFromExtensionsAsync(ArchiveReaderContext archiveReaderContext,
             IEnumerable<DwcEventOccurrenceVerbatim> eventRecords)
         {
+            if (archiveReaderContext?.ArchiveReader == null)
+            {
+                return;
+            }
+
             var archiveReader  = archiveReaderContext.ArchiveReader;
             var eventDictionary = eventRecords?.ToDictionary(e => e.RecordId, e => e);
+
+            if (eventDictionary == null)
+            {
+                return;
+            }
+
             await AddOccurencesDataAsync(eventDictionary, archiveReader);
             await AddEmofExtensionDataAsync(eventDictionary, archiveReader);
             await AddMofExtensionDataAsync(eventDictionary, archiveReader);
@@ -366,10 +382,14 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="archiveReader"></param>
         /// <returns></returns>
         private async Task AddOccurencesDataAsync(IDictionary<string, DwcEventOccurrenceVerbatim> eventRecords,
-            ArchiveReader archiveReader)
+            ArchiveReader? archiveReader)
         {
             try
             {
+                if (archiveReader == null)
+                {
+                    throw new Exception("ArchiveReader not initialized");
+                }
                 var occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Occurrence);
                 if (occurrenceFileReader == null)
                 {
@@ -405,7 +425,12 @@ namespace SOS.Harvest.DarwinCore
                 await using var xmlFileStream = File.OpenRead(Path.Combine(path, "taxonlist.xml"));
                 using var xmlReader = XmlReader.Create(xmlFileStream);
                 var xmlDoc = XDocument.Load(xmlReader);
-                var ns = xmlDoc.Root.GetDefaultNamespace();
+
+                if (xmlDoc == null)
+                {
+                    return;
+                }
+                var ns = xmlDoc!.Root!.GetDefaultNamespace();
                 var taxonlistsElement = xmlDoc.Element(ns + "taxonlists");
 
                 if (taxonlistsElement == null)
@@ -417,10 +442,9 @@ namespace SOS.Harvest.DarwinCore
                 foreach (var taxonListElement in taxonlistsElement.Elements(ns + "taxonlist"))
                 {
                     var listId = taxonListElement.Element(ns + "samplingTaxonlistID")?.Value;
-
                     var taxaElement = taxonListElement.Element(ns + "taxa");
 
-                    if (taxaElement == null)
+                    if (listId == null || taxaElement == null)
                     {
                         continue;
                     }
@@ -466,19 +490,19 @@ namespace SOS.Harvest.DarwinCore
                     return;
                 }
 
-                foreach (var listEventMapping in taxonListEventMapping)
+                foreach (var listEventMapping in taxonListEventMapping!)
                 {
-                    if (!eventRecords.TryGetValue(listEventMapping.EventID, out var eventRecord))
+                    if (!eventRecords.TryGetValue(listEventMapping?.EventID ?? "", out var eventRecord))
                     {
                         continue;
                     }
 
-                    eventRecord.BasisOfRecord = listEventMapping.BasisOfRecord;
+                    eventRecord.BasisOfRecord = listEventMapping!.BasisOfRecord;
                     eventRecord.IdentificationVerificationStatus = listEventMapping.IdentificationVerificationStatus;
                     eventRecord.RecordedBy = listEventMapping.RecordedBy;
                     eventRecord.SamplingEffortTime = listEventMapping.SamplingEffortTime;
 
-                    if (!taxonLists.TryGetValue(listEventMapping.SamplingTaxonlistID, out var taxonList))
+                    if (!taxonLists.TryGetValue(listEventMapping.SamplingTaxonlistID ?? "", out var taxonList))
                     {
                         continue;
                     }
@@ -498,7 +522,7 @@ namespace SOS.Harvest.DarwinCore
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        public async Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReader archiveReader)
+        public async Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReader archiveReader)
         {
             var datasets = await GetDatasetsFromJsonOrXmlAsync(archiveReader.OutputPath);
             return datasets;
@@ -552,7 +576,13 @@ namespace SOS.Harvest.DarwinCore
             await using var xmlFileStream = File.OpenRead(xmlFilePath);
             using var xmlReader = XmlReader.Create(xmlFileStream);
             var xmlDoc = XDocument.Load(xmlReader);
-            var ns = xmlDoc.Root.GetDefaultNamespace();
+
+            if (xmlDoc == null)
+            {
+                throw new Exception($"Failed to open file ({path}).");
+            }
+
+            var ns = xmlDoc!.Root!.GetDefaultNamespace();
             var datasetsElement = xmlDoc.Element(ns + "datasets");
 
             if (datasetsElement == null)
@@ -677,7 +707,7 @@ namespace SOS.Harvest.DarwinCore
             return observationDatasets;
         }
 
-        private Dictionary<string, DwcVerbatimDataset> CreateEventDatasetDictionary(IEnumerable<DwcVerbatimDataset> observationDatasets)
+        private Dictionary<string, DwcVerbatimDataset>? CreateEventDatasetDictionary(IEnumerable<DwcVerbatimDataset>? observationDatasets)
         {
             if (observationDatasets == null || !observationDatasets.Any()) return null;
             var observationDatasetByEventId = new Dictionary<string, DwcVerbatimDataset>();
@@ -701,10 +731,15 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="archiveReader"></param>
         /// <returns></returns>
         private async Task AddMofExtensionDataAsync(IDictionary<string, DwcEventOccurrenceVerbatim> eventRecords,
-            ArchiveReader archiveReader)
+            ArchiveReader? archiveReader)
         {
             try
             {
+                if (archiveReader == null)
+                {
+                    throw new Exception("ArchiveReader not initialized");
+                }
+
                 var mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
                 if (mofFileReader == null)
                 {
@@ -739,10 +774,15 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="archiveReader"></param>
         /// <returns></returns>
         private async Task AddEmofExtensionDataAsync(IDictionary<string, DwcEventOccurrenceVerbatim> eventRecords,
-            ArchiveReader archiveReader)
+            ArchiveReader? archiveReader)
         {
             try
             {
+                if (archiveReader == null)
+                {
+                    throw new Exception("ArchiveReader not initialized");
+                }
+
                 var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
                 if (emofFileReader == null)
                 {
@@ -834,7 +874,7 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="idIdentifierTuple"></param>
         /// <param name="batchSize"></param>
         /// <returns></returns>
-        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
+        public async IAsyncEnumerable<List<DwcObservationVerbatim>?> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple,
             int batchSize)
@@ -844,6 +884,12 @@ namespace SOS.Harvest.DarwinCore
             var occurrenceRecords = new List<DwcObservationVerbatim>();
             var idIndex = occurrenceFileReader.GetIdIndex();
             var observationDatasets = await GetDatasetsFromJsonOrXmlAsync(archiveReader.OutputPath);
+
+            if (!observationDatasets?.Any() ?? true)
+            {
+                yield return null;
+            }
+
             var observationDatasetByEventId = CreateEventDatasetDictionary(observationDatasets);
 
             await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
@@ -854,20 +900,20 @@ namespace SOS.Harvest.DarwinCore
                 if (occurrenceRecords.Count % batchSize == 0)
                 {
                     await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
-                    AddDatasetInformation(occurrenceRecords, observationDatasetByEventId, observationDatasets.FirstOrDefault());
+                    AddDatasetInformation(occurrenceRecords, observationDatasetByEventId, observationDatasets!.FirstOrDefault()!);
                     yield return occurrenceRecords;
                     occurrenceRecords.Clear();
                 }
             }
 
             await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
-            AddDatasetInformation(occurrenceRecords, observationDatasetByEventId, observationDatasets.FirstOrDefault());
+            AddDatasetInformation(occurrenceRecords, observationDatasetByEventId, observationDatasets!.FirstOrDefault()!);
             yield return occurrenceRecords;
         }        
 
         private void AddDatasetInformation(List<DwcObservationVerbatim> occurrenceRecords, 
-            Dictionary<string, DwcVerbatimDataset> observationDatasetByEventId, 
-            DwcVerbatimDataset defaultDataset)
+            Dictionary<string, DwcVerbatimDataset>? observationDatasetByEventId, 
+            DwcVerbatimDataset? defaultDataset)
         {
             if (observationDatasetByEventId == null && defaultDataset == null) return;
             
@@ -887,7 +933,7 @@ namespace SOS.Harvest.DarwinCore
         }
 
         private void AddDatasetInformation(List<DwcEventOccurrenceVerbatim> events,
-            Dictionary<string, DwcVerbatimDataset> observationDatasetByEventId,
+            Dictionary<string, DwcVerbatimDataset>? observationDatasetByEventId,
             DwcVerbatimDataset defaultDataset)
         {
             if (observationDatasetByEventId == null && defaultDataset == null) return;
@@ -912,7 +958,7 @@ namespace SOS.Harvest.DarwinCore
             }
         }
 
-        public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
+        public async Task<List<DwcObservationVerbatim>?> ReadArchiveAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple)
         {
@@ -924,14 +970,14 @@ namespace SOS.Harvest.DarwinCore
             var observations = new List<DwcObservationVerbatim>();
             await foreach (var observationsBatch in observationsBatches)
             {
-                observations.AddRange(observationsBatch);
+                observations.AddRange(observationsBatch!);
             }
 
             return observations;
         }
 
 
-        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEvents(ArchiveReader archiveReader,
+        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEvents(ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple)
         {
             var eventFileReader = archiveReader.GetAsyncFileReader(RowTypes.Event);
@@ -958,19 +1004,26 @@ namespace SOS.Harvest.DarwinCore
             return events;
         }
 
-        public async Task<List<DwcVerbatimDataset>> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
-        {            
-            var datasets = await GetDatasetsFromJsonOrXmlAsync(archiveReaderContext.ArchiveReader.OutputPath);
-            archiveReaderContext.DatasetByEventId = CreateEventDatasetDictionary(datasets);
-            archiveReaderContext.Datasets = datasets;
+        public async Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
+        {
+            if (archiveReaderContext?.ArchiveReader == null)
+            {
+                return null;
+            }
+            var datasets = await GetDatasetsFromJsonOrXmlAsync(archiveReaderContext!.ArchiveReader!.OutputPath);
+            archiveReaderContext.DatasetByEventId = CreateEventDatasetDictionary(datasets!)!;
+            archiveReaderContext.Datasets = datasets!;
             return datasets;
         }
 
         private void AddOccurrenceEventData(ArchiveReaderContext archiveReaderContext, DwcObservationVerbatim occurrence)
         {
-            if (string.IsNullOrEmpty(occurrence.EventID)) return;
-
-            if (!archiveReaderContext.OccurrenceIdsByEventId.ContainsKey(occurrence.EventID))
+            if ((!archiveReaderContext?.OccurrenceIdsByEventId?.Any() ?? true) || string.IsNullOrEmpty(occurrence.EventID))
+            {
+                return;
+            }
+           
+            if (!archiveReaderContext!.OccurrenceIdsByEventId!.ContainsKey(occurrence.EventID))
             {                
                 archiveReaderContext.OccurrenceIdsByEventId.Add(occurrence.EventID, new List<string>());
             }
@@ -978,9 +1031,14 @@ namespace SOS.Harvest.DarwinCore
             archiveReaderContext.OccurrenceIdsByEventId[occurrence.EventID].Add(occurrence.OccurrenceID);
         }
 
-        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext)
+        public async IAsyncEnumerable<List<DwcObservationVerbatim>?> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext)
         {
-            var occurrenceFileReader = archiveReaderContext.ArchiveReader.GetAsyncFileReader(RowTypes.Occurrence);
+            if (archiveReaderContext?.ArchiveReader == null)
+            {
+                yield return null;
+            }
+
+            var occurrenceFileReader = archiveReaderContext!.ArchiveReader!.GetAsyncFileReader(RowTypes.Occurrence);
             if (occurrenceFileReader == null) yield break;
             var occurrenceRecords = new List<DwcObservationVerbatim>();
             var idIndex = occurrenceFileReader.GetIdIndex();
@@ -1003,12 +1061,17 @@ namespace SOS.Harvest.DarwinCore
             }
 
             await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, occurrenceRecords);
-            AddDatasetInformation(occurrenceRecords, archiveReaderContext.DatasetByEventId, archiveReaderContext.Datasets?.FirstOrDefault());
+            AddDatasetInformation(occurrenceRecords, archiveReaderContext.DatasetByEventId!, archiveReaderContext.Datasets?.FirstOrDefault()!);
             yield return occurrenceRecords;
         }
 
-        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEvents(ArchiveReaderContext archiveReaderContext)
+        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEvents(ArchiveReaderContext archiveReaderContext)
         {
+            if (archiveReaderContext?.ArchiveReader == null)
+            {
+                return null;
+            }
+
             var eventFileReader = archiveReaderContext.ArchiveReader.GetAsyncFileReader(RowTypes.Event);
             if (eventFileReader == null)
             {
@@ -1032,7 +1095,7 @@ namespace SOS.Harvest.DarwinCore
             }
 
             await AddDataFromExtensionsAsync(archiveReaderContext, events);
-            AddDatasetInformation(events, archiveReaderContext.DatasetByEventId, archiveReaderContext.Datasets?.FirstOrDefault());
+            AddDatasetInformation(events, archiveReaderContext!.DatasetByEventId, archiveReaderContext.Datasets?.FirstOrDefault()!);
             foreach (var eve in events)
             {                
                 eve.NotFoundTaxa = GetNotFoundTaxa(eve.Taxa, eve.Observations);                
@@ -1085,12 +1148,12 @@ namespace SOS.Harvest.DarwinCore
 
         private class SamplingEventTaxonList
         {
-            public string EventID { get; set; }
-            public string SamplingTaxonlistID { get; set; }
-            public string SamplingEffortTime { get; set; }
-            public string BasisOfRecord { get; set; }
-            public string RecordedBy { get; set; }
-            public string IdentificationVerificationStatus { get; set; }
+            public string? EventID { get; set; }
+            public string? SamplingTaxonlistID { get; set; }
+            public string? SamplingEffortTime { get; set; }
+            public string? BasisOfRecord { get; set; }
+            public string? RecordedBy { get; set; }
+            public string? IdentificationVerificationStatus { get; set; }
         }
     }
 }

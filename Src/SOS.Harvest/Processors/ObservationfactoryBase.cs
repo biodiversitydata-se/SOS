@@ -116,7 +116,7 @@ namespace SOS.Harvest.Processors
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
         protected ObservationFactoryBase(DataProvider dataProvider, 
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa, 
             IProcessTimeManager processTimeManager, 
             ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
         {
@@ -195,15 +195,15 @@ namespace SOS.Harvest.Processors
         /// <param name="observation"></param>
         protected void PopulateGenericData(Observation observation)
         {
-            if (observation.Event?.StartDate == null ||
-                (observation.Taxon?.Id ?? 0) == 0 ||
-                (observation.Location?.DecimalLatitude ?? 0) == 0 ||
-                (observation.Location?.DecimalLongitude ?? 0) == 0)
+            if (observation?.Event?.StartDate == null ||
+                (observation?.Taxon?.Id ?? 0) == 0 ||
+                (observation?.Location?.DecimalLatitude ?? 0) == 0 ||
+                (observation?.Location?.DecimalLongitude ?? 0) == 0)
             {
                 return;
             }
             // Round coordinates to 5 decimals (roughly 1m)
-            var source = $"{observation.Event.StartDate.Value.ToUniversalTime().ToString("s")}-{observation.Taxon.Id}-{Math.Round(observation.Location.DecimalLongitude.Value, 5)}/{Math.Round(observation.Location.DecimalLatitude.Value, 5)}";
+            var source = $"{observation!.Event.StartDate.Value.ToUniversalTime().ToString("s")}-{observation.Taxon.Id}-{Math.Round(observation!.Location!.DecimalLongitude!.Value, 5)}/{Math.Round(observation!.Location!.DecimalLatitude!.Value, 5)}";
 
             observation.DataQuality = new DataQuality
             {
@@ -231,7 +231,7 @@ namespace SOS.Harvest.Processors
             }
         }
 
-        protected int GetBirdNestActivityId(VocabularyValue activity, Lib.Models.Processed.Observation.Taxon taxon)
+        protected int GetBirdNestActivityId(VocabularyValue? activity, Lib.Models.Processed.Observation.Taxon? taxon)
         {
             if (taxon?.IsBird() ?? false)
             {

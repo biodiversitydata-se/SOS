@@ -31,7 +31,7 @@ namespace SOS.Harvest.Services
         public ObservationDatabaseConfiguration Configuration { get; }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null!)
+        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic? parameters = null)
         {
             using var conn = Connection;
             conn.Open();
@@ -54,7 +54,7 @@ namespace SOS.Harvest.Services
 
                 transaction.Commit();
             }
-            catch (Exception e)
+            catch 
             {
                 transaction.Rollback();
             }

@@ -14,6 +14,6 @@ namespace SOS.Harvest.Processors.Interfaces
         /// <param name="verbatim"></param>
         /// <param name="diffuseIfSupported"></param>
         /// <returns></returns>
-        Observation CreateProcessedObservation(TEntity verbatim, bool diffuseIfSupported);
+        Observation? CreateProcessedObservation(TEntity verbatim, bool diffuseIfSupported);
     }
 }

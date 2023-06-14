@@ -23,7 +23,7 @@ namespace SOS.Harvest.Factories.Validation
     public class NorsDataValidationReportFactory : DataValidationReportFactoryBase<NorsObservationVerbatim>
     {
         private readonly INorsObservationVerbatimRepository _norsObservationVerbatimRepository;
-        private NorsObservationFactory _norsObservationFactory;
+        private NorsObservationFactory? _norsObservationFactory;
 
         public NorsDataValidationReportFactory(
             IVocabularyRepository processedVocabularyRepository,
@@ -49,11 +49,14 @@ namespace SOS.Harvest.Factories.Validation
             return await _norsObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override async Task<Observation> CreateProcessedObservationAsync(NorsObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override async Task<Observation?> CreateProcessedObservationAsync(NorsObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
-            _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
-            return processedObservation;
+            return await Task.Run(() =>
+            {
+                var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
+                _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
+                return processedObservation;
+            });
         }
 
         protected override void ValidateVerbatimTaxon(

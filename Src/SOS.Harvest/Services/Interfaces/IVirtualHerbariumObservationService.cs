@@ -13,12 +13,12 @@ namespace SOS.Harvest.Services.Interfaces
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        Task<XDocument> GetAsync(DateTime from, int pageIndex, int pageSize);
+        Task<XDocument?> GetAsync(DateTime from, int pageIndex, int pageSize);
 
         /// <summary>
         ///     Get list of localities
         /// </summary>
         /// <returns></returns>
-        Task<XDocument> GetLocalitiesAsync();
+        Task<XDocument?> GetLocalitiesAsync();
     }
 }
