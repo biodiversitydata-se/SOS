@@ -19,11 +19,14 @@ namespace SOS.Observations.Api.HealthChecks
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly HealthCheckConfiguration _healthCheckConfiguration;
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="processInfoRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="healthCheckConfiguration"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public APDbRestoreHealthCheck(
             IProcessInfoRepository processInfoRepository,
             IProcessedObservationRepository processedObservationRepository,
@@ -86,7 +89,7 @@ namespace SOS.Observations.Api.HealthChecks
                             data: data
                       );
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new HealthCheckResult(HealthStatus.Unhealthy, "Artportalen database backup restore health check failed");
             }

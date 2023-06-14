@@ -64,7 +64,7 @@ namespace SOS.Observations.Api.HealthChecks
 
                 return new HealthCheckResult(HealthStatus.Healthy, "Artportalen and SOS DwC-A files are up to date.");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new HealthCheckResult(HealthStatus.Unhealthy, "DwC-A health check failed");
             }

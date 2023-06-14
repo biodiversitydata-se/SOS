@@ -292,10 +292,10 @@ namespace SOS.Observations.Api.Managers
                 var fileExportResult = exportFormat switch
                 {
                     ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, propertyLabelType, gzip, cancellationToken),
-                    ExportFormat.DwC => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken),
                     ExportFormat.DwCEvent => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken, true),
                     ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, propertyLabelType, gzip, cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, gzip, cancellationToken)
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, gzip, cancellationToken),
+                    _ => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken)
                 };
                 
                 return fileExportResult;

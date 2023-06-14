@@ -79,23 +79,40 @@ namespace SOS.ElasticSearch.Proxy
             services.AddApplicationInsightsTelemetry(Configuration);
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>());
+            var applicationInsightsConfiguration = Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>();
+            if (applicationInsightsConfiguration == null)
+            {
+                throw new Exception("Failed to load Application Insights Configuration");
+            }
+            services.AddSingleton(applicationInsightsConfiguration);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
             //setup the elastic search configuration
             var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+            if (elasticConfiguration == null)
+            {
+                throw new Exception("Failed to load Elastic Configuration");
+            }
+            services.AddSingleton(elasticConfiguration);
             services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(elasticConfiguration));
 
             // Processed Mongo Db
             var processedDbConfiguration = Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            if (processedDbConfiguration == null)
+            {
+                throw new Exception("Failed to load Process Db Configuration");
+            }
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();
             services.AddScoped<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
 
-            // Add configuration
-            services.AddSingleton(elasticConfiguration);
-            services.AddSingleton(Configuration.GetSection("ProxyConfiguration").Get<ProxyConfiguration>());
+            var proxyConfiguration = Configuration.GetSection("ProxyConfiguration").Get<ProxyConfiguration>();
+            if (proxyConfiguration == null)
+            {
+                throw new Exception("Failed to load Proxy Configuration");
+            }
+            services.AddSingleton(proxyConfiguration);
 
             // Add Caches
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();

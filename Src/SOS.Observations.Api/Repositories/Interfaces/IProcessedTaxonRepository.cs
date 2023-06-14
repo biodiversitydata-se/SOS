@@ -31,7 +31,6 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <param name="sumUnderlyingTaxa"></param>
-        /// <param name="noOfLatestHits"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,

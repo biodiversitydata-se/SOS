@@ -4,7 +4,7 @@ namespace SOS.Analysis.Api.Dtos.Filter
 {
     public class LatLonBoundingBoxDto
     {
-        public static LatLonBoundingBoxDto Create(Envelope envelope)
+        public static LatLonBoundingBoxDto? Create(Envelope envelope)
         {
             if (envelope == null)
             {

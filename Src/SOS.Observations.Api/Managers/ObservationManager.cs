@@ -166,7 +166,7 @@ namespace SOS.Observations.Api.Managers
 
                 return processedObservations;
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 throw;
             }
@@ -198,7 +198,7 @@ namespace SOS.Observations.Api.Managers
                 PostProcessObservations(filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
                 return processedObservations;
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 throw;
             }
@@ -235,7 +235,7 @@ namespace SOS.Observations.Api.Managers
 
                 return null;
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 throw;
             }

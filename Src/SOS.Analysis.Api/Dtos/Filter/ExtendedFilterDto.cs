@@ -199,7 +199,7 @@
         /// <summary>
         /// Sighting type search group id's
         /// </summary>
-        public IEnumerable<int> SightingTypeSearchGroupIds { get; set; }
+        public IEnumerable<int>? SightingTypeSearchGroupIds { get; set; }
 
         /// <summary>
         /// Site id filter

@@ -3,9 +3,8 @@
 namespace SOS.Observations.Api.Dtos
 {
     /// <summary>
-    ///     Result returned year month aggregation
+    /// Result returned year month aggregation
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public class YearMonthDayCountResultDto : YearMonthCountResultDto
     {
         /// <summary>

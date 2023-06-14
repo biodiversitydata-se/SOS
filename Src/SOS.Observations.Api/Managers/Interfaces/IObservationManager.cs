@@ -69,7 +69,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Geo grid tile aggregation
         /// </summary>
-        /// <param name="userId"></param>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>

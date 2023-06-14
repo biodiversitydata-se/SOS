@@ -86,7 +86,7 @@ namespace SOS.Analysis.Api.Controllers
 
                 return new OkObjectResult(result!);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -136,7 +136,7 @@ namespace SOS.Analysis.Api.Controllers
 
                 return new OkObjectResult(result!);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -234,7 +234,7 @@ namespace SOS.Analysis.Api.Controllers
                 );
                 return new OkObjectResult(result!);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }

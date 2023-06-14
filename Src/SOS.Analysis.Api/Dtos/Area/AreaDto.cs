@@ -13,16 +13,16 @@ namespace SSOS.Analysis.Api.Dtos.Area
         /// <summary>
         /// Area bounding box
         /// </summary>
-        public LatLonBoundingBox BoundingBox { get; set; }
+        public LatLonBoundingBox? BoundingBox { get; set; }
 
         /// <summary>
         /// Feature id
         /// </summary>
-        public string FeatureId { get; set; }
+        public string? FeatureId { get; set; }
 
         /// <summary>
         ///     Name of area
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

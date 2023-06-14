@@ -27,7 +27,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="filter"></param>
         /// <param name="autoAdjustBoundingBox"></param>
         /// <returns></returns>
-        private async Task<LatLonBoundingBoxDto> GetBoundingBoxAsync(
+        private async Task<LatLonBoundingBoxDto?> GetBoundingBoxAsync(
             GeographicsFilterDto filter,
             bool autoAdjustBoundingBox = true)
         {
@@ -75,7 +75,7 @@ namespace SOS.Analysis.Api.Controllers
 
                 if (geometryUnion != null)
                 {
-                    boundingBox = boundingBox.AdjustByGeometry(geometryUnion, filter.MaxDistanceFromPoint);
+                    boundingBox = boundingBox.AdjustByGeometry(geometryUnion, filter?.MaxDistanceFromPoint);
                 }
             }
 
@@ -108,18 +108,18 @@ namespace SOS.Analysis.Api.Controllers
         /// </summary>
         /// <param name="areaKeys"></param>
         /// <returns></returns>
-        protected async Task<Result> ValidateAreasAsync(IEnumerable<AreaFilterDto> areaKeys)
+        protected async Task<Result> ValidateAreasAsync(IEnumerable<AreaFilterDto>? areaKeys)
         {
             if (!areaKeys?.Any() ?? true)
             {
                 return Result.Success();
             }
            
-            var existingAreaIds = (await _areaCache.GetAreasAsync(areaKeys.Select(a => ((AreaType)a.AreaType, a.FeatureId))))
+            var existingAreaIds = (await _areaCache.GetAreasAsync(areaKeys!.Select(a => ((AreaType)a.AreaType, a.FeatureId))))
                 .Select(a => new AreaFilterDto { AreaType = (AreaTypeDto)a.AreaType, FeatureId = a.FeatureId });
 
             var missingAreas = areaKeys?
-                .Where(aid => !existingAreaIds.Any(a => a.AreaType.Equals(aid.AreaType) && a.FeatureId.Equals(aid.FeatureId, StringComparison.CurrentCultureIgnoreCase)))
+                .Where(aid => !existingAreaIds.Any(a => a.AreaType.Equals(aid.AreaType) && (a?.FeatureId?.Equals(aid.FeatureId, StringComparison.CurrentCultureIgnoreCase) ?? false)))
                 .Select(aid => $"Area doesn't exist (AreaType: {aid.AreaType}, FeatureId: {aid.FeatureId})");
 
             return missingAreas?.Any() ?? false ?
@@ -135,7 +135,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="mandatory"></param>
         /// <returns></returns>
         protected Result ValidateBoundingBox(
-            LatLonBoundingBoxDto boundingBox,
+            LatLonBoundingBoxDto? boundingBox,
             bool mandatory = false)
         {
             if (boundingBox == null)

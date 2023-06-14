@@ -54,7 +54,7 @@ namespace SOS.Observations.Api.HealthChecks
 
                 return new HealthCheckResult(HealthStatus.Degraded, "No ApplicationInsights harvest has been done");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new HealthCheckResult(HealthStatus.Degraded, "ApplicationInsights health check failed");
             }

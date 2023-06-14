@@ -75,7 +75,7 @@ namespace SOS.Observations.Api.HealthChecks
                 
                 return new HealthCheckResult(HealthStatus.Healthy, null);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new HealthCheckResult(HealthStatus.Unhealthy, "Elasticsearch proxy health check failed");
             }

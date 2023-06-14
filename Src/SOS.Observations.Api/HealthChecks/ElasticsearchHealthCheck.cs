@@ -32,6 +32,11 @@ namespace SOS.Observations.Api.HealthChecks
         /// Constructor
         /// </summary>
         /// <param name="healthCheckConfiguration"></param>
+        /// <param name="elasticClientManager"></param>
+        /// <param name="elasticConfiguration"></param>
+        /// <param name="processedConfigurationCache"></param>
+        /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ElasticsearchHealthCheck(HealthCheckConfiguration healthCheckConfiguration,
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
@@ -56,9 +61,8 @@ namespace SOS.Observations.Api.HealthChecks
                 var processedConfig = _processedConfigurationCache.GetAsync(_processedConfigurationId)?.Result;
                 return processedConfig ?? new ProcessedConfiguration { Id = _processedConfigurationId };
             }
-            catch (Exception e)
+            catch 
             {
-                
                 return default;
             }
         }

@@ -59,7 +59,7 @@ namespace SOS.Observations.Api.Controllers
                 var dto = userInfo.ToUserInformationDto();
                 return new OkObjectResult(dto);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }

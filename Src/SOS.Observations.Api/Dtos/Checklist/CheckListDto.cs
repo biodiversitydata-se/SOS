@@ -74,7 +74,7 @@ namespace SOS.Observations.Api.Dtos.Checklist
         /// </summary>
         public IEnumerable<int> TaxonIdsFound { get; set; }
 
-        // <summary>
+        /// <summary>
         /// Taxon id's not found
         /// </summary>
         public IEnumerable<int> TaxonIdsNotFound => TaxonIds?.Where(t => !TaxonIdsFound?.Contains(t) ?? true);

@@ -22,6 +22,8 @@ namespace SOS.Observations.Api.HealthChecks
         /// Constructor
         /// </summary>
         /// <param name="healthCheckConfiguration"></param>
+        /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public AzureSearchHealthCheck(HealthCheckConfiguration healthCheckConfiguration, ILogger<AzureSearchHealthCheck> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

@@ -114,12 +114,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         public TaxonFilterDto Taxon { get; set; }
 
         /// <summary>
-        /// Requested validation status. Deprecated and replaced by VerificationStatus.
-        /// </summary>
-        /*[Obsolete]
-        public StatusValidationDto? ValidationStatus { get; set; }*/
-
-        /// <summary>
         /// Requested verification status.
         /// </summary>
         public StatusVerificationDto VerificationStatus { get; set; }

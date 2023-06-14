@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Microsoft.ApplicationInsights;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -115,12 +114,6 @@ namespace SOS.Observations.Api.Controllers
             filter.Geographics ??= new GeographicsFilterDto();
             filter.Geographics.BoundingBox = await GetBoundingBoxAsync(filter.Geographics);
             return filter;
-        }
-
-        protected string ReplaceDomain(string str, string domain, string path)
-        {
-            // This is a bad solution to fix problems when behind load balancer...
-            return Regex.Replace(str, string.Format(@"(https?:\/\/.*?)(\/{0}\/v2)?(\/.*)", path), m => domain + m.Groups[3].Value);
         }
 
         protected Result ValidateAggregationPagingArguments(int skip, int? take, bool handleInfinityTake = false)

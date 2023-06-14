@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
@@ -8,7 +7,6 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Amazon.Runtime.Internal.Transform;
 using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
@@ -30,6 +28,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
@@ -100,6 +99,49 @@ namespace SOS.Observations.Api
         private const string InternalApiPrefix = "Internal";
         private IWebHostEnvironment CurrentEnvironment { get; set; }
         private bool _isDevelopment;
+
+        private class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
+        {
+            readonly IApiVersionDescriptionProvider provider;
+
+            public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider) =>
+            this.provider = provider;
+
+            public void Configure(SwaggerGenOptions options)
+            {
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    options.SwaggerDoc(
+                           $"{InternalApiName}{description.GroupName}",
+                           new OpenApiInfo()
+                           {
+                               Title = $"SOS Observations API (Internal) {description.GroupName.ToUpperInvariant()}",
+                               Version = description.ApiVersion.ToString(),
+                               Description = "Species Observation System (SOS) - Observations API. Internal API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
+                           });
+
+                    options.SwaggerDoc(
+                        $"{PublicApiName}{description.GroupName}",
+                        new OpenApiInfo()
+                        {
+                            Title = $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}",
+                            Version = description.ApiVersion.ToString(),
+                            Description = "Species Observation System (SOS) - Observations API. Public API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
+                        });
+                    //var schemaHelper = new SwashbuckleSchemaHelper();
+                    //swagger.CustomSchemaIds(type => schemaHelper.GetSchemaId(type)); // temporarily used when checking for schema duplicates.
+                    options.CustomOperationIds(apiDesc =>
+                    {
+                        apiDesc.TryGetMethodInfo(out MethodInfo methodInfo);
+                        string controller = apiDesc.ActionDescriptor.RouteValues["controller"];
+                        string methodName = methodInfo.Name;
+
+                        return $"{controller}_{methodName}".Replace("Async", "", StringComparison.InvariantCultureIgnoreCase);
+                    });
+                }
+            }
+        }
+
         /// <summary>
         ///     Start up
         /// </summary>
@@ -203,46 +245,13 @@ namespace SOS.Observations.Api
                     // can also be used to control the format of the API version in route templates
                     options.SubstituteApiVersionInUrl = true;
                 });
-            
-            var apiVersionDescriptionProvider =
-                services.BuildServiceProvider().GetService<IApiVersionDescriptionProvider>();
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             services.AddSwaggerGen(
-                swagger =>
+                options =>
                 {                    
-                    foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
-                    {
-                        swagger.SwaggerDoc(
-                            $"{InternalApiName}{description.GroupName}",
-                            new OpenApiInfo()
-                            {
-                                Title = $"SOS Observations API (Internal) {description.GroupName.ToUpperInvariant()}",
-                                Version = description.ApiVersion.ToString(),
-                                Description = "Species Observation System (SOS) - Observations API. Internal API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
-                            });
-
-                        swagger.SwaggerDoc(
-                            $"{PublicApiName}{description.GroupName}",
-                            new OpenApiInfo()
-                            {
-                                Title = $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}",
-                                Version = description.ApiVersion.ToString(),
-                                Description = "Species Observation System (SOS) - Observations API. Public API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
-                            });                        
-                        //var schemaHelper = new SwashbuckleSchemaHelper();
-                        //swagger.CustomSchemaIds(type => schemaHelper.GetSchemaId(type)); // temporarily used when checking for schema duplicates.
-                        swagger.CustomOperationIds(apiDesc =>
-                        {
-                            apiDesc.TryGetMethodInfo(out MethodInfo methodInfo);
-                            string controller = apiDesc.ActionDescriptor.RouteValues["controller"];
-                            string methodName = methodInfo.Name;
-                      
-                            return $"{controller}_{methodName}".Replace("Async", "", StringComparison.InvariantCultureIgnoreCase);
-                        });
-                    }
-
                     // add a custom operation filters
-                    swagger.OperationFilter<SwaggerDefaultValues>();
-                    swagger.OperationFilter<SwaggerAddOptionalHeaderParameters>();
+                    options.OperationFilter<SwaggerDefaultValues>();
+                    options.OperationFilter<SwaggerAddOptionalHeaderParameters>();
 
                     var currentAssembly = Assembly.GetExecutingAssembly();
                     var xmlDocs = currentAssembly.GetReferencedAssemblies()
@@ -252,16 +261,16 @@ namespace SOS.Observations.Api
 
                     Array.ForEach(xmlDocs, (d) =>
                     {
-                        swagger.IncludeXmlComments(d);
+                        options.IncludeXmlComments(d);
                     });
 
-                    swagger.SchemaFilter<SwaggerIgnoreFilter>();
-                    swagger.SchemaFilter<SwaggerForceSchemaFilter>();
+                    options.SchemaFilter<SwaggerIgnoreFilter>();
+                    options.SchemaFilter<SwaggerForceSchemaFilter>();
                     // Post-modify Operation descriptions once they've been generated by wiring up one or more
                     // Operation filters.
-                    swagger.OperationFilter<ApiManagementDocumentationFilter>();
+                    options.OperationFilter<ApiManagementDocumentationFilter>();
 
-                    swagger.DocInclusionPredicate((documentName, apiDescription) =>
+                    options.DocInclusionPredicate((documentName, apiDescription) =>
                     {
                         var apiVersions = GetApiVersions(apiDescription);
                         bool isEndpointInternalApi = apiDescription.ActionDescriptor.EndpointMetadata.Any(x => x.GetType() == typeof(InternalApiAttribute));
@@ -272,7 +281,7 @@ namespace SOS.Observations.Api
                                    $"{PublicApiName}v{v}" == documentName);
                     });
 
-                    swagger.AddSecurityDefinition("Bearer", //Name the security scheme
+                    options.AddSecurityDefinition("Bearer", //Name the security scheme
                         new OpenApiSecurityScheme
                         {
                             Name = "Authorization",
@@ -282,7 +291,7 @@ namespace SOS.Observations.Api
                             Scheme = "bearer" //The name of the HTTP Authorization scheme to be used in the Authorization header. In this case "bearer".
                         });
 
-                    swagger.AddSecurityRequirement(new OpenApiSecurityRequirement{
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement{
                         {
                             new OpenApiSecurityScheme{
                                 Scheme = "bearer",

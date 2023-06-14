@@ -71,7 +71,7 @@ namespace SOS.Observations.Api.HealthChecks
 
                 return new HealthCheckResult(HealthStatus.Unhealthy, "To few observations processed", data: data);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new HealthCheckResult(HealthStatus.Unhealthy, "Data amount health check failed");
             }

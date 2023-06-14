@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Observations.Api.Dtos.Vocabulary;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -30,7 +29,7 @@ namespace SOS.Observations.Api.Controllers
         /// Constructor
         /// </summary>
         /// <param name="vocabularyManager"></param>
-        /// <param name="_projectManager"></param>
+        /// <param name="projectManager"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public VocabulariesController(
@@ -84,8 +83,11 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var fieldDescriptions = ObservationPropertyFieldDescriptionHelper.AllFields
+                var fieldDescriptions = await Task.Run(() =>
+                {
+                    return ObservationPropertyFieldDescriptionHelper.AllFields
                     .Where(m => m.FieldSets is { Count: > 0 }).ToList();
+                }); 
                 
                 if (!fieldDescriptions?.Any() ?? true)
                 {
@@ -115,8 +117,11 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var fieldDescriptions = ObservationPropertyFieldDescriptionHelper.AllFields
+                var fieldDescriptions = await Task.Run(() =>
+                {
+                    return ObservationPropertyFieldDescriptionHelper.AllFields
                     .Where(m => m.FieldSets is { Count: > 0 } && m.FieldSets.Contains(fieldSet)).ToList();
+                });
 
                 if (!fieldDescriptions?.Any() ?? true)
                 {

@@ -63,7 +63,7 @@ namespace SOS.Observations.Api.HealthChecks
 
                 return new HealthCheckResult(HealthStatus.Unhealthy, "To many providers are missing an EML file");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new HealthCheckResult(HealthStatus.Unhealthy, "Data provider health check failed");
             }

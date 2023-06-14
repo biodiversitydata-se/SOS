@@ -206,7 +206,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -266,7 +266,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -374,7 +374,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -450,7 +450,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -534,7 +534,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch(TimeoutException e)
+            catch(TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -676,7 +676,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -825,7 +825,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -891,7 +891,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -950,7 +950,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -1118,7 +1118,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -1196,7 +1196,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -1296,7 +1296,7 @@ namespace SOS.Observations.Api.Controllers
                 GeoGridTileTaxonPageResultDto dto = result.Value.ToGeoGridTileTaxonPageResultDto();
                 return new OkObjectResult(dto);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -1379,7 +1379,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -1476,7 +1476,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -1603,7 +1603,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -1695,7 +1695,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -1757,7 +1757,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -1847,7 +1847,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -1908,7 +1908,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -1978,7 +1978,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 return BadRequest(e.Message);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -2034,7 +2034,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 return BadRequest(e.Message);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -2090,7 +2090,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 return BadRequest(e.Message);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -2149,7 +2149,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 return BadRequest(e.Message);
             }
-            catch (TimeoutException e)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }

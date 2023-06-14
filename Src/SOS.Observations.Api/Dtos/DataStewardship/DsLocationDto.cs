@@ -55,7 +55,6 @@ namespace SOS.Observations.Api.Dtos.DataStewardship
         /// <summary>
         /// The municipality (swe: kommun) within which the site is situated. Should be derived from the given position.
         /// </summary>
-        /// </summary>
         [Required]
         [SwaggerSchema("Municipality")]
         public Municipality Municipality { get; set; }

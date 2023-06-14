@@ -34,6 +34,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship
 
         /// <summary>
         /// Date and Time for when the survey started (local time).
+        /// </summary>
         [Required]
         public DateTime? EventStartDate { get; set; }
 

@@ -38,18 +38,20 @@ namespace SOS.Observations.Api.HealthChecks
             HealthCheckContext context,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            try
+            return await Task.Run(() =>
             {
-                int esActiveIndex = _processedObservationRepository.ActiveInstance;
-                var observationIndexName = _processedObservationRepository.PublicIndexName;                
-                var processedDbConfiguration = _configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
-                var elasticConfiguration = _configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
-                var identityServerConfiguration = _configuration.GetSection("IdentityServer").Get<IdentityServerConfiguration>();
-                var hangfireConfiguration = _configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
-                var userServiceConfiguration = _configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>();
-                var esClusterIndex = Math.Min(elasticConfiguration.Clusters.Count()-1, esActiveIndex);                
+                try
+                {
+                    int esActiveIndex = _processedObservationRepository.ActiveInstance;
+                    var observationIndexName = _processedObservationRepository.PublicIndexName;
+                    var processedDbConfiguration = _configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+                    var elasticConfiguration = _configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+                    var identityServerConfiguration = _configuration.GetSection("IdentityServer").Get<IdentityServerConfiguration>();
+                    var hangfireConfiguration = _configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+                    var userServiceConfiguration = _configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>();
+                    var esClusterIndex = Math.Min(elasticConfiguration.Clusters.Count() - 1, esActiveIndex);
 
-                var dependencies = new List<(string Title, string Value)>
+                    var dependencies = new List<(string Title, string Value)>
                 {
                     ("MongoDb", $"{processedDbConfiguration.Hosts.First().Name} ({processedDbConfiguration.DatabaseName})"),
                     ("Hangfire", $"{hangfireConfiguration.Hosts.First().Name} ({hangfireConfiguration.DatabaseName})"),
@@ -58,13 +60,14 @@ namespace SOS.Observations.Api.HealthChecks
                     ("IdentityServer", $"{identityServerConfiguration.Authority}")
                 };
 
-                string str = string.Join(", ", dependencies.Select(m => $"**{m.Title}**: [{m.Value}]"));
-                return new HealthCheckResult(HealthStatus.Healthy, str);
-            }
-            catch (Exception e)
-            {
-                return new HealthCheckResult(HealthStatus.Healthy, "Reading configuration file failed");
-            }
+                    string str = string.Join(", ", dependencies.Select(m => $"**{m.Title}**: [{m.Value}]"));
+                    return new HealthCheckResult(HealthStatus.Healthy, str);
+                }
+                catch (Exception)
+                {
+                    return new HealthCheckResult(HealthStatus.Healthy, "Reading configuration file failed");
+                }
+            });
         }
     }
 }

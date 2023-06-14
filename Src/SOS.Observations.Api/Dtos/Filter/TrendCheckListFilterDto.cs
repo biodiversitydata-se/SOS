@@ -10,7 +10,8 @@ namespace SOS.Observations.Api.Dtos.Filter
     {
         private TimeSpan _minEffortTime;
 
-        ///     Only get data from these providers.
+        /// <summary>
+        /// Only get data from these providers.
         /// </summary>
         public DataProviderFilterDto DataProvider { get; set; }
 

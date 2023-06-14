@@ -74,7 +74,7 @@ namespace SOS.Observations.Api.HealthChecks
 
                 return new HealthCheckResult(HealthStatus.Healthy, "No duplicate observations found");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new HealthCheckResult(HealthStatus.Degraded, "Duplicate health check failed");
             }

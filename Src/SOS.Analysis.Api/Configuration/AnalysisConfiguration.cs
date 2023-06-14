@@ -20,7 +20,7 @@ namespace SOS.Analysis.Api.Configuration
         /// <summary>
         /// Protected scope
         /// </summary>
-        public string ProtectedScope { get; set; }
+        public string? ProtectedScope { get; set; }
 
         /// <summary>
         /// Response compression level.

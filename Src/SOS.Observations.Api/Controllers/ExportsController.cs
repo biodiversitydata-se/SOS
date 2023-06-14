@@ -407,7 +407,7 @@ namespace SOS.Observations.Api.Controllers
                 else
                     return GetFile(fileExportResult.FilePath, "Observations.csv", "text/tab-separated-values"); // or "text/csv"?                
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -479,7 +479,7 @@ namespace SOS.Observations.Api.Controllers
 
                 return GetFile(fileExportResult.FilePath, "Observations_DwC.zip", "application/zip");
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -559,7 +559,7 @@ namespace SOS.Observations.Api.Controllers
                 else
                     return GetFile(fileExportResult.FilePath, "Observations.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -643,7 +643,7 @@ namespace SOS.Observations.Api.Controllers
                 else                
                     return GetFile(fileExportResult.FilePath, "Observations.geojson", "application/geo+json");
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -735,7 +735,7 @@ namespace SOS.Observations.Api.Controllers
 
                 return new OkObjectResult(jobId);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -818,7 +818,7 @@ namespace SOS.Observations.Api.Controllers
 
                 return new OkObjectResult(jobId);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -908,7 +908,7 @@ namespace SOS.Observations.Api.Controllers
 
                 return new OkObjectResult(jobId);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -1001,7 +1001,7 @@ namespace SOS.Observations.Api.Controllers
 
                 return new OkObjectResult(jobId);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -1077,7 +1077,7 @@ namespace SOS.Observations.Api.Controllers
                 else
                     return GetFile(fileExportResult.FilePath, "Observations.csv", "text/tab-separated-values"); // or "text/csv"?                
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -1144,7 +1144,7 @@ namespace SOS.Observations.Api.Controllers
 
                 return GetFile(fileExportResult.FilePath, "Observations_DwC.zip", "application/zip");
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -1224,7 +1224,7 @@ namespace SOS.Observations.Api.Controllers
                 else
                     return GetFile(fileExportResult.FilePath, "Observations.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -1308,7 +1308,7 @@ namespace SOS.Observations.Api.Controllers
                 else
                     return GetFile(fileExportResult.FilePath, "Observations.geojson", "application/geo+json");
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -1401,7 +1401,7 @@ namespace SOS.Observations.Api.Controllers
 
                 return new OkObjectResult(jobId);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -1484,7 +1484,7 @@ namespace SOS.Observations.Api.Controllers
 
                 return new OkObjectResult(jobId);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -1573,7 +1573,7 @@ namespace SOS.Observations.Api.Controllers
 
                 return new OkObjectResult(jobId);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
@@ -1666,7 +1666,7 @@ namespace SOS.Observations.Api.Controllers
 
                 return new OkObjectResult(jobId);
             }
-            catch (AuthenticationRequiredException e)
+            catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }

@@ -5,7 +5,7 @@
         /// <summary>
         /// Aggregated field
         /// </summary>
-        public object AggregationField { get; set; }
+        public object? AggregationField { get; set; }
 
         /// <summary>
         /// Document count
