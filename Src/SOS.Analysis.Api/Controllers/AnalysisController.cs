@@ -156,9 +156,9 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="alphaValues">One or more alpha values used to calculate AOO and EEO</param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="useCenterPoint">If true, grid cell center point will be used, else grid cell corner points will be used.</param>
-        /// <param name="useEdgeLengthRatio">Change behavior of edgeLength. When true: 
-        /// Computes the concave hull of the vertices in a geometry using the target criterion of maximum edge length ratio. 
-        /// The edge length factor is a fraction of the length difference between the longest and shortest edges in the Delaunay Triangulation of the input points.
+        /// <param name="useEdgeLengthRatio">Change behavior of alpha values. When true: 
+        /// Computes the concave hull of the vertices in a geometry using the target criterion of maximum alpha ratio. 
+        /// The alpha factor is a fraction of the length difference between the longest and shortest edges in the Delaunay Triangulation of the input points.
         /// When false: 
         /// Computes the concave hull of the vertices in a geometry using the target criterion of maximum edge length.</param>
         /// <param name="allowHoles">Gets or sets whether holes are allowed in the concave hull polygon.</param>
