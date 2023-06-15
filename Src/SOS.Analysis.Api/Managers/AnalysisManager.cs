@@ -11,7 +11,6 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Search.Result;
 
 namespace SOS.Analysis.Api.Managers
 {
@@ -117,7 +116,7 @@ namespace SOS.Analysis.Api.Managers
             SearchFilter filter,
             int gridCellsInMeters,
             bool useCenterPoint,
-            IEnumerable<double> edgeLengths,
+            IEnumerable<double> alphaValues,
             bool useEdgeLengthRatio,
             bool allowHoles,
             bool returnGridCells,
@@ -161,12 +160,12 @@ namespace SOS.Analysis.Api.Managers
                     BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem) 
                 };
 
-                foreach (var edgeLength in edgeLengths)
+                foreach (var alphaValue in alphaValues)
                 {
                     var eooGeometry = gridCellFeaturesMetric
                         .Select(f => f.Value.Geometry as Polygon)
                             .ToArray()
-                                .ConcaveHull(useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
+                                .ConcaveHull(useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles);
                     if (eooGeometry == null)
                     {
                         return null!;
@@ -179,7 +178,7 @@ namespace SOS.Analysis.Api.Managers
                     futureCollection.Add(new Feature(
                         transformedEooGeometry,
                         new AttributesTable(new KeyValuePair<string, object>[] {
-                                new KeyValuePair<string, object>("id", $"eoo-{edgeLength.ToString().Replace(',', '.')}"),
+                                new KeyValuePair<string, object>("id", $"eoo-{alphaValue.ToString().Replace(',', '.')}"),
                                 new KeyValuePair<string, object>("aoo", (int)aoo),
                                 new KeyValuePair<string, object>("eoo", (int)eoo),
                                 new KeyValuePair<string, object>("gridCellArea", gridCellArea),
@@ -235,6 +234,13 @@ namespace SOS.Analysis.Api.Managers
                 _logger.LogError(e, "Failed to calculate AOO/EOO.");
                 throw;
             }
+        }
+
+        /// <inheritdoc />
+        public async Task<long> GetMatchCountAsync(int? roleId, string? authorizationApplicationIdentifier, SearchFilterBase filter)
+        {
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            return await _processedObservationRepository.GetMatchCountAsync(filter);
         }
     }
 }

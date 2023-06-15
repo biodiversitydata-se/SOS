@@ -295,12 +295,12 @@ namespace SOS.Lib.Extensions
         /// Calculte concave hull for a list of polygons
         /// </summary>
         /// <param name="points">Points used for calculation</param>
-        /// <param name="edgeLength">The target maximum edge length or the target edge length ratio if useEdgeLengthRatio = true</param>
+        /// <param name="alphaValue">The target maximum edge length or the target edge length ratio if useEdgeLengthRatio = true</param>
         /// <param name="useEdgeLengthRatio">Use edge length ratio instead of edge length. The edge length ratio is a fraction of the length difference between the 
         /// longest and shortest edges in the Delaunay Triangulation of the input points</param>
         /// <param name="allowHoles"></param>
         /// <returns></returns>
-        public static Geometry ConcaveHull(this Point[] points, double edgeLength = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
+        public static Geometry ConcaveHull(this Point[] points, double alphaValue = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
         {
             if (!points?.Any() ?? true)
             {
@@ -308,9 +308,9 @@ namespace SOS.Lib.Extensions
             }
 
             return useEdgeLengthRatio ?
-               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLengthRatio(new MultiPoint(points), edgeLength, allowHoles)
+               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLengthRatio(new MultiPoint(points), alphaValue, allowHoles)
                :
-               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLength(new MultiPoint(points), edgeLength, allowHoles);
+               NetTopologySuite.Algorithm.Hull.ConcaveHull.ConcaveHullByLength(new MultiPoint(points), alphaValue, allowHoles);
         }
 
         /// <summary>
@@ -318,12 +318,12 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="polygons">Polygons used for calculation</param>
         /// <param name="useCenterPoint">Use polygon center point amd not polygon envelope edges, less points to use in calculation makes this faster</param>
-        /// <param name="edgeLength">The target maximum edge length or the target edge length ratio if useEdgeLengthRatio = true</param>
+        /// <param name="alphaValue">The target maximum edge length or the target edge length ratio if useEdgeLengthRatio = true</param>
         /// <param name="useEdgeLengthRatio">Use edge length ratio instead of edge length. The edge length ratio is a fraction of the length difference between the 
         /// longest and shortest edges in the Delaunay Triangulation of the input points</param>
         /// <param name="allowHoles"></param>
         /// <returns></returns>
-        public static Geometry ConcaveHull(this Polygon[] polygons, bool useCenterPoint = true, double edgeLength = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
+        public static Geometry ConcaveHull(this Polygon[] polygons, bool useCenterPoint = true, double alphaValue = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
         {
             var points = new HashSet<Point>();
             if (useCenterPoint)
@@ -339,12 +339,12 @@ namespace SOS.Lib.Extensions
                 }
             }
 
-            return points.ToArray().ConcaveHull(edgeLength, useEdgeLengthRatio, allowHoles);
+            return points.ToArray().ConcaveHull(alphaValue, useEdgeLengthRatio, allowHoles);
         }
 
-        public static Geometry ConcaveHull(this MultiPolygon multiPolygon, bool useCenterPoint = true, double edgeLength = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
+        public static Geometry ConcaveHull(this MultiPolygon multiPolygon, bool useCenterPoint = true, double alphaValue = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
         {
-            return ConcaveHull(multiPolygon?.Geometries.Select(g => g as Polygon)?.ToArray(), useCenterPoint, edgeLength, useEdgeLengthRatio, allowHoles);
+            return ConcaveHull(multiPolygon?.Geometries.Select(g => g as Polygon)?.ToArray(), useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles);
         }
 
         /// <summary>

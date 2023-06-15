@@ -41,7 +41,7 @@ namespace SOS.Analysis.Api.Controllers
             IAnalysisManager analysisManager,
             IAreaCache areaCache,
             AnalysisConfiguration analysisConfiguration,
-            ILogger<AnalysisController> logger) : base(areaCache, analysisConfiguration?.ProtectedScope!, 350000)
+            ILogger<AnalysisController> logger) : base(areaCache, analysisConfiguration?.ProtectedScope!, analysisConfiguration?.TilesLimit ?? 350000, analysisConfiguration?.CountFactor ?? 1.0)
         {
             _analysisManager = analysisManager ?? throw new ArgumentNullException(nameof(analysisManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -153,7 +153,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
-        /// <param name="edgeLengths">One or more edge lenghts to calculate AOO and EEO</param>
+        /// <param name="alphaValues">One or more alpha values used to calculate AOO and EEO</param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="useCenterPoint">If true, grid cell center point will be used, else grid cell corner points will be used.</param>
         /// <param name="useEdgeLengthRatio">Change behavior of edgeLength. When true: 
@@ -177,7 +177,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
-            [FromQuery] double[] edgeLengths,
+            [FromQuery] double[] alphaValues,
             [FromQuery] int? gridCellSizeInMeters = 2000,
             [FromQuery] bool? useCenterPoint = true,
             [FromQuery] bool? useEdgeLengthRatio = true,
@@ -192,11 +192,11 @@ namespace SOS.Analysis.Api.Controllers
                 CheckAuthorization(searchFilter.ProtectionFilter);
                 searchFilter = await InitializeSearchFilterAsync(searchFilter);
                 var edgeLengthValidation = Result.Success();
-                if ((useEdgeLengthRatio ?? false) && (edgeLengths?.Any() ?? false))
+                if ((useEdgeLengthRatio ?? false) && (alphaValues?.Any() ?? false))
                 {
-                    foreach(var edgeLength in edgeLengths)
+                    foreach(var edgeLength in alphaValues)
                     {
-                        edgeLengthValidation = ValidateDouble(edgeLength, 0.0, 1.0, "Edge length");
+                        edgeLengthValidation = ValidateDouble(edgeLength, 0.0, 1.0, "Alpha value");
                         if (edgeLengthValidation.IsFailure)
                         {
                             break;
@@ -204,19 +204,23 @@ namespace SOS.Analysis.Api.Controllers
                     }
                 }
 
+                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
+
                 var validationResult = Result.Combine(
                     edgeLengthValidation,
-                    edgeLengths?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one edge length"),
+                    alphaValues?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one alpha value"),
                     ValidateSearchFilter(searchFilter!),
                     ValidateInt(gridCellSizeInMeters!.Value, minLimit: 100, maxLimit: 100000, "Grid cell size in meters"),
-                    ValidateMetricTilesLimit(searchFilter.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters.Value));
+                    await ValidateMetricTilesLimitAsync(
+                        searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), 
+                        gridCellSizeInMeters.Value,
+                        _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter)
+                    ));
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
-
-                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
 
                 var result = await _analysisManager.CalculateAooAndEooAsync(
                     roleId,
@@ -224,7 +228,7 @@ namespace SOS.Analysis.Api.Controllers
                     filter, 
                     gridCellSizeInMeters!.Value, 
                     useCenterPoint!.Value,
-                    edgeLengths!, 
+                    alphaValues!, 
                     useEdgeLengthRatio!.Value, 
                     allowHoles!.Value,
                     returnGridCells!.Value,

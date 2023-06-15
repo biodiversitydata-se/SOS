@@ -20,6 +20,7 @@
         WaterArea = 27,
         Atlas5x5 = 29,
         Atlas10x10 = 30,
-        SfvDistricts = 34
+        SfvDistricts = 34,
+        Campus = 35
     }
 }

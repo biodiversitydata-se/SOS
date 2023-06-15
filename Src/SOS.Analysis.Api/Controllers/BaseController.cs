@@ -7,7 +7,6 @@ using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.Models.Processed.Observation;
 using Result = CSharpFunctionalExtensions.Result;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -20,6 +19,7 @@ namespace SOS.Analysis.Api.Controllers
         private readonly IAreaCache _areaCache;
         private readonly string _protectedScope;
         private readonly int _tilesLimit;
+        private readonly double _countFactor;
 
         /// <summary>
         /// Get bounding box
@@ -197,16 +197,17 @@ namespace SOS.Analysis.Api.Controllers
         }
 
         /// <summary>
-        /// Validate metric tiles limit
+        /// 
         /// </summary>
         /// <param name="envelope"></param>
-        /// <param name="gridCellSizeInMeters "></param>
+        /// <param name="gridCellSizeInMeters"></param>
+        /// <param name="countTask"></param>
         /// <returns></returns>
-        protected Result ValidateMetricTilesLimit(
+        protected async Task<Result> ValidateMetricTilesLimitAsync(
             Envelope envelope,
-            int gridCellSizeInMeters)
+            int gridCellSizeInMeters,
+            Task<long> countTask)
         {
-
             if (envelope == null)
             {
                 return Result.Success();
@@ -218,7 +219,12 @@ namespace SOS.Analysis.Api.Controllers
 
             if (maxTilesTot > _tilesLimit)
             {
-                return Result.Failure($"The number of cells that can be returned is too large. The limit is {_tilesLimit} cells. Try using larger grid cell size or a smaller bounding box.");
+                var count = await countTask;
+
+                if (count > _tilesLimit * _countFactor)
+                {
+                    return Result.Failure($"The number of cells that can be returned is too large. The limit is {_tilesLimit} cells. Try using larger grid cell size or a smaller bounding box.");
+                }
             }
 
             return Result.Success();
@@ -280,15 +286,18 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="areaCache"></param>
         /// <param name="protectedScope"></param>
         /// <param name="tilesLimit"></param>
+        /// <param name="countFactor"></param>
         /// <exception cref="ArgumentNullException"></exception>
         protected BaseController(
             IAreaCache areaCache,
             string protectedScope,
-            int tilesLimit)
+            int tilesLimit,
+            double countFactor)
         {
             _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
             _protectedScope = protectedScope ?? throw new ArgumentNullException(nameof(protectedScope));
             _tilesLimit = !tilesLimit.Equals(0) ? tilesLimit : throw new ArgumentNullException(nameof(tilesLimit));
+            _countFactor = !countFactor.Equals(0) ? countFactor : throw new ArgumentNullException(nameof(countFactor)); 
         }
     }
 }

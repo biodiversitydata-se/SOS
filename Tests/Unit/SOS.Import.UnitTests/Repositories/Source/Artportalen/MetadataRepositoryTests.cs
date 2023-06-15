@@ -67,13 +67,13 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         {
             IEnumerable<MetadataWithCategoryEntity<int>> activities = new[]
             {
-                new MetadataWithCategoryEntity<int>
+                new MetadataWithCategoryEntity<int>(1)
                 {
-                    Id = 1, CategoryId = 1, CategoryName = "Category", Translation = "Activity 1", CultureCode = "sv-GB"
+                    CategoryId = 1, CategoryName = "Category", Translation = "Activity 1", CultureCode = "sv-GB"
                 },
-                new MetadataWithCategoryEntity<int>
+                new MetadataWithCategoryEntity<int>(2)
                 {
-                    Id = 2, CategoryId = 1, CategoryName = "Category", Translation = "Activity 2", CultureCode = "sv-GB"
+                    CategoryId = 1, CategoryName = "Category", Translation = "Activity 2", CultureCode = "sv-GB"
                 }
             };
 
@@ -125,8 +125,8 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         {
             IEnumerable<MetadataEntity<int>> biotopes = new[]
             {
-                new MetadataEntity<int> {Id = 1, Translation = "Biotope 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity<int> {Id = 2, Translation = "Biotope 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int>(1) {Translation = "Biotope 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int>(2) {Translation = "Biotope 2", CultureCode = Cultures.en_GB}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
@@ -176,8 +176,8 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         {
             IEnumerable<MetadataEntity<int>> activities = new[]
             {
-                new MetadataEntity<int> {Id = 1, Translation = "Gender 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity<int> {Id = 2, Translation = "Gender 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int>(1) {Translation = "Gender 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int>(2) {Translation = "Gender 2", CultureCode = Cultures.en_GB}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
@@ -227,8 +227,8 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         {
             IEnumerable<MetadataEntity<int>> activities = new[]
             {
-                new MetadataEntity<int> {Id = 1, Translation = "Stage 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity<int> {Id = 2, Translation = "Stage 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int>(1) {Translation = "Stage 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int>(2) {Translation = "Stage 2", CultureCode = Cultures.en_GB}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
@@ -278,8 +278,8 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         {
             IEnumerable<MetadataEntity<int>> substrates = new[]
             {
-                new MetadataEntity<int> {Id = 1, Translation = "Substrate 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity<int> {Id = 2, Translation = "Substrate 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int>(1) {Translation = "Substrate 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int>(2) {Translation = "Substrate 2", CultureCode = Cultures.en_GB}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
@@ -329,8 +329,8 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         {
             IEnumerable<MetadataEntity<int>> activities = new[]
             {
-                new MetadataEntity<int> {Id = 1, Translation = "Unit 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity<int> {Id = 2, Translation = "Unit 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int>(1) {Translation = "Unit 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int>(2) {Translation = "Unit 2", CultureCode = Cultures.en_GB}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))
@@ -380,8 +380,8 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         {
             IEnumerable<MetadataEntity<int>> validationStatus = new[]
             {
-                new MetadataEntity<int> {Id = 1, Translation = "ValidationStatus 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity<int> {Id = 2, Translation = "ValidationStatus 2", CultureCode = Cultures.en_GB}
+                new MetadataEntity<int>(1) {Translation = "ValidationStatus 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity<int>(2) {Translation = "ValidationStatus 2", CultureCode = Cultures.en_GB}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity<int>>(It.IsAny<string>(), null, false))

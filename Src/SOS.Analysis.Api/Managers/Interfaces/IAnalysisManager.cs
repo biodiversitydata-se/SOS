@@ -52,7 +52,7 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="filter"></param>
         /// <param name="gridCellsInMeters"></param>
         /// <param name="useCenterPoint"></param>
-        /// <param name="edgeLengths"></param>
+        /// <param name="alphaValues"></param>
         /// <param name="useEdgeLengthRatio"></param>
         /// <param name="allowHoles"></param>
         /// <param name="returnGridCells"></param>
@@ -66,12 +66,21 @@ namespace SOS.Analysis.Api.Managers.Interfaces
             SearchFilter filter,
             int gridCellsInMeters,
             bool useCenterPoint,
-            IEnumerable<double> edgeLengths,
+            IEnumerable<double> alphaValues,
             bool useEdgeLengthRatio,
             bool allowHoles,
             bool returnGridCells,
             bool includeEmptyCells,
             MetricCoordinateSys metricCoordinateSys,
             CoordinateSys coordinateSystem);
+
+        /// <summary>
+        /// Get count of observations matching search criteria
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<long> GetMatchCountAsync(int? roleId, string? authorizationApplicationIdentifier, SearchFilterBase filter);
     }
 }
