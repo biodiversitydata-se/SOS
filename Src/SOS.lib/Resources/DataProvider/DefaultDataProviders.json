@@ -734,73 +734,73 @@
       "SupportEvents": false
     },
     {
-      "Id": 13,
-      "Identifier": "ButterflyMonitoring",
-      "IsActive": true,
-      "IncludeInScheduledHarvest": true,
-      "IncludeInHealthCheck": true,
-      "IncludeInSearchByDefault": true,
-      "SupportIncrementalHarvest": false,
-      "SupportDynamicEml": false,
-      "HarvestFailPreventProcessing": false,
-      "UseVerbatimFileInExport": false,
-      "CoordinateUncertaintyInMeters": 5000,
-      "Type": "DwcA",
-      "Names": [
-        {
-          "CultureCode": "en-GB",
-          "Value": "Swedish Butterfly Monitoring Scheme (SeBMS)"
+        "Id": 13,
+        "Identifier": "Swedish Butterfly Monitoring Scheme (SeBMS)",
+        "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": true,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "DwcA",
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Swedish Butterfly Monitoring Scheme (SeBMS)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Svensk Dagfjärilsövervakning"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The SeBMS is a standarised monitoring scheme for butterflies in Sweden. This dataset includes records from fixed transect sites, often called ‘Pollard Walks’, and point site counts which cover a set area for a standardised visit time. The SeBMS is run by Lund University for the Swedish Environmental Protection Agency, in partnership with the Entomological Society of Sweden, the Swedish Environmental Protection Agency, Lund University, the Swedish University of Agricultural Sciences, the Swedish Transport Administration and the Swedish County Administration Boards. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Lund University"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Lunds universitet"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Lund University", "Swedish Butterfly Monitoring Scheme" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "Lunds universitet", "Svensk Dagfjärilsövervakning" ]
+            }
+        ],
+        "Url": "https://www.dagfjarilar.lu.se/",
+        "ContactPerson": {
+            "FirstName": "",
+            "LastName": "",
+            "Email": ""
         },
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Svensk Dagfjärilsövervakning"
-        }
-      ],
-      "Descriptions": [
-        {
-          "CultureCode": "en-GB",
-          "Value": "The SeBMS is a standarised monitoring scheme for butterflies in Sweden. This dataset includes records from fixed transect sites, often called ‘Pollard Walks’, and point site counts which cover a set area for a standardised visit time. The SeBMS is run by Lund University for the Swedish Environmental Protection Agency, in partnership with the Entomological Society of Sweden, the Swedish Environmental Protection Agency, Lund University, the Swedish University of Agricultural Sciences, the Swedish Transport Administration and the Swedish County Administration Boards. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
-        }
-      ],
-      "Organizations": [
-        {
-          "CultureCode": "en-GB",
-          "Value": "Lund University"
-        },
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Lunds universitet"
-        }
-      ],
-      "Paths": [
-        {
-          "CultureCode": "en-GB",
-          "path": [ "Lund University", "Swedish Butterfly Monitoring Scheme" ]
-        },
-        {
-          "CultureCode": "sv-SE",
-          "path": [ "Lunds universitet", "Svensk Dagfjärilsövervakning" ]
-        }
-      ],
-      "Url": "https://www.dagfjarilar.lu.se/",
-      "ContactPerson": {
-        "FirstName": "",
-        "LastName": "",
-        "Email": ""
-      },
-      "DownloadUrls": [
-        {
-          "type": "Observations",
-          "url": "https://www.gbif.se/ipt/archive.do?r=lu_sebms"
-        },
-        {
-          "type": "ObservationEml",
-          "url": "https://www.gbif.se/ipt/eml.do?r=lu_sebms"
-        }
-      ],
-      "HarvestSchedule": "* * * * *",
-      "SupportDatasets": false,
-      "SupportEvents": false
+        "DownloadUrls": [
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=lu_sebms"
+            },
+            {
+                "type": "ObservationEml",
+                "url": "https://www.gbif.se/ipt/eml.do?r=lu_sebms"
+            }
+        ],
+        "HarvestSchedule": "* * * * *",
+        "SupportDatasets": false,
+        "SupportEvents": false
     },
     {
       "Id": 14,
