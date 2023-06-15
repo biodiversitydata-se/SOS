@@ -63,8 +63,8 @@ namespace SOS.Harvest.Processors
                 return;
             }
 
-            location.DecimalLongitude = point.X;
-            location.DecimalLatitude = point.Y;
+            location.DecimalLongitude = Math.Round(point.X, 5);
+            location.DecimalLatitude = Math.Round(point.Y, 5);
             location.Point = point.ToGeoShape() as PointGeoShape;
             location.PointLocation = point.ToGeoLocation();
 
@@ -73,12 +73,12 @@ namespace SOS.Harvest.Processors
 
             var coordinateConversionTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.CoordinateConversion);
             var sweRef99TmPoint = point.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
-            location.Sweref99TmX = sweRef99TmPoint.Coordinate.X;
-            location.Sweref99TmY = sweRef99TmPoint.Coordinate.Y;
+            location.Sweref99TmX = Math.Round(sweRef99TmPoint.Coordinate.X, 0);
+            location.Sweref99TmY = Math.Round(sweRef99TmPoint.Coordinate.Y, 0);
            
             var etrs89Point = point.Transform(CoordinateSys.WGS84, CoordinateSys.ETRS89_LAEA_Europe);
-            location.Etrs89X = etrs89Point.Coordinate.X;
-            location.Etrs89Y = etrs89Point.Coordinate.Y;
+            location.Etrs89X = Math.Round(etrs89Point.Coordinate.X, 7);
+            location.Etrs89Y = Math.Round(etrs89Point.Coordinate.Y, 7);
             TimeManager.Stop(ProcessTimeManager.TimerTypes.CoordinateConversion, coordinateConversionTimerSessionId);
 
             location.VerbatimSRS = verbatimCoordinateSystem.EpsgCode();
