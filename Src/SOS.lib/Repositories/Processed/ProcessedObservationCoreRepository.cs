@@ -892,13 +892,13 @@ namespace SOS.Lib.Repositories.Processed
                             .Terms("metric_x", t => t
                                 .Script(sct => sct
                                     .Source(
-                                        $"(Math.floor(doc['location.{( metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89 ) ? "etrs89X" : "sweref99TmX")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
+                                        $"(Math.floor(doc['location.{( metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) || metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89_LAEA_Europe) ? "etrs89X" : "sweref99TmX")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
                                 )
                             )
                             .Terms("metric_y", t => t
                                 .Script(sct => sct
                                     .Source(
-                                        $"(Math.floor(doc['location.{(metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) ? "etrs89Y" : "sweref99TmY")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
+                                        $"(Math.floor(doc['location.{(metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) || metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89_LAEA_Europe) ? "etrs89Y" : "sweref99TmY")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
                                 )
                             )
                         )
