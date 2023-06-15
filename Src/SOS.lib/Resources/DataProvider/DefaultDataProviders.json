@@ -735,7 +735,7 @@
     },
     {
         "Id": 13,
-        "Identifier": "Swedish Butterfly Monitoring Scheme (SeBMS)",
+        "Identifier": "ButterflyMonitoring",
         "IsActive": true,
         "IncludeInScheduledHarvest": true,
         "IncludeInHealthCheck": true,
