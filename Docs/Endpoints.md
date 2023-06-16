@@ -28,7 +28,7 @@ The following endpoints exists in Species Observation System API (SOS):
 | /Areas | Areas_GetAreas | GET | Search for areas (regions). |
 | /Areas/\{areaType\}/\{featureId\}/Export | Areas_GetExport | GET | Get an area as a zipped JSON file including its polygon. |
 | &nbsp;  	|  	|  	|  	|  	|
-| **Data providers** 	| 	|  	|  	|  	|  
+| **Data providers & dataset** 	| 	|  	|  	|  	|  
 | /DataProviders 	| DataProviders_GetDataProviders 	| GET 	| Get all data providers. 	|
 | /DataProviders/\{providerId\}/LastModified 	| DataProviders_GetLastModifiedDateById 	| GET 	| Get latest modified date for a data provider. 	|
 | /DataProviders/\{providerId\}/EML 	| DataProviders_GetEML 	| GET 	| Get provider EML file. 	|
