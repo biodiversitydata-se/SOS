@@ -34,3 +34,4 @@ You can get site details by using the `Locations_GetLocationsByIds` endpoint. Th
 | attributes.projectId 	| string 	|  	| Artportalen project id.    	|  	|
 | point 	| PointGeoShape 	| `{ "coordinates": [15.01, 58.05],"type": "point" }` 	| The geographic center of the Location (WGS84).    	|  	|
 | pointWithBuffer 	| PolygonGeoShape 	| `{"coordinates": [[[15.02,58.05],[15.02,58.06],...]],"type": "polygon"}`  	| The site polygon if the site is a polygon in Artportalen. Otherwise it is a circle with `point` as center and `coordinateUncertaintyInMeters` as radius (WGS84).    	|  	|
+| type 	| LocationType enum 	| "Polygon"  	| The site type. Point or Polygon   	|  	|
