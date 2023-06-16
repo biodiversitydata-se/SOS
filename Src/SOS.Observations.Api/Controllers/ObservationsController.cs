@@ -37,7 +37,9 @@ namespace SOS.Observations.Api.Controllers
     public class ObservationsController : ObservationBaseController
     {
         private readonly ITaxonSearchManager _taxonSearchManager;
-        private readonly int _tilesLimit;
+        private readonly int _tilesLimitInternal;
+        private readonly int _tilesLimitPublic;
+        private readonly double _countFactor;
         private readonly IEnumerable<int> _signalSearchTaxonListIds;
         private readonly ILogger<ObservationsController> _logger;
 
@@ -77,17 +79,45 @@ namespace SOS.Observations.Api.Controllers
             );
         }
 
-        /// <summary>
-        /// Validate metric tiles limit
-        /// </summary>
-        /// <param name="envelope"></param>
-        /// <param name="gridCellSizeInMeters "></param>
-        /// <returns></returns>
-        private Result ValidateMetricTilesLimit(
-            Envelope envelope,
-            int gridCellSizeInMeters)
+       /// <summary>
+       /// Validate tiles limit
+       /// </summary>
+       /// <param name="tilesLimit"></param>
+       /// <param name="maxTilesTot"></param>
+       /// <param name="envelope"></param>
+       /// <param name="countTask"></param>
+       /// <returns></returns>
+        private async Task<Result> TryValidateTilesLimitAsync(int tilesLimit,
+            double maxTilesTot,
+            Task<long> countTask)
         {
+            if (maxTilesTot > tilesLimit)
+            {
+                var count = await countTask;
 
+                if (count > tilesLimit * _countFactor)
+                {
+                    return Result.Failure($"The number of cells that can be returned is too large. The limit is {tilesLimit} cells. Try using larger grid cell size or a smaller bounding box.");
+                }
+            }
+
+            return Result.Success();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tilesLimit"></param>
+        /// <param name="envelope"></param>
+        /// <param name="gridCellSizeInMeters"></param>
+        /// <param name="countTask"></param>
+        /// <returns></returns>
+        private async Task<Result> ValidateMetricTilesLimitAsync(
+            int tilesLimit,
+            Envelope envelope,
+            int gridCellSizeInMeters,
+            Task<long> countTask)
+        {
             if (envelope == null)
             {
                 return Result.Success();
@@ -97,32 +127,31 @@ namespace SOS.Observations.Api.Controllers
             var maxLatTiles = Math.Ceiling((envelope.MaxY - envelope.MinY) / gridCellSizeInMeters);
             var maxTilesTot = maxLonTiles * maxLatTiles;
 
-            if (maxTilesTot > _tilesLimit)
-            {
-                return Result.Failure($"The number of cells that can be returned is too large. The limit is {_tilesLimit} cells. Try using larger grid cell size or a smaller bounding box.");
-            }
-
-            return Result.Success();
+            return await TryValidateTilesLimitAsync(tilesLimit, maxTilesTot, countTask);
         }
 
         /// <summary>
         /// Validate tiles limit
         /// </summary>
+        /// <param name="tilesLimit"></param>
         /// <param name="envelope"></param>
         /// <param name="zoom"></param>
+        /// <param name="countTask"></param>
         /// <returns></returns>
-        private Result ValidateTilesLimit(
+        private async Task<Result> ValidateTilesLimitAsync(
+            int tilesLimit,
             Envelope envelope,
-            int zoom)
+            int zoom,
+            Task<long> countTask)
         {
-            var maxTilesTot = envelope.CalculateNumberOfTiles(zoom);
-
-            if (maxTilesTot > _tilesLimit)
+            if (envelope == null)
             {
-                return Result.Failure($"The number of cells that can be returned is too large. The limit is {_tilesLimit} cells. Try using lower zoom or a smaller bounding box.");
+                return Result.Success();
             }
 
-            return Result.Success();
+            var maxTilesTot = envelope.CalculateNumberOfTiles(zoom);
+
+            return await TryValidateTilesLimitAsync(tilesLimit, maxTilesTot, countTask);
         }
 
         /// <summary>
@@ -146,8 +175,9 @@ namespace SOS.Observations.Api.Controllers
             ILogger<ObservationsController> logger) : base(observationManager, areaManager, taxonManager, observationApiConfiguration)
         {
             _taxonSearchManager = taxonSearchManager ?? throw new ArgumentNullException(nameof(taxonSearchManager));
-            _tilesLimit = elasticConfiguration?.IndexSettings?.FirstOrDefault(i => i.Name.Equals("observation", StringComparison.CurrentCultureIgnoreCase))?.MaxNrAggregationBuckets ??
-                          throw new ArgumentNullException(nameof(elasticConfiguration));
+            _tilesLimitInternal = observationApiConfiguration?.TilesLimitInternal ?? throw new ArgumentNullException(nameof(elasticConfiguration));
+            _tilesLimitPublic = observationApiConfiguration.TilesLimitPublic;
+            _countFactor = observationApiConfiguration.CountFactor;
 
             _signalSearchTaxonListIds = (observationApiConfiguration?.SignalSearchTaxonListIds?.Any() ?? false) ? observationApiConfiguration.SignalSearchTaxonListIds : Array.Empty<int>();
 
@@ -340,20 +370,20 @@ namespace SOS.Observations.Api.Controllers
                 CheckAuthorization(protectionFilter);
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
-                
+                var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateTilesLimit(boundingBox, zoom));
+                    await ValidateTilesLimitAsync(_tilesLimitPublic, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                );
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
-
-                var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, translationCultureCode);
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(
                     roleId,
@@ -418,19 +448,21 @@ namespace SOS.Observations.Api.Controllers
                 CheckAuthorization(protectionFilter);
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
+                var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, "en-GB");
 
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
-                    ValidateMetricTilesLimit(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters));
+                    await ValidateMetricTilesLimitAsync(_tilesLimitPublic, boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                    );
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, "en-GB");
+                
                 var result = await ObservationManager.GetMetricGridAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters, MetricCoordinateSys.SWEREF99_TM);
@@ -787,21 +819,23 @@ namespace SOS.Observations.Api.Controllers
                 CheckAuthorization(protectionFilter);
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
+                var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                
+
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateTaxonAggregationPagingArguments(skip, take),
-                    ValidateTilesLimit(boundingBox, 1));
+                    await ValidateTilesLimitAsync(_tilesLimitPublic, boundingBox, 1, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                );
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, translationCultureCode);
+                
                 var result = await _taxonSearchManager.GetTaxonAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier,
@@ -1085,21 +1119,23 @@ namespace SOS.Observations.Api.Controllers
 
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
+                var searchFilter = filter.ToSearchFilterInternal(UserId, translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-               
+
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateTilesLimit(boundingBox, zoom));
+                    await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                );
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal(UserId, translationCultureCode);
+               
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
               
@@ -1164,20 +1200,23 @@ namespace SOS.Observations.Api.Controllers
 
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
+                var searchFilter = filter.ToSearchFilter(UserId, filter.ProtectionFilter, translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateTilesLimit(boundingBox, zoom));
+                    await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                );
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilter(UserId, filter.ProtectionFilter, translationCultureCode);
+               
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
 
                 string strJson = result.GetFeatureCollectionGeoJson();
@@ -1273,20 +1312,23 @@ namespace SOS.Observations.Api.Controllers
 
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
+                var searchFilter = filter.ToSearchFilterInternal(UserId, translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateTilesLimit(boundingBox, zoom));
+                    await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                );
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal(UserId, translationCultureCode);
+                
                 var result = await _taxonSearchManager.GetPageGeoTileTaxaAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom, geoTilePage, taxonIdPage);
                 if (result.IsFailure)
                 {
@@ -1345,18 +1387,21 @@ namespace SOS.Observations.Api.Controllers
 
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
+                var searchFilter = filter.ToSearchFilter(UserId, filter.ProtectionFilter, "en-GB");
+
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
-                    ValidateMetricTilesLimit(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters));
+                    await ValidateMetricTilesLimitAsync(_tilesLimitInternal, boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                );
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilter(UserId, filter.ProtectionFilter, "en-GB");
+                
                 var result = await ObservationManager.GetMetricGridAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier, 
@@ -1810,20 +1855,23 @@ namespace SOS.Observations.Api.Controllers
 
                 filter = await InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
+                var searchFilter = filter.ToSearchFilterInternal(UserId, translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateTaxonAggregationPagingArguments(skip, take),
-                    ValidateTilesLimit(boundingBox, 1));
+                    await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, 1, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                 );
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal(UserId, translationCultureCode);
+               
                 var result = await _taxonSearchManager.GetTaxonAggregationAsync(roleId,
                     authorizationApplicationIdentifier,
                     searchFilter,

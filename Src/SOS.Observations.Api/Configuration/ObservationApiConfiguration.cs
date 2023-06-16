@@ -9,6 +9,11 @@ namespace SOS.Observations.Api.Configuration
     public class ObservationApiConfiguration
     {
         /// <summary>
+        /// Factor used to compute tiles limit
+        /// </summary>
+        public double CountFactor { get; set; }
+
+        /// <summary>
         /// Default max ongoing export jobs for a user
         /// </summary>
         public int DefaultUserExportLimit { get; set; }
@@ -17,6 +22,11 @@ namespace SOS.Observations.Api.Configuration
         /// Max number of observations allowed for file download
         /// </summary>
         public int  DownloadExportObservationsLimit { get; set; }
+
+        /// <summary>
+        /// If true, make response compression enabled.
+        /// </summary>
+        public bool EnableResponseCompression { get; set; } = false;
 
         /// <summary>
         /// File Export path
@@ -32,20 +42,25 @@ namespace SOS.Observations.Api.Configuration
         /// Protected scope
         /// </summary>
         public string ProtectedScope { get; set; }
-      
+
+        /// <summary>
+        /// Response compression level.
+        /// </summary>
+        public CompressionLevel ResponseCompressionLevel { get; set; } = CompressionLevel.Optimal;
+
         /// <summary>
         /// Taxon list id's allowed in signal search
         /// </summary>
         public IEnumerable<int> SignalSearchTaxonListIds { get; set; }
 
         /// <summary>
-        /// If true, make response compression enabled.
+        /// Max number of buckets created by aggregations
         /// </summary>
-        public bool EnableResponseCompression { get; set; } = false;
+        public int TilesLimitInternal { get; set; }
 
         /// <summary>
-        /// Response compression level.
+        /// Max number of buckets created by aggregations
         /// </summary>
-        public CompressionLevel ResponseCompressionLevel { get; set; } = CompressionLevel.Optimal;
+        public int TilesLimitPublic { get; set; }
     }
 }

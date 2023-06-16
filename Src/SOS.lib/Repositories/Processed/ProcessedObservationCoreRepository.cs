@@ -887,7 +887,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Aggregations(a => a
                     .Composite("gridCells", c => c
                         .Size(maxBuckets ?? MaxNrElasticSearchAggregationBuckets + 1) 
-                        .After(afterKey ?? null)
+                        .After(afterKey ?? null) 
                         .Sources(s => s
                             .Terms("metric_x", t => t
                                 .Script(sct => sct
