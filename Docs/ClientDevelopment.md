@@ -7,7 +7,7 @@ This document contains some basic information about SOS and tips on what to cons
 - [Headers](#headers)
 - [Resources](#resources)
 - [Versioning](#versioning)
-
+- [Data ingestion](#data-ingestion)
 
 ## Basics
 Regardless of whether you are developing a web, app or desktop solution, it is best practice to communicate with SOS through a dedicated backend and not access the API directly from the web browser or phone app. This way, you only need to make changes in one place, the App Backend, if there are structural changes in the SOS API.
@@ -207,3 +207,8 @@ Managing multiple versions of an API is complex and costly, so we strive to make
 - *Removal of support for media types.*
 
 *As a producer of an API, one SHOULD avoid introducing non-backward compatible changes in their API, although sometimes it is unavoidable. As a consumer, one SHOULD always be tolerant, expect, and handle unexpected responses in a message. This creates robustness.*
+
+## Data ingestion
+- Most datasets are harvested and processed once a day. 
+- Some datasets are rarely updated and harvested only when they have changed.
+- The Artportalen database is harvested, in addition to once daily, also incrementally every 5 minutes. In other words, it takes at most 5 minutes before an Artportalen observation is available in SOS.
