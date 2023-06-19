@@ -34,6 +34,7 @@ namespace SOS.Lib.Jobs.Export
         [JobDisplayName("Export observations. Email={3}, Description={4}, ExportFormat={5}")]
         [AutomaticRetry(Attempts = 2, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
         [Queue("low")]
+        [PreserveOriginalQueue]
         [OneAtTheTime(MaxAttempts = 0, RetryInSeconds = 60)]
         [HandleFileExportFailure]
         Task<bool> RunAsync(SearchFilter filter,
