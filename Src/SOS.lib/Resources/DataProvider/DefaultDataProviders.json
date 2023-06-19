@@ -930,7 +930,7 @@
     },
     {
       "Id": 16,
-      "Identifier": "NFI",
+      "Identifier": "ForestInventory",
       "IsActive": true,
       "IncludeInScheduledHarvest": false,
       "IncludeInHealthCheck": true,
@@ -1119,7 +1119,7 @@
     },
     {
       "Id": 19,
-      "Identifier": "iNaturalistSverige",
+      "Identifier": "iNaturalist",
       "IsActive": true,
       "IncludeInScheduledHarvest": true,
       "IncludeInHealthCheck": true,

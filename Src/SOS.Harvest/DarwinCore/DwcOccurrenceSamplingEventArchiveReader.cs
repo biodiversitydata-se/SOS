@@ -1018,7 +1018,7 @@ namespace SOS.Harvest.DarwinCore
 
         private void AddOccurrenceEventData(ArchiveReaderContext archiveReaderContext, DwcObservationVerbatim occurrence)
         {
-            if ((!archiveReaderContext?.OccurrenceIdsByEventId?.Any() ?? true) || string.IsNullOrEmpty(occurrence.EventID))
+            if (string.IsNullOrEmpty(occurrence.EventID))
             {
                 return;
             }
