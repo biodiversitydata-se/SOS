@@ -4,11 +4,15 @@
       "commandName": "Project",
       "commandLineArgs": "local"
     },
+    "SOS.Hangfire.JobServer (ST)": {
+      "commandName": "Project",
+      "commandLineArgs": "ST"
+    },
     "Docker": {
       "commandName": "Docker",
-        "environmentVariables": {
-            "ASPNETCORE_ENVIRONMENT": "Prod"
-        }
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Prod"
+      }
     }
   }
 }

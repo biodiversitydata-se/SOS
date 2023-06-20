@@ -16,6 +16,14 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }
+    },
+    "SOS.Administration.Api (ST)": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "ST"
+      }
     }
   }
 }

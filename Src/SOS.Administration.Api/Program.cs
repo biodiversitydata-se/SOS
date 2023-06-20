@@ -80,8 +80,9 @@ namespace SOS.Administration.Api
                 })
                 .UseServiceProviderFactory(hostContext =>
                 {
-                    if (hostContext.HostingEnvironment.EnvironmentName.Equals("local",
-                        StringComparison.CurrentCultureIgnoreCase))
+                    var environment = hostContext.HostingEnvironment.EnvironmentName.ToLower();
+                    bool isDevelopment = environment.Equals("local") || environment.Equals("dev") || environment.Equals("st");
+                    if (isDevelopment)
                     {
                         // IIS Express don't get values from secret storage.  This workaround fix it
                         foreach (var prop in hostContext.Properties)
