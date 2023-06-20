@@ -51,15 +51,15 @@
 
     <ItemGroup>
 	    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
-	    <PackageReference Include="CSharpFunctionalExtensions" Version="2.39.0" />
+	    <PackageReference Include="CSharpFunctionalExtensions" Version="2.39.2" />
 	    <PackageReference Include="Elastic.Apm.NLog" Version="8.6.0" />
 	    <PackageReference Include="Elastic.CommonSchema.NLog" Version="8.6.0" />
-	    <PackageReference Include="HangFire" Version="1.8.1" />
-	    <PackageReference Include="HangFire.Autofac" Version="2.3.1" />
-	    <PackageReference Include="HangFire.Mongo" Version="1.9.5" />
+	    <PackageReference Include="HangFire" Version="1.8.2" />
+	    <PackageReference Include="HangFire.Autofac" Version="2.4.1" />
+	    <PackageReference Include="HangFire.Mongo" Version="1.9.6" />
 	    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
 	    <PackageReference Include="NLog.Targets.ElasticSearch" Version="7.7.0" />
-	    <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.3" />
+	    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.0" />
 	    <PackageReference Include="Quartz" Version="3.6.2" />
 	    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>

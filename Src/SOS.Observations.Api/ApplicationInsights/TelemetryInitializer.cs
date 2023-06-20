@@ -23,33 +23,38 @@ namespace SOS.Observations.Api.ApplicationInsights
         /// <param name="telemetry"></param>
         protected override void OnInitializeTelemetry(HttpContext platformContext, RequestTelemetry requestTelemetry, ITelemetry telemetry)
         {
+            if (requestTelemetry == null)
+            {
+                return;
+            }
+
             if (new[] { "get", "post", "put" }.Contains(platformContext.Request.Method, StringComparer.CurrentCultureIgnoreCase))
             {
-                if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !telemetry.Context.GlobalProperties.ContainsKey("Protected-observations"))
+                if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Protected-observations"))
                 {
                     telemetry.Context.GlobalProperties.Add("Protected-observations", value);
                 }
 
                 if (_loggRequestBody && platformContext.Items.TryGetValue("Request-body", out var requestBody))
                 {
-                    if (!telemetry.Context.GlobalProperties.ContainsKey("Request-body"))
+                    if (!requestTelemetry.Context.GlobalProperties.ContainsKey("Request-body"))
                     {
                         var body = requestBody?.ToString();
-                        telemetry.Context.GlobalProperties.Add("Request-body", body);
+                        requestTelemetry.Context.GlobalProperties.Add("Request-body", body);
                     }
                 }
 
                 if (_loggSearchResponseCount && platformContext.Items.TryGetValue("Observation-count", out var observationCount))
                 {
-                    if (int.TryParse(observationCount?.ToString(), out var obsCount) && !telemetry.Context.GlobalProperties.ContainsKey("Observation-count"))
+                    if (int.TryParse(observationCount?.ToString(), out var obsCount) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Observation-count"))
                     {
-                        telemetry.Context.GlobalProperties.Add("Observation-count", obsCount.ToString());
+                        requestTelemetry.Context.GlobalProperties.Add("Observation-count", obsCount.ToString());
                     }
                 }
 
-                if (platformContext.Request.ContentLength != null && !telemetry.Context.GlobalProperties.ContainsKey("Request-length"))
+                if (platformContext.Request.ContentLength != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("Request-length"))
                 {
-                    telemetry.Context.GlobalProperties.Add("Request-length", platformContext.Request.ContentLength.ToString());
+                    requestTelemetry.Context.GlobalProperties.Add("Request-length", platformContext.Request.ContentLength.ToString());
                 }
             }
 
@@ -58,16 +63,16 @@ namespace SOS.Observations.Api.ApplicationInsights
             // If we have a logged in user, use nameidentifier
             if (!string.IsNullOrEmpty(nameidentifier))
             {
-                telemetry.Context.User.AuthenticatedUserId = nameidentifier;
+                requestTelemetry.Context.User.AuthenticatedUserId = nameidentifier;
             }
 
             // If it's a call from Azure API management, we should have Azure user id in header 
             if (platformContext.Request.Headers.TryGetValue("request-user-id", out var accountId))
             {
-                telemetry.Context.User.AccountId = accountId;
+                requestTelemetry.Context.User.AccountId = accountId;
             }
 
-            if (!telemetry.Context.GlobalProperties.ContainsKey("Requesting-System"))
+            if (!requestTelemetry.Context.GlobalProperties.ContainsKey("Requesting-System"))
             {
                 var requestingSystem = new StringValues();
                 if (!platformContext.Request.Headers.TryGetValue("X-Requesting-System", out requestingSystem))
@@ -77,7 +82,7 @@ namespace SOS.Observations.Api.ApplicationInsights
                         requestingSystem = new StringValues("N/A");
                     }
                 }
-                telemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
+                requestTelemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
             }
 
            

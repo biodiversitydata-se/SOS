@@ -6,6 +6,11 @@
     public class ApplicationInsights
     {
         /// <summary>
+        /// Connection string
+        /// </summary>
+        public string ConnectionString => $"InstrumentationKey={InstrumentationKey};IngestionEndpoint=https://northeurope-3.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/";
+        
+            /// <summary>
         /// Key to application insights
         /// </summary>
         public string InstrumentationKey { get; set; }

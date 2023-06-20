@@ -38,11 +38,11 @@
 		<PackageReference Include="Bogus" Version="34.0.2" />
 		<PackageReference Include="FluentAssertions" Version="6.11.0" />
 		<PackageReference Include="LinqStatistics" Version="2.3.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.7" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
 		<PackageReference Include="Moq" Version="4.18.4" />
 		<PackageReference Include="NBuilder" Version="6.1.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -51,7 +51,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="coverlet.collector" Version="3.2.0">
+		<PackageReference Include="coverlet.collector" Version="6.0.0">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>

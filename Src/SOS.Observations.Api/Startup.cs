@@ -180,6 +180,18 @@ namespace SOS.Observations.Api
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            var applicationInsightsConfiguration = Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>();
+            services.AddSingleton(applicationInsightsConfiguration);
+
+            // Add application insights.
+            services.AddApplicationInsightsTelemetry(c =>
+            {
+                c.ConnectionString = applicationInsightsConfiguration.ConnectionString;
+            });
+            // Application insights custom
+            services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
+            services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
+
             services.AddMemoryCache();
 
             services.AddControllers()
@@ -217,14 +229,6 @@ namespace SOS.Observations.Api
                     options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
                     options.TokenValidationParameters.RoleClaimType = "rname";
                 });
-
-            // Add application insights.
-            services.AddApplicationInsightsTelemetry(Configuration);
-            // Application insights custom
-            services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>());
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
             services.AddApiVersioning(o =>
             {
