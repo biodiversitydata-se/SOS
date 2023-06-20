@@ -16,27 +16,25 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"pm.test(\"Returns 2 records\", function () {    ",
-									"    pm.expect(result.records.length).to.eql(2);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const observation = result.records[0];",
 									"",
-									"const otterCount = parseInt(pm.environment.get(\"observations.search.otterCount\"));",
-									"pm.test(\"total count > \" + otterCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(otterCount);",
-									"});",
+									"    pm.test(\"Returns 2 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(2);",
+									"    });",
 									"",
-									"pm.test(\"TaxonId is 100077\", function () {    ",
-									"    pm.expect(observation.taxon.id).to.eql(100077);",
-									"});",
+									"    const otterCount = parseInt(pm.environment.get(\"observations.search.otterCount\"));",
+									"    pm.test(\"total count > \" + otterCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(otterCount);",
+									"    });",
 									"",
-									""
+									"    pm.test(\"TaxonId is 100077\", function () {    ",
+									"        pm.expect(observation.taxon.id).to.eql(100077);",
+									"    });",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -52,6 +50,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -88,21 +91,23 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    const observation = result.records[0];",
+									"",
+									"    pm.test(\"Returns 2 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(2);",
+									"    });",
+									"",
+									"    const redListedCount = parseInt(pm.environment.get(\"observations.search.redListedCount\"));",
+									"    pm.test(\"total count >= \" + redListedCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(redListedCount);",
+									"    });",
 									"});    ",
 									"",
-									"pm.test(\"Returns 2 records\", function () {    ",
-									"    pm.expect(result.records.length).to.eql(2);",
-									"});",
-									"",
-									"const redListedCount = parseInt(pm.environment.get(\"observations.search.redListedCount\"));",
-									"pm.test(\"total count >= \" + redListedCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(redListedCount);",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -118,6 +123,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -155,24 +165,24 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"pm.test(\"Returns 2 records\", function () {    ",
-									"    pm.expect(result.records.length).to.eql(2);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const observation = result.records[0];",
 									"",
-									"const otterCount = parseInt(pm.environment.get(\"observations.search.otterCount\"));",
-									"pm.test(\"total count > \" + otterCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(otterCount);",
-									"});",
+									"    pm.test(\"Returns 2 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(2);",
+									"    });",
 									"",
-									"pm.test(\"TaxonId is 100077\", function () {    ",
-									"    pm.expect(observation.taxon.id).to.eql(100077);",
+									"    const otterCount = parseInt(pm.environment.get(\"observations.search.otterCount\"));",
+									"    pm.test(\"total count > \" + otterCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(otterCount);",
+									"    });",
+									"",
+									"    pm.test(\"TaxonId is 100077\", function () {    ",
+									"        pm.expect(observation.taxon.id).to.eql(100077);",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -189,6 +199,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -225,9 +240,6 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    "
@@ -246,6 +258,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -283,8 +300,6 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    "
@@ -303,6 +318,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -344,20 +364,22 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    const observation = result.records[0];",
+									"",
+									"    pm.test(\"Municipality is Tranås\", function () {    ",
+									"        pm.expect(observation.location.municipality.name).to.eql('Tranås');",
+									"    });",
+									"",
+									"    pm.test(\"Taxon vernacular name is 'utter'\", function () {    ",
+									"        pm.expect(observation.taxon.vernacularName).to.eql('utter');",
+									"    });",
 									"});    ",
 									"",
-									"pm.test(\"Municipality is Tranås\", function () {    ",
-									"    pm.expect(observation.location.municipality.name).to.eql('Tranås');",
-									"});",
-									"",
-									"pm.test(\"Taxon vernacular name is 'utter'\", function () {    ",
-									"    pm.expect(observation.taxon.vernacularName).to.eql('utter');",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -373,6 +395,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -409,8 +436,6 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    "
@@ -429,6 +454,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -455,16 +485,18 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    const observation = result.records[0];",
+									"   ",
+									"    pm.test(\"Taxon vernacular name is 'utter'\", function () {    ",
+									"        pm.expect(observation.taxon.vernacularName).to.eql('utter');",
+									"    });",
 									"});    ",
 									"",
-									"pm.test(\"Taxon vernacular name is 'utter'\", function () {    ",
-									"    pm.expect(observation.taxon.vernacularName).to.eql('utter');",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -480,6 +512,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -516,19 +553,19 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"pm.test(\"Municipality is Tranås\", function () {    ",
-									"    pm.expect(observation.location.municipality.name).to.eql('Tranås');",
-									"});",
+									"    const result = pm.response.json();",
+									"    const observation = result.records[0];",
 									"",
-									"pm.test(\"Taxon vernacular name is 'utter'\", function () {    ",
-									"    pm.expect(observation.taxon.vernacularName).to.eql('utter');",
+									"    pm.test(\"Municipality is Tranås\", function () {    ",
+									"        pm.expect(observation.location.municipality.name).to.eql('Tranås');",
+									"    });",
+									"",
+									"    pm.test(\"Taxon vernacular name is 'utter'\", function () {    ",
+									"        pm.expect(observation.taxon.vernacularName).to.eql('utter');",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -545,6 +582,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -581,15 +623,16 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    pm.test(\"Returns 0 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(0);",
+									"    });",
 									"});    ",
 									" ",
-									"pm.test(\"Returns 0 records\", function () {    ",
-									"    pm.expect(result.records.length).to.eql(0);",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -605,6 +648,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -641,15 +689,16 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    pm.test(\"Protection level is 1\", function () {",
+									"        pm.expect(result.records.every(o => o.occurrence.sensitivityCategory === 1)).to.be.true;",
+									"    });",
 									"});    ",
 									" ",
-									"pm.test(\"Protection level is 1\", function () {",
-									"    pm.expect(result.records.every(o => o.occurrence.sensitivityCategory === 1)).to.be.true;",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -665,6 +714,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -701,20 +755,20 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const observationCount = parseInt(pm.environment.get(\"observations.search.observationCount\"));",
-									"pm.test(\"total count > \" + observationCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(observationCount);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const observation = result.records[0];",
 									"",
-									"pm.test(\"Occurrence status has value 'present'\", function () {    ",
-									"    pm.expect(observation.occurrence.occurrenceStatus.value).to.eql('present');",
+									"    const observationCount = parseInt(pm.environment.get(\"observations.search.observationCount\"));",
+									"    pm.test(\"total count > \" + observationCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(observationCount);",
+									"    });",
+									"",
+									"    pm.test(\"Occurrence status has value 'present'\", function () {    ",
+									"        pm.expect(observation.occurrence.occurrenceStatus.value).to.eql('present');",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -731,6 +785,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -767,23 +826,22 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const absentObservationCount = parseInt(pm.environment.get(\"observations.search.absentObservationCount\"));",
-									"pm.test(\"total count > \" + absentObservationCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(absentObservationCount);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const observation = result.records[0];",
 									"",
-									"pm.test(\"Occurrence status has value 'present'\", function () {    ",
-									"    pm.expect(observation.occurrence.occurrenceStatus.value).to.eql('absent');",
-									"    pm.expect(observation.occurrence.isPositiveObservation).to.be.false;",
-									"});",
-									""
+									"    const absentObservationCount = parseInt(pm.environment.get(\"observations.search.absentObservationCount\"));",
+									"    pm.test(\"total count > \" + absentObservationCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(absentObservationCount);",
+									"    });",
+									"",
+									"    pm.test(\"Occurrence status has value 'present'\", function () {    ",
+									"        pm.expect(observation.occurrence.occurrenceStatus.value).to.eql('absent');",
+									"        pm.expect(observation.occurrence.isPositiveObservation).to.be.false;",
+									"    });",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -799,6 +857,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -839,16 +902,17 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    const observation = result.records[0];",
+									"    pm.test(\"Returns 2 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(2);",
+									"    });",
 									"});    ",
 									"",
-									"pm.test(\"Returns 2 records\", function () {    ",
-									"    pm.expect(result.records.length).to.eql(2);",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -864,6 +928,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -900,22 +969,20 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"pm.test(\"Returns 2 records\", function () {    ",
-									"    pm.expect(result.records.length).to.eql(2);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const observation = result.records[0];",
+									"    pm.test(\"Returns 2 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(2);",
+									"    });",
 									"",
-									"const secondHandInfoCount = parseInt(pm.environment.get(\"observations.search.secondHandInfoCount\"));",
-									"pm.test(\"total count > \" + secondHandInfoCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(secondHandInfoCount);",
-									"});",
-									""
+									"    const secondHandInfoCount = parseInt(pm.environment.get(\"observations.search.secondHandInfoCount\"));",
+									"    pm.test(\"total count > \" + secondHandInfoCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(secondHandInfoCount);",
+									"    });",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -931,6 +998,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -968,8 +1040,6 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});    "
@@ -988,6 +1058,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1014,17 +1089,16 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const observation = result[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"pm.test(\"Returns 2 records\", function () {    ",
-									"    pm.expect(result.length).to.eql(2);",
-									"});",
-									""
+									"    const result = pm.response.json();",
+									"    const observation = result[0];",
+									"",
+									"    pm.test(\"Returns 2 records\", function () {    ",
+									"        pm.expect(result.length).to.eql(2);",
+									"    });",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -1043,6 +1117,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1103,21 +1182,21 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const gridCell = result.gridCells[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const mammalCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalCellCount\"));",
-									"pm.test(\"grid cell count > \" + mammalCellCount, function () {    ",
-									"    pm.expect(result.gridCellCount).to.greaterThan(mammalCellCount);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const gridCell = result.gridCells[0];",
 									"",
-									"const mammalCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalCountCell\"));",
-									"pm.test(\"Observation count > \" + mammalCountCell + \" for the grid cell with most observations\", function () {    ",
-									"    pm.expect(gridCell.observationsCount).to.greaterThan(mammalCountCell);    ",
+									"    const mammalCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalCellCount\"));",
+									"    pm.test(\"grid cell count > \" + mammalCellCount, function () {    ",
+									"        pm.expect(result.gridCellCount).to.greaterThan(mammalCellCount);",
+									"    });",
+									"",
+									"    const mammalCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalCountCell\"));",
+									"    pm.test(\"Observation count > \" + mammalCountCell + \" for the grid cell with most observations\", function () {    ",
+									"        pm.expect(gridCell.observationsCount).to.greaterThan(mammalCountCell);    ",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1134,6 +1213,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1166,21 +1250,20 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const gridCell = result.gridCells[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const invalidTaxaCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.invalidTaxaCellCount\"));",
-									"pm.test(\"grid cell count > \" + invalidTaxaCellCount, function () {    ",
-									"    pm.expect(result.gridCellCount).to.greaterThan(invalidTaxaCellCount);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const gridCell = result.gridCells[0];",
+									"    const invalidTaxaCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.invalidTaxaCellCount\"));",
+									"    pm.test(\"grid cell count > \" + invalidTaxaCellCount, function () {    ",
+									"        pm.expect(result.gridCellCount).to.greaterThan(invalidTaxaCellCount);",
+									"    });",
 									"",
-									"const invalidTaxaCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.invalidTaxaCountCell\"));",
-									"pm.test(\"Observation count > \" + invalidTaxaCountCell + \" for the grid cell with most observations\", function () {    ",
-									"    pm.expect(gridCell.observationsCount).to.greaterThan(invalidTaxaCountCell);    ",
+									"    const invalidTaxaCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.invalidTaxaCountCell\"));",
+									"    pm.test(\"Observation count > \" + invalidTaxaCountCell + \" for the grid cell with most observations\", function () {    ",
+									"        pm.expect(gridCell.observationsCount).to.greaterThan(invalidTaxaCountCell);    ",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1197,6 +1280,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1229,21 +1317,20 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const gridCell = result.gridCells[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const mammalBboxCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalBboxCellCount\"));",
-									"pm.test(\"grid cell count > \" + mammalBboxCellCount, function () {    ",
-									"    pm.expect(result.gridCellCount).to.greaterThan(mammalBboxCellCount);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const gridCell = result.gridCells[0];",
+									"    const mammalBboxCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalBboxCellCount\"));",
+									"    pm.test(\"grid cell count > \" + mammalBboxCellCount, function () {    ",
+									"        pm.expect(result.gridCellCount).to.greaterThan(mammalBboxCellCount);",
+									"    });",
 									"",
-									"const mammalBboxCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalBboxCountCell\"));",
-									"pm.test(\"Observation count > \" + mammalBboxCellCount + \" for the grid cell with most observations\", function () {    ",
-									"    pm.expect(gridCell.observationsCount).to.greaterThan(mammalBboxCountCell);    ",
+									"    const mammalBboxCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.mammalBboxCountCell\"));",
+									"    pm.test(\"Observation count > \" + mammalBboxCellCount + \" for the grid cell with most observations\", function () {    ",
+									"        pm.expect(gridCell.observationsCount).to.greaterThan(mammalBboxCountCell);    ",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1260,6 +1347,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1292,9 +1384,6 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const gridCell = result.gridCells[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"});"
@@ -1313,6 +1402,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1350,21 +1444,21 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const gridCell = result.gridCells[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const circleCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.circleCellCount\"));",
-									"pm.test(\"grid cell count > \" + circleCellCount, function () {    ",
-									"    pm.expect(result.gridCellCount).to.greaterThan(circleCellCount);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const gridCell = result.gridCells[0];",
 									"",
-									"const circleCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.circleCountCell\"));",
-									"pm.test(\"Observation count > \" + circleCountCell + \" for the grid cell with most observations\", function () {    ",
-									"    pm.expect(gridCell.observationsCount).to.greaterThan(circleCountCell);    ",
+									"    const circleCellCount = parseInt(pm.environment.get(\"observations.geogridAggregation.circleCellCount\"));",
+									"    pm.test(\"grid cell count > \" + circleCellCount, function () {    ",
+									"        pm.expect(result.gridCellCount).to.greaterThan(circleCellCount);",
+									"    });",
+									"",
+									"    const circleCountCell = parseInt(pm.environment.get(\"observations.geogridAggregation.circleCountCell\"));",
+									"    pm.test(\"Observation count > \" + circleCountCell + \" for the grid cell with most observations\", function () {    ",
+									"        pm.expect(gridCell.observationsCount).to.greaterThan(circleCountCell);    ",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1381,6 +1475,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1418,21 +1517,20 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const taxonRecord = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
-									"pm.test(\"total count > \" + taxaCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(taxaCount);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const taxonRecord = result.records[0];",
+									"    const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
+									"    pm.test(\"total count > \" + taxaCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(taxaCount);",
+									"    });",
 									"",
-									"const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
-									"pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
+									"    const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
+									"    pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
+									"        pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1449,6 +1547,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1485,21 +1588,21 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const taxonRecord = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
-									"pm.test(\"total count > \" + taxaCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(taxaCount);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const taxonRecord = result.records[0];",
 									"",
-									"const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
-									"pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
+									"    const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
+									"    pm.test(\"total count > \" + taxaCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(taxaCount);",
+									"    });",
+									"",
+									"    const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
+									"    pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
+									"        pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1516,6 +1619,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1557,21 +1665,21 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const taxonRecord = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
-									"pm.test(\"total count > \" + taxaCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(taxaCount);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const taxonRecord = result.records[0];",
 									"",
-									"const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
-									"pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
+									"    const taxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.taxaCount\"));",
+									"    pm.test(\"total count > \" + taxaCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(taxaCount);",
+									"    });",
+									"",
+									"    const mostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.mostCommonCount\"));",
+									"    pm.test(\"The taxon with most observations has more than \" + mostCommonCount, function () {    ",
+									"        pm.expect(taxonRecord.observationCount).to.greaterThan(mostCommonCount);    ",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1588,6 +1696,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1625,21 +1738,20 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const taxonRecord = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const bBoxtaxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.bBoxtaxaCount\"));",
-									"pm.test(\"total count > \" + bBoxtaxaCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(bBoxtaxaCount);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const taxonRecord = result.records[0];",
+									"    const bBoxtaxaCount = parseInt(pm.environment.get(\"observations.taxonAggregation.bBoxtaxaCount\"));",
+									"    pm.test(\"total count > \" + bBoxtaxaCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(bBoxtaxaCount);",
+									"    });",
 									"",
-									"const bBoxmostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.bBoxmostCommonCount\"));",
-									"pm.test(\"The taxon with most observations has more than \" + bBoxmostCommonCount, function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(bBoxmostCommonCount);    ",
+									"    const bBoxmostCommonCount = parseInt(pm.environment.get(\"observations.taxonAggregation.bBoxmostCommonCount\"));",
+									"    pm.test(\"The taxon with most observations has more than \" + bBoxmostCommonCount, function () {    ",
+									"        pm.expect(taxonRecord.observationCount).to.greaterThan(bBoxmostCommonCount);    ",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1656,6 +1768,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1694,14 +1811,14 @@
 								"exec": [
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const result = pm.response.json();",
-									"const taxonRecord = result.records[0];",
+									"    const result = pm.response.json();",
+									"    const taxonRecord = result.records[0];",
 									"",
-									"const circleCount = parseInt(pm.environment.get(\"observations.taxonAggregation.circleCount\"));",
-									"pm.test(\"total count > \" + circleCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(circleCount);",
+									"    const circleCount = parseInt(pm.environment.get(\"observations.taxonAggregation.circleCount\"));",
+									"    pm.test(\"total count > \" + circleCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(circleCount);",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1721,7 +1838,7 @@
 							},
 							{
 								"key": "Ocp-Apim-Subscription-Key",
-								"value": "a797384f056149d2bee82a4456568fae",
+								"value": "{{observationApiKey}}",
 								"type": "text"
 							}
 						],
@@ -1761,14 +1878,14 @@
 								"exec": [
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const result = pm.response.json();",
-									"const taxonRecord = result.records[0];",
+									"    const result = pm.response.json();",
+									"    const taxonRecord = result.records[0];",
 									"",
-									"const circleCumulativeCount = parseInt(pm.environment.get(\"observations.taxonAggregation.circleCumulativeCount\"));",
-									"pm.test(\"total count > \" + circleCumulativeCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(circleCumulativeCount);",
+									"    const circleCumulativeCount = parseInt(pm.environment.get(\"observations.taxonAggregation.circleCumulativeCount\"));",
+									"    pm.test(\"total count > \" + circleCumulativeCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(circleCumulativeCount);",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1788,7 +1905,7 @@
 							},
 							{
 								"key": "Ocp-Apim-Subscription-Key",
-								"value": "a797384f056149d2bee82a4456568fae",
+								"value": "{{observationApiKey}}",
 								"type": "text"
 							}
 						],
@@ -1831,22 +1948,23 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const taxonRecord = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    const taxonRecord = result.records[0];",
+									"    const internalCumulativeTotCount = parseInt(pm.environment.get(\"observations.taxonAggregation.internalCumulativeTotCount\"));",
+									"    pm.test(\"total count > \" + internalCumulativeTotCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(internalCumulativeTotCount);",
+									"    });",
+									"",
+									"    const internalCumulativeObsCount = parseInt(pm.environment.get(\"observations.taxonAggregation.internalCumulativeObsCount\"));",
+									"    pm.test(\"The taxon with most observations has more than \" + internalCumulativeObsCount, function () {    ",
+									"        pm.expect(taxonRecord.observationCount).to.greaterThan(internalCumulativeObsCount);    ",
+									"    });",
 									"});    ",
 									"",
-									"const internalCumulativeTotCount = parseInt(pm.environment.get(\"observations.taxonAggregation.internalCumulativeTotCount\"));",
-									"pm.test(\"total count > \" + internalCumulativeTotCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(internalCumulativeTotCount);",
-									"});",
-									"",
-									"const internalCumulativeObsCount = parseInt(pm.environment.get(\"observations.taxonAggregation.internalCumulativeObsCount\"));",
-									"pm.test(\"The taxon with most observations has more than \" + internalCumulativeObsCount, function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(internalCumulativeObsCount);    ",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -1862,6 +1980,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1903,21 +2026,20 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"const taxonRecord = result.records[0];",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"const speciesTotCount = parseInt(pm.environment.get(\"observations.taxonAggregation.speciesTotCount\"));",
-									"pm.test(\"total count > \" + speciesTotCount, function () {    ",
-									"    pm.expect(result.totalCount).to.greaterThan(speciesTotCount);",
-									"});",
+									"    const result = pm.response.json();",
+									"    const taxonRecord = result.records[0];",
+									"    const speciesTotCount = parseInt(pm.environment.get(\"observations.taxonAggregation.speciesTotCount\"));",
+									"    pm.test(\"total count > \" + speciesTotCount, function () {    ",
+									"        pm.expect(result.totalCount).to.greaterThan(speciesTotCount);",
+									"    });",
 									"",
-									"const speciesObsCount = parseInt(pm.environment.get(\"observations.taxonAggregation.speciesObsCount\"));",
-									"pm.test(\"The taxon with most observations has more than \" + speciesObsCount, function () {    ",
-									"    pm.expect(taxonRecord.observationCount).to.greaterThan(speciesObsCount);    ",
+									"    const speciesObsCount = parseInt(pm.environment.get(\"observations.taxonAggregation.speciesObsCount\"));",
+									"    pm.test(\"The taxon with most observations has more than \" + speciesObsCount, function () {    ",
+									"        pm.expect(taxonRecord.observationCount).to.greaterThan(speciesObsCount);    ",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1934,6 +2056,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -1980,22 +2107,22 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// Init variables",
-									"const dataProviders = pm.response.json();",
-									"const artportalenDataProvider = dataProviders.find(d => d.id == 1);",
-									"",
 									"// Tests",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});   ",
 									"",
-									"pm.test(\"Every dataprovider has Id and Identifier property\", function () {",
-									"    pm.expect(dataProviders.every(d => d.id !== undefined && d.identifier !== undefined)).to.be.true;",
-									"});",
+									"    // Init variables",
+									"    const dataProviders = pm.response.json();",
+									"    const artportalenDataProvider = dataProviders.find(d => d.id == 1);",
+									"    ",
+									"    pm.test(\"Every dataprovider has Id and Identifier property\", function () {",
+									"        pm.expect(dataProviders.every(d => d.id !== undefined && d.identifier !== undefined)).to.be.true;",
+									"    });",
 									"",
-									"const observationCount = parseInt(pm.environment.get(\"observations.dataProviders.observationCount\"));",
-									"pm.test(\"Artportalen observations is more than \" + observationCount, function () {",
-									"    pm.expect(artportalenDataProvider.publicObservations).to.be.greaterThan(observationCount);",
+									"    const observationCount = parseInt(pm.environment.get(\"observations.dataProviders.observationCount\"));",
+									"    pm.test(\"Artportalen observations is more than \" + observationCount, function () {",
+									"        pm.expect(artportalenDataProvider.publicObservations).to.be.greaterThan(observationCount);",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2004,7 +2131,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{testUrl}}/DataProviders",
 							"host": [
@@ -2030,16 +2163,16 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const processInformation = pm.response.json();",
-									"var yesterday = new Date();",
-									"yesterday.setDate(yesterday.getDate() - 1);",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});   ",
 									"",
-									"pm.test(\"Latest Process was successful\", function () {",
-									"    pm.expect(processInformation.status === 'Success').to.be.true;",
+									"    const processInformation = pm.response.json();",
+									"    var yesterday = new Date();",
+									"    yesterday.setDate(yesterday.getDate() - 1);",
+									"",
+									"    pm.test(\"Latest Process was successful\", function () {",
+									"        pm.expect(processInformation.status === 'Success').to.be.true;",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2048,7 +2181,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{testUrl}}/Systems/ProcessInformation?active=true",
 							"host": [
@@ -2081,15 +2220,14 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const lifeStageVocabulary = pm.response.json();",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"pm.test(\"LifeStage vocabulary is returned\", function () {",
-									"    pm.expect(lifeStageVocabulary.name).to.eql('LifeStage');",
-									"    pm.expect(lifeStageVocabulary.enumId).to.eql('LifeStage');    ",
+									"    const lifeStageVocabulary = pm.response.json();",
+									"        pm.test(\"LifeStage vocabulary is returned\", function () {",
+									"        pm.expect(lifeStageVocabulary.name).to.eql('LifeStage');",
+									"        pm.expect(lifeStageVocabulary.enumId).to.eql('LifeStage');    ",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2109,6 +2247,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -2135,15 +2278,14 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const vocabulary = pm.response.json();",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"pm.test(\"Verification vocabulary is returned\", function () {",
-									"    pm.expect(vocabulary.name).to.eql('VerificationStatus');",
-									"    pm.expect(vocabulary.enumId).to.eql('VerificationStatus');    ",
+									"    const vocabulary = pm.response.json();",
+									"    pm.test(\"Verification vocabulary is returned\", function () {",
+									"        pm.expect(vocabulary.name).to.eql('VerificationStatus');",
+									"        pm.expect(vocabulary.enumId).to.eql('VerificationStatus');    ",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2163,6 +2305,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -2194,14 +2341,13 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();",
-									"",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
 									"",
-									"pm.test(\"Observations exists in more than 10 counties\", function () {    ",
-									"    pm.expect(result.records.length).to.greaterThan(10);",
+									"    const result = pm.response.json();",
+									"    pm.test(\"Observations exists in more than 10 counties\", function () {    ",
+									"        pm.expect(result.records.length).to.greaterThan(10);",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2222,10 +2368,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false        \n    },    \n    \"occurrenceStatus\":\"present\"\n}\n"
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"ids\":[100077],\n        \"includeUnderlyingTaxa\" : false        \n    },    \n    \"occurrenceStatus\":\"present\"    \n}\n"
 						},
 						"url": {
-							"raw": "{{analysisApiUrl}}/internal/aggregation?aggregationField=location.county.name&take=50",
+							"raw": "{{analysisApiUrl}}/internal/aggregation?aggregationField=event.startYear&take=50",
 							"host": [
 								"{{analysisApiUrl}}"
 							],
@@ -2236,7 +2382,7 @@
 							"query": [
 								{
 									"key": "aggregationField",
-									"value": "location.county.name"
+									"value": "event.startYear"
 								},
 								{
 									"key": "take",
@@ -2259,19 +2405,18 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();\r",
-									"\r",
 									"pm.test(\"Successful POST request\", function () {\r",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
-									"});    \r",
 									"\r",
-									"pm.test(\"Observation have properties\", function () {        \r",
-									"    pm.expect(result.features[0].properties).to.have.property('occurrenceId');\r",
-									"    pm.expect(result.features[0].properties).to.have.property('startDate');\r",
-									"});\r",
+									"    const result = pm.response.json();\r",
+									"    pm.test(\"Observation have properties\", function () {        \r",
+									"        pm.expect(result.features[0].properties).to.have.property('occurrenceId');\r",
+									"        pm.expect(result.features[0].properties).to.have.property('startDate');\r",
+									"    });\r",
 									"\r",
-									"pm.test(\"10 observations are returned\", function () {    \r",
-									"    pm.expect(result.numberReturned).to.eql(10);\r",
+									"    pm.test(\"10 observations are returned\", function () {    \r",
+									"        pm.expect(result.numberReturned).to.eql(10);\r",
+									"    });\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2333,15 +2478,14 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();\r",
-									"\r",
 									"pm.test(\"Successful POST request\", function () {\r",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
-									"});    \r",
 									"\r",
-									"pm.test(\"Observation have expected property values\", function () {        \r",
-									"    pm.expect(result.features[0].properties.organismGroup).to.eql('Kärlväxter');\r",
-									"    pm.expect(result.features[0].properties.isProtectedByLaw).to.be.true;\r",
+									"    const result = pm.response.json();\r",
+									"    pm.test(\"Observation have expected property values\", function () {        \r",
+									"        pm.expect(result.features[0].properties.organismGroup).to.eql('Kärlväxter');\r",
+									"        pm.expect(result.features[0].properties.isProtectedByLaw).to.be.true;\r",
+									"    });\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2403,113 +2547,456 @@
 			]
 		},
 		{
-			"name": "ElasticSearchProxy",
+			"name": "Data Stewardship API",
 			"item": [
 				{
-					"name": "Search without sort",
+					"name": "Datasets-Sök efter Utter",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();\r",
-									"\r",
-									"pm.test(\"Successful POST request\", function () {\r",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
-									"});    \r",
-									"\r",
-									"pm.test(\"10 records are returned\", function () {        \r",
-									"    pm.expect(result.hits.hits.length).to.eql(10);    \r",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    const dataset = result.records[0];",
+									"    pm.test(\"Returns 1 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(1);",
+									"    });",
+									"",
+									"    pm.test(\"dataset event count > 50\", function () {    ",
+									"        pm.expect(dataset.eventIds.length).to.greaterThan(50);",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {}
-					},
 					"request": {
 						"method": "POST",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json;+charset=UTF-8",
-								"type": "text"
+								"key": "accept",
+								"value": "text/plain"
 							},
 							{
-								"key": "Authorization",
-								"value": "Basic ZWxhc3RpYzphcnRkYXRhcm9vdA==",
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{dataStewardshipApiKey}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"size\":10,\"query\":{\"match_all\":{}},\"from\":0} "
+							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      100077\n    ]\n  }\n}"
 						},
 						"url": {
-							"raw": "{{elasticsearchProxyUrl}}/sos-observation/_search",
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=1&exportMode=Json",
 							"host": [
-								"{{elasticsearchProxyUrl}}"
+								"{{dataStewardshipApiUrl}}"
 							],
 							"path": [
-								"sos-observation",
-								"_search"
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Search with sort",
+					"name": "Datasets-Sök efter Fladdermöss",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const result = pm.response.json();\r",
-									"\r",
-									"pm.test(\"Successful POST request\", function () {\r",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);\r",
-									"});    \r",
-									"\r",
-									"pm.test(\"10 records are returned\", function () {        \r",
-									"    pm.expect(result.hits.hits.length).to.eql(10);    \r",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    const dataset = result.records[0];",
+									"    pm.test(\"Returns 1 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(1);",
+									"    });",
+									"",
+									"    const batCount = 1;//parseInt(pm.environment.get(\"dataset.search.batDatasetCount\"));",
+									"    pm.test(\"total count >= \" + batCount, function () {    ",
+									"        pm.expect(result.totalCount).to.gte(batCount);",
+									"    });",
+									"",
+									"    pm.test(\"dataset event count > 50\", function () {    ",
+									"        pm.expect(dataset.eventIds.length).to.greaterThan(50);",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript"
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {}
-					},
 					"request": {
 						"method": "POST",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json;+charset=UTF-8",
-								"type": "text"
+								"key": "accept",
+								"value": "text/plain"
 							},
 							{
-								"key": "Authorization",
-								"value": "Basic ZWxhc3RpYzphcnRkYXRhcm9vdA==",
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{dataStewardshipApiKey}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"size\":10,\"query\":{\"match_all\":{}},\"from\":0, \"sort\":[{\"_id\":{\"order\":\"asc\"}}]} "
+							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      3000299\n    ]\n  }\n}"
 						},
 						"url": {
-							"raw": "{{elasticsearchProxyUrl}}/sos-observation/_search",
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=1&exportMode=Json",
 							"host": [
-								"{{elasticsearchProxyUrl}}"
+								"{{dataStewardshipApiUrl}}"
 							],
 							"path": [
-								"sos-observation",
-								"_search"
+								"datastewardship",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Events-Sök efter Fladdermöss",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    const event = result.records[0];",
+									"    pm.test(\"Returns 1 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(1);",
+									"    });",
+									"",
+									"    const batCount = 1; //parseInt(pm.environment.get(\"event.search.batEventCount\"));",
+									"    pm.test(\"total count >= \" + batCount, function () {    ",
+									"        pm.expect(result.totalCount).to.gte(batCount);",
+									"    });",
+									"",
+									"    pm.test(\"event occurrenceIds count > 1\", function () {    ",
+									"        pm.expect(event.occurrenceIds.length).to.greaterThan(1);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{dataStewardshipApiKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      3000299\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=1&exportMode=Json&responseCoordinateSystem=EPSG4326",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								},
+								{
+									"key": "responseCoordinateSystem",
+									"value": "EPSG4326"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Events-Sök efter Utter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    const event = result.records[0];",
+									"    pm.test(\"Returns 1 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(1);",
+									"    });",
+									"",
+									"    pm.test(\"event occurrence id's count > 2\", function () {    ",
+									"        pm.expect(event.occurrenceIds.length).to.greaterThan(2);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{dataStewardshipApiKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dateFilter\": {\n    \"startDate\": \"2021-08-12\",\n    \"endDate\": \"2021-08-13\",\n    \"dateFilterType\": \"BetweenStartDateAndEndDate\"\n  },\n  \"taxon\": {\n    \"ids\": [\n      100077\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=1&exportMode=Json&responseCoordinateSystem=EPSG4326",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"events"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								},
+								{
+									"key": "responseCoordinateSystem",
+									"value": "EPSG4326"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Occurrences-Sök efter Fladdermöss",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"",
+									"    const result = pm.response.json();",
+									"    const occurrence = result.records[0];",
+									"    pm.test(\"Returns 1 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(1);",
+									"    });",
+									"",
+									"    const batCount = 2; //parseInt(pm.environment.get(\"dataset.search.batDatasetCount\"));",
+									"    pm.test(\"total count >= \" + batCount, function () {    ",
+									"        pm.expect(result.totalCount).to.gte(batCount);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{dataStewardshipApiKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      3000299\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/occurrences?skip=0&take=1&exportMode=Json",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"occurrences"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Occurrences-Sök efter Utter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"    ",
+									"    const result = pm.response.json();",
+									"    const dataset = result.records[0];",
+									"    pm.test(\"Returns 1 records\", function () {    ",
+									"        pm.expect(result.records.length).to.eql(1);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{dataStewardshipApiKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      100077\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{dataStewardshipApiUrl}}/datastewardship/occurrences?skip=0&take=1&exportMode=Json",
+							"host": [
+								"{{dataStewardshipApiUrl}}"
+							],
+							"path": [
+								"datastewardship",
+								"occurrences"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								},
+								{
+									"key": "exportMode",
+									"value": "Json"
+								}
 							]
 						}
 					},
@@ -2518,795 +3005,6 @@
 			]
 		},
 		{
-			"name": "DataStewardship API",
-			"item": [
-				{
-					"name": "Sök dataset - filtrera på datasetIds",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"1 record matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.eql(1);",
-									"});",
-									"",
-									"pm.test(\"The dataset identifier is expected\", function () {",
-									"    pm.expect(result.records[0].identifier).to.eql('Artportalen - Fladdermöss');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"datasetIds\": [\n        \"Artportalen - Fladdermöss\"\n    ]\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"datasets"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök datasets - filtrera på datum",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"More than 5 records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.greaterThan(5);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"dateFilter\": {\n        \"startDate\": \"2021-06-16T20:00:00Z\",\n        \"endDate\": \"2021-06-17T03:00:00Z\",\n        \"datumFilterType\": \"OverlappingStartDateAndEndDate\"\n    }\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"datasets"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök datasets - filtrera på taxon",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"1 or more records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.gte(1);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"taxon\": {\n        \"ids\": [\n            205995\n        ]\n    }\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"datasets"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök datasets - filtrera på län",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"5 or more records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.gte(5);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"area\": {\n        \"county\": \"JönköpingsLän\"\n    }\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"datasets"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök datasets - filtrera på geometri",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"1 or more records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.gte(1);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"area\": {\n        \"geometry\": {\n            \"geographicArea\": {\n                \"type\": \"polygon\",\n                \"coordinates\": [\n                    [\n                        [15.07063,57.92573],\n                        [15.0051,58.16108],\n                        [14.58003,58.10148],\n                        [14.64143,57.93294],\n                        [15.07063,57.92573]\n                    ]\n                ]\n            }\n        }\n    }\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/datasets?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"datasets"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök events - filtrera på datasetIds",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"500 or more records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.gte(500);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"datasetIds\": [\n        \"Artportalen - Fladdermöss\"\n    ]\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"events"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök events - filtrera på datum",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"40 or more records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.gte(40);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"dateFilter\": {\n        \"startDate\": \"2021-06-16T20:00:00Z\",\n        \"endDate\": \"2021-06-17T03:00:00Z\",\n        \"datumFilterType\": \"OverlappingStartDateAndEndDate\"\n    }\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"events"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök events - filtrera på geometri",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"50 or more records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.gte(50);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"area\": {\n        \"geometry\": {\n            \"geographicArea\": {\n                \"type\": \"polygon\",\n                \"coordinates\": [\n                    [\n                        [15.07063,57.92573],\n                        [15.0051,58.16108],\n                        [14.58003,58.10148],\n                        [14.64143,57.93294],\n                        [15.07063,57.92573]\n                    ]\n                ]\n            }\n        }\n    }\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"events"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök events - filtrera på län",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"200 or more records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.gte(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"area\": {\n        \"county\": \"JönköpingsLän\"\n    }\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"events"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök events - filtrera på taxon",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"500 or more records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.gte(500);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"taxon\": {\n        \"ids\": [\n            205995\n        ]\n    }\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/events?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"events"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök occurrences - filtrera på datasetIds",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"2000 or more records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.gte(2000);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"datasetIds\": [\n        \"Artportalen - Fladdermöss\"\n    ]\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/occurrences?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"occurrences"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök occurrences - filtrera på datum",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"300 or more records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.gte(300);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"dateFilter\": {\n        \"startDate\": \"2021-06-16T20:00:00Z\",\n        \"endDate\": \"2021-06-17T03:00:00Z\",\n        \"datumFilterType\": \"OverlappingStartDateAndEndDate\"\n    }\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/occurrences?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"occurrences"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sök occurrences - filtrera på geometri",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const result = pm.response.json();",
-									"",
-									"pm.test(\"Successful POST request\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});    ",
-									"    ",
-									"pm.test(\"400 or more records matches the query\", function () {",
-									"    pm.expect(result.totalCount).to.gte(400);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "text/plain"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"area\": {\n        \"geometry\": {\n            \"geographicArea\": {\n                \"type\": \"polygon\",\n                \"coordinates\": [\n                    [\n                        [16.07063,56.92573],\n                        [15.0051,58.16108],\n                        [14.58003,58.10148],\n                        [14.64143,57.93294],\n                        [16.07063,56.92573]\n                    ]\n                ]\n            }\n        }\n    }\n}"
-						},
-						"url": {
-							"raw": "{{dataStewardshipApiUrl}}/datastewardship/occurrences?skip=0&take=2",
-							"host": [
-								"{{dataStewardshipApiUrl}}"
-							],
-							"path": [
-								"datastewardship",
-								"occurrences"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "0"
-								},
-								{
-									"key": "take",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-    {
 			"name": "JSON Serialization",
 			"item": [
 				{
@@ -3316,19 +3014,17 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// Init variables",
-									"const taxonLists = pm.response.json();",
-									"const fridlystaArter = taxonLists.find(d => d.id == 1);",
-									"",
 									"// Tests",
 									"pm.test(\"Successful POST request\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
-									"});   ",
 									"",
-									"pm.test(\"Null values are returned and not omitted\", function () {",
-									"    pm.expect(fridlystaArter.parentId).to.be.null;    ",
-									"});",
-									""
+									"    // Init variables",
+									"    const taxonLists = pm.response.json();",
+									"    const fridlystaArter = taxonLists.find(d => d.id == 1);",
+									"    pm.test(\"Null values are returned and not omitted\", function () {",
+									"        pm.expect(fridlystaArter.parentId).to.be.null;    ",
+									"    });",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -3336,7 +3032,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{observationApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{testUrl}}/TaxonLists",
 							"host": [

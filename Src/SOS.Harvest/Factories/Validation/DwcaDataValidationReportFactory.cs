@@ -21,7 +21,7 @@ namespace SOS.Harvest.Factories.Validation
     /// DwC data validation manager.
     /// </summary>
     public class DwcaDataValidationReportFactory : DataValidationReportFactoryBase<DwcObservationVerbatim>
-    {
+    {        
         private DwcaObservationFactory? _dwcaObservationFactory;
         private readonly IVerbatimClient _verbatimClient;
         private readonly ILoggerFactory _loggerFactory;
@@ -44,22 +44,22 @@ namespace SOS.Harvest.Factories.Validation
 
         protected override async Task<IAsyncCursor<DwcObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
         {
-            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
-                    dataProvider,
-                    _verbatimClient,
-                    new Logger<DarwinCoreArchiveVerbatimRepository>(_loggerFactory));
+            using var dwcArchiveCollectionRepository = new DwcCollectionRepository(
+                dataProvider,
+                _verbatimClient,
+                new Logger<DwcCollectionRepository>(_loggerFactory));
            
-            return await dwcArchiveVerbatimRepository.GetAllByCursorAsync();
+            return await dwcArchiveCollectionRepository.OccurrenceRepository.GetAllByCursorAsync();
         }
 
         protected override async Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider)
         {
-            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+            using var dwcArchiveCollectionRepository = new DwcCollectionRepository(
                 dataProvider,
                 _verbatimClient,
-                new Logger<DarwinCoreArchiveVerbatimRepository>(_loggerFactory));
-
-            return await dwcArchiveVerbatimRepository.CountAllDocumentsAsync();
+                new Logger<DwcCollectionRepository>(_loggerFactory));
+            
+            return await dwcArchiveCollectionRepository.OccurrenceRepository.CountAllDocumentsAsync();
         }
 
         protected override async Task<Observation?> CreateProcessedObservationAsync(DwcObservationVerbatim verbatimObservation, DataProvider dataProvider)

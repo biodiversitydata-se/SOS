@@ -47,7 +47,7 @@ namespace SOS.Administration.Api
                 .AddJsonFile($"appsettings.{environment}.json", true)
                 .AddEnvironmentVariables();
 
-            _isDevelopment = environment.Equals("local");
+            _isDevelopment = environment.Equals("local") || environment.Equals("dev") || environment.Equals("st");
             //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
             if (_isDevelopment)
             {
