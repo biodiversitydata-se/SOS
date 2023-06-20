@@ -108,7 +108,7 @@ namespace SOS.Lib.Managers
                 var tuple = (Taxa: new HashSet<int>(), WithUnderlyingTaxa: new HashSet<int>());
                 tuple.Taxa = taxonList.Taxa.Select(m => m.Id).ToHashSet();
                 tuple.WithUnderlyingTaxa = TaxonTree.GetUnderlyingTaxonIds(tuple.Taxa, true).ToHashSet();
-                taxonListSetById.Add(taxonList.Id, tuple);
+                taxonListSetById.TryAdd(taxonList.Id, tuple);
             }
             
             return taxonListSetById;
@@ -137,10 +137,13 @@ namespace SOS.Lib.Managers
                 }
            
                 await Task.WhenAll(tasks);
-                var taxa = new List<IBasicTaxon>();
+                var taxa = new HashSet<IBasicTaxon>();
                 foreach (var task in tasks)
                 {
-                    taxa.AddRange(task.Result);
+                    foreach(var taxon in task.Result)
+                    {
+                        taxa.Add(taxon);
+                    }
                 }
 
                 return taxa;
