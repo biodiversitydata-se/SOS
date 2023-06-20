@@ -184,10 +184,8 @@ namespace SOS.Observations.Api
             services.AddSingleton(applicationInsightsConfiguration);
 
             // Add application insights.
-            services.AddApplicationInsightsTelemetry(c =>
-            {
-                c.ConnectionString = applicationInsightsConfiguration.ConnectionString;
-            });
+            services.AddApplicationInsightsTelemetry();
+
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
