@@ -24,7 +24,7 @@ namespace SOS.Observations.Api.ApplicationInsights
         /// <param name="telemetry"></param>
         protected override void OnInitializeTelemetry(HttpContext platformContext, RequestTelemetry requestTelemetry, ITelemetry telemetry)
         {
-            if (requestTelemetry == null)
+            if (telemetry is not RequestTelemetry)
             {
                 return;
             }
