@@ -486,7 +486,7 @@ namespace SOS.Lib.Repositories
         /// <inheritdoc />
         public async Task<List<TEntity>> GetAllAsync(IMongoCollection<TEntity> mongoCollection)
         {
-            var res = await mongoCollection.AsQueryable().ToListAsync();
+            var res = await mongoCollection.AsQueryable().ToListAsync();            
 
             return res;
         }
@@ -503,6 +503,56 @@ namespace SOS.Lib.Repositories
         {
             return await mongoCollection.FindAsync(FilterDefinition<TEntity>.Empty,
                 new FindOptions<TEntity, TEntity> { NoCursorTimeout = noCursorTimeout, BatchSize = BatchSizeRead, AllowPartialResults = true, CursorType = CursorType.NonTailable });
+        }
+
+        /// <inheritdoc />
+        public async Task<List<TProjection>> GetAllAsync<TProjection>(ProjectionDefinition<TEntity, TProjection> projectionDefinition,
+            bool noCursorTimeout = false)
+        {
+            return await GetAllAsync(MongoCollection, projectionDefinition, noCursorTimeout);
+        }
+
+        /// <inheritdoc />
+        public async Task<List<TProjection>> GetAllAsync<TProjection>(IMongoCollection<TEntity> mongoCollection,
+            ProjectionDefinition<TEntity, TProjection> projectionDefinition,
+            bool noCursorTimeout = false)
+        {
+            var items = new List<TProjection>();
+            var cursor = await GetAllByCursorAsync(mongoCollection, projectionDefinition, noCursorTimeout);
+            while (await cursor.MoveNextAsync())
+            {
+                items.AddRange(cursor.Current);                
+            }
+
+            return items;
+        }
+
+        /// <inheritdoc />
+        public async Task<IAsyncCursor<TProjection>> GetAllByCursorAsync<TProjection>(ProjectionDefinition<TEntity, TProjection> projectionDefinition, 
+            bool noCursorTimeout = false)
+        {
+            return await GetAllByCursorAsync(MongoCollection, projectionDefinition, noCursorTimeout);
+        }
+
+        /// <inheritdoc />
+        public async Task<IAsyncCursor<TProjection>> GetAllByCursorAsync<TProjection>(IMongoCollection<TEntity> mongoCollection, 
+            ProjectionDefinition<TEntity, TProjection> projectionDefinition,
+            bool noCursorTimeout = false)
+        {
+            return await GetByCursorAsync(mongoCollection,  
+                FilterDefinition<TEntity>.Empty,
+                projectionDefinition,
+                noCursorTimeout);
+        }
+
+        /// <inheritdoc />
+        public async Task<IAsyncCursor<TProjection>> GetByCursorAsync<TProjection>(IMongoCollection<TEntity> mongoCollection,
+            FilterDefinition<TEntity> filterDefinition,
+            ProjectionDefinition<TEntity, TProjection> projectionDefinition,
+            bool noCursorTimeout = false)
+        {            
+            return await mongoCollection.FindAsync(filterDefinition,
+                new FindOptions<TEntity, TProjection> { NoCursorTimeout = noCursorTimeout, BatchSize = BatchSizeRead, AllowPartialResults = true, CursorType = CursorType.NonTailable, Projection = projectionDefinition });
         }
 
         /// <inheritdoc />

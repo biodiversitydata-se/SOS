@@ -222,6 +222,64 @@ namespace SOS.Lib.Repositories.Interfaces
             bool noCursorTimeout = false);
 
         /// <summary>
+        /// Retrieves all documents from the repository Mongo collection with the specified projection.
+        /// </summary>
+        /// <typeparam name="TProjection">The type to which the documents are projected.</typeparam>        
+        /// <param name="projectionDefinition">The projection definition used to project the documents.</param>
+        /// <param name="noCursorTimeout">A flag indicating whether the cursor should have a timeout.</param>
+        /// <returns></returns>
+        Task<List<TProjection>> GetAllAsync<TProjection>(ProjectionDefinition<TEntity, TProjection> projectionDefinition,
+            bool noCursorTimeout = false);
+
+        /// <summary>
+        /// Retrieves all documents from a Mongo collection with the specified projection.
+        /// </summary>
+        /// <typeparam name="TProjection">The type to which the documents are projected.</typeparam>
+        /// <param name="mongoCollection">The Mongo collection to retrieve documents from.</param>
+        /// <param name="projectionDefinition">The projection definition used to project the documents.</param>
+        /// <param name="noCursorTimeout">A flag indicating whether the cursor should have a timeout.</param>
+        /// <returns></returns>
+        Task<List<TProjection>> GetAllAsync<TProjection>(IMongoCollection<TEntity> mongoCollection,
+            ProjectionDefinition<TEntity, TProjection> projectionDefinition,
+            bool noCursorTimeout = false);
+
+        /// <summary>
+        /// Retrieves all documents from the repository Mongo collection as an asynchronous streaming cursor with the specified projection.
+        /// </summary>
+        /// <typeparam name="TProjection">The type to which the documents are projected.</typeparam>        
+        /// <param name="projectionDefinition">The projection definition used to project the documents.</param>
+        /// <param name="noCursorTimeout">A flag indicating whether the cursor should have a timeout.</param>
+        /// <returns>An asynchronous streaming cursor representing the result of the search.</returns>
+        Task<IAsyncCursor<TProjection>> GetAllByCursorAsync<TProjection>(ProjectionDefinition<TEntity, TProjection> projectionDefinition,
+            bool noCursorTimeout = false);
+
+        /// <summary>
+        /// Retrieves all documents from a Mongo collection as an asynchronous streaming cursor with the specified projection.
+        /// </summary>
+        /// <typeparam name="TProjection">The type to which the documents are projected.</typeparam>
+        /// <param name="mongoCollection">The Mongo collection to retrieve documents from.</param>
+        /// <param name="projectionDefinition">The projection definition used to project the documents.</param>
+        /// <param name="noCursorTimeout">A flag indicating whether the cursor should have a timeout.</param>
+        /// <returns>An asynchronous streaming cursor representing the result of the search.</returns>
+        Task<IAsyncCursor<TProjection>> GetAllByCursorAsync<TProjection>(IMongoCollection<TEntity> mongoCollection,
+            ProjectionDefinition<TEntity, TProjection> projectionDefinition,
+            bool noCursorTimeout = false);
+
+        /// <summary>
+        /// Retrieves documents from a Mongo collection using a filter and returns an asynchronous streaming cursor with the specified projection.
+        /// </summary>
+        /// <typeparam name="TProjection">The type to which the documents are projected.</typeparam>
+        /// <param name="mongoCollection">The Mongo collection to retrieve documents from.</param>
+        /// <param name="filterDefinition">The filter definition used to filter the documents.</param>
+        /// <param name="projectionDefinition">The projection definition used to project the documents.</param>
+        /// <param name="noCursorTimeout">A flag indicating whether the cursor should have a timeout.</param>
+        /// <returns>An asynchronous streaming cursor representing the result of the search.</returns>
+        Task<IAsyncCursor<TProjection>> GetByCursorAsync<TProjection>(IMongoCollection<TEntity> mongoCollection,
+            FilterDefinition<TEntity> filterDefinition,
+            ProjectionDefinition<TEntity, TProjection> projectionDefinition,
+            bool noCursorTimeout = false);
+
+        /// <summary>
         ///     Get document batch
         /// </summary>
         /// <param name="startId"></param>
