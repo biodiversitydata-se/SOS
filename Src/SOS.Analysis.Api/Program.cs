@@ -16,8 +16,7 @@ namespace SOS.Analysis.Api
         public static void Main(string[] args)
         {
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-            var logger = NLogBuilder.ConfigureNLog($"NLog.{env}.config").GetCurrentClassLogger();
+            var logger = LogManager.Setup().LoadConfigurationFromAppSettings(environment: env).GetCurrentClassLogger();
 
             logger.Debug("Starting Service");
             try

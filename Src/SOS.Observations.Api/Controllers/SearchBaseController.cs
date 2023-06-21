@@ -13,6 +13,7 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -49,7 +50,7 @@ namespace SOS.Observations.Api.Controllers
         protected void LogObservationCount(long observationCount)
         {
             if (HttpContext == null) return;
-
+            
             HttpContext.Items.TryAdd("Observation-count", observationCount);
         }
 

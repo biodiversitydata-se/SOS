@@ -50,7 +50,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             var filePath = Path.Combine(assemblyPath, fileName);
             var str = File.ReadAllText(filePath, Encoding.UTF8);
 
-            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true, };
+            var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
             serializeOptions.Converters.Add(new ObjectIdConverter());
 
             var observations = JsonSerializer.Deserialize<List<Observation>>(str, serializeOptions);

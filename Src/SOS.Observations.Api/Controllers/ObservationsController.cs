@@ -84,7 +84,6 @@ namespace SOS.Observations.Api.Controllers
        /// </summary>
        /// <param name="tilesLimit"></param>
        /// <param name="maxTilesTot"></param>
-       /// <param name="envelope"></param>
        /// <param name="countTask"></param>
        /// <returns></returns>
         private async Task<Result> TryValidateTilesLimitAsync(int tilesLimit,
@@ -174,6 +173,7 @@ namespace SOS.Observations.Api.Controllers
             ElasticSearchConfiguration elasticConfiguration,
             ILogger<ObservationsController> logger) : base(observationManager, areaManager, taxonManager, observationApiConfiguration)
         {
+           
             _taxonSearchManager = taxonSearchManager ?? throw new ArgumentNullException(nameof(taxonSearchManager));
             _tilesLimitInternal = observationApiConfiguration?.TilesLimitInternal ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _tilesLimitPublic = observationApiConfiguration.TilesLimitPublic;

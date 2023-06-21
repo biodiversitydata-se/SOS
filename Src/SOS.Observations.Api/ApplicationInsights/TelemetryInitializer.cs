@@ -15,6 +15,7 @@ namespace SOS.Observations.Api.ApplicationInsights
     {
         private readonly bool _loggRequestBody;
         private readonly bool _loggSearchResponseCount;
+
         /// <summary>
         /// Initialize event
         /// </summary>
@@ -30,9 +31,10 @@ namespace SOS.Observations.Api.ApplicationInsights
 
             if (new[] { "get", "post", "put" }.Contains(platformContext.Request.Method, StringComparer.CurrentCultureIgnoreCase))
             {
+                
                 if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Protected-observations"))
                 {
-                    telemetry.Context.GlobalProperties.Add("Protected-observations", value);
+                    requestTelemetry.Context.GlobalProperties.Add("Protected-observations", value);
                 }
 
                 if (_loggRequestBody && platformContext.Items.TryGetValue("Request-body", out var requestBody))
@@ -84,8 +86,6 @@ namespace SOS.Observations.Api.ApplicationInsights
                 }
                 requestTelemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
             }
-
-           
         }
 
         /// <summary>

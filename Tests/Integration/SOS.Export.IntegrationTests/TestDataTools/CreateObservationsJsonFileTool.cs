@@ -49,10 +49,10 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             var observations = await processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(new SearchFilter(0));
 
-            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+            var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
             serializeOptions.Converters.Add(new ObjectIdConverter());
 
-            var strJson = JsonSerializer.Serialize(observations, serializeOptions);
+            var strJson = JsonSerializer.Serialize(observations, serializeOptions!);
 
             File.WriteAllText(filePath, strJson, Encoding.UTF8);
         }
