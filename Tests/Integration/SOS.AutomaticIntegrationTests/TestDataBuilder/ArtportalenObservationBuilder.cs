@@ -39,7 +39,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 var filePath = System.IO.Path.Combine(assemblyPath, string.Format($@"Resources\{(sensitive ? "ArtportalenVerbatimProtectedObservations_1000" : "ArtportalenVerbatimObservations_1000")}.json") );                    
                 string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
-                var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true, PropertyNameCaseInsensitive = true, IncludeFields = false };
+                var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull, PropertyNameCaseInsensitive = true, IncludeFields = false };
                 serializeOptions.Converters.Add(new ObjectIdConverter());
                 serializeOptions.Converters.Add(new JsonStringEnumConverter());
                 serializeOptions.Converters.Add(new GeoJsonConverter());
@@ -54,7 +54,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             
         }
 
-        private static List<ArtportalenObservationVerbatim> _verbatimArtportalenObservationsFromJsonFile;
+        private static List<ArtportalenObservationVerbatim>? _verbatimArtportalenObservationsFromJsonFile;
         private static bool _sensitiveLoaded;
 
         private static UserInternal GetRandomUserInternal()

@@ -27,7 +27,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                     var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     var filePath = System.IO.Path.Combine(assemblyPath, @"Resources\DarwinCoreObservations_1000.json");
                     string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
-                    var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+                    var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
                     serializeOptions.Converters.Add(new ObjectIdConverter());
 
                     _verbatimDarwinCoreObservationsFromJsonFile = JsonSerializer.Deserialize<List<DwcObservationVerbatim>>(str, serializeOptions);

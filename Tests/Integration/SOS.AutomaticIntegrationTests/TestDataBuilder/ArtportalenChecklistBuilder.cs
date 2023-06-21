@@ -25,7 +25,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                     var filePath = System.IO.Path.Combine(assemblyPath, @"Resources\ArtportalenVerbatimChecklists_1000.json");                    
                     string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
 
-                    var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+                    var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
                     serializeOptions.Converters.Add(new ObjectIdConverter());
                     serializeOptions.Converters.Add(new GeoJsonConverter());
                     _verbatimArtportalenChecklistsFromJsonFile = JsonSerializer.Deserialize<List<ArtportalenChecklistVerbatim>>(str, serializeOptions);  

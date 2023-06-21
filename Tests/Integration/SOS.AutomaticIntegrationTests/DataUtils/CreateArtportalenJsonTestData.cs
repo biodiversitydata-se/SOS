@@ -57,7 +57,7 @@ namespace SOS.AutomaticIntegrationTests.DataUtils
 
             // Write observations to JSON
 
-            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+            var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
             serializeOptions.Converters.Add(new ObjectIdConverter());
             serializeOptions.Converters.Add(new JsonStringEnumConverter());
 
@@ -109,7 +109,7 @@ namespace SOS.AutomaticIntegrationTests.DataUtils
 
             // Write observations to JSON
 
-            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true, PropertyNameCaseInsensitive = true };
+            var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
             serializeOptions.Converters.Add(new ObjectIdConverter());
             serializeOptions.Converters.Add(new JsonStringEnumConverter());
             serializeOptions.Converters.Add(new GeoShapeConverter());
