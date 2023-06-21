@@ -10,6 +10,8 @@ using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.Processed.Observation;
+using MongoDB.Driver;
 
 namespace SOS.Lib.Managers
 {
@@ -116,36 +118,33 @@ namespace SOS.Lib.Managers
 
         private async Task<TaxonTree<IBasicTaxon>> GetTaxonTreeAsync()
         {
-            var taxa = await GetBasicTaxaAsync();
-            var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa?.ToDictionary(t => t.Id, t => t));
-            return taxonTree;
+            try
+            {
+                var taxa = await GetBasicTaxaAsync();                                
+                var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa?.ToDictionary(t => t.Id, t => t));
+                return taxonTree;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetTaxonTreeAsync()");
+                throw;
+            }
         }
 
         private async Task<IEnumerable<IBasicTaxon>> GetBasicTaxaAsync()
         {
             try
             {
-                var taxaCount = await _processedTaxonRepository.CountAllDocumentsAsync();
-                const int batchSize = 10000;
-                var skip = 0;
-                var tasks = new List<Task<IEnumerable<IBasicTaxon>>>();
-               
-                while(skip < taxaCount)
+                var builder = Builders<Taxon>.Projection;
+                ProjectionDefinition<Taxon, BasicTaxon> projection = builder.Expression(m => new BasicTaxon
                 {
-                    tasks.Add(_processedTaxonRepository.GetBasicTaxonChunkAsync(skip, batchSize));
-                    skip += batchSize;
-                }
-           
-                await Task.WhenAll(tasks);
-                var taxa = new HashSet<IBasicTaxon>();
-                foreach (var task in tasks)
-                {
-                    foreach(var taxon in task.Result)
-                    {
-                        taxa.Add(taxon);
-                    }
-                }
-
+                    Id = m.Id,
+                    SecondaryParentDyntaxaTaxonIds = m.SecondaryParentDyntaxaTaxonIds,
+                    ScientificName = m.ScientificName,
+                    Attributes = m.Attributes
+                });
+                
+                var taxa = await _processedTaxonRepository.GetAllAsync(projection);
                 return taxa;
             }
             catch (Exception e)

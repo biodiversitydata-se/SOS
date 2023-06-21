@@ -96,7 +96,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 foreach (var verbatimDataset in datasetsBatch!)
                 {
                     var dataset = datasetFactory.CreateProcessedDataset(verbatimDataset);
-
+                    CheckData(verbatimDataset, dataset, dataProvider);
                     if (dataset == null)
                     {
                         continue;
@@ -124,6 +124,32 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             {
                 ProcessManager.Release();
             }
+        }
+
+        private void CheckData(DwcVerbatimDataset verbatimDataset, Dataset? dataset, DataProvider dataProvider)
+        {
+            try
+            {
+                if (verbatimDataset == null) Logger.LogWarning($"verbatimDataset is null for {dataProvider}");
+                if (dataset == null) Logger.LogWarning($"dataset is null for {dataProvider}");
+
+                if (verbatimDataset != null)
+                {
+                    if (verbatimDataset.EventIds == null || verbatimDataset.EventIds.Count == 0)
+                    {
+                        Logger.LogWarning($"verbatimDataset contains no eventIds for {dataProvider}");
+                    }
+                }
+
+                if (dataset != null)
+                {
+                    if (dataset.EventIds == null || dataset.EventIds.Count == 0)
+                    {
+                        Logger.LogWarning($"dataset contains no eventIds for {dataProvider}");
+                    }
+                }
+            }
+            catch { }            
         }
 
         private async Task UpdateDatasetEventsAsync(ConcurrentDictionary<string, Dataset> processedDatasets, DataProvider dataProvider)
