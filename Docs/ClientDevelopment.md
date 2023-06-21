@@ -156,7 +156,7 @@ The SOS API is divided into different resource groups to group related functiona
 Areas are used to define different geographical regions. Municipality, county, and parish are examples of different areas used by SOS.
 
 ### DataProviders
-Information about the different data providers for SOS can be found under DataProviders.
+Information about different data providers and datasets for SOS can be found under DataProviders.
 
 ### Environment
 Environment describes the current environment in which SOS is operated.
