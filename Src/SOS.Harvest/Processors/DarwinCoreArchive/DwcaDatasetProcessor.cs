@@ -170,8 +170,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             var filter = new EventSearchFilter();
             filter.DatasetIds = processedDatasets.Keys.ToList();
             var datasetEventIds = await _eventRepository.GetAllAggregationItemsListAsync<string, string>(filter, "dataStewardship.datasetIdentifier", "eventId");
-            Dictionary<string, List<string>> eventIdsByDatasetId = datasetEventIds.ToDictionary(m => m.AggregationKey.ToLower(), m => m.Items);
-            DebugLogEventIdsByDatasetId(processedDatasets, eventIdsByDatasetId);
+            Dictionary<string, List<string>> eventIdsByDatasetId = datasetEventIds.ToDictionary(m => m.AggregationKey.ToLower(), m => m.Items);            
+            DebugLogEventIdsByDatasetId(processedDatasets, eventIdsByDatasetId, _eventRepository.IndexName);
 
             foreach (var datasetPair in processedDatasets)
             {
@@ -193,9 +193,9 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             return eventIdsByDatasetId;
         }
 
-        private void DebugLogEventIdsByDatasetId(ConcurrentDictionary<string, Dataset> processedDatasets, Dictionary<string, List<string>> eventIdsByDatasetId)
+        private void DebugLogEventIdsByDatasetId(ConcurrentDictionary<string, Dataset> processedDatasets, Dictionary<string, List<string>> eventIdsByDatasetId, string indexName)
         {
-            Logger.LogDebug($"GetDatasetEventsDictionaryAsync() executed GetAllAggregationItemsListAsync() with the following DatasetIds filter: {processedDatasets.Keys.ToList()}");
+            Logger.LogDebug($"GetDatasetEventsDictionaryAsync() executed GetAllAggregationItemsListAsync() with the following parameters: IndexName={indexName}, DatasetIds filter: {string.Join(", ", processedDatasets.Keys.ToList())}");
             if (eventIdsByDatasetId == null)
             {
                 Logger.LogWarning($"eventIdsByDatasetId is null");
@@ -211,7 +211,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     {
                         strVal = $"{pair.Value.Count} items";
                     }
-                    Logger.LogDebug($"Key={pair.Key}, Value={strVal}");
+                    Logger.LogDebug($"Key=\"{pair.Key}\", Value={strVal}");
                 }
             }
         }
