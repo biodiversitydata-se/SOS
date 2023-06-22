@@ -24,6 +24,14 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="observations"></param>
         /// <param name="protectedIndex"></param>
         /// <returns></returns>
+        int AddMany(IEnumerable<Observation> observations, bool protectedIndex);
+
+        /// <summary>
+        ///  Add many items
+        /// </summary>
+        /// <param name="observations"></param>
+        /// <param name="protectedIndex"></param>
+        /// <returns></returns>
         Task<int> AddManyAsync(IEnumerable<Observation> observations, bool protectedIndex);
 
         /// <summary>

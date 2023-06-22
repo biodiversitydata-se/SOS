@@ -228,7 +228,7 @@ namespace SOS.Administration.Gui.Controllers
                     Requests = requests
                 };
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

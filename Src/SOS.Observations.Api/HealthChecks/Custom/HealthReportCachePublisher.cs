@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
-using HealthChecks.UI.Client;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 

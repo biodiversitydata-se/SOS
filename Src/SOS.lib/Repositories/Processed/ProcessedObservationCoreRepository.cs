@@ -572,15 +572,21 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public int AddMany(IEnumerable<Observation> items, bool protectedIndex)
+        {
+            // Save valid processed data
+            Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");
+            var indexResult = WriteToElastic(items, protectedIndex);
+            Logger.LogDebug("Finished indexing batch for searching");
+            if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
+            return items.Count();
+        }
+
+        /// <inheritdoc />
         public async Task<int> AddManyAsync(IEnumerable<Observation> items, bool protectedIndex)
         {
-           return await Task.Run(() => {
-                // Save valid processed data
-                Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");
-                var indexResult = WriteToElastic(items, protectedIndex);
-                Logger.LogDebug("Finished indexing batch for searching");
-                if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
-                return items.Count();
+            return await Task.Run(() => {
+                return AddMany(items, protectedIndex);
             });
         }
 

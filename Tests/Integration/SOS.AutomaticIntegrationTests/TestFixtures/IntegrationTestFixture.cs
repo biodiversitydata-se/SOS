@@ -9,7 +9,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -700,7 +699,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 await ProcessedObservationRepository.DeleteAllDocumentsAsync(protectedIndex);
             }
             await ProcessedObservationRepository.DisableIndexingAsync(protectedIndex);
-            await ProcessedObservationRepository.AddManyAsync(observations, protectedIndex);
+            ProcessedObservationRepository.AddMany(observations, protectedIndex);
             await ProcessedObservationRepository.EnableIndexingAsync(protectedIndex);            
         }
 
