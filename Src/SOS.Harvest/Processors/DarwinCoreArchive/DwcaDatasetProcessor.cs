@@ -166,30 +166,54 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         }
 
         private async Task<Dictionary<string, List<string>>> GetDatasetEventsDictionaryAsync(ConcurrentDictionary<string, Dataset> processedDatasets, DataProvider dataProvider)
-        {            
+        {
             var filter = new EventSearchFilter();
             filter.DatasetIds = processedDatasets.Keys.ToList();
             var datasetEventIds = await _eventRepository.GetAllAggregationItemsListAsync<string, string>(filter, "dataStewardship.datasetIdentifier", "eventId");
             Dictionary<string, List<string>> eventIdsByDatasetId = datasetEventIds.ToDictionary(m => m.AggregationKey.ToLower(), m => m.Items);
+            DebugLogEventIdsByDatasetId(processedDatasets, eventIdsByDatasetId);
 
-            foreach (var eventPair in processedDatasets)
+            foreach (var datasetPair in processedDatasets)
             {
-                if (eventIdsByDatasetId.TryGetValue(eventPair.Key.ToLower(), out var eventIds))
+                if (eventIdsByDatasetId.TryGetValue(datasetPair.Key.ToLower(), out var eventIds))
                 {
-                    if (eventIds != null && eventPair.Value.EventIds != null && eventIds.Count != eventPair.Value.EventIds.Count)
-                        Logger.LogInformation($"Dataset.EventIds differs. #Verbatim={eventPair.Value.EventIds.Count}, #Processed={eventIds.Count}, DatasetId={eventPair.Key}, DataProvider={dataProvider}");
-                    eventPair.Value.EventIds = eventIds;
+                    if (eventIds != null && datasetPair.Value.EventIds != null && eventIds.Count != datasetPair.Value.EventIds.Count)
+                        Logger.LogInformation($"Dataset.EventIds differs. #Verbatim={datasetPair.Value.EventIds.Count}, #Processed={eventIds.Count}, DatasetId={datasetPair.Key}, DataProvider={dataProvider}");
+                    datasetPair.Value.EventIds = eventIds;
                 }
                 else
                 {
-                    eventIdsByDatasetId.Add(eventPair.Key, new List<string>());
-                    if (eventPair.Value.EventIds != null && eventPair.Value.EventIds.Count > 0)
-                        Logger.LogInformation($"Dataset.EventIds differs. #Verbatim={eventPair.Value.EventIds.Count}, #Processed=0, DatasetId={eventPair.Key}, DataProvider={dataProvider}");
-                    eventPair.Value.EventIds = null;
+                    eventIdsByDatasetId.Add(datasetPair.Key, new List<string>());
+                    if (datasetPair.Value.EventIds != null && datasetPair.Value.EventIds.Count > 0)
+                        Logger.LogInformation($"Dataset.EventIds differs. #Verbatim={datasetPair.Value.EventIds.Count}, #Processed=0, DatasetId={datasetPair.Key}, DataProvider={dataProvider}");
+                    datasetPair.Value.EventIds = null;
                 }
             }
 
             return eventIdsByDatasetId;
+        }
+
+        private void DebugLogEventIdsByDatasetId(ConcurrentDictionary<string, Dataset> processedDatasets, Dictionary<string, List<string>> eventIdsByDatasetId)
+        {
+            Logger.LogDebug($"GetDatasetEventsDictionaryAsync() executed GetAllAggregationItemsListAsync() with the following DatasetIds filter: {processedDatasets.Keys.ToList()}");
+            if (eventIdsByDatasetId == null)
+            {
+                Logger.LogWarning($"eventIdsByDatasetId is null");
+            }
+            else
+            {
+                Logger.LogDebug("eventIdsByDatasetId have the following values:");
+
+                foreach (var pair in eventIdsByDatasetId)
+                {
+                    string strVal = "null";
+                    if (pair.Value != null)
+                    {
+                        strVal = $"{pair.Value.Count} items";
+                    }
+                    Logger.LogDebug($"Key={pair.Key}, Value={strVal}");
+                }
+            }
         }
     }
 }
