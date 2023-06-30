@@ -893,14 +893,24 @@ namespace SOS.Lib.Extensions
             {
                 case "point":
                     var point = (PointGeoShape)geoShape;
-                    return Geometry.DefaultFactory.CreatePoint(new Coordinate(point.Coordinates.Longitude,
-                        point.Coordinates.Latitude));
+                    return new Point(point.Coordinates.Longitude, point.Coordinates.Latitude);
+                case "multipoint":
+                    var multipoint = (MultiPointGeoShape)geoShape;
+                    return Geometry.DefaultFactory.CreateMultiPoint(multipoint.Coordinates.Select(c => new Point(c.Longitude, c.Latitude))?.ToArray());
                 case "linestring":
-                    var linestring = (LineString)geoShape;
-                    return Geometry.DefaultFactory.CreateLineString(linestring.Coordinates.Select(c => new Coordinate(c.X, c.Y))?.ToArray());
                 case "linearring":
-                    var linearring = (LinearRing)geoShape;
-                    return Geometry.DefaultFactory.CreateLinearRing(linearring.Coordinates.Select(c => new Coordinate(c.X, c.Y))?.ToArray());
+                    var linestring = (LineStringGeoShape)geoShape;
+                    return Geometry.DefaultFactory.CreateLineString(linestring.Coordinates.Select(c => new Coordinate(c.Longitude, c.Latitude))?.ToArray());
+                case "multilinestring":
+                    var multiLineString = (MultiLineStringGeoShape)geoShape;
+                    var lineStrings = new List<LineString>();
+
+                    foreach (var coordinates in multiLineString.Coordinates)
+                    {
+                        lineStrings.Add(new LineString(coordinates.Select(c => new Coordinate(c.Longitude, c.Latitude)).ToArray()));
+                    }
+
+                    return Geometry.DefaultFactory.CreateMultiLineString(lineStrings.ToArray());
                 case "polygon":
                     var polygon = (PolygonGeoShape)geoShape;
                     var linearRings = polygon.Coordinates.Select(lr =>
