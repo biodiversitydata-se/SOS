@@ -6,7 +6,7 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
+using SOS.Lib.Models.Processed.Observation;
 using Result = CSharpFunctionalExtensions.Result;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -168,7 +168,8 @@ namespace SOS.Analysis.Api.Controllers
             if (fields?.Any() ?? false)
             {
                 errors.AddRange(fields
-                    .Where(f => !ObservationPropertyFieldDescriptionHelper.FieldByPropertyPath.ContainsKey(f.ToLower()))
+                   // .Where(f => !ObservationPropertyFieldDescriptionHelper.FieldByPropertyPath.ContainsKey(f.ToLower()))
+                    .Where(f => !typeof(Observation).HasProperty(f))
                     .Select(f => $"Field doesn't exist ({f})"));
             }
 
