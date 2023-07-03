@@ -1,7 +1,6 @@
 ﻿using Swashbuckle.AspNetCore.Annotations;
 using SOS.DataStewardship.Api.Application.Managers.Interfaces;
 using SOS.DataStewardship.Api.Contracts.Models;
-using System.Globalization;
 
 namespace SOS.DataStewardship.Api.Endpoints.ApiInfo;
 
