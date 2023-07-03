@@ -5,6 +5,17 @@
     /// </summary>
     public class MetadataEntity<T>
     {
+        /// <summary>
+        /// Constrctor
+        /// </summary>
+        public MetadataEntity()
+        {
+            Id = default!;
+        }
+
+        /// <summary>
+        /// Constrctor
+        /// </summary>
         public MetadataEntity(T id)
         {
             Id = id;
