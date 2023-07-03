@@ -1002,6 +1002,19 @@ namespace SOS.Lib.Extensions
             transformedGeometry.Apply(mathTransformFilter);
             transformedGeometry.SRID = (int) toCoordinateSystem;
 
+            // Remove decimals for some coordinate systems
+            if (toCoordinateSystem == CoordinateSys.ETRS89_LAEA_Europe ||
+                toCoordinateSystem == CoordinateSys.Rt90_25_gon_v ||
+                toCoordinateSystem == CoordinateSys.SWEREF99_TM ||
+                toCoordinateSystem == CoordinateSys.WebMercator)
+            {
+                foreach(var coordinate in transformedGeometry.Coordinates)
+                {
+                    coordinate.X = Math.Round(coordinate.X, 0);
+                    coordinate.Y = Math.Round(coordinate.Y, 0);
+                }
+            }
+
             if (!string.IsNullOrEmpty(key))
             {
                 // If we got this far and key is set, try add point to cache
