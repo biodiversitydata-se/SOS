@@ -91,13 +91,16 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 var processedEvents = new ConcurrentDictionary<string, Event>();
                 foreach (var verbatimEvent in verbatimEventsBatch)
                 {
-                    var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
-                    if (processedEvent == null)
-                    {                        
-                        Logger.LogInformation($"Processed event is null, EventId: {verbatimEvent.EventID})");
-                        continue;
+                    if (!processedEvents.ContainsKey(verbatimEvent.EventID))
+                    {
+                        var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
+                        if (processedEvent == null)
+                        {
+                            Logger.LogInformation($"Processed event is null, EventId: {verbatimEvent.EventID})");
+                            continue;
+                        }
+                        processedEvents.TryAdd(processedEvent.EventId, processedEvent);
                     }
-                    processedEvents.TryAdd(processedEvent.EventId, processedEvent);
                 }
 
                 await UpdateEventOccurrencesAsync(processedEvents, dataProvider);

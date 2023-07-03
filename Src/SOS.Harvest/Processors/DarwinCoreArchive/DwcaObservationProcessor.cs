@@ -14,7 +14,6 @@ using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
-using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Configuration.Import;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
