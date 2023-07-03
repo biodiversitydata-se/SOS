@@ -1,5 +1,7 @@
-namespace SOS.DataStewardship.Api.Contracts.Models
-{    
+﻿using System;
+
+namespace SOS.Lib.Models.ApiInfo
+{
     /// <summary>
     /// API information.
     /// </summary>

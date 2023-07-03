@@ -1,11 +1,18 @@
 ﻿using Swashbuckle.AspNetCore.Annotations;
 using SOS.DataStewardship.Api.Application.Managers.Interfaces;
-using SOS.DataStewardship.Api.Contracts.Models;
+using SOS.Lib.Models.ApiInfo;
 
 namespace SOS.DataStewardship.Api.Endpoints.ApiInfo;
 
+/// <summary>
+/// 
+/// </summary>
 public class GetApiInfoEndpoint : IEndpointDefinition
 {
+    /// <summary>
+    /// Define end point
+    /// </summary>
+    /// <param name="app"></param>
     public void DefineEndpoint(WebApplication app)
     {
         app.MapGet("/api_info", GetApiInfoAsync)
