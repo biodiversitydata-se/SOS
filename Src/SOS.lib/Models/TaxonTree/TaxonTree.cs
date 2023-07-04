@@ -76,12 +76,13 @@ namespace SOS.Lib.Models.TaxonTree
         /// <returns></returns>
         public IEnumerable<int> GetUnderlyingTaxonIds(IEnumerable<int> taxonIds, bool returnSelfs)
         {
+            var underlyingTaxonIds = new HashSet<int>();
             if (!taxonIds?.Any() ?? true)
             {
-                return null;
+                return underlyingTaxonIds;
             }
             var treeNodes = taxonIds.Where(t => TreeNodeById.ContainsKey(t)).Select(t => TreeNodeById[t]);
-            var underlyingTaxonIds = new HashSet<int>();
+            
             foreach (var treeNode in treeNodes.AsDepthFirstNodeIterator(returnSelfs))
             {
                 underlyingTaxonIds.Add(treeNode.TaxonId);

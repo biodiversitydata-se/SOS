@@ -180,7 +180,7 @@ namespace SOS.Lib.Managers
             var taxonListIdsSet = new HashSet<int>();
             foreach (var taxonListId in listIds)
             {
-                if (_taxonManager.TaxonListSetById.TryGetValue(taxonListId, out var taxonListSet))
+                if (_taxonManager.TaxonListSetById?.TryGetValue(taxonListId, out var taxonListSet) ?? false)
                 {
                     if (includeUnderlyingTaxa)
                     {

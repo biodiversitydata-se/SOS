@@ -26,7 +26,6 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -384,8 +383,17 @@ namespace SOS.Observations.Api
             services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
             services.AddSingleton(Configuration);
 
-            services.AddSingleton<IHealthCheckPublisher, HealthReportCachePublisher>();
-            services.Configure<HealthCheckPublisherOptions>(options =>
+
+#if !DEBUG
+           services.AddSingleton<IHealthCheckPublisher, HealthReportCachePublisher>();
+           services.Configure<HealthCheckPublisherOptions>(options =>
+            {
+                options.Delay = TimeSpan.FromSeconds(10);
+                options.Period = TimeSpan.FromSeconds(90); // Create new health check every 90 sek and cache reult
+                options.Timeout = TimeSpan.FromSeconds(60);
+            });
+
+             services.Configure<HealthCheckPublisherOptions>(options =>
             {
                 options.Delay = TimeSpan.FromSeconds(10);
                 options.Period = TimeSpan.FromSeconds(90); // Create new health check every 90 sek and cache reult
@@ -416,7 +424,8 @@ namespace SOS.Observations.Api
                 healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
                 healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] { "wfs" }); // add this to ST environment when we have a GeoServer test environment.
             }
-           
+#endif
+
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
@@ -573,9 +582,11 @@ namespace SOS.Observations.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+#if !DEBUG
                 endpoints.MapHealthChecks("/health", new HealthCheckOptions()
                 {
                     Predicate = _ => false,
@@ -615,10 +626,11 @@ namespace SOS.Observations.Api
                     Predicate = _ => false,
                     ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.LatestOnlyWfs)
                 });
+#endif
             });
 
-            // make sure protected log is created and indexed
-            if (protectedLogRepository.VerifyCollectionAsync().Result)
+                // make sure protected log is created and indexed
+                if (protectedLogRepository.VerifyCollectionAsync().Result)
             {
                 protectedLogRepository.CreateIndexAsync();
             }
