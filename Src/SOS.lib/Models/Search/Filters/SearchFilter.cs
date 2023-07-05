@@ -10,6 +10,14 @@ namespace SOS.Lib.Models.Search.Filters
         /// <summary>
         /// Constructor
         /// </summary>
+        public SearchFilter() : this(0)
+        {
+
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         /// <param name="userId"></param>
         /// <param name="protectionFilter"></param>
         public SearchFilter(int userId, ProtectionFilter protectionFilter = ProtectionFilter.Public) : base(userId, protectionFilter)
@@ -24,11 +32,5 @@ namespace SOS.Lib.Models.Search.Filters
         ///     Omit this parameter and you will receive the complete collection of fields.
         /// </summary>
         public OutputFilter Output { get; set; }
-
-        public new SearchFilter Clone()
-        {
-            var searchFilter = (SearchFilter)MemberwiseClone();
-            return searchFilter;
-        }
     }
 }

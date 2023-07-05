@@ -22,10 +22,6 @@ namespace SOS.Lib.HangfireAttributes
                         "OriginalQueue")
                 );
 
-                var x = context.Connection.GetJobParameter(
-                        context.BackgroundJob.Id,
-                        "OriginalQueue");
-
                 if (originalQueue != null)
                 {
                     // Override any other queue value that is currently set (by other filters, for example)

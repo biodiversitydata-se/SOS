@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
@@ -138,8 +139,7 @@ namespace SOS.Observations.Api.Controllers
             }
 
             var exportFilter = filter.ToSearchFilter(UserId, protectionFilter ?? ProtectionFilterDto.Public, "en-GB");
-            var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter);
-            
+            var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter.Clone());
             if (matchCount == 0)
             {
                 return (Result: NoContent(), Count: 0);

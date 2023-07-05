@@ -14,6 +14,14 @@ namespace SOS.Lib.Models.Search.Filters
         /// <summary>
         /// Constructor
         /// </summary>
+        public SearchFilterBase() : this(0)
+        {
+            
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         /// <param name="userId"></param>
         /// <param name="protectionFilter"></param>
         public SearchFilterBase(int userId, ProtectionFilter protectionFilter = ProtectionFilter.Public)
@@ -168,12 +176,6 @@ namespace SOS.Lib.Models.Search.Filters
         /////     Which type of date filtering that should be used
         ///// </summary>
         //public DateRangeFilterType DateFilterType { get; set; } = DateRangeFilterType.OverlappingStartDateAndEndDate;
-
-        public SearchFilterBase Clone()
-        {
-            var searchFilter = (SearchFilterBase)MemberwiseClone();
-            return searchFilter;
-        }
 
         /// <summary>
         /// Convert filter to string
