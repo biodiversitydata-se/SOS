@@ -120,9 +120,14 @@ namespace SOS.Lib.Managers
         {
             try
             {
-                var taxa = await GetBasicTaxaAsync();                                
-                var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa?.ToDictionary(t => t.Id, t => t));
-                return taxonTree;
+                var taxa = await GetBasicTaxaAsync();
+                var taxaDictionary = new Dictionary<int, IBasicTaxon>();
+                foreach (var taxon in taxa)
+                {
+                    // Make sure no duplicates exists
+                    taxaDictionary.TryAdd(taxon.Id, taxon);
+                }
+                return TaxonTreeFactory.CreateTaxonTree(taxaDictionary);
             }
             catch (Exception ex)
             {
