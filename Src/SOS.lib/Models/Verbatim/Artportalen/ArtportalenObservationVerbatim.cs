@@ -232,11 +232,6 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int? SightingSpeciesCollectionItemId { get; set; }
 
         /// <summary>
-        /// Taxon species group
-        /// </summary>
-        public int? SpeciesGroupId { get; set; }
-
-        /// <summary>
         ///     Taxon stage id
         /// </summary>
         public Metadata<int> Stage { get; set; }

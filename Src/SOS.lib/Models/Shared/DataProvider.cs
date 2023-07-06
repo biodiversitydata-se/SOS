@@ -17,6 +17,11 @@ namespace SOS.Lib.Models.Shared
     public class DataProvider : IEntity<int>, IIdIdentifierTuple
     {
         /// <summary>
+        /// Categories
+        /// </summary>
+        public IEnumerable<DataProviderCategory> Categories { get; set; }
+
+        /// <summary>
         ///     Contact person.
         /// </summary>
         public ContactPerson ContactPerson { get; set; }

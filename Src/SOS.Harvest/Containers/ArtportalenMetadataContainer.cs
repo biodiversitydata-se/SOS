@@ -17,7 +17,6 @@ namespace SOS.Harvest.Containers
         private readonly IMetadataRepository _metadataRepository;
         private readonly IPersonRepository _personRepository;
         private readonly IProjectRepository _projectRepository;
-        private readonly ITaxonRepository _taxonRepository;
         private readonly ILogger<ArtportalenMetadataContainer> _logger;
 
         private bool _initilazionInProgress;
@@ -34,7 +33,6 @@ namespace SOS.Harvest.Containers
         private ConcurrentDictionary<string, Metadata<string>>? _sharedLabels;
         private ConcurrentDictionary<int, Metadata<int>>? _stages;
         private ConcurrentDictionary<int, Metadata<int>>? _substrates;
-        private ConcurrentDictionary<int, int?>? _taxonSpeciesGroups;
         private ConcurrentDictionary<int, Metadata<int>>? _units;
         private ConcurrentDictionary<int, Metadata<int>>? _validationStatus;
 
@@ -250,7 +248,6 @@ namespace SOS.Harvest.Containers
         /// <param name="metadataRepository"></param>
         /// <param name="personRepository"></param>
         /// <param name="projectRepository"></param>
-        /// <param name="taxonRepository"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ArtportalenMetadataContainer(
@@ -258,14 +255,12 @@ namespace SOS.Harvest.Containers
             IMetadataRepository metadataRepository,
             IPersonRepository personRepository,
             IProjectRepository projectRepository,
-            ITaxonRepository taxonRepository,
             ILogger<ArtportalenMetadataContainer> logger)
         {
             _diaryEntryRepository = diaryEntryRepository ?? throw new ArgumentNullException(nameof(diaryEntryRepository));
             _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _personRepository = personRepository ?? throw new ArgumentNullException(nameof(personRepository));
             _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
-            _taxonRepository = taxonRepository ?? throw new ArgumentNullException(nameof(taxonRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             IsInitialized = false;
         }
@@ -306,7 +301,6 @@ namespace SOS.Harvest.Containers
                 };
                 var personsTask = _personRepository.GetAsync();
                 var projectsTask = _projectRepository.GetProjectsAsync();
-                var taxaTask = _taxonRepository.GetAsync();
                 var sharedLabelsTask = _metadataRepository.GetResourcesAsync("Shared_");
 
                 await Task.WhenAll(metaDataTasks);
@@ -323,7 +317,6 @@ namespace SOS.Harvest.Containers
                 var activities = await activitiesTask;
                 var persons = await personsTask;
                 var projects = await projectsTask;
-                var taxa = await taxaTask;
                 var sharedLabels = await sharedLabelsTask;
 
                 _activities = CastMetdataWithCategoryEntityToVerbatim(activities)?.ToConcurrentDictionary(a => a.Id, a => a) ?? new ConcurrentDictionary<int, MetadataWithCategory<int>>();
@@ -337,7 +330,6 @@ namespace SOS.Harvest.Containers
                 _sharedLabels = CastMetdataEntitiesToVerbatims(sharedLabels)?.ToConcurrentDictionary(g => g.Id, g => g) ?? new ConcurrentDictionary<string, Metadata<string>>();
                 _stages = CastMetdataEntitiesToVerbatims(stages)?.ToConcurrentDictionary(s => s.Id, s => s) ?? new ConcurrentDictionary<int, Metadata<int>>();
                 _substrates = CastMetdataEntitiesToVerbatims(substrates)?.ToConcurrentDictionary(s => s.Id, s => s) ?? new ConcurrentDictionary<int, Metadata<int>>();
-                _taxonSpeciesGroups = taxa.ToConcurrentDictionary(t => t.Id, t => t.SpeciesGroupId) ?? new ConcurrentDictionary<int, int?>();
                 _units = CastMetdataEntitiesToVerbatims(units)?.ToConcurrentDictionary(u => u.Id, u => u) ?? new ConcurrentDictionary<int, Metadata<int>>();
                 _validationStatus = CastMetdataEntitiesToVerbatims<int>(validationStatus)?.ToConcurrentDictionary(vs => vs.Id, vs => vs) ?? new ConcurrentDictionary<int, Metadata<int>>();
 
@@ -360,7 +352,6 @@ namespace SOS.Harvest.Containers
                 _metadataRepository.Live = value;
                 _personRepository.Live = value;
                 _projectRepository.Live = value;
-                _taxonRepository.Live = value;
             }
         }
 
@@ -579,18 +570,6 @@ namespace SOS.Harvest.Containers
             var regexSpaces = new Regex("\\s+");
             source = regexSpaces.Replace(source," ").Trim();
             return source!;
-        }
-
-        /// <inheritdoc />
-        public int? TryGetTaxonSpeciesGroupId(int? id)
-        {
-            if (id == null || (!_taxonSpeciesGroups?.Any() ?? true))
-            {
-                return null!;
-            }
-            _taxonSpeciesGroups!.TryGetValue(id ?? 0, out var taxonSpeciesGroupId);
-
-            return taxonSpeciesGroupId!;
         }
 
         /// <inheritdoc />

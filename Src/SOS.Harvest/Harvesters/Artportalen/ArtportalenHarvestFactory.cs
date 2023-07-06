@@ -48,11 +48,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 sightingId = entity.Id;
 
-                var speciesGroupId = _artportalenMetadataContainer.TryGetTaxonSpeciesGroupId(entity.TaxonId ?? 0);
-
                 var observation = new ArtportalenObservationVerbatim();
                 observation.Activity = _artportalenMetadataContainer.TryGetActivity(entity.ActivityId);
-
                 observation.Biotope = _artportalenMetadataContainer.TryGetBiotope(entity.BiotopeId);
                 observation.BiotopeDescription = entity.BiotopeDescription;
                 observation.ChecklistId = entity.ChecklistId;
@@ -88,7 +85,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.ReportedDate = entity.RegisterDate;
                 observation.RightsHolder = entity.RightsHolder;
                 observation.Site = site;
-                observation.SpeciesGroupId = speciesGroupId;
                 observation.Stage = _artportalenMetadataContainer.TryGetStage(entity.StageId);
                 observation.StartDate = entity.StartDate;
                 observation.StartTime = entity.StartTime;

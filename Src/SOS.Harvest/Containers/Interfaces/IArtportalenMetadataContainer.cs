@@ -126,13 +126,6 @@ namespace SOS.Harvest.Containers.Interfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        int? TryGetTaxonSpeciesGroupId(int? id);
-
-        /// <summary>
-        /// Try to get a xxx by id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         Metadata<int>? TryGetUnit(int? id);
 
         /// <summary>
