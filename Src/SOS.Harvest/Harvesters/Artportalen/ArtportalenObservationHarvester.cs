@@ -85,6 +85,13 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <returns></returns>
         private async Task<int> HarvestAllAsync(ArtportalenHarvestFactory harvestFactory, IJobCancellationToken cancellationToken)
         {
+            var backupDate = await _metadataRepository.GetLastBackupDateAsync();
+#if !DEBUG
+            if (backupDate < DateTime.Now.AddDays(-2))
+            {
+                throw new Exception($"Artportalen backup to old ({backupDate}). Stopping harvest");
+            }
+#endif
             Logger.LogInformation($"Start Artportalen HarvestAllAsync()");
             if (_artportalenConfiguration.AddTestSightings && (_artportalenConfiguration.AddTestSightingIds?.Any() ?? false))
             { 
@@ -146,7 +153,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             return -1;
         }
-        #endregion Full
+#endregion Full
 
         #region Incremental
         /// <summary>

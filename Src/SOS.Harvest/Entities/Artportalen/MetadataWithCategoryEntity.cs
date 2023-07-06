@@ -5,6 +5,16 @@
     /// </summary>
     public class MetadataWithCategoryEntity<T> : MetadataEntity<T>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public MetadataWithCategoryEntity(): base(default!)
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public MetadataWithCategoryEntity(T id) : base(id)
         {
         } 
