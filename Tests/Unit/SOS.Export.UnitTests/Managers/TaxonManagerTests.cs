@@ -1,9 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
+using Hangfire;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Moq;
+using ProjNet.CoordinateSystems;
 using SOS.Lib.Cache;
+using SOS.Lib.Enums;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -54,9 +60,9 @@ namespace SOS.Export.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedTaxonRepositoryMock.Setup(pir => pir.GetBasicTaxonChunkAsync(It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(new BasicTaxon[0]);
-
+            _processedTaxonRepositoryMock.Setup(pir => pir.GetAllAsync(It.IsAny<ProjectionDefinition<Taxon, BasicTaxon>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new List<BasicTaxon>());
+       
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -79,12 +85,8 @@ namespace SOS.Export.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedTaxonRepositoryMock
-                .Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i == 0), It.IsAny<int>()))
-                .ReturnsAsync(new[] {new BasicTaxon()});
-            _processedTaxonRepositoryMock
-                .Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i != 0), It.IsAny<int>()))
-                .ReturnsAsync(new BasicTaxon[0]);
+            _processedTaxonRepositoryMock.Setup(pir => pir.GetAllAsync(It.IsAny<ProjectionDefinition<Taxon, BasicTaxon>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new List<BasicTaxon>() { new BasicTaxon { Id = 1 } });
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -94,33 +96,8 @@ namespace SOS.Export.UnitTests.Managers
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            tree.Should().Be(null);
-        }
-
-        /// <summary>
-        ///     Test taxon tree throws
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        [Trait("Category", "Unit")]
-        public void TaxonTreeThrows()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _processedTaxonRepositoryMock
-                .Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i == 0), It.IsAny<int>()))
-                .Throws<Exception>();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var tree = TestObject.TaxonTree;
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            tree.Should().BeNull();
+            tree.Should().NotBe(null);
+            tree.TreeNodeById.Count.Should().BeGreaterThan(0);
         }
     }
 }
