@@ -214,6 +214,7 @@ namespace SOS.Lib.IO.DwcArchive
             DataProvider dataProvider,
             ICollection<Observation> processedObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart,
+            DwcaFilePartsInfo dwcaFilePartsInfo,
             bool checkForIllegalCharacters = false)
         {
             if (!processedObservations?.Any() ?? true)
@@ -228,6 +229,7 @@ namespace SOS.Lib.IO.DwcArchive
             bool fixSbdiArtportalenInstitutionCode = dataProvider.Id == 1;
             var dwcObservations = processedObservations.ToDarwinCore(fixSbdiArtportalenInstitutionCode);
             if (checkForIllegalCharacters) ValidateObservations(dwcObservations);
+            dwcaFilePartsInfo.ObservationCount += dwcObservations.Count();
             await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
             await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
                 dwcObservations,
@@ -311,7 +313,7 @@ namespace SOS.Lib.IO.DwcArchive
                 await CreateDwcArchiveFileAsync(dataProvider, dwcaFilePartsInfo, tempFilePath);
 
                 File.Move(tempFilePath, filePath, true);
-                _logger.LogInformation($"A new .zip({filePath}) was created.");
+                _logger.LogInformation($"A new .zip({filePath}) was created. #ObservationCount={dwcaFilePartsInfo.ObservationCount:N0}, #ObservationCountBeforeFilter={dwcaFilePartsInfo.ObservationCountBeforeFilter:N0}");
 
                 return filePath;
             }
