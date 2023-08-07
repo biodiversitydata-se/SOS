@@ -15,6 +15,7 @@ namespace SOS.Lib.IO.DwcArchive
         public string ExportFolder { get; set; }
         public Dictionary<string, Dictionary<DwcaFilePart, string>> FilePathByBatchIdAndFilePart { get; set; }
         public Dictionary<string, Dictionary<DwcaEventFilePart, string>> EventFilePathByBatchIdAndFilePart { get; set; }
+        public int ObservationsCount { get; set; }
         public WrittenEventSets WrittenEventsData { get; set; } = new WrittenEventSets();
 
         public static DwcaFilePartsInfo Create(DataProvider dataProvider, string exportFolderPath)

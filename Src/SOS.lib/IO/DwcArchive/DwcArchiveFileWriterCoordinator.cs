@@ -149,6 +149,8 @@ namespace SOS.Lib.IO.DwcArchive
                 // Exclude sensitive species.
                 var publicObservations = processedObservations
                     .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
+
+                _dwcaFilePartsInfoByDataProvider[dataProvider].ObservationsCount += publicObservations.Length;
                 var writeHeaderlessDwcaFilesTasks = new List<Task>()
                 {
                     _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters)
@@ -183,6 +185,9 @@ namespace SOS.Lib.IO.DwcArchive
                 foreach (var pair in _dwcaFilePartsInfoByDataProvider)
                 {
                     var provider = pair.Key;
+
+                    _logger.LogInformation($"DwC export file for {provider.Identifier} has {pair.Value.ObservationsCount} observations.");
+
                     if (provider.UseVerbatimFileInExport)
                     {
                         try
