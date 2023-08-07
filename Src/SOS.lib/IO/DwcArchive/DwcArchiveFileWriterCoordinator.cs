@@ -156,7 +156,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // Exclude sensitive species.
                 dwcaFilePartsInfo.ObservationCountBeforeFilter += processedObservations.Count();
                 var publicObservations = processedObservations
-                    .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
+                    .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();                
                 var writeHeaderlessDwcaFilesTasks = new List<Task>()
                 {
                     _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, dwcaFilePartsInfo, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters)
@@ -197,6 +197,8 @@ namespace SOS.Lib.IO.DwcArchive
                         _logger.LogError($"Skipped creating Artportalen DwC-A. The number of Artportalen observations was {pair.Value.ObservationCount:N0} but it need to be at least {_dwcaFilesCreationConfiguration.ArtportalenLowerLimitCount}.");
                         continue;
                     }
+
+                    _logger.LogInformation($"DwC-A export file for {provider.Identifier} has {pair.Value.ObservationCount:N0} observations. ObservationCountBeforeFilter={pair.Value.ObservationCountBeforeFilter:N0}");
 
                     if (provider.UseVerbatimFileInExport)
                     {
