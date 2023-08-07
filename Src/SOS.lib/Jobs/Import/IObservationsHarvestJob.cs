@@ -27,7 +27,6 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [DeleteRunningJobBeforeStart]
-        [JobExpirationTimeout(Minutes = 0)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [JobDisplayName("Incremental Harvest Observations, active instance")]
         [Queue("high")]
