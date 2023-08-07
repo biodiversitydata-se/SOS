@@ -16,12 +16,12 @@ using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Factories;
+using System.Threading;
 
 namespace SOS.Lib.IO.DwcArchive
 {
     public class DwcArchiveFileWriterCoordinator : Interfaces.IDwcArchiveFileWriterCoordinator
-    {
-        private readonly object _initWriteCsvLock = new object();
+    {        
         private readonly IFileService _fileService;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
         private readonly IDwcArchiveEventFileWriter _dwcArchiveEventFileWriter;
@@ -33,6 +33,7 @@ namespace SOS.Lib.IO.DwcArchive
         private Dictionary<DataProvider, DwcaFilePartsInfo> _dwcaFilePartsInfoByDataProvider;
         private WrittenEventSets _writtenEventSets;
         public bool Enabled => _dwcaFilesCreationConfiguration.IsEnabled;
+        private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         /// <summary>
         /// Simplified by only returning file size
@@ -134,9 +135,11 @@ namespace SOS.Lib.IO.DwcArchive
                 batchId ??= "";
                 Dictionary<DwcaFilePart, string> filePathByFilePart;
                 Dictionary<DwcaEventFilePart, string> filePathByEventFilePart;
-                lock (_initWriteCsvLock)
+                DwcaFilePartsInfo dwcaFilePartsInfo = null;
+
+                await _semaphore.WaitAsync();
+                try
                 {
-                    DwcaFilePartsInfo dwcaFilePartsInfo = null;
                     if (!_dwcaFilePartsInfoByDataProvider?.TryGetValue(dataProvider, out dwcaFilePartsInfo) ?? true)
                     {
                         dwcaFilePartsInfo = CreateDwcaFilePartsInfo(dataProvider);
@@ -145,15 +148,20 @@ namespace SOS.Lib.IO.DwcArchive
                     filePathByFilePart = dwcaFilePartsInfo.GetOrCreateFilePathByFilePart(batchId);
                     filePathByEventFilePart = dwcaFilePartsInfo.GetOrCreateEventFilePathByFilePart(batchId);
                 }
+                finally
+                {                    
+                    _semaphore.Release();
+                }
 
                 // Exclude sensitive species.
+                dwcaFilePartsInfo.ObservationCountBeforeFilter += processedObservations.Count();
                 var publicObservations = processedObservations
                     .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
 
                 _dwcaFilePartsInfoByDataProvider[dataProvider].ObservationsCount += publicObservations.Length;
                 var writeHeaderlessDwcaFilesTasks = new List<Task>()
                 {
-                    _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters)
+                    _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, dwcaFilePartsInfo, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters)
                 };
 
                 if (dataProvider.CreateEventDwC)
