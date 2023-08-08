@@ -21,7 +21,7 @@ using System.Threading;
 namespace SOS.Lib.IO.DwcArchive
 {
     public class DwcArchiveFileWriterCoordinator : Interfaces.IDwcArchiveFileWriterCoordinator
-    {        
+    {     
         private readonly IFileService _fileService;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
         private readonly IDwcArchiveEventFileWriter _dwcArchiveEventFileWriter;
@@ -156,9 +156,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // Exclude sensitive species.
                 dwcaFilePartsInfo.ObservationCountBeforeFilter += processedObservations.Count();
                 var publicObservations = processedObservations
-                    .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
-
-                _dwcaFilePartsInfoByDataProvider[dataProvider].ObservationsCount += publicObservations.Length;
+                    .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();                
                 var writeHeaderlessDwcaFilesTasks = new List<Task>()
                 {
                     _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, dwcaFilePartsInfo, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters)
@@ -193,8 +191,14 @@ namespace SOS.Lib.IO.DwcArchive
                 foreach (var pair in _dwcaFilePartsInfoByDataProvider)
                 {
                     var provider = pair.Key;
+                    // Skip creating Artportalen DwC-A if the number of observations is too low.
+                    if (provider.Id == 1 && pair.Value.ObservationCount < _dwcaFilesCreationConfiguration.ArtportalenLowerLimitCount)
+                    {
+                        _logger.LogError($"Skipped creating Artportalen DwC-A. The number of Artportalen observations was {pair.Value.ObservationCount:N0} but it need to be at least {_dwcaFilesCreationConfiguration.ArtportalenLowerLimitCount}.");
+                        continue;
+                    }
 
-                    _logger.LogInformation($"DwC export file for {provider.Identifier} has {pair.Value.ObservationsCount} observations.");
+                    _logger.LogInformation($"DwC-A export file for {provider.Identifier} has {pair.Value.ObservationCount:N0} observations. ObservationCountBeforeFilter={pair.Value.ObservationCountBeforeFilter:N0}");
 
                     if (provider.UseVerbatimFileInExport)
                     {
@@ -251,7 +255,7 @@ namespace SOS.Lib.IO.DwcArchive
 
                 foreach (var task in dwcaCreationTasks)
                 {
-                    var dataProvider = task.Key.dataProvider;
+                    var dataProvider = task.Key.dataProvider;                    
                     var filePath = task.Value.Result;
 
                     // Id 0 = complete Dwc archive file

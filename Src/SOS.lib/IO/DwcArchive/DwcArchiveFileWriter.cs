@@ -313,7 +313,7 @@ namespace SOS.Lib.IO.DwcArchive
                 await CreateDwcArchiveFileAsync(dataProvider, dwcaFilePartsInfo, tempFilePath);
 
                 File.Move(tempFilePath, filePath, true);
-                _logger.LogInformation($"A new .zip({filePath}) was created. #ObservationCount={dwcaFilePartsInfo.ObservationCount:N0}, #ObservationCountBeforeFilter={dwcaFilePartsInfo.ObservationCountBeforeFilter:N0}");
+                _logger.LogInformation($"A new .zip({filePath}) was created.");
 
                 return filePath;
             }
