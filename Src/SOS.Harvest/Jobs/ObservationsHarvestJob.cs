@@ -64,6 +64,7 @@ namespace SOS.Harvest.Jobs
             DateTime? fromDate,
             IJobCancellationToken cancellationToken)
         {
+            _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", mode.GetLoggerMode()) });
             var activeProviders = (await _dataProviderManager.GetAllDataProvidersAsync()).Where(dp =>
                 dp.IsActive
             ).ToArray();
@@ -112,6 +113,7 @@ namespace SOS.Harvest.Jobs
             bool processOnSuccess,
             IJobCancellationToken cancellationToken)
         {
+            _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", mode.GetLoggerMode()) });
             _logger.LogInformation($"Start harvest job ({mode})");
             await HarvestResources(mode, cancellationToken);
             var harvestCount = await HarvestAsync(harvestProviders, mode, fromDate, cancellationToken);
@@ -142,6 +144,7 @@ namespace SOS.Harvest.Jobs
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
+            _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", mode.GetLoggerMode()) });
             try
             {
                 _logger.LogInformation($"Start {mode} resources harvest jobs");
@@ -180,6 +183,7 @@ namespace SOS.Harvest.Jobs
         DateTime? fromDate,
         IJobCancellationToken cancellationToken)
         {
+            _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", mode.GetLoggerMode()) });
             try
             {
                 _logger.LogInformation($"Start {mode} harvest jobs");

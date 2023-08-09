@@ -26,6 +26,7 @@ using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
+using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
@@ -1180,6 +1181,7 @@ namespace SOS.Harvest.Jobs
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
+            _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", mode.GetLoggerMode()) });
             if (mode == JobRunModes.Full)
             {
                 _dataProviderCache.Clear();
@@ -1226,6 +1228,7 @@ namespace SOS.Harvest.Jobs
         /// <inheritdoc />
         public async Task<bool> ProcessArtportalenObservationsAsync(IEnumerable<ArtportalenObservationVerbatim> verbatims)
         {
+            _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", JobRunModes.IncrementalActiveInstance.GetLoggerMode()) });
             var processor = _processorByType[DataProviderType.ArtportalenObservations] as IArtportalenObservationProcessor;
             var provider = await _dataProviderCache.GetAsync(1);
             var taxa = await GetTaxaAsync(JobRunModes.IncrementalActiveInstance);
