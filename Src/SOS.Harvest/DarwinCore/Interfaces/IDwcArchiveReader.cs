@@ -75,5 +75,11 @@ namespace SOS.Harvest.DarwinCore.Interfaces
         /// <param name="archiveReaderContext"></param>
         /// <returns></returns>
         Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEventsAsync(ArchiveReaderContext archiveReaderContext);
+
+        /// <summary>
+        /// Set initilaize value for id
+        /// </summary>
+        /// <param name="value"></param>
+        void SetIdInitValue(int value);
     }
 }

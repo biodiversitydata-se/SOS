@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using DnsClient.Internal;
-using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Models.Log;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Statistics;
@@ -314,7 +310,6 @@ namespace SOS.Lib.Repositories.Verbatim
             return events;
         }
     }
-
 
     public class OccurrenceVerbatimRepository : VerbatimRepositoryBase<DwcObservationVerbatim, int>, IDarwinCoreArchiveVerbatimRepository        
     {

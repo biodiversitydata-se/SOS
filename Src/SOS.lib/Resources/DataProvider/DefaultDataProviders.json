@@ -658,17 +658,325 @@
         "DownloadUrls": [
             {
                 "type": "Observations",
-                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-nrm"
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-1"
             },
             {
-                "type": "ObservationEml",
-                "url": "https://www.gbif.se/ipt/eml.do?r=smtp-nrm"
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-2"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-3"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-4"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-5"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-6"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-7"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-8"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-9"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-10"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-11"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-12"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-13"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-14"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-15"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-16"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-17"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-18"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-19"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-20"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-21"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-22"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-23"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-24"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-25"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-26"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-27"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-28"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-29"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-30"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-31"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-32"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-33"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-34"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-35"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-36"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-37"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-38"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-39"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-40"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-41"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-42"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-43"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-44"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-45"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-46"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-47"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-48"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-49"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-50"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-51"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-52"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-53"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-54"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-55"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-56"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-57"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-58"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-59"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-60"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-61"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-62"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-63"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-64"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-65"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-66"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-67"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-68"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-69"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-70"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-71"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-72"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-73"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-74"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-75"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-76"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-77"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-78"
+            },
+            {
+                "type": "Observations",
+                "url": "https://www.gbif.se/ipt/archive.do?r=smtp-79"
             }
         ],
         "Categories": [ "EntomologicalCollections" ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": true
     },
     {
         "Id": 12,
