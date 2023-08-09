@@ -34,11 +34,16 @@ namespace SOS.Harvest.DarwinCore
             .Map(t => t.BasisOfRecord, 3)
             .Map(t => t.RecordedBy, 4)
             .Map(t => t.IdentificationVerificationStatus, 5);
-
-        public DwcOccurrenceSamplingEventArchiveReader(ILogger<DwcArchiveReader> logger)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="idInitValue"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public DwcOccurrenceSamplingEventArchiveReader(ILogger<DwcArchiveReader> logger, int idInitValue = 0)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _idCounter = 0;
+            _idCounter = idInitValue;
         }
 
         /// <summary>

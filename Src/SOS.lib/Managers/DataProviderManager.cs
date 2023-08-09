@@ -70,8 +70,7 @@ namespace SOS.Lib.Managers
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, @"Resources\DataProvider\DefaultDataProviders.json");
             var dataProviders =
-                JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
-            
+               JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
             await _dataProviderRepository.DeleteCollectionAsync();
             await _dataProviderRepository.AddCollectionAsync();
             await _dataProviderRepository.AddManyAsync(dataProviders);

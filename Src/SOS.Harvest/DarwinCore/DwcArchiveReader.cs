@@ -14,15 +14,15 @@ namespace SOS.Harvest.DarwinCore
     public class DwcArchiveReader : IDwcArchiveReader
     {
         private readonly ILogger<DwcArchiveReader> _logger;
-
+        private int _initValueId;
         private IDwcArchiveReaderAsDwcObservation CreateDwcReader(string rowType)
         {
             if (rowType == RowTypes.Occurrence)
             {
-                return new DwcOccurrenceArchiveReader(_logger);
+                return new DwcOccurrenceArchiveReader(_logger, _initValueId);
             }
 
-            return new DwcOccurrenceSamplingEventArchiveReader(_logger);
+            return new DwcOccurrenceSamplingEventArchiveReader(_logger, _initValueId);
         }
 
         public DwcArchiveReader(ILogger<DwcArchiveReader> logger)
@@ -154,6 +154,12 @@ namespace SOS.Harvest.DarwinCore
         {
             var reader = CreateDwcReader(RowTypes.Event);
             return await reader.ReadEvents(archiveReaderContext);
+        }
+
+        /// <inheritdoc/>
+        public void SetIdInitValue(int value)
+        {
+            _initValueId = value;
         }
     }
 }

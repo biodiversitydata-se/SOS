@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using DwC_A;
+﻿using DwC_A;
 using DwC_A.Terms;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.DarwinCore.Factories;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Harvest.DarwinCore
@@ -24,10 +18,16 @@ namespace SOS.Harvest.DarwinCore
         private int _idCounter;
         private int NextId => Interlocked.Increment(ref _idCounter);
 
-        public DwcOccurrenceArchiveReader(ILogger<DwcArchiveReader> logger)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="idInitValue"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public DwcOccurrenceArchiveReader(ILogger<DwcArchiveReader> logger, int idInitValue = 0)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _idCounter = 0;
+            _idCounter = idInitValue;
         }
 
         /// <summary>
