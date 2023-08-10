@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Xunit;
 using SOS.Lib.IO.DwcArchive;
+using System.IO;
 
 namespace SOS.Process.IntegrationTests.Dwca
 {
@@ -88,5 +89,40 @@ namespace SOS.Process.IntegrationTests.Dwca
             distinctValues.Should().NotBeEmpty();
         }
 
+        [Fact]
+        public void Get_number_of_lines_in_file()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------            
+            string sourceFilePath = @"C:\dwcatest\occurrence.txt";
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------            
+            int nrLines = CountLines(sourceFilePath);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            nrLines.Should().BeLessThan(0);
+        }
+
+
+        private int CountLines(string filePath)
+        {
+            int lineCount = 0;
+
+            using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            using (var streamReader = new StreamReader(fileStream))
+            {
+                while (streamReader.ReadLine() != null)
+                {
+                    lineCount++;
+                }
+            }
+
+            return lineCount;
+        }
     }
 }
