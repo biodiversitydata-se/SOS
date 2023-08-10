@@ -508,13 +508,10 @@ namespace SOS.Harvest.Jobs
                 var success = result.All(t => t.Value.Status == RunStatus.Success);
 
                 //---------------------------------------------------------------
-                // 6. Create Elasticsearch observation index by enable indexing
+                // 6. Enable Elasticsearch observation index
                 //---------------------------------------------------------------
                 await EnableIndexingAsync();
-
-                //---------------------------------
-                // 6. Create ElasticSearch index
-                //---------------------------------
+                
                 if (success)
                 {
                     // Update dynamic provider data
@@ -523,7 +520,7 @@ namespace SOS.Harvest.Jobs
                     if (mode == JobRunModes.Full)
                     {
                         //-------------------------------------------------------
-                        // 7. Wait for Elasticsearch indexing to finish and
+                        // 6.1 Wait for Elasticsearch indexing to finish and
                         //    start incremental harvest of missing observations
                         //-------------------------------------------------------
                         var processCount = result.Sum(s => s.Value.PublicCount);
@@ -539,32 +536,17 @@ namespace SOS.Harvest.Jobs
                             docCount = await _processedObservationRepository.IndexCountAsync(false);
                         }
 
+                        //---------------------------------------------------------------
+                        // 7. Start harvest of Artportalen observations that has been
+                        //    added during the day and doesn't exist in the backup db
+                        //---------------------------------------------------------------
                         if (_runIncrementalAfterFull)
                         {
                             // Enqueue incremental harvest/process job to Hangfire in order to get latest sightings
                             var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunIncrementalInactiveAsync(cancellationToken));
 
                             _logger.LogInformation($"Incremental harvest/process job with Id={jobId} was enqueued");
-                        }
-
-                        //----------------------------------------------------------------------------
-                        // 8. End create DwC CSV files and merge the files into multiple DwC-A files.
-                        //----------------------------------------------------------------------------
-                        var dwCCreationTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.DwCCreation);
-                        var dwcFiles = await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
-                        _processTimeManager.Stop(ProcessTimeManager.TimerTypes.DwCCreation, dwCCreationTimerSessionId);
-
-                        if (dwcFiles?.Any() ?? false)
-                        {
-                            foreach (var dwcFile in dwcFiles)
-                            {
-                                // Enqueue upload file to blob storage job
-                                var uploadJobId = BackgroundJob.Enqueue<IUploadToStoreJob>(job => job.RunAsync(dwcFile, _exportContainer, true,
-                                    cancellationToken));
-
-                                _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
-                            }
-                        }
+                        }                        
                     }
 
                     if (!await _processedObservationRepository.EnsureNoDuplicatesAsync())
@@ -585,6 +567,7 @@ namespace SOS.Harvest.Jobs
                         {
                             throw new Exception("Validation of processed indexes failed. Job stopped.");
                         }
+                        _logger.LogInformation($"Finish validate indexes");
 
                         // Add data stewardardship events & datasets
                         if (_processConfiguration.ProcessDataset)
@@ -613,21 +596,39 @@ namespace SOS.Harvest.Jobs
                             await EnableEsDatasetIndexingAsync();
                         }
 
-                        _logger.LogInformation($"Finish validate indexes");
                         _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateIndex, validateIndexTimerSessionId);
+
+                        //----------------------------------------------------------------------------
+                        // 11. End create DwC CSV files and merge the files into multiple DwC-A files.
+                        //----------------------------------------------------------------------------
+                        var dwCCreationTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.DwCCreation);
+                        var dwcFiles = await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
+                        _processTimeManager.Stop(ProcessTimeManager.TimerTypes.DwCCreation, dwCCreationTimerSessionId);
+
+                        if (dwcFiles?.Any() ?? false)
+                        {
+                            foreach (var dwcFile in dwcFiles)
+                            {
+                                // Enqueue upload file to blob storage job
+                                var uploadJobId = BackgroundJob.Enqueue<IUploadToStoreJob>(job => job.RunAsync(dwcFile, _exportContainer, true,
+                                    cancellationToken));
+
+                                _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
+                            }
+                        }
 
                         // Get on going job id's
                         var onGouingJobIds = GetOnGoingJobIds("ICreateDoiJob", "IExportAndSendJob", "IExportAndStoreJob");
 
                         //---------------------------------------------------------
-                        // 11. Toggle active instance when full processing is done
+                        // 12. Toggle active instance when full processing is done
                         //---------------------------------------------------------
                         _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstance} => {_processedObservationRepository.InActiveInstance}");
                         await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
                             .InActiveInstance);
 
                         //-------------------------------------------------------------------------
-                        // 12. Clear ProcessedConfiguration cache in all dependent services (APIs)
+                        // 13. Clear ProcessedConfiguration cache in all dependent services (APIs)
                         //-------------------------------------------------------------------------
                         _logger.LogInformation($"Start clear processed configuration cache at search api");
                         await _cacheManager.ClearAsync(Cache.ProcessedConfiguration);
@@ -660,7 +661,7 @@ namespace SOS.Harvest.Jobs
                 }
 
                 //-------------------------------
-                // 13. Return processing result
+                // 14. Return processing result
                 //-------------------------------
                 return success ? true : throw new Exception($@"Failed to process observations. {string.Join(", ", result
                     .Where(r => r.Value.Status != RunStatus.Success)

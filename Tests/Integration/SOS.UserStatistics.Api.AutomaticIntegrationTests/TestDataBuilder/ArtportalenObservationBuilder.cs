@@ -195,8 +195,7 @@ public static class ArtportalenObservationBuilder
             obs.VerifiedBy = verifiedBy;
             obs.ObserversInternal = observersInternal;
             obs.Observers = observers;
-            obs.Site = GetTestSite(); // todo
-            obs.SpeciesGroupId = 1; // todo
+            obs.Site = GetTestSite(); // todo            
             obs.Stage = new Metadata<int>(0); // todo
             obs.TaxonId = 231326; // todo
             obs.Unit = new Metadata<int>(0); // todo
@@ -292,7 +291,6 @@ public static class ArtportalenObservationBuilder
             obs.ObserversInternal = sourceObservation.ObserversInternal;
             obs.Observers = sourceObservation.Observers;
             obs.Site = sourceObservation.Site;
-            obs.SpeciesGroupId = sourceObservation.SpeciesGroupId;
             obs.Stage = sourceObservation.Stage;
             obs.TaxonId = sourceObservation.TaxonId;
             obs.Unit = sourceObservation.Unit;
@@ -339,7 +337,6 @@ public static class ArtportalenObservationBuilder
             obs.SightingTypeId = sourceObservation.SightingTypeId;
             obs.SightingTypeSearchGroupId = sourceObservation.SightingTypeSearchGroupId;
             obs.SpeciesCollection = sourceObservation.SpeciesCollection;
-            obs.SpeciesGroupId = sourceObservation.SpeciesGroupId;
             obs.StartTime = sourceObservation.StartTime;
             obs.Substrate = sourceObservation.Substrate;
             obs.SubstrateDescription = sourceObservation.SubstrateDescription;
