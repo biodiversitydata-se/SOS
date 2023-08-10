@@ -275,7 +275,7 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         /// <inheritdoc/>
-        public async Task WriteHeaderlessEventDwcaFilesAsync(
+        public async Task<DwcaBatchWriteResult> WriteHeaderlessEventDwcaFilesAsync(
             DataProvider dataProvider,
             ICollection<Observation> processedObservations,
             Dictionary<DwcaEventFilePart, string> eventFilePathByFilePart,
@@ -284,35 +284,47 @@ namespace SOS.Lib.IO.DwcArchive
         {
             if (!processedObservations?.Any() ?? true)
             {
-                return;
+                return new DwcaBatchWriteResult() { DataProviderIdentifier = dataProvider.Identifier };
             }
+            int eventsCount = 0;
+            int occurrenceCount = 0;
+            int emofCount = 0;
+            int multimediaCount = 0;
 
             // Create Event CSV file
             var nonProcessedObservationEvents = GetNonProcessedObservationEvents(processedObservations, writtenEventsData.WrittenEvents);
             var eventCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Event];
             bool fixSbdiArtportalenInstitutionCode = dataProvider.Id == 1;
             var dwcObservations = nonProcessedObservationEvents.ToDarwinCore(fixSbdiArtportalenInstitutionCode);
-            if (checkForIllegalCharacters)
+            if (dwcObservations != null && dwcObservations.Any())
             {
-                ValidateObservations(dwcObservations);
+                if (checkForIllegalCharacters)
+                {
+                    ValidateObservations(dwcObservations);
+                }
+                eventsCount = dwcObservations.Count();
+                var eventFieldDescriptions = FieldDescriptionHelper.GetAllDwcEventCoreFieldDescriptions();
+                await using var eventFileStream = File.AppendText(eventCsvFilePath);
+                await _dwcArchiveEventCsvWriter.WriteHeaderlessEventCsvFileAsync(
+                    dwcObservations,
+                    eventFileStream,
+                    eventFieldDescriptions);
             }
-            var eventFieldDescriptions = FieldDescriptionHelper.GetAllDwcEventCoreFieldDescriptions();
-            await using var eventFileStream = File.AppendText(eventCsvFilePath);
-            await _dwcArchiveEventCsvWriter.WriteHeaderlessEventCsvFileAsync(
-                dwcObservations,
-                eventFileStream,
-                eventFieldDescriptions);
 
             // Create Occurrence event CSV file - exclude event data
             var occurrenceCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Occurrence];
             var dwcEventObservations = processedObservations.ToDarwinCore(fixSbdiArtportalenInstitutionCode);
-            var occurrenceFieldDescriptions = FieldDescriptionHelper.GetAllDwcCoreEventOccurrenceFieldDescriptions();
-            await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
-            await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
-                dwcEventObservations,
-                occurrenceFileStream,
-                occurrenceFieldDescriptions,
-                true);
+            if (dwcEventObservations != null && dwcEventObservations.Any())
+            {
+                occurrenceCount = dwcEventObservations.Count();
+                var occurrenceFieldDescriptions = FieldDescriptionHelper.GetAllDwcCoreEventOccurrenceFieldDescriptions();
+                await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
+                await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
+                    dwcEventObservations,
+                    occurrenceFileStream,
+                    occurrenceFieldDescriptions,
+                    true);
+            }
 
             // Create EMOF Event CSV file
             var emofCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Emof];
@@ -320,6 +332,7 @@ namespace SOS.Lib.IO.DwcArchive
             emofRows = GetNonWrittenMeasurements(emofRows, writtenEventsData.WrittenMeasurements);
             if (emofRows != null && emofRows.Any())
             {
+                emofCount = emofRows.Count();
                 await using StreamWriter emofFileStream = File.AppendText(emofCsvFilePath);
                 await _extendedMeasurementOrFactCsvWriter.WriteHeaderlessEmofCsvFileAsync(
                     emofRows,
@@ -327,18 +340,28 @@ namespace SOS.Lib.IO.DwcArchive
                     true);
             }
 
-            //// Create Multimedia CSV file
+            // Create Multimedia CSV file
             string multimediaCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Multimedia];
             var multimediaRows = processedObservations.ToSimpleMultimediaRows();
             multimediaRows = GetNonWrittenMultimedia(multimediaRows, writtenEventsData.WrittenMultimedia);
             if (multimediaRows != null && multimediaRows.Any())
             {
+                multimediaCount = multimediaRows.Count();
                 await using StreamWriter multimediaFileStream = File.AppendText(multimediaCsvFilePath);
                 _simpleMultimediaCsvWriter.WriteHeaderlessCsvFile(
                     multimediaRows,
                     multimediaFileStream,
                     true);
             }
+
+            return new DwcaBatchWriteResult
+            {
+                DataProviderIdentifier = dataProvider.Identifier,
+                EventCount = eventsCount,
+                OccurrenceCount = occurrenceCount,
+                EmofCount = emofCount,
+                MultimediaCount = multimediaCount
+            };
         }
 
         public async Task<FileExportResult> CreateEventDwcArchiveFileAsync(

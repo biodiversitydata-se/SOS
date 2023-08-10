@@ -23,7 +23,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="writtenEventsData"></param>
         /// <param name="checkForIllegalCharacters"></param>
         /// <returns></returns>
-        Task WriteHeaderlessEventDwcaFilesAsync(
+        Task<DwcaBatchWriteResult> WriteHeaderlessEventDwcaFilesAsync(
             DataProvider dataProvider,
             ICollection<Observation> dwcObservations,
             Dictionary<DwcaEventFilePart, string> eventFilePathByFilePart,

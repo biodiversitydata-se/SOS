@@ -157,7 +157,7 @@ namespace SOS.Lib.IO.DwcArchive
                 dwcaFilePartsInfo.ObservationCountBeforeFilter += processedObservations.Count();
                 var publicObservations = processedObservations
                     .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();                
-                var writeHeaderlessDwcaFilesTasks = new List<Task>()
+                var writeHeaderlessDwcaFilesTasks = new List<Task<DwcaBatchWriteResult>>()
                 {
                     _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, dwcaFilePartsInfo, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters)
                 };
@@ -167,8 +167,9 @@ namespace SOS.Lib.IO.DwcArchive
                     writeHeaderlessDwcaFilesTasks.Add(_dwcArchiveEventFileWriter.WriteHeaderlessEventDwcaFilesAsync(dataProvider, publicObservations, filePathByEventFilePart, _writtenEventSets, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters));
                 }
 
-                await Task.WhenAll(writeHeaderlessDwcaFilesTasks);
-
+                DwcaBatchWriteResult[] results = await Task.WhenAll(writeHeaderlessDwcaFilesTasks);
+                LogBatchWriteResultSummary(results);
+            
                 return true;
             }
             catch (Exception e)
@@ -176,6 +177,30 @@ namespace SOS.Lib.IO.DwcArchive
                 _logger.LogError(e, $"Write observations failed for {dataProvider} and batchId={batchId}");
                 return false;
             }
+        }
+
+        private void LogBatchWriteResultSummary(IEnumerable<DwcaBatchWriteResult> batchWriteResults)
+        {
+            try
+            {
+                var groupedResults = batchWriteResults
+                    .GroupBy(r => r.DataProviderIdentifier)
+                    .Select(group => new
+                    {
+                        DataProviderIdentifier = group.Key,
+                        TotalEventCount = group.Sum(r => r.EventCount),
+                        TotalOccurrenceCount = group.Sum(r => r.OccurrenceCount),
+                        TotalEmofCount = group.Sum(r => r.EmofCount),
+                        TotalMultimediaCount = group.Sum(r => r.MultimediaCount)
+                    })
+                    .ToList();
+
+                foreach (var result in groupedResults)
+                {
+                    _logger.LogInformation($"DwC-A batch summary. Identifier: {result.DataProviderIdentifier}, EventCount: {result.TotalEventCount}, OccurrenceCount: {result.TotalOccurrenceCount}, EmofCount: {result.TotalEmofCount}, MultimediaCount: {result.TotalMultimediaCount}");                    
+                }
+            }
+            catch (Exception) { }
         }
 
         /// <summary>

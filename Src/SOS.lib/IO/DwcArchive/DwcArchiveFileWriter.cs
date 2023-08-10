@@ -210,7 +210,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        public async Task WriteHeaderlessDwcaFiles(
+        public async Task<DwcaBatchWriteResult> WriteHeaderlessDwcaFiles(
             DataProvider dataProvider,
             ICollection<Observation> processedObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart,
@@ -219,9 +219,11 @@ namespace SOS.Lib.IO.DwcArchive
         {
             if (!processedObservations?.Any() ?? true)
             {
-                return;
+                return new DwcaBatchWriteResult() { DataProviderIdentifier = dataProvider.Identifier };
             }
-
+            int occurrenceCount = 0;
+            int emofCount = 0;
+            int multimediaCount = 0;
             var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
 
             // Create Occurrence txt file
@@ -229,19 +231,23 @@ namespace SOS.Lib.IO.DwcArchive
             bool fixSbdiArtportalenInstitutionCode = dataProvider.Id == 1;
             var dwcObservations = processedObservations.ToDarwinCore(fixSbdiArtportalenInstitutionCode);
             if (checkForIllegalCharacters) ValidateObservations(dwcObservations);
-            dwcaFilePartsInfo.ObservationCount += dwcObservations.Count();
-            await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
-            await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
-                dwcObservations,
-                occurrenceFileStream,
-                fieldDescriptions);
-
+            if (dwcObservations != null && dwcObservations.Any())
+            {
+                dwcaFilePartsInfo.ObservationCount += dwcObservations.Count();
+                occurrenceCount = dwcObservations.Count();
+                await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
+                await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
+                    dwcObservations,
+                    occurrenceFileStream,
+                    fieldDescriptions);
+            }
             // Create EMOF txt file
             string emofCsvFilePath = filePathByFilePart[DwcaFilePart.Emof];
             var emofRows = processedObservations.ToExtendedMeasurementOrFactRows();
             if (checkForIllegalCharacters) ValidateEmofRows(emofRows);
             if (emofRows != null && emofRows.Any())
             {
+                emofCount = emofRows.Count();
                 await using StreamWriter emofFileStream = File.AppendText(emofCsvFilePath);
                 await _extendedMeasurementOrFactCsvWriter.WriteHeaderlessEmofCsvFileAsync(
                     emofRows,
@@ -254,16 +260,26 @@ namespace SOS.Lib.IO.DwcArchive
             if (checkForIllegalCharacters) ValidateMultimediaRows(multimediaRows);
             if (multimediaRows != null && multimediaRows.Any())
             {
+                multimediaCount = multimediaRows.Count();
                 await using var multimediaFileStream = File.AppendText(multimediaCsvFilePath);
                
                 _simpleMultimediaCsvWriter.WriteHeaderlessCsvFile(
                     multimediaRows,
                     multimediaFileStream);
             }
+
+            return new DwcaBatchWriteResult
+            {
+                DataProviderIdentifier = dataProvider.Identifier,
+                OccurrenceCount = occurrenceCount,
+                EmofCount = emofCount,
+                MultimediaCount = multimediaCount,
+            };
         }
 
         private void ValidateObservations(IEnumerable<DarwinCore> dwcObservations)
         {
+            if (dwcObservations == null) return;
             foreach (var dwcObservation in dwcObservations)
             {
                 string validation = DwcaFileValidator.Validate(dwcObservation);

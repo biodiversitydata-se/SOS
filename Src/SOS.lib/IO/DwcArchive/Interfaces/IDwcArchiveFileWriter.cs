@@ -69,7 +69,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="dwcaFilePartsInfo"></param>
         /// <param name="checkForIllegalCharacters"></param>
         /// <returns></returns>
-        Task WriteHeaderlessDwcaFiles(
+        Task<DwcaBatchWriteResult> WriteHeaderlessDwcaFiles(
             DataProvider dataProvider,
             ICollection<Observation> dwcObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart,
