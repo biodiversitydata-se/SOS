@@ -19,7 +19,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         /// Categories
         /// </summary>
-       // public IEnumerable<DataProviderCategory> Categories { get; set; }
+        public IEnumerable<DataProviderCategory> Categories { get; set; }
 
         /// <summary>
         ///     Contact person.

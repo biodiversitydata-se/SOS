@@ -3,16 +3,25 @@ namespace SOS.Lib.Enums
 {
     public enum DataProviderCategory
     {
-        AquaticResources,
-        Birds,
-        EntomologicalCollections,
-        Fauna,
-        Flora,
-        Funga,
-        Herbarium,
-        Institute,
-        MuseumCollections,
+        DataHostesship,
+
         NationalInventory,
-        PublicCommunity,
+        RegionalInventory, 
+        MuseumCollections,
+        HerbariaCollections,
+        CitizenSciencePlatform,
+
+        Atlas,
+        Terrestrial,
+        Freshwater,
+        Marine,
+
+        Vertebrates,
+        Invertebrates,
+        Arthropods,
+        Microorganisms,
+        Plants_Bryophytes_Lichens,
+        Fungi,
+        Algae
     }
 }

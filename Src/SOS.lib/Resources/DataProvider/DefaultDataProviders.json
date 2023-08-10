@@ -59,7 +59,21 @@
             "LastName": "Liljeblad",
             "Email": "Johan.Liljeblad@slu.se"
         },
-        "Categories": [ "Birds", "Fauna", "Flora", "Funga", "PublicCommunity" ],
+        "Categories": [
+            "DataHostesship",
+            "RegionalInventory",
+            "CitizenSciencePlatform",
+            "Atlas",
+            "Terrestrial",
+            "Freshwater",
+            "Marine",
+            "Vertebrates",
+            "Arthropods",
+            "Microorganisms",
+            "Plants_Bryophytes_Lichens",
+            "Fungi",
+            "Algae"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": true,
         "SupportEvents": true
@@ -123,7 +137,12 @@
             "LastName": "Ljungberg",
             "Email": "peter.ljungberg@slu.se"
         },
-        "Categories": [ "AquaticResources", "Institute" ],
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Marine",
+            "Vertebrates"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -187,7 +206,17 @@
             "LastName": "Sonesten",
             "Email": "Lars.Sonesten@slu.se"
         },
-        "Categories": [ "AquaticResources", "Institute" ],
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Freshwater",
+            "Vertebrates",
+            "Invertebrates",
+            "Arthropods",
+            "Microorganisms",
+            "Plants_Bryophytes_Lichens",
+            "Algae"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -251,7 +280,12 @@
             "LastName": "Kinnerbäck",
             "Email": "anders.kinnerback@slu.se"
         },
-        "Categories": [ "AquaticResources", "Institute" ],
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Freshwater",
+            "Vertebrates"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -315,7 +349,12 @@
             "LastName": "Myrstener",
             "Email": "SERS@slu.se"
         },
-        "Categories": [ "AquaticResources", "Institute" ],
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Freshwater",
+            "Vertebrates"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -379,7 +418,15 @@
             "LastName": "Ericson",
             "Email": "mossnisse@hotmail.com"
         },
-        "Categories": [ "Herbarium", "Institute" ],
+        "Categories": [
+            "HerbariaCollections",
+            "Terrestrial",
+            "Freshwater",
+            "Marine",
+            "Plants_Bryophytes_Lichens",
+            "Fungi",
+            "Algae"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -443,7 +490,17 @@
             "FirstName": "",
             "Email": "shark@smhi.se"
         },
-        "Categories": [ "AquaticResources", "Institute" ],
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "RegionalInventory",
+            "Marine",
+            "Vertebrates",
+            "Invertebrates",
+            "Arthropods",
+            "Microorganisms",
+            "Algae"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -517,7 +574,7 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=nrm-ringedbirds"
             }
         ],
-        "Categories": [ "Institute", "MuseumCollections", "Birds" ],
+        "Categories": [ "Terrestrial", "Vertebrates" ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -591,7 +648,13 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=nhrs-nrm"
             }
         ],
-        "Categories": [ "EntomologicalCollections", "Institute", "MuseumCollections" ],
+        "Categories": [
+            "MuseumCollections",
+            "Terrestrial",
+            "Freshwater",
+            "Invertebrates",
+            "Arthropods"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -973,7 +1036,13 @@
                 "url": "https://www.gbif.se/ipt/archive.do?r=smtp-79"
             }
         ],
-        "Categories": [ "EntomologicalCollections" ],
+        "Categories": [
+            "NationalInventory",
+            "MuseumCollections",
+            "Terrestrial",
+            "Invertebrates",
+            "Arthropods"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": true
@@ -1047,7 +1116,11 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=nrm-porpoises"
             }
         ],
-        "Categories": [ "AquaticResources", "MuseumCollections" ],
+        "Categories": [
+            "MuseumCollections",
+            "Marine",
+            "Vertebrates"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1117,7 +1190,13 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=lu_sebms"
             }
         ],
-        "Categories": [ "EntomologicalCollections", "Institute" ],
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Terrestrial",
+            "Invertebrates",
+            "Arthropods"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1181,7 +1260,13 @@
             "LastName": "Sundqvist",
             "Email": "shark@smhi.se"
         },
-        "Categories": [ "AquaticResources", "Institute", "NationalInventory" ],
+        "Categories": [
+            "DataHostesship",
+            "RegionalInventory",
+            "Marine",
+            "Invertebrates",
+            "Arthropods"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": true,
         "SupportEvents": true
@@ -1245,7 +1330,11 @@
             "LastName": "Werner",
             "Email": "Malin.Werner@slu.se"
         },
-        "Categories": [ "AquaticResources", "Institute" ],
+        "Categories": [
+            "RegionalInventory",
+            "Marine",
+            "Vertebrates"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1309,7 +1398,11 @@
             "LastName": "Dahlgren",
             "Email": "riksskogstaxeringen@slu.se"
         },
-        "Categories": [ "Flora", "NationalInventory" ],
+        "Categories": [
+            "NationalInventory",
+            "Terrestrial",
+            "Plants_Bryophytes_Lichens"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1373,7 +1466,18 @@
             "LastName": "Edelsjö",
             "Email": "Jan.Edelsjo@slu.se"
         },
-        "Categories": [ "Birds", "EntomologicalCollections", "MuseumCollections" ],
+        "Categories": [
+            "MuseumCollections",
+            "Terrestrial",
+            "Freshwater",
+            "Marine",
+            "Vertebrates",
+            "Invertebrates",
+            "Arthropods",
+            "Plants_Bryophytes_Lichens",
+            "Fungi",
+            "Algae"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1437,7 +1541,19 @@
             "LastName": "Eriksson",
             "Email": "info@biologg.se"
         },
-        "Categories": [ "AquaticResources", "Birds", "EntomologicalCollections", "Plants", "PublicCommunity" ],
+        "Categories": [
+            "CitizenSciencePlatform",
+            "Terrestrial",
+            "Freshwater",
+            "Marine",
+            "Vertebrates",
+            "Invertebrates",
+            "Arthropods",
+            "Microorganisms",
+            "Plants_Bryophytes_Lichens",
+            "Fungi",
+            "Algae"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1501,7 +1617,19 @@
             "LastName": "Mora Aronsson",
             "Email": "artdatabanken@slu.se"
         },
-        "Categories": [ "AquaticResources", "Birds", "EntomologicalCollections", "Plants", "PublicCommunity" ],
+        "Categories": [
+            "CitizenSciencePlatform",
+            "Terrestrial",
+            "Freshwater",
+            "Marine",
+            "Vertebrates",
+            "Invertebrates",
+            "Arthropods",
+            "Microorganisms",
+            "Plants_Bryophytes_Lichens",
+            "Fungi",
+            "Algae"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1571,7 +1699,12 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=lu_sft_kfr"
             }
         ],
-        "Categories": [ "Birds", "NationalInventory" ],
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Terrestrial",
+            "Vertebrates"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1641,7 +1774,12 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=lu_sft_spkt"
             }
         ],
-        "Categories": [ "Birds", "Institute" ],
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Terrestrial",
+            "Vertebrates"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1711,7 +1849,12 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=lu_sft_std"
             }
         ],
-        "Categories": [ "Birds", "Institute" ],
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Terrestrial",
+            "Vertebrates"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1781,7 +1924,13 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=lu_kbv"
             }
         ],
-        "Categories": [ "Birds", "Institute" ],
+        "Categories": [
+            "DataHostesship",
+            "RegionalInventory",
+            "Terrestrial",
+            "Marine",
+            "Vertebrates"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1855,7 +2004,11 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=sjv-tuva"
             }
         ],
-        "Categories": [ "Fauna", "NationalInventory" ],
+        "Categories": [
+            "NationalInventory",
+            "Terrestrial",
+            "Plants_Bryophytes_Lichens"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
         "SupportEvents": false
@@ -1919,7 +2072,12 @@
             "LastName": "Andersson",
             "Email": "marcus.andersson@slu.se"
         },
-        "Categories": [ "NationalInventory" ],
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Terrestrial",
+            "Plants_Bryophytes_Lichens"
+        ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": true,
         "SupportEvents": true

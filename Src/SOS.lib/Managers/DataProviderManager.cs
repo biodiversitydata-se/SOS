@@ -60,25 +60,32 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task<Result<string>> InitDefaultDataProviders(bool forceOverwriteIfCollectionExist)
         {
-            var collectionExists = await _dataProviderRepository.CheckIfCollectionExistsAsync();
-            if (collectionExists && !forceOverwriteIfCollectionExist)
+            try
             {
-                return Result.Failure<string>(
-                    "The DataProvider collection already exists. Set forceOverwriteIfCollectionExist to true if you want to overwrite this collection with default data.");
+                var collectionExists = await _dataProviderRepository.CheckIfCollectionExistsAsync();
+                if (collectionExists && !forceOverwriteIfCollectionExist)
+                {
+                    return Result.Failure<string>(
+                        "The DataProvider collection already exists. Set forceOverwriteIfCollectionExist to true if you want to overwrite this collection with default data.");
+                }
+
+                var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                var filePath = Path.Combine(assemblyPath, @"Resources\DataProvider\DefaultDataProviders.json");
+                var dataProviders =
+                   JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
+                await _dataProviderRepository.DeleteCollectionAsync();
+                await _dataProviderRepository.AddCollectionAsync();
+                await _dataProviderRepository.AddManyAsync(dataProviders);
+
+                var returnDescription = collectionExists
+                    ? "DataProvider collection was created and initialized with default data providers. Existing data were overwritten."
+                    : "DataProvider collection was created and initialized with default data providers.";
+                return Result.Success(returnDescription);
             }
-
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath, @"Resources\DataProvider\DefaultDataProviders.json");
-            var dataProviders =
-               JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
-            await _dataProviderRepository.DeleteCollectionAsync();
-            await _dataProviderRepository.AddCollectionAsync();
-            await _dataProviderRepository.AddManyAsync(dataProviders);
-
-            var returnDescription = collectionExists
-                ? "DataProvider collection was created and initialized with default data providers. Existing data were overwritten."
-                : "DataProvider collection was created and initialized with default data providers.";
-            return Result.Success(returnDescription);
+            catch(Exception e)
+            {
+                return Result.Failure<string>(e.Message);
+            }
         }
 
         public async Task<Result<string>> InitDefaultDataProvider(string dataProviderIdOrIdentifier)
