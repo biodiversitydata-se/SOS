@@ -519,22 +519,11 @@ namespace SOS.Harvest.Jobs
 
                     if (mode == JobRunModes.Full)
                     {
-                        //-------------------------------------------------------
-                        // 6.1 Wait for Elasticsearch indexing to finish and
-                        //    start incremental harvest of missing observations
-                        //-------------------------------------------------------
+                        //-------------------------------------------------
+                        // 6.1 Wait for Elasticsearch indexing to finish                        
+                        //-------------------------------------------------
                         var processCount = result.Sum(s => s.Value.PublicCount);
-                        var docCount = await _processedObservationRepository.IndexCountAsync(false);
-                        var iterations = 0;
-                        // Compare number of documents processed with acctually db count
-                        // If docCoumt is less than process count, indexing is not ready yet
-                        while (docCount < processCount && iterations < 100)
-                        {
-                            iterations++; // Safety to prevent infinite loop.
-                            _logger.LogInformation($"Waiting for indexing to be done {iterations}");
-                            Thread.Sleep(TimeSpan.FromSeconds(6)); // Wait for Elasticsearch indexing to finish.
-                            docCount = await _processedObservationRepository.IndexCountAsync(false);
-                        }
+                        await _processedObservationRepository.WaitForPublicIndexCreation(processCount, TimeSpan.FromMinutes(10));
 
                         //---------------------------------------------------------------
                         // 7. Start harvest of Artportalen observations that has been
@@ -583,7 +572,21 @@ namespace SOS.Harvest.Jobs
                             //var eventResult = await ProcessVerbatimEvents(dataProvidersToProcess.Where(m => m.IsActive && m.SupportEvents), mode, taxonById, cancellationToken);
                             var eventSuccess = eventResult == null || eventResult.All(t => t.Value.Status == RunStatus.Success);
                             await EnableEsEventIndexingAsync();
-                            Thread.Sleep(TimeSpan.FromSeconds(60)); // Wait for Elasticsearch indexing to finish.
+                            int eventProcessCount = 0;
+                            if (eventResult != null)
+                            {
+                                eventProcessCount = eventResult.Sum(s => s.Value.PublicCount);
+                                await _observationEventRepository.WaitForIndexCreation(eventProcessCount, TimeSpan.FromMinutes(10));
+                            }
+
+                            if (eventSuccess)
+                            {
+                                _logger.LogInformation($"Processing events finished successfully. EventCount={eventProcessCount}");
+                            }
+                            else
+                            {
+                                _logger.LogInformation($"Processing events failed. EventCount={eventProcessCount}");
+                            }
 
                             //----------------------
                             // 10. Process datasets
@@ -594,6 +597,21 @@ namespace SOS.Harvest.Jobs
                             //var datasetResult = await ProcessVerbatimDatasets(dataProvidersToProcess.Where(m => m.IsActive && m.SupportDatasets), mode, taxonById, cancellationToken);
                             var datasetSuccess = datasetResult == null || datasetResult.All(t => t.Value.Status == RunStatus.Success);
                             await EnableEsDatasetIndexingAsync();
+                            int datasetProcessCount = 0;
+                            if (datasetResult != null)
+                            {
+                                datasetProcessCount = datasetResult.Sum(s => s.Value.PublicCount);
+                                await _observationDatasetRepository.WaitForIndexCreation(datasetProcessCount, TimeSpan.FromMinutes(10));
+                            }
+
+                            if (datasetSuccess)
+                            {
+                                _logger.LogInformation($"Processing datasets finished successfully. DatasetCount={datasetProcessCount}");
+                            }
+                            else
+                            {
+                                _logger.LogInformation($"Processing datasets failed. DatasetCount={datasetProcessCount}");
+                            }
                         }
 
                         _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateIndex, validateIndexTimerSessionId);

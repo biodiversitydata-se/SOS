@@ -331,5 +331,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
         /// <returns></returns>
         Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter, bool getAllFields = false);
+
+        /// <summary>
+        /// Wait for public index to be created.
+        /// </summary>
+        /// <param name="expectedRecordsCount"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        Task WaitForPublicIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Elasticsearch.Net;
@@ -1301,7 +1302,29 @@ namespace SOS.Lib.Repositories.Processed
                 return -1;
             }
         }
-       
+
+        /// <inheritdoc />
+        public async Task WaitForPublicIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null)
+        {
+            Logger.LogInformation($"Begin waiting for index creation. Index={PublicIndexName}.");
+            if (timeout == null) timeout = TimeSpan.FromMinutes(10);
+            var sleepTime = TimeSpan.FromSeconds(5);
+            int nrIterations = (int) (Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
+            long docCount = await IndexCountAsync(false);
+            var iterations = 0;
+            
+            // Compare number of documents processed with actually db count
+            // If docCount is less than process count, indexing is not ready yet
+            while (docCount < expectedRecordsCount && iterations < nrIterations)
+            {
+                iterations++; // Safety to prevent infinite loop.                                
+                await Task.Delay(sleepTime);
+                docCount = await IndexCountAsync(false);
+            }
+
+            Logger.LogInformation($"Finish waiting for index creation. Index={PublicIndexName}.");
+        }
+
         /// <inheritdoc />
         public async Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool protectedIndex, int maxReturnedItems)
         {
