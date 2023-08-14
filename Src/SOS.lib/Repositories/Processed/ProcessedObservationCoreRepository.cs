@@ -1306,7 +1306,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task WaitForPublicIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null)
         {
-            Logger.LogInformation($"Begin waiting for index creation. Index={PublicIndexName}.");
+            Logger.LogInformation($"Begin waiting for index creation. Index={IndexName}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
             if (timeout == null) timeout = TimeSpan.FromMinutes(10);
             var sleepTime = TimeSpan.FromSeconds(5);
             int nrIterations = (int) (Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
