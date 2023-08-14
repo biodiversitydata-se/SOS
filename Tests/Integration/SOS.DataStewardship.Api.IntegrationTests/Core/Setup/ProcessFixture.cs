@@ -26,8 +26,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
         private List<Taxon> _taxa;
 
-        private IDatasetRepository _observationDatasetRepository;
-        private IEventRepository _observationEventRepository;
+        private IDatasetRepository _datasetRepository;
+        private IEventRepository _eventRepository;
         private IProcessedObservationCoreRepository _processedObservationCoreRepository;
 
 
@@ -50,8 +50,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             _processTimeManager = processTimeManager;
             _processConfiguration = processConfiguration;
 
-            _observationDatasetRepository = observationDatasetRepository;
-            _observationEventRepository = observationEventRepository;
+            _datasetRepository = observationDatasetRepository;
+            _eventRepository = observationEventRepository;
             _processedObservationCoreRepository = processedObservationCoreRepository;
 
             InitializeAsync().Wait();
@@ -65,8 +65,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 
         public async Task InitializeElasticsearchIndices()
         {
-            await _observationDatasetRepository.ClearCollectionAsync();
-            await _observationEventRepository.ClearCollectionAsync();
+            await _datasetRepository.ClearCollectionAsync();
+            await _eventRepository.ClearCollectionAsync();
             await _processedObservationCoreRepository.ClearCollectionAsync(false);
             await _processedObservationCoreRepository.ClearCollectionAsync(true);
         }
@@ -175,11 +175,11 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         {
             if (clearExistingObservations)
             {
-                await _observationDatasetRepository.DeleteAllDocumentsAsync();
+                await _datasetRepository.DeleteAllDocumentsAsync();
             }
-            await _observationDatasetRepository.DisableIndexingAsync();
-            await _observationDatasetRepository.AddManyAsync(datasets);
-            await _observationDatasetRepository.EnableIndexingAsync();
+            await _datasetRepository.DisableIndexingAsync();
+            await _datasetRepository.AddManyAsync(datasets);
+            await _datasetRepository.EnableIndexingAsync();
             await Task.Delay(delayInMs);
         }
 
@@ -187,11 +187,11 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         {
             if (clearExistingObservations)
             {
-                await _observationEventRepository.DeleteAllDocumentsAsync();
+                await _eventRepository.DeleteAllDocumentsAsync();
             }
-            await _observationEventRepository.DisableIndexingAsync();
-            await _observationEventRepository.AddManyAsync(events);
-            await _observationEventRepository.EnableIndexingAsync();
+            await _eventRepository.DisableIndexingAsync();
+            await _eventRepository.AddManyAsync(events);
+            await _eventRepository.EnableIndexingAsync();
             await Task.Delay(delayInMs);
         }
 
@@ -238,6 +238,22 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 
             return _dwcaDatasetFactory;
         }
+
+        public async Task<long> GetObservationsCount(bool protectedIndex = false)
+        {
+            return await _processedObservationCoreRepository.IndexCountAsync(protectedIndex);
+        }
+
+        public async Task<long> GetEventsCount()
+        {
+            return await _eventRepository.IndexCountAsync();
+        }
+
+        public async Task<long> GetDatasetsCount()
+        {
+            return await _datasetRepository.IndexCountAsync();
+        }
+
 
         private void InitAreaHelper()
         {

@@ -208,4 +208,28 @@ public class DwcaImportTests : TestBase
             .Where(m => m.OccurrenceStatus == Contracts.Enums.OccurrenceStatus.InteObserverad).Count()
             .Should().Be(25, "because the DwC-A file contains 25 occurrences with absent status");
     }
+
+    [Fact]
+    public async Task ImportDwcaFile_ShouldHaveExpectedRecords_WhenImportingDwcaWithoutDataset()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------        
+        var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
+        await ProcessFixture.ImportDwcaFileAsync(@"Data/Resources/dwca-datastewardship-without-dataset.zip", dataProvider, Output);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        long datasetCount = await ProcessFixture.GetDatasetsCount();
+        long eventCount = await ProcessFixture.GetEventsCount();
+        long occurrenceCount = await ProcessFixture.GetObservationsCount();        
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------        
+        datasetCount.Should().Be(0, because: "The DwC-A file doesn't contain any datasets");
+        eventCount.Should().Be(7, because: "The DwC-A file contains 7 events");
+        occurrenceCount.Should().Be(15, because: "The DwC-A file contains 15 occurrences");
+    }
 }
