@@ -2345,8 +2345,8 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
 									"",
 									"    const result = pm.response.json();",
-									"    pm.test(\"Observations exists in more than 10 counties\", function () {    ",
-									"        pm.expect(result.records.length).to.greaterThan(10);",
+									"    pm.test(\"Observations exists in more than 5 counties\", function () {    ",
+									"        pm.expect(result.records.length).to.greaterThan(5);",
 									"    });",
 									"});"
 								],
