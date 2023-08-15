@@ -225,15 +225,6 @@ namespace SOS.Lib.IO.DwcArchive
                         continue;
                     }
 
-                    var occurrenceSummary = pair.Value.OccurrenceDwcaWriteSummary;
-                    _logger.LogInformation($"DwC-A export file for {occurrenceSummary.DataProviderIdentifier}. OccurrenceCount={occurrenceSummary.OccurrenceCount}, EmofCount={occurrenceSummary.EmofCount}, MultimediaCount={occurrenceSummary.MultimediaCount}");
-
-                    var eventSummary = pair.Value.EventDwcaWriteSummary;
-                    if (eventSummary != null && eventSummary.EventCount > 0) 
-                    {
-                        _logger.LogInformation($"DwC-A export file for {eventSummary.DataProviderIdentifier}. EventCount={eventSummary.EventCount}, OccurrenceCount={eventSummary.OccurrenceCount}, EmofCount={eventSummary.EmofCount}, MultimediaCount={eventSummary.MultimediaCount}");
-                    }
-
                     if (provider.UseVerbatimFileInExport)
                     {
                         try
@@ -271,10 +262,15 @@ namespace SOS.Lib.IO.DwcArchive
                         continue;
                     }
 
+                    var occurrenceSummary = pair.Value.OccurrenceDwcaWriteSummary;
+                    _logger.LogInformation($"DwC-A export file for {occurrenceSummary.DataProviderIdentifier}. OccurrenceCount={occurrenceSummary.OccurrenceCount}, EmofCount={occurrenceSummary.EmofCount}, MultimediaCount={occurrenceSummary.MultimediaCount}");
+                    
                     dwcaCreationTasks.Add((provider, false), _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(provider,
                         _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
                     if (provider.CreateEventDwC)
                     {
+                        var eventSummary = pair.Value.EventDwcaWriteSummary;                        
+                        _logger.LogInformation($"DwC-A export file for {eventSummary.DataProviderIdentifier}. EventCount={eventSummary.EventCount}, OccurrenceCount={eventSummary.OccurrenceCount}, EmofCount={eventSummary.EmofCount}, MultimediaCount={eventSummary.MultimediaCount}");                        
                         dwcaCreationTasks.Add((provider, true), _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileAsync(provider,
                         _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
                     }
