@@ -210,7 +210,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        public async Task<DwcaBatchWriteResult> WriteHeaderlessDwcaFiles(
+        public async Task<DwcaWriteResult> WriteHeaderlessDwcaFiles(
             DataProvider dataProvider,
             ICollection<Observation> processedObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart,
@@ -219,7 +219,7 @@ namespace SOS.Lib.IO.DwcArchive
         {
             if (!processedObservations?.Any() ?? true)
             {
-                return new DwcaBatchWriteResult() { DataProviderIdentifier = dataProvider.Identifier };
+                return new DwcaWriteResult() { DataProviderIdentifier = dataProvider.Identifier };
             }
             int occurrenceCount = 0;
             int emofCount = 0;
@@ -268,7 +268,7 @@ namespace SOS.Lib.IO.DwcArchive
                     multimediaFileStream);
             }
 
-            return new DwcaBatchWriteResult
+            return new DwcaWriteResult
             {
                 DataProviderIdentifier = dataProvider.Identifier,
                 OccurrenceCount = occurrenceCount,

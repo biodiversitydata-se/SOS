@@ -156,19 +156,37 @@ namespace SOS.Lib.IO.DwcArchive
                 // Exclude sensitive species.
                 dwcaFilePartsInfo.ObservationCountBeforeFilter += processedObservations.Count();
                 var publicObservations = processedObservations
-                    .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();                
-                var writeHeaderlessDwcaFilesTasks = new List<Task<DwcaBatchWriteResult>>()
-                {
-                    _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, dwcaFilePartsInfo, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters)
-                };
-
+                    .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
+                var writeHeaderlessDwcaFilesTasks = new List<Task<DwcaWriteResult>>();
+                Task<DwcaWriteResult> writeOccurrenceBatchTask = _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, dwcaFilePartsInfo, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters);
+                writeHeaderlessDwcaFilesTasks.Add(writeOccurrenceBatchTask);
+                Task<DwcaWriteResult> writeEventBatchTask = null;
                 if (dataProvider.CreateEventDwC)
                 {
-                    writeHeaderlessDwcaFilesTasks.Add(_dwcArchiveEventFileWriter.WriteHeaderlessEventDwcaFilesAsync(dataProvider, publicObservations, filePathByEventFilePart, _writtenEventSets, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters));
+                    writeEventBatchTask = _dwcArchiveEventFileWriter.WriteHeaderlessEventDwcaFilesAsync(dataProvider, publicObservations, filePathByEventFilePart, _writtenEventSets, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters);
+                    writeHeaderlessDwcaFilesTasks.Add(writeEventBatchTask);
                 }
 
-                DwcaBatchWriteResult[] results = await Task.WhenAll(writeHeaderlessDwcaFilesTasks);
-                LogBatchWriteResultSummary(results);
+                DwcaWriteResult[] results = await Task.WhenAll(writeHeaderlessDwcaFilesTasks);
+
+                // Update write summary
+                await _semaphore.WaitAsync();
+                try
+                {
+                    if (writeOccurrenceBatchTask != null)
+                    {
+                        UpdateWriteSummary(dwcaFilePartsInfo.OccurrenceDwcaWriteSummary, writeOccurrenceBatchTask.Result);
+                    }
+
+                    if (writeEventBatchTask != null)
+                    {
+                        UpdateWriteSummary(dwcaFilePartsInfo.EventDwcaWriteSummary, writeOccurrenceBatchTask.Result);
+                    }                    
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }                
             
                 return true;
             }
@@ -179,30 +197,14 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        private void LogBatchWriteResultSummary(IEnumerable<DwcaBatchWriteResult> batchWriteResults)
+        private void UpdateWriteSummary(DwcaWriteResult summary, DwcaWriteResult batch)
         {
-            try
-            {
-                var groupedResults = batchWriteResults
-                    .GroupBy(r => r.DataProviderIdentifier)
-                    .Select(group => new
-                    {
-                        DataProviderIdentifier = group.Key,
-                        TotalEventCount = group.Sum(r => r.EventCount),
-                        TotalOccurrenceCount = group.Sum(r => r.OccurrenceCount),
-                        TotalEmofCount = group.Sum(r => r.EmofCount),
-                        TotalMultimediaCount = group.Sum(r => r.MultimediaCount)
-                    })
-                    .ToList();
-
-                foreach (var result in groupedResults)
-                {
-                    _logger.LogInformation($"DwC-A batch summary. Identifier: {result.DataProviderIdentifier}, EventCount: {result.TotalEventCount}, OccurrenceCount: {result.TotalOccurrenceCount}, EmofCount: {result.TotalEmofCount}, MultimediaCount: {result.TotalMultimediaCount}");                    
-                }
-            }
-            catch (Exception) { }
+            summary.OccurrenceCount += batch.OccurrenceCount;
+            summary.EventCount += batch.EventCount;
+            summary.MultimediaCount += batch.MultimediaCount;
+            summary.EmofCount += batch.EmofCount;
         }
-
+      
         /// <summary>
         /// Create DwC-A for each data provider and DwC-A for all data providers combined.
         /// </summary>
@@ -223,7 +225,14 @@ namespace SOS.Lib.IO.DwcArchive
                         continue;
                     }
 
-                    _logger.LogInformation($"DwC-A export file for {provider.Identifier} has {pair.Value.ObservationCount:N0} observations. ObservationCountBeforeFilter={pair.Value.ObservationCountBeforeFilter:N0}");
+                    var occurrenceSummary = pair.Value.OccurrenceDwcaWriteSummary;
+                    _logger.LogInformation($"DwC-A export file for {occurrenceSummary.DataProviderIdentifier}. OccurrenceCount={occurrenceSummary.OccurrenceCount}, EmofCount={occurrenceSummary.EmofCount}, MultimediaCount={occurrenceSummary.MultimediaCount}");
+
+                    var eventSummary = pair.Value.EventDwcaWriteSummary;
+                    if (eventSummary != null && eventSummary.EventCount > 0) 
+                    {
+                        _logger.LogInformation($"DwC-A export file for {eventSummary.DataProviderIdentifier}. EventCount={eventSummary.EventCount}, OccurrenceCount={eventSummary.OccurrenceCount}, EmofCount={eventSummary.EmofCount}, MultimediaCount={eventSummary.MultimediaCount}");
+                    }
 
                     if (provider.UseVerbatimFileInExport)
                     {
