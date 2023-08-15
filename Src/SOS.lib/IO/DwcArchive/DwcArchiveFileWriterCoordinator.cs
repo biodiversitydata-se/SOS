@@ -20,7 +20,7 @@ using System.Threading;
 
 namespace SOS.Lib.IO.DwcArchive
 {
-    public class DwcArchiveFileWriterCoordinator : Interfaces.IDwcArchiveFileWriterCoordinator
+    public class DwcArchiveFileWriterCoordinator : IDwcArchiveFileWriterCoordinator
     {     
         private readonly IFileService _fileService;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
