@@ -24,7 +24,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Helpers
 
             return new DwcaComposite
             {
-                Datasets = datasets,
+                Datasets = datasets == null ? new List<DwcVerbatimDataset>() : datasets,
                 Events = events,
                 Occurrences = occurrences
             };

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Search.Filters;
@@ -53,5 +54,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<List<Dataset>> GetDatasetsByIds(IEnumerable<string> ids, IEnumerable<SortOrderFilter> sortOrders = null);
 
         Task<bool> DeleteAllDocumentsAsync();
+
+        Task WaitForIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null);
+
+        /// <summary>
+        /// Count documents in index
+        /// </summary>        
+        /// <returns></returns>
+        Task<long> IndexCountAsync();
     }
 }

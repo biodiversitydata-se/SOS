@@ -543,5 +543,44 @@ namespace SOS.Lib.Repositories.Processed
                 new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
             }
         };
+
+        public async Task WaitForIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null)
+        {
+            Logger.LogInformation($"Begin waiting for index creation. Index={IndexName}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
+            if (timeout == null) timeout = TimeSpan.FromMinutes(10);
+            var sleepTime = TimeSpan.FromSeconds(5);
+            int nrIterations = (int)(Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
+            long docCount = await IndexCountAsync();
+            var iterations = 0;
+
+            // Compare number of documents processed with actually db count
+            // If docCount is less than process count, indexing is not ready yet
+            while (docCount < expectedRecordsCount && iterations < nrIterations)
+            {
+                iterations++; // Safety to prevent infinite loop.                                
+                await Task.Delay(sleepTime);
+                docCount = await IndexCountAsync();
+            }
+
+            Logger.LogInformation($"Finish waiting for index creation. Index={IndexName}.");
+        }
+
+        public async Task<long> IndexCountAsync()
+        {
+            try
+            {
+                var countResponse = await Client.CountAsync<Event>(s => s
+                    .Index(IndexName)
+                );
+
+                countResponse.ThrowIfInvalid();
+                return countResponse.Count;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return -1;
+            }
+        }
     }
 }

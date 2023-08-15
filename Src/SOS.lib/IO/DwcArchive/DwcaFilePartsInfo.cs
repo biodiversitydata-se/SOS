@@ -16,6 +16,8 @@ namespace SOS.Lib.IO.DwcArchive
         public Dictionary<string, Dictionary<DwcaFilePart, string>> FilePathByBatchIdAndFilePart { get; set; }
         public Dictionary<string, Dictionary<DwcaEventFilePart, string>> EventFilePathByBatchIdAndFilePart { get; set; }        
         public WrittenEventSets WrittenEventsData { get; set; } = new WrittenEventSets();
+        public DwcaWriteResult OccurrenceDwcaWriteSummary { get; set; } = new DwcaWriteResult();
+        public DwcaWriteResult EventDwcaWriteSummary { get; set; } = new DwcaWriteResult();
         public int ObservationCount { get; set; }
         public int ObservationCountBeforeFilter { get; set; }
 
@@ -26,7 +28,9 @@ namespace SOS.Lib.IO.DwcArchive
                 DataProvider = dataProvider,
                 ExportFolder = Path.Combine(exportFolderPath, $"DwcaCreationTempFiles-{dataProvider.Identifier}"),
                 FilePathByBatchIdAndFilePart = new Dictionary<string, Dictionary<DwcaFilePart, string>>(),
-                EventFilePathByBatchIdAndFilePart = new Dictionary<string, Dictionary<DwcaEventFilePart, string>>()
+                EventFilePathByBatchIdAndFilePart = new Dictionary<string, Dictionary<DwcaEventFilePart, string>>(),
+                OccurrenceDwcaWriteSummary = new DwcaWriteResult() { DataProviderIdentifier = dataProvider.Identifier },
+                EventDwcaWriteSummary = new DwcaWriteResult() { DataProviderIdentifier = dataProvider.Identifier }
             };
             return dwcaFilePartsInfo;
         }

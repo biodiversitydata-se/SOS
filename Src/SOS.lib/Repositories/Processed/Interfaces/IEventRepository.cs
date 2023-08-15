@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Search.Filters;
@@ -55,6 +56,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> DeleteAllDocumentsAsync();
         Task<List<AggregationItemList<TKey, TValue>>> GetAllAggregationItemsListAsync<TKey, TValue>(EventSearchFilter filter, string aggregationFieldKey, string aggregationFieldList);
         Task<List<AggregationItem>> GetAllAggregationItemsAsync(EventSearchFilter filter, string aggregationField);        
-        Task<PagedResult<dynamic>> GetChunkAsync(EventSearchFilter filter, int skip, int take, bool getAllFields = false);
+        Task<PagedResult<dynamic>> GetChunkAsync(EventSearchFilter filter, int skip, int take, bool getAllFields = false);        
+        Task WaitForIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null);
+
+        /// <summary>
+        /// Count documents in index
+        /// </summary>        
+        /// <returns></returns>
+        Task<long> IndexCountAsync();
     }
 }

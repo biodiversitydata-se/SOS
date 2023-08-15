@@ -274,7 +274,7 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         /// <inheritdoc/>
-        public async Task<DwcaBatchWriteResult> WriteHeaderlessEventDwcaFilesAsync(
+        public async Task<DwcaWriteResult> WriteHeaderlessEventDwcaFilesAsync(
             DataProvider dataProvider,
             ICollection<Observation> processedObservations,
             Dictionary<DwcaEventFilePart, string> eventFilePathByFilePart,
@@ -283,7 +283,7 @@ namespace SOS.Lib.IO.DwcArchive
         {
             if (!processedObservations?.Any() ?? true)
             {
-                return new DwcaBatchWriteResult() { DataProviderIdentifier = dataProvider.Identifier };
+                return new DwcaWriteResult() { DataProviderIdentifier = dataProvider.Identifier };
             }
             int eventsCount = 0;
             int occurrenceCount = 0;
@@ -353,7 +353,7 @@ namespace SOS.Lib.IO.DwcArchive
                     true);
             }
 
-            return new DwcaBatchWriteResult
+            return new DwcaWriteResult
             {
                 DataProviderIdentifier = dataProvider.Identifier,
                 EventCount = eventsCount,

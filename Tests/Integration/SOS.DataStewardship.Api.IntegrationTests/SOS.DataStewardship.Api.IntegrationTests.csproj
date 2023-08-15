@@ -64,6 +64,9 @@
     <None Update="Data\Resources\dwca-datastewardship-single-dataset.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\Resources\dwca-datastewardship-without-dataset.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\Resources\mongodb-sos-dev.gz">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
