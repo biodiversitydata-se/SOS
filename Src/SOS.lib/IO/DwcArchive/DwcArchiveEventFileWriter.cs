@@ -23,7 +23,6 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using Amazon.Runtime.Internal.Util;
 
 namespace SOS.Lib.IO.DwcArchive
 {
