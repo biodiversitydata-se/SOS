@@ -18,7 +18,6 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Search.Filters;
-using Amazon.Runtime.Internal.Util;
 
 namespace SOS.Lib.IO.DwcArchive
 {
