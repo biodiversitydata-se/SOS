@@ -112,6 +112,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Analysis.Api", "Src\SOS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.ElasticSearch.Proxy.UnitTests", "Tests\Unit\SOS.ElasticSearch.Proxy.UnitTests\SOS.ElasticSearch.Proxy.UnitTests.csproj", "{73FCC760-127E-4D45-8DB3-63DC64F3B846}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.ContainerIntegrationTests", "Tests\Integration\SOS.ContainerIntegrationTests\SOS.ContainerIntegrationTests.csproj", "{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -214,6 +216,10 @@ Global
 		{73FCC760-127E-4D45-8DB3-63DC64F3B846}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73FCC760-127E-4D45-8DB3-63DC64F3B846}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73FCC760-127E-4D45-8DB3-63DC64F3B846}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -250,6 +256,7 @@ Global
 		{54507E17-2CDF-4686-940E-BE1EB727C814} = {A3C5E4A0-5599-48B7-BE17-07E19D585ACE}
 		{D6314D60-5107-407E-8FD8-76CA37F6090C} = {A1FE1227-E3C9-455B-9F43-FEEEFB131B25}
 		{73FCC760-127E-4D45-8DB3-63DC64F3B846} = {E71FD295-A777-4518-AEB9-6E5E8D1097B0}
+		{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81} = {A3C5E4A0-5599-48B7-BE17-07E19D585ACE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CBCE6ED-CC4F-4B55-913F-1231086E92FE}
