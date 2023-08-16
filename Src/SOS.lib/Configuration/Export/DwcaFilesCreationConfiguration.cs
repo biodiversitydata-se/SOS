@@ -18,10 +18,5 @@ public class DwcaFilesCreationConfiguration
     /// <summary>
     /// If true, check if the DwC-A files that is created contains any illegal characters.
     /// </summary>
-    public bool CheckForIllegalCharacters { get; set; }
-
-    /// <summary>
-    /// The minimum number of observations that is needed to create Artportalen DwC-A file.
-    /// </summary>
-    public int ArtportalenLowerLimitCount { get; set; }
+    public bool CheckForIllegalCharacters { get; set; }    
 }
