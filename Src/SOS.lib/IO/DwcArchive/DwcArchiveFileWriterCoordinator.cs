@@ -154,7 +154,6 @@ namespace SOS.Lib.IO.DwcArchive
                 }
 
                 // Exclude sensitive species.
-                dwcaFilePartsInfo.ObservationCountBeforeFilter += processedObservations.Count();
                 var publicObservations = processedObservations
                     .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
                 var writeHeaderlessDwcaFilesTasks = new List<Task<DwcaWriteResult>>();
@@ -180,7 +179,7 @@ namespace SOS.Lib.IO.DwcArchive
 
                     if (writeEventBatchTask != null)
                     {
-                        UpdateWriteSummary(dwcaFilePartsInfo.EventDwcaWriteSummary, writeOccurrenceBatchTask.Result);
+                        UpdateWriteSummary(dwcaFilePartsInfo.EventDwcaWriteSummary, writeEventBatchTask.Result);
                     }                    
                 }
                 finally
@@ -218,13 +217,6 @@ namespace SOS.Lib.IO.DwcArchive
                 foreach (var pair in _dwcaFilePartsInfoByDataProvider)
                 {
                     var provider = pair.Key;
-                    // Skip creating Artportalen DwC-A if the number of observations is too low.
-                    if (provider.Id == 1 && pair.Value.ObservationCount < _dwcaFilesCreationConfiguration.ArtportalenLowerLimitCount)
-                    {
-                        _logger.LogError($"Skipped creating Artportalen DwC-A. The number of Artportalen observations was {pair.Value.ObservationCount:N0} but it need to be at least {_dwcaFilesCreationConfiguration.ArtportalenLowerLimitCount}.");
-                        continue;
-                    }
-
                     if (provider.UseVerbatimFileInExport)
                     {
                         try
@@ -262,15 +254,10 @@ namespace SOS.Lib.IO.DwcArchive
                         continue;
                     }
 
-                    var occurrenceSummary = pair.Value.OccurrenceDwcaWriteSummary;
-                    _logger.LogInformation($"DwC-A export file for {occurrenceSummary.DataProviderIdentifier}. OccurrenceCount={occurrenceSummary.OccurrenceCount}, EmofCount={occurrenceSummary.EmofCount}, MultimediaCount={occurrenceSummary.MultimediaCount}");
-                    
                     dwcaCreationTasks.Add((provider, false), _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(provider,
                         _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
                     if (provider.CreateEventDwC)
-                    {
-                        var eventSummary = pair.Value.EventDwcaWriteSummary;                        
-                        _logger.LogInformation($"DwC-A export file for {eventSummary.DataProviderIdentifier}. EventCount={eventSummary.EventCount}, OccurrenceCount={eventSummary.OccurrenceCount}, EmofCount={eventSummary.EmofCount}, MultimediaCount={eventSummary.MultimediaCount}");                        
+                    {                        
                         dwcaCreationTasks.Add((provider, true), _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileAsync(provider,
                         _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
                     }
@@ -295,8 +282,19 @@ namespace SOS.Lib.IO.DwcArchive
                         continue;
                     }
 
+                    var filePartsInfo = _dwcaFilePartsInfoByDataProvider[task.Key.dataProvider];
                     var hash = await GetFileHashAsync(task.Value.Result);
-                    _logger.LogInformation($"Generated DwC-A {(task.Key.eventBased ? "event based" : "")} file for {dataProvider}. Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
+                    if (task.Key.eventBased)
+                    {
+                        var writeSummary = filePartsInfo.OccurrenceDwcaWriteSummary;
+                        _logger.LogInformation($"Generated DwC-A file for {dataProvider}. OccurrenceCount={writeSummary.OccurrenceCount:N0}, EmofCount={writeSummary.EmofCount:N0}, MultimediaCount={writeSummary.MultimediaCount:N0}, Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
+                    }
+                    else
+                    {
+                        var writeSummary = filePartsInfo.EventDwcaWriteSummary;
+                        _logger.LogInformation($"Generated event based DwC-A file for {dataProvider}. EventCount={writeSummary.EventCount:N0} OccurrenceCount={writeSummary.OccurrenceCount:N0}, EmofCount={writeSummary.EmofCount:N0}, MultimediaCount={writeSummary.MultimediaCount:N0}, Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
+                    }
+                    
                     if (dataProvider.LatestUploadedFileHash == hash)
                     {
                         continue;

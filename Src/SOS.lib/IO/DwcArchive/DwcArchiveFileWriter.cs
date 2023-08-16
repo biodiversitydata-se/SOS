@@ -232,8 +232,7 @@ namespace SOS.Lib.IO.DwcArchive
             var dwcObservations = processedObservations.ToDarwinCore(fixSbdiArtportalenInstitutionCode);
             if (checkForIllegalCharacters) ValidateObservations(dwcObservations);
             if (dwcObservations != null && dwcObservations.Any())
-            {
-                dwcaFilePartsInfo.ObservationCount += dwcObservations.Count();
+            {                
                 occurrenceCount = dwcObservations.Count();
                 await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
                 await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
