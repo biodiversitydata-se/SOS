@@ -27,7 +27,8 @@ namespace SOS.Lib.IO.DwcArchive
             SearchFilterBase filter,
             Stream stream,
             IProcessedObservationCoreRepository processedObservationRepository,
-            IJobCancellationToken cancellationToken)
+            IJobCancellationToken cancellationToken,
+            bool isEventCore = false)
         {
             try
             {
@@ -38,7 +39,7 @@ namespace SOS.Lib.IO.DwcArchive
                 var csvFileHelper = new CsvFileHelper();
                 csvFileHelper.InitializeWrite(stream, "\t");
                 // Write header row
-                WriteHeaderRow(csvFileHelper);
+                WriteHeaderRow(csvFileHelper, isEventCore);
 
                 while (searchResult?.Records?.Any() ?? false)
                 {

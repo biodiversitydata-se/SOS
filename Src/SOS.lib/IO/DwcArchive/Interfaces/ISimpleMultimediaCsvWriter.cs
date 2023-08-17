@@ -21,10 +21,12 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="stream"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="isEventCore"></param>
         /// <returns></returns>
         Task<bool> CreateCsvFileAsync(SearchFilterBase filter, Stream stream,
             IProcessedObservationCoreRepository processedObservationRepository,
-            IJobCancellationToken cancellationToken);
+            IJobCancellationToken cancellationToken,
+            bool isEventCore = false);
 
         /// <summary>
         ///  Create a headerless Simple Multimedia extension CSV file.

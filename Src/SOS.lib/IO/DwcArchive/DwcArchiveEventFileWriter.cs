@@ -428,7 +428,8 @@ namespace SOS.Lib.IO.DwcArchive
                         filter,
                         fileStream,
                         processedObservationRepository,
-                        cancellationToken);
+                        cancellationToken, 
+                        true);
                 }
 
                 // Create multimedia.txt
@@ -438,7 +439,8 @@ namespace SOS.Lib.IO.DwcArchive
                         filter,
                         fileStream,
                         processedObservationRepository,
-                        cancellationToken);
+                        cancellationToken,
+                        true);
                 }
 
                 // Delete extension files if not used.
