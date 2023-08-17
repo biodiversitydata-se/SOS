@@ -286,13 +286,13 @@ namespace SOS.Lib.IO.DwcArchive
                     var hash = await GetFileHashAsync(task.Value.Result);
                     if (task.Key.eventBased)
                     {
-                        var writeSummary = filePartsInfo.OccurrenceDwcaWriteSummary;
-                        _logger.LogInformation($"Generated DwC-A file for {dataProvider}. OccurrenceCount={writeSummary.OccurrenceCount:N0}, EmofCount={writeSummary.EmofCount:N0}, MultimediaCount={writeSummary.MultimediaCount:N0}, Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
+                        var writeSummary = filePartsInfo.EventDwcaWriteSummary;
+                        _logger.LogInformation($"Generated event based DwC-A file for {dataProvider}. EventCount={writeSummary.EventCount:N0} OccurrenceCount={writeSummary.OccurrenceCount:N0}, EmofCount={writeSummary.EmofCount:N0}, MultimediaCount={writeSummary.MultimediaCount:N0}, Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");                        
                     }
                     else
                     {
-                        var writeSummary = filePartsInfo.EventDwcaWriteSummary;
-                        _logger.LogInformation($"Generated event based DwC-A file for {dataProvider}. EventCount={writeSummary.EventCount:N0} OccurrenceCount={writeSummary.OccurrenceCount:N0}, EmofCount={writeSummary.EmofCount:N0}, MultimediaCount={writeSummary.MultimediaCount:N0}, Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
+                        var writeSummary = filePartsInfo.OccurrenceDwcaWriteSummary;
+                        _logger.LogInformation($"Generated DwC-A file for {dataProvider}. OccurrenceCount={writeSummary.OccurrenceCount:N0}, EmofCount={writeSummary.EmofCount:N0}, MultimediaCount={writeSummary.MultimediaCount:N0}, Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
                     }
                     
                     if (dataProvider.LatestUploadedFileHash == hash)
