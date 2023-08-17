@@ -16,6 +16,8 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Observations.Api.Repositories;
+using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 
@@ -101,6 +103,8 @@ public class IntegrationTestsFixture : IAsyncLifetime
         serviceCollection.AddSingleton<IElasticClientManager, ElasticClientTestManager>();
         serviceCollection.AddSingleton<IDatasetRepository, DatasetRepository>();
         serviceCollection.AddSingleton<IEventRepository, EventRepository>();
+        
+        serviceCollection.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
         serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
 
         var elasticConfiguration = CreateElasticSearchConfiguration();

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using SOS.ContainerIntegrationTests.Stubs;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 
@@ -35,6 +36,7 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
         var observationDatasetRepository = scope.ServiceProvider.GetService<IDatasetRepository>();
         var observationEventRepository = scope.ServiceProvider.GetService<IEventRepository>();
         var processedObservationCoreRepository = scope.ServiceProvider.GetService<IProcessedObservationCoreRepository>();
+        var processedObservationRepository = scope.ServiceProvider.GetService<IProcessedObservationRepository>();
         var processClient = scope.ServiceProvider.GetService<IProcessClient>();
 
         builder.ConfigureTestServices(services =>
@@ -50,6 +52,7 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
             services.Replace(ServiceDescriptor.Scoped<IDatasetRepository>(x => observationDatasetRepository));
             services.Replace(ServiceDescriptor.Scoped<IEventRepository>(x => observationEventRepository));
             services.Replace(ServiceDescriptor.Scoped<IProcessedObservationCoreRepository>(x => processedObservationCoreRepository));
+            services.Replace(ServiceDescriptor.Scoped<IProcessedObservationRepository>(x => processedObservationRepository));
             services.Replace(ServiceDescriptor.Singleton<IProcessClient>(x => processClient));
         });
     }
