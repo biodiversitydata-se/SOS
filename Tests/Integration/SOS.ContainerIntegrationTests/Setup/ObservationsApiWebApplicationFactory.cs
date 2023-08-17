@@ -1,4 +1,10 @@
-﻿namespace SOS.ContainerIntegrationTests.Setup;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using SOS.ContainerIntegrationTests.Stubs;
+using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
+
+namespace SOS.ContainerIntegrationTests.Setup;
 
 /// <summary>
 /// Represents a custom WebApplicationFactory used for testing the Observations API.
@@ -9,6 +15,8 @@
 /// </remarks>
 public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observations.Api.Program>
 {
+    public ServiceProvider ServiceProvider { get; set; }
+
     /// <summary>
     /// Initializes a new instance of the RestApiWebApplicationFactory class.
     /// </summary>
@@ -23,12 +31,26 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
     /// <param name="builder">The WebHostBuilder instance to be configured.</param>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        // Here is where you can replace services with test-specific implementations.
-        // For example, you can replace a conventional database with a test database 
-        // that temporarily runs in a container for as long as the test runs.
+        using var scope = ServiceProvider.CreateScope();
+        var observationDatasetRepository = scope.ServiceProvider.GetService<IDatasetRepository>();
+        var observationEventRepository = scope.ServiceProvider.GetService<IEventRepository>();
+        var processedObservationCoreRepository = scope.ServiceProvider.GetService<IProcessedObservationCoreRepository>();
+        var processClient = scope.ServiceProvider.GetService<IProcessClient>();
+
         builder.ConfigureTestServices(services =>
         {
-            //services.Replace(...);
+            services.Configure<AuthenticationOptions>(options =>
+            {
+                options.SchemeMap.Clear();
+                ((IList<AuthenticationSchemeBuilder>)options.Schemes).Clear();
+            });
+
+            services.AddAuthentication(TestAuthHandler.AuthenticationScheme)
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, options => { });
+            services.Replace(ServiceDescriptor.Scoped<IDatasetRepository>(x => observationDatasetRepository));
+            services.Replace(ServiceDescriptor.Scoped<IEventRepository>(x => observationEventRepository));
+            services.Replace(ServiceDescriptor.Scoped<IProcessedObservationCoreRepository>(x => processedObservationCoreRepository));
+            services.Replace(ServiceDescriptor.Singleton<IProcessClient>(x => processClient));
         });
     }
 }

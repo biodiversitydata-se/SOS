@@ -35,4 +35,40 @@
     <ProjectReference Include="..\..\..\Src\SOS.Observations.Api\SOS.Observations.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Resources\Dwca\dwca-datastewardship-multiple-datasets.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Dwca\dwca-datastewardship-single-dataset-with-other-dataset-identifier.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Dwca\dwca-datastewardship-single-dataset-with-taxalist.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Dwca\dwca-datastewardship-single-dataset.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Dwca\dwca-datastewardship-without-dataset.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\MongoDb\mongodb-sos-dev.gz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\TestDataBuilder\ArtportalenVerbatimChecklists_1000.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\TestDataBuilder\ArtportalenVerbatimObservations_1000.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\TestDataBuilder\ArtportalenVerbatimProtectedObservations_1000.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\TestDataBuilder\DarwinCoreObservations_1000.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\TestDataBuilder\TaxonCollection.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

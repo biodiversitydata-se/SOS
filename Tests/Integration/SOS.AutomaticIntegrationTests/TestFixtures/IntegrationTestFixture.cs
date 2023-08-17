@@ -653,7 +653,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var processedObservations = ProcessObservations(verbatimObservations);
             await AddObservationsToElasticsearchAsync(processedObservations);
         }
-
+        
         public async Task ProcessAndAddUserObservationToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
         {
             List<Observation> processedObservations = ProcessObservations(verbatimObservations);
@@ -741,8 +741,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
 
             _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, true);
             return processedObservations;
-        }
-
+        }        
 
         public List<Checklist> ProcessChecklists(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists)
         {            

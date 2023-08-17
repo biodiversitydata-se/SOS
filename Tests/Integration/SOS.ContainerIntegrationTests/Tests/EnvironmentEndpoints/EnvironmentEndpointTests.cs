@@ -17,7 +17,7 @@ public class EnvironmentEndpointTests : IntegrationTestsBase
     /// Integration test for the get Environment endpoint.
     /// </summary>
     [Fact]
-    public async Task DateEndpoint_ReturnsParsedDate_GivenValidDate()
+    public async Task EnvironmentEndpoint_ReturnsServerEnvironmentInformation()
     {
         // Arrange
         var apiClient = TestFixture.CreateApiClient();
