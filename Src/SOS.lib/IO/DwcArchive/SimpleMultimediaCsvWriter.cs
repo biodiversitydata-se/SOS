@@ -52,7 +52,7 @@ namespace SOS.Lib.IO.DwcArchive
                     // Write occurrence rows to CSV file.
                     foreach (var row in multimediaRows)
                     {
-                        WriteSimpleMultimediaRow(csvFileHelper, row);
+                        WriteSimpleMultimediaRow(csvFileHelper, row, isEventCore);
                     }
                     await csvFileHelper.FlushAsync();
 
