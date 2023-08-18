@@ -2,25 +2,10 @@
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
-namespace SOS.ContainerIntegrationTests.TestData;
+namespace SOS.ContainerIntegrationTests.TestData.Factories;
 
-internal static class ArtportalenTestData
+internal static class ArtportalenTestDataFactory
 {
-    public static IList<ArtportalenObservationVerbatim> Create100RecordsWhere60HasRedlistCategoriesCrEnVu()
-    {
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>
-            .CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(20).HaveRedlistedTaxonId("CR") // Critically Endangered (Akut hotad)
-             .TheNext(20).HaveRedlistedTaxonId("EN") // Endangered (Starkt hotad)
-             .TheNext(20).HaveRedlistedTaxonId("VU") // Vulnerable (Sårbar)
-             .TheNext(20).HaveRedlistedTaxonId("NT") // Near Threatened (Nära hotad)
-             .TheNext(20).HaveRedlistedTaxonId(null) // Not redlisted taxa
-            .Build();
-
-        return verbatimObservations;
-    }
-
     public static IList<ArtportalenObservationVerbatim> Create100RecordsWithRedlistCategories(
         string? category1, string? category2, string? category3, string? category4, string? category5)
     {
@@ -36,7 +21,6 @@ internal static class ArtportalenTestData
 
         return verbatimObservations;
     }
-
 
     public static IList<ArtportalenObservationVerbatim> Create100RecordsWithTaxonIds(int taxonId1, int taxonId2, int taxonId3, int taxonId4, int taxonId5)
     {

@@ -1,6 +1,6 @@
 ﻿using SOS.Observations.Api.Dtos.Filter;
 
-namespace SOS.ContainerIntegrationTests.TestData;
+namespace SOS.ContainerIntegrationTests.TestData.Factories;
 internal static class SearchFilterDtoFactory
 {
     public static SearchFilterDto CreateWithRedListCategories(params string[] categories)
@@ -56,7 +56,7 @@ internal static class SearchFilterDtoFactory
         {
             Taxon = new TaxonFilterDto
             {
-                TaxonCategories = taxonCategoryIds                
+                TaxonCategories = taxonCategoryIds
             }
         };
     }

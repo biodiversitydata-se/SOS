@@ -1,5 +1,6 @@
 ﻿using FizzWare.NBuilder;
 using Nest;
+using SOS.ContainerIntegrationTests.TestData.Factories;
 using SOS.Lib.Models.Processed.Observation;
 using System;
 using System.Collections.Generic;

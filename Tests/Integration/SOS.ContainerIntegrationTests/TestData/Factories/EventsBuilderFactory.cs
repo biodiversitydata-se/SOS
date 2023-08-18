@@ -4,7 +4,7 @@ using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.ContainerIntegrationTests.Helpers;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 
-namespace SOS.ContainerIntegrationTests.TestData;
+namespace SOS.ContainerIntegrationTests.TestData.Factories;
 internal static class EventsBuilderFactory
 {
     public static IOperable<Event> Create(int size)

@@ -1,6 +1,7 @@
 ﻿using FizzWare.NBuilder;
 using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData;
+using SOS.ContainerIntegrationTests.TestData.Factories;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;

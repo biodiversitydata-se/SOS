@@ -5,7 +5,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.ContainerIntegrationTests.Helpers;
 using Nest;
 
-namespace SOS.ContainerIntegrationTests.TestData;
+namespace SOS.ContainerIntegrationTests.TestData.Factories;
 internal static class ObservationsBuilderFactory
 {
     private static Bogus.Faker _faker = new Bogus.Faker("sv");
@@ -35,7 +35,7 @@ internal static class ObservationsBuilderFactory
                 {
                     Id = _faker.Random.Int(0, 10000)
                 })
-                .With(m => m.Location = new Lib.Models.Processed.Observation.Location
+                .With(m => m.Location = new Location
                 {
 
                 });
