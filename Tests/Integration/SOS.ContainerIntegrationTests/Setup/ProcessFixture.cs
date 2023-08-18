@@ -1,25 +1,17 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
-using SOS.ContainerIntegrationTests.Helpers;
+﻿using SOS.ContainerIntegrationTests.Helpers;
 using SOS.ContainerIntegrationTests.TestData;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 public class ProcessFixture
@@ -33,17 +25,15 @@ public class ProcessFixture
     private Dictionary<int, Taxon> _taxaById;
     private ITaxonRepository _taxonRepository;
     private IProcessTimeManager _processTimeManager;
-    private ProcessConfiguration _processConfiguration;
-
-    private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
+    private ProcessConfiguration _processConfiguration;    
     private List<Taxon> _taxa;
-
     private IDatasetRepository _datasetRepository;
     private IEventRepository _eventRepository;
     private IProcessedObservationCoreRepository _processedObservationCoreRepository;
     private ArtportalenObservationFactory _artportalenObservationFactory;
     private IVocabularyValueResolver _vocabularyValueResolver;
     private IArtportalenDatasetMetadataRepository _artportalenDatasetMetadataRepository;
+    private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
 
     public ProcessFixture(IAreaHelper areaHelper,
         IProcessClient processClient,
@@ -77,8 +67,7 @@ public class ProcessFixture
     {
         _taxa = await _taxonRepository.GetAllAsync();
         _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
-
-        //var datasetRepository = new ArtportalenDatasetMetadataRepository(_processClient, new NullLogger<ArtportalenDatasetMetadataRepository>());
+        
         _artportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
             new DataProvider { Id = 1 },
             _taxaById,

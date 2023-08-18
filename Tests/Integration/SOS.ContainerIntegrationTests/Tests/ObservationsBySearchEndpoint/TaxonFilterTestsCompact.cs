@@ -1,10 +1,7 @@
-﻿using FizzWare.NBuilder;
-using SOS.ContainerIntegrationTests.Setup;
+﻿using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 
@@ -14,9 +11,9 @@ namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint;
 /// Integration tests for ObservationsBySearch endpoint when using taxon filters.
 /// </summary>
 [Collection(IntegrationTestsCollection.Name)]
-public class TaxonFilterTests : IntegrationTestsBase
+public class TaxonFilterTestsCompact : IntegrationTestsBase
 {
-    public TaxonFilterTests(IntegrationTestsFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    public TaxonFilterTestsCompact(IntegrationTestsFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
     }
     
@@ -26,44 +23,29 @@ public class TaxonFilterTests : IntegrationTestsBase
         // Arrange
         var apiClient = TestFixture.CreateApiClient();
         int expectedObservationsCount = 60;
-        var searchFilter = SearchFilterDtoFactory.CreateWithRedListCategories("CR", "EN", "VU");
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>
-            .CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(20).HaveRedlistedTaxonId("CR") // Critically Endangered (Akut hotad)
-             .TheNext(20).HaveRedlistedTaxonId("EN") // Endangered (Starkt hotad)
-             .TheNext(20).HaveRedlistedTaxonId("VU") // Vulnerable (Sårbar)
-             .TheNext(20).HaveRedlistedTaxonId("NT") // Near Threatened (Nära hotad)
-             .TheNext(20).HaveRedlistedTaxonId(null) // Not redlisted taxa
-            .Build();
+        var searchFilter = SearchFilterDtoFactory.CreateWithRedListCategories("CR", "EN", "VU");        
+        var verbatimObservations = ArtportalenTestData.Create100RecordsWithRedlistCategories("CR", "EN", "VU", "NT", null);        
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        
+
         // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(expectedObservationsCount, 
+        result!.TotalCount.Should().Be(expectedObservationsCount,
             because: "60 out of 100 observations added to Elasticsearch had one of the Red List categories CR, EN, or VU.");
     }
-
+   
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByTaxonIds()
     {
         // Arrange
         var apiClient = TestFixture.CreateApiClient();
         int expectedObservationsCount = 60;
-        var searchFilter = SearchFilterDtoFactory.CreateWithTaxonIds(TaxonIds.Silvergran, TaxonIds.Blåmes, TaxonIds.Talgoxe);        
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(20).With(o => o.TaxonId = TaxonIds.Skata) // Pica pica
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Silvergran)  // Abies alba
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Jättebalsamin)  // Impatiens glandulifera
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Talgoxe)  // Parus major
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Blåmes)  // Cyanistes caeruleus
-            .Build();
-
+        var searchFilter = SearchFilterDtoFactory.CreateWithTaxonIds(TaxonIds.Silvergran, TaxonIds.Blåmes, TaxonIds.Talgoxe);
+        var verbatimObservations = ArtportalenTestData.Create100RecordsWithTaxonIds(
+            TaxonIds.Jättebalsamin, TaxonIds.Silvergran, TaxonIds.Blåmes, TaxonIds.Talgoxe, TaxonIds.Skata);
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
 
         // Act
@@ -74,23 +56,17 @@ public class TaxonFilterTests : IntegrationTestsBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(expectedObservationsCount,
             because: "60 out of 100 observations added to Elasticsearch had one of the Taxon Silvergran, Blåmes, Talgoxe.");
-    }  
+    }
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingForUnderlyingTaxa()
     {
         // Arrange
         var apiClient = TestFixture.CreateApiClient();
-        int expectedObservationsCount = 60;        
-        var searchFilter = SearchFilterDtoFactory.CreateWithTaxonIds(includeUnderlyingTaxa: true, TaxonIds.Mesar);
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(20).With(o => o.TaxonId = TaxonIds.Svartmes)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Blåmes)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Tofsmes)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Jättebalsamin)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Duvhök)
-            .Build();
+        int expectedObservationsCount = 60;
+        var searchFilter = SearchFilterDtoFactory.CreateWithTaxonIds(includeUnderlyingTaxa: true, TaxonIds.Mesar);        
+        var verbatimObservations = ArtportalenTestData.Create100RecordsWithTaxonIds(
+            TaxonIds.Svartmes, TaxonIds.Blåmes, TaxonIds.Tofsmes, TaxonIds.Duvhök, TaxonIds.Jättebalsamin);
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
 
         // Act
@@ -101,8 +77,8 @@ public class TaxonFilterTests : IntegrationTestsBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(expectedObservationsCount,
             because: "60 out of 100 observations added to Elasticsearch has Taxon Mesar as ancestor.");
-    }    
-    
+    }      
+
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchByTaxonListMerge()
     {
@@ -111,14 +87,8 @@ public class TaxonFilterTests : IntegrationTestsBase
         int expectedObservationsCount = 60;
         var searchFilter = SearchFilterDtoFactory.CreateWithTaxonListId(
             (int)TaxonListId.ProtectedByLaw, TaxonListOperatorDto.Merge, TaxonIds.Jättebalsamin);
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()
-             .TheFirst(20).With(o => o.TaxonId = TaxonIds.SvartfläckigBlåvinge)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Asknätfjäril)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Jättebalsamin)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Sjögull)             
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Jätteloka)
-            .Build();
+        var verbatimObservations = ArtportalenTestData.Create100RecordsWithTaxonIds(
+            TaxonIds.SvartfläckigBlåvinge, TaxonIds.Asknätfjäril, TaxonIds.Jättebalsamin, TaxonIds.Sjögull, TaxonIds.Jätteloka);
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
 
         // Act
@@ -139,15 +109,9 @@ public class TaxonFilterTests : IntegrationTestsBase
         var apiClient = TestFixture.CreateApiClient();
         int expectedObservationsCount = 60;
         var searchFilter = SearchFilterDtoFactory.CreateWithTaxonListId(
-            (int)TaxonListId.ProtectedByLaw, TaxonListOperatorDto.Filter, TaxonIds.ViolettGuldvinge, TaxonIds.Jättebalsamin);        
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()
-             .TheFirst(20).With(o => o.TaxonId = TaxonIds.ViolettGuldvinge)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.ViolettGuldvinge)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.ViolettGuldvinge)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.SvartfläckigBlåvinge)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Jättebalsamin)
-            .Build();
+            (int)TaxonListId.ProtectedByLaw, TaxonListOperatorDto.Filter, TaxonIds.ViolettGuldvinge, TaxonIds.Jättebalsamin);
+        var verbatimObservations = ArtportalenTestData.Create100RecordsWithTaxonIds(TaxonIds.ViolettGuldvinge, 
+            TaxonIds.ViolettGuldvinge, TaxonIds.ViolettGuldvinge, TaxonIds.SvartfläckigBlåvinge, TaxonIds.Jättebalsamin);
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
 
         // Act
@@ -159,22 +123,15 @@ public class TaxonFilterTests : IntegrationTestsBase
         result!.TotalCount.Should().Be(expectedObservationsCount,
             because: "Violett guldvinge (60 records) is protected by law but not Jättebalsamin.");
     }
-
+  
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilterByTaxonCategories()
     {
         // Arrange
         var apiClient = TestFixture.CreateApiClient();
         int expectedObservationsCount = 60;
-        var searchFilter = SearchFilterDtoFactory.CreateWithTaxonCategories(17, 18);            
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()
-             .TheFirst(20).HaveTaxonCategoryTaxonId(17)
-             .TheNext(20).HaveTaxonCategoryTaxonId(17)
-             .TheNext(20).HaveTaxonCategoryTaxonId(18)
-             .TheNext(20).HaveTaxonCategoryTaxonId(14)
-             .TheNext(20).HaveTaxonCategoryTaxonId(11)             
-            .Build();
+        var searchFilter = SearchFilterDtoFactory.CreateWithTaxonCategories(17, 18);
+        var verbatimObservations = ArtportalenTestData.Create100RecordsWithTaxonCategoryIds(17, 17, 18, 14, 11);
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
 
         // Act
