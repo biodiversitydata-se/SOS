@@ -1,7 +1,11 @@
-﻿using Microsoft.ApplicationInsights;
+﻿using DwC_A;
+using Microsoft.ApplicationInsights;
+using SOS.ContainerIntegrationTests.Extensions;
 using SOS.ContainerIntegrationTests.Helpers;
 using SOS.ContainerIntegrationTests.Stubs;
 using SOS.ContainerIntegrationTests.TestData;
+using SOS.Harvest.DarwinCore.Interfaces;
+using SOS.Harvest.DarwinCore;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen;
@@ -155,6 +159,24 @@ public class ProcessFixture
         return processedObservations;
     }
 
+    public async Task ImportDwcaFileUsingDwcArchiveReaderAsync(string filePath, DataProvider dataProvider, ITestOutputHelper output)
+    {
+        filePath = filePath.GetAbsoluteFilePath();
+        string outputPath = Path.GetTempPath();
+        using var archiveReader = new ArchiveReader(filePath, outputPath);        
+        IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+        var dwcObservations = await dwcArchiveReader.ReadArchiveAsync(
+            archiveReader,
+            dataProvider);
+        var observationFactory = GetDwcaObservationFactory(true);
+        var processedObservations = dwcObservations        
+            .Select(m => observationFactory.CreateProcessedObservation(m, false))
+            .ToList();
+        await AddObservationsToElasticsearchAsync(processedObservations!);
+        output.WriteLine($"Processed observations count= {processedObservations.Count}");
+    }
+
+
     public async Task ImportDwcaFileAsync(string filePath, DataProvider dataProvider, ITestOutputHelper output)
     {
         var parsedDwcaFile = await DwcaHelper.ReadDwcaFileAsync(filePath, dataProvider);
@@ -166,7 +188,7 @@ public class ProcessFixture
             .Occurrences
             .Select(m => observationFactory.CreateProcessedObservation(m, false))
             .ToList();
-        await AddObservationsToElasticsearchAsync(processedObservations);
+        await AddObservationsToElasticsearchAsync(processedObservations!);
         output.WriteLine($"Processed observations count= {processedObservations.Count}");
 
         var processedEvents = parsedDwcaFile

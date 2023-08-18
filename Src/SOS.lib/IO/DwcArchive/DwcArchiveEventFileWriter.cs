@@ -392,23 +392,26 @@ namespace SOS.Lib.IO.DwcArchive
                 var expectedNoOfObservations = await processedObservationRepository.GetMatchCountAsync(filter);
 
                 // Create Event.txt
+                var eventFieldDescriptions = FieldDescriptionHelper.GetAllDwcEventCoreFieldDescriptions().ToList();
                 using (var fileStream = File.Create(eventCsvFilePath, 128 * 1024))
                 {
                     eventFileCreated = await _dwcArchiveEventCsvWriter.CreateEventCsvFileAsync(
                         filter,
                         fileStream,
-                        FieldDescriptionHelper.GetAllDwcEventCoreFieldDescriptions(),
+                        eventFieldDescriptions,
                         processedObservationRepository,
                         cancellationToken);
                 }
 
                 // Create Occurrence.txt
+                var occurrenceFieldDescriptions =
+                    FieldDescriptionHelper.GetAllDwcCoreEventOccurrenceFieldDescriptions().ToList();
                 using (var fileStream = File.Create(occurrenceCsvFilePath, 128 * 1024))
                 {
                     nrObservations = await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                         filter,
                         fileStream,
-                        FieldDescriptionHelper.GetAllDwcCoreEventOccurrenceFieldDescriptions(),
+                        occurrenceFieldDescriptions,
                         processedObservationRepository,
                         cancellationToken,
                         false,
@@ -444,14 +447,15 @@ namespace SOS.Lib.IO.DwcArchive
                 // Delete extension files if not used.
                 if (!emofFileCreated && File.Exists(emofCsvFilePath)) File.Delete(emofCsvFilePath);
                 if (!multimediaFileCreated && File.Exists(multimediaCsvFilePath)) File.Delete(multimediaCsvFilePath);
-
+                
                 // Create meta.xml
                 using (var fileStream = File.Create(metaXmlFilePath))
                 {
-                    var dwcExtensions = new List<DwcaFilePart>();
-                    if (emofFileCreated) dwcExtensions.Add(DwcaFilePart.Emof);
-                    if (multimediaFileCreated) dwcExtensions.Add(DwcaFilePart.Multimedia);
-                    //DwcArchiveMetaFileWriter.CreateMetaXmlFile(fileStream, fieldDescriptions.ToList(), dwcExtensions);
+                    var dwcExtensions = new List<DwcaEventFilePart>();
+                    dwcExtensions.Add(DwcaEventFilePart.Occurrence);
+                    if (emofFileCreated) dwcExtensions.Add(DwcaEventFilePart.Emof);
+                    if (multimediaFileCreated) dwcExtensions.Add(DwcaEventFilePart.Multimedia);                    
+                    DwcArchiveMetaFileWriter.CreateEventMetaXmlFile(fileStream, eventFieldDescriptions, dwcExtensions, occurrenceFieldDescriptions);                    
                 }
 
                 var emlFile = await _dataProviderRepository.GetEmlAsync(dataProvider.Id);

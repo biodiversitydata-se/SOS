@@ -14,6 +14,17 @@ internal static class SearchFilterDtoFactory
         };
     }
 
+    public static SearchFilterDto CreateWithDataProviderIds(params int[] dataProviderIds)
+    {
+        return new SearchFilterDto
+        {
+            DataProvider = new DataProviderFilterDto
+            {
+                Ids = dataProviderIds.ToList()
+            }
+        };
+    }
+
     public static SearchFilterDto CreateWithTaxonIds(params int[] taxonIds)
     {
         return new SearchFilterDto
