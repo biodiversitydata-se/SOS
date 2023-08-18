@@ -1,5 +1,4 @@
 ﻿using DwC_A;
-using Microsoft.Extensions.Logging.Abstractions;
 using SOS.ContainerIntegrationTests.Extensions;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.DarwinCore;

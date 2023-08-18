@@ -5,11 +5,6 @@ using SOS.ContainerIntegrationTests.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Text.Json;
 
 namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
 {

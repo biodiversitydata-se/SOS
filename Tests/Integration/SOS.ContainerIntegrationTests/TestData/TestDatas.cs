@@ -1,12 +1,6 @@
 ﻿using FizzWare.NBuilder;
-using Nest;
 using SOS.ContainerIntegrationTests.TestData.Factories;
 using SOS.Lib.Models.Processed.Observation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SOS.ContainerIntegrationTests.TestData;
 public static class TestDatas

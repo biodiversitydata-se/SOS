@@ -4,17 +4,10 @@ using NetTopologySuite.Geometries;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Enums.Artportalen;
 using MongoDB.Driver.GeoJsonObjectModel;
-using System.Text.Json.Serialization;
-using System.Text.Json;
 using SOS.ContainerIntegrationTests.Extensions;
 
 namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder

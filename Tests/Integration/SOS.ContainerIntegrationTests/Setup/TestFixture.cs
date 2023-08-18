@@ -1,23 +1,5 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Extensibility;
+﻿using Microsoft.ApplicationInsights.Extensibility;
 using SOS.ContainerIntegrationTests.Extensions;
-using SOS.ContainerIntegrationTests.Stubs;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Managers;
-using SOS.Lib.Cache;
-using SOS.Lib.Configuration.Process;
-using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Helpers;
-using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Repositories.Processed;
-using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Lib.Repositories.Resource;
-using SOS.Lib.Cache.Interfaces;
-using SOS.Observations.Api.Repositories;
-using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 
@@ -67,7 +49,7 @@ public class IntegrationTestsFixture : IAsyncLifetime
         ApiFactory.ServiceProvider = ServiceProvider;
         using var scope = ServiceProvider.CreateScope();
         ProcessFixture = scope.ServiceProvider.GetService<ProcessFixture>();
-        await ProcessFixture.InitializeElasticsearchIndices();
+        await ProcessFixture!.InitializeElasticsearchIndices();
     }
 
     /// <summary>
@@ -81,96 +63,9 @@ public class IntegrationTestsFixture : IAsyncLifetime
 
     private ServiceProvider RegisterServices()
     {
-        var serviceCollection = GetServiceCollection();
-        var testContainersServiceCollection = TestContainerFixture.GetServiceCollection();
-        var serviceProvider = ServiceProviderExtensions.RegisterServices(serviceCollection, testContainersServiceCollection);
+        var processFixtureServices = ProcessFixture.GetServiceCollection();
+        var testContainersServices = TestContainerFixture.GetServiceCollection();
+        var serviceProvider = ServiceProviderExtensions.RegisterServices(processFixtureServices, testContainersServices);
         return serviceProvider;
-    }
-
-    public ServiceCollection GetServiceCollection()
-    {
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddLogging();
-        serviceCollection.AddSingleton<IAreaHelper, AreaHelper>();
-        serviceCollection.AddSingleton<IAreaRepository, AreaRepository>();
-        serviceCollection.AddSingleton<ProcessFixture>();
-        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
-        serviceCollection.AddSingleton<ITaxonRepository, TaxonRepository>();
-        serviceCollection.AddSingleton<IProcessTimeManager, ProcessTimeManager>();
-        serviceCollection.AddSingleton<ProcessConfiguration>();
-
-        serviceCollection.AddSingleton<TelemetryClient>();
-        serviceCollection.AddSingleton<IElasticClientManager, ElasticClientTestManager>();
-        serviceCollection.AddSingleton<IDatasetRepository, DatasetRepository>();
-        serviceCollection.AddSingleton<IEventRepository, EventRepository>();
-        
-        serviceCollection.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
-        serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
-
-        var elasticConfiguration = CreateElasticSearchConfiguration();
-        serviceCollection.AddSingleton(elasticConfiguration);
-        serviceCollection.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
-        serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
-
-        serviceCollection.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
-        serviceCollection.AddSingleton<IArtportalenDatasetMetadataRepository, ArtportalenDatasetMetadataRepository>();
-
-        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
-        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
-
-        VocabularyConfiguration vocabularyConfiguration = new VocabularyConfiguration()
-        {
-            ResolveValues = true,
-            LocalizationCultureCode = "sv-SE"
-        };
-        serviceCollection.AddSingleton(vocabularyConfiguration);
-
-
-        return serviceCollection;
-    }
-
-    private ElasticSearchConfiguration CreateElasticSearchConfiguration()
-    {
-        return new ElasticSearchConfiguration()
-        {
-            IndexSettings = new List<ElasticSearchIndexConfiguration>()
-                {
-                    new ElasticSearchIndexConfiguration
-                    {
-                        Name = "observation",
-                        ReadBatchSize = 10000,
-                        WriteBatchSize = 1000,
-                        ScrollBatchSize = 5000,
-                        ScrollTimeout = "300s",
-                    },
-                    new ElasticSearchIndexConfiguration
-                    {
-                        Name = "observationEvent",
-                        ReadBatchSize = 10000,
-                        WriteBatchSize = 1000,
-                        ScrollBatchSize = 5000,
-                        ScrollTimeout = "300s"
-                    },
-                    new ElasticSearchIndexConfiguration
-                    {
-                        Name = "observationDataset",
-                        ReadBatchSize = 10000,
-                        WriteBatchSize = 1000,
-                        ScrollBatchSize = 5000,
-                        ScrollTimeout = "300s"
-                    }
-                },
-            RequestTimeout = 300,
-            DebugMode = true,
-            IndexPrefix = "",
-            Clusters = null
-            //Clusters = new[]
-            //{
-            //    new Cluster()
-            //    {
-            //        Hosts = strHosts                    
-            //    }
-            //}
-        };
     }
 }

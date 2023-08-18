@@ -64,20 +64,18 @@ public class TestContainersFixture : IAsyncLifetime
     public ServiceCollection GetServiceCollection()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddSingleton(TestSubstitutes.ProcessClient);
-        serviceCollection.AddSingleton(TestSubstitutes.ElasticClient);
+        serviceCollection.AddSingleton(TestSubstitutes.ProcessClient!);
+        serviceCollection.AddSingleton(TestSubstitutes.ElasticClient!);
 
         return serviceCollection;
     }
 
     private async Task<ElasticClient> InitializeElasticsearchAsync()
     {
-
         await ElasticsearchContainer.StartAsync().ConfigureAwait(false);
         var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
             .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-            .EnableApiVersioningHeader()
-        //      .BasicAuthentication(ELASTIC_USERNAME, ELASTIC_PASSWORD)
+            .EnableApiVersioningHeader()        
         .EnableDebugMode());
         return elasticClient;
     }

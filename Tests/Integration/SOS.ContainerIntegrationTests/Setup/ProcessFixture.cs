@@ -1,17 +1,30 @@
-﻿using SOS.ContainerIntegrationTests.Helpers;
+﻿using Microsoft.ApplicationInsights;
+using SOS.ContainerIntegrationTests.Helpers;
+using SOS.ContainerIntegrationTests.Stubs;
 using SOS.ContainerIntegrationTests.TestData;
+using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.Lib.Cache;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Observations.Api.Repositories;
+using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 public class ProcessFixture
@@ -61,6 +74,41 @@ public class ProcessFixture
         _artportalenDatasetMetadataRepository = artportalenDatasetMetadataRepository;
 
         InitializeAsync().Wait();
+    }
+
+    public static ServiceCollection GetServiceCollection()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddLogging();
+        serviceCollection.AddSingleton<IAreaHelper, AreaHelper>();
+        serviceCollection.AddSingleton<IAreaRepository, AreaRepository>();
+        serviceCollection.AddSingleton<ProcessFixture>();
+        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
+        serviceCollection.AddSingleton<ITaxonRepository, TaxonRepository>();
+        serviceCollection.AddSingleton<IProcessTimeManager, ProcessTimeManager>();
+        serviceCollection.AddSingleton<ProcessConfiguration>();
+        serviceCollection.AddSingleton<TelemetryClient>();
+        serviceCollection.AddSingleton<IElasticClientManager, ElasticClientTestManager>();
+        serviceCollection.AddSingleton<IDatasetRepository, DatasetRepository>();
+        serviceCollection.AddSingleton<IEventRepository, EventRepository>();
+        serviceCollection.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
+        serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
+        var elasticConfiguration = CreateElasticSearchConfiguration();
+        serviceCollection.AddSingleton(elasticConfiguration);
+        serviceCollection.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
+        serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
+        serviceCollection.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
+        serviceCollection.AddSingleton<IArtportalenDatasetMetadataRepository, ArtportalenDatasetMetadataRepository>();
+        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
+        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
+        VocabularyConfiguration vocabularyConfiguration = new VocabularyConfiguration()
+        {
+            ResolveValues = true,
+            LocalizationCultureCode = "sv-SE"
+        };
+        serviceCollection.AddSingleton(vocabularyConfiguration);
+
+        return serviceCollection;
     }
 
     private async Task InitializeAsync()
@@ -322,5 +370,43 @@ public class ProcessFixture
             _processConfiguration);
 
         return factory;
+    }
+
+    private static ElasticSearchConfiguration CreateElasticSearchConfiguration()
+    {
+        return new ElasticSearchConfiguration()
+        {
+            IndexSettings = new List<ElasticSearchIndexConfiguration>()
+                {
+                    new ElasticSearchIndexConfiguration
+                    {
+                        Name = "observation",
+                        ReadBatchSize = 10000,
+                        WriteBatchSize = 1000,
+                        ScrollBatchSize = 5000,
+                        ScrollTimeout = "300s",
+                    },
+                    new ElasticSearchIndexConfiguration
+                    {
+                        Name = "observationEvent",
+                        ReadBatchSize = 10000,
+                        WriteBatchSize = 1000,
+                        ScrollBatchSize = 5000,
+                        ScrollTimeout = "300s"
+                    },
+                    new ElasticSearchIndexConfiguration
+                    {
+                        Name = "observationDataset",
+                        ReadBatchSize = 10000,
+                        WriteBatchSize = 1000,
+                        ScrollBatchSize = 5000,
+                        ScrollTimeout = "300s"
+                    }
+                },
+            RequestTimeout = 300,
+            DebugMode = true,
+            IndexPrefix = "",
+            Clusters = null
+        };
     }
 }

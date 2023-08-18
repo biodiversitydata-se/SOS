@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿namespace SOS.ContainerIntegrationTests.Extensions;
 
-namespace SOS.ContainerIntegrationTests.Extensions;
 internal static class ServiceProviderExtensions
 {
     public static ServiceProvider RegisterServices(params ServiceCollection[] serviceCollections)
