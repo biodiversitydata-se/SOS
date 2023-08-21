@@ -63,7 +63,7 @@ namespace SOS.Lib.IO.DwcArchive
                     // Write occurrence rows to CSV file.
                     foreach (var emofRow in emofRows)
                     {
-                        WriteEmofRow(csvFileHelper, emofRow);
+                        WriteEmofRow(csvFileHelper, emofRow, isEventCore);
                     }
                     await csvFileHelper.FlushAsync();
 
