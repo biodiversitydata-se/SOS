@@ -14,10 +14,10 @@ namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint;
 /// <summary>
 /// Integration tests for ObservationsBySearch endpoint when using taxon filters.
 /// </summary>
-[Collection(IntegrationTestsCollection.Name)]
-public class TaxonFilterTests : IntegrationTestsBase
+[Collection(TestCollection.Name)]
+public class TaxonFilterTests : TestBase
 {
-    public TaxonFilterTests(IntegrationTestsFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    public TaxonFilterTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
     }
     

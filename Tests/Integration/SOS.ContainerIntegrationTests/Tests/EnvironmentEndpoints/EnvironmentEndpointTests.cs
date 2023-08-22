@@ -6,10 +6,10 @@ namespace SOS.ContainerIntegrationTests.Tests.EnvironmentEndpoints;
 /// <summary>
 /// Integration tests for the get Environment endpoint.
 /// </summary>
-[Collection(IntegrationTestsCollection.Name)]
-public class EnvironmentEndpointTests : IntegrationTestsBase
+[Collection(TestCollection.Name)]
+public class EnvironmentEndpointTests : TestBase
 {
-    public EnvironmentEndpointTests(IntegrationTestsFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    public EnvironmentEndpointTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
     }
 

@@ -7,7 +7,7 @@ namespace SOS.ContainerIntegrationTests.Setup;
 /// Represents a fixture for integration tests, implementing the <see cref="IAsyncLifetime"/> interface.
 /// This fixture provides the necessary setup and teardown logic for integration tests using the Observations API.
 /// </summary>
-public class IntegrationTestsFixture : IAsyncLifetime
+public class TestFixture : IAsyncLifetime
 {
     /// <summary>
     /// The <see cref="ObservationsApiWebApplicationFactory"/> used to create the API client.
@@ -19,9 +19,9 @@ public class IntegrationTestsFixture : IAsyncLifetime
     public ProcessFixture? ProcessFixture { get; private set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="IntegrationTestsFixture"/> class.    
+    /// Initializes a new instance of the <see cref="TestFixture"/> class.    
     /// </summary>
-    public IntegrationTestsFixture()
+    public TestFixture()
     {
         ApiFactory = new ObservationsApiWebApplicationFactory();
         TestContainerFixture = new TestContainersFixture();

@@ -9,10 +9,10 @@ namespace SOS.ContainerIntegrationTests.Tests.Exports;
 /// <summary>
 /// Integration tests for exporting to DwC-A file.
 /// </summary>
-[Collection(IntegrationTestsCollection.Name)]
-public class DarwinCoreArchiveTests : IntegrationTestsBase
+[Collection(TestCollection.Name)]
+public class DarwinCoreArchiveTests : TestBase
 {
-    public DarwinCoreArchiveTests(IntegrationTestsFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    public DarwinCoreArchiveTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
     }
 

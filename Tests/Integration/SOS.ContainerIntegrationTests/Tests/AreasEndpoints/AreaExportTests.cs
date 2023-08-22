@@ -9,10 +9,10 @@ namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint;
 /// <summary>
 /// Integration tests for export area to zip file endpoint.
 /// </summary>
-[Collection(IntegrationTestsCollection.Name)]
-public class AreaExportTests : IntegrationTestsBase
+[Collection(TestCollection.Name)]
+public class AreaExportTests : TestBase
 {
-    public AreaExportTests(IntegrationTestsFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    public AreaExportTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
     }
     

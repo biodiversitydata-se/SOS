@@ -8,7 +8,7 @@
 /// temporary test databases running in containers.
 /// </remarks>
 [CollectionDefinition(name: Name, DisableParallelization = true)]
-public class IntegrationTestsCollection : ICollectionFixture<IntegrationTestsFixture>
+public class TestCollection : ICollectionFixture<TestFixture>
 {
     /// <summary>
     /// The name of the integration tests collection.
