@@ -3,6 +3,21 @@
 namespace SOS.ContainerIntegrationTests.TestData.Factories;
 internal static class SearchFilterDtoFactory
 {
+    public static SearchFilterDto CreateWithMunicipalityFeatureIds(params string[] featureIds)
+    {        
+        return new SearchFilterDto
+        {
+            Geographics = new GeographicsFilterDto 
+            { 
+                Areas = featureIds.Select(id => new AreaFilterDto
+                {
+                    AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality,
+                    FeatureId = id
+                })
+            }
+        };
+    }
+
     public static SearchFilterDto CreateWithRedListCategories(params string[] categories)
     {
         return new SearchFilterDto

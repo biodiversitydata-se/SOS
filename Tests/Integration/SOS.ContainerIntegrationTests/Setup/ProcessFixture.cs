@@ -360,6 +360,35 @@ public class ProcessFixture
         return await _datasetRepository.IndexCountAsync();
     }
 
+    //public void UseMockUserService(int userId, params AuthorityModel[] authorities)
+    //{
+    //    UserModel user = new UserModel();
+    //    user.Id = userId;
+    //    var userServiceMock = new Mock<IUserService>();
+    //    userServiceMock.Setup(userService => userService.GetUserAsync())
+    //        .ReturnsAsync(user);
+    //    userServiceMock.Setup(userService =>
+    //            userService.GetUserAuthoritiesAsync(userId, It.IsAny<string>(), It.IsAny<string>()))
+    //        .ReturnsAsync(authorities);
+    //    _filterManager.UserService = userServiceMock.Object;
+    //}
+
+    //public void UseMockUser(ControllerBase controller, int userId, string email)
+    //{
+    //    var contextAccessor = new HttpContextAccessor() { HttpContext = new DefaultHttpContext() };
+    //    var claimsIdentity = new ClaimsIdentity();
+    //    claimsIdentity.AddClaim(new Claim("scope", "SOS.Observations.Protected"));
+    //    claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
+    //    claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
+    //    contextAccessor.HttpContext.User.AddIdentity(claimsIdentity);
+
+    //    controller.ControllerContext.HttpContext = new DefaultHttpContext { User = contextAccessor.HttpContext.User };
+    //}
+
+    //public void RestoreUserService()
+    //{
+    //    _filterManager.UserService = _userService;
+    //}
 
     private void InitAreaHelper()
     {

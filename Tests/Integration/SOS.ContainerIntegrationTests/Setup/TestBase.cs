@@ -1,4 +1,6 @@
-﻿namespace SOS.ContainerIntegrationTests.Setup;
+﻿using SOS.Lib.JsonConverters;
+
+namespace SOS.ContainerIntegrationTests.Setup;
 
 /// <summary>
 /// Base class for integration tests providing common functionalities and settings.
@@ -23,7 +25,12 @@ public class TestBase
     protected readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions()
     {
         PropertyNameCaseInsensitive = true,
-        Converters = { new JsonStringEnumConverter() }
+        Converters = 
+        { 
+            new JsonStringEnumConverter(),
+            new GeoShapeConverter(),
+            new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+        }
     };
 
     /// <summary>
