@@ -450,6 +450,7 @@ namespace SOS.Observations.Api.Controllers
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 CheckAuthorization(protectionFilter);
+                filter.Output = new OutputFilterDto { FieldSet = OutputFieldSet.All };
 
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter);
                 if (validateResult is not OkObjectResult okResult)
