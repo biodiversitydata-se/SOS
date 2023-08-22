@@ -139,10 +139,11 @@ public class ProcessFixture
         await _processedObservationCoreRepository.ClearCollectionAsync(true);
     }
 
-    public async Task ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+    public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
     {
         var processedObservations = ProcessObservations(verbatimObservations);
         await AddObservationsToElasticsearchAsync(processedObservations);
+        return processedObservations;
     }
 
     public List<Observation> ProcessObservations(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
@@ -359,7 +360,7 @@ public class ProcessFixture
     {
         return await _datasetRepository.IndexCountAsync();
     }
-
+  
     //public void UseMockUserService(int userId, params AuthorityModel[] authorities)
     //{
     //    UserModel user = new UserModel();
@@ -388,7 +389,7 @@ public class ProcessFixture
     //public void RestoreUserService()
     //{
     //    _filterManager.UserService = _userService;
-    //}
+    //}    
 
     private void InitAreaHelper()
     {

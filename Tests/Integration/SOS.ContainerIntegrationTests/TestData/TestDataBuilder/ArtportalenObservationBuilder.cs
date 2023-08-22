@@ -490,6 +490,14 @@ namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
             return operable;
         }
 
+        public static IOperable<ArtportalenObservationVerbatim> IsInDateSpan(this IOperable<ArtportalenObservationVerbatim> operable, string strSpanStartDate, string strSpanEndDate)
+        {
+            var spanStartDate = DateTime.SpecifyKind(DateTime.Parse(strSpanStartDate), DateTimeKind.Local);
+            var spanEndDate = DateTime.SpecifyKind(DateTime.Parse(strSpanEndDate), DateTimeKind.Local);
+
+            return operable.IsInDateSpan(spanStartDate, spanEndDate);            
+        }
+
         public static IOperable<ArtportalenObservationVerbatim> HaveTaxonSensitivityCategory(this IOperable<ArtportalenObservationVerbatim> operable, int sensitivityCategory)
         {
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
