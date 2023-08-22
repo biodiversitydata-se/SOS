@@ -268,10 +268,13 @@ namespace SOS.Observations.Api.Managers
             {
                 var sortOrders = new List<SortOrderFilter>
                 {
-                new SortOrderFilter { SortBy = "identifier", SortOrder = SearchSortOrder.Asc }
-            };
+                    new SortOrderFilter { SortBy = "identifier", SortOrder = SearchSortOrder.Asc }
+                };
 
-                var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(aggregationResult.Records.Select(m => m.AggregationKey), sortOrders);
+                var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(
+                    ids: aggregationResult.Records.Select(m => m.AggregationKey), 
+                    excludeFields: filter?.Output?.ExcludeFields,
+                    sortOrders: sortOrders);
                 records = observationDatasets.Select(m => m.ToDto()).ToList();
             }
 
