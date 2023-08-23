@@ -99,6 +99,7 @@ namespace SOS.Observations.Api
         private const string InternalApiPrefix = "Internal";
         private IWebHostEnvironment CurrentEnvironment { get; set; }
         private bool _isDevelopment;
+        private bool _disableHangfireInit = false;
 
         private class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         {
@@ -158,6 +159,7 @@ namespace SOS.Observations.Api
                 .AddEnvironmentVariables();
 
             _isDevelopment = CurrentEnvironment.IsEnvironment("local") || CurrentEnvironment.IsEnvironment("dev") || CurrentEnvironment.IsEnvironment("st");
+            _disableHangfireInit = GetDisableHangfireInit();
             if (_isDevelopment)
             {
                 // If Development mode, add secrets stored on developer machine 
@@ -329,30 +331,32 @@ namespace SOS.Observations.Api
             }
 
             // Hangfire
-            var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
-
-            services.AddHangfire(configuration =>
-                configuration
-                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                    .UseSimpleAssemblyNameTypeSerializer()
-                    .UseRecommendedSerializerSettings(m =>
-                    {
-                        m.Converters.Add(new NewtonsoftGeoShapeConverter());
-                        m.Converters.Add(new StringEnumConverter());
-                    })
-                    .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
-                        mongoConfiguration.DatabaseName,
-                        new MongoStorageOptions
+            if (!_disableHangfireInit)
+            {
+                var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+                services.AddHangfire(configuration =>
+                    configuration
+                        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                        .UseSimpleAssemblyNameTypeSerializer()
+                        .UseRecommendedSerializerSettings(m =>
                         {
-                            MigrationOptions = new MongoMigrationOptions
-                            {
-                                MigrationStrategy = new MigrateMongoMigrationStrategy(),
-                                BackupStrategy = new CollectionMongoBackupStrategy()
-                            },
-                            Prefix = "hangfire",
-                            CheckConnection = true
+                            m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                            m.Converters.Add(new StringEnumConverter());
                         })
-            );
+                        .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
+                            mongoConfiguration.DatabaseName,
+                            new MongoStorageOptions
+                            {
+                                MigrationOptions = new MongoMigrationOptions
+                                {
+                                    MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                                    BackupStrategy = new CollectionMongoBackupStrategy()
+                                },
+                                Prefix = "hangfire",
+                                CheckConnection = true
+                            })
+                );
+            }
 
             services.AddSingleton(Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>());
 
@@ -552,7 +556,10 @@ namespace SOS.Observations.Api
                 app.UseMiddleware<StoreRequestBodyMiddleware>();
             }
 
-            app.UseHangfireDashboard();
+            if (!_disableHangfireInit)
+            {
+                app.UseHangfireDashboard();
+            }
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
@@ -652,6 +659,26 @@ namespace SOS.Observations.Api
                 ? actionApiVersionModel.DeclaredApiVersions
                 : actionApiVersionModel.ImplementedApiVersions;
             return apiVersions;
+        }
+
+        private static bool GetDisableHangfireInit()
+        {
+            string variableName = "DISABLE_HANGFIRE_INIT";
+            string value = Environment.GetEnvironmentVariable(variableName);
+
+            if (value != null)
+            {
+                if (bool.TryParse(value, out var disableHangfireInit))
+                {
+                    return disableHangfireInit;
+                }
+
+                return false;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

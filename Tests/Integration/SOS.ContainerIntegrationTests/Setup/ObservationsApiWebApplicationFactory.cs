@@ -22,6 +22,7 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
     public ObservationsApiWebApplicationFactory()
     {        
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Dev");
+        Environment.SetEnvironmentVariable("DISABLE_HANGFIRE_INIT", "true");
     }
 
     /// <summary>
