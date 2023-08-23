@@ -72,6 +72,11 @@ namespace SOS.Lib.Models.Search.Filters
         public List<DiffusionStatus> DiffusionStatuses { get; set; }
 
         /// <summary>
+        /// Event related filters
+        /// </summary>
+        public EventFilter Event { get; set; }
+
+        /// <summary>
         /// Exclude filter
         /// </summary>
         public ExcludeFilter ExcludeFilter { get; set; }
@@ -159,8 +164,6 @@ namespace SOS.Lib.Models.Search.Filters
 
         public List<string> DataStewardshipDatasetIds { get; set; }
         public bool? IsPartOfDataStewardshipDataset { get; set; }
-
-        public List<string> EventIds { get; set; }
 
         ///// <summary>
         /////     Observation start date specified in the ISO 8601 standard.

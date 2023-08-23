@@ -92,7 +92,7 @@ namespace SOS.Observations.Api.Managers
         private async Task<DsEventDto> GetEventByIdFromObservationIndexAsync(string id, CoordinateSys responseCoordinateSystem)
         {
             var filter = new SearchFilter(0);
-            filter.EventIds = new List<string> { id };
+            filter.Event = new EventFilter { Ids = new[] { id } };
             filter.Output.Fields = _observationEventOutputFields?.ToList();
 
             var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 1, true);

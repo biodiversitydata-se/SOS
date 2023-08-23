@@ -73,6 +73,11 @@ namespace SOS.Observations.Api.Dtos.Filter
         public IEnumerable<DiffusionStatusDto> DiffusionStatuses { get; set; }
 
         /// <summary>
+        /// Event related filter
+        /// </summary>
+        public EventFilterDto? Event { get; set; }
+
+        /// <summary>
         /// Exclude filter
         /// </summary>
         public ExcludeFilterDto ExcludeFilter { get; set; }
