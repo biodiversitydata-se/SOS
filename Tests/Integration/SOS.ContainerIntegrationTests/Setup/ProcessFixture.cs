@@ -12,6 +12,7 @@ using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
@@ -221,7 +222,7 @@ public class ProcessFixture
                 .Occurrences
                 .Select(m => observationFactory.CreateProcessedObservation(m, false))
                 .ToList();
-            await AddObservationsToElasticsearchAsync(processedObservations, false, clearExistingRecords);
+            await AddObservationsToElasticsearchAsync(processedObservations!, clearExistingRecords);
             output.WriteLine($"Processed observations count= {processedObservations.Count}");
 
             var processedEvents = parsedDwcaFile
@@ -235,7 +236,7 @@ public class ProcessFixture
                 .Datasets
                 .Select(m => datasetFactory.CreateProcessedDataset(m))
                 .ToList();
-            await AddDatasetsToElasticsearchAsync(processedDatasets, clearExistingRecords);
+            await AddDatasetsToElasticsearchAsync(processedDatasets!, clearExistingRecords);
             output.WriteLine($"Processed datasets count= {processedDatasets.Count}");
             clearExistingRecords = false;
         }
@@ -245,35 +246,32 @@ public class ProcessFixture
     public async Task AddDataToElasticsearchAsync(
         List<Dataset> datasets,
         List<Lib.Models.Processed.DataStewardship.Event.Event> events,
-        List<Observation> observations,
-        bool protectedIndex = false,
+        List<Observation> observations,        
         bool clearExistingObservations = true)
     {
         await AddDatasetsToElasticsearchAsync(datasets, clearExistingObservations, 0);
         await AddEventsToElasticsearchAsync(events, clearExistingObservations, 0);
-        await AddObservationsToElasticsearchAsync(observations, protectedIndex, clearExistingObservations, 0);
+        await AddObservationsToElasticsearchAsync(observations, clearExistingObservations, 0);
         await Task.Delay(1000);
     }
 
     public async Task AddDataToElasticsearchAsync(
-        TestDatas.TestDataSet testDataSet,
-        bool protectedIndex = false,
+        TestDatas.TestDataSet testDataSet,        
         bool clearExistingObservations = true)
     {
         await AddDatasetsToElasticsearchAsync(testDataSet.Datasets, clearExistingObservations, 0);
         await AddEventsToElasticsearchAsync(testDataSet.Events, clearExistingObservations, 0);
-        await AddObservationsToElasticsearchAsync(testDataSet.Observations, protectedIndex, clearExistingObservations, 0);
+        await AddObservationsToElasticsearchAsync(testDataSet.Observations, clearExistingObservations, 0);
         await Task.Delay(1000);
     }
 
     public async Task AddDataToElasticsearchAsync(
         IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events,
-        IEnumerable<Observation> observations,
-        bool protectedIndex = false,
+        IEnumerable<Observation> observations,        
         bool clearExistingObservations = true)
     {
         await AddEventsToElasticsearchAsync(events, clearExistingObservations, 0);
-        await AddObservationsToElasticsearchAsync(observations, protectedIndex, clearExistingObservations, 0);
+        await AddObservationsToElasticsearchAsync(observations, clearExistingObservations, 0);
         await Task.Delay(1000);
     }
 
@@ -302,16 +300,40 @@ public class ProcessFixture
         await Task.Delay(delayInMs);
     }
 
-    public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool protectedIndex = false, bool clearExistingObservations = true, int delayInMs = 1000)
+    public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true, int delayInMs = 1000)
+    {
+        var publicObservations = new List<Observation>();
+        var protectedObservations = new List<Observation>();
+
+        foreach (var observation in observations)
+        {
+            if (observation.ShallBeProtected())
+            {
+                protectedObservations.Add(observation);
+            }
+            else
+            {
+                publicObservations.Add(observation);
+            }
+        }
+
+        await AddObservationsBatchToElasticsearchAsync(publicObservations, false, clearExistingObservations);
+        await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, clearExistingObservations);
+
+        await Task.Delay(delayInMs);        
+    }
+
+    private async Task AddObservationsBatchToElasticsearchAsync(IEnumerable<Observation> observations,
+            bool protectedIndex,
+            bool clearExistingObservations = true)
     {
         if (clearExistingObservations)
         {
             await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
         }
         await _processedObservationCoreRepository.DisableIndexingAsync(protectedIndex);
-        await _processedObservationCoreRepository.AddManyAsync(observations, protectedIndex);
+        _processedObservationCoreRepository.AddMany(observations, protectedIndex);
         await _processedObservationCoreRepository.EnableIndexingAsync(protectedIndex);
-        await Task.Delay(delayInMs);
     }
 
     public DwcaObservationFactory GetDwcaObservationFactory(bool initAreaHelper)
@@ -361,36 +383,6 @@ public class ProcessFixture
         return await _datasetRepository.IndexCountAsync();
     }
   
-    //public void UseMockUserService(int userId, params AuthorityModel[] authorities)
-    //{
-    //    UserModel user = new UserModel();
-    //    user.Id = userId;
-    //    var userServiceMock = new Mock<IUserService>();
-    //    userServiceMock.Setup(userService => userService.GetUserAsync())
-    //        .ReturnsAsync(user);
-    //    userServiceMock.Setup(userService =>
-    //            userService.GetUserAuthoritiesAsync(userId, It.IsAny<string>(), It.IsAny<string>()))
-    //        .ReturnsAsync(authorities);
-    //    _filterManager.UserService = userServiceMock.Object;
-    //}
-
-    //public void UseMockUser(ControllerBase controller, int userId, string email)
-    //{
-    //    var contextAccessor = new HttpContextAccessor() { HttpContext = new DefaultHttpContext() };
-    //    var claimsIdentity = new ClaimsIdentity();
-    //    claimsIdentity.AddClaim(new Claim("scope", "SOS.Observations.Protected"));
-    //    claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
-    //    claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
-    //    contextAccessor.HttpContext.User.AddIdentity(claimsIdentity);
-
-    //    controller.ControllerContext.HttpContext = new DefaultHttpContext { User = contextAccessor.HttpContext.User };
-    //}
-
-    //public void RestoreUserService()
-    //{
-    //    _filterManager.UserService = _userService;
-    //}    
-
     private void InitAreaHelper()
     {
         if (!_areaHelper.IsInitialized)

@@ -13,6 +13,7 @@
 	<PackageReference Include="Bogus" Version="34.0.2" />
 	<PackageReference Include="FluentAssertions" Version="6.9.0" />
 	<PackageReference Include="NBuilder" Version="6.1.0" />
+	<PackageReference Include="NSubstitute" Version="5.0.0" />
 	<PackageReference Include="Testcontainers" Version="3.0.0" />
 	<PackageReference Include="Testcontainers.Elasticsearch" Version="3.0.0" />
 	<PackageReference Include="Testcontainers.MongoDb" Version="3.0.0" />

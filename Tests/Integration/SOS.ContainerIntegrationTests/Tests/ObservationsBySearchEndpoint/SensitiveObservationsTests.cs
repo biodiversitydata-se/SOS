@@ -6,7 +6,7 @@ using SOS.Observations.Api.Dtos;
 using SOS.Lib.Models.Shared;
 using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
-using SOS.TestHelpers.Helpers.Builders;
+using SOS.ContainerIntegrationTests.Stubs;
 
 namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.ObservationsBySearchEndpoint;
 
@@ -18,19 +18,16 @@ public class SensitiveObservationsTests : TestBase
     }
 
     [Fact]        
-    public async Task ObservationsBySearchEndpoint_ReturnsNoObservations_WhenSearchingForPublicObservationsButOnlyProtectedExists()
+    public async Task ObservationsBySearchEndpoint_ReturnsNoObservations_WhenSearchingForPublicObservations_GivenOnlyProtectedExists()
     {            
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations().HaveTaxonSensitivityCategory(3)
+            .All().HaveValuesFromPredefinedObservations()
+                  .HaveTaxonSensitivityCategory(3)
             .Build();
-
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto
-        {
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent
-        };
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent };
 
         // Act
         var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=false", JsonContent.Create(searchFilter));
@@ -38,196 +35,113 @@ public class SensitiveObservationsTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(0, because: "All observations should be added to the protected index");
+        result!.TotalCount.Should().Be(0,
+            because: "0 observations added to Elasticsearch are public observations.");
     }
 
-    //[Fact]
-    //[Trait("Category", "AutomaticIntegrationTest")]
-    //public async Task Search_sensitive_observations_without_permissions_returns_no_observations()
-    //{            
-    //    // Arrange            
-    //    var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-    //        .All()
-    //            .HaveValuesFromPredefinedObservations()
-    //            .HaveTaxonSensitivityCategory(3)
-    //        .Build();
-    //    var authorityBuilder = new UserAuthorizationTestBuilder();
-    //    var authority = authorityBuilder
-    //        .WithAuthorityIdentity("Sighting")
-    //        .WithMaxProtectionLevel(1)
-    //        .Build();
-    //    ProcessFixture.UseMockUserService(15, authority);
-    //    ProcessFixture.UseMockUser(_fixture.ObservationsController, 15, "user@test.xx");
+    [Fact]    
+    public async Task ObservationsBySearchEndpoint_ReturnsNoObservations_WhenSearchingForProtectedObservations_GivenTheUserHasNoAccessRights()
+    {
+        // Arrange            
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+                  .HaveTaxonSensitivityCategory(3)
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);        
+        var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 1);
+        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent };
 
-    //    await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-    //    var searchFilter = new SearchFilterDto
-    //    {
-    //        OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent
-    //    };
-        
-    //    // Act
-    //    var response = await ProcessFixture.ObservationsController.ObservationsBySearch(
-    //        null,
-    //        null,
-    //        searchFilter,
-    //        0,
-    //        100,
-    //        sensitiveObservations: true);
-    //    var result = response.GetResult<PagedResultDto<Observation>>();
-        
-    //    // Assert
-    //    result.Should().NotBeNull();
-    //    result.TotalCount.Should().Be(0);
-    //    ProcessFixture.RestoreUserService();
-    //}
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-    //[Fact]
-    //[Trait("Category", "AutomaticIntegrationTest")]
-    //public async Task Search_sensitive_observations_with_permission_to_category3()
-    //{
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    // Arrange
-    //    //-----------------------------------------------------------------------------------------------------------            
-    //    var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-    //        .All()
-    //            .HaveValuesFromPredefinedObservations()
-    //        .TheFirst(60)
-    //            .HaveTaxonSensitivityCategory(3)
-    //        .TheNext(40)
-    //            .HaveTaxonSensitivityCategory(4)
-    //        .Build();
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(0,
+            because: "All observations added to Elasticsearch is sensitive and the user has no access rights.");
+    }
 
-    //    var authorityBuilder = new UserAuthorizationTestBuilder();
-    //    var authority = authorityBuilder
-    //        .WithAuthorityIdentity("Sighting")
-    //        .WithMaxProtectionLevel(3)                
-    //        .Build();
-    //    _fixture.UseMockUserService(15, authority);
-    //    _fixture.UseMockUser(_fixture.ObservationsController, 15, "user@test.xx");
+    [Fact]    
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingForSensitiveObservations_GivenTheUserHasAccessRights()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(60).HaveTaxonSensitivityCategory(3)
+             .TheNext(40).HaveTaxonSensitivityCategory(4)
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3);
+        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);        
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent };
 
-    //    await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-    //    var searchFilter = new SearchFilterDto
-    //    {
-    //        OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent
-    //    };
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    // Act
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    var response = await _fixture.ObservationsController.ObservationsBySearch(
-    //        null,
-    //        null,
-    //        searchFilter,
-    //        0,
-    //        100,
-    //        sensitiveObservations: true);
-    //    var result = response.GetResult<PagedResultDto<Observation>>();
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch have sensitivty category 3 and the user has max access rights to category 3.");
+    }
 
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    // Assert
-    //    //-----------------------------------------------------------------------------------------------------------            
-    //    result.Should().NotBeNull();
-    //    result.TotalCount.Should().Be(60);
-    //    _fixture.RestoreUserService();
-    //}
+    [Fact]
+    [Trait("Category", "AutomaticIntegrationTest")]    
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingForSensitiveObservationsObservedByMe()
+    {
+        // Arrange
+        const int userId = TestAuthHandler.DefaultTestUserId;
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+                  .HaveTaxonSensitivityCategory(3)
+            .TheFirst(60).With(m => m.ObserversInternal = new[] { 
+                new UserInternal { Id = userId, PersonId = userId, UserServiceUserId = userId, ViewAccess = true } })
+            .Build();
 
-    //[Fact]
-    //[Trait("Category", "AutomaticIntegrationTest")]
-    //public async Task Search_sensitive_observations_without_permissions_returns_my_observed_observations()
-    //{
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    // Arrange
-    //    //-----------------------------------------------------------------------------------------------------------            
-    //    const int userId = 15;
-    //    var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-    //        .All()
-    //            .HaveValuesFromPredefinedObservations()
-    //            .HaveTaxonSensitivityCategory(3)
-    //        .TheFirst(60)
-    //            .With(m => m.ObserversInternal = new[] { new UserInternal() { Id = userId, PersonId = userId, UserServiceUserId = userId, ViewAccess = true } })
-    //        .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 1);
+        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        apiClient.DefaultRequestHeaders.Add(TestAuthHandler.UserId, userId.ToString());
+        var searchFilter = new SearchFilterDto { ObservedByMe = true };
 
-    //    var authorityBuilder = new UserAuthorizationTestBuilder();
-    //    var authority = authorityBuilder
-    //        .WithAuthorityIdentity("Sighting")
-    //        .WithMaxProtectionLevel(1)
-    //        .Build();
-    //    _fixture.UseMockUserService(userId, authority);
-    //    _fixture.UseMockUser(_fixture.ObservationsController, userId, "user@test.xx");
 
-    //    await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-    //    var searchFilter = new SearchFilterDto
-    //    {
-    //        ObservedByMe = true
-    //    };
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    // Act
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    var response = await _fixture.ObservationsController.ObservationsBySearch(
-    //        null,
-    //        null,
-    //        searchFilter,
-    //        0,
-    //        100,
-    //        sensitiveObservations: true);
-    //    var result = response.GetResult<PagedResultDto<Observation>>();
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch are observed by UserId=15. " +
+                     "The user has no access rights but can view its own observed sightings.");
+    }
 
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    // Assert
-    //    //-----------------------------------------------------------------------------------------------------------            
-    //    result.Should().NotBeNull();
-    //    result.TotalCount.Should().Be(60);
-    //    _fixture.RestoreUserService();
-    //}
+    [Fact]
+    [Trait("Category", "AutomaticIntegrationTest")]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingForSensitiveObservationsReportedByMe()
+    {
+        // Arrange
+        const int userId = TestAuthHandler.DefaultTestUserId;
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+                  .HaveTaxonSensitivityCategory(3)
+            .TheFirst(60).With(m => m.ReportedByUserServiceUserId = userId)
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 1);
+        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);        
+        apiClient.DefaultRequestHeaders.Add(TestAuthHandler.UserId, userId.ToString());
+        var searchFilter = new SearchFilterDto { ReportedByMe = true };
 
-    //[Fact]
-    //[Trait("Category", "AutomaticIntegrationTest")]
-    //public async Task Search_sensitive_observations_without_permissions_returns_my_reported_observations()
-    //{
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    // Arrange
-    //    //-----------------------------------------------------------------------------------------------------------            
-    //    const int userId = 15;
-    //    var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-    //        .All()
-    //            .HaveValuesFromPredefinedObservations()
-    //            .HaveTaxonSensitivityCategory(3)
-    //        .TheFirst(60)
-    //            .With(m => m.ReportedByUserServiceUserId = userId)
-    //        .Build();
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-    //    var authorityBuilder = new UserAuthorizationTestBuilder();
-    //    var authority = authorityBuilder
-    //        .WithAuthorityIdentity("Sighting")
-    //        .WithMaxProtectionLevel(1)
-    //        .Build();
-    //    _fixture.UseMockUserService(userId, authority);
-    //    _fixture.UseMockUser(_fixture.ObservationsController, userId, "user@test.xx");
-
-    //    await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-    //    var searchFilter = new SearchFilterDto
-    //    {
-    //        ReportedByMe = true
-    //    };
-
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    // Act
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    var response = await _fixture.ObservationsController.ObservationsBySearch(
-    //        null,
-    //        null,
-    //        searchFilter,
-    //        0,
-    //        100,
-    //        sensitiveObservations: true);
-    //    var result = response.GetResult<PagedResultDto<Observation>>();
-
-    //    //-----------------------------------------------------------------------------------------------------------
-    //    // Assert
-    //    //-----------------------------------------------------------------------------------------------------------            
-    //    result.Should().NotBeNull();
-    //    result.TotalCount.Should().Be(60);
-    //    _fixture.RestoreUserService();
-    //}
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch are observed by UserId=15. " +
+                     "The user has no access rights but can view its own reported sightings.");
+    }
 }

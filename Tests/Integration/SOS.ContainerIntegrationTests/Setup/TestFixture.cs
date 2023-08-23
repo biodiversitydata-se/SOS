@@ -33,8 +33,20 @@ public class TestFixture : IAsyncLifetime
     /// </summary>
     /// <returns>A new <see cref="HttpClient"/> instance.</returns>
     public HttpClient CreateApiClient()
-    {
+    {                
         return ApiFactory.CreateClient();        
+    }
+
+    public HttpClient CreateApiClientWithReplacedService<TService>(TService service) where TService : class
+    {
+        var apiClient = ApiFactory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureTestServices(services =>
+            {
+                services.Replace(ServiceDescriptor.Singleton(x => service));
+            });
+        }).CreateClient();
+        return apiClient;
     }
 
     /// <summary>
