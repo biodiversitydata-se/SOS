@@ -57,6 +57,11 @@ namespace SOS.Lib.Models.Search.Filters
         public List<int> DataProviderIds { get; set; }
 
         /// <summary>
+        /// Data stewardship filter
+        /// </summary>
+        public DataStewardshipFilter DataStewardship { get; set; }
+
+        /// <summary>
         ///     Which type of date filtering that should be used
         /// </summary>
         public DateFilter Date { get; set; }

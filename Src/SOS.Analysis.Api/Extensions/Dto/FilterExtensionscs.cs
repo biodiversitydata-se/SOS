@@ -15,6 +15,7 @@ namespace SOS.Analysis.Api.Extensions.Dto
 
             var filter = new SearchFilterInternal(userId, (ProtectionFilter)searchFilterDto.ProtectionFilter);
             filter.Taxa = searchFilterDto.Taxon?.ToTaxonFilter();
+            filter.DataStewardship = ToDataStewardshipFilter(searchFilterDto.DataStewardship);
             filter.Date = ToDateFilter(searchFilterDto.Date!);
             filter.DataProviderIds = searchFilterDto.DataProvider?.Ids?.ToList();
             filter.FieldTranslationCultureCode = translationCultureCode;
@@ -124,6 +125,15 @@ namespace SOS.Analysis.Api.Extensions.Dto
                 internalFilter.Years = searchFilterInternalDto.ExtendedFilter.Years;
                 internalFilter.YearsComparison = (DateFilterComparison)searchFilterInternalDto.ExtendedFilter.YearsComparison;
             }
+        }
+
+        private static DataStewardshipFilter? ToDataStewardshipFilter(DataStewardshipFilterDto? filter)
+        {
+            return filter == null ? null :
+                new DataStewardshipFilter
+                {
+                    DatasetIdentifiers = filter.DatasetIdentifiers
+                };
         }
 
         private static DateFilter ToDateFilter(DateFilterDto filter)

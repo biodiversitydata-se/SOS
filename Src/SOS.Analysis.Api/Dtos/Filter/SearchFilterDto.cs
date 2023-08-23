@@ -22,6 +22,11 @@ namespace SOS.Analysis.Api.Dtos.Filter
         public DataProviderFilterDto? DataProvider { get; set; }
 
         /// <summary>
+        /// Data stewardship filter
+        /// </summary>
+        public DataStewardshipFilterDto? DataStewardship { get; set; }
+
+        /// <summary>
         /// Date filter.
         /// </summary>
         public DateFilterDto? Date { get; set; }

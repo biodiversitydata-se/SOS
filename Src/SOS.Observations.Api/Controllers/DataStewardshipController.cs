@@ -106,6 +106,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="roleId">Limit user authorization too specified role.</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
+        /// <param name="includeEventIds">Include list of event id's if true</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="skip">Pagination start index.</param>
         /// <param name="take">Number of items to return.</param>
@@ -119,6 +120,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterBaseDto filter,
+            [FromQuery] bool includeEventIds = false,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] int skip = 0, 
             [FromQuery] int take = 100,
@@ -136,8 +138,14 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return BadRequest(validationResult.Error);
                 }
+                
                 var searchFilter = filter.ToSearchFilter(UserId, ProtectionFilterDto.Public, "sv-SE");
-
+                if (!includeEventIds)
+                {
+                    searchFilter ??= new Lib.Models.Search.Filters.SearchFilter();
+                    searchFilter.Output.ExcludeFields.Add("eventIds");
+                }
+                
                 var result = await _dataStewardshipManager.GetDatasetsBySearchAsync(searchFilter, skip, take);
 
                 return exportMode.Equals(DsExportMode.Csv) ?

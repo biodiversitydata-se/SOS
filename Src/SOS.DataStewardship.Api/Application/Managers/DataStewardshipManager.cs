@@ -266,7 +266,7 @@ public class DataStewardshipManager : IDataStewardshipManager
                 new SortOrderFilter { SortBy = "identifier", SortOrder = SearchSortOrder.Asc }                
             };
 
-            var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(aggregationResult.Records.Select(m => m.AggregationKey), sortOrders);
+            var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(aggregationResult.Records.Select(m => m.AggregationKey), sortOrders: sortOrders);
             records = observationDatasets.Select(m => m.ToDataset()).ToList();
         }
 

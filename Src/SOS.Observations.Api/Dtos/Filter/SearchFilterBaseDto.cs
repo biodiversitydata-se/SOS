@@ -53,6 +53,11 @@ namespace SOS.Observations.Api.Dtos.Filter
         public DataProviderFilterDto DataProvider { get; set; }
 
         /// <summary>
+        ///  DataStewardship filter
+        /// </summary>
+        public DataStewardshipFilterDto DataStewardship { get; set; }
+
+        /// <summary>
         /// Date filter.
         /// </summary>
         public DateFilterDto Date { get; set; }
