@@ -49,6 +49,7 @@ namespace SOS.Observations.Api.Extensions
                 new SearchFilterInternal(userId, protectionFilter.ToFilter()) : 
                 new SearchFilter(userId, protectionFilter.ToFilter());
             filter.Taxa = searchFilterBaseDto.Taxon?.ToTaxonFilter();
+            filter.DataStewardship = PopulateDataStewardshipFilter(searchFilterBaseDto.DataStewardship);
             filter.Date = PopulateDateFilter(searchFilterBaseDto.Date);
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
@@ -196,6 +197,15 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.Years = searchFilterInternalDto.ExtendedFilter.Years;
                 internalFilter.YearsComparison = (DateFilterComparison)searchFilterInternalDto.ExtendedFilter.YearsComparison;
             }
+        }
+
+        private static DataStewardshipFilter? PopulateDataStewardshipFilter(DataStewardshipFilterDto? filter)
+        {
+            return filter == null ? null :
+                new DataStewardshipFilter
+                {
+                    DatasetIdentifiers = filter.DatasetIdentifiers
+                };
         }
 
         private static DateFilter PopulateDateFilter(DateFilterDto filter)

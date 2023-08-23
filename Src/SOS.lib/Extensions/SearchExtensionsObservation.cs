@@ -414,11 +414,21 @@ namespace SOS.Lib
             );
         }
 
-        /// <summary>
-        /// Add determination filters
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="filter"></param>
+        private static void TryAddDataStewardshipFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, DataStewardshipFilter filter)
+        { 
+            if (filter == null)
+            {
+                return;
+            }
+
+            query.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIdentifiers);
+        }
+
+            /// <summary>
+            /// Add determination filters
+            /// </summary>
+            /// <param name="query"></param>
+            /// <param name="filter"></param>
         private static void TryAddDeterminationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             switch (filter.DeterminationFilter)
@@ -753,6 +763,7 @@ namespace SOS.Lib
                 query.TryAddDateRangeFilters(filter.Date, "event.startDate", "event.endDate");
             }
 
+            query.TryAddDataStewardshipFilter(filter.DataStewardship);
             query.TryAddTimeRangeFilters(filter.Date, "event.startDate");
             query.TryAddDeterminationFilters(filter);
             query.TryAddLocationFilter(filter.Location);
@@ -769,7 +780,6 @@ namespace SOS.Lib
                 query.AddExistsCriteria("dataStewardship");
             }
             query.TryAddTermsCriteria("event.eventId", filter.EventIds);
-
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);                        
             query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds); 
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
