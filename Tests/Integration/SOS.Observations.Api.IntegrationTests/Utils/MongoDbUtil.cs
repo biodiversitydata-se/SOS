@@ -88,12 +88,12 @@ namespace SOS.Observations.Api.IntegrationTests.Utils
 
                 return true;
             }
-            catch (MongoWriteException e1)
+            catch (MongoWriteException)
             {
                 // Item allready exists
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -163,7 +163,7 @@ namespace SOS.Observations.Api.IntegrationTests.Utils
 
                 throw;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }

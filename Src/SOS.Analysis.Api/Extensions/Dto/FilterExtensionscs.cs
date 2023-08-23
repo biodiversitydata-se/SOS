@@ -18,6 +18,7 @@ namespace SOS.Analysis.Api.Extensions.Dto
             filter.DataStewardship = ToDataStewardshipFilter(searchFilterDto.DataStewardship);
             filter.Date = ToDateFilter(searchFilterDto.Date!);
             filter.DataProviderIds = searchFilterDto.DataProvider?.Ids?.ToList();
+            filter.Event = ToEventFilter(searchFilterDto.Event);
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterDto.NotRecoveredFilter;
             filter.VerificationStatus = (SearchFilterBase.StatusVerification)searchFilterDto.VerificationStatus;
@@ -150,6 +151,15 @@ namespace SOS.Analysis.Api.Extensions.Dto
                 DateFilterType = (DateFilter.DateRangeFilterType)(filter?.DateFilterType).GetValueOrDefault(),
                 TimeRanges = filter!.TimeRanges?.Select(tr => (DateFilter.TimeRange)tr)
             };
+        }
+
+        private static EventFilter? ToEventFilter(EventFilterDto? filter)
+        {
+            return filter == null ? null :
+                new EventFilter
+                {
+                    Ids = filter.Ids
+                };
         }
 
         /// <summary>

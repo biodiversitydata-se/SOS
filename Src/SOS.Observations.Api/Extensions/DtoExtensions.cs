@@ -52,6 +52,7 @@ namespace SOS.Observations.Api.Extensions
             filter.DataStewardship = PopulateDataStewardshipFilter(searchFilterBaseDto.DataStewardship);
             filter.Date = PopulateDateFilter(searchFilterBaseDto.Date);
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
+            filter.Event = PopulateEventFilter(searchFilterBaseDto.Event);
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
             //filter.VerificationStatus = searchFilterBaseDto.ValidationStatus.HasValue ? (SearchFilterBase.StatusVerification)searchFilterBaseDto.ValidationStatus.Value.ToStatusVerification() : (SearchFilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
@@ -222,6 +223,15 @@ namespace SOS.Observations.Api.Extensions
                 DateFilterType = (DateFilter.DateRangeFilterType)(filter?.DateFilterType).GetValueOrDefault(),
                 TimeRanges = filter.TimeRanges?.Select(tr => (DateFilter.TimeRange)tr).ToList()
             };
+        }
+
+        private static EventFilter? PopulateEventFilter(EventFilterDto? filter)
+        {
+            return filter == null ? null :
+                new EventFilter
+                {
+                    Ids = filter.Ids
+                };
         }
 
         private static LocationFilter PopulateLocationFilter(GeographicsFilterDto filter)

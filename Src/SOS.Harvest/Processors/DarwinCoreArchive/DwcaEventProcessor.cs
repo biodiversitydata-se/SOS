@@ -140,7 +140,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {
             var filter = new SearchFilter(0);
             //filter.IsPartOfDataStewardshipDataset = true;
-            filter.EventIds = processedEvents.Keys.ToList();
+            filter.Event = new EventFilter { Ids = processedEvents.Keys };
             Logger.LogInformation($"DwcaEventProcessor.GetEventObservationsDictionaryAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
             List<Lib.Models.Search.Result.EventOccurrenceAggregationItem> eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
             Dictionary<string, List<string>> occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId.ToLower(), m => m.OccurrenceIds);

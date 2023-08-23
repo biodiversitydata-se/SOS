@@ -79,7 +79,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             //-----------------------------------------------------------------------------------------------------------
             SearchFilter searchFilter = new SearchFilter(0)
             {
-                EventIds = new List<string> { "urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10002293427000658739" }
+                Event = new EventFilter { Ids = new List<string> { "urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10002293427000658739" } }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -126,12 +126,15 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             //-----------------------------------------------------------------------------------------------------------
             SearchFilter searchFilter = new SearchFilter(0)
             {
-                EventIds = new List<string>
-                {
-                    "SFTspkt:19770610:241"
-                    //"SFTstd:20060627:461",
-                    //"SFTstd:20050606:106"
+                Event = 
+                    new EventFilter { Ids = new List<string>
+                    {
+                        "SFTspkt:19770610:241"
+                        //"SFTstd:20060627:461",
+                        //"SFTstd:20050606:106"
+                    }
                 }
+                
             };
 
             //-----------------------------------------------------------------------------------------------------------

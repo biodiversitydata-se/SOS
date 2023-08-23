@@ -107,7 +107,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
             public string Format { get; set; }            
             public string Status { get; set; }
             public string ErrorMsg { get; set; }            
-            public string? OutputFieldSet { get; set; }
+            public string OutputFieldSet { get; set; }
         }
     }
 }

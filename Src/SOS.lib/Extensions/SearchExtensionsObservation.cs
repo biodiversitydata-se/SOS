@@ -424,11 +424,11 @@ namespace SOS.Lib
             query.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIdentifiers);
         }
 
-            /// <summary>
-            /// Add determination filters
-            /// </summary>
-            /// <param name="query"></param>
-            /// <param name="filter"></param>
+        /// <summary>
+        /// Add determination filters
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="filter"></param>
         private static void TryAddDeterminationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             switch (filter.DeterminationFilter)
@@ -441,6 +441,17 @@ namespace SOS.Lib
                     break;
             }
         }
+
+        private static void TryAddEventFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, EventFilter filter)
+        {
+            if (filter == null)
+            {
+                return;
+            }
+
+            query.TryAddTermsCriteria("event.eventId", filter.Ids);
+        }
+       
 
         /// <summary>
         /// Add geometry filter to query
@@ -764,6 +775,7 @@ namespace SOS.Lib
             }
 
             query.TryAddDataStewardshipFilter(filter.DataStewardship);
+            query.TryAddEventFilter(filter.Event);
             query.TryAddTimeRangeFilters(filter.Date, "event.startDate");
             query.TryAddDeterminationFilters(filter);
             query.TryAddLocationFilter(filter.Location);
@@ -779,7 +791,7 @@ namespace SOS.Lib
             {                
                 query.AddExistsCriteria("dataStewardship");
             }
-            query.TryAddTermsCriteria("event.eventId", filter.EventIds);
+            
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);                        
             query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds); 
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
