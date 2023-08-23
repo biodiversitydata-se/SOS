@@ -8,7 +8,7 @@ using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using SOS.ContainerIntegrationTests.Stubs;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
 public class MyObservationsTests : TestBase
@@ -25,7 +25,7 @@ public class MyObservationsTests : TestBase
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All().HaveValuesFromPredefinedObservations()
             .TheFirst(60)
-                .With(m => m.ObserversInternal = m.ObserversInternal = new[] { 
+                .With(m => m.ObserversInternal = m.ObserversInternal = new[] {
                     new UserInternal() { Id = userId, PersonId = userId, UserServiceUserId = userId, ViewAccess = true } })
                 .With(m => m.Observers = "Tom Volgers")
                 .With(m => m.ReportedByUserServiceUserId = userId)
@@ -41,11 +41,11 @@ public class MyObservationsTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60, 
+        result!.TotalCount.Should().Be(60,
             because: "60 observations added to Elasticsearch are observed by UserId=15.");
     }
 
-    [Fact]    
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsNoObservations_WhenFilteringByObservedByMe_GivenNoObservationsObservedByMe()
     {
         // Arrange

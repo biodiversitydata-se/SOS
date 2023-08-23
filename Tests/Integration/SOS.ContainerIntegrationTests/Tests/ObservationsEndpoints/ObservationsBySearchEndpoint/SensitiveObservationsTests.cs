@@ -8,7 +8,7 @@ using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using SOS.ContainerIntegrationTests.Stubs;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
 public class SensitiveObservationsTests : TestBase

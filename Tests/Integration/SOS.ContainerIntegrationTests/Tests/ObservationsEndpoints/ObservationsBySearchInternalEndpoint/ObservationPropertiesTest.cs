@@ -9,11 +9,11 @@ using Nest;
 using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchInternalEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchInternalEndpoint;
 
 [Collection(TestCollection.Name)]
 public class ObservationPropertiesTest : TestBase
-{    
+{
     public ObservationPropertiesTest(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
     }
