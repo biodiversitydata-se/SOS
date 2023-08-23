@@ -15,8 +15,7 @@ public class TaxonAggregationTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]
-    public async Task TaxonAggregationInternalTest()
+    public async Task TaxonAggregationTest()
     {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
