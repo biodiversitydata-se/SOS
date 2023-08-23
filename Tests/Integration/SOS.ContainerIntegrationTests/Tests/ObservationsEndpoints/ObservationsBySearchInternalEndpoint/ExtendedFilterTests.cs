@@ -7,7 +7,7 @@ using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using SOS.ContainerIntegrationTests.Helpers;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchInternalEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchInternalEndpoint;
 
 [Collection(TestCollection.Name)]
 public class ExtendedFilterTests : TestBase

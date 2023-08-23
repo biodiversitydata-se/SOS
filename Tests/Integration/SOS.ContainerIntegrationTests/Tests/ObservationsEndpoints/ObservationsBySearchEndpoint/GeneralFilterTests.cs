@@ -8,7 +8,7 @@ using SOS.Observations.Api.Dtos;
 using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
 public class GeneralFilterTests : TestBase

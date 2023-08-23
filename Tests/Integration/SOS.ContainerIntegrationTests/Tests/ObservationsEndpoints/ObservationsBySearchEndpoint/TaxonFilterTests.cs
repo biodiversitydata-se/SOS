@@ -9,7 +9,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 /// <summary>
 /// Integration tests for ObservationsBySearch endpoint when using taxon filters.
@@ -20,8 +20,8 @@ public class TaxonFilterTests : TestBase
     public TaxonFilterTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
     }
-    
-    [Fact]    
+
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByRedListCategories()
     {
         // Arrange        
@@ -44,7 +44,7 @@ public class TaxonFilterTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60, 
+        result!.TotalCount.Should().Be(60,
             because: "60 out of 100 observations added to Elasticsearch had one of the Red List categories CR, EN, or VU.");
     }
 
@@ -59,7 +59,7 @@ public class TaxonFilterTests : TestBase
              .TheNext(20).With(o => o.TaxonId = TaxonIds.Jättebalsamin)
              .TheNext(20).With(o => o.TaxonId = TaxonIds.Talgoxe)
              .TheNext(20).With(o => o.TaxonId = TaxonIds.Blåmes)
-            .Build();        
+            .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = SearchFilterDtoFactory.CreateWithTaxonIds(TaxonIds.Silvergran, TaxonIds.Talgoxe, TaxonIds.Blåmes);
@@ -72,7 +72,7 @@ public class TaxonFilterTests : TestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60,
             because: "60 out of 100 observations added to Elasticsearch had one of the Taxon Silvergran, Blåmes, Talgoxe.");
-    }  
+    }
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingForUnderlyingTaxa()
@@ -98,8 +98,8 @@ public class TaxonFilterTests : TestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60,
             because: "60 out of 100 observations added to Elasticsearch has Taxon Mesar as ancestor.");
-    }    
-    
+    }
+
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchByTaxonListMerge()
     {
@@ -109,7 +109,7 @@ public class TaxonFilterTests : TestBase
              .TheFirst(20).With(o => o.TaxonId = TaxonIds.SvartfläckigBlåvinge)
              .TheNext(20).With(o => o.TaxonId = TaxonIds.Asknätfjäril)
              .TheNext(20).With(o => o.TaxonId = TaxonIds.Jättebalsamin)
-             .TheNext(20).With(o => o.TaxonId = TaxonIds.Sjögull)             
+             .TheNext(20).With(o => o.TaxonId = TaxonIds.Sjögull)
              .TheNext(20).With(o => o.TaxonId = TaxonIds.Jätteloka)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -165,7 +165,7 @@ public class TaxonFilterTests : TestBase
              .TheNext(20).HaveTaxonCategoryTaxonId(17)
              .TheNext(20).HaveTaxonCategoryTaxonId(18)
              .TheNext(20).HaveTaxonCategoryTaxonId(14)
-             .TheNext(20).HaveTaxonCategoryTaxonId(11)             
+             .TheNext(20).HaveTaxonCategoryTaxonId(11)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
