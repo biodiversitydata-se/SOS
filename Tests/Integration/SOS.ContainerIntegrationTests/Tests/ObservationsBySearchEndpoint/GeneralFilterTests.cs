@@ -8,7 +8,7 @@ using SOS.Observations.Api.Dtos;
 using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 
-namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.ObservationsBySearchEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
 public class GeneralFilterTests : TestBase
@@ -17,9 +17,9 @@ public class GeneralFilterTests : TestBase
     {
     }
 
-    [Fact]    
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByProjectIds()
-    {        
+    {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All().HaveValuesFromPredefinedObservations()
@@ -41,9 +41,9 @@ public class GeneralFilterTests : TestBase
             because: "60 observations added to Elasticsearch have ProjectId = 1.");
     }
 
-    [Fact]        
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPresentObservations()
-    {        
+    {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All().HaveValuesFromPredefinedObservations()
@@ -70,9 +70,9 @@ public class GeneralFilterTests : TestBase
             because: "60 observations added to Elasticsearch are present observations.");
     }
 
-    [Fact]    
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByAbsentObservations()
-    {        
+    {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All().HaveValuesFromPredefinedObservations()
@@ -101,7 +101,7 @@ public class GeneralFilterTests : TestBase
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByVerifiedObservations()
-    {        
+    {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All()
@@ -138,7 +138,7 @@ public class GeneralFilterTests : TestBase
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByNotVerifiedObservations()
-    {        
+    {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All().HaveValuesFromPredefinedObservations()
@@ -177,9 +177,9 @@ public class GeneralFilterTests : TestBase
             because: "60 observations added to Elasticsearch have not verified status.");
     }
 
-    [Fact]    
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByNotUnsureDetermination()
-    {        
+    {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All().HaveValuesFromPredefinedObservations()
@@ -188,7 +188,8 @@ public class GeneralFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
             DeterminationFilter = SearchFilterBaseDto.SightingDeterminationFilterDto.NotUnsureDetermination
         };
 
@@ -204,7 +205,7 @@ public class GeneralFilterTests : TestBase
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByOnlyUnsureDetermination()
-    {        
+    {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All().HaveValuesFromPredefinedObservations()
@@ -213,7 +214,8 @@ public class GeneralFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
             DeterminationFilter = SearchFilterBaseDto.SightingDeterminationFilterDto.OnlyUnsureDetermination
         };
 
@@ -229,7 +231,7 @@ public class GeneralFilterTests : TestBase
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByDontIncludeNotRecovered()
-    {        
+    {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All().HaveValuesFromPredefinedObservations()
@@ -238,7 +240,8 @@ public class GeneralFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
             NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.DontIncludeNotRecovered
         };
 
@@ -263,7 +266,8 @@ public class GeneralFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
             NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.OnlyNotRecovered
         };
 

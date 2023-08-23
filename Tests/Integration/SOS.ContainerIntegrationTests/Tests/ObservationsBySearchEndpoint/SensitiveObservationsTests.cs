@@ -8,7 +8,7 @@ using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using SOS.ContainerIntegrationTests.Stubs;
 
-namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.ObservationsBySearchEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
 public class SensitiveObservationsTests : TestBase
@@ -17,9 +17,9 @@ public class SensitiveObservationsTests : TestBase
     {
     }
 
-    [Fact]        
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsNoObservations_WhenSearchingForPublicObservations_GivenOnlyProtectedExists()
-    {            
+    {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All().HaveValuesFromPredefinedObservations()
@@ -39,7 +39,7 @@ public class SensitiveObservationsTests : TestBase
             because: "0 observations added to Elasticsearch are public observations.");
     }
 
-    [Fact]    
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsNoObservations_WhenSearchingForProtectedObservations_GivenTheUserHasNoAccessRights()
     {
         // Arrange            
@@ -47,7 +47,7 @@ public class SensitiveObservationsTests : TestBase
             .All().HaveValuesFromPredefinedObservations()
                   .HaveTaxonSensitivityCategory(3)
             .Build();
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);        
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 1);
         var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
         var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent };
@@ -62,7 +62,7 @@ public class SensitiveObservationsTests : TestBase
             because: "All observations added to Elasticsearch is sensitive and the user has no access rights.");
     }
 
-    [Fact]    
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingForSensitiveObservations_GivenTheUserHasAccessRights()
     {
         // Arrange
@@ -73,7 +73,7 @@ public class SensitiveObservationsTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);        
+        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
         var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent };
 
         // Act
@@ -87,7 +87,7 @@ public class SensitiveObservationsTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]    
+    [Trait("Category", "AutomaticIntegrationTest")]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingForSensitiveObservationsObservedByMe()
     {
         // Arrange
@@ -95,7 +95,7 @@ public class SensitiveObservationsTests : TestBase
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All().HaveValuesFromPredefinedObservations()
                   .HaveTaxonSensitivityCategory(3)
-            .TheFirst(60).With(m => m.ObserversInternal = new[] { 
+            .TheFirst(60).With(m => m.ObserversInternal = new[] {
                 new UserInternal { Id = userId, PersonId = userId, UserServiceUserId = userId, ViewAccess = true } })
             .Build();
 
@@ -130,7 +130,7 @@ public class SensitiveObservationsTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 1);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);        
+        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
         apiClient.DefaultRequestHeaders.Add(TestAuthHandler.UserId, userId.ToString());
         var searchFilter = new SearchFilterDto { ReportedByMe = true };
 

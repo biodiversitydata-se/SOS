@@ -9,7 +9,7 @@ using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using SOS.ContainerIntegrationTests.TestData.Factories;
 
-namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.ObservationsBySearchEndpoint
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint
 {
     [Collection(TestCollection.Name)]
     public class GeographicsFilterTests : TestBase
@@ -20,7 +20,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
 
         [Fact]
         public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByMunicipality()
-        {            
+        {
             // Arrange
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
@@ -31,7 +31,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var apiClient = TestFixture.CreateApiClient();
             var searchFilter = SearchFilterDtoFactory.CreateWithMunicipalityFeatureIds("Municipality1");
-            
+
             // Act
             var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
             var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
@@ -41,10 +41,10 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             result!.TotalCount.Should().Be(60,
                 because: "60 observations added to Elasticsearch are in the municipality Municipality1.");
         }
-        
+
         [Fact]
         public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByMultipleMunicipalities()
-        {            
+        {
             // Arrange
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
@@ -67,9 +67,9 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 because: "60 observations added to Elasticsearch are in the municipality Municipality1 OR Municipality2.");
         }
 
-        [Fact]        
+        [Fact]
         public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByProvinceAndMunicipality()
-        {            
+        {
             // Arrange
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
@@ -79,8 +79,10 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .Build();
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var apiClient = TestFixture.CreateApiClient();
-            var searchFilter = new SearchFilterDto {
-                Geographics = new GeographicsFilterDto {
+            var searchFilter = new SearchFilterDto
+            {
+                Geographics = new GeographicsFilterDto
+                {
                     Areas = new[] {
                         new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Province, FeatureId = "Province1" },
                         new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "Municipality1" }
@@ -100,7 +102,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
 
         [Fact]
         public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygon()
-        {            
+        {
             // Arrange
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
@@ -110,8 +112,10 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .Build();
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var apiClient = TestFixture.CreateApiClient();
-            var searchFilter = new SearchFilterDto {
-                Geographics = new GeographicsFilterDto {
+            var searchFilter = new SearchFilterDto
+            {
+                Geographics = new GeographicsFilterDto
+                {
                     Geometries = new[] {
                         new Point(1.00005, 1.00004).ToCircle(10).ToGeoShape()
                     }
@@ -130,7 +134,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
 
         [Fact]
         public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygonAndMaxAccuracy()
-        {            
+        {
             // Arrange
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
@@ -140,8 +144,10 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .Build();
             var apiClient = TestFixture.CreateApiClient();
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var searchFilter = new SearchFilterDto {
-                Geographics = new GeographicsFilterDto {
+            var searchFilter = new SearchFilterDto
+            {
+                Geographics = new GeographicsFilterDto
+                {
                     Geometries = new[] {
                         new Point(1.00005, 1.00004).ToCircle(10).ToGeoShape()
                     },
@@ -160,9 +166,9 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                          "and also with accuracy <= 15 meter.");
         }
 
-        [Fact]        
+        [Fact]
         public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygonAndConsiderAccuracy()
-        {            
+        {
             // Arrange
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
@@ -173,8 +179,10 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .Build();
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var apiClient = TestFixture.CreateApiClient();
-            var searchFilter = new SearchFilterDto {
-                Geographics = new GeographicsFilterDto {
+            var searchFilter = new SearchFilterDto
+            {
+                Geographics = new GeographicsFilterDto
+                {
                     Geometries = new[] {
                         new Point(1.00005, 1.00004).ToCircle(10).ToGeoShape()
                     },
@@ -195,7 +203,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
 
         [Fact]
         public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygonAndConsiderDisturbanceRadius()
-        {            
+        {
             // Arrange
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
@@ -210,8 +218,10 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .Build();
             var apiClient = TestFixture.CreateApiClient();
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var searchFilter = new SearchFilterDto {
-                Geographics = new GeographicsFilterDto {
+            var searchFilter = new SearchFilterDto
+            {
+                Geographics = new GeographicsFilterDto
+                {
                     Geometries = new[] {
                         new Point(1.00005, 1.00004).ToCircle(10).ToGeoShape()
                     },
@@ -230,7 +240,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                          "when disturbance radius is considered");
         }
 
-        [Fact]        
+        [Fact]
         public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByBoundingBox()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -244,9 +254,12 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .Build();
             var apiClient = TestFixture.CreateApiClient();
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var searchFilter = new SearchFilterDto {
-                Geographics = new GeographicsFilterDto {
-                    BoundingBox = new LatLonBoundingBoxDto {
+            var searchFilter = new SearchFilterDto
+            {
+                Geographics = new GeographicsFilterDto
+                {
+                    BoundingBox = new LatLonBoundingBoxDto
+                    {
                         BottomRight = new LatLonCoordinateDto { Latitude = 1, Longitude = 1.1 },
                         TopLeft = new LatLonCoordinateDto { Latitude = 1.1, Longitude = 1 }
                     }

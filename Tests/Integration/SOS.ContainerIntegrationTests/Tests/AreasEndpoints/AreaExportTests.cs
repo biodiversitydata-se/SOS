@@ -4,7 +4,7 @@ using SOS.ContainerIntegrationTests.TestData;
 using SOS.Observations.Api.Dtos;
 using System.IO.Compression;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.AreasEndpoints;
 
 /// <summary>
 /// Integration tests for export area to zip file endpoint.
@@ -15,8 +15,8 @@ public class AreaExportTests : TestBase
     public AreaExportTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
     }
-    
-    [Fact]    
+
+    [Fact]
     public async Task AreaExportEndpoint_UsesCamelCasePropertyNames_WhenExportingToGeoJson()
     {
         // Arrange                
@@ -35,7 +35,7 @@ public class AreaExportTests : TestBase
         JsonElement root = document.RootElement;
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);        
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         using (new AssertionScope())
         {
             root.TryGetProperty("type", out var typeJsonElement).Should().BeTrue();
@@ -67,7 +67,7 @@ public class AreaExportTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         using (new AssertionScope())
         {
             root.TryGetProperty("AreaType", out var areaElement).Should().BeTrue();
@@ -76,7 +76,7 @@ public class AreaExportTests : TestBase
             root.TryGetProperty("BoundingBox", out var boundingBoxElement).Should().BeTrue();
             root.TryGetProperty("Geometry", out var geometryElement).Should().BeTrue();
             geometryElement.TryGetProperty("Coordinates", out var coordinatesElement).Should().BeTrue();
-            geometryElement.TryGetProperty("Type", out var typeElement).Should().BeTrue();            
+            geometryElement.TryGetProperty("Type", out var typeElement).Should().BeTrue();
         }
     }
 }

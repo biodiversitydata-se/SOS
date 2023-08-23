@@ -7,7 +7,7 @@ using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using SOS.ContainerIntegrationTests.Helpers;
 
-namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.ObservationsBySearchEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
 public class DateFilterTests : TestBase
@@ -15,7 +15,7 @@ public class DateFilterTests : TestBase
     public DateFilterTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
     }
-    
+
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByBetweenStartDateAndEndDate()
     {
@@ -28,8 +28,10 @@ public class DateFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
-            Date = new DateFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Date = new DateFilterDto
+            {
                 StartDate = DateTime.Parse("2000-02-01T00:00:00"),
                 EndDate = DateTime.Parse("2000-02-29T23:59:59"),
                 DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
@@ -58,8 +60,10 @@ public class DateFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
-            Date = new DateFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Date = new DateFilterDto
+            {
                 StartDate = DateTime.Parse("2000-02-01T00:00:00"),
                 EndDate = DateTime.Parse("2000-02-29T23:59:59"),
                 DateFilterType = DateFilterTypeDto.OverlappingStartDateAndEndDate
@@ -89,8 +93,10 @@ public class DateFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
-            Date = new DateFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Date = new DateFilterDto
+            {
                 StartDate = DateTime.Parse("2000-02-01T00:00:00"),
                 EndDate = DateTime.Parse("2000-02-29T23:59:59"),
                 DateFilterType = DateFilterTypeDto.OnlyStartDate
@@ -120,8 +126,10 @@ public class DateFilterTests : TestBase
             .Build();
         var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
-            Date = new DateFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Date = new DateFilterDto
+            {
                 StartDate = DateTime.Parse("2000-02-01T00:00:00"),
                 EndDate = DateTime.Parse("2000-02-29T23:59:59"),
                 DateFilterType = DateFilterTypeDto.OnlyEndDate
@@ -131,7 +139,7 @@ public class DateFilterTests : TestBase
         // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-        var debug = DebugTestOnlyEndDateFilter(verbatimObservations, processedObservations, result!.Records);        
+        var debug = DebugTestOnlyEndDateFilter(verbatimObservations, processedObservations, result!.Records);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -139,11 +147,11 @@ public class DateFilterTests : TestBase
             because: "60 observations added to Elasticsearch have ProjectId = 1.");
     }
 
-    private List<TestResultItem> DebugTestOnlyEndDateFilter(        
+    private List<TestResultItem> DebugTestOnlyEndDateFilter(
         IList<ArtportalenObservationVerbatim> verbatimObservations,
         IEnumerable<Observation> allObservations,
         IEnumerable<Observation> resultObservations)
-    {        
+    {
         var testResultItems = DebugTestResultHelper.CreateTestResultSummary(verbatimObservations, allObservations, resultObservations);
         foreach (var item in testResultItems)
         {
@@ -155,5 +163,5 @@ public class DateFilterTests : TestBase
             .OrderBy(m => m.ProcessedObservation.Event.EndDate!.Value)
             .ToList();
         return testResultItems;
-    }   
+    }
 }
