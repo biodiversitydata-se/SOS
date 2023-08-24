@@ -358,10 +358,18 @@ namespace SOS.Harvest.Processors.Taxon
                 _logger.LogDebug("Finish adding taxon attributes");
 
                 var taxa = dwcTaxa.ToProcessedTaxa();
-
+                
+                var taxonCount = await _processedTaxonRepository.CountAllDocumentsAsync();
+                var useCurrentCollection = false;
                 if (!taxa?.Any() ?? true)
                 {
-                    return -1;
+                    _logger.LogWarning("No taxa harvested");
+                    useCurrentCollection = true;
+                }
+                if (taxa!.Count() < taxonCount * 0.95)
+                {
+                    _logger.LogWarning("Less than 95% of previous number of taxa harvested");
+                    useCurrentCollection = true;
                 }
 
                 var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
@@ -369,10 +377,16 @@ namespace SOS.Harvest.Processors.Taxon
                 if (!isTaxonDataOk)
                 {
                     // If there are cycles in the data, use the current information in Taxon collection.
-                    var taxonCount = await _processedTaxonRepository.CountAllDocumentsAsync();
-                    return Convert.ToInt32(taxonCount);
+                    _logger.LogWarning("There are cycles in the taxa data");
+                    useCurrentCollection = true;
                 }
                 
+                if (useCurrentCollection)
+                {
+                    _logger.LogInformation("Using current taxa collection");
+                    return Convert.ToInt32(taxonCount);
+                }
+
                 _logger.LogDebug("Start calculating higher classification for taxa");
                 CalculateHigherClassificationField(taxa, taxonTree);
                 _logger.LogDebug("Finish calculating higher classification for taxa");
