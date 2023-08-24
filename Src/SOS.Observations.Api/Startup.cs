@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
@@ -185,6 +186,11 @@ namespace SOS.Observations.Api
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            // Use Swedish culture info.
+            var culture = new CultureInfo("sv-SE");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+
             var applicationInsightsConfiguration = Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>();
             services.AddSingleton(applicationInsightsConfiguration);
 

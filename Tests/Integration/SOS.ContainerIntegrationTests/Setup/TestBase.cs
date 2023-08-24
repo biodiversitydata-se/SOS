@@ -1,4 +1,5 @@
 ﻿using SOS.Lib.JsonConverters;
+using System.Globalization;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 
@@ -42,5 +43,10 @@ public class TestBase
     {
         TestFixture = testFixture;
         Output = output;
+        
+        // Use Swedish culture info.
+        var culture = new CultureInfo("sv-SE");
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
     }
 }
