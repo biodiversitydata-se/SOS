@@ -14,7 +14,7 @@ namespace SOS.Lib.UnitTests.TestHelpers.Fixtures
         public ProcessedBasicTaxaFixture()
         {
             Taxa = MessagePackHelper.CreateListFromMessagePackFile<IBasicTaxon>(
-                @"Resources\AllProcessedBasicTaxa.msgpck");
+                @"Resources/AllProcessedBasicTaxa.msgpck");
         }
 
         public IEnumerable<IBasicTaxon> Taxa { get; private set; }

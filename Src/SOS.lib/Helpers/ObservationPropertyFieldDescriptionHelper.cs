@@ -255,7 +255,7 @@ namespace SOS.Lib.Helpers
         private static IEnumerable<PropertyFieldDescription> LoadFieldDescriptionsFromJson()
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath, @"Resources\ObservationFieldDescriptions.json");
+            var filePath = Path.Combine(assemblyPath, @"Resources/ObservationFieldDescriptions.json");
             using var fs = FileSystemHelper.WaitForFileAndThenOpenIt(filePath);
             var fields = System.Text.Json.JsonSerializer.DeserializeAsync<List<PropertyFieldDescription>>(fs).Result;
             return fields;

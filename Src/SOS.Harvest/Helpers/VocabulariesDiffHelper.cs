@@ -87,7 +87,7 @@ namespace SOS.Harvest.Helpers
         private List<Vocabulary> GetJsonFilesVocabularies()
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath!, @"Resources\Vocabularies\");
+            var filePath = Path.Combine(assemblyPath!, @"Resources/Vocabularies/");
             var jsonFilesVocabularies = new List<Vocabulary>();
             foreach (var fileName in Directory.GetFiles(filePath))
             {

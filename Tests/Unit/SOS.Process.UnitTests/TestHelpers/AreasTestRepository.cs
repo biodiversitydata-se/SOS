@@ -28,11 +28,11 @@ namespace SOS.Process.UnitTests.TestHelpers
                 switch (areaType)
                 {
                     case AreaType.County:
-                        areas = LoadAreas(Path.Combine(assemblyPath, @"Resources\Regions\Counties.geojson"), areaType);
+                        areas = LoadAreas(Path.Combine(assemblyPath, @"Resources/Regions/Counties.geojson"), areaType);
                         areaCollection.AddRange(areas);
                         break;
                     case AreaType.Province:
-                        areas = LoadAreas(Path.Combine(assemblyPath, @"Resources\Regions\Provinces.geojson"), areaType);
+                        areas = LoadAreas(Path.Combine(assemblyPath, @"Resources/Regions/Provinces.geojson"), areaType);
                         areaCollection.AddRange(areas);
                         break;
                     default:

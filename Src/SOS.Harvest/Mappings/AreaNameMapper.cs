@@ -61,7 +61,7 @@ namespace SOS.Harvest.Mappings
         private Dictionary<string, string>? LoadCountyNameMapping()
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath!, @"Resources\CountyNameMapper.json");
+            var filePath = Path.Combine(assemblyPath!, @"Resources/CountyNameMapper.json");
             using (var fs = FileSystemHelper.WaitForFile(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 var countyNameMappings = JsonSerializer.DeserializeAsync<List<CountyNameMapperItem>>(fs).Result;
@@ -72,7 +72,7 @@ namespace SOS.Harvest.Mappings
         private Dictionary<string, string>? LoadProvinceNameMapping()
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath!, @"Resources\ProvinceNameMapper.json");
+            var filePath = Path.Combine(assemblyPath!, @"Resources/ProvinceNameMapper.json");
             using (var fs = FileSystemHelper.WaitForFile(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 var countyNameMappings = JsonSerializer.DeserializeAsync<List<ProvinceNameMapperItem>>(fs).Result;

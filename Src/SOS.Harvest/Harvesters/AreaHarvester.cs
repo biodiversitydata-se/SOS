@@ -130,7 +130,7 @@ namespace SOS.Harvest.Harvesters
         private void UseSimplifiedEconomicZoneOfSweden(Dictionary<string, Geometry> geometries)
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath!, @"Resources\Gis\swedenExtentSimplified.geojson");
+            var filePath = Path.Combine(assemblyPath!, @"Resources/Gis/swedenExtentSimplified.geojson");
             var str = File.ReadAllText(filePath);
             var geoJsonReader = new GeoJsonReader();
             var swedenExtentSimplified = geoJsonReader.Read<FeatureCollection>(str);

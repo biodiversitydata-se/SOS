@@ -382,7 +382,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         private List<Taxon> GetTaxaFromZipFile()
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath, @"Resources\TaxonCollection.zip");
+            var filePath = Path.Combine(assemblyPath, @"Resources/TaxonCollection.zip");
 
             using (ZipArchive archive = ZipFile.OpenRead(filePath))
             {

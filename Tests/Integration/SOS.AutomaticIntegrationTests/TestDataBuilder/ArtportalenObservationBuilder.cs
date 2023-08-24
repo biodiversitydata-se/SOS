@@ -37,7 +37,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             if (_verbatimArtportalenObservationsFromJsonFile == null || !sensitive.Equals(_sensitiveLoaded))
             {
                 var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var filePath = System.IO.Path.Combine(assemblyPath, string.Format($@"Resources\{(sensitive ? "ArtportalenVerbatimProtectedObservations_1000" : "ArtportalenVerbatimObservations_1000")}.json") );                    
+                var filePath = System.IO.Path.Combine(assemblyPath, string.Format($@"Resources/{(sensitive ? "ArtportalenVerbatimProtectedObservations_1000" : "ArtportalenVerbatimObservations_1000")}.json") );                    
                 string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
                 var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull, PropertyNameCaseInsensitive = true, IncludeFields = false };
                 serializeOptions.Converters.Add(new ObjectIdConverter());

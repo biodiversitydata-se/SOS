@@ -22,7 +22,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 if (_verbatimArtportalenChecklistsFromJsonFile == null)
                 {
                     var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                    var filePath = System.IO.Path.Combine(assemblyPath, @"Resources\ArtportalenVerbatimChecklists_1000.json");                    
+                    var filePath = System.IO.Path.Combine(assemblyPath, @"Resources/ArtportalenVerbatimChecklists_1000.json");                    
                     string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
 
                     var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };

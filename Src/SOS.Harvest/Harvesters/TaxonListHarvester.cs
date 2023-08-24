@@ -56,7 +56,7 @@ namespace SOS.Harvest.Harvesters
                 _logger.LogDebug("Start getting taxon lists");
 
                 var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var filePath = Path.Combine(assemblyPath!, @"Resources\TaxonLists.json");
+                var filePath = Path.Combine(assemblyPath!, @"Resources/TaxonLists.json");
                 var taxonLists =
                     JsonConvert.DeserializeObject<List<TaxonList>>(await File.ReadAllTextAsync(filePath));
 

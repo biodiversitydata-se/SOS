@@ -11,7 +11,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
     {
         public static Observation CreateDefaultObservation()
         {
-            var fileName = @"Resources\DefaultTestObservation.json";
+            var fileName = @"Resources/DefaultTestObservation.json";
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
             var str = File.ReadAllText(filePath, Encoding.UTF8);
