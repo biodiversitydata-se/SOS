@@ -1,6 +1,8 @@
-﻿using SOS.ContainerIntegrationTests.Stubs;
+﻿using NSubstitute;
+using SOS.ContainerIntegrationTests.Stubs;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -57,7 +59,8 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
             services.Replace(ServiceDescriptor.Scoped(x => processedObservationRepository!));
             services.Replace(ServiceDescriptor.Scoped(x => processedTaxonRepository!));
             services.Replace(ServiceDescriptor.Singleton(x => processClient!));
-            services.Replace(ServiceDescriptor.Singleton(x => _apiConfiguration));
+            services.Replace(ServiceDescriptor.Singleton(x => _apiConfiguration));            
+            services.Replace(ServiceDescriptor.Singleton(x => Substitute.For<IBlobStorageService>()));
         });
     }
 
