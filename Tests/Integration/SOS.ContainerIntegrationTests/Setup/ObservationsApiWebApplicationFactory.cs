@@ -1,6 +1,7 @@
 ﻿using SOS.ContainerIntegrationTests.Stubs;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.ContainerIntegrationTests.Setup;
@@ -56,6 +57,23 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
             services.Replace(ServiceDescriptor.Scoped(x => processedObservationRepository!));
             services.Replace(ServiceDescriptor.Scoped(x => processedTaxonRepository!));
             services.Replace(ServiceDescriptor.Singleton(x => processClient!));
+            services.Replace(ServiceDescriptor.Singleton(x => _apiConfiguration));
         });
     }
+
+    // Replace api configuration and set ExportPath=Path.GetTempPath() in order to exports to work on Linux.
+    private ObservationApiConfiguration _apiConfiguration = new ObservationApiConfiguration()
+    {
+        ProtectedScope = "SOS.Observations.Protected",
+        DefaultUserExportLimit = 5,
+        DownloadExportObservationsLimit = 50000,
+        OrderExportObservationsLimit = 2000000,
+        ExportPath = Path.GetTempPath(),
+        SignalSearchTaxonListIds = new int[] { 1, 7, 8, 17, 18 },
+        EnableResponseCompression = true,
+        ResponseCompressionLevel = System.IO.Compression.CompressionLevel.Fastest,
+        TilesLimitInternal = 350000,
+        TilesLimitPublic = 65535,
+        CountFactor = 1.1
+    };
 }

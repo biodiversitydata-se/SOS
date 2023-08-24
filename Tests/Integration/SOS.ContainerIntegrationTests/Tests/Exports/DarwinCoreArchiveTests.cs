@@ -23,7 +23,6 @@ public class DarwinCoreArchiveTests : TestBase
         // Arrange                 
         var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
         await ProcessFixture.ImportDwcaFileUsingDwcArchiveReaderAsync(@"Resources/Dwca/dwca-datastewardship-single-dataset.zip", dataProvider, Output);
-        //await ProcessFixture.ImportDwcaFileAsync(@"Resources/Dwca/dwca-datastewardship-single-dataset.zip", dataProvider, Output);
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = new SearchFilterDto();
 
