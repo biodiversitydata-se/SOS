@@ -130,7 +130,7 @@ namespace SOS.Harvest.Harvesters
             {
                 _logger.LogDebug("Start importing vocabularies");
 
-                foreach (var fileName in Directory.GetFiles(@"Resources\Vocabularies\"))
+                foreach (var fileName in Directory.GetFiles(@"Resources/Vocabularies/"))
                 {
                     var vocabulary = CreateVocabularyFromJsonFile(fileName);
 

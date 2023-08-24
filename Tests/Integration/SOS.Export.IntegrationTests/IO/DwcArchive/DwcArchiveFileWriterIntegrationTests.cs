@@ -127,7 +127,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var exportFolderPath = exportConfiguration.FileDestination.Path;
             var processedObservationRepository = CreateProcessedObservationRepository(exportClient, elasticConfiguration);
             var processedDarwinCoreRepositoryStub =
-                ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");
+                ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources/TenProcessedTestObservations.json");
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository =
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);

@@ -41,7 +41,7 @@ namespace SOS.Lib.Helpers
         private static List<FieldDescription> LoadFieldDescriptions()
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath, @"Resources\FieldDescriptions.json");
+            var filePath = Path.Combine(assemblyPath, @"Resources/FieldDescriptions.json");
             using var fs = FileSystemHelper.WaitForFileAndThenOpenIt(filePath);
             var fields = JsonSerializer.DeserializeAsync<List<FieldDescription>>(fs).Result;
             return fields;

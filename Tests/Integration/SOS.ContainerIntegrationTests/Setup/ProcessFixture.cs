@@ -30,6 +30,10 @@ using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
+using SOS.Lib.Managers;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.TaxonTree;
+using SOS.Lib.Models.TaxonListService;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 public class ProcessFixture
@@ -85,6 +89,7 @@ public class ProcessFixture
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddLogging();
+        serviceCollection.AddMemoryCache();
         serviceCollection.AddSingleton<IAreaHelper, AreaHelper>();
         serviceCollection.AddSingleton<IAreaRepository, AreaRepository>();
         serviceCollection.AddSingleton<ProcessFixture>();
@@ -96,6 +101,11 @@ public class ProcessFixture
         serviceCollection.AddSingleton<IElasticClientManager, ElasticClientTestManager>();
         serviceCollection.AddSingleton<IDatasetRepository, DatasetRepository>();
         serviceCollection.AddSingleton<IEventRepository, EventRepository>();
+        serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+        serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
+        serviceCollection.AddSingleton<ITaxonListRepository, TaxonListRepository>();
+        serviceCollection.AddSingleton<ITaxonManager, TaxonManager>();
+        serviceCollection.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();
         serviceCollection.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
         serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
         var elasticConfiguration = CreateElasticSearchConfiguration();
@@ -300,7 +310,7 @@ public class ProcessFixture
         await Task.Delay(delayInMs);
     }
 
-    public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true, int delayInMs = 1000)
+    public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true, int delayInMs = 100)
     {
         var publicObservations = new List<Observation>();
         var protectedObservations = new List<Observation>();
@@ -320,7 +330,7 @@ public class ProcessFixture
         await AddObservationsBatchToElasticsearchAsync(publicObservations, false, clearExistingObservations);
         await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, clearExistingObservations);
 
-        await Task.Delay(delayInMs);        
+        await Task.Delay(delayInMs);
     }
 
     private async Task AddObservationsBatchToElasticsearchAsync(IEnumerable<Observation> observations,

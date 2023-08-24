@@ -14,7 +14,7 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
 {
     public static class ProcessedDarwinCoreRepositoryStubFactory
     {
-        public static string TenObservations = @"Resources\TenProcessedTestObservations.json";
+        public static string TenObservations = @"Resources/TenProcessedTestObservations.json";
 
         public static Mock<IProcessedObservationCoreRepository> Create(string fileName)
         {

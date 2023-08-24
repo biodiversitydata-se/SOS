@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,13 +10,10 @@ using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
-using HealthChecks.UI.Client;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -32,7 +28,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
@@ -73,8 +68,6 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.ApplicationInsights;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.HealthChecks;
-using SOS.Observations.Api.HealthChecks.Custom;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
@@ -100,6 +93,7 @@ namespace SOS.Observations.Api
         private IWebHostEnvironment CurrentEnvironment { get; set; }
         private bool _isDevelopment;
         private bool _disableHangfireInit = false;
+        private bool _disableHealthCheckInit = false;
 
         private class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         {
@@ -159,7 +153,9 @@ namespace SOS.Observations.Api
                 .AddEnvironmentVariables();
 
             _isDevelopment = CurrentEnvironment.IsEnvironment("local") || CurrentEnvironment.IsEnvironment("dev") || CurrentEnvironment.IsEnvironment("st");
-            _disableHangfireInit = GetDisableHangfireInit();
+            _disableHangfireInit = GetDisableFeature(environmentVariable: "DISABLE_HANGFIRE_INIT");
+            _disableHealthCheckInit = GetDisableFeature(environmentVariable: "DISABLE_HEALTHCHECK_INIT");
+
             if (_isDevelopment)
             {
                 // If Development mode, add secrets stored on developer machine 
@@ -389,44 +385,45 @@ namespace SOS.Observations.Api
 
 
 #if !DEBUG
-           services.AddSingleton<IHealthCheckPublisher, HealthReportCachePublisher>();
-           services.Configure<HealthCheckPublisherOptions>(options =>
+            if (!_disableHealthCheckInit)
             {
-                options.Delay = TimeSpan.FromSeconds(10);
-                options.Period = TimeSpan.FromSeconds(90); // Create new health check every 90 sek and cache reult
-                options.Timeout = TimeSpan.FromSeconds(60);
-            });
+               services.AddSingleton<IHealthCheckPublisher, HealthReportCachePublisher>();
+               services.Configure<HealthCheckPublisherOptions>(options => {
+                    options.Delay = TimeSpan.FromSeconds(10);
+                    options.Period = TimeSpan.FromSeconds(90); // Create new health check every 90 sek and cache reult
+                    options.Timeout = TimeSpan.FromSeconds(60);
+                });
 
-             services.Configure<HealthCheckPublisherOptions>(options =>
-            {
-                options.Delay = TimeSpan.FromSeconds(10);
-                options.Period = TimeSpan.FromSeconds(90); // Create new health check every 90 sek and cache reult
-                options.Timeout = TimeSpan.FromSeconds(60);
-            });
-            var healthChecks = services.AddHealthChecks()
-                .AddDiskStorageHealthCheck(
-                    x => x.AddDrive("C:\\", (long)(healthCheckConfiguration.MinimumLocalDiskStorage * 1000)),
-                    name: $"Primary disk: min {healthCheckConfiguration.MinimumLocalDiskStorage}GB free - warning",
-                    failureStatus: HealthStatus.Degraded,
-                    tags: new[] { "disk" })
-                .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" })
-                .AddHangfire(a => a.MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
-                .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
-                .AddCheck<SearchDataProvidersHealthCheck>("Search data providers", tags: new[] { "database", "elasticsearch", "query" })
-                .AddCheck<SearchPerformanceHealthCheck>("Search performance", tags: new[] { "database", "elasticsearch", "query", "performance" })
-                .AddCheck<AzureSearchHealthCheck>("Azure search API health check", tags: new[] { "azure", "database", "elasticsearch", "query" })
-                .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
-                .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
-                .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
-                .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" })
-                .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" })
-                .AddCheck<APDbRestoreHealthCheck>("Artportalen database backup restore", tags: new[] { "database", "sql server" });
+                services.Configure<HealthCheckPublisherOptions>(options => {
+                    options.Delay = TimeSpan.FromSeconds(10);
+                    options.Period = TimeSpan.FromSeconds(90); // Create new health check every 90 sek and cache reult
+                    options.Timeout = TimeSpan.FromSeconds(60);
+                });
+                var healthChecks = services.AddHealthChecks()
+                    .AddDiskStorageHealthCheck(
+                        x => x.AddDrive("C:\\", (long)(healthCheckConfiguration.MinimumLocalDiskStorage * 1000)),
+                        name: $"Primary disk: min {healthCheckConfiguration.MinimumLocalDiskStorage}GB free - warning",
+                        failureStatus: HealthStatus.Degraded,
+                        tags: new[] { "disk" })
+                    .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" })
+                    .AddHangfire(a => a.MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
+                    .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
+                    .AddCheck<SearchDataProvidersHealthCheck>("Search data providers", tags: new[] { "database", "elasticsearch", "query" })
+                    .AddCheck<SearchPerformanceHealthCheck>("Search performance", tags: new[] { "database", "elasticsearch", "query", "performance" })
+                    .AddCheck<AzureSearchHealthCheck>("Azure search API health check", tags: new[] { "azure", "database", "elasticsearch", "query" })
+                    .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
+                    .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
+                    .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
+                    .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" })
+                    .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" })
+                    .AddCheck<APDbRestoreHealthCheck>("Artportalen database backup restore", tags: new[] { "database", "sql server" });
 
-            if (CurrentEnvironment.IsEnvironment("prod"))
-            {
-                healthChecks.AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
-                healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
-                healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] { "wfs" }); // add this to ST environment when we have a GeoServer test environment.
+                if (CurrentEnvironment.IsEnvironment("prod"))
+                {
+                    healthChecks.AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
+                    healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
+                    healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] { "wfs" }); // add this to ST environment when we have a GeoServer test environment.
+                }
             }
 #endif
 
@@ -594,45 +591,48 @@ namespace SOS.Observations.Api
             {
                 endpoints.MapControllers();
 #if !DEBUG
-                endpoints.MapHealthChecks("/health", new HealthCheckOptions()
+                if (!_disableHealthCheckInit)
                 {
-                    Predicate = _ => false,
-                    ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.LatestNoWfs)
-                });
-                endpoints.MapHealthChecks("/health-json", new HealthCheckOptions()
-                {
-                    Predicate = _ => false,
-                    ResponseWriter = async (context, _) =>
+                    endpoints.MapHealthChecks("/health", new HealthCheckOptions()
                     {
-                        var report = HealthReportCachePublisher.LatestAll;
-                        var result = report == null ? "{}" : JsonConvert.SerializeObject(
-                            new
-                            {
-                                status = report.Status.ToString(),
-                                duration = report.TotalDuration,
-                                entries = report.Entries.Select(e => new
+                        Predicate = _ => false,
+                        ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.LatestNoWfs)
+                    });
+                    endpoints.MapHealthChecks("/health-json", new HealthCheckOptions()
+                    {
+                        Predicate = _ => false,
+                        ResponseWriter = async (context, _) =>
+                        {
+                            var report = HealthReportCachePublisher.LatestAll;
+                            var result = report == null ? "{}" : JsonConvert.SerializeObject(
+                                new
                                 {
-                                    key = e.Key,
-                                    description = e.Value.Description,
-                                    duration = e.Value.Duration,
-                                    status = Enum.GetName(typeof(HealthStatus),
-                                        e.Value.Status),
-                                    tags = e.Value.Tags
-                                }).ToList()
-                            }, Formatting.None,
-                            new JsonSerializerSettings
-                            {
-                                NullValueHandling = NullValueHandling.Ignore
-                            });
-                        context.Response.ContentType = MediaTypeNames.Application.Json;
-                        await context.Response.WriteAsync(result);
-                    }
-                });
-                endpoints.MapHealthChecks("/health-wfs", new HealthCheckOptions()
-                {
-                    Predicate = _ => false,
-                    ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.LatestOnlyWfs)
-                });
+                                    status = report.Status.ToString(),
+                                    duration = report.TotalDuration,
+                                    entries = report.Entries.Select(e => new
+                                    {
+                                        key = e.Key,
+                                        description = e.Value.Description,
+                                        duration = e.Value.Duration,
+                                        status = Enum.GetName(typeof(HealthStatus),
+                                            e.Value.Status),
+                                        tags = e.Value.Tags
+                                    }).ToList()
+                                }, Formatting.None,
+                                new JsonSerializerSettings
+                                {
+                                    NullValueHandling = NullValueHandling.Ignore
+                                });
+                            context.Response.ContentType = MediaTypeNames.Application.Json;
+                            await context.Response.WriteAsync(result);
+                        }
+                    });
+                    endpoints.MapHealthChecks("/health-wfs", new HealthCheckOptions()
+                    {
+                        Predicate = _ => false,
+                        ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.LatestOnlyWfs)
+                    });
+                }
 #endif
             });
 
@@ -661,10 +661,9 @@ namespace SOS.Observations.Api
             return apiVersions;
         }
 
-        private static bool GetDisableHangfireInit()
-        {
-            string variableName = "DISABLE_HANGFIRE_INIT";
-            string value = Environment.GetEnvironmentVariable(variableName);
+        private static bool GetDisableFeature(string environmentVariable)
+        {            
+            string value = Environment.GetEnvironmentVariable(environmentVariable);
 
             if (value != null)
             {

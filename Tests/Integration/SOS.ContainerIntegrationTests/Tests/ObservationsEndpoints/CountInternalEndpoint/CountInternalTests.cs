@@ -1,21 +1,21 @@
 ﻿using FizzWare.NBuilder;
-using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
 using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Observations.Api.Dtos.Filter;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.TaxonAggregationEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.CountInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class TaxonAggregationTests : TestBase
+public class CountInternalTests : TestBase
 {
-    public TaxonAggregationTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    public CountInternalTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
     }
 
     [Fact]
-    public async Task TaxonAggregationTest()
+    [Trait("Category", "AutomaticIntegrationTest")]
+    public async Task SumObservationCountInternalTest()
     {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
@@ -34,17 +34,18 @@ public class TaxonAggregationTests : TestBase
                 .With(p => p.StartDate = new DateTime(2000, 1, 30))
                 .With(p => p.EndDate = new DateTime(2000, 1, 30))
             .TheNext(20)
-                .With(p => p.TaxonId = 100013)
-                .With(p => p.StartDate = new DateTime(2000, 2, 1))
+                .With(p => p.TaxonId = 100011)
+                .With(p => p.StartDate = new DateTime(2000, 1, 1))
                 .With(p => p.EndDate = new DateTime(2000, 2, 1))
             .TheLast(20)
-                .With(p => p.TaxonId = 100012)
+                .With(p => p.TaxonId = 100011)
                 .With(p => p.StartDate = new DateTime(2000, 4, 1))
                 .With(p => p.EndDate = new DateTime(2000, 4, 15))
             .Build();
+
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterAggregationDto
+        var searchFilter = new SearchFilterInternalBaseDto
         {
             Date = new DateFilterDto
             {
@@ -59,12 +60,12 @@ public class TaxonAggregationTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/taxonaggregation", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<dynamic>>();
+        var response = await apiClient.PostAsync($"/observations/internal/count", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<int>();
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(2,
+        result.Should().Be(60,
             because: "");
     }
 }

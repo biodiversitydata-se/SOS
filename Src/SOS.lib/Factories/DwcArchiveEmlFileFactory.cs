@@ -130,7 +130,7 @@ namespace SOS.Lib.Factories
                     return null;
                 }
                 var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var emlTemplatePath = Path.Combine(assemblyPath, @"Resources\DarwinCore\eml.xml");
+                var emlTemplatePath = Path.Combine(assemblyPath, @"Resources/DarwinCore/eml.xml");
                 var xDoc = XDocument.Load(emlTemplatePath);
                 var dataset = xDoc.Root.Element("dataset");
 

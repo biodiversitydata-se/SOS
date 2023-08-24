@@ -40,7 +40,7 @@ namespace SOS.Process.UnitTests.TestHelpers
             var dataProviderDummy = new DataProvider();
             var mammaliaTaxa =
                 MessagePackHelper.CreateListFromMessagePackFile<Taxon>(
-                    @"Resources\MammaliaProcessedTaxa.msgpck");
+                    @"Resources/MammaliaProcessedTaxa.msgpck");
             var mammaliaTaxonByTaxonId = mammaliaTaxa.ToDictionary(t => t.Id, t => t);
             var processedAreaRepositoryStub =
                 ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);

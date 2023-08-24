@@ -23,6 +23,7 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
     {        
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Dev");
         Environment.SetEnvironmentVariable("DISABLE_HANGFIRE_INIT", "true");
+        Environment.SetEnvironmentVariable("DISABLE_HEALTHCHECK_INIT", "true");        
     }
 
     /// <summary>
@@ -36,6 +37,7 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
         var observationEventRepository = scope.ServiceProvider.GetService<IEventRepository>();
         var processedObservationCoreRepository = scope.ServiceProvider.GetService<IProcessedObservationCoreRepository>();
         var processedObservationRepository = scope.ServiceProvider.GetService<IProcessedObservationRepository>();
+        var processedTaxonRepository = scope.ServiceProvider.GetService<IProcessedTaxonRepository>();
         var processClient = scope.ServiceProvider.GetService<IProcessClient>();
 
         builder.ConfigureTestServices(services =>
@@ -52,6 +54,7 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
             services.Replace(ServiceDescriptor.Scoped(x => observationEventRepository!));
             services.Replace(ServiceDescriptor.Scoped(x => processedObservationCoreRepository!));
             services.Replace(ServiceDescriptor.Scoped(x => processedObservationRepository!));
+            services.Replace(ServiceDescriptor.Scoped(x => processedTaxonRepository!));
             services.Replace(ServiceDescriptor.Singleton(x => processClient!));
         });
     }

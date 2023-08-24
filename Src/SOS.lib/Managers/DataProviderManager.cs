@@ -70,7 +70,7 @@ namespace SOS.Lib.Managers
                 }
 
                 var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var filePath = Path.Combine(assemblyPath, @"Resources\DataProvider\DefaultDataProviders.json");
+                var filePath = Path.Combine(assemblyPath, @"Resources/DataProvider/DefaultDataProviders.json");
                 var dataProviders =
                    JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
                 await _dataProviderRepository.DeleteCollectionAsync();
@@ -92,7 +92,7 @@ namespace SOS.Lib.Managers
         {
             if (string.IsNullOrWhiteSpace(dataProviderIdOrIdentifier)) return Result.Failure<string>("dataProviderIdOrIdentifier is empty");
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath, @"Resources\DataProvider\DefaultDataProviders.json");
+            var filePath = Path.Combine(assemblyPath, @"Resources/DataProvider/DefaultDataProviders.json");
             var dataProviders =
                 JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
 
@@ -146,7 +146,7 @@ namespace SOS.Lib.Managers
             }
 
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var emlDirectory = Path.Combine(assemblyPath, @"Resources\DataProvider\Eml");
+            var emlDirectory = Path.Combine(assemblyPath, @"Resources/DataProvider/Eml");
 
             foreach (var provider in providers)
             {

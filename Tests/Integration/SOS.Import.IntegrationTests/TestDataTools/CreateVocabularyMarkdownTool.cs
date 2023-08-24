@@ -74,117 +74,117 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             {
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\AccessRightsVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/AccessRightsVocabulary.json"),
                     Title = "accessRights"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\ActivityVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/ActivityVocabulary.json"),
                     Title = "activity"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\AreaTypeVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/AreaTypeVocabulary.json"),
                     Title = "areaType"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\BasisOfRecordVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/BasisOfRecordVocabulary.json"),
                     Title = "basisOfRecord"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\BehaviorVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/BehaviorVocabulary.json"),
                     Title = "behavior"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\BiotopeVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/BiotopeVocabulary.json"),
                     Title = "biotope"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\BirdNestActivityVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/BirdNestActivityVocabulary.json"),
                     Title = "birdNestActivity"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\continentVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/continentVocabulary.json"),
                     Title = "continent"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\countryVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/countryVocabulary.json"),
                     Title = "country"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\determinationMethodVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/determinationMethodVocabulary.json"),
                     Title = "determinationMethod"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\discoveryMethodVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/discoveryMethodVocabulary.json"),
                     Title = "discoveryMethod"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\establishmentMeansVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/establishmentMeansVocabulary.json"),
                     Title = "establishmentMeans"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\institutionVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/institutionVocabulary.json"),
                     Title = "institutionCode"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\lifeStageVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/lifeStageVocabulary.json"),
                     Title = "lifeStage"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\occurrenceStatusVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/occurrenceStatusVocabulary.json"),
                     Title = "occurrenceStatus"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\reproductiveCondition.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/reproductiveCondition.json"),
                     Title = "reproductiveCondition"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\sexVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/sexVocabulary.json"),
                     Title = "sex"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\substrateVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/substrateVocabulary.json"),
                     Title = "substrate"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\sensitivityCategoryVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/sensitivityCategoryVocabulary.json"),
                     Title = "protectionLevel"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\typeVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/typeVocabulary.json"),
                     Title = "type"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\unitVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/unitVocabulary.json"),
                     Title = "unit"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\verificationStatusVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/verificationStatusVocabulary.json"),
                     Title = "validationStatus"
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\taxonCategoryVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources/Vocabularies/taxonCategoryVocabulary.json"),
                     Title = "taxonCategory"
                 }
             };
