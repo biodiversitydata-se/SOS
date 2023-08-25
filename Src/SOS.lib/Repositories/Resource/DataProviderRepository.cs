@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace SOS.Lib.Repositories.Resource
     {
         private readonly GridFSBucket _gridFSBucket;
 
-        private string GetKey(int providerId) => $"eml_{providerId}.xml";
+        private string GetKey(int providerId) => $"eml_{providerId.ToString(CultureInfo.InvariantCulture)}.xml";
 
         /// <summary>
         ///     Constructor
