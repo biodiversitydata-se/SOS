@@ -511,8 +511,9 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="items"></param>
         /// <param name="protectedIndex"></param>
+        /// <param name="refreshIndex"></param>
         /// <returns></returns>
-        private BulkAllObserver WriteToElastic(IEnumerable<Observation> items, bool protectedIndex)
+        private BulkAllObserver WriteToElastic(IEnumerable<Observation> items, bool protectedIndex, bool refreshIndex = false)
         {
             if (!items.Any())
             {
@@ -538,6 +539,7 @@ namespace SOS.Lib.Repositories.Processed
                     .MaxDegreeOfParallelism(Environment.ProcessorCount)
                     // number of items per bulk request
                     .Size(WriteBatchSize)
+                    .RefreshOnCompleted(refreshIndex)
                     .DroppedDocumentCallback((r, o) =>
                     {
                         if (r.Error != null)
@@ -573,21 +575,21 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public int AddMany(IEnumerable<Observation> items, bool protectedIndex)
+        public int AddMany(IEnumerable<Observation> items, bool protectedIndex, bool refreshIndex = false)
         {
             // Save valid processed data
             Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");
-            var indexResult = WriteToElastic(items, protectedIndex);
+            var indexResult = WriteToElastic(items, protectedIndex, refreshIndex);
             Logger.LogDebug("Finished indexing batch for searching");
             if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
             return items.Count();
         }
 
         /// <inheritdoc />
-        public async Task<int> AddManyAsync(IEnumerable<Observation> items, bool protectedIndex)
+        public async Task<int> AddManyAsync(IEnumerable<Observation> items, bool protectedIndex, bool refreshIndex = false)
         {
             return await Task.Run(() => {
-                return AddMany(items, protectedIndex);
+                return AddMany(items, protectedIndex, refreshIndex);
             });
         }
 

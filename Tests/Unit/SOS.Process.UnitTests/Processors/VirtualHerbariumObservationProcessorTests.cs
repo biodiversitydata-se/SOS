@@ -136,7 +136,7 @@ namespace SOS.Process.UnitTests.Processors
                 .ReturnsAsync(true);
 
             _processedObservationRepositoryMock
-                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>()))
+                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .ReturnsAsync(1);
             
             var dataProvider = CreateDataProvider();

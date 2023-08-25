@@ -153,7 +153,7 @@ public class ProcessFixture
     public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
     {
         var processedObservations = ProcessObservations(verbatimObservations);
-        await AddObservationsToElasticsearchAsync(processedObservations);
+        await AddObservationsToElasticsearchAsync(processedObservations, true, 0);
         return processedObservations;
     }
 
@@ -341,9 +341,7 @@ public class ProcessFixture
         {
             await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
         }
-        await _processedObservationCoreRepository.DisableIndexingAsync(protectedIndex);
-        _processedObservationCoreRepository.AddMany(observations, protectedIndex);
-        await _processedObservationCoreRepository.EnableIndexingAsync(protectedIndex);
+        _processedObservationCoreRepository.AddMany(observations, protectedIndex, true);
     }
 
     public DwcaObservationFactory GetDwcaObservationFactory(bool initAreaHelper)

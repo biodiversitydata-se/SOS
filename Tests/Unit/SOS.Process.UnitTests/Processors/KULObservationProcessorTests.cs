@@ -156,7 +156,7 @@ namespace SOS.Process.UnitTests.Processors
                 .ReturnsAsync(true);
 
             _processedObservationRepository
-                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>()))
+                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .ReturnsAsync(1);
             
             var taxa = new Dictionary<int, Taxon>

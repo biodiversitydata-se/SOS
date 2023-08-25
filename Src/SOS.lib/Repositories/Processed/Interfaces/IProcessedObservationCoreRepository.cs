@@ -23,16 +23,18 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <param name="observations"></param>
         /// <param name="protectedIndex"></param>
+        /// <param name="refreshIndex"></param>
         /// <returns></returns>
-        int AddMany(IEnumerable<Observation> observations, bool protectedIndex);
+        int AddMany(IEnumerable<Observation> observations, bool protectedIndex, bool refreshIndex = false);
 
         /// <summary>
         ///  Add many items
         /// </summary>
         /// <param name="observations"></param>
         /// <param name="protectedIndex"></param>
+        /// <param name="refreshIndex"></param>
         /// <returns></returns>
-        Task<int> AddManyAsync(IEnumerable<Observation> observations, bool protectedIndex);
+        Task<int> AddManyAsync(IEnumerable<Observation> observations, bool protectedIndex, bool refreshIndex = false);
 
         /// <summary>
         /// Clear the collection
