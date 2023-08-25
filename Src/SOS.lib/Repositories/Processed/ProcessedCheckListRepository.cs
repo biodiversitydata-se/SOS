@@ -164,7 +164,7 @@ namespace SOS.Lib.Repositories.Processed
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ILogger<ProcessedChecklistRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
-            LiveMode = false;
+            LiveMode = true;
         }
 
         /// <inheritdoc />

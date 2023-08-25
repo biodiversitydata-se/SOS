@@ -81,7 +81,6 @@ public class DateFilterTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByOnlyStartDate()
     {
         // Arrange
@@ -114,7 +113,6 @@ public class DateFilterTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByOnlyEndDate()
     {
         // Arrange

@@ -16,7 +16,6 @@ public class AggregationTypeTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]
     public async Task TestSearchAggregatedInternalSightingsPerWeek()
     {
         //-----------------------------------------------------------------------------------------------------------

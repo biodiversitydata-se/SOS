@@ -34,6 +34,8 @@ using SOS.Lib.Managers;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.Processed.Checklist;
+using SOS.Harvest.Processors.Interfaces;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 public class ProcessFixture
@@ -55,6 +57,8 @@ public class ProcessFixture
     private ArtportalenObservationFactory _artportalenObservationFactory;
     private IVocabularyValueResolver _vocabularyValueResolver;
     private IArtportalenDatasetMetadataRepository _artportalenDatasetMetadataRepository;
+    private ArtportalenChecklistFactory _artportalenChecklistFactory;
+    private IProcessedChecklistRepository _processedChecklistRepository { get; set; }
     private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
 
     public ProcessFixture(IAreaHelper areaHelper,
@@ -67,7 +71,8 @@ public class ProcessFixture
         IEventRepository observationEventRepository,
         IProcessedObservationCoreRepository processedObservationCoreRepository,
         IVocabularyValueResolver vocabularyValueResolver,
-        IArtportalenDatasetMetadataRepository artportalenDatasetMetadataRepository)
+        IArtportalenDatasetMetadataRepository artportalenDatasetMetadataRepository,
+        IProcessedChecklistRepository processedChecklistRepository)
     {
         _areaHelper = areaHelper;
         _processClient = processClient;
@@ -81,6 +86,7 @@ public class ProcessFixture
         _processedObservationCoreRepository = processedObservationCoreRepository;
         _vocabularyValueResolver = vocabularyValueResolver;
         _artportalenDatasetMetadataRepository = artportalenDatasetMetadataRepository;
+        _processedChecklistRepository = processedChecklistRepository;
 
         InitializeAsync().Wait();
     }
@@ -116,6 +122,7 @@ public class ProcessFixture
         serviceCollection.AddSingleton<IArtportalenDatasetMetadataRepository, ArtportalenDatasetMetadataRepository>();
         serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
         serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
+        serviceCollection.AddSingleton<IProcessedChecklistRepository, ProcessedChecklistRepository>();        
         VocabularyConfiguration vocabularyConfiguration = new VocabularyConfiguration()
         {
             ResolveValues = true,
@@ -140,6 +147,8 @@ public class ProcessFixture
             "https://www.artportalen.se",
             _processTimeManager,
             _processConfiguration);
+
+        _artportalenChecklistFactory = new ArtportalenChecklistFactory(new DataProvider { Id = 1 }, _processTimeManager, _processConfiguration);
     }
 
     public async Task InitializeElasticsearchIndices()
@@ -148,6 +157,7 @@ public class ProcessFixture
         await _eventRepository.ClearCollectionAsync();
         await _processedObservationCoreRepository.ClearCollectionAsync(false);
         await _processedObservationCoreRepository.ClearCollectionAsync(true);
+        await _processedChecklistRepository.ClearCollectionAsync();
     }
 
     public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
@@ -390,7 +400,38 @@ public class ProcessFixture
     {
         return await _datasetRepository.IndexCountAsync();
     }
-  
+
+    public async Task ProcessAndAddChecklistsToElasticSearch(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists)
+    {
+        var processedChecklists = ProcessChecklists(verbatimChecklists);
+        await AddChecklistsToElasticsearchAsync(processedChecklists);
+    }
+
+    private List<Checklist> ProcessChecklists(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists)
+    {
+        var checklists = new List<Checklist>();
+        foreach (var verbatimChecklist in verbatimChecklists)
+        {
+            var checklist = _artportalenChecklistFactory.CreateProcessedChecklist(verbatimChecklist);
+            checklists.Add(checklist!);
+        }
+
+        return checklists;
+    }
+
+    private async Task AddChecklistsToElasticsearchAsync(IEnumerable<Checklist> checklists, bool clearExistingChecklists = true)
+    {
+        if (clearExistingChecklists)
+        {
+            await _processedChecklistRepository.DeleteAllDocumentsAsync();
+        }
+        await _processedChecklistRepository.DisableIndexingAsync();
+        await _processedChecklistRepository.AddManyAsync(checklists);
+        await _processedChecklistRepository.EnableIndexingAsync();
+
+        Thread.Sleep(1000);
+    }
+
     private void InitAreaHelper()
     {
         if (!_areaHelper.IsInitialized)

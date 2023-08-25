@@ -16,7 +16,6 @@ public class MetricGridAggregationInternalTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]
     public async Task SumObservationCountInternalTest()
     {
         // Arrange

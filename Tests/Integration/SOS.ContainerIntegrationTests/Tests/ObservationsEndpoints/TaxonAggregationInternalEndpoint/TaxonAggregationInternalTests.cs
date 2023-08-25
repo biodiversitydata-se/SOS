@@ -15,7 +15,6 @@ public class TaxonAggregationInternalTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]
     public async Task TaxonAggregationInternalTest()
     {
         // Arrange

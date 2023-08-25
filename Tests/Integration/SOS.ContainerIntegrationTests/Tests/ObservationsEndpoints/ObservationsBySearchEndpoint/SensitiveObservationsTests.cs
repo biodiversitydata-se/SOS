@@ -87,7 +87,6 @@ public class SensitiveObservationsTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingForSensitiveObservationsObservedByMe()
     {
         // Arrange
@@ -118,7 +117,6 @@ public class SensitiveObservationsTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingForSensitiveObservationsReportedByMe()
     {
         // Arrange

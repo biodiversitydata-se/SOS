@@ -16,7 +16,6 @@ public class TaxonSumAggregationInternalTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]
     public async Task SumObservationCountInternalTest()
     {
         //-----------------------------------------------------------------------------------------------------------

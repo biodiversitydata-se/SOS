@@ -41,6 +41,7 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
         var processedObservationCoreRepository = scope.ServiceProvider.GetService<IProcessedObservationCoreRepository>();
         var processedObservationRepository = scope.ServiceProvider.GetService<IProcessedObservationRepository>();
         var processedTaxonRepository = scope.ServiceProvider.GetService<IProcessedTaxonRepository>();
+        var processedChecklistRepository = scope.ServiceProvider.GetService<IProcessedChecklistRepository>();
         var processClient = scope.ServiceProvider.GetService<IProcessClient>();
 
         builder.ConfigureTestServices(services =>
@@ -58,6 +59,7 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
             services.Replace(ServiceDescriptor.Scoped(x => processedObservationCoreRepository!));
             services.Replace(ServiceDescriptor.Scoped(x => processedObservationRepository!));
             services.Replace(ServiceDescriptor.Scoped(x => processedTaxonRepository!));
+            services.Replace(ServiceDescriptor.Scoped(x => processedChecklistRepository!));
             services.Replace(ServiceDescriptor.Singleton(x => processClient!));
             services.Replace(ServiceDescriptor.Singleton(x => _apiConfiguration));            
             services.Replace(ServiceDescriptor.Singleton(x => Substitute.For<IBlobStorageService>()));

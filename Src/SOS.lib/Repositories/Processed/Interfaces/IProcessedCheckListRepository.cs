@@ -92,5 +92,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync();
+
+        Task<bool> DeleteAllDocumentsAsync();
     }
 }

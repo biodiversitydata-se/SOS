@@ -16,7 +16,6 @@ public class SignalSearchTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]
     public async Task SignalSearchInternalTest()
     {
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)

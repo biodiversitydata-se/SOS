@@ -14,7 +14,6 @@ public class CountInternalTests : TestBase
     }
 
     [Fact]
-    [Trait("Category", "AutomaticIntegrationTest")]
     public async Task SumObservationCountInternalTest()
     {
         // Arrange
