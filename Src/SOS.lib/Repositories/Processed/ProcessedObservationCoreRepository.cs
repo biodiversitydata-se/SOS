@@ -1324,7 +1324,14 @@ namespace SOS.Lib.Repositories.Processed
                 docCount = await IndexCountAsync(false);
             }
 
-            Logger.LogInformation($"Finish waiting for index creation. Index={PublicIndexName}.");
+            if (iterations == nrIterations)
+            {
+                Logger.LogError($"Failed waiting for index creation due to timeout. Index={PublicIndexName}. ExpectedRecordsCount={expectedRecordsCount}, DocCount={docCount}");
+            }
+            else
+            {
+                Logger.LogInformation($"Finish waiting for index creation. Index={PublicIndexName}.");
+            }
         }
 
         /// <inheritdoc />
