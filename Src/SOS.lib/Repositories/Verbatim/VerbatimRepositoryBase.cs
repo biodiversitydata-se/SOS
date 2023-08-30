@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -20,7 +21,7 @@ namespace SOS.Lib.Repositories.Verbatim
     {
         private readonly GridFSBucket _gridFSBucket;
 
-        private string GetKey(int providerId) => $"source_{providerId}";
+        private string GetKey(int providerId) => $"source_{providerId.ToString(CultureInfo.InvariantCulture)}";
 
         /// <summary>
         /// Delete provider source file if any

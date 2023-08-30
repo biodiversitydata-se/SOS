@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using System.Globalization;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -109,7 +110,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Error getting last modified date for provider {providerId}");
+                _logger.LogError(e, $"Error getting last modified date for provider {providerId.ToString(CultureInfo.InvariantCulture)}");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -164,7 +165,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Error getting EML date for provider {providerId}");
+                _logger.LogError(e, $"Error getting EML date for provider {providerId.ToString(CultureInfo.InvariantCulture)}");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

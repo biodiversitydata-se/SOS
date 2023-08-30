@@ -7,6 +7,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
+using System.Globalization;
 using Result = CSharpFunctionalExtensions.Result;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -181,7 +182,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             if (value < minLimit || value > maxLimit)
             {
-                return Result.Failure($"{paramName} must be between {minLimit} and {maxLimit}");
+                return Result.Failure($"{paramName} must be between {minLimit.ToString(CultureInfo.InvariantCulture)} and {maxLimit.ToString(CultureInfo.InvariantCulture)}");
             }
 
             return Result.Success();
@@ -191,7 +192,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             if (value < minLimit || value > maxLimit)
             {
-                return Result.Failure($"{paramName} must be between {minLimit} and {maxLimit}");
+                return Result.Failure($"{paramName} must be between {minLimit.ToString(CultureInfo.InvariantCulture)} and {maxLimit.ToString(CultureInfo.InvariantCulture)}");
             }
 
             return Result.Success();

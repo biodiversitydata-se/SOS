@@ -24,7 +24,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
         {
             var sb = new StringBuilder();
             sb.AppendLine("Fish Data Harvest settings:");
-            sb.AppendLine($"  Start Harvest Year: {_fishDataServiceConfiguration.StartHarvestYear}");
+            sb.AppendLine($"Start Harvest Year: {_fishDataServiceConfiguration.StartHarvestYear}");
             if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
             {
                 sb.AppendLine(

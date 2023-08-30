@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -190,7 +191,7 @@ namespace SOS.Administration.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
                 }
 
-                return Ok($"Ok. The EML was updated for provider id: {providerId}");
+                return Ok($"Ok. The EML was updated for provider id: {providerId.ToString(CultureInfo.InvariantCulture)}");
             }
             catch (Exception e)
             {

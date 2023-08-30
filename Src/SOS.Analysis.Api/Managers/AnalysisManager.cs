@@ -11,6 +11,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
+using System.Globalization;
 
 namespace SOS.Analysis.Api.Managers
 {
@@ -178,7 +179,7 @@ namespace SOS.Analysis.Api.Managers
                     futureCollection.Add(new Feature(
                         transformedEooGeometry,
                         new AttributesTable(new KeyValuePair<string, object>[] {
-                                new KeyValuePair<string, object>("id", $"eoo-{alphaValue.ToString().Replace(',', '.')}"),
+                                new KeyValuePair<string, object>("id", $"eoo-{alphaValue.ToString(CultureInfo.InvariantCulture).Replace(',', '.')}"),
                                 new KeyValuePair<string, object>("aoo", (int)aoo),
                                 new KeyValuePair<string, object>("eoo", (int)eoo),
                                 new KeyValuePair<string, object>("gridCellArea", gridCellArea),
