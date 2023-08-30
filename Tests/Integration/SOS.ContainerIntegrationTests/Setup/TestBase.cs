@@ -1,4 +1,5 @@
-﻿using SOS.Lib.JsonConverters;
+﻿using MongoDB.Bson.Serialization.Conventions;
+using SOS.Lib.JsonConverters;
 using System.Globalization;
 
 namespace SOS.ContainerIntegrationTests.Setup;
@@ -48,5 +49,15 @@ public class TestBase
         var culture = new CultureInfo("sv-SE");
         CultureInfo.DefaultThreadCurrentCulture = culture;
         CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+        // MongoDB conventions.
+        ConventionRegistry.Register(
+            "MongoDB Solution Conventions",
+            new ConventionPack
+            {
+                new IgnoreExtraElementsConvention(true),
+                new IgnoreIfNullConvention(true)
+            },
+            t => true);
     }
 }

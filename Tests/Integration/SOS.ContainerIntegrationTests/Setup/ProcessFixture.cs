@@ -35,7 +35,7 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.Processed.Checklist;
-using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 public class ProcessFixture
@@ -60,6 +60,11 @@ public class ProcessFixture
     private ArtportalenChecklistFactory _artportalenChecklistFactory;
     private IProcessedChecklistRepository _processedChecklistRepository { get; set; }
     private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
+
+    public List<Taxon> Taxa 
+    {  
+        get => _taxa;
+    } 
 
     public ProcessFixture(IAreaHelper areaHelper,
         IProcessClient processClient,
@@ -179,6 +184,50 @@ public class ProcessFixture
 
         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, true);
         return processedObservations;
+    }
+
+    public List<Observation> ProcessObservations(IEnumerable<DwcObservationVerbatim> verbatimObservations, bool initAreaHelper = false)
+    {
+        var processedObservations = new List<Observation>();
+        bool diffuseIfSupported = false;
+        var factory = GetDarwinCoreFactory(initAreaHelper);
+        foreach (var verbatimObservation in verbatimObservations)
+        {
+            var processedObservation = factory.CreateProcessedObservation(verbatimObservation, diffuseIfSupported);
+            processedObservations.Add(processedObservation);
+        }
+
+        return processedObservations;
+    }
+
+    public DwcaObservationFactory GetDarwinCoreFactory(bool initAreaHelper)
+    {
+        if (_darwinCoreFactory == null)
+        {
+            var dataProvider = new DataProvider() { Id = 1, Identifier = "Artportalen" };
+            _areaHelper = new AreaHelper(new AreaRepository(_processClient, new NullLogger<AreaRepository>()));
+            _darwinCoreFactory = CreateDarwinCoreFactoryAsync(dataProvider).Result;
+        }
+
+        if (initAreaHelper && !_areaHelper.IsInitialized)
+        {
+            _areaHelper.InitializeAsync().Wait();
+        }
+
+        return _darwinCoreFactory;
+    }
+
+    public async Task<DwcaObservationFactory> CreateDarwinCoreFactoryAsync(DataProvider dataProvider)
+    {
+        var factory = await DwcaObservationFactory.CreateAsync(
+            dataProvider,
+            _taxaById,
+            _vocabularyRepository,
+            _areaHelper,
+            _processTimeManager,
+            _processConfiguration);
+
+        return factory;
     }
 
     public async Task ImportDwcaFileUsingDwcArchiveReaderAsync(string filePath, DataProvider dataProvider, ITestOutputHelper output)
@@ -407,7 +456,7 @@ public class ProcessFixture
         await AddChecklistsToElasticsearchAsync(processedChecklists);
     }
 
-    private List<Checklist> ProcessChecklists(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists)
+    public List<Checklist> ProcessChecklists(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists)
     {
         var checklists = new List<Checklist>();
         foreach (var verbatimChecklist in verbatimChecklists)

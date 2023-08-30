@@ -57,7 +57,7 @@ public class DarwinCoreArchiveTests : TestBase
         var processedObservations = ProcessFixture.ProcessObservations(verbatimObservations).ToList();
         await ProcessFixture.AddObservationsToElasticsearchAsync(processedObservations, true, 0);
         var dwcArchiveOccurrenceCsvWriter = TestFixture.ApiFactory.Services.GetService<IDwcArchiveOccurrenceCsvWriter>();
-        var processedObservationRepository = TestFixture.ApiFactory.Services.GetService<IProcessedObservationRepository>();                
+        var processedObservationRepository = TestFixture.ApiFactory.Services.GetService<IProcessedObservationRepository>();
         var writeStream = new MemoryStream();
         var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
 
