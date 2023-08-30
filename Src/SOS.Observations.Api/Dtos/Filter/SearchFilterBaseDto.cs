@@ -75,7 +75,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         /// Event related filter
         /// </summary>
-        public EventFilterDto? Event { get; set; }
+        public EventFilterDto Event { get; set; }
 
         /// <summary>
         /// Exclude filter

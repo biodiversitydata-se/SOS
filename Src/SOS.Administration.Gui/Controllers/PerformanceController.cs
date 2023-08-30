@@ -189,9 +189,9 @@ namespace SOS.Administration.Gui.Controllers
                 {
                     interval = "PT30M";
                 }
-                if (string.IsNullOrEmpty(interval))
+                if (string.IsNullOrEmpty(timespan))
                 {
-                    interval = "PT12H";
+                    timespan = "PT12H";
                 }
 
                 var json = GetTelemetry(_aiConfig.ApplicationId, _aiConfig.ApiKey, "metrics/requests/duration", $"interval={interval}&timespan={timespan}&segment=request/name&top={1000}");

@@ -34,7 +34,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 return _verbatimArtportalenChecklistsFromJsonFile;
             }
         }
-        private static List<ArtportalenChecklistVerbatim> _verbatimArtportalenChecklistsFromJsonFile;        
+        private static List<ArtportalenChecklistVerbatim>? _verbatimArtportalenChecklistsFromJsonFile;        
        
         public static IOperable<ArtportalenChecklistVerbatim> HaveValuesFromPredefinedChecklists(this IOperable<ArtportalenChecklistVerbatim> operable)
         {

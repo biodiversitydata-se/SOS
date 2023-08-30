@@ -17,7 +17,6 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
-using SOS.Harvest.Managers;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Managers

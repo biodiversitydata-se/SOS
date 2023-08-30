@@ -9,6 +9,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Globalization;
 
 namespace SOS.Harvest.Harvesters.VirtualHerbarium
 {
@@ -80,7 +81,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                     var distinctVerbatims = new HashSet<VirtualHerbariumObservationVerbatim>();
                     foreach (var verbatim in verbatims!)
                     {
-                        var occurrenceId = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}";
+                        var occurrenceId = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId.ToString(CultureInfo.InvariantCulture)}";
                         if (occurrenceIdsSet.Contains(occurrenceId))
                         {
                             Logger.LogWarning($"Duplicate observation found in Virtual Herbarium: {occurrenceId}");

@@ -40,7 +40,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var vocabularies = await vocabularyRepository.GetAllAsync();
-            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
+            var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
             serializeOptions.Converters.Add(new ObjectIdConverter());
 
             var strJson = JsonSerializer.Serialize(vocabularies, serializeOptions);

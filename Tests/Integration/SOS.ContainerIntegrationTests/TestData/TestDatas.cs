@@ -61,12 +61,12 @@ public static class TestDatas
 
     public class TestDataSet
     {
-        public List<Lib.Models.Processed.DataStewardship.Dataset.Dataset> Datasets { get; set; }
-        public List<Lib.Models.Processed.DataStewardship.Event.Event> Events { get; set; }
-        public List<Observation> Observations { get; set; }
-        public IOperable<Lib.Models.Processed.DataStewardship.Dataset.Dataset> DatasetsBuilder { get; set; }
-        public IOperable<Lib.Models.Processed.DataStewardship.Event.Event> EventsBuilder { get; set; }
-        public IOperable<Observation> ObservationsBuilder { get; set; }
+        public List<Lib.Models.Processed.DataStewardship.Dataset.Dataset>? Datasets { get; set; }
+        public List<Lib.Models.Processed.DataStewardship.Event.Event>? Events { get; set; }
+        public List<Observation>? Observations { get; set; }
+        public IOperable<Lib.Models.Processed.DataStewardship.Dataset.Dataset>? DatasetsBuilder { get; set; }
+        public IOperable<Lib.Models.Processed.DataStewardship.Event.Event>? EventsBuilder { get; set; }
+        public IOperable<Observation>? ObservationsBuilder { get; set; }
     }
 }
 

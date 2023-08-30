@@ -153,12 +153,12 @@ public class DateFilterTests : TestBase
         var testResultItems = DebugTestResultHelper.CreateTestResultSummary(verbatimObservations, allObservations, resultObservations);
         foreach (var item in testResultItems)
         {
-            item.VerbatimValue = item.VerbatimObservation.EndDate!.Value;
-            item.ProcessedValue = item.ProcessedObservation.Event.EndDate!.Value;
+            item.VerbatimValue = item.VerbatimObservation?.EndDate!.Value;
+            item.ProcessedValue = item.ProcessedObservation?.Event.EndDate!.Value;
         }
 
         testResultItems = testResultItems
-            .OrderBy(m => m.ProcessedObservation.Event.EndDate!.Value)
+            .OrderBy(m => m.ProcessedObservation?.Event.EndDate!.Value)
             .ToList();
         return testResultItems;
     }
