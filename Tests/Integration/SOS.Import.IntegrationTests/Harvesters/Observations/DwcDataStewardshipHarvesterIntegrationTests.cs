@@ -110,9 +110,9 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 var occurrences = await dwcArchiveReader.ReadOccurrencesAsync(archiveReaderContext);
                 var events = await dwcArchiveReader.ReadEventsAsync(archiveReaderContext);
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                throw;
             }
         }
 

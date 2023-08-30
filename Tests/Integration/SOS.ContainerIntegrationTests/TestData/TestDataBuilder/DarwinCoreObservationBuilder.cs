@@ -14,7 +14,7 @@ namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
         private static Bogus.DataSets.Lorem _lorem = new Bogus.DataSets.Lorem("sv");
         private const int ArtportalenDataSourceId = 1;
 
-        public static List<DwcObservationVerbatim> VerbatimDarwinCoreObservationsFromJsonFile
+        public static List<DwcObservationVerbatim>? VerbatimDarwinCoreObservationsFromJsonFile
         {
             get
             {
@@ -25,13 +25,13 @@ namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
                     var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
                     serializeOptions.Converters.Add(new ObjectIdConverter());
 
-                    _verbatimDarwinCoreObservationsFromJsonFile = JsonSerializer.Deserialize<List<DwcObservationVerbatim>>(str, serializeOptions);
+                    _verbatimDarwinCoreObservationsFromJsonFile = JsonSerializer.Deserialize<List<DwcObservationVerbatim>>(str, serializeOptions)!;
                 }
 
                 return _verbatimDarwinCoreObservationsFromJsonFile;
             }
         }
-        private static List<DwcObservationVerbatim> _verbatimDarwinCoreObservationsFromJsonFile;
+        private static List<DwcObservationVerbatim>? _verbatimDarwinCoreObservationsFromJsonFile;
 
         public static IOperable<DwcObservationVerbatim> HaveRandomValues(this IOperable<DwcObservationVerbatim> operable)
         {

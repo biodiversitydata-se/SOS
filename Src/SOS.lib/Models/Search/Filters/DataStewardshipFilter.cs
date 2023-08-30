@@ -7,6 +7,6 @@ namespace SOS.Lib.Models.Search.Filters
         /// <summary>
         /// Dataset filter
         /// </summary>
-        public IEnumerable<string>? DatasetIdentifiers { get; set; }
+        public IEnumerable<string> DatasetIdentifiers { get; set; }
     }
 }

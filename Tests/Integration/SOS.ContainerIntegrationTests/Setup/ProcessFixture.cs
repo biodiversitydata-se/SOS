@@ -35,29 +35,27 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.Processed.Checklist;
-using SOS.Harvest.Processors.Interfaces;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 public class ProcessFixture
 {
-    private IProcessClient _processClient;
     private IAreaHelper _areaHelper;
-    private DwcaObservationFactory _darwinCoreFactory;
-    private DwcaEventFactory _dwcaEventFactory;
-    private DwcaDatasetFactory _dwcaDatasetFactory;
+    private DwcaObservationFactory? _darwinCoreFactory;
+    private DwcaEventFactory? _dwcaEventFactory;
+    private DwcaDatasetFactory? _dwcaDatasetFactory;
     private IVocabularyRepository _vocabularyRepository;
-    private Dictionary<int, Taxon> _taxaById;
+    private Dictionary<int, Taxon>? _taxaById;
     private ITaxonRepository _taxonRepository;
     private IProcessTimeManager _processTimeManager;
     private ProcessConfiguration _processConfiguration;    
-    private List<Taxon> _taxa;
+    private List<Taxon>? _taxa;
     private IDatasetRepository _datasetRepository;
     private IEventRepository _eventRepository;
     private IProcessedObservationCoreRepository _processedObservationCoreRepository;
-    private ArtportalenObservationFactory _artportalenObservationFactory;
+    private ArtportalenObservationFactory? _artportalenObservationFactory;
     private IVocabularyValueResolver _vocabularyValueResolver;
     private IArtportalenDatasetMetadataRepository _artportalenDatasetMetadataRepository;
-    private ArtportalenChecklistFactory _artportalenChecklistFactory;
+    private ArtportalenChecklistFactory? _artportalenChecklistFactory;
     private IProcessedChecklistRepository _processedChecklistRepository { get; set; }
     private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
 
@@ -75,7 +73,6 @@ public class ProcessFixture
         IProcessedChecklistRepository processedChecklistRepository)
     {
         _areaHelper = areaHelper;
-        _processClient = processClient;
         _vocabularyRepository = vocabularyRepository;
         _taxonRepository = taxonRepository;
         _processTimeManager = processTimeManager;

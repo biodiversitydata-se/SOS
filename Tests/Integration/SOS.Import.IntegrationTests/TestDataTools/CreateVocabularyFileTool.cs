@@ -39,7 +39,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var processedVocabularies = await vocabularyRepository.GetAllAsync();
-            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true, };
+            var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
             serializeOptions.Converters.Add(new ObjectIdConverter());
 
             var strJson = JsonSerializer.Serialize(processedVocabularies, serializeOptions);

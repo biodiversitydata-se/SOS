@@ -24,7 +24,7 @@ namespace SOS.Import.IntegrationTests.TestHelpers.Factories
             using Stream zipStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             using var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, false);
             
-            var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true,  };
+            var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
             serializeOptions.Converters.Add(new ObjectIdConverter());
 
             var taxa = JsonSerializer.Deserialize<List<DarwinCoreTaxon>>(zipArchive.Entries.First().Open(), serializeOptions);

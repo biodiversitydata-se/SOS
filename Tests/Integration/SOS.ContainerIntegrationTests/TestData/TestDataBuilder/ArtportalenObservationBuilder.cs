@@ -63,12 +63,12 @@ namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
             };
         }
 
-        private static List<UserInternal> GetRandomUserInternals((int Value, float Probability)[] probabilities)
+        private static List<UserInternal>? GetRandomUserInternals((int Value, float Probability)[] probabilities)
         {
             int[] values = probabilities.Select(m => m.Value).ToArray();
             float[] weights = probabilities.Select(m => m.Probability).ToArray();
             int nrVerifiers = _faker.Random.WeightedRandom(values, weights);
-            List<UserInternal> userInternals = null;
+            List<UserInternal>? userInternals = null;
             if (nrVerifiers > 0)
             {
                 userInternals = new List<UserInternal>();

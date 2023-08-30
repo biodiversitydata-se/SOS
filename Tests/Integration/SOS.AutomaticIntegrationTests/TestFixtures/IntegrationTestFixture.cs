@@ -179,7 +179,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             ExportsController.ControllerContext.HttpContext = new DefaultHttpContext();
         }
 
-        protected string GetUserAuthenticationToken()
+        protected string? GetUserAuthenticationToken()
         {
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
@@ -195,7 +195,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return useTaxonZipCollection;
         }
 
-        protected string GetAzureApiUrl()
+        protected string? GetAzureApiUrl()
         {
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
@@ -203,7 +203,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return azureApiUrl;
         }
 
-        protected string GetAzureApiSubscriptionKey()
+        protected string? GetAzureApiSubscriptionKey()
         {
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
@@ -211,7 +211,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return azureApiUrl;
         }
 
-        protected MongoDbConfiguration GetMongoDbConfiguration()
+        protected MongoDbConfiguration? GetMongoDbConfiguration()
         {
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
@@ -219,7 +219,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return mongoDbConfiguration;
         }
 
-        protected MongoDbConfiguration GetVerbatimMongoDbConfiguration()
+        protected MongoDbConfiguration? GetVerbatimMongoDbConfiguration()
         {
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
@@ -227,7 +227,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return mongoDbConfiguration;
         }
 
-        protected ElasticSearchConfiguration GetSearchDbConfiguration()
+        protected ElasticSearchConfiguration? GetSearchDbConfiguration()
         {
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
@@ -235,7 +235,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return elasticConfiguration;
         }
 
-        protected ElasticSearchConfiguration GetCustomSearchDbConfiguration()
+        protected ElasticSearchConfiguration? GetCustomSearchDbConfiguration()
         {
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
@@ -243,7 +243,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return elasticConfiguration;
         }
 
-        protected UserServiceConfiguration GetUserServiceConfiguration()
+        protected UserServiceConfiguration? GetUserServiceConfiguration()
         {
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
@@ -251,7 +251,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return userServiceConfiguration;
         }
 
-        protected ObservationApiConfiguration GetObservationApiConfiguration()
+        protected ObservationApiConfiguration? GetObservationApiConfiguration()
         {
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);

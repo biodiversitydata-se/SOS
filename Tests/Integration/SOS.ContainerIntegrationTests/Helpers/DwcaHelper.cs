@@ -68,8 +68,8 @@ internal static class DwcaHelper
 
     public class DwcaComposite
     {
-        public List<DwcVerbatimDataset> Datasets { get; set; }
-        public IEnumerable<Lib.Models.Verbatim.DarwinCore.DwcEventOccurrenceVerbatim> Events { get; set; }
-        public IEnumerable<Lib.Models.Verbatim.DarwinCore.DwcObservationVerbatim> Occurrences { get; set; }
+        public List<DwcVerbatimDataset>? Datasets { get; set; }
+        public IEnumerable<Lib.Models.Verbatim.DarwinCore.DwcEventOccurrenceVerbatim>? Events { get; set; }
+        public IEnumerable<Lib.Models.Verbatim.DarwinCore.DwcObservationVerbatim>? Occurrences { get; set; }
     }
 }

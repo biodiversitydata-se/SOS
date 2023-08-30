@@ -200,7 +200,7 @@ namespace SOS.Observations.Api.Extensions
             }
         }
 
-        private static DataStewardshipFilter? PopulateDataStewardshipFilter(DataStewardshipFilterDto? filter)
+        private static DataStewardshipFilter PopulateDataStewardshipFilter(DataStewardshipFilterDto filter)
         {
             return filter == null ? null :
                 new DataStewardshipFilter
@@ -225,7 +225,7 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        private static EventFilter? PopulateEventFilter(EventFilterDto? filter)
+        private static EventFilter PopulateEventFilter(EventFilterDto filter)
         {
             return filter == null ? null :
                 new EventFilter

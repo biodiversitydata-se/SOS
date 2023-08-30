@@ -12,7 +12,7 @@ namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
         private static Bogus.Faker _faker = new Bogus.Faker();
         private static Bogus.DataSets.Lorem _lorem = new Bogus.DataSets.Lorem("sv");
 
-        public static List<ArtportalenChecklistVerbatim> VerbatimArtportalenChecklistsFromJsonFile
+        public static List<ArtportalenChecklistVerbatim>? VerbatimArtportalenChecklistsFromJsonFile
         {
             get
             {
@@ -24,13 +24,13 @@ namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
                     var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
                     serializeOptions.Converters.Add(new ObjectIdConverter());
                     serializeOptions.Converters.Add(new GeoJsonConverter());
-                    _verbatimArtportalenChecklistsFromJsonFile = JsonSerializer.Deserialize<List<ArtportalenChecklistVerbatim>>(str, serializeOptions);
+                    _verbatimArtportalenChecklistsFromJsonFile = JsonSerializer.Deserialize<List<ArtportalenChecklistVerbatim>>(str, serializeOptions)!;
                 }
 
                 return _verbatimArtportalenChecklistsFromJsonFile;
             }
         }
-        private static List<ArtportalenChecklistVerbatim> _verbatimArtportalenChecklistsFromJsonFile;
+        private static List<ArtportalenChecklistVerbatim>? _verbatimArtportalenChecklistsFromJsonFile;
 
         public static IOperable<ArtportalenChecklistVerbatim> HaveValuesFromPredefinedChecklists(this IOperable<ArtportalenChecklistVerbatim> operable)
         {
