@@ -9,7 +9,6 @@ using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,8 +34,6 @@ using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using MassTransit;
 using SOS.Hangfire.JobServer.ServiceBus.Consumers;
-using SOS.Lib.ApplicationInsights;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using SOS.Lib.Context;
 
 namespace SOS.Hangfire.JobServer

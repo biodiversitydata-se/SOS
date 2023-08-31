@@ -440,6 +440,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<AreasHarvestJob>().As<IAreasHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ApiUsageStatisticsHarvestJob>().As<IApiUsageStatisticsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ChecklistsHarvestJob>().As<IChecklistsHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<CleanUpJob>().As<ICleanUpJob>().InstancePerLifetimeScope();
             builder.RegisterType<ClearCacheJob>().As<IClearCacheJob>().InstancePerLifetimeScope();
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
             builder.RegisterType<CreateDwcaDataValidationReportJob>().As<ICreateDwcaDataValidationReportJob>().InstancePerLifetimeScope();
