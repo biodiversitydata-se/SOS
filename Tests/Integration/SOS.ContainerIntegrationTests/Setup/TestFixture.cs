@@ -17,6 +17,7 @@ public class TestFixture : IAsyncLifetime
     public TestContainersFixture TestContainerFixture { get; private set; }
     public ServiceProvider? ServiceProvider { get; private set; }
     public ProcessFixture? ProcessFixture { get; private set; }
+    public HarvestFixture? HarvestFixture { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestFixture"/> class.    
@@ -55,13 +56,14 @@ public class TestFixture : IAsyncLifetime
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task InitializeAsync()
-    {
+    {        
         await TestContainerFixture.InitializeAsync();
         ServiceProvider = RegisterServices();
         ApiFactory.ServiceProvider = ServiceProvider;
         using var scope = ServiceProvider.CreateScope();
         ProcessFixture = scope.ServiceProvider.GetService<ProcessFixture>();
         await ProcessFixture!.InitializeElasticsearchIndices();
+        HarvestFixture = scope.ServiceProvider.GetService<HarvestFixture>();
     }
 
     /// <summary>
@@ -76,8 +78,9 @@ public class TestFixture : IAsyncLifetime
     private ServiceProvider RegisterServices()
     {
         var processFixtureServices = ProcessFixture.GetServiceCollection();
+        var harvestFixtureServices = HarvestFixture.GetServiceCollection();
         var testContainersServices = TestContainerFixture.GetServiceCollection();
-        var serviceProvider = ServiceProviderExtensions.RegisterServices(processFixtureServices, testContainersServices);
+        var serviceProvider = ServiceProviderExtensions.RegisterServices(processFixtureServices, harvestFixtureServices, testContainersServices);
         return serviceProvider;
     }
 }
