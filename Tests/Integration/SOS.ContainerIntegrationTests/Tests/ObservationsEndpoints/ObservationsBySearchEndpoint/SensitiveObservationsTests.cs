@@ -6,7 +6,7 @@ using SOS.Observations.Api.Dtos;
 using SOS.Lib.Models.Shared;
 using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
-using SOS.ContainerIntegrationTests.Stubs;
+using SOS.ContainerIntegrationTests.Setup.Stubs;
 
 namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint;
 

@@ -8,7 +8,7 @@ using SOS.Lib.Database;
 using Testcontainers.Elasticsearch;
 using Testcontainers.MongoDb;
 
-namespace SOS.ContainerIntegrationTests.Setup;
+namespace SOS.ContainerIntegrationTests.Setup.ContainerDbFixtures;
 public class TestContainersFixture : IAsyncLifetime
 {
     private const string ELASTIC_PASSWORD = "elastic";
@@ -75,7 +75,7 @@ public class TestContainersFixture : IAsyncLifetime
         await ElasticsearchContainer.StartAsync().ConfigureAwait(false);
         var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
             .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-            .EnableApiVersioningHeader()        
+            .EnableApiVersioningHeader()
         .EnableDebugMode());
         return elasticClient;
     }

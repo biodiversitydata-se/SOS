@@ -6,18 +6,18 @@ using SOS.Lib.Database;
 using SOS.Lib.Models.Shared;
 using Microsoft.Extensions.Logging;
 
-namespace SOS.ContainerIntegrationTests.Setup;
+namespace SOS.ContainerIntegrationTests.Setup.LiveDbFixtures;
 public class HarvestFixture
 {
     private IVerbatimClient _verbatimClient;
     public IArtportalenVerbatimRepository ArtportalenVerbatimRepository { get; set; }
-    public ArtportalenChecklistVerbatimRepository ArtportalenChecklistVerbatimRepository { get; set; }    
+    public ArtportalenChecklistVerbatimRepository ArtportalenChecklistVerbatimRepository { get; set; }
 
-    public HarvestFixture(IVerbatimClient verbatimClient,        
+    public HarvestFixture(IVerbatimClient verbatimClient,
         IArtportalenVerbatimRepository artportalenVerbatimRepository,
         ArtportalenChecklistVerbatimRepository artportalenChecklistVerbatimRepository)
     {
-        _verbatimClient = verbatimClient;        
+        _verbatimClient = verbatimClient;
         ArtportalenVerbatimRepository = artportalenVerbatimRepository;
         ArtportalenChecklistVerbatimRepository = artportalenChecklistVerbatimRepository;
     }
@@ -34,7 +34,7 @@ public class HarvestFixture
             verbatimDbConfiguration.ReadBatchSize,
             verbatimDbConfiguration.WriteBatchSize);
         serviceCollection.AddSingleton<IVerbatimClient>(importClient);
-        serviceCollection.AddSingleton<IArtportalenVerbatimRepository, ArtportalenVerbatimRepository>();        
+        serviceCollection.AddSingleton<IArtportalenVerbatimRepository, ArtportalenVerbatimRepository>();
         serviceCollection.AddSingleton<ArtportalenChecklistVerbatimRepository>();
         serviceCollection.AddSingleton<HarvestFixture>();
 
@@ -42,7 +42,7 @@ public class HarvestFixture
     }
 
     private static MongoDbConfiguration GetVerbatimMongoDbConfiguration()
-    {        
+    {
         // return ST settings
         return new MongoDbConfiguration()
         {
@@ -50,10 +50,10 @@ public class HarvestFixture
             DatabaseName = "sos-harvest-st",
             AuthenticationDb = "admin",
             ReadBatchSize = 10000,
-            WriteBatchSize = 10000,            
+            WriteBatchSize = 10000,
             UserName = "user",
             Password = "password"
-        };        
+        };
     }
 
     public DwcCollectionRepository GetDwcCollectionRepository(DataProvider dataProvider)

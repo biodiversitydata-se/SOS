@@ -1,5 +1,5 @@
 ﻿using NSubstitute;
-using SOS.ContainerIntegrationTests.Stubs;
+using SOS.ContainerIntegrationTests.Setup.Stubs;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;

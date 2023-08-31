@@ -3,7 +3,7 @@ using SOS.Lib.Models.UserService;
 using SOS.Lib.Services.Interfaces;
 using SOS.TestHelpers.Helpers.Builders;
 
-namespace SOS.ContainerIntegrationTests.Stubs;
+namespace SOS.ContainerIntegrationTests.Setup.Stubs;
 internal static class UserServiceStubFactory
 {
     public static IUserService CreateWithSightingAuthority(int maxProtectionLevel)
@@ -25,7 +25,7 @@ internal static class UserServiceStubFactory
         IUserService userServiceMock = Substitute.For<IUserService>();
         userServiceMock.GetUserAsync().Returns(user);
         userServiceMock.GetUserAuthoritiesAsync(userId, Arg.Any<string>(), Arg.Any<string>()).Returns(authorities);
-        
+
         return userServiceMock;
     }
 

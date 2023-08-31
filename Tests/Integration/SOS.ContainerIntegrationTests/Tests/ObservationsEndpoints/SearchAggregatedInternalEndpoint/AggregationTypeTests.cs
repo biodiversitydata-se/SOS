@@ -6,7 +6,7 @@ using SOS.ContainerIntegrationTests.Setup;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Enums;
 
-namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.SearchAggregatedInternalEndpoint;
+namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.SearchAggregatedInternalEndpoint;
 
 [Collection(TestCollection.Name)]
 public class AggregationTypeTests : TestBase
@@ -70,7 +70,7 @@ public class AggregationTypeTests : TestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60);
-        result!.Records.Count().Should().Be(5);        
+        result!.Records.Count().Should().Be(5);
     }
 
     [Fact]

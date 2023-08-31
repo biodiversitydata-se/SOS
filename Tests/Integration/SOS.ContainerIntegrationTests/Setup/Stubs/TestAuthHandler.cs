@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
-namespace SOS.ContainerIntegrationTests.Stubs;
+namespace SOS.ContainerIntegrationTests.Setup.Stubs;
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public const string UserId = "UserId";
@@ -44,7 +44,7 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
         //};        
         var identity = new ClaimsIdentity(claims, AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
-        var ticket = new AuthenticationTicket(principal, AuthenticationScheme);        
+        var ticket = new AuthenticationTicket(principal, AuthenticationScheme);
 
         var result = AuthenticateResult.Success(ticket);
 

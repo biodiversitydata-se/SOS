@@ -1,6 +1,6 @@
 ﻿using FizzWare.NBuilder;
 using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.Stubs;
+using SOS.ContainerIntegrationTests.Setup.Stubs;
 using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos;

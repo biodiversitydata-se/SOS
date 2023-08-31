@@ -1,7 +1,7 @@
 ﻿using Nest;
 using SOS.Lib.Managers.Interfaces;
 
-namespace SOS.ContainerIntegrationTests.Stubs;
+namespace SOS.ContainerIntegrationTests.Setup.Stubs;
 internal class ElasticClientTestManager : IElasticClientManager
 {
     private IElasticClient[] _clients;

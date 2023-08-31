@@ -1,5 +1,7 @@
 ﻿using Microsoft.ApplicationInsights.Extensibility;
 using SOS.ContainerIntegrationTests.Extensions;
+using SOS.ContainerIntegrationTests.Setup.ContainerDbFixtures;
+using SOS.ContainerIntegrationTests.Setup.LiveDbFixtures;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 

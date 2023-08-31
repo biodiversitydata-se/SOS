@@ -7,7 +7,20 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <UserSecretsId>46676871-c5de-4e36-a4b7-19fbb6fa184d</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Setup\LiveDbFixtures\appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Setup\LiveDbFixtures\appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
 	<PackageReference Include="Bogus" Version="34.0.2" />

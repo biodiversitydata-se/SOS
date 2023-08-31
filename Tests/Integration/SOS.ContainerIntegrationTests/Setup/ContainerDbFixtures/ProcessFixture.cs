@@ -2,7 +2,6 @@
 using Microsoft.ApplicationInsights;
 using SOS.ContainerIntegrationTests.Extensions;
 using SOS.ContainerIntegrationTests.Helpers;
-using SOS.ContainerIntegrationTests.Stubs;
 using SOS.ContainerIntegrationTests.TestData;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.DarwinCore;
@@ -36,8 +35,9 @@ using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.ContainerIntegrationTests.Setup.Stubs;
 
-namespace SOS.ContainerIntegrationTests.Setup;
+namespace SOS.ContainerIntegrationTests.Setup.ContainerDbFixtures;
 public class ProcessFixture
 {
     private IProcessClient _processClient;
@@ -49,7 +49,7 @@ public class ProcessFixture
     private Dictionary<int, Taxon>? _taxaById;
     private ITaxonRepository _taxonRepository;
     private IProcessTimeManager _processTimeManager;
-    private ProcessConfiguration _processConfiguration;    
+    private ProcessConfiguration _processConfiguration;
     private List<Taxon>? _taxa;
     private IDatasetRepository _datasetRepository;
     private IEventRepository _eventRepository;
@@ -61,10 +61,10 @@ public class ProcessFixture
     private IProcessedChecklistRepository _processedChecklistRepository { get; set; }
     private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
 
-    public List<Taxon> Taxa 
-    {  
+    public List<Taxon> Taxa
+    {
         get => _taxa;
-    } 
+    }
 
     public ProcessFixture(IAreaHelper areaHelper,
         IProcessClient processClient,
@@ -127,7 +127,7 @@ public class ProcessFixture
         serviceCollection.AddSingleton<IArtportalenDatasetMetadataRepository, ArtportalenDatasetMetadataRepository>();
         serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
         serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
-        serviceCollection.AddSingleton<IProcessedChecklistRepository, ProcessedChecklistRepository>();        
+        serviceCollection.AddSingleton<IProcessedChecklistRepository, ProcessedChecklistRepository>();
         VocabularyConfiguration vocabularyConfiguration = new VocabularyConfiguration()
         {
             ResolveValues = true,
@@ -142,7 +142,7 @@ public class ProcessFixture
     {
         _taxa = await _taxonRepository.GetAllAsync();
         _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
-        
+
         _artportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
             new DataProvider { Id = 1 },
             _taxaById,
@@ -234,13 +234,13 @@ public class ProcessFixture
     {
         filePath = filePath.GetAbsoluteFilePath();
         string outputPath = Path.GetTempPath();
-        using var archiveReader = new ArchiveReader(filePath, outputPath);        
+        using var archiveReader = new ArchiveReader(filePath, outputPath);
         IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
         var dwcObservations = await dwcArchiveReader.ReadArchiveAsync(
             archiveReader,
             dataProvider);
         var observationFactory = GetDwcaObservationFactory(true);
-        var processedObservations = dwcObservations        
+        var processedObservations = dwcObservations
             .Select(m => observationFactory.CreateProcessedObservation(m, false))
             .ToList();
         await AddObservationsToElasticsearchAsync(processedObservations!);
@@ -315,7 +315,7 @@ public class ProcessFixture
     public async Task AddDataToElasticsearchAsync(
         List<Dataset> datasets,
         List<Lib.Models.Processed.DataStewardship.Event.Event> events,
-        List<Observation> observations,        
+        List<Observation> observations,
         bool clearExistingObservations = true)
     {
         await AddDatasetsToElasticsearchAsync(datasets, clearExistingObservations, 0);
@@ -325,7 +325,7 @@ public class ProcessFixture
     }
 
     public async Task AddDataToElasticsearchAsync(
-        TestDatas.TestDataSet testDataSet,        
+        TestDatas.TestDataSet testDataSet,
         bool clearExistingObservations = true)
     {
         await AddDatasetsToElasticsearchAsync(testDataSet.Datasets, clearExistingObservations, 0);
@@ -336,7 +336,7 @@ public class ProcessFixture
 
     public async Task AddDataToElasticsearchAsync(
         IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events,
-        IEnumerable<Observation> observations,        
+        IEnumerable<Observation> observations,
         bool clearExistingObservations = true)
     {
         await AddEventsToElasticsearchAsync(events, clearExistingObservations, 0);
