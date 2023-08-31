@@ -311,40 +311,54 @@ namespace SOS.Harvest.Jobs
                 ValidateRandomObservationsAsync(),
                 ValidateCountAsync()
             };
+            var results = await Task.WhenAll(validationTasks);
 
-            // Make sure no protected observations exists in public index and vice versa
-            return (await Task.WhenAll(validationTasks)).All(t => t);
+            // Make sure validation tasks succeded
+            return results.All(t => t);
         }
 
+        /// <summary>
+        /// Check that we ha a resonable amount of observations compared to last run
+        /// </summary>
+        /// <returns></returns>
         private async Task<bool> ValidateCountAsync()
         {
             var liveMode = _processedObservationRepository.LiveMode;
-            var currentProcessInfo = await GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
+            var processInfoInactive = await GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
             _processedObservationRepository.LiveMode = !liveMode;
-            var otherProcessInfo = await GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
+            var processInfoActive = await GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
             _processedObservationRepository.LiveMode = liveMode;
 
-            if (!(currentProcessInfo?.ProvidersInfo?.Any() ?? true) || !(otherProcessInfo?.ProvidersInfo?.Any() ?? true))
+            if (!(processInfoActive?.ProvidersInfo?.Any() ?? true))
             {
+                // Processing not done before
                 return true;
             }
-            var success = true;
-            foreach (var currProvider in currentProcessInfo!.ProvidersInfo)
-            {
-                var otherProvider = otherProcessInfo!.ProvidersInfo.FirstOrDefault(p => p.DataProviderId.Equals(currProvider.DataProviderId));
 
-                if (otherProvider != null)
+            if (!(processInfoInactive?.ProvidersInfo?.Any() ?? true))
+            {
+                // Something is wrong. process info should be saved at this point
+                _logger.LogError("Can't find any process information for current processing");
+                return false;
+            }
+
+            var success = true;
+            foreach (var providerInactive in processInfoInactive!.ProvidersInfo)
+            {
+                var providerActive = processInfoActive!.ProvidersInfo.FirstOrDefault(p => p.DataProviderId.Equals(providerInactive.DataProviderId));
+
+                if (providerActive != null)
                 {
                     double percentLimit = _processConfiguration.MinPercentObservationCount / 100.0;
-                    if (otherProvider.PublicProcessCount > 0 && currProvider.PublicProcessCount <= percentLimit * otherProvider.PublicProcessCount)
+                    if (providerActive.PublicProcessCount > 0 && providerInactive.PublicProcessCount <= percentLimit * providerActive.PublicProcessCount)
                     {
-                        _logger.LogError($"Validation failed. Public observation count for {currProvider.DataProviderIdentifier} is less than {_processConfiguration.MinPercentObservationCount}% of last run. Count this time={currProvider.PublicProcessCount}. Count previous time={otherProvider.PublicProcessCount}.");
+                        _logger.LogError($"Validation failed. Public observation count for {providerInactive.DataProviderIdentifier} is less than {_processConfiguration.MinPercentObservationCount}% of last run. Count this time={providerInactive.PublicProcessCount}. Count previous time={providerActive.PublicProcessCount}.");
                         success = false;
                     }
 
-                    if (otherProvider.ProtectedProcessCount < 0 && currProvider.ProtectedProcessCount <= percentLimit * otherProvider.ProtectedProcessCount)
+                    if (providerActive.ProtectedProcessCount > 0 && providerInactive.ProtectedProcessCount <= percentLimit * providerActive.ProtectedProcessCount)
                     {
-                        _logger.LogError($"Validation failed. Protected observation count for {currProvider.DataProviderIdentifier} is less than {_processConfiguration.MinPercentObservationCount}% of last run. Count this time={currProvider.ProtectedProcessCount}. Count previous time={otherProvider.ProtectedProcessCount}.");
+                        _logger.LogError($"Validation failed. Protected observation count for {providerInactive.DataProviderIdentifier} is less than {_processConfiguration.MinPercentObservationCount}% of last run. Count this time={providerInactive.ProtectedProcessCount}. Count previous time={providerActive.ProtectedProcessCount}.");
                         success = false;
                     }
                 }
@@ -507,13 +521,13 @@ namespace SOS.Harvest.Jobs
                 var result = await ProcessVerbatimObservations(dataProvidersToProcess, mode, taxonById!, cancellationToken!);
                 var success = result.All(t => t.Value.Status == RunStatus.Success);
 
-                //---------------------------------------------------------------
-                // 6. Enable Elasticsearch observation index
-                //---------------------------------------------------------------
-                await EnableIndexingAsync();
-                
                 if (success)
                 {
+                    //---------------------------------------------------------------
+                    // 6. Enable Elasticsearch observation index
+                    //---------------------------------------------------------------
+                    await EnableIndexingAsync();
+
                     // Update dynamic provider data
                     await UpdateProvidersMetadataAsync(dataProvidersToProcess);
 
