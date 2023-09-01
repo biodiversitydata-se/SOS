@@ -181,7 +181,13 @@ namespace SOS.Lib.IO.Excel
                 if (gzip)
                 {
                     await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+                    if ((Directory.GetFiles(temporaryZipExportFolderPath)?.Length ?? 0) == 0)
+                    {
+                        throw new Exception($"No files to compress in '{temporaryZipExportFolderPath}'");
+                    }
+
                     var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
+                    
                     return new FileExportResult
                     {
                         FilePath = zipFilePath,
