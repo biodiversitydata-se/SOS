@@ -1,12 +1,12 @@
 ﻿using FizzWare.NBuilder;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.Setup.Stubs;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
+using SOS.IntegrationTests.Setup.Stubs;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.SignalSearchInternalEndpoint;
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.SignalSearchInternalEndpoint;
 
 [Collection(TestCollection.Name)]
 public class SignalSearchTests : TestBase
@@ -48,7 +48,7 @@ public class SignalSearchTests : TestBase
             maxProtectionLevel: 1,
             countyFeatureId: "3");
         var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
-       
+
         var searchFilter = new SignalFilterDto
         {
             StartDate = new DateTime(1999, 12, 1),
@@ -72,6 +72,6 @@ public class SignalSearchTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Should().BeTrue();        
+        result.Should().BeTrue();
     }
 }

@@ -3,11 +3,11 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
-using SOS.ContainerIntegrationTests.Helpers;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
+using SOS.IntegrationTests.Helpers;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint;
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
 public class DateFilterTests : TestBase

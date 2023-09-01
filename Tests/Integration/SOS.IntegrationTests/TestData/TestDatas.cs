@@ -1,8 +1,8 @@
 ﻿using FizzWare.NBuilder;
-using SOS.ContainerIntegrationTests.TestData.Factories;
+using SOS.IntegrationTests.TestData.Factories;
 using SOS.Lib.Models.Processed.Observation;
 
-namespace SOS.ContainerIntegrationTests.TestData;
+namespace SOS.IntegrationTests.TestData;
 public static class TestDatas
 {
     public static TestDataSet Create(int size = 10)

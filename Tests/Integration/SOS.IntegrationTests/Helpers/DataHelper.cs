@@ -1,4 +1,4 @@
-﻿namespace SOS.ContainerIntegrationTests.Helpers;
+﻿namespace SOS.IntegrationTests.Helpers;
 internal static class DataHelper
 {
     private static Random _random = new Random();

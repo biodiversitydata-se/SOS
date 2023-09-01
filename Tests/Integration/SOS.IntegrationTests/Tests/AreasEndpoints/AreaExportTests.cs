@@ -1,10 +1,10 @@
 ﻿using FluentAssertions.Execution;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData;
+using SOS.IntegrationTests.Setup;
+using SOS.IntegrationTests.TestData;
 using SOS.Observations.Api.Dtos;
 using System.IO.Compression;
 
-namespace SOS.ContainerIntegrationTests.Tests.AreasEndpoints;
+namespace SOS.IntegrationTests.Tests.AreasEndpoints;
 
 /// <summary>
 /// Integration tests for export area to zip file endpoint.

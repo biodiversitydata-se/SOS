@@ -1,11 +1,11 @@
 ﻿using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
-using SOS.ContainerIntegrationTests.Extensions;
+using SOS.IntegrationTests.Extensions;
 using SOS.Lib.Extensions;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
-namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
+namespace SOS.IntegrationTests.TestData.TestDataBuilder
 {
     public static class ArtportalenChecklistBuilder
     {
@@ -17,7 +17,7 @@ namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
             get
             {
                 if (_verbatimArtportalenChecklistsFromJsonFile == null)
-                {                    
+                {
                     string filePath = "Resources/TestDataBuilder/ArtportalenVerbatimChecklists_1000.json".GetAbsoluteFilePath();
                     string str = File.ReadAllText(filePath, Encoding.UTF8);
 

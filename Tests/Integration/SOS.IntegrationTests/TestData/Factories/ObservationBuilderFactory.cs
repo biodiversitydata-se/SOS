@@ -2,10 +2,10 @@
 using FizzWare.NBuilder;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.ContainerIntegrationTests.Helpers;
 using Nest;
+using SOS.IntegrationTests.Helpers;
 
-namespace SOS.ContainerIntegrationTests.TestData.Factories;
+namespace SOS.IntegrationTests.TestData.Factories;
 internal static class ObservationsBuilderFactory
 {
     private static Bogus.Faker _faker = new Bogus.Faker("sv");

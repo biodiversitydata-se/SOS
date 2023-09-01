@@ -1,9 +1,9 @@
 ﻿using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.ContainerIntegrationTests.Setup;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Helpers.DataUtils;
+namespace SOS.IntegrationTests.Helpers.DataUtils;
 
 [Collection(TestCollection.Name)]
 public class CreateArtportalenJsonTestData : TestBase
@@ -14,7 +14,7 @@ public class CreateArtportalenJsonTestData : TestBase
     {
     }
 
-    [Fact(Skip = "Intended to run on demand when needed")]    
+    [Fact(Skip = "Intended to run on demand when needed")]
     [Trait("Category", "DataUtil")]
     public async Task CreateArtportalenVerbatimObservationTestData()
     {

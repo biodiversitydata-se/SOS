@@ -1,8 +1,8 @@
 ﻿using FizzWare.NBuilder;
-using SOS.ContainerIntegrationTests.Helpers;
+using SOS.IntegrationTests.Helpers;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 
-namespace SOS.ContainerIntegrationTests.TestData.Factories;
+namespace SOS.IntegrationTests.TestData.Factories;
 internal class DatasetBuilderFactory
 {
     public static IOperable<Dataset> Create(int size = 10)

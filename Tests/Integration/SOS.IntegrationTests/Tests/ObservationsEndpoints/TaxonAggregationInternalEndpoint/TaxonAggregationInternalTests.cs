@@ -2,10 +2,10 @@
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.TaxonAggregationInternalEndpoint;
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.TaxonAggregationInternalEndpoint;
 
 [Collection(TestCollection.Name)]
 public class TaxonAggregationInternalTests : TestBase

@@ -3,7 +3,7 @@ using SOS.Lib.Models.UserService;
 using SOS.Lib.Services.Interfaces;
 using SOS.TestHelpers.Helpers.Builders;
 
-namespace SOS.ContainerIntegrationTests.Setup.Stubs;
+namespace SOS.IntegrationTests.Setup.Stubs;
 internal static class UserServiceStubFactory
 {
     public static IUserService CreateWithSightingAuthority(int maxProtectionLevel)

@@ -1,12 +1,12 @@
 ﻿using NSubstitute;
-using SOS.ContainerIntegrationTests.Setup.Stubs;
+using SOS.IntegrationTests.Setup.Stubs;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
 
-namespace SOS.ContainerIntegrationTests.Setup;
+namespace SOS.IntegrationTests.Setup;
 
 /// <summary>
 /// Represents a custom WebApplicationFactory used for testing the Observations API.
@@ -23,11 +23,11 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
     /// Initializes a new instance of the RestApiWebApplicationFactory class.
     /// </summary>
     public ObservationsApiWebApplicationFactory()
-    {        
+    {
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Dev");
         Environment.SetEnvironmentVariable("DISABLE_HANGFIRE_INIT", "true");
         Environment.SetEnvironmentVariable("DISABLE_HEALTHCHECK_INIT", "true");
-        Environment.SetEnvironmentVariable("DISABLE_CACHED_TAXON_SUM_INIT", "true");        
+        Environment.SetEnvironmentVariable("DISABLE_CACHED_TAXON_SUM_INIT", "true");
     }
 
     /// <summary>
@@ -36,17 +36,17 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
     /// <param name="builder">The WebHostBuilder instance to be configured.</param>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        using var scope = ServiceProvider!.CreateScope();        
+        using var scope = ServiceProvider!.CreateScope();
         var processClient = scope.ServiceProvider.GetService<IProcessClient>();
         var elasticSearchConfiguration = scope.ServiceProvider.GetService<ElasticSearchConfiguration>();
         var elasticClientManager = scope.ServiceProvider.GetService<IElasticClientManager>();
-        
+
         builder.ConfigureTestServices(services =>
-        {            
+        {
             services.Replace(ServiceDescriptor.Singleton(x => processClient!)); // Replace MongoDB 
             services.Replace(ServiceDescriptor.Singleton(x => elasticClientManager!)); // Replace Elasticsearch
             services.Replace(ServiceDescriptor.Singleton(x => elasticSearchConfiguration!));
-            services.Replace(ServiceDescriptor.Singleton(x => _apiConfiguration));            
+            services.Replace(ServiceDescriptor.Singleton(x => _apiConfiguration));
             services.Replace(ServiceDescriptor.Singleton(x => Substitute.For<IBlobStorageService>()));
 
             services.Configure<AuthenticationOptions>(options =>

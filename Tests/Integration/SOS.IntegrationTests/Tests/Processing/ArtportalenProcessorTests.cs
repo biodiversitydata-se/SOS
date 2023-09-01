@@ -1,11 +1,11 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using System.ComponentModel;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
 using LinqStatistics;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Tests.Processing;
+namespace SOS.IntegrationTests.Tests.Processing;
 
 [Collection(TestCollection.Name)]
 public class ArtportalenProcessorTests : TestBase

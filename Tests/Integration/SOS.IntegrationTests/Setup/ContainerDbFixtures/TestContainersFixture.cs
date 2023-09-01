@@ -2,13 +2,13 @@
 using Elasticsearch.Net;
 using MongoDB.Driver;
 using Nest;
-using SOS.ContainerIntegrationTests.Extensions;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Database;
 using Testcontainers.Elasticsearch;
 using Testcontainers.MongoDb;
+using SOS.IntegrationTests.Extensions;
 
-namespace SOS.ContainerIntegrationTests.Setup.ContainerDbFixtures;
+namespace SOS.IntegrationTests.Setup.ContainerDbFixtures;
 public class TestContainersFixture : IAsyncLifetime
 {
     private const string ELASTIC_PASSWORD = "elastic";

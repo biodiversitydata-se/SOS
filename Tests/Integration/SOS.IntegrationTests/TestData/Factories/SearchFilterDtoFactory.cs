@@ -1,14 +1,14 @@
 ﻿using SOS.Observations.Api.Dtos.Filter;
 
-namespace SOS.ContainerIntegrationTests.TestData.Factories;
+namespace SOS.IntegrationTests.TestData.Factories;
 internal static class SearchFilterDtoFactory
 {
     public static SearchFilterDto CreateWithMunicipalityFeatureIds(params string[] featureIds)
-    {        
+    {
         return new SearchFilterDto
         {
-            Geographics = new GeographicsFilterDto 
-            { 
+            Geographics = new GeographicsFilterDto
+            {
                 Areas = featureIds.Select(id => new AreaFilterDto
                 {
                     AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality,

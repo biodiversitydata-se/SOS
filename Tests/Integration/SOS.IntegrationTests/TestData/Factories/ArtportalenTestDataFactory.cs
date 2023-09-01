@@ -1,8 +1,8 @@
 ﻿using FizzWare.NBuilder;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
-namespace SOS.ContainerIntegrationTests.TestData.Factories;
+namespace SOS.IntegrationTests.TestData.Factories;
 
 internal static class ArtportalenTestDataFactory
 {

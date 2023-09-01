@@ -1,4 +1,4 @@
-﻿namespace SOS.ContainerIntegrationTests.Extensions;
+﻿namespace SOS.IntegrationTests.Extensions;
 
 internal static class ServiceProviderExtensions
 {

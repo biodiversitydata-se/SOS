@@ -2,10 +2,10 @@
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Lib.Models.Statistics;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Tests.ChecklistsEndpoints;
+namespace SOS.IntegrationTests.Tests.ChecklistsEndpoints;
 
 [Collection(TestCollection.Name)]
 public class CalculateTrendTests : TestBase
@@ -35,8 +35,10 @@ public class CalculateTrendTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddChecklistsToElasticSearch(verbatimChecklists);
         var apiClient = TestFixture.CreateApiClient();
-        var calculateTrendFilter = new CalculateTrendFilterDto {
-            Checklist = new TrendChecklistFilterDto {
+        var calculateTrendFilter = new CalculateTrendFilterDto
+        {
+            Checklist = new TrendChecklistFilterDto
+            {
                 MinEffortTime = "00:15:00"
             },
             TaxonId = 103026

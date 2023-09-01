@@ -1,15 +1,15 @@
 ﻿using FizzWare.NBuilder;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData;
-using SOS.ContainerIntegrationTests.TestData.Factories;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
+using SOS.IntegrationTests.TestData;
+using SOS.IntegrationTests.TestData.Factories;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint;
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 /// <summary>
 /// Integration tests for ObservationsBySearch endpoint when using taxon filters.

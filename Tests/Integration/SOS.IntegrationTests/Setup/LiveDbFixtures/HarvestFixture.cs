@@ -6,7 +6,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Models.Shared;
 using Microsoft.Extensions.Logging;
 
-namespace SOS.ContainerIntegrationTests.Setup.LiveDbFixtures;
+namespace SOS.IntegrationTests.Setup.LiveDbFixtures;
 public class HarvestFixture
 {
     private IVerbatimClient _verbatimClient;

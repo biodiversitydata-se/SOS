@@ -3,10 +3,10 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint;
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 /// <summary>
 /// Integration tests for the ObservationsBySearch endpoint with sorting observations scenarios.

@@ -8,9 +8,9 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Enums.Artportalen;
 using MongoDB.Driver.GeoJsonObjectModel;
-using SOS.ContainerIntegrationTests.Extensions;
+using SOS.IntegrationTests.Extensions;
 
-namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
+namespace SOS.IntegrationTests.TestData.TestDataBuilder
 {
     public static class ArtportalenObservationBuilder
     {
@@ -29,7 +29,7 @@ namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
         public static List<ArtportalenObservationVerbatim>? VerbatimArtportalenObservationsFromJsonFile(bool sensitive)
         {
             if (_verbatimArtportalenObservationsFromJsonFile == null || !sensitive.Equals(_sensitiveLoaded))
-            {                
+            {
                 string filePath = $"Resources/TestDataBuilder/{(sensitive ? "ArtportalenVerbatimProtectedObservations_1000" : "ArtportalenVerbatimObservations_1000")}.json".GetAbsoluteFilePath();
                 string str = File.ReadAllText(filePath, Encoding.UTF8);
                 var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, PropertyNameCaseInsensitive = true, IncludeFields = false };
@@ -495,7 +495,7 @@ namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
             var spanStartDate = DateTime.SpecifyKind(DateTime.Parse(strSpanStartDate), DateTimeKind.Local);
             var spanEndDate = DateTime.SpecifyKind(DateTime.Parse(strSpanEndDate), DateTimeKind.Local);
 
-            return operable.IsInDateSpan(spanStartDate, spanEndDate);            
+            return operable.IsInDateSpan(spanStartDate, spanEndDate);
         }
 
         public static IOperable<ArtportalenObservationVerbatim> HaveTaxonSensitivityCategory(this IOperable<ArtportalenObservationVerbatim> operable, int sensitivityCategory)

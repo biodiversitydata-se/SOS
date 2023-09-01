@@ -1,10 +1,10 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Search.Result;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.CachedCountInternalEndpoint;
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.CachedCountInternalEndpoint;
 
 [Collection(TestCollection.Name)]
 public class CachedCountInternalTests : TestBase
@@ -51,7 +51,7 @@ public class CachedCountInternalTests : TestBase
 
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var taxonId = 100012;        
+        var taxonId = 100012;
 
         // Act
         var response = await apiClient.GetAsync($"/observations/internal/cachedcount?taxonId={taxonId}");
@@ -61,6 +61,6 @@ public class CachedCountInternalTests : TestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.ObservationCount.Should().Be(40);
         result!.ProvinceCount.Should().Be(2,
-            because: "");        
+            because: "");
     }
 }

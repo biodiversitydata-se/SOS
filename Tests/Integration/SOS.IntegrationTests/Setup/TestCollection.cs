@@ -1,4 +1,4 @@
-﻿namespace SOS.ContainerIntegrationTests.Setup;
+﻿namespace SOS.IntegrationTests.Setup;
 
 /// <summary>
 /// Represents a collection definition for integration tests.

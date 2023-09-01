@@ -1,10 +1,10 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos.Checklist;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Tests.ChecklistsEndpoints;
+namespace SOS.IntegrationTests.Tests.ChecklistsEndpoints;
 
 [Collection(TestCollection.Name)]
 public class GetChecklistByIdTests : TestBase

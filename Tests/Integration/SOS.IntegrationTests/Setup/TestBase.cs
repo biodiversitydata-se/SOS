@@ -1,9 +1,8 @@
 ﻿using MongoDB.Bson.Serialization.Conventions;
-using SOS.ContainerIntegrationTests.Setup.ContainerDbFixtures;
 using SOS.Lib.JsonConverters;
 using System.Globalization;
 
-namespace SOS.ContainerIntegrationTests.Setup;
+namespace SOS.IntegrationTests.Setup;
 
 /// <summary>
 /// Base class for integration tests providing common functionalities and settings.
@@ -20,7 +19,7 @@ public class TestBase
     /// </summary>
     protected ITestOutputHelper Output { get; private set; }
 
-    protected IProcessFixture ProcessFixture => TestFixture.ProcessFixture!;    
+    protected IProcessFixture ProcessFixture => TestFixture.ProcessFixture!;
 
     /// <summary>
     /// Standard JSON serializer options used in the integration tests for serialization/deserialization operations.
@@ -28,8 +27,8 @@ public class TestBase
     protected readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions()
     {
         PropertyNameCaseInsensitive = true,
-        Converters = 
-        { 
+        Converters =
+        {
             new JsonStringEnumConverter(),
             new GeoShapeConverter(),
             new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
@@ -45,7 +44,7 @@ public class TestBase
     {
         TestFixture = testFixture;
         Output = output;
-        
+
         // Use Swedish culture info.
         var culture = new CultureInfo("sv-SE");
         CultureInfo.DefaultThreadCurrentCulture = culture;

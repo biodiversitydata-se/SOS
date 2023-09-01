@@ -5,11 +5,11 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
-using SOS.ContainerIntegrationTests.TestData.Factories;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
+using SOS.IntegrationTests.TestData.Factories;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchEndpoint
 {
     [Collection(TestCollection.Name)]
     public class GeographicsFilterTests : TestBase

@@ -1,10 +1,10 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Search.Result;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.CachedCountInternalEndpoint;
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.CachedCountInternalEndpoint;
 
 [Collection(TestCollection.Name)]
 public class MultipleCachedCountInternalTests : TestBase

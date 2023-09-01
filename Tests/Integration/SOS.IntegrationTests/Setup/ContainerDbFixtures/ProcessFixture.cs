@@ -1,8 +1,5 @@
 ﻿using DwC_A;
 using Microsoft.ApplicationInsights;
-using SOS.ContainerIntegrationTests.Extensions;
-using SOS.ContainerIntegrationTests.Helpers;
-using SOS.ContainerIntegrationTests.TestData;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.Managers;
@@ -35,9 +32,13 @@ using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.ContainerIntegrationTests.Setup.Stubs;
+using SOS.IntegrationTests.Setup;
+using SOS.IntegrationTests.Helpers;
+using SOS.IntegrationTests.TestData;
+using SOS.IntegrationTests.Setup.Stubs;
+using SOS.IntegrationTests.Extensions;
 
-namespace SOS.ContainerIntegrationTests.Setup.ContainerDbFixtures;
+namespace SOS.IntegrationTests.Setup.ContainerDbFixtures;
 public class ProcessFixture : IProcessFixture
 {
     private IProcessClient _processClient;

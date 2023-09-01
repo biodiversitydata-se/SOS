@@ -1,14 +1,14 @@
 ﻿using FizzWare.NBuilder;
-using SOS.ContainerIntegrationTests.Helpers;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Helpers;
+using SOS.IntegrationTests.Setup;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos.Filter;
 
-namespace SOS.ContainerIntegrationTests.Tests.ExportsEndpoints;
+namespace SOS.IntegrationTests.Tests.ExportsEndpoints;
 
 [Collection(TestCollection.Name)]
 public class DownloadCsvTests : TestBase
@@ -53,8 +53,10 @@ public class DownloadCsvTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
-            Output = new OutputFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Output = new OutputFilterDto
+            {
                 Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity" }
             }
         };
@@ -73,7 +75,7 @@ public class DownloadCsvTests : TestBase
         fileEntry["Activity"].Should().Be("ruvande");
     }
 
-    [Fact]    
+    [Fact]
     public async Task DownloadCsvFileEndpoint_ReturnsExpectedColumnNames_WhenPropertyLabelTypeIsSpecified()
     {
         // Arrange
@@ -82,8 +84,10 @@ public class DownloadCsvTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
-            Output = new OutputFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Output = new OutputFilterDto
+            {
                 Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity" }
             }
         };
@@ -113,7 +117,7 @@ public class DownloadCsvTests : TestBase
             .BeEquivalentTo("Occurrence Id", "Dataset", "Recorded By", "Activity");
     }
 
-    [Fact]    
+    [Fact]
     public async Task DownloadCsvFileEndpoint_ContainsProjectAndMediaColumns_WhenProjectAndMediaFieldsAreIncludedInFilter()
     {
         // Arrange
@@ -127,8 +131,10 @@ public class DownloadCsvTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
-            Output = new OutputFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Output = new OutputFilterDto
+            {
                 FieldSet = OutputFieldSet.Extended,
                 Fields = new List<string> { "Occurrence.Media" }
             }
@@ -144,5 +150,5 @@ public class DownloadCsvTests : TestBase
         var fileEntry = fileEntries.Single(m => m["OccurrenceId"] == occurrenceId);
         fileEntry["Projects"].Should().NotBeNullOrEmpty();
         fileEntry["Media"].Should().NotBeNullOrEmpty();
-    }    
+    }
 }

@@ -1,8 +1,8 @@
 ﻿using LinqStatistics;
-using SOS.ContainerIntegrationTests.Setup;
+using SOS.IntegrationTests.Setup;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
-namespace SOS.ContainerIntegrationTests.Helpers.DataUtils;
+namespace SOS.IntegrationTests.Helpers.DataUtils;
 
 [Collection(TestCollection.Name)]
 public class CalculateArtportalenDataStatistics : TestBase
@@ -11,7 +11,7 @@ public class CalculateArtportalenDataStatistics : TestBase
     {
     }
 
-    [Fact(Skip = "Intended to run on demand when needed")]    
+    [Fact(Skip = "Intended to run on demand when needed")]
     [Trait("Category", "DataUtil")]
     public async Task CalculateArtportalenVerbatimDataStatistics()
     {

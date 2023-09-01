@@ -2,9 +2,9 @@
 using System.IO.Compression;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.ContainerIntegrationTests.Setup;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Helpers.DataUtils;
+namespace SOS.IntegrationTests.Helpers.DataUtils;
 
 [Collection(TestCollection.Name)]
 public class CreateTaxonTestData : TestBase
@@ -98,7 +98,7 @@ public class CreateTaxonTestData : TestBase
         }
     }
 
-    [Fact(Skip = "Intended to run on demand when needed")]    
+    [Fact(Skip = "Intended to run on demand when needed")]
     [Trait("Category", "DataUtil")]
     public void CreateTaxonCsvFile()
     {

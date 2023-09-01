@@ -1,6 +1,6 @@
 ﻿using NetTopologySuite.Features;
 
-namespace SOS.ContainerIntegrationTests.Helpers;
+namespace SOS.IntegrationTests.Helpers;
 internal static class GeoJsonHelper
 {
     public static FeatureCollection ReadGeoJsonFile(byte[] file)

@@ -1,11 +1,11 @@
 ﻿using FizzWare.NBuilder;
 using FluentAssertions;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using System.Linq;
 using Xunit;
 
-namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder.Tests
+namespace SOS.IntegrationTests.TestData.TestDataBuilder.Tests
 {
     public class ArtportalenObservationBuilderTests
     {

@@ -1,4 +1,4 @@
-﻿namespace SOS.ContainerIntegrationTests.Helpers;
+﻿namespace SOS.IntegrationTests.Helpers;
 internal static class CsvHelper
 {
     public static List<Dictionary<string, string>> ReadCsvFile(byte[] csvFileBytes)

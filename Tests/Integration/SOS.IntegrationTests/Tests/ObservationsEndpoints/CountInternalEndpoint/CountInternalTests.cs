@@ -1,10 +1,10 @@
 ﻿using FizzWare.NBuilder;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos.Filter;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.CountInternalEndpoint;
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.CountInternalEndpoint;
 
 [Collection(TestCollection.Name)]
 public class CountInternalTests : TestBase

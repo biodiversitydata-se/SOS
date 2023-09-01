@@ -1,12 +1,12 @@
 ﻿using DwC_A;
-using SOS.ContainerIntegrationTests.Extensions;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.DarwinCore;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Shared;
 using System.IO.Compression;
+using SOS.IntegrationTests.Extensions;
 
-namespace SOS.ContainerIntegrationTests.Helpers;
+namespace SOS.IntegrationTests.Helpers;
 internal static class DwcaHelper
 {
     public static async Task<DwcaComposite> ReadDwcaFileAsync(string filePath, DataProvider dataProvider)

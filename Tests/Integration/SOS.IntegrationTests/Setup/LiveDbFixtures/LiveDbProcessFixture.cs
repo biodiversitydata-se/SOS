@@ -1,8 +1,5 @@
 ﻿using DwC_A;
 using Microsoft.ApplicationInsights;
-using SOS.ContainerIntegrationTests.Extensions;
-using SOS.ContainerIntegrationTests.Helpers;
-using SOS.ContainerIntegrationTests.TestData;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.Managers;
@@ -38,8 +35,12 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Database;
 using Microsoft.Extensions.Configuration;
 using System.IO.Compression;
+using SOS.IntegrationTests.Setup;
+using SOS.IntegrationTests.Helpers;
+using SOS.IntegrationTests.TestData;
+using SOS.IntegrationTests.Extensions;
 
-namespace SOS.ContainerIntegrationTests.Setup.LiveDbFixtures;
+namespace SOS.IntegrationTests.Setup.LiveDbFixtures;
 public class LiveDbProcessFixture : IProcessFixture
 {
     private IProcessClient _processClient;
@@ -110,7 +111,7 @@ public class LiveDbProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<ITaxonRepository, TaxonRepository>();
         serviceCollection.AddSingleton<IProcessTimeManager, ProcessTimeManager>();
         serviceCollection.AddSingleton<ProcessConfiguration>();
-        serviceCollection.AddSingleton<TelemetryClient>();        
+        serviceCollection.AddSingleton<TelemetryClient>();
         serviceCollection.AddSingleton<IDatasetRepository, DatasetRepository>();
         serviceCollection.AddSingleton<IEventRepository, EventRepository>();
         serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
@@ -119,7 +120,7 @@ public class LiveDbProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<ITaxonManager, TaxonManager>();
         serviceCollection.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();
         serviceCollection.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
-        serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();        
+        serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
         serviceCollection.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
         serviceCollection.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
@@ -139,7 +140,7 @@ public class LiveDbProcessFixture : IProcessFixture
         var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
         mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
         serviceCollection.AddSingleton<IProcessClient>(processClient);
-        
+
         var elasticConfiguration = GetSearchDbConfiguration();
         serviceCollection.AddSingleton(elasticConfiguration!);
         var elasticClientManager = new ElasticClientManager(elasticConfiguration);
@@ -148,16 +149,16 @@ public class LiveDbProcessFixture : IProcessFixture
         return serviceCollection;
     }
 
-    private static Lib.Configuration.Shared.MongoDbConfiguration GetMongoDbConfiguration()
+    private static MongoDbConfiguration GetMongoDbConfiguration()
     {
-        var config = GetAppSettings();        
-        var mongoDbConfiguration = config.GetSection($"ProcessDbConfiguration").Get<Lib.Configuration.Shared.MongoDbConfiguration>();
+        var config = GetAppSettings();
+        var mongoDbConfiguration = config.GetSection($"ProcessDbConfiguration").Get<MongoDbConfiguration>();
         return mongoDbConfiguration;
     }
 
     private static ElasticSearchConfiguration? GetSearchDbConfiguration()
     {
-        var config = GetAppSettings();        
+        var config = GetAppSettings();
         var elasticConfiguration = config.GetSection($"SearchDbConfiguration").Get<ElasticSearchConfiguration>();
         return elasticConfiguration;
     }
@@ -185,7 +186,7 @@ public class LiveDbProcessFixture : IProcessFixture
         {
             _taxa = await _taxonRepository.GetAllAsync();
         }
-        
+
         _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
         _artportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
             new DataProvider { Id = 1 },
@@ -572,8 +573,8 @@ public class LiveDbProcessFixture : IProcessFixture
             var taxonFileStream = taxonFile.Open();
             using var sr = new StreamReader(taxonFileStream, Encoding.UTF8);
             string strJson = sr.ReadToEnd();
-            var jsonSerializerOptions = new System.Text.Json.JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-            var taxa = System.Text.Json.JsonSerializer.Deserialize<List<Taxon>>(strJson, jsonSerializerOptions);
+            var jsonSerializerOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+            var taxa = JsonSerializer.Deserialize<List<Taxon>>(strJson, jsonSerializerOptions);
 
             return taxa;
         }

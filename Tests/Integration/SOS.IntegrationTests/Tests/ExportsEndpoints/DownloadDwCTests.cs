@@ -1,11 +1,11 @@
 ﻿using FizzWare.NBuilder;
-using SOS.ContainerIntegrationTests.Helpers;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Helpers;
+using SOS.IntegrationTests.Setup;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos.Filter;
 
-namespace SOS.ContainerIntegrationTests.Tests.ExportsEndpoints;
+namespace SOS.IntegrationTests.Tests.ExportsEndpoints;
 
 [Collection(TestCollection.Name)]
 public class DownloadDwcTests : TestBase
@@ -36,5 +36,5 @@ public class DownloadDwcTests : TestBase
         fileEntries.Count.Should().Be(100);
     }
 
-    
+
 }

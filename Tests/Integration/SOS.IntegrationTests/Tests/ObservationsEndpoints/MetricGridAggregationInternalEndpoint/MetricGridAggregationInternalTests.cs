@@ -3,10 +3,10 @@ using SOS.Observations.Api.Dtos.Filter;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos;
 using MongoDB.Driver.GeoJsonObjectModel;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.MetricGridAggregationInternalEndpoint;
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.MetricGridAggregationInternalEndpoint;
 
 [Collection(TestCollection.Name)]
 public class MetricGridAggregationInternalTests : TestBase
@@ -21,7 +21,7 @@ public class MetricGridAggregationInternalTests : TestBase
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All()
-                .HaveValuesFromPredefinedObservations()            
+                .HaveValuesFromPredefinedObservations()
             .TheFirst(20)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.Site.County = new GeographicalArea { FeatureId = "6" })

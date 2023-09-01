@@ -1,5 +1,5 @@
-﻿using SOS.ContainerIntegrationTests.TestData;
-using SOS.Harvest.Processors.DarwinCoreArchive;
+﻿using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.IntegrationTests.TestData;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
@@ -7,7 +7,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
-namespace SOS.ContainerIntegrationTests.Setup;
+namespace SOS.IntegrationTests.Setup;
 public interface IProcessFixture
 {
     List<Taxon> Taxa { get; }

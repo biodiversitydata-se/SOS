@@ -3,10 +3,10 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using MongoDB.Driver.GeoJsonObjectModel;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.GeoGridTaxaAggregationInternalEndpoint;
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.GeoGridTaxaAggregationInternalEndpoint;
 
 [Collection(TestCollection.Name)]
 public class GeoGridTaxaAggregationInternalTests : TestBase

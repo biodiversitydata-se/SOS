@@ -1,10 +1,10 @@
 ﻿using FizzWare.NBuilder.Implementation;
 using FizzWare.NBuilder;
 using SOS.Lib.Models.Processed.DataStewardship.Event;
-using SOS.ContainerIntegrationTests.Helpers;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
+using SOS.IntegrationTests.Helpers;
 
-namespace SOS.ContainerIntegrationTests.TestData.Factories;
+namespace SOS.IntegrationTests.TestData.Factories;
 internal static class EventsBuilderFactory
 {
     public static IOperable<Event> Create(int size)

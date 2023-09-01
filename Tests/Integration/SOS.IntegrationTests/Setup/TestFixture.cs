@@ -1,11 +1,11 @@
 ﻿using Microsoft.ApplicationInsights.Extensibility;
-using SOS.ContainerIntegrationTests.Extensions;
-using SOS.ContainerIntegrationTests.Setup.ContainerDbFixtures;
-using SOS.ContainerIntegrationTests.Setup.LiveDbFixtures;
+using SOS.IntegrationTests.Extensions;
+using SOS.IntegrationTests.Setup.ContainerDbFixtures;
+using SOS.IntegrationTests.Setup.LiveDbFixtures;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Models.Search.Result;
 
-namespace SOS.ContainerIntegrationTests.Setup;
+namespace SOS.IntegrationTests.Setup;
 
 /// <summary>
 /// Represents a fixture for integration tests, implementing the <see cref="IAsyncLifetime"/> interface.
@@ -40,8 +40,8 @@ public class TestFixture : IAsyncLifetime
     /// </summary>
     /// <returns>A new <see cref="HttpClient"/> instance.</returns>
     public HttpClient CreateApiClient()
-    {                
-        return ApiFactory.CreateClient();        
+    {
+        return ApiFactory.CreateClient();
     }
 
     public HttpClient CreateApiClientWithReplacedService<TService>(TService service) where TService : class
@@ -57,7 +57,7 @@ public class TestFixture : IAsyncLifetime
     }
 
     public async Task InitializeAsync()
-    {        
+    {
         ServiceCollection[] services = null!;
         if (_processFixtureDbMode == ProcessFixtureDbMode.ContainerDb)
         {
@@ -76,7 +76,7 @@ public class TestFixture : IAsyncLifetime
         await ProcessFixture!.InitializeElasticsearchIndices();
         HarvestFixture = scope.ServiceProvider.GetService<HarvestFixture>();
     }
-    
+
     private ServiceCollection[] GetContainerModeServices()
     {
         return new ServiceCollection[]
@@ -92,7 +92,7 @@ public class TestFixture : IAsyncLifetime
         return new ServiceCollection[]
         {
             LiveDbProcessFixture.GetServiceCollection(),
-            HarvestFixture.GetServiceCollection()            
+            HarvestFixture.GetServiceCollection()
         };
     }
 

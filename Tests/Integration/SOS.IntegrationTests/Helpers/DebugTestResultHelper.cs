@@ -4,24 +4,24 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using System.Text.RegularExpressions;
 
-namespace SOS.ContainerIntegrationTests.Helpers;
+namespace SOS.IntegrationTests.Helpers;
 internal static class DebugTestResultHelper
 {
     public static async Task<List<TestResultItem>> CreateTestResultSummaryAsync(
             HttpClient httpClient,
             IList<ArtportalenObservationVerbatim> verbatimObservations,
             IEnumerable<Observation> resultObservations)
-    {        
+    {
         List<Observation> allProcessedObservations = await GetAllProcessedObservationsAsync(httpClient);
         return CreateTestResultSummary(verbatimObservations, allProcessedObservations, resultObservations);
     }
 
-    public static List<TestResultItem> CreateTestResultSummary(                        
+    public static List<TestResultItem> CreateTestResultSummary(
             IList<ArtportalenObservationVerbatim> verbatimObservations,
             IEnumerable<Observation> processedObservations,
             IEnumerable<Observation> resultObservations)
     {
-        List<TestResultItem> testResultItems = new List<TestResultItem>();        
+        List<TestResultItem> testResultItems = new List<TestResultItem>();
         foreach (var item in processedObservations)
         {
             int sightingId = GetSightingIdFromOccurrenceId(item.Occurrence.OccurrenceId);
@@ -46,8 +46,10 @@ internal static class DebugTestResultHelper
 
     private static async Task<List<Observation>> GetAllProcessedObservationsAsync(HttpClient httpClient)
     {
-        var searchFilter = new SearchFilterDto {
-            Output = new OutputFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Output = new OutputFilterDto
+            {
                 FieldSet = Lib.Enums.OutputFieldSet.All
             }
         };
@@ -55,7 +57,7 @@ internal static class DebugTestResultHelper
         var response = await httpClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
         return result!.Records.ToList();
-    }    
+    }
 }
 
 public class TestResultItem

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace SOS.ContainerIntegrationTests.Extensions;
+namespace SOS.IntegrationTests.Extensions;
 internal static class StringExtensions
 {
     public static string GetAbsoluteFilePath(this string filePath)

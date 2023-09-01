@@ -1,9 +1,9 @@
-﻿using SOS.ContainerIntegrationTests.Setup;
+﻿using SOS.IntegrationTests.Setup;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
-namespace SOS.ContainerIntegrationTests.Helpers.DataUtils;
+namespace SOS.IntegrationTests.Helpers.DataUtils;
 
 [Collection(TestCollection.Name)]
 public class CreateDarwinCoreJsonTestData : TestBase

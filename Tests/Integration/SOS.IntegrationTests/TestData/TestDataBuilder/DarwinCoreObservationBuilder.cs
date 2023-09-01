@@ -1,12 +1,12 @@
 ﻿using DotNetCore.Mapping;
 using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
-using SOS.ContainerIntegrationTests.Extensions;
+using SOS.IntegrationTests.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
-namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
+namespace SOS.IntegrationTests.TestData.TestDataBuilder
 {
     public static class DarwinCoreObservationBuilder
     {
@@ -19,7 +19,7 @@ namespace SOS.ContainerIntegrationTests.TestData.TestDataBuilder
             get
             {
                 if (_verbatimDarwinCoreObservationsFromJsonFile == null)
-                {                    
+                {
                     string filePath = "Resources/TestDataBuilder/DarwinCoreObservations_1000.json".GetAbsoluteFilePath();
                     string str = File.ReadAllText(filePath, Encoding.UTF8);
                     var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };

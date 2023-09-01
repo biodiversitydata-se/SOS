@@ -1,7 +1,7 @@
-﻿using SOS.ContainerIntegrationTests.Setup;
+﻿using SOS.IntegrationTests.Setup;
 using SOS.Observations.Api.Dtos;
 
-namespace SOS.ContainerIntegrationTests.Tests.EnvironmentEndpoints;
+namespace SOS.IntegrationTests.Tests.EnvironmentEndpoints;
 
 /// <summary>
 /// Integration tests for the get Environment endpoint.
@@ -33,7 +33,7 @@ public class EnvironmentEndpointTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Should().BeEquivalentTo(expectedEnvironmentInformation, options => options            
+        result.Should().BeEquivalentTo(expectedEnvironmentInformation, options => options
             .Excluding(m => m.AspDotnetVersion)
             .Excluding(m => m.HostingServerName)
             .Excluding(m => m.OsPlatform));

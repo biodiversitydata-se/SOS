@@ -1,9 +1,9 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Tests.Processing;
+namespace SOS.IntegrationTests.Tests.Processing;
 
 [Collection(TestCollection.Name)]
 public class ArtportalenChecklistProcessorTests : TestBase

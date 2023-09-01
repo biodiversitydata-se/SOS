@@ -6,10 +6,10 @@ using SOS.Observations.Api.Dtos;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Extensions;
 using Nest;
-using SOS.ContainerIntegrationTests.Setup;
-using SOS.ContainerIntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.TestData.TestDataBuilder;
+using SOS.IntegrationTests.Setup;
 
-namespace SOS.ContainerIntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchInternalEndpoint;
+namespace SOS.IntegrationTests.Tests.ObservationsEndpoints.ObservationsBySearchInternalEndpoint;
 
 [Collection(TestCollection.Name)]
 public class ObservationPropertiesTest : TestBase

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
-namespace SOS.ContainerIntegrationTests.Setup.Stubs;
+namespace SOS.IntegrationTests.Setup.Stubs;
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public const string UserId = "UserId";
