@@ -1,5 +1,17 @@
-﻿# Automatic integration tests
-This is an overview of how the integration test works. 
+﻿# SOS integration tests
+This is an overview of how the integration tests works. 
+You can choose if you want to run the tests with databases temporarily created in Containers (default) or if you want to use on premise databases.
+
+## 1. Databases running temporarily as containers in Docker (default)
+
+1. When the tests are starting, one Elasticsearch database and one MongoDB database are created as containers and runs in Docker. The MongoDB is restored with data from the `~/Resources/MongoDb/mongodb-sos-dev.gz` file.
+2. For each test, observations are created in raw data format (verbatim) with the properties you want them to have. 
+3. Then the observations are processed using data from taxonomy, dictionaries and areas. This data are fetched from the MongoDB instance running in Docker. 
+4. The observation is then added to the observation index in Elasticsearch. 
+5. The endpoint you want to test is requested and a result is returned.
+6. The result is verified.
+
+## 2. Databases running on premise
 
 1. First, observations are created in raw data format (verbatim) with the properties you want them to have. 
 2. Then the observations are processed using data from taxonomy, dictionaries and areas. This data are fetched from MongoDB, but it could be moved to JSON files. 
@@ -7,25 +19,20 @@ This is an overview of how the integration test works.
 4. After that, the endpoint is called and a result is returned.
 5. The result is verified.
 
-## Sequence diagram
+### 2.1 Sequence diagram for running test with databases on premise
 [![](https://mermaid.ink/img/pako:eNqNVE1v2zAM_SuCTgkQY9iORhEgadphh30A7XqZd2AsNjUgSx5FBw2K_vdRsYvGkZMmp4h675F8pPWiS29Q5zrgvxZdiasKNgR14ZT8oGXv2nqN1J0bIK7KqgHH6ptjFCRX3t1jYAXhMKRYYilp0UTsChiWbWUNUqQ9IK2FVB9djbF_rgPSdp_hFkr2tIsCC-LGE4NFlwJSmQNMuPaOyVvbVTJ-kyrcWAhyCAhUPkXiIHC1pk_zPwLvjl-yz1l04-8-fhV8yKp3o-JNyPx74nlMVrgu6Q_PqPxWqjuyO5emCdwGO9zRbTafJ07n6poQGGP4sM_JtJNICJmoJFm3_awOFU6XkE4jV7_IlxjCoIQx1emxA-NyvwMqwuBbElU1uYdn72bqwZewbi3QbiZGIUz33gehoFGVU9-92_jVch99az9VH3Wg6epHc4kFg73I1QotMi6sHQ6gm_hFCgszyDsZrSax7kjkEKuAUIEx4gt7xU8o9hh8vnBXP97Skk91Nv6x5eorDvZzubvblz3pqr-tLCP1HY5LpK6dkuxlBujsTGkdLe5ba_lsCWObM8I-55xMlVjPdI1UQ2XkjX6JpELLkGosdC5_DT5CFNOFexVo2xj5wm9MJdur80ewAWc6PuJ3O1fqnKnFN1D_zveo1_8WqzPI)](https://mermaid.live/edit#pako:eNqNVE1v2zAM_SuCTgkQY9iORhEgadphh30A7XqZd2AsNjUgSx5FBw2K_vdRsYvGkZMmp4h675F8pPWiS29Q5zrgvxZdiasKNgR14ZT8oGXv2nqN1J0bIK7KqgHH6ptjFCRX3t1jYAXhMKRYYilp0UTsChiWbWUNUqQ9IK2FVB9djbF_rgPSdp_hFkr2tIsCC-LGE4NFlwJSmQNMuPaOyVvbVTJ-kyrcWAhyCAhUPkXiIHC1pk_zPwLvjl-yz1l04-8-fhV8yKp3o-JNyPx74nlMVrgu6Q_PqPxWqjuyO5emCdwGO9zRbTafJ07n6poQGGP4sM_JtJNICJmoJFm3_awOFU6XkE4jV7_IlxjCoIQx1emxA-NyvwMqwuBbElU1uYdn72bqwZewbi3QbiZGIUz33gehoFGVU9-92_jVch99az9VH3Wg6epHc4kFg73I1QotMi6sHQ6gm_hFCgszyDsZrSax7kjkEKuAUIEx4gt7xU8o9hh8vnBXP97Skk91Nv6x5eorDvZzubvblz3pqr-tLCP1HY5LpK6dkuxlBujsTGkdLe5ba_lsCWObM8I-55xMlVjPdI1UQ2XkjX6JpELLkGosdC5_DT5CFNOFexVo2xj5wm9MJdur80ewAWc6PuJ3O1fqnKnFN1D_zveo1_8WqzPI)
 
+# Creating test data
 
-# Divided diagrams, Arrange-Act-Assert
-
-## Arrange
-
-[![](https://mermaid.ink/img/pako:eNqNVMFu2zAM_RVBpwSIMWxHozCQLi3Qw9YC63qZd6AtNjUgSx5FBw2K_vuoOF1iywPik0k9vkc-CnrTtTeocx3wT4-uxk0DW4K2dEo-6Nm7vq2QhrgD4qZuOnCs7hyjILnx7hEDKwjnKcWSS4vWXcRugOG6b6xBimVPSJUUtZOjuer7KiDtDgq3ULOnfSRYE3eeGCy6FJDS3FgIEgQEql9i_ShxVdGn4pfAh_BL9jmLs_w-5K-CD1lzGjOehMyfRIsoVrpB9LtnVH4nU07MyqVlArfFATc5zYoi8SlXXwmBMabPZgyL5UCRFGTCkqjujk6fM_y_hdTLXD2QrzGEUQtzrMupA_N0PwMqwuB7Ela1eIRX71bqyddQ9RZovxKjEJYH74OUoFGNU9-82_rN9b9NtTE-LSruKHDxYUyqO-tNN0yG5hJzRjcmVxu0yLi2drya4S5cxLA2I93FbDeJqROSc6wCQgXGiGPsFb-gGGfw9cJbfIANanqlW6QWGiOvxFvMlVroWix1Lr8Gn6G3XOrSvQu074zc0hvTiM86fwYbcKXjM_Jj72qdM_X4ATq-NEfU-1-t3KV-)](https://mermaid.live/edit#pako:eNqNVMFu2zAM_RVBpwSIMWxHozCQLi3Qw9YC63qZd6AtNjUgSx5FBw2K_vuoOF1iywPik0k9vkc-CnrTtTeocx3wT4-uxk0DW4K2dEo-6Nm7vq2QhrgD4qZuOnCs7hyjILnx7hEDKwjnKcWSS4vWXcRugOG6b6xBimVPSJUUtZOjuer7KiDtDgq3ULOnfSRYE3eeGCy6FJDS3FgIEgQEql9i_ShxVdGn4pfAh_BL9jmLs_w-5K-CD1lzGjOehMyfRIsoVrpB9LtnVH4nU07MyqVlArfFATc5zYoi8SlXXwmBMabPZgyL5UCRFGTCkqjujk6fM_y_hdTLXD2QrzGEUQtzrMupA_N0PwMqwuB7Ela1eIRX71bqyddQ9RZovxKjEJYH74OUoFGNU9-82_rN9b9NtTE-LSruKHDxYUyqO-tNN0yG5hJzRjcmVxu0yLi2drya4S5cxLA2I93FbDeJqROSc6wCQgXGiGPsFb-gGGfw9cJbfIANanqlW6QWGiOvxFvMlVroWix1Lr8Gn6G3XOrSvQu074zc0hvTiM86fwYbcKXjM_Jj72qdM_X4ATq-NEfU-1-t3KV-)
-1. Create verbatim test data using a TestDataBuilder class to get observations with specific properties.
-2. Verbatim observations are created in memory.
-3. Process the verbatim observations. Use additional resources (taxonomy, vocabularies, areas) from MongoDB. This could possible be moved to JSON files.
-4. Processed observations are created in memory.
-5. Delete all observations in the Elasticsearch integration test index to make sure only the observations in this test are added.
-6. Add processed observations to Elasticsearch integration test.
-
-## Act, Assert
-[![](https://mermaid.ink/img/pako:eNqNUk1rwzAM_SvGpw0axnYMJbCPbuyyHbrbsoObqKshsTNJKZTS_7Lfsl82Oe5o04Yw44Mlvff0ZLTVhS9Bp5rgqwVXwIM1n2jq3Ck5pmXv2noBGOPGINvCNsaxenYMgmTr3RsQK0PHKcUhJ-ec-LogwHWHonvvGH1VAQb-cOVcYVYZkoDAYLEKxF5iusCr7F3gMbxJrpNg5qPLT8lTYg8-Q4USf2ic5S42fPEMyq_F2cmkqbotOGJOKkmWDY-Qqifg49LdZt6Zu4geH23FgJdRdFhCtHtT_lNS_XzLjcI9fjJiNgopBGorHjUlIme_M8Ae-0sSYdYTXQPWxpayittAyjWvoIZcp_IsYWmCmM7dTqBtUxqGWWnZo06XpiKY6LCr840rdMrYwh9ov8571O4X9dQSqQ)](https://mermaid.live/edit#pako:eNqNUk1rwzAM_SvGpw0axnYMJbCPbuyyHbrbsoObqKshsTNJKZTS_7Lfsl82Oe5o04Yw44Mlvff0ZLTVhS9Bp5rgqwVXwIM1n2jq3Ck5pmXv2noBGOPGINvCNsaxenYMgmTr3RsQK0PHKcUhJ-ec-LogwHWHonvvGH1VAQb-cOVcYVYZkoDAYLEKxF5iusCr7F3gMbxJrpNg5qPLT8lTYg8-Q4USf2ic5S42fPEMyq_F2cmkqbotOGJOKkmWDY-Qqifg49LdZt6Zu4geH23FgJdRdFhCtHtT_lNS_XzLjcI9fjJiNgopBGorHjUlIme_M8Ae-0sSYdYTXQPWxpayittAyjWvoIZcp_IsYWmCmM7dTqBtUxqGWWnZo06XpiKY6LCr840rdMrYwh9ov8571O4X9dQSqQ)
-1. The controller method that should be tested is called.
-2. The Elasticsearch integration test index is queried.
-3. The search result is returned from Elasticsearch.
-4. The search result is returned to the integration test. The result is then verified.
+## Creating a sos-dev MongoDb dump file
+1. Create a dump file of the sos-dev database running in test environment: 
+   `"mongodump.exe" --uri="mongodb://<user>:<password>@artmongo2-1-test.artdata.slu.se:27017/sos-dev --archive=mongodb-sos-dev.gz --gzip`
+2. Now you have a lot of geometries in that that file. In order of get rid of them, do the following:
+    1. Replace the `mongodb-sos-dev.gz` in the `Resources` directory.
+    2. Start an integration test in ordet to spin up the sos-dev MongoDb docker container with the database restored.
+    3. Connect to the sos-dev db running in the container using for example NoSQLBooster and delete the `Area` and `Area.files` collections.
+    4. Uncomment the `UseSimplifiedEconomicZoneOfSweden(areaGeometries);` line in `AreaHarvester.HarvestAreasAsync()`.
+    5. Change `appsettings.local.json` in `SOS.Hangfire.JobServer` to use the sos-dev MongoDb docker container.
+    6. Start the Hangfire server locally and run `RunAreasHarvestJob`.
+    7. Start a shell in the container and run `mongodump --username=mongo --password=mongo --gzip --db=sos-dev --archive=mongodb-sos-dev.gz --authenticationDatabase=admin`
+    8. Copy the file to your computer `docker cp <container-id>:/mongodb-sos-dev.gz .` and add it to the Resource directory.
