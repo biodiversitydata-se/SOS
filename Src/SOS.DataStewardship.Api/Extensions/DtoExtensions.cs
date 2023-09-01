@@ -672,7 +672,10 @@ namespace SOS.DataStewardship.Api.Extensions
 
             var filter = new SearchFilter(0);
             filter.DataStewardshipDatasetIds = eventsFilter.DatasetIds ?? eventsFilter.DatasetList;
-            filter.EventIds = eventsFilter.EventIds;
+            filter.Event = new EventFilter
+            {
+                Ids = eventsFilter.EventIds
+            };
             filter.IsPartOfDataStewardshipDataset = true;
             if (eventsFilter.Taxon?.Ids?.Any() ?? false)
             {
@@ -712,7 +715,7 @@ namespace SOS.DataStewardship.Api.Extensions
             if (occurrenceFilter == null) return null;
 
             var filter = new SearchFilter(0);
-            filter.EventIds = occurrenceFilter.EventIds;
+            filter.Event = new EventFilter { Ids = occurrenceFilter.EventIds };
             filter.DataStewardshipDatasetIds = occurrenceFilter.DatasetIds ?? occurrenceFilter.DatasetList;
             filter.IsPartOfDataStewardshipDataset = true;
             if (occurrenceFilter.Taxon?.Ids != null && occurrenceFilter.Taxon.Ids.Any())
