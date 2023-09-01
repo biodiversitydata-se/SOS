@@ -35,10 +35,12 @@ using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.ContainerIntegrationTests.Setup.Stubs;
+using SOS.Lib.Database;
+using Microsoft.Extensions.Configuration;
+using System.IO.Compression;
 
-namespace SOS.ContainerIntegrationTests.Setup.ContainerDbFixtures;
-public class ProcessFixture : IProcessFixture
+namespace SOS.ContainerIntegrationTests.Setup.LiveDbFixtures;
+public class LiveDbProcessFixture : IProcessFixture
 {
     private IProcessClient _processClient;
     private IAreaHelper _areaHelper;
@@ -66,7 +68,7 @@ public class ProcessFixture : IProcessFixture
         get => _taxa!;
     }
 
-    public ProcessFixture(IAreaHelper areaHelper,
+    public LiveDbProcessFixture(IAreaHelper areaHelper,
         IProcessClient processClient,
         IVocabularyRepository vocabularyRepository,
         ITaxonRepository taxonRepository,
@@ -103,13 +105,12 @@ public class ProcessFixture : IProcessFixture
         serviceCollection.AddMemoryCache();
         serviceCollection.AddSingleton<IAreaHelper, AreaHelper>();
         serviceCollection.AddSingleton<IAreaRepository, AreaRepository>();
-        serviceCollection.AddSingleton<IProcessFixture, ProcessFixture>();
+        serviceCollection.AddSingleton<IProcessFixture, LiveDbProcessFixture>();
         serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
         serviceCollection.AddSingleton<ITaxonRepository, TaxonRepository>();
         serviceCollection.AddSingleton<IProcessTimeManager, ProcessTimeManager>();
         serviceCollection.AddSingleton<ProcessConfiguration>();
-        serviceCollection.AddSingleton<TelemetryClient>();
-        serviceCollection.AddSingleton<IElasticClientManager, ElasticClientTestManager>();
+        serviceCollection.AddSingleton<TelemetryClient>();        
         serviceCollection.AddSingleton<IDatasetRepository, DatasetRepository>();
         serviceCollection.AddSingleton<IEventRepository, EventRepository>();
         serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
@@ -118,9 +119,7 @@ public class ProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<ITaxonManager, TaxonManager>();
         serviceCollection.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();
         serviceCollection.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
-        serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
-        var elasticConfiguration = CreateElasticSearchConfiguration();
-        serviceCollection.AddSingleton(elasticConfiguration);
+        serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();        
         serviceCollection.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
         serviceCollection.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
@@ -135,14 +134,59 @@ public class ProcessFixture : IProcessFixture
         };
         serviceCollection.AddSingleton(vocabularyConfiguration);
 
+        var mongoDbConfiguration = GetMongoDbConfiguration();
+        var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
+        var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
+        mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
+        serviceCollection.AddSingleton<IProcessClient>(processClient);
+        
+        var elasticConfiguration = GetSearchDbConfiguration();
+        serviceCollection.AddSingleton(elasticConfiguration!);
+        var elasticClientManager = new ElasticClientManager(elasticConfiguration);
+        serviceCollection.AddSingleton<IElasticClientManager>(elasticClientManager);
+
         return serviceCollection;
+    }
+
+    private static Lib.Configuration.Shared.MongoDbConfiguration GetMongoDbConfiguration()
+    {
+        var config = GetAppSettings();        
+        var mongoDbConfiguration = config.GetSection($"ProcessDbConfiguration").Get<Lib.Configuration.Shared.MongoDbConfiguration>();
+        return mongoDbConfiguration;
+    }
+
+    private static ElasticSearchConfiguration? GetSearchDbConfiguration()
+    {
+        var config = GetAppSettings();        
+        var elasticConfiguration = config.GetSection($"SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+        return elasticConfiguration;
+    }
+
+    private static IConfiguration GetAppSettings()
+    {
+        var appsettingsPath = @"Setup/LiveDbFixtures/appsettings.json".GetAbsoluteFilePath();
+        var config = new ConfigurationBuilder()
+            .AddJsonFile(appsettingsPath)
+            .AddEnvironmentVariables()
+            .AddUserSecrets<LiveDbProcessFixture>()
+            .Build();
+
+        return config;
     }
 
     private async Task InitializeAsync()
     {
-        _taxa = await _taxonRepository.GetAllAsync();
+        bool useTaxonZipCollection = true;
+        if (useTaxonZipCollection)
+        {
+            _taxa = GetTaxaFromZipFile();
+        }
+        else
+        {
+            _taxa = await _taxonRepository.GetAllAsync();
+        }
+        
         _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
-
         _artportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
             new DataProvider { Id = 1 },
             _taxaById,
@@ -514,41 +558,24 @@ public class ProcessFixture : IProcessFixture
         return factory;
     }
 
-    private static ElasticSearchConfiguration CreateElasticSearchConfiguration()
+    private List<Taxon> GetTaxaFromZipFile()
     {
-        return new ElasticSearchConfiguration()
+        //var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        //var filePath = Path.Combine(assemblyPath, @"Resources/TaxonCollection.zip");
+        var filePath = "Resources/TestDataBuilder/TaxonCollection.zip".GetAbsoluteFilePath();
+
+        using (ZipArchive archive = ZipFile.OpenRead(filePath))
         {
-            IndexSettings = new List<ElasticSearchIndexConfiguration>()
-                {
-                    new ElasticSearchIndexConfiguration
-                    {
-                        Name = "observation",
-                        ReadBatchSize = 10000,
-                        WriteBatchSize = 1000,
-                        ScrollBatchSize = 5000,
-                        ScrollTimeout = "300s",
-                    },
-                    new ElasticSearchIndexConfiguration
-                    {
-                        Name = "observationEvent",
-                        ReadBatchSize = 10000,
-                        WriteBatchSize = 1000,
-                        ScrollBatchSize = 5000,
-                        ScrollTimeout = "300s"
-                    },
-                    new ElasticSearchIndexConfiguration
-                    {
-                        Name = "observationDataset",
-                        ReadBatchSize = 10000,
-                        WriteBatchSize = 1000,
-                        ScrollBatchSize = 5000,
-                        ScrollTimeout = "300s"
-                    }
-                },
-            RequestTimeout = 300,
-            DebugMode = true,
-            IndexPrefix = "",
-            Clusters = null
-        };
+            var taxonFile = archive.Entries.FirstOrDefault(f =>
+                f.Name.Equals("TaxonCollection.json", StringComparison.CurrentCultureIgnoreCase));
+
+            var taxonFileStream = taxonFile.Open();
+            using var sr = new StreamReader(taxonFileStream, Encoding.UTF8);
+            string strJson = sr.ReadToEnd();
+            var jsonSerializerOptions = new System.Text.Json.JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+            var taxa = System.Text.Json.JsonSerializer.Deserialize<List<Taxon>>(strJson, jsonSerializerOptions);
+
+            return taxa;
+        }
     }
 }

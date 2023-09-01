@@ -13,6 +13,8 @@ namespace SOS.ContainerIntegrationTests.Setup;
 /// </summary>
 public class TestFixture : IAsyncLifetime
 {
+    private ProcessFixtureDbMode _processFixtureDbMode = ProcessFixtureDbMode.ContainerDb;
+
     /// <summary>
     /// The <see cref="ObservationsApiWebApplicationFactory"/> used to create the API client.
     /// </summary>
@@ -20,8 +22,8 @@ public class TestFixture : IAsyncLifetime
 
     public TestContainersFixture TestContainerFixture { get; private set; }
     public ServiceProvider? ServiceProvider { get; private set; }
-    public ProcessFixture? ProcessFixture { get; private set; }
     public HarvestFixture? HarvestFixture { get; private set; }
+    public IProcessFixture? ProcessFixture { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestFixture"/> class.    
@@ -54,20 +56,44 @@ public class TestFixture : IAsyncLifetime
         return apiClient;
     }
 
-    /// <summary>
-    /// Performs asynchronous setup logic before running the integration tests.
-    /// For example, this method could be used to initialize temporary databases running in containers.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task InitializeAsync()
     {        
-        await TestContainerFixture.InitializeAsync();
-        ServiceProvider = RegisterServices();
+        ServiceCollection[] services = null!;
+        if (_processFixtureDbMode == ProcessFixtureDbMode.ContainerDb)
+        {
+            await TestContainerFixture.InitializeAsync();
+            services = GetContainerModeServices();
+        }
+        else if (_processFixtureDbMode == ProcessFixtureDbMode.LiveDb)
+        {
+            services = GetLiveDbModeServices();
+        }
+
+        ServiceProvider = ServiceProviderExtensions.RegisterServices(services);
         ApiFactory.ServiceProvider = ServiceProvider;
         using var scope = ServiceProvider.CreateScope();
-        ProcessFixture = scope.ServiceProvider.GetService<ProcessFixture>();
+        ProcessFixture = scope.ServiceProvider.GetService<IProcessFixture>();
         await ProcessFixture!.InitializeElasticsearchIndices();
         HarvestFixture = scope.ServiceProvider.GetService<HarvestFixture>();
+    }
+    
+    private ServiceCollection[] GetContainerModeServices()
+    {
+        return new ServiceCollection[]
+        {
+            ContainerDbFixtures.ProcessFixture.GetServiceCollection(),
+            HarvestFixture.GetServiceCollection(),
+            TestContainerFixture.GetServiceCollection()
+        };
+    }
+
+    private ServiceCollection[] GetLiveDbModeServices()
+    {
+        return new ServiceCollection[]
+        {
+            LiveDbProcessFixture.GetServiceCollection(),
+            HarvestFixture.GetServiceCollection()            
+        };
     }
 
     /// <summary>
@@ -79,15 +105,6 @@ public class TestFixture : IAsyncLifetime
         await ApiFactory.DisposeAsync();
     }
 
-    private ServiceProvider RegisterServices()
-    {
-        var processFixtureServices = ProcessFixture.GetServiceCollection();
-        var harvestFixtureServices = HarvestFixture.GetServiceCollection();
-        var testContainersServices = TestContainerFixture.GetServiceCollection();
-        var serviceProvider = ServiceProviderExtensions.RegisterServices(processFixtureServices, harvestFixtureServices, testContainersServices);
-        return serviceProvider;
-    }
-
     internal void ResetTaxonSumAggregationCache()
     {
         IClassCache<Dictionary<int, TaxonSumAggregationItem>>? cache = ApiFactory.Services.GetService<IClassCache<Dictionary<int, TaxonSumAggregationItem>>>()!;
@@ -96,5 +113,18 @@ public class TestFixture : IAsyncLifetime
         {
             cache.Set(null!);
         }
+    }
+
+    private enum ProcessFixtureDbMode
+    {
+        /// <summary>
+        /// Run Elasticsearch and MongoDB in container
+        /// </summary>
+        ContainerDb = 0,
+
+        /// <summary>
+        /// Run Elasticsearch and MongoDB in a existing on premise db
+        /// </summary>
+        LiveDb = 1
     }
 }

@@ -20,7 +20,7 @@ public class TestBase
     /// </summary>
     protected ITestOutputHelper Output { get; private set; }
 
-    protected ProcessFixture ProcessFixture => TestFixture.ProcessFixture!;
+    protected IProcessFixture ProcessFixture => TestFixture.ProcessFixture!;    
 
     /// <summary>
     /// Standard JSON serializer options used in the integration tests for serialization/deserialization operations.
