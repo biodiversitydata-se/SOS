@@ -79,7 +79,10 @@ public class DataStewardshipManager : IDataStewardshipManager
     private async Task<Contracts.Models.Event> GetEventByIdFromObservationIndexAsync(string id, CoordinateSystem responseCoordinateSystem)
     {
         var filter = new SearchFilter(0);
-        filter.EventIds = new List<string> { id };
+        filter.Event = new EventFilter
+        {
+            Ids = new List<string> { id }
+        };
         filter.Output.Fields = _observationEventOutputFields;
 
         var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 1, true);

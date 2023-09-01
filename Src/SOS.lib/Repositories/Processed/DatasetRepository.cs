@@ -105,8 +105,11 @@ namespace SOS.Lib.Repositories.Processed
             var sortDescriptor = await Client.GetSortDescriptorAsync<Dataset>(IndexName, sortOrders);
 
             var sourceFilter = new SourceFilterDescriptor<dynamic>();
-            sourceFilter.Excludes(e => e.Fields(excludeFields.Select(f => new Field(f))));
-            
+            if (excludeFields != null && excludeFields.Count() > 0)
+            {
+                sourceFilter.Excludes(e => e.Fields(excludeFields.Select(f => new Field(f))));
+            }
+
             var query = new List<Func<QueryContainerDescriptor<Dataset>, QueryContainer>>();
             query.TryAddTermsCriteria("identifier", ids);
             var searchResponse = await Client.SearchAsync<Dataset>(s => s
@@ -296,7 +299,14 @@ namespace SOS.Lib.Repositories.Processed
                 docCount = await IndexCountAsync();
             }
 
-            Logger.LogInformation($"Finish waiting for index creation. Index={IndexName}.");
+            if (iterations == nrIterations)
+            {
+                Logger.LogError($"Failed waiting for index creation due to timeout. Index={IndexName}. ExpectedRecordsCount={expectedRecordsCount}, DocCount={docCount}");
+            }
+            else
+            {
+                Logger.LogInformation($"Finish waiting for index creation. Index={IndexName}.");
+            }
         }
 
         public async Task<long> IndexCountAsync()
