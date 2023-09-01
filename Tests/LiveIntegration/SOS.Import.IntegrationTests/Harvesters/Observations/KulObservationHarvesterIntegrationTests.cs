@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Harvest.Harvesters.AquaSupport.Kul;
 using SOS.Harvest.Services;
+using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Repositories.Verbatim;
@@ -13,7 +14,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Harvesters.Observations
+namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
 {
     public class KulObservationHarvesterIntegrationTests : TestBase
     {
@@ -29,7 +30,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
 
             var kulObservationService = new KulObservationService(
-                new AquaSupportRequestService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<AquaSupportRequestService>()), 
+                new AquaSupportRequestService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<AquaSupportRequestService>()),
                 importConfiguration.KulServiceConfiguration,
                 new NullLogger<KulObservationService>());
 

@@ -7,6 +7,7 @@ using Moq;
 using Newtonsoft.Json;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.Managers;
+using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -19,7 +20,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Managers
+namespace SOS.Import.LiveIntegrationTests.Managers
 {
     public class DwcaDataValidationReportManagerTests : TestBase
     {
@@ -35,7 +36,7 @@ namespace SOS.Import.IntegrationTests.Managers
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             return new VocabularyValueResolver(vocabularyRepository,
-                new VocabularyConfiguration {LocalizationCultureCode = "sv-SE", ResolveValues = true});
+                new VocabularyConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
         }
 
         [Fact]
@@ -118,7 +119,7 @@ namespace SOS.Import.IntegrationTests.Managers
 
         private JsonSerializerSettings CreateJsonSerializerSettings()
         {
-            var jsonResolver = new IgnorableSerializerContractResolver { SetStringPropertyDefaultsToEmptyString = true}
+            var jsonResolver = new IgnorableSerializerContractResolver { SetStringPropertyDefaultsToEmptyString = true }
                 .Ignore<Observation>(obs => obs.Location.Point)
                 .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
                 .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
@@ -146,7 +147,7 @@ namespace SOS.Import.IntegrationTests.Managers
                 mongoDbConfiguration.DatabaseName,
                 mongoDbConfiguration.ReadBatchSize,
                 mongoDbConfiguration.WriteBatchSize);
-            
+
             return processClient;
         }
 
@@ -182,7 +183,7 @@ namespace SOS.Import.IntegrationTests.Managers
         {
             var invalidObservationRepositoryMock = new Mock<IInvalidObservationRepository>();
             var invalidEventRepositoryMock = new Mock<IInvalidEventRepository>();
-            ValidationManager validationManager = new ValidationManager(invalidObservationRepositoryMock.Object, 
+            ValidationManager validationManager = new ValidationManager(invalidObservationRepositoryMock.Object,
                 invalidEventRepositoryMock.Object, new NullLogger<ValidationManager>());
             return validationManager;
         }

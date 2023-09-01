@@ -26,8 +26,9 @@ using SOS.Harvest.Processors.DarwinCoreArchive;
 using Xunit;
 using Xunit.Abstractions;
 using SOS.Lib.Configuration.Import;
+using SOS.Process.LiveIntegrationTests;
 
-namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
+namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
 {
     public class DwcaObservationProcessorIntegrationTests : TestBase
     {
@@ -76,7 +77,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveFileWriterCoordinator = CreateDwcArchiveFileWriterCoordinator();
             var dwcaProcessor = CreateDwcaObservationProcessor(dwcArchiveFileWriterCoordinator, storeProcessedObservations: false, 10000);
-            
+
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
             var dataProvider = new DataProvider
             {
@@ -132,10 +133,10 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var processTimeManager = new ProcessTimeManager(processConfiguration);
             IProcessedObservationCoreRepository processedObservationRepository;
-     
+
             if (storeProcessedObservations)
             {
-                processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager, 
+                processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager,
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new NullLogger<ProcessedObservationCoreRepository>());
@@ -191,7 +192,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             var vocabularyValueResolver =
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
 
-          
+
             var dataProviderRepository =
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
             var extendedMeasurementOrFactCsvWriter = new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>());
@@ -222,10 +223,10 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                     fileService,
                     new NullLogger<DwcArchiveEventFileWriter>()
                 ),
-                fileService, 
-                dataProviderRepository, 
-                verbatimClient, 
-                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, 
+                fileService,
+                dataProviderRepository,
+                verbatimClient,
+                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" },
                 new NullLogger<DwcArchiveFileWriterCoordinator>()
             );
             return dwcArchiveFileWriterCoordinator;

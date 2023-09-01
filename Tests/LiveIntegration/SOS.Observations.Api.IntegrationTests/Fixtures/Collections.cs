@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SOS.Observations.Api.IntegrationTests.Fixtures
+namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
 {
     public static class Collections
     {
-        public const string ApiIntegrationTestsCollection = "ApiIntegrationTestsCollection";        
+        public const string ApiIntegrationTestsCollection = "ApiIntegrationTestsCollection";
     }
 }

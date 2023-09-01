@@ -3,11 +3,11 @@ using MongoDB.Bson.Serialization.Conventions;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Shared;
 
-namespace SOS.Import.IntegrationTests
+namespace SOS.Import.LiveIntegrationTests
 {
     public class TestBase
     {
-        public TestBase() 
+        public TestBase()
         {
             // MongoDB conventions.
             ConventionRegistry.Register(

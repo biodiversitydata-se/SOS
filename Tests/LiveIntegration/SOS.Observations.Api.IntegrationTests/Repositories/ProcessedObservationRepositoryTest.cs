@@ -7,15 +7,15 @@ using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed;
-using SOS.Observations.Api.IntegrationTests.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib;
 using System.Linq;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Observations.Api.LiveIntegrationTests.Repositories.Interfaces;
 
-namespace SOS.Observations.Api.IntegrationTests.Repositories
+namespace SOS.Observations.Api.LiveIntegrationTests.Repositories
 {
     /// <summary>
     ///     Species data service
@@ -37,7 +37,7 @@ namespace SOS.Observations.Api.IntegrationTests.Repositories
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ILogger<ProcessedObservationRepositoryTest> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
-           
+
         }
 
         public async Task<SearchAfterResult<Observation>> GetNaturalisChunkAsync(SearchFilterInternal filter, string pointInTimeId = null,

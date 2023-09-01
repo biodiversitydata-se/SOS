@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Lib.Models.UserService;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.VocabulariesController
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.UserController
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class UserInformationIntegrationTests
@@ -30,7 +30,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.VocabulariesCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.UserController.GetUserInformation();
-            var userInformation = response.GetResult<UserInformation>();            
+            var userInformation = response.GetResult<UserInformation>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

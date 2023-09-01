@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Harvest.DarwinCore;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.DarwinCore
+namespace SOS.Import.LiveIntegrationTests.DarwinCore
 {
     public class DwcSamplingEventArchiveReaderIntegrationTests
     {

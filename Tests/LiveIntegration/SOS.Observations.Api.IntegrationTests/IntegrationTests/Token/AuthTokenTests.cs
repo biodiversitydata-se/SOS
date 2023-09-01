@@ -2,11 +2,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Token
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Token
 {
     public class AuthTokenTests
     {
-        [Fact]        
+        [Fact]
         public void Inspect_auth_token()
         {
             //-----------------------------------------------------------------------------------------------------------

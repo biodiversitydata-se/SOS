@@ -9,11 +9,12 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.TaxonAggregationEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.TaxonAggregationEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class TaxonAggregationIntegrationTests
@@ -123,26 +124,26 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
         public async Task TaxonAggregationInternal_SumUnderlyingTaxa()
-        {            
+        {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilterAggregationInternalDto()
-            {                
+            {
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.TaxonAggregationInternal(null, 
-                null, 
+            var response = await _fixture.ObservationsController.TaxonAggregationInternal(null,
+                null,
                 searchFilter,
-                0, 
-                100, 
-                false, 
-                "sv-SE", 
-                false, 
+                0,
+                100,
+                false,
+                "sv-SE",
+                false,
                 true);
             var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
 
@@ -162,21 +163,21 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilterAggregationInternalDto()
-            {                
+            {
                 Taxon = new TaxonFilterDto() { Ids = new int[] { TestData.TaxonIds.Biota } }
             };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.TaxonAggregationInternal(null, 
-                null, 
-                searchFilter, 
-                0, 
-                100, 
-                false, 
-                "sv-SE", 
-                false, 
+            var response = await _fixture.ObservationsController.TaxonAggregationInternal(null,
+                null,
+                searchFilter,
+                0,
+                100,
+                false,
+                "sv-SE",
+                false,
                 true);
             var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
 
@@ -184,7 +185,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             int biotaObservationCount = result.Records.First().ObservationCount;
-            biotaObservationCount.Should().BeGreaterThan(10000000, "There are more than 10 million observations");            
+            biotaObservationCount.Should().BeGreaterThan(10000000, "There are more than 10 million observations");
         }
 
         [Fact]
@@ -196,7 +197,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilterAggregationInternalDto()
             {
-                Taxon = new TaxonFilterDto() { 
+                Taxon = new TaxonFilterDto()
+                {
                     Ids = new int[] { TestData.TaxonIds.Biota },
                     IncludeUnderlyingTaxa = true
                 }
@@ -205,14 +207,14 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.TaxonAggregationInternal(null, 
-                null, 
+            var response = await _fixture.ObservationsController.TaxonAggregationInternal(null,
+                null,
                 searchFilter,
-                null, 
-                null, 
-                false, 
-                "sv-SE", 
-                false, 
+                null,
+                null,
+                false,
+                "sv-SE",
+                false,
                 true);
             var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
 
@@ -223,11 +225,11 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             biotaObservationCount.Should().BeGreaterThan(10000000, "There are more than 10 million observations");
             result.TotalCount.Should().BeGreaterThan(40000, "The number of taxa under Biota with observations are more than 40 000");
         }
-        
+
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
         public async Task TaxonAggregationInternal_SumUnderlyingTaxa_BiotaIncludeUnderlyingTaxa_OnlySpecies()
-        {   
+        {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
@@ -271,31 +273,31 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilterAggregationInternalDto()
-            {                
-                Taxon = new TaxonFilterDto { Ids = new int[] { 3597 }}                
+            {
+                Taxon = new TaxonFilterDto { Ids = new int[] { 3597 } }
             };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var responseWithSum = await _fixture.ObservationsController.TaxonAggregationInternal(null, 
-                null, 
-                searchFilter, 
-                0, 
-                100, 
-                false, 
-                "sv-SE", 
-                false, 
+            var responseWithSum = await _fixture.ObservationsController.TaxonAggregationInternal(null,
+                null,
+                searchFilter,
+                0,
+                100,
+                false,
+                "sv-SE",
+                false,
                 true);
             var resultWithSum = responseWithSum.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
-            var responseWithoutSum = await _fixture.ObservationsController.TaxonAggregationInternal(null, 
-                null, 
-                searchFilter, 
-                0, 
-                100, 
-                false, 
-                "sv-SE", 
-                false, 
+            var responseWithoutSum = await _fixture.ObservationsController.TaxonAggregationInternal(null,
+                null,
+                searchFilter,
+                0,
+                100,
+                false,
+                "sv-SE",
+                false,
                 false);
             var resultWithoutSum = responseWithoutSum.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
 

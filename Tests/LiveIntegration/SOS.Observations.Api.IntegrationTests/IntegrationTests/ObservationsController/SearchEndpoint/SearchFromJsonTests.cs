@@ -4,15 +4,15 @@ using FluentAssertions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using SOS.Lib.JsonConverters;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class SearchFromJsonTests
@@ -25,14 +25,14 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
         }
 
         private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
-            {
-                Converters = { 
+        {
+            Converters = {
                     new GeoShapeConverter(),
                     new NetTopologySuite.IO.Converters.GeoJsonConverterFactory(),
                     new JsonStringEnumConverter()
                 },
-                PropertyNameCaseInsensitive = true
-            };
+            PropertyNameCaseInsensitive = true
+        };
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
@@ -56,6 +56,6 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             result.Records.Count().Should().Be(2, "because the take parameter is 2");
         }
 
-        
+
     }
 }

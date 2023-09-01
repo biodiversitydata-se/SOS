@@ -10,7 +10,7 @@ using SOS.Lib.JsonConverters;
 using SOS.Lib.Repositories.Resource;
 using Xunit;
 
-namespace SOS.Process.IntegrationTests.TestDataTools
+namespace SOS.Process.LiveIntegrationTests.TestDataTools
 {
     public class CreateVocabulariesFileTool : TestBase
     {

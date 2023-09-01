@@ -2,7 +2,7 @@
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
 
-namespace SOS.Export.IntegrationTests
+namespace SOS.Export.LiveIntegrationTests
 {
     public class TestBase
     {

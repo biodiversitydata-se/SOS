@@ -8,7 +8,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Services
+namespace SOS.Import.LiveIntegrationTests.Services
 {
     public class SersObservationServiceIntegrationTests : TestBase
     {
@@ -19,7 +19,7 @@ namespace SOS.Import.IntegrationTests.Services
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var importConfiguration = GetImportConfiguration();           
+            var importConfiguration = GetImportConfiguration();
             var sersObservationService = new SersObservationService(
                 new AquaSupportRequestService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<AquaSupportRequestService>()),
                 importConfiguration.SersServiceConfiguration,

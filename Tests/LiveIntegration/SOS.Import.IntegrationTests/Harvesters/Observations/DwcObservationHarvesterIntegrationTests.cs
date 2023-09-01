@@ -15,10 +15,10 @@ using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Harvesters.Observations
+namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
 {
     public class DwcObservationHarvesterIntegrationTests : TestBase
-    {       
+    {
         [Fact]
         public async Task Harvest_occurrence_dwc_archive_with_emof_extension()
         {
@@ -193,11 +193,11 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             );
 
             var dwcObservationHarvester = new DwcObservationHarvester(
-                importClient,                
+                importClient,
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
-                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), 
-                new DwcaConfiguration {ImportPath = @"C:\Temp", BatchSize=100},
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new DwcaConfiguration { ImportPath = @"C:\Temp", BatchSize = 100 },
                 new NullLogger<DwcObservationHarvester>());
             return dwcObservationHarvester;
         }

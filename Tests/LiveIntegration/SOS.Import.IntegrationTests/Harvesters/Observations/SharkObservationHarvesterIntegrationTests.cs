@@ -10,10 +10,10 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Harvesters.Observations
+namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
 {
     public class SharkObservationHarvesterIntegrationTests : TestBase
-    {        
+    {
         [Fact]
         [Trait("Category", "Integration")]
         public async Task Get_shark_harvest_datasets()
@@ -37,13 +37,13 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 }
             };
             var httpClientService = new HttpClientService(new NullLogger<HttpClientService>());
-            SharkObservationService sharkObservationService = new SharkObservationService(httpClientService, 
+            SharkObservationService sharkObservationService = new SharkObservationService(httpClientService,
                 sharkServiceConfiguration, new NullLogger<SharkObservationService>());
             var sharkObservationHarvester = new SharkObservationHarvester(
                 sharkObservationService,
                 new Mock<ISharkObservationVerbatimRepository>().Object,
                 sharkServiceConfiguration,
-                new NullLogger<SharkObservationHarvester>());                
+                new NullLogger<SharkObservationHarvester>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -54,6 +54,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             datasets.Should().NotBeNull();
-        }       
+        }
     }
 }

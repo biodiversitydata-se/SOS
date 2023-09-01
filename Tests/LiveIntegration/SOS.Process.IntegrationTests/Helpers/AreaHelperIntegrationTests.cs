@@ -7,7 +7,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.TestHelpers.Gis;
 using Xunit;
 
-namespace SOS.Process.IntegrationTests.Helpers
+namespace SOS.Process.LiveIntegrationTests.Helpers
 {
     public class AreaHelperIntegrationTests : IClassFixture<AreaHelperFixture>
     {
@@ -44,8 +44,8 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Location.Attributes.CountyPartIdByCoordinate.Should().Be((string) SpecialCountyPartId.Öland);
-            observation.Location.County.FeatureId.Should().Be((string) CountyId.Kalmar);
+            observation.Location.Attributes.CountyPartIdByCoordinate.Should().Be(SpecialCountyPartId.Öland);
+            observation.Location.County.FeatureId.Should().Be(CountyId.Kalmar);
         }
 
         [Fact]
@@ -74,11 +74,11 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Location.Attributes.CountyPartIdByCoordinate.Should().Be((string) SpecialCountyPartId.KalmarFastland);
-            observation.Location.County.FeatureId.Should().Be((string) CountyId.Kalmar);
+            observation.Location.Attributes.CountyPartIdByCoordinate.Should().Be(SpecialCountyPartId.KalmarFastland);
+            observation.Location.County.FeatureId.Should().Be(CountyId.Kalmar);
         }
 
-       
+
         [Fact]
         [Trait("Category", "Integration")]
         public void ProvincePartIdByCoordinateShouldBeSetToLappland_When_ObservationIsInLappmark()
@@ -103,8 +103,8 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Location.Attributes.ProvincePartIdByCoordinate.Should().Be((string) SpecialProvincePartId.Lappland);
-            observation.Location.Province.FeatureId.Should().Be((string) ProvinceIds.TorneLappmark);
+            observation.Location.Attributes.ProvincePartIdByCoordinate.Should().Be(SpecialProvincePartId.Lappland);
+            observation.Location.Province.FeatureId.Should().Be(ProvinceIds.TorneLappmark);
         }
     }
 }

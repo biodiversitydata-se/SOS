@@ -6,10 +6,10 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationManager
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationManager
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class DuplicatesIntegrationTests

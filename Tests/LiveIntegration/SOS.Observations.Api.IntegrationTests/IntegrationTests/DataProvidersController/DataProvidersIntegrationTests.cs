@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Vocabulary;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.DataProvidersController
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.DataProvidersController
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class DataProvidersIntegrationTests

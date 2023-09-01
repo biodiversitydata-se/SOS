@@ -9,7 +9,7 @@ using SOS.Harvest.Services;
 using SOS.Lib.Services;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Services
+namespace SOS.Import.LiveIntegrationTests.Services
 {
     public class MvmObservationServiceIntegrationTests : TestBase
     {

@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.DataProfiling
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.DataProfiling
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class ObservationDatabaseIntegrationTests

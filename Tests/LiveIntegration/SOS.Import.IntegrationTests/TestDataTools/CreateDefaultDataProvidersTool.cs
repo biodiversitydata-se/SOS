@@ -3,12 +3,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
+using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.TestDataTools
+namespace SOS.Import.LiveIntegrationTests.TestDataTools
 {
     public class CreateDefaultDataProvidersTool : TestBase
     {

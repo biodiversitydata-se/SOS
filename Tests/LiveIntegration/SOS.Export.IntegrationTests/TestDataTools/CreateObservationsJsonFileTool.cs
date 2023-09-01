@@ -16,7 +16,7 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using Xunit;
 
-namespace SOS.Export.IntegrationTests.TestDataTools
+namespace SOS.Export.LiveIntegrationTests.TestDataTools
 {
     public class CreateObservationsJsonFileTool : TestBase
     {

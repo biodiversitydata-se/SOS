@@ -11,6 +11,7 @@ using SOS.Harvest.Harvesters.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services;
+using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
@@ -21,7 +22,7 @@ using Xunit;
 using ITaxonRepository = SOS.Harvest.Repositories.Source.Artportalen.Interfaces.ITaxonRepository;
 using TaxonRepository = SOS.Harvest.Repositories.Source.Artportalen.TaxonRepository;
 
-namespace SOS.Import.IntegrationTests.Harvesters.Observations
+namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
 {
     public class ArtportalenObservationHarvesterIntegrationTests : TestBase
     {

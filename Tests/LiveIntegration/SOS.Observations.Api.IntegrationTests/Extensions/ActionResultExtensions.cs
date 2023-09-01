@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace SOS.Observations.Api.IntegrationTests.Extensions
+namespace SOS.Observations.Api.LiveIntegrationTests.Extensions
 {
     public static class ActionResultExtensions
     {

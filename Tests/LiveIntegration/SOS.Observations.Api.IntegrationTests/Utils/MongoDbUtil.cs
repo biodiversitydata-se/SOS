@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.IntegrationTests.Utils
+namespace SOS.Observations.Api.LiveIntegrationTests.Utils
 {
     public class MongoDbUtil
     {
@@ -44,7 +44,7 @@ namespace SOS.Observations.Api.IntegrationTests.Utils
         private IMongoCollection<TEntity> GetMongoCollection<TEntity>(IMongoDatabase db, string collectionName)
         {
             return db.GetCollection<TEntity>(collectionName)
-                .WithWriteConcern(new WriteConcern(1, journal: true));            
+                .WithWriteConcern(new WriteConcern(1, journal: true));
         }
 
         private async Task<List<TEntity>> GetAllRecordsAsync<TEntity>(IMongoCollection<TEntity> mongoCollection)

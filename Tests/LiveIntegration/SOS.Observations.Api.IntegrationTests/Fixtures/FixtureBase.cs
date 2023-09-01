@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
+using SOS.Observations.Api.LiveIntegrationTests;
 using SOS.TestHelpers;
 
-namespace SOS.Observations.Api.IntegrationTests.Fixtures
+namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
 {
     public class FixtureBase
     {

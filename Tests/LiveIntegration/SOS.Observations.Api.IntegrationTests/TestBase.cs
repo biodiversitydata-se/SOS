@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using SOS.Lib.Configuration.Shared;
 
-namespace SOS.Observations.Api.IntegrationTests
+namespace SOS.Observations.Api.LiveIntegrationTests
 {
     public class TestBase
     {

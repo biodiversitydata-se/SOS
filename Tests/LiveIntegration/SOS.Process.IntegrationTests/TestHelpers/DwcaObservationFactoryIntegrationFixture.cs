@@ -14,8 +14,9 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.Process.LiveIntegrationTests;
 
-namespace SOS.Process.IntegrationTests.TestHelpers
+namespace SOS.Process.LiveIntegrationTests.TestHelpers
 {
     public class DwcaObservationFactoryIntegrationFixture : TestBase, IDisposable
     {

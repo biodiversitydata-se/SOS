@@ -6,7 +6,7 @@ using System.Text;
 using DwC_A.Terms;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.TestDataTools
+namespace SOS.Import.LiveIntegrationTests.TestDataTools
 {
     public class CreateDwcTermMappingTool
     {
@@ -29,7 +29,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 .GetFields(BindingFlags.Public | BindingFlags.Static)
                 .Where(f => f.FieldType == typeof(string))
                 .ToDictionary(f => f.Name,
-                    f => (string) f.GetValue(null));
+                    f => (string)f.GetValue(null));
         }
 
         [Fact]

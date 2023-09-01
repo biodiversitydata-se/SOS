@@ -11,13 +11,14 @@ using AgileObjects.NetStandardPolyfills;
 using FluentAssertions;
 using Newtonsoft.Json;
 using SOS.Export.Models;
+using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models;
 using SOS.Lib.Models.Shared;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.TestDataTools
+namespace SOS.Import.LiveIntegrationTests.TestDataTools
 {
     public class CreatePropertyFieldDescriptionsTool : TestBase
     {
@@ -40,14 +41,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             var fieldDescriptions = System.Text.Json.JsonSerializer.Deserialize<List<SsosFieldDescription>>(strJson);
             return fieldDescriptions;
         }
-        
+
         [Fact]
         [Trait("Category", "Tool")]
         public void ValidateUniquePropertyNamesAndTitles()
         {
             // Act
             bool unique = ObservationPropertyFieldDescriptionHelper.ValidateUniquePropertyNames();
-            
+
             // Assert
             unique.Should().BeTrue();
         }
@@ -67,7 +68,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 sb.AppendLine($"    return {fieldDescription.PropertyName};");
             }
             string result = sb.ToString();
-            
+
             // Assert
             result.Should().NotBeNullOrEmpty();
         }
@@ -88,7 +89,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             {
                 string dataType = GetDataTypeString(fieldDescription.DataType, fieldDescription.DataTypeIsNullable.GetValueOrDefault());
                 string propertyName = fieldDescription.PropertyName;
-                string str = $"public {dataType} {propertyName} => _observation?.{fieldDescription.PropertyPath.Replace(".","?.")};";
+                string str = $"public {dataType} {propertyName} => _observation?.{fieldDescription.PropertyPath.Replace(".", "?.")};";
                 sb.AppendLine(str);
             }
             string result = sb.ToString();
@@ -126,14 +127,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Arrange
             var ssosFieldDescriptions = await ReadSsosFieldDescriptions();
             var sosFieldDescriptions = FieldDescriptionHelper.GetAllFieldDescriptions().ToList();
-            var observationType = typeof(SOS.Lib.Models.Processed.Observation.Observation);
+            var observationType = typeof(Lib.Models.Processed.Observation.Observation);
             var propertyFields = GetAllProperties(observationType, true);
-            
+
             // Act
             AddSsosTitlesToPropertyFields(propertyFields, ssosFieldDescriptions);
             AddSosDwcInfoToPropertyFields(propertyFields, sosFieldDescriptions);
             string strJson = System.Text.Json.JsonSerializer.Serialize(propertyFields);
-            
+
             // Assert
             strJson.Should().NotBeNullOrEmpty();
         }

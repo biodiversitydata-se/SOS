@@ -7,16 +7,17 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.JsonConverters;
 using SOS.Observations.Api.Dtos.Enum;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using SOS.Observations.Api.LiveIntegrationTests;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class DateFilterIntegrationTests
@@ -120,11 +121,11 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilterInternalDto
             {
-                DataProvider = new DataProviderFilterDto { Ids = new List<int> {1}},
+                DataProvider = new DataProviderFilterDto { Ids = new List<int> { 1 } },
                 Taxon = new TaxonFilterDto
                 {
                     IncludeUnderlyingTaxa = false,
-                    Ids = new []{100008, 100009, 100019, 102928, 102929, 103058, 103059, 205924, 205925,
+                    Ids = new[]{100008, 100009, 100019, 102928, 102929, 103058, 103059, 205924, 205925,
                         205926, 205927, 232125, 232268, 232269, 233777, 233778, 233813, 233814,
                         233815, 233816, 233837, 233838, 233880, 266225, 266226, 266227, 266228,
                         266229, 266230, 266231, 266232, 266233, 266234, 266235, 266236, 266735,
@@ -136,10 +137,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 Date = new DateFilterDto
                 {
                     StartDate = new DateTime(2021, 1, 1, 0, 0, 0),
-                    EndDate = new DateTime(2021, 12, 31,23,59,59),
+                    EndDate = new DateTime(2021, 12, 31, 23, 59, 59),
                     DateFilterType = DateFilterTypeDto.OverlappingStartDateAndEndDate
                 },
-                DiffusionStatuses = new [] {DiffusionStatusDto.NotDiffused},
+                DiffusionStatuses = new[] { DiffusionStatusDto.NotDiffused },
                 IncludeRealCount = true,
                 DeterminationFilter = SearchFilterBaseDto.SightingDeterminationFilterDto.NotUnsureDetermination,
                 NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.NoFilter,
@@ -149,10 +150,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.StartDateEndDateMonthRange,
                     Months = new[] { 5, 6 },
                     TypeFilter = ExtendedFilterDto.SightingTypeFilterDto.DoNotShowMerged,
-                    ExcludeVerificationStatusIds = new [] { 50, 13 },
+                    ExcludeVerificationStatusIds = new[] { 50, 13 },
                     UnspontaneousFilter = ExtendedFilterDto.SightingUnspontaneousFilterDto.NoFilter,
                     NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.DontIncludeNotPresent,
-                    SiteIds = new []{ 2245350 }
+                    SiteIds = new[] { 2245350 }
                 }
             };
 

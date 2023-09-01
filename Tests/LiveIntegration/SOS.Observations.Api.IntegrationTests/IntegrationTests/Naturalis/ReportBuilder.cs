@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Naturalis
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Naturalis
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class ReportBuilder
@@ -44,7 +44,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Naturalis
 
             var taxa = (await _fixture.TaxonRepository.GetAllAsync()).ToDictionary(t => t.Id, t => t);
             var writtenTaxonIds = new HashSet<int>();
-            foreach(var taxonId in taxonIds)
+            foreach (var taxonId in taxonIds)
             {
                 WriteTaxon(csvFileHelperTaxa, taxa, taxonId, writtenTaxonIds);
             }
@@ -100,8 +100,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Naturalis
                 {
                     WriteTaxon(csvFileHelperTaxa, taxa, relatedTaxonId, writtenTaxonIds);
                 }
-            }  
-        } 
+            }
+        }
 
         public ReportBuilder(ApiIntegrationTestFixture fixture)
         {
@@ -113,7 +113,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Naturalis
         public async Task CreateReport()
         {
             var filter = new SearchFilterInternal(0);
-            filter.DataProviderIds = new List<int>(){ 1 };
+            filter.DataProviderIds = new List<int>() { 1 };
             filter.OnlyWithMedia = true;
             filter.Output.Fields = new List<string> {
                 "event.plainStartDate",
@@ -129,7 +129,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Naturalis
                 "taxon.taxonId",
             };
             await _fixture.FilterManager.PrepareFilterAsync(0, "", filter);
-            
+
             var taxonIds = new HashSet<int>();
 
             using var imagesStream = new FileStream(@"c:\\temp\images.csv", FileMode.CreateNew);
@@ -166,7 +166,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Naturalis
                             if (
                                 (!media.Type?.Equals("image", StringComparison.CurrentCultureIgnoreCase) ?? true)
                                 || media.Identifier.IndexOf("AwaitingImage.png", StringComparison.CurrentCultureIgnoreCase) != -1
-                            ) 
+                            )
                             {
                                 continue;
                             }
@@ -188,7 +188,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Naturalis
                         }
                     }
                 }
-               
+
                 data = await _fixture.ProcessedObservationRepositoryTest.GetNaturalisChunkAsync(filter, data.PointInTimeId, data.SearchAfter);
             }
 

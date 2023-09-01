@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using SOS.Process.IntegrationTests.TestHelpers;
+using SOS.Process.LiveIntegrationTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
 using Xunit;
 
-namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
+namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
 {
     public class DwcaObservationFactoryIntegrationTests : IClassFixture<DwcaObservationFactoryIntegrationFixture>
     {

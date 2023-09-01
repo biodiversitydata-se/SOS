@@ -18,7 +18,7 @@ using SOS.Lib.Services;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace SOS.Import.IntegrationTests.TestDataTools
+namespace SOS.Import.LiveIntegrationTests.TestDataTools
 {
     public class CreateDwcDataStatisticsTool : TestBase
     {
@@ -63,10 +63,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 processConfiguration.WriteBatchSize
                 );
             var dwcObservationHarvester = new DwcObservationHarvester(
-                importClient,                
+                importClient,
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
-                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), 
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new DwcaConfiguration { ImportPath = @"C:\Temp" },
                 new NullLogger<DwcObservationHarvester>());
             return dwcObservationHarvester;
@@ -552,7 +552,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             package.Save();
         }
 
-        
+
 
         //[Fact]
         //public void CreateProperties()

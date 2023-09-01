@@ -10,19 +10,19 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Result;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.TestDataTools
+namespace SOS.Import.LiveIntegrationTests.TestDataTools
 {
     public class CreateAreaMarkdownTool : TestBase
     {
         public class AreaData
         {
             public List<Lib.Models.Shared.Area> Areas { get; set; }
-            public AreaType AreaType { get; set; }            
+            public AreaType AreaType { get; set; }
             public string Title { get; set; }
             public string Markdown { get; set; }
         }
 
-        
+
         private class SosClient
         {
             private readonly HttpClient _client;
@@ -34,13 +34,13 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             }
 
             public async Task<List<Lib.Models.Shared.Area>> GetAreas(int skip, int take, AreaType areaType)
-            {                
+            {
                 var response = await _client.GetAsync($"{_apiUrl}Areas?take={take}&skip={skip}&areaTypes={areaType.ToString()}");
                 if (response.IsSuccessStatusCode)
                 {
                     var resultString = response.Content.ReadAsStringAsync().Result;
                     var pagedResult = JsonConvert.DeserializeObject<PagedResult<Lib.Models.Shared.Area>>(resultString);
-                    return pagedResult.Records.OrderBy(m => int.Parse(m.FeatureId)).ToList();                    
+                    return pagedResult.Records.OrderBy(m => int.Parse(m.FeatureId)).ToList();
                 }
                 else
                 {
@@ -65,7 +65,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             List<AreaData> areaDatas = GetAreaData();
             foreach (var item in areaDatas)
             {
-                item.Areas = await sosClient.GetAreas(0, 5000, item.AreaType);                
+                item.Areas = await sosClient.GetAreas(0, 5000, item.AreaType);
                 item.Markdown = CreateMarkdown(item.Areas);
             }
 
@@ -119,16 +119,16 @@ namespace SOS.Import.IntegrationTests.TestDataTools
 
             return areaDatas;
         }
-      
+
         private string CreateMarkdown(List<Lib.Models.Shared.Area> areas)
         {
-            var sb = new StringBuilder();            
+            var sb = new StringBuilder();
             sb.AppendLine("| FeatureId | Name |");
             sb.AppendLine("|:---	|:---	|");
             foreach (var area in areas)
             {
                 sb.AppendLine($"| {area.FeatureId} | {area.Name} |");
-            }            
+            }
 
             return sb.ToString();
         }

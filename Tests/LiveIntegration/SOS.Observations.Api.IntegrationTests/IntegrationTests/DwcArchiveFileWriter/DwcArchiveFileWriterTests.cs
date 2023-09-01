@@ -5,10 +5,10 @@ using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Models.Shared;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.DwcArchiveFileWriter
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.DwcArchiveFileWriter
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class DwcArchiveFileWriterTests
@@ -35,7 +35,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.DwcArchiveFileW
             filePart.FilePathByBatchIdAndFilePart =
                 new Dictionary<string, Dictionary<DwcaFilePart, string>> { { "1", new Dictionary<DwcaFilePart, string>() } };
             filePart.FilePathByBatchIdAndFilePart["1"].Add(DwcaFilePart.Occurrence, Path.Join(occurrenceCsvFolder, "occurrence.csv"));
-            filePart.ExportFolder = occurrenceCsvFolder; 
+            filePart.ExportFolder = occurrenceCsvFolder;
             fileParts.Add(filePart);
             DataProvider dataProvider = new DataProvider();
 

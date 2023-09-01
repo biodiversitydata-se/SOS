@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 using SOS.Lib.Models.Search.Filters;
 using System.Collections.Generic;
 using System.Linq;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepository
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationRepository
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class DistinctValuesTests
@@ -16,7 +16,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
         public DistinctValuesTests(ApiIntegrationTestFixture fixture)
         {
             _fixture = fixture;
-        }       
+        }
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
@@ -26,7 +26,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             SearchFilter searchFilter = new SearchFilter(0)
-            {                
+            {
             };
 
             //-----------------------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using SOS.Export.LiveIntegrationTests;
 using SOS.Lib.Cache;
 using SOS.Lib.Database;
 using SOS.Lib.Managers;
@@ -13,7 +14,7 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using Xunit;
 
-namespace SOS.Export.IntegrationTests.Repositories
+namespace SOS.Export.LiveIntegrationTests.Repositories
 {
     public class ProcessedDwcRepositoryIntegrationTests : TestBase
     {
@@ -70,7 +71,7 @@ namespace SOS.Export.IntegrationTests.Repositories
                 new ProcessedObservationCoreRepository(
                     new ElasticClientManager(elasticConfiguration),
                     elasticConfiguration,
-                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),                   
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new NullLogger<ProcessedObservationCoreRepository>());
 
             return processedObservationRepository;

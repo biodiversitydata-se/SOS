@@ -8,11 +8,11 @@ using Nest;
 using NetTopologySuite.Features;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.GeoGridAggregationEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.MetricGridAggregationEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class MetricGridAggregationIntegrationTests
@@ -63,15 +63,15 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.MetricGridAggregationInternalAsync(
-                null, 
-                null, 
-                searchFilter, 
-                10000, 
-                false, 
-                false, 
+                null,
+                null,
+                searchFilter,
+                10000,
+                false,
+                false,
                 Lib.Enums.MetricCoordinateSys.SWEREF99_TM,
                 OutputFormatDto.GeoJson);
-            var result = response.GetResultObject<FeatureCollection>();            
+            var result = response.GetResultObject<FeatureCollection>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

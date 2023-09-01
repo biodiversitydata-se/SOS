@@ -6,7 +6,6 @@ using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Export.IntegrationTests.TestHelpers.Factories;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
@@ -20,8 +19,10 @@ using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Services;
 using Xunit;
+using SOS.Export.LiveIntegrationTests;
+using SOS.Export.LiveIntegrationTests.TestHelpers.Factories;
 
-namespace SOS.Export.IntegrationTests.IO.DwcArchive
+namespace SOS.Export.LiveIntegrationTests.IO.DwcArchive
 {
     public class DwcArchiveFileWriterIntegrationTests : TestBase
     {
@@ -91,7 +92,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var processInfo = await processInfoRepository.GetAsync(processedObservationRepository.PublicIndexName);
             var filename = FilenameHelper.CreateFilenameWithDate("sos_dwc_archive_with_all_data");
             //var filter = new AdvancedFilter();
-            var filter = new SearchFilter(0) { Taxa = new TaxonFilter{ Ids = new[] { 102951 } } };
+            var filter = new SearchFilter(0) { Taxa = new TaxonFilter { Ids = new[] { 102951 } } };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

@@ -7,13 +7,13 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 using System.IO;
 using System;
 using FeatureCollection = NetTopologySuite.Features.FeatureCollection;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Diffusion
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Diffusion
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class CreateDiffusedFiles
@@ -71,7 +71,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Diffusion
             {
                 var searchFilter = new SearchFilter(-1, ProtectionFilter.Sensitive)
                 {
-                    SensitivityCategories = new []{ i }
+                    SensitivityCategories = new[] { i }
                 };
 
                 var gridCellsInMeters = i switch
@@ -100,7 +100,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Diffusion
                     featureCollectionAll.Add(gridCellFeature);
                     featureCollection.Add(gridCellFeature);
 
-                    
+
                 }
                 await SaveFileAsync(featureCollection, i);
             }

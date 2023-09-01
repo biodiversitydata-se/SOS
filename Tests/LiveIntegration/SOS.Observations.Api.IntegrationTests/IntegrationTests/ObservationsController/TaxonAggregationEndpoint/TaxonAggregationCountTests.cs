@@ -8,11 +8,12 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Search.Result;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.TaxonAggregationEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.TaxonAggregationEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class TaxonAggregationCountTests
@@ -21,7 +22,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
         public TaxonAggregationCountTests(ApiIntegrationTestFixture fixture)
         {
-            _fixture = fixture;        
+            _fixture = fixture;
         }
 
         [Fact]
@@ -39,16 +40,16 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var spDictionary = Stopwatch.StartNew();
             var dictionary = new Dictionary<int, Dictionary<int, int>>();
-            for (int i=0; i<NrIterations; i++)
+            for (int i = 0; i < NrIterations; i++)
             {
                 var dic = new Dictionary<int, int>();
-                for (int j=0; j < 100; j++)
+                for (int j = 0; j < 100; j++)
                 {
                     var provinceId = random.Next(0, 33);
                     if (!dic.TryAdd(provinceId, i))
                     {
                         dic[provinceId] += 1;
-                    }                                        
+                    }
                 }
                 dictionary.Add(i, dic);
             }
@@ -65,7 +66,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 for (int j = 0; j < 100; j++)
                 {
                     var provinceId = random.Next(0, 33);
-                    array[provinceId] += 1;                    
+                    array[provinceId] += 1;
                 }
                 dictionaryArray.Add(i, array);
             }
@@ -219,7 +220,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var taxonFilter = new TaxonFilterDto
-            {                
+            {
                 IncludeUnderlyingTaxa = false
             };
 
@@ -232,7 +233,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.TotalCount.Should().Be(1, "only Biota is returned");            
+            result.TotalCount.Should().Be(1, "only Biota is returned");
         }
 
         [Fact]
@@ -317,7 +318,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             commonBlackBird.ObservationCount.Should().BeGreaterThan(50000);
             commonBlackBird.SumObservationCount.Should().BeGreaterOrEqualTo(commonBlackBird.ObservationCount);
             commonBlackBird.ProvinceCount.Should().BeGreaterOrEqualTo(25);
-            commonBlackBird.SumProvinceCount.Should().BeGreaterOrEqualTo(25);            
+            commonBlackBird.SumProvinceCount.Should().BeGreaterOrEqualTo(25);
         }
 
         [Fact]

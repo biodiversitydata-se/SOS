@@ -8,7 +8,7 @@ using SOS.Harvest.Services;
 using SOS.Lib.Services;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Services
+namespace SOS.Import.LiveIntegrationTests.Services
 {
     public class KulObservationServiceIntegrationTests : TestBase
     {
@@ -30,7 +30,7 @@ namespace SOS.Import.IntegrationTests.Services
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = (await kulObservationService.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), 0));
+            var result = await kulObservationService.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), 0);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

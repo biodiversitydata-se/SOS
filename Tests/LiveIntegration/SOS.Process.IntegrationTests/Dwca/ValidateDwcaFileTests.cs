@@ -2,10 +2,10 @@
 using Xunit;
 using SOS.Lib.IO.DwcArchive;
 
-namespace SOS.Process.IntegrationTests.Dwca
+namespace SOS.Process.LiveIntegrationTests.Dwca
 {
     public class ValidateDwcaFileTests
-    {      
+    {
         [Fact]
         public void ValidateDwcaFile()
         {
@@ -22,10 +22,10 @@ namespace SOS.Process.IntegrationTests.Dwca
             // Act
             //-----------------------------------------------------------------------------------------------------------            
             string filePath = DwcaFileValidator.ValidateFile(
-                sourceFilePath, 
-                outputFolder, 
-                outputFileName, 
-                nrRowsLimit, 
+                sourceFilePath,
+                outputFolder,
+                outputFileName,
+                nrRowsLimit,
                 startRow);
 
             //-----------------------------------------------------------------------------------------------------------

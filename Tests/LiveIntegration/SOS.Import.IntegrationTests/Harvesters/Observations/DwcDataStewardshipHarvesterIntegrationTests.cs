@@ -20,7 +20,7 @@ using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Harvesters.Observations
+namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
 {
     public class DwcDataStewardshipHarvesterIntegrationTests : TestBase
     {
@@ -63,7 +63,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var readOccurrences = await dwcCollectionRepository.OccurrenceRepository.GetAllAsync();
             var readDatasets = await dwcCollectionRepository.DatasetRepository.GetAllAsync();
             var readEvents = await dwcCollectionRepository.EventRepository.GetAllAsync();
-            
+
             var dwcObservationHarvester = CreateDwcObservationHarvester();
             var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
                 archivePath,
@@ -81,14 +81,14 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
         [Fact]
         public async Task Test_Parse_Multiple_DwcaFiles()
         {
-            foreach(var archivePath in _dwcaFiles)
+            foreach (var archivePath in _dwcaFiles)
             {
                 await ParseDwcaFileAsync(archivePath);
-            }            
+            }
         }
 
         private List<string> _dwcaFiles = new List<string>
-        {            
+        {
             "./resources/dwca/dwca-datastewardship-bats-taxalists.zip",
             "./resources/dwca/dwca-event-emof-vims_neamap.zip",
             "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip",
@@ -239,11 +239,11 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             );
 
             var dwcObservationHarvester = new DwcObservationHarvester(
-                importClient,                
+                importClient,
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
-                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), 
-                new DwcaConfiguration {ImportPath = @"C:\Temp", BatchSize=100},
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new DwcaConfiguration { ImportPath = @"C:\Temp", BatchSize = 100 },
                 new NullLogger<DwcObservationHarvester>());
             return dwcObservationHarvester;
         }

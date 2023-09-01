@@ -29,8 +29,9 @@ using SOS.Harvest.Services;
 using Xunit;
 using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
 using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
+using SOS.Process.LiveIntegrationTests;
 
-namespace SOS.Process.IntegrationTests.Processors.Artportalen
+namespace SOS.Process.LiveIntegrationTests.Processors.Artportalen
 {
     public class ArtportalenObservationProcessorIntegrationTests : TestBase
     {
@@ -48,7 +49,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             {
                 Id = 1,
                 Identifier = "Artportalen",
-                Names = new []{ new VocabularyValueTranslation{ CultureCode = "en-GB", Value = "Artportalen" } },
+                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } },
                 Type = DataProviderType.ArtportalenObservations
             };
 
@@ -117,7 +118,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             var datasetRepository = new ArtportalenDatasetMetadataRepository(processClient, new NullLogger<ArtportalenDatasetMetadataRepository>());
             var artportalenVerbatimRepository = new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>());
 
-            
+
             var areaHelper = new AreaHelper(
                 new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
@@ -196,10 +197,10 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                     fileService,
                     new NullLogger<DwcArchiveEventFileWriter>()
                 ),
-                fileService, 
+                fileService,
                 dataProviderRepository,
                 verbatimClient,
-                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, 
+                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" },
                 new NullLogger<DwcArchiveFileWriterCoordinator>()
             );
             return dwcArchiveFileWriterCoordinator;

@@ -10,7 +10,7 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
-namespace SOS.Export.IntegrationTests.TestHelpers.Factories
+namespace SOS.Export.LiveIntegrationTests.TestHelpers.Factories
 {
     public static class ProcessedDarwinCoreRepositoryStubFactory
     {
@@ -37,7 +37,7 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
 
             var observations = JsonSerializer.Deserialize<List<Observation>>(str, serializeOptions!);
 
-            return new SearchAfterResult<Observation> {Records = observations};
+            return new SearchAfterResult<Observation> { Records = observations };
         }
     }
 }

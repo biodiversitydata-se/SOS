@@ -11,7 +11,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Services;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Harvesters.Observations
+namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
 {
     public class iNaturalistObservationHarvesterIntegrationTests : TestBase
     {
@@ -27,7 +27,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested = 100000;
 
             var iNaturalistObservationService = new iNaturalistObservationService(
-                new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), 
+                new HttpClientService(new Mock<ILogger<HttpClientService>>().Object),
                 importConfiguration.iNaturalistServiceConfiguration,
                 new NullLogger<iNaturalistObservationService>());
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();

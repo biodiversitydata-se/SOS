@@ -5,8 +5,9 @@ using Moq;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Resource;
+using SOS.Process.LiveIntegrationTests;
 
-namespace SOS.Process.IntegrationTests.Helpers
+namespace SOS.Process.LiveIntegrationTests.Helpers
 {
     public class AreaHelperFixture : TestBase, IDisposable
     {

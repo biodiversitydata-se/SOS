@@ -4,7 +4,7 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 
-namespace SOS.Process.IntegrationTests
+namespace SOS.Process.LiveIntegrationTests
 {
     public class TestBase
     {

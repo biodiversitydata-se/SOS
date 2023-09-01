@@ -6,11 +6,11 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class ExtendedFilterIntegrationTests
@@ -39,10 +39,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 },
                 ExtendedFilter = new ExtendedFilterDto()
                 {
-                    Months = new List<int> {1,2,4},
+                    Months = new List<int> { 1, 2, 4 },
                     MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.BothStartDateAndEndDate
                 },
-                Output = new OutputFilterExtendedDto{ Fields = new[] { "Event" } } 
+                Output = new OutputFilterExtendedDto { Fields = new[] { "Event" } }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            yearsStartDate.Should().BeEquivalentTo(new []{2018, 2019, 2020 });
+            yearsStartDate.Should().BeEquivalentTo(new[] { 2018, 2019, 2020 });
             yearsEndDate.Should().BeEquivalentTo(new[] { 2018, 2019, 2020 });
             monthsStartDate.Should().BeEquivalentTo(new[] { 1, 2, 4 });
             monthsEndDate.Should().BeEquivalentTo(new[] { 1, 2, 4 });
@@ -86,7 +86,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             {
                 DataProvider = new DataProviderFilterDto
                 {
-                    Ids = new List<int>() {1}
+                    Ids = new List<int>() { 1 }
                 },
                 //Date = new DateFilterDto()
                 //{
@@ -103,7 +103,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 Taxon = new TaxonFilterDto()
                 {
                     IncludeUnderlyingTaxa = true,
-                    Ids = new int[] { 103046}
+                    Ids = new int[] { 103046 }
                 },
                 ExtendedFilter = new ExtendedFilterDto()
                 {
@@ -145,7 +145,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     Months = new List<int> { 1, 2, 4 },
                     MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.StartDate
                 },
-                Output = new OutputFilterExtendedDto { Fields = new[] { "Event" } } 
+                Output = new OutputFilterExtendedDto { Fields = new[] { "Event" } }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -168,13 +168,13 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 yearsEndDate.Add(observation.Event.EndDate.Value.Year);
                 monthsEndDate.Add(observation.Event.EndDate.Value.Month);
             }
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            yearsStartDate.Should().BeEquivalentTo(new[] {2018, 2019, 2020 });
-            monthsStartDate.Should().BeEquivalentTo(new []{ 1, 2, 4 });
-            yearsEndDate.Should().Contain(new[] { 2018, 2019, 2020});
+            yearsStartDate.Should().BeEquivalentTo(new[] { 2018, 2019, 2020 });
+            monthsStartDate.Should().BeEquivalentTo(new[] { 1, 2, 4 });
+            yearsEndDate.Should().Contain(new[] { 2018, 2019, 2020 });
             monthsEndDate.Should().Contain(new[] { 1, 2, 4 });
         }
 
@@ -224,7 +224,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            monthsStartDate.Should().BeEquivalentTo(new []{ 1, 2 });
+            monthsStartDate.Should().BeEquivalentTo(new[] { 1, 2 });
             monthsEndDate.Should().BeEquivalentTo(new[] { 1, 2 });
             yearsStartDate.Count.Should().BeGreaterOrEqualTo(10, "because all years are included in the search when UsePeriodForAllYears=true");
         }

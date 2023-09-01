@@ -17,7 +17,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource;
 using Xunit;
 
-namespace SOS.Process.IntegrationTests.TestDataTools
+namespace SOS.Process.LiveIntegrationTests.TestDataTools
 {
     public class CreateTaxaFilesTool : TestBase
     {
@@ -97,7 +97,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------            
             var taxonProcessedRepository = CreateTaxonProcessedRepository();
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
                         TaxonId = taxon.Id
                     };
 
-                    if (!taxonInfo.Name.Any(Char.IsWhiteSpace))
+                    if (!taxonInfo.Name.Any(char.IsWhiteSpace))
                     {
                         oneWordTaxonInfos.Add(taxonInfo);
                     }

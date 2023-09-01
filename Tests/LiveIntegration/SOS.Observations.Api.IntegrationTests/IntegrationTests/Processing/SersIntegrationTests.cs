@@ -1,12 +1,12 @@
 ﻿using FluentAssertions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 using SOS.Lib.Helpers;
 using System.Collections.Generic;
 using SOS.Lib.Factories;
 using System.Threading.Tasks;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Processing
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class SersIntegrationTests
@@ -26,11 +26,11 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             // Act
             //-----------------------------------------------------------------------------------------------------------            
             var maxId = await _fixture.SersObservationVerbatimRepository.GetMaxIdAsync();
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             maxId.Should().BeGreaterThan(1);
-        }  
+        }
     }
 }

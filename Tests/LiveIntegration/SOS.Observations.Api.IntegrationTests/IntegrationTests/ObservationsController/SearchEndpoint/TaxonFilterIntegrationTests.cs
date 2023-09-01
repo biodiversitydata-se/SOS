@@ -8,11 +8,12 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class TaxonFilterIntegrationTests
@@ -35,10 +36,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             {
                 Taxon = new TaxonFilterDto
                 {
-                    Ids = new List<int> { TestData.TaxonIds.Mammalia }, 
+                    Ids = new List<int> { TestData.TaxonIds.Mammalia },
                     IncludeUnderlyingTaxa = true,
-                    TaxonListIds = new List<int> {(int)TaxonListId.InvasiveSpecies},
-                    TaxonListOperator = TaxonListOperatorDto.Filter                    
+                    TaxonListIds = new List<int> { (int)TaxonListId.InvasiveSpecies },
+                    TaxonListOperator = TaxonListOperatorDto.Filter
                 }
             };
 
@@ -157,7 +158,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             SearchFilterDto searchFilter = new SearchFilterDto
             {
                 Taxon = new TaxonFilterDto
-                {                    
+                {
                     IncludeUnderlyingTaxa = true,
                     TaxonCategories = new List<int> { (int)TaxonCategoryId.Species }
                 }
@@ -214,7 +215,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             SearchFilterDto searchFilter = new SearchFilterDto
             {
                 Taxon = new TaxonFilterDto
-                {                    
+                {
                     TaxonCategories = new List<int> { (int)TaxonCategoryId.Species }
                 }
             };

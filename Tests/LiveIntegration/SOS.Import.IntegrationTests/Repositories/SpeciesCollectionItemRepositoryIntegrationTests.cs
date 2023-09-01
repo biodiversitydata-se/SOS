@@ -5,9 +5,10 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Harvest.Repositories.Source.Artportalen;
 using SOS.Harvest.Services;
+using SOS.Import.LiveIntegrationTests;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Repositories
+namespace SOS.Import.LiveIntegrationTests.Repositories
 {
     public class SpeciesCollectionItemRepositoryIntegrationTests : TestBase
     {

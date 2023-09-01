@@ -8,12 +8,13 @@ using Nest;
 using SOS.Lib.Enums;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using SOS.TestHelpers.Helpers.Builders;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class SignalSearchIntegrationTests
@@ -42,11 +43,13 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     {
                         BottomRight = new LatLonCoordinateDto()
                         {
-                            Latitude = -90, Longitude = 180
+                            Latitude = -90,
+                            Longitude = 180
                         },
                         TopLeft = new LatLonCoordinateDto()
                         {
-                            Latitude = 90, Longitude = -180
+                            Latitude = 90,
+                            Longitude = -180
                         }
                     },
                     ConsiderObservationAccuracy = true,
@@ -117,10 +120,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 {
                     TaxonListIds = new[]
                     {
-                        (int)TaxonListId.RedlistedSpecies, 
-                        (int)TaxonListId.HabitatsDirective, 
-                        (int)TaxonListId.ProtectedByLaw, 
-                        (int)TaxonListId.ActionPlan, 
+                        (int)TaxonListId.RedlistedSpecies,
+                        (int)TaxonListId.HabitatsDirective,
+                        (int)TaxonListId.ProtectedByLaw,
+                        (int)TaxonListId.ActionPlan,
                         (int)TaxonListId.SwedishForestAgencyNatureConservationSpecies
                     }
                 },
@@ -266,7 +269,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
         public async Task Test_SignalSearch_Lansstyrelsen()
-        {            
+        {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
@@ -274,7 +277,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
             var searchFilter = new SignalFilterDto()
             {
-                BirdNestActivityLimit = 19,                
+                BirdNestActivityLimit = 19,
                 Geographics = new GeographicsFilterDto()
                 {
                     Geometries = new List<IGeoShape>()

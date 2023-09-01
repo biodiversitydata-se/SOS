@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepository
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationRepository
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class CustomElasticsearchIndexTests

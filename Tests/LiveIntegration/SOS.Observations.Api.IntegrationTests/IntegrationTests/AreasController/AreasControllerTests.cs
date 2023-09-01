@@ -12,11 +12,11 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Location;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.LocationsController
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.AreasController
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class AreasControllerTests
@@ -61,8 +61,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.LocationsContro
 
             string strJson = JsonSerializer.Serialize(municipalities, jsonSerializerOptions);
             var filename = FilenameHelper.CreateFilenameWithDate("municipalities", "json");
-            var filePath = System.IO.Path.Combine(@"C:\temp\", filename);            
-            await System.IO.File.WriteAllTextAsync(filePath, strJson);            
+            var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
+            await System.IO.File.WriteAllTextAsync(filePath, strJson);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -9,11 +9,12 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class SearchByScrollTests
@@ -36,7 +37,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             {
                 Taxon = new TaxonFilterDto
                 {
-                    Ids = new List<int> { TestData.TaxonIds.Mammalia }, 
+                    Ids = new List<int> { TestData.TaxonIds.Mammalia },
                     IncludeUnderlyingTaxa = true
                 },
                 Geographics = new GeographicsFilterDto()
@@ -48,7 +49,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 },
                 Output = new OutputFilterDto
                 {
-                    Fields = new [] { "event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.occurrenceId", "occurrence.recordedBy", "occurrence.occurrenceStatus" }
+                    Fields = new[] { "event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.occurrenceId", "occurrence.recordedBy", "occurrence.occurrenceStatus" }
                 }
             };
             var observations = new List<Observation>();
@@ -58,7 +59,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var countResponse = await _fixture.ObservationsController.Count(null, null, searchFilter);
             int count = countResponse.GetResult<int>();
-            count.Should().BeLessOrEqualTo(100000,"because our limit for the scroll endpoint is 100000");
+            count.Should().BeLessOrEqualTo(100000, "because our limit for the scroll endpoint is 100000");
             string scrollId = null; // no scroll in first request
             bool hasMorePages;
             HashSet<string> ids = new HashSet<string>();

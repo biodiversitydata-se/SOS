@@ -14,7 +14,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.DarwinCore
+namespace SOS.Import.LiveIntegrationTests.DarwinCore
 {
     public class iNaturalistTests
     {

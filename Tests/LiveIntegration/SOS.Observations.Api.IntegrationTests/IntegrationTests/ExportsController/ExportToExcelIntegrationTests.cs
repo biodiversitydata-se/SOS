@@ -10,11 +10,12 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsController
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsController
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class ExportToExcelIntegrationTests
@@ -25,7 +26,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
         {
             _fixture = fixture;
         }
-        
+
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
         public async Task Export_to_Excel_filter_with_polygon_geometry()
@@ -62,10 +63,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var response = await _fixture.ExportsController.DownloadExcelAsync(
                 null,
                 null,
-                searchFilter, 
+                searchFilter,
                 OutputFieldSet.Minimum,
                 false,
-                PropertyLabelType.Swedish, 
+                PropertyLabelType.Swedish,
                 "sv-SE");
             var bytes = response.GetFileContentResult();
 
@@ -74,7 +75,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             bytes.Length.Should().BeGreaterThan(0);
 
-            var filename = FilenameHelper.CreateFilenameWithDate("excel_export","zip");
+            var filename = FilenameHelper.CreateFilenameWithDate("excel_export", "zip");
             var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
             await System.IO.File.WriteAllBytesAsync(filePath, bytes);
         }
@@ -88,10 +89,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilterDto()
             {
-                ProjectIds = new List<int> {2976},
+                ProjectIds = new List<int> { 2976 },
                 Date = new DateFilterDto()
                 {
-                    StartDate = new DateTime(2016,9,1),
+                    StartDate = new DateTime(2016, 9, 1),
                     EndDate = new DateTime(2016, 9, 30),
                 }
             };
@@ -102,10 +103,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var response = await _fixture.ExportsController.DownloadExcelAsync(
                 null,
                 null,
-                searchFilter, 
+                searchFilter,
                 OutputFieldSet.Minimum,
                 false,
-                PropertyLabelType.Swedish, 
+                PropertyLabelType.Swedish,
                 "sv-SE");
             var bytes = response.GetFileContentResult();
 
@@ -149,9 +150,9 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 searchFilter,
                 OutputFieldSet.Minimum,
                 false,
-                PropertyLabelType.Swedish, 
-                "sv-SE", 
-                false);                
+                PropertyLabelType.Swedish,
+                "sv-SE",
+                false);
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -183,14 +184,14 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                     Geometries = new List<IGeoShape>()
                     {
                         geoShape
-                    }                    
+                    }
                 },
                 Taxon = new TaxonFilterDto()
                 {
                     Ids = new List<int> { 3000293 },
                     IncludeUnderlyingTaxa = true
                 }
-            };            
+            };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -198,10 +199,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var response = await _fixture.ExportsController.DownloadExcelAsync(
                 null,
                 null,
-                searchFilter, 
+                searchFilter,
                 OutputFieldSet.Minimum,
                 false,
-                PropertyLabelType.Swedish, 
+                PropertyLabelType.Swedish,
                 "sv-SE");
             var bytes = response.GetFileContentResult();
 

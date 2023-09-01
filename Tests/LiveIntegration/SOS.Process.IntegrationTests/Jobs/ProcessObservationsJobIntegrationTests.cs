@@ -39,14 +39,15 @@ using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Process.LiveIntegrationTests;
 
-namespace SOS.Process.IntegrationTests.Jobs
+namespace SOS.Process.LiveIntegrationTests.Jobs
 {
     public class ProcessObservationsJobIntegrationTests : TestBase
     {
         private ProcessObservationsJob CreateProcessJob(bool storeProcessed)
         {
-            
+
             var processConfiguration = GetProcessConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
             var elasticClientManager = new ElasticClientManager(elasticConfiguration);
@@ -62,10 +63,10 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            
+
             var areaHelper = new AreaHelper(
                 new AreaRepository(processClient, new NullLogger<AreaRepository>()));
-           
+
             var taxonProcessedRepository =
                 new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
 
@@ -86,7 +87,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             IProcessedObservationCoreRepository processedObservationRepository;
             if (storeProcessed)
             {
-                processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager, 
+                processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager,
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new NullLogger<ProcessedObservationCoreRepository>());
@@ -110,7 +111,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var artportalenDatasetRepository =
-                new ArtportalenDatasetMetadataRepository( processClient, new NullLogger<ArtportalenDatasetMetadataRepository>());
+                new ArtportalenDatasetMetadataRepository(processClient, new NullLogger<ArtportalenDatasetMetadataRepository>());
             var vocabularyValueResolver =
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
             var extendedMeasurementOrFactCsvWriter = new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>());
@@ -141,10 +142,10 @@ namespace SOS.Process.IntegrationTests.Jobs
                     fileService,
                     new NullLogger<DwcArchiveEventFileWriter>()
                 ),
-                fileService, 
-                dataProviderRepository, 
-                verbatimClient, 
-                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, 
+                fileService,
+                dataProviderRepository,
+                verbatimClient,
+                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" },
                 new NullLogger<DwcArchiveFileWriterCoordinator>()
             );
 
@@ -256,13 +257,13 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new NullLogger<ArtportalenObservationProcessor>());
 
             var instanceManager = new InstanceManager(
-                new ProcessedObservationCoreRepository(elasticClientManager, 
-                    new ElasticSearchConfiguration(), 
+                new ProcessedObservationCoreRepository(elasticClientManager,
+                    new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new NullLogger<ProcessedObservationCoreRepository>()),
                 new NullLogger<InstanceManager>());
 
-            
+
 
             var processTaxaJob = new ProcessTaxaJob(null, // todo
                 harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
@@ -355,7 +356,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result = await processJob.RunAsync(
-                new List<string> {DataProviderIdentifiers.ButterflyMonitoring},
+                new List<string> { DataProviderIdentifiers.ButterflyMonitoring },
                 JobRunModes.Full,
                 JobCancellationToken.Null);
 
@@ -377,7 +378,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result = await processJob.RunAsync(
-                new List<string> {DataProviderIdentifiers.Artportalen},
+                new List<string> { DataProviderIdentifiers.Artportalen },
                 JobRunModes.Full,
                 JobCancellationToken.Null);
 

@@ -65,11 +65,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit", "Unit", "{E71FD295-A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{A3C5E4A0-5599-48B7-BE17-07E19D585ACE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Export.IntegrationTests", "Tests\LiveIntegration\SOS.Export.IntegrationTests\SOS.Export.IntegrationTests.csproj", "{45A02CCC-5E06-45C8-AA50-E2C7A79AD407}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Export.LiveIntegrationTests", "Tests\LiveIntegration\SOS.Export.IntegrationTests\SOS.Export.LiveIntegrationTests.csproj", "{45A02CCC-5E06-45C8-AA50-E2C7A79AD407}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Import.IntegrationTests", "Tests\LiveIntegration\SOS.Import.IntegrationTests\SOS.Import.IntegrationTests.csproj", "{419D5FA2-0FFB-4BB4-BE18-7CC627D31C7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Import.LiveIntegrationTests", "Tests\LiveIntegration\SOS.Import.IntegrationTests\SOS.Import.LiveIntegrationTests.csproj", "{419D5FA2-0FFB-4BB4-BE18-7CC627D31C7E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Process.IntegrationTests", "Tests\LiveIntegration\SOS.Process.IntegrationTests\SOS.Process.IntegrationTests.csproj", "{6D6ED655-603E-4E0D-8FA5-43176A64A674}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Process.LiveIntegrationTests", "Tests\LiveIntegration\SOS.Process.IntegrationTests\SOS.Process.LiveIntegrationTests.csproj", "{6D6ED655-603E-4E0D-8FA5-43176A64A674}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.TestHelpers", "Tests\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj", "{28571B85-2E06-4196-A584-E6E8B34C4618}"
 EndProject
@@ -85,7 +85,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Administration.Api", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Observations.Api", "Src\SOS.Observations.Api\SOS.Observations.Api.csproj", "{3AF27B20-8F97-469D-BD31-58AD3636635A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Observations.Api.IntegrationTests", "Tests\LiveIntegration\SOS.Observations.Api.IntegrationTests\SOS.Observations.Api.IntegrationTests.csproj", "{73ED84F1-EE76-4A74-B263-C9E4D7A0BCFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Observations.Api.LiveIntegrationTests", "Tests\LiveIntegration\SOS.Observations.Api.IntegrationTests\SOS.Observations.Api.LiveIntegrationTests.csproj", "{73ED84F1-EE76-4A74-B263-C9E4D7A0BCFA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Observations.Api.UnitTests", "Tests\Unit\SOS.Observations.Api.UnitTests\SOS.Observations.Api.UnitTests.csproj", "{147DAE82-B72C-49AF-B2A6-584BE4F5202C}"
 EndProject

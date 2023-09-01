@@ -4,7 +4,7 @@ using SOS.Lib.Models.Search.Result;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.IntegrationTests.Repositories.Interfaces
+namespace SOS.Observations.Api.LiveIntegrationTests.Repositories.Interfaces
 {
     public interface IProcessedObservationRepositoryTest
     {

@@ -11,12 +11,12 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Observation;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.ObservationsBySearchDwcEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.ObservationsBySearchDwcEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class ObservationsBySearchDwcTests
@@ -35,12 +35,12 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.ObservationsBySearchDwc(null, 
-                null, 
-                "Plantae", 
+            var response = await _fixture.ObservationsController.ObservationsBySearchDwc(null,
+                null,
+                "Plantae",
                 null,
                 null,
-                null,                
+                null,
                 null,
                 null,
                 null,

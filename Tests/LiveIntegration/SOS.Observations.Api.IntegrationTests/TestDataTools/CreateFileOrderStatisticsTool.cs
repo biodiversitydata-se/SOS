@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.TestDataTools
-{    
+namespace SOS.Observations.Api.LiveIntegrationTests.TestDataTools
+{
     public class CreateFileOrderStatisticsTool
-    {        
+    {
         /// <summary>
         /// In order to run this test, first save the UserExport collection (MongoDB) to a JSON file.
         /// </summary>
@@ -41,11 +41,11 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
         {
             DateTime? firstDate = null;
             DateTime? lastDate = null;
-            FileOrderStats fileOrderStats = new FileOrderStats();            
-            foreach(var userExport in userExports)
+            FileOrderStats fileOrderStats = new FileOrderStats();
+            foreach (var userExport in userExports)
             {
                 if (userExport._Id == 0) continue; // AccountId used by integration tests.
-                foreach(var job in userExport.Jobs)
+                foreach (var job in userExport.Jobs)
                 {
                     if (firstDate == null)
                     {
@@ -87,11 +87,11 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
         }
 
         private class UserExportDto
-        {            
+        {
             /// <summary>
             /// Id
             /// </summary>
-            public int _Id { get; set; }                        
+            public int _Id { get; set; }
 
             public List<ExportJobInfoDto> Jobs { get; set; }
         }
@@ -101,12 +101,12 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
             public string Id { get; set; }
             public DateTime CreatedDate { get; set; }
             public DateTime? ProcessStartDate { get; set; }
-            public DateTime? ProcessEndDate { get; set; }            
+            public DateTime? ProcessEndDate { get; set; }
             public int NumberOfObservations { get; set; }
-            public string Description { get; set; }            
-            public string Format { get; set; }            
+            public string Description { get; set; }
+            public string Format { get; set; }
             public string Status { get; set; }
-            public string ErrorMsg { get; set; }            
+            public string ErrorMsg { get; set; }
             public string OutputFieldSet { get; set; }
         }
     }

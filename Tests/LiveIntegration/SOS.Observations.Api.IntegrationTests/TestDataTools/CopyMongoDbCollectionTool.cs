@@ -4,12 +4,12 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
-using SOS.Observations.Api.IntegrationTests.Utils;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Utils;
 using SOS.TestHelpers;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.TestDataTools
+namespace SOS.Observations.Api.LiveIntegrationTests.TestDataTools
 {
     public class CopyMongoDbCollectionTool : FixtureBase
     {
@@ -42,8 +42,8 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var fromClient = GetProcessClient(InstallationEnvironment.DevelopmentTest, "sos-dev");
-            var toClient = GetProcessClient(InstallationEnvironment.Local, "sos");            
-            var mongoDbUtil = new MongoDbUtil(fromClient, toClient);            
+            var toClient = GetProcessClient(InstallationEnvironment.Local, "sos");
+            var mongoDbUtil = new MongoDbUtil(fromClient, toClient);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -64,7 +64,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
             var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
                 mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
             return processClient;
-        }        
+        }
 
         protected MongoDbConfiguration GetMongoDbConfiguration(InstallationEnvironment environment)
         {

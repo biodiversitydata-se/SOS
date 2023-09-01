@@ -14,7 +14,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Harvesters
+namespace SOS.Import.LiveIntegrationTests.Harvesters
 {
     public class AreaHarvesterIntegrationTests : TestBase
     {
@@ -43,8 +43,8 @@ namespace SOS.Import.IntegrationTests.Harvesters
                 new Harvest.Repositories.Source.Artportalen.AreaRepository(artportalenDataService, new Mock<ILogger<Harvest.Repositories.Source.Artportalen.AreaRepository>>().Object),
                 areaVerbatimRepository,
                 new AreaHelper(new Mock<IAreaRepository>().Object),
-                new GeoRegionApiService(new GeoRegionApiConfiguration {ApiUrl = "https://georegionapi-dev.artdata.slu.se/"}), 
-                cacheManager.Object, 
+                new GeoRegionApiService(new GeoRegionApiConfiguration { ApiUrl = "https://georegionapi-dev.artdata.slu.se/" }),
+                cacheManager.Object,
                 new Mock<ILogger<AreaHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

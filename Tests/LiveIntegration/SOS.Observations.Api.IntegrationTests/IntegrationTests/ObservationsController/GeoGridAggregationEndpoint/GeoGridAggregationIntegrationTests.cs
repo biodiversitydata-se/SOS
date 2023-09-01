@@ -7,11 +7,11 @@ using FluentAssertions;
 using Nest;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.GeoGridAggregationEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.GeoGridAggregationEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class GeoGridAggregationIntegrationTests
@@ -127,9 +127,9 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 response = await _fixture.ObservationsController.GeogridTaxaAggregationInternal(
                     null,
                     null,
-                    searchFilter, 
-                    zoom, 
-                    result.NextGeoTilePage, 
+                    searchFilter,
+                    zoom,
+                    result.NextGeoTilePage,
                     result.NextTaxonIdPage);
                 result = response.GetResult<GeoGridTileTaxonPageResultDto>();
                 gridCells.AddRange(result.GridCells);

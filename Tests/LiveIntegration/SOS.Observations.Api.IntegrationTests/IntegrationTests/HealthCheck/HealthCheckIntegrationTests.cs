@@ -1,22 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
-using Nest;
-using NetTopologySuite.Features;
-using NetTopologySuite.IO;
-using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
-using SOS.Lib.JsonConverters;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.HealthCheck
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.HealthCheck
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class HealthCheckIntegrationTests
@@ -31,7 +18,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.HealthCheck
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
         public async Task SearchPerformanceHealthCheck()
-        {            
+        {
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -40,7 +27,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.HealthCheck
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Status.Should().Be(Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Healthy);            
+            result.Status.Should().Be(Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Healthy);
         }
 
         [Fact]

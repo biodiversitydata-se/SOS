@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 using SOS.Lib.Models.Search.Filters;
 using System.Collections.Generic;
 using System.Linq;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepository
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationRepository
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class EventIdsAggregationTests
@@ -16,7 +16,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
         public EventIdsAggregationTests(ApiIntegrationTestFixture fixture)
         {
             _fixture = fixture;
-        }       
+        }
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
@@ -35,7 +35,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             //-----------------------------------------------------------------------------------------------------------
             var eventIds = await _fixture.ProcessedObservationRepository.GetAggregationItemsAsync(searchFilter, "event.eventId");
             var eventIdsAll = await _fixture.ProcessedObservationRepository.GetAllAggregationItemsAsync(searchFilter, "event.eventId");
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             //-----------------------------------------------------------------------------------------------------------
             var occurrenceIds = await _fixture.ProcessedObservationRepository.GetAggregationItemsAsync(searchFilter, "occurrence.occurrenceId");
             var occurrenceIdsAll = await _fixture.ProcessedObservationRepository.GetAllAggregationItemsAsync(searchFilter, "occurrence.occurrenceId");
-            
+
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -126,15 +126,17 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             //-----------------------------------------------------------------------------------------------------------
             SearchFilter searchFilter = new SearchFilter(0)
             {
-                Event = 
-                    new EventFilter { Ids = new List<string>
+                Event =
+                    new EventFilter
+                    {
+                        Ids = new List<string>
                     {
                         "SFTspkt:19770610:241"
                         //"SFTstd:20060627:461",
                         //"SFTstd:20050606:106"
                     }
-                }
-                
+                    }
+
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -160,9 +162,9 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
                 DataProviderIds = new List<int>() { 1 },
                 Taxa = new TaxonFilter
                 {
-                    Ids= new List<int>() { 3000299 }, // bats
-                    IncludeUnderlyingTaxa= true
-                }                
+                    Ids = new List<int>() { 3000299 }, // bats
+                    IncludeUnderlyingTaxa = true
+                }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -173,7 +175,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            occurrenceIdsByEventIdItems.Should().NotBeNull();            
+            occurrenceIdsByEventIdItems.Should().NotBeNull();
         }
     }
 }

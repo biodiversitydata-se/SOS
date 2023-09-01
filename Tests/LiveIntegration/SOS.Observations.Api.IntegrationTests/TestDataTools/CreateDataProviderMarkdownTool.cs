@@ -5,13 +5,11 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using SOS.Lib.Enums;
 using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.TestDataTools
+namespace SOS.Observations.Api.LiveIntegrationTests.TestDataTools
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class CreateDataProviderMarkdownTool
@@ -32,7 +30,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             string outputPath = @"C:\temp\";
             var sosClient = new SosClient("https://sos-search.artdata.slu.se/");
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------            
@@ -54,7 +52,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
             }
 
             public async Task<List<DataProviderDto>> GetDataProviders(string cultureCode)
-            {                
+            {
                 var response = await _client.GetAsync($"{_apiUrl}DataProviders?cultureCode={cultureCode}");
                 if (response.IsSuccessStatusCode)
                 {
@@ -71,14 +69,14 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
 
         private string CreateMarkdown(List<DataProviderDto> dataProviders)
         {
-            int totalCount=0;
+            int totalCount = 0;
             var sb = new StringBuilder();
             sb.AppendLine("| Id 	| Name 	| Organization 	| Number of observations 	|");
             sb.AppendLine("|:---	|:---	|:--- |---:	|");
             foreach (var dataProvider in dataProviders)
             {
-                sb.AppendLine($"| {dataProvider.Id} | [{dataProvider.Name}]({dataProvider.Url}) | {dataProvider.Organization} | {(dataProvider.PublicObservations + dataProvider.ProtectedObservations):N0} |");
-                totalCount += (dataProvider.PublicObservations + dataProvider.ProtectedObservations);
+                sb.AppendLine($"| {dataProvider.Id} | [{dataProvider.Name}]({dataProvider.Url}) | {dataProvider.Organization} | {dataProvider.PublicObservations + dataProvider.ProtectedObservations:N0} |");
+                totalCount += dataProvider.PublicObservations + dataProvider.ProtectedObservations;
             }
             sb.AppendLine($"|  |  |  | **{totalCount:N0}** |");
 

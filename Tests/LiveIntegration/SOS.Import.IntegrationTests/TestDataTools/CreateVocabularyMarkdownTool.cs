@@ -6,17 +6,18 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Models.Shared;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.TestDataTools
+namespace SOS.Import.LiveIntegrationTests.TestDataTools
 {
     public class CreateVocabularyMarkdownTool : TestBase
     {
         public class VocabularyFile
         {
             public string SourceFilePath { get; set; }
-            public Vocabulary Vocabulary { get; set; }            
+            public Vocabulary Vocabulary { get; set; }
             public string Title { get; set; }
             public string Markdown { get; set; }
         }
@@ -36,11 +37,11 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            List<VocabularyFile> vocabularyFiles = GetVocabularyFiles();            
-            foreach(var vocabularyFile in vocabularyFiles)
+            List<VocabularyFile> vocabularyFiles = GetVocabularyFiles();
+            foreach (var vocabularyFile in vocabularyFiles)
             {
                 Debug.WriteLine($"Reading: {vocabularyFile.Title}");
-                var str = File.ReadAllText(vocabularyFile.SourceFilePath, Encoding.UTF8);                
+                var str = File.ReadAllText(vocabularyFile.SourceFilePath, Encoding.UTF8);
                 vocabularyFile.Vocabulary = JsonConvert.DeserializeObject<Vocabulary>(str);
                 vocabularyFile.Markdown = CreateMarkdown(vocabularyFile.Vocabulary);
             }
@@ -64,7 +65,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 sbComposite.Append(vocabularyFile.Markdown);
                 sbComposite.AppendLine();
             }
-            File.WriteAllText(Path.Join(outputPath, "vocabularies.md"), sbComposite.ToString());            
+            File.WriteAllText(Path.Join(outputPath, "vocabularies.md"), sbComposite.ToString());
         }
 
         private List<VocabularyFile> GetVocabularyFiles()
@@ -243,7 +244,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 sb.AppendLine("|:---	|:---	|:---	|");
                 foreach (var item in vocabulary.Values)
                 {
-                    sb.AppendLine($"| {item.Id} | {item.Value} | {item.Category.Name }");
+                    sb.AppendLine($"| {item.Id} | {item.Value} | {item.Category.Name}");
                 }
             }
 

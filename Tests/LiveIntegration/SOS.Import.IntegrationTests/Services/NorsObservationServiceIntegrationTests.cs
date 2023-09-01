@@ -5,10 +5,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Harvest.Services;
+using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Services;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Services
+namespace SOS.Import.LiveIntegrationTests.Services
 {
     public class NorsObservationServiceIntegrationTests : TestBase
     {

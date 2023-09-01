@@ -24,8 +24,9 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
 using Xunit;
+using SOS.Export.LiveIntegrationTests;
 
-namespace SOS.Export.IntegrationTests.Managers
+namespace SOS.Export.LiveIntegrationTests.Managers
 {
     public class ObservationManagerIntegrationTests : TestBase
     {
@@ -49,8 +50,8 @@ namespace SOS.Export.IntegrationTests.Managers
                 new DwcArchiveOccurrenceCsvWriter(
                     vocabularyValueResolver,
                     new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
-                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()), 
-                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()), 
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new NullLogger<DwcArchiveFileWriter>());
@@ -100,7 +101,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,
                 new FileDestination { Path = exportConfiguration.FileDestination.Path },
-                filterManager.Object, 
+                filterManager.Object,
                 new Mock<ILogger<ObservationManager>>().Object);
 
             return observationManager;
@@ -142,7 +143,7 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndSendAsync(null, null, 
+                await observationManager.ExportAndSendAsync(null, null,
                     new SearchFilter(0)
                     {
                         DataProviderIds = new List<int> { 1 },
@@ -162,10 +163,10 @@ namespace SOS.Export.IntegrationTests.Managers
                                 "taxon.vernacularName"
                             }
                         }
-                    }, 
-                    "mats.lindgren@slu.se", 
-                    "AP", 
-                    ExportFormat.GeoJson, 
+                    },
+                    "mats.lindgren@slu.se",
+                    "AP",
+                    ExportFormat.GeoJson,
                     "en-GB",
                     false,
                     PropertyLabelType.PropertyPath,
@@ -215,7 +216,7 @@ namespace SOS.Export.IntegrationTests.Managers
                             "taxon.vernacularName"
                         }
                     }
-                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false,  PropertyLabelType.PropertyPath, false, false,
+                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false, PropertyLabelType.PropertyPath, false, false,
                     false,
                     null, JobCancellationToken.Null);
 

@@ -12,7 +12,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.TestDataTools
+namespace SOS.Import.LiveIntegrationTests.TestDataTools
 {
     public class CreateVocabularyEnumsTool : TestBase
     {
@@ -89,7 +89,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
         public string ReplaceInvalidChars(string input)
         {
             var str = input;
-            string[] invalidChars = {".", ",", "(", ")", "-"};
+            string[] invalidChars = { ".", ",", "(", ")", "-" };
             foreach (var invalidChar in invalidChars)
             {
                 str = str.Replace(invalidChar, "");
@@ -123,11 +123,11 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\VocabularyEnums.cs";
             var verbatimDbConfiguration = GetProcessDbConfiguration();
-            var processClient = new ProcessClient (
+            var processClient = new ProcessClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
                 verbatimDbConfiguration.DatabaseName,
                 verbatimDbConfiguration.ReadBatchSize,
-                verbatimDbConfiguration.WriteBatchSize); 
+                verbatimDbConfiguration.WriteBatchSize);
 
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());

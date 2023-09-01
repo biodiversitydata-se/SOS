@@ -3,10 +3,10 @@ using Xunit;
 using SOS.Lib.IO.DwcArchive;
 using System.IO;
 
-namespace SOS.Process.IntegrationTests.Dwca
+namespace SOS.Process.LiveIntegrationTests.Dwca
 {
     public class CreatePartialDwcaFileTests
-    {      
+    {
         [Fact]
         public void Create_partial_dwca_file()
         {
@@ -23,10 +23,10 @@ namespace SOS.Process.IntegrationTests.Dwca
             // Act
             //-----------------------------------------------------------------------------------------------------------            
             string filePath = PartialDwcaFileCreator.CreateDwcaFile(
-                sourceFilePath, 
-                outputFolder, 
-                outputFileName, 
-                nrRowsLimit, 
+                sourceFilePath,
+                outputFolder,
+                outputFileName,
+                nrRowsLimit,
                 startRow);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ namespace SOS.Process.IntegrationTests.Dwca
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------            
-            string sourceFilePath = @"C:\DwC-A\Artportalen.dwca.zip";            
+            string sourceFilePath = @"C:\DwC-A\Artportalen.dwca.zip";
             int nrRowsLimit = 100;
             int startRow = 0;
 

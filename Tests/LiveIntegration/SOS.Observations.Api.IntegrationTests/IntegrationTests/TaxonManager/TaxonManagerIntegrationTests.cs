@@ -1,11 +1,11 @@
 ﻿using FluentAssertions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 using SOS.Lib.Helpers;
 using System.Collections.Generic;
 using SOS.Lib.Factories;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.TaxonManager
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class TaxonManagerIntegrationTests
@@ -59,7 +59,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var taxonTree = _fixture.TaxonManager.TaxonTree;            
+            var taxonTree = _fixture.TaxonManager.TaxonTree;
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -121,7 +121,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             var taxonTree = _fixture.TaxonManager.TaxonTree;
             //var taxonIds = new List<int>() { 261815, 261806 };
             var taxonIds = new List<int>() { 222474, 1016470, 221107, 1006157, 2002715 };
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -161,6 +161,6 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             strMermaid.Should().NotBeNullOrEmpty();
-        }        
+        }
     }
 }

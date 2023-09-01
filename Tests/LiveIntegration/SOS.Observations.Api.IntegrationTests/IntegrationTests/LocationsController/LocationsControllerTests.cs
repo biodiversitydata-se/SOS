@@ -5,11 +5,11 @@ using FluentAssertions;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Location;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.LocationsController
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.LocationsController
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class LocationsControllerTests
@@ -30,7 +30,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.LocationsContro
             //-----------------------------------------------------------------------------------------------------------
             GeographicsFilterDto searchFilter = new GeographicsFilterDto
             {
-                Areas = new []{new AreaFilterDto
+                Areas = new[]{new AreaFilterDto
                 {
                     AreaType = AreaTypeDto.Municipality,
                     FeatureId = "380"

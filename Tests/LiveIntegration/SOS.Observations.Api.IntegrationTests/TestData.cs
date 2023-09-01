@@ -3,7 +3,7 @@ using SOS.Lib.Models.UserService;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 
-namespace SOS.Observations.Api.IntegrationTests
+namespace SOS.Observations.Api.LiveIntegrationTests
 {
     public static class TestData
     {
@@ -23,7 +23,7 @@ namespace SOS.Observations.Api.IntegrationTests
             /// Tranås municipality.
             /// </summary>
             public static AreaFilterDto TranasMunicipality => new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "687" };
-            
+
             /// <summary>
             /// Jönköping county.
             /// </summary>
@@ -37,7 +37,7 @@ namespace SOS.Observations.Api.IntegrationTests
 
         public static class AreaAuthority
         {
-            public static AreaModel Sweden => new AreaModel {AreaTypeId = (int) AreaType.BirdValidationArea, FeatureId = "100"};
+            public static AreaModel Sweden => new AreaModel { AreaTypeId = (int)AreaType.BirdValidationArea, FeatureId = "100" };
             public static AreaModel JonkopingCounty => new AreaModel { AreaTypeId = (int)AreaType.County, FeatureId = "6" };
             public static AreaModel OstergotlandCounty => new AreaModel { AreaTypeId = (int)AreaType.County, FeatureId = "5" };
             public static AreaModel TranasMunicipality => new AreaModel { AreaTypeId = (int)AreaType.Municipality, FeatureId = "687" };

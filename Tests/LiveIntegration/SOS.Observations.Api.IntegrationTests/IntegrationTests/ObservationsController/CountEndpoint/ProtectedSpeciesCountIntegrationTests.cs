@@ -6,12 +6,13 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using SOS.TestHelpers.Helpers.Builders;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.CountEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.CountEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class ProtectedSpeciesCountIntegrationTests
@@ -88,7 +89,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().Be(0,"because wolf is protected and you have no permissions.");
+            result.Should().Be(0, "because wolf is protected and you have no permissions.");
         }
 
         [Fact]

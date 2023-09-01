@@ -13,11 +13,11 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsController
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsController
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class ExportJob
@@ -28,7 +28,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
         {
             _fixture = fixture;
         }
-        
+
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
         public async Task Export_to_Excel_uttag()
@@ -60,11 +60,11 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ExportsController.DownloadExcelAsync(
                 null,
-                null, 
-                searchFilter, 
-                OutputFieldSet.Minimum, 
+                null,
+                searchFilter,
+                OutputFieldSet.Minimum,
                 false,
-                PropertyLabelType.Swedish, 
+                PropertyLabelType.Swedish,
                 "sv-SE");
             var bytes = response.GetFileContentResult();
 
@@ -73,7 +73,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             bytes.Length.Should().BeGreaterThan(0);
 
-            var filename = FilenameHelper.CreateFilenameWithDate("excel_export","zip");
+            var filename = FilenameHelper.CreateFilenameWithDate("excel_export", "zip");
             var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
             await System.IO.File.WriteAllBytesAsync(filePath, bytes);
         }
@@ -103,17 +103,17 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 },
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ExportsController.DownloadGeoJsonAsync(
                 null,
                 null,
-                searchFilter, 
+                searchFilter,
                 OutputFieldSet.Minimum,
                 false,
-                PropertyLabelType.Swedish, 
+                PropertyLabelType.Swedish,
                 "sv-SE");
             var bytes = response.GetFileContentResult();
 
@@ -149,10 +149,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var response = await _fixture.ExportsController.DownloadGeoJsonAsync(
                 null,
                 null,
-                searchFilter, 
-                OutputFieldSet.Minimum, 
+                searchFilter,
+                OutputFieldSet.Minimum,
                 false,
-                PropertyLabelType.Swedish, 
+                PropertyLabelType.Swedish,
                 "sv-SE");
             var bytes = response.GetFileContentResult();
 

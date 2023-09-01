@@ -7,11 +7,12 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsController
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsController
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class ExportToGeoJsonIntegrationTests
@@ -22,7 +23,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
         {
             _fixture = fixture;
         }
-        
+
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
         public async Task Export_to_flat_GeoJson_filter_with_polygon_geometry()
@@ -72,7 +73,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             bytes.Length.Should().BeGreaterThan(0);
 
-            var filename = FilenameHelper.CreateFilenameWithDate("geojson_export","zip");
+            var filename = FilenameHelper.CreateFilenameWithDate("geojson_export", "zip");
             var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
             await System.IO.File.WriteAllBytesAsync(filePath, bytes);
         }
@@ -257,8 +258,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJsonAsync( null, 
-                null, 
+            var response = await _fixture.ExportsController.DownloadGeoJsonAsync(null,
+                null,
                 searchFilter,
                 OutputFieldSet.All,
                 false,

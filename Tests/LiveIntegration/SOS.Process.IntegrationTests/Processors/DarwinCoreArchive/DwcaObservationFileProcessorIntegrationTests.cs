@@ -33,8 +33,9 @@ using Xunit.Abstractions;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using SOS.Process.LiveIntegrationTests;
 
-namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
+namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
 {
     public class DwcaObservationFileProcessorIntegrationTests : TestBase
     {
@@ -78,7 +79,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 .Returns(Task.FromResult(true))
                 .Returns(Task.FromResult(false));
             var verbatimClient = new Mock<VerbatimClient>();
-           
+
             var dwcaVerbatimRepository = new Mock<DarwinCoreArchiveVerbatimRepository>();
             dwcaVerbatimRepository.Setup(m => m.GetAllByCursorAsync())
                 .ReturnsAsync(mockCursor.Object);
@@ -139,10 +140,10 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                     fileService,
                     new NullLogger<DwcArchiveEventFileWriter>()
                 ),
-                fileService, 
-                dataProviderRepository, 
-                importClient, 
-                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, 
+                fileService,
+                dataProviderRepository,
+                importClient,
+                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" },
                 new NullLogger<DwcArchiveFileWriterCoordinator>()
             );
             var dwcaConfiguration = new DwcaConfiguration()

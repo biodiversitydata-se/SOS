@@ -7,7 +7,7 @@ using System.Text.Json;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.DarwinCore;
 
-namespace SOS.Import.IntegrationTests.TestHelpers.Factories
+namespace SOS.Import.LiveIntegrationTests.TestHelpers.Factories
 {
     public static class DarwinCoreTaxonFactory
     {
@@ -23,7 +23,7 @@ namespace SOS.Import.IntegrationTests.TestHelpers.Factories
             var filePath = Path.Combine(assemblyPath, fileName);
             using Stream zipStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             using var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, false);
-            
+
             var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
             serializeOptions.Converters.Add(new ObjectIdConverter());
 

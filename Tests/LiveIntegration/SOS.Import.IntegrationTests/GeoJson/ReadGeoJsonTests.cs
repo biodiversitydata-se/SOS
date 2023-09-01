@@ -12,7 +12,7 @@ using NetTopologySuite.Features;
 using Xunit;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Import.IntegrationTests.GeoJson
+namespace SOS.Import.LiveIntegrationTests.GeoJson
 {
     public class ReadGeoJsonTests
     {

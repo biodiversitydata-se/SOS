@@ -2,8 +2,8 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.ObservationByIdEndpoint
+namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.ObservationByIdEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class GetObservationByIdInternalTests

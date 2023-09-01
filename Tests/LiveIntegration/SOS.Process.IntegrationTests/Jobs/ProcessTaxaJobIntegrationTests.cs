@@ -8,7 +8,7 @@ using SOS.Harvest.Jobs;
 using SOS.Harvest.Processors.Taxon;
 using Xunit;
 
-namespace SOS.Process.IntegrationTests.Jobs
+namespace SOS.Process.LiveIntegrationTests.Jobs
 {
     public class ProcessTaxaJobIntegrationTests : TestBase
     {

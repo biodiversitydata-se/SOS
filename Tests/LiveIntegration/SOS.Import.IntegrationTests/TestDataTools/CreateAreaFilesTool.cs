@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using NetTopologySuite.Features;
 using NetTopologySuite.IO;
+using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.TestDataTools
+namespace SOS.Import.LiveIntegrationTests.TestDataTools
 {
     public class CreateAreaFilesTool : TestBase
     {

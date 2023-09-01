@@ -8,7 +8,7 @@ using SOS.Harvest.Repositories.Source.Artportalen;
 using SOS.Harvest.Services;
 using Xunit;
 
-namespace SOS.Import.IntegrationTests.Repositories
+namespace SOS.Import.LiveIntegrationTests.Repositories
 {
     /// <summary>
     ///     Test sighting repository
