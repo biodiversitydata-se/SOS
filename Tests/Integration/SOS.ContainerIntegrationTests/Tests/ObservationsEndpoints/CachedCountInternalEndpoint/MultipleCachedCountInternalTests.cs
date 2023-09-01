@@ -16,10 +16,8 @@ public class MultipleCachedCountInternalTests : TestBase
     [Fact]
     public async Task SumObservationCountInternalTest()
     {
-        //-----------------------------------------------------------------------------------------------------------
-        // Arrange - Create verbatim observations
-        //-----------------------------------------------------------------------------------------------------------
-
+        // Arrange
+        TestFixture.ResetTaxonSumAggregationCache();
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
            .All()
                .HaveValuesFromPredefinedObservations()

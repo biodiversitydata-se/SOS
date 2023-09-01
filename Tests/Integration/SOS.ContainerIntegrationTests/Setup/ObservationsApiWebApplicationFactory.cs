@@ -1,10 +1,10 @@
 ﻿using NSubstitute;
 using SOS.ContainerIntegrationTests.Setup.Stubs;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 
@@ -26,7 +26,8 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
     {        
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Dev");
         Environment.SetEnvironmentVariable("DISABLE_HANGFIRE_INIT", "true");
-        Environment.SetEnvironmentVariable("DISABLE_HEALTHCHECK_INIT", "true");        
+        Environment.SetEnvironmentVariable("DISABLE_HEALTHCHECK_INIT", "true");
+        Environment.SetEnvironmentVariable("DISABLE_CACHED_TAXON_SUM_INIT", "true");        
     }
 
     /// <summary>
@@ -35,17 +36,19 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
     /// <param name="builder">The WebHostBuilder instance to be configured.</param>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        using var scope = ServiceProvider!.CreateScope();
-        var observationDatasetRepository = scope.ServiceProvider.GetService<IDatasetRepository>();
-        var observationEventRepository = scope.ServiceProvider.GetService<IEventRepository>();
-        var processedObservationCoreRepository = scope.ServiceProvider.GetService<IProcessedObservationCoreRepository>();
-        var processedObservationRepository = scope.ServiceProvider.GetService<IProcessedObservationRepository>();
-        var processedTaxonRepository = scope.ServiceProvider.GetService<IProcessedTaxonRepository>();
-        var processedChecklistRepository = scope.ServiceProvider.GetService<IProcessedChecklistRepository>();
+        using var scope = ServiceProvider!.CreateScope();        
         var processClient = scope.ServiceProvider.GetService<IProcessClient>();
-
+        var elasticSearchConfiguration = scope.ServiceProvider.GetService<ElasticSearchConfiguration>();
+        var elasticClientManager = scope.ServiceProvider.GetService<IElasticClientManager>();
+        
         builder.ConfigureTestServices(services =>
-        {
+        {            
+            services.Replace(ServiceDescriptor.Singleton(x => processClient!)); // Replace MongoDB 
+            services.Replace(ServiceDescriptor.Singleton(x => elasticClientManager!)); // Replace Elasticsearch
+            services.Replace(ServiceDescriptor.Singleton(x => elasticSearchConfiguration!));
+            services.Replace(ServiceDescriptor.Singleton(x => _apiConfiguration));            
+            services.Replace(ServiceDescriptor.Singleton(x => Substitute.For<IBlobStorageService>()));
+
             services.Configure<AuthenticationOptions>(options =>
             {
                 options.SchemeMap.Clear();
@@ -54,15 +57,6 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Observ
 
             services.AddAuthentication(TestAuthHandler.AuthenticationScheme)
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, options => { });
-            services.Replace(ServiceDescriptor.Scoped(x => observationDatasetRepository!));
-            services.Replace(ServiceDescriptor.Scoped(x => observationEventRepository!));
-            services.Replace(ServiceDescriptor.Scoped(x => processedObservationCoreRepository!));
-            services.Replace(ServiceDescriptor.Scoped(x => processedObservationRepository!));
-            services.Replace(ServiceDescriptor.Scoped(x => processedTaxonRepository!));
-            services.Replace(ServiceDescriptor.Scoped(x => processedChecklistRepository!));
-            services.Replace(ServiceDescriptor.Singleton(x => processClient!));
-            services.Replace(ServiceDescriptor.Singleton(x => _apiConfiguration));            
-            services.Replace(ServiceDescriptor.Singleton(x => Substitute.For<IBlobStorageService>()));
         });
     }
 

@@ -2,6 +2,8 @@
 using SOS.ContainerIntegrationTests.Extensions;
 using SOS.ContainerIntegrationTests.Setup.ContainerDbFixtures;
 using SOS.ContainerIntegrationTests.Setup.LiveDbFixtures;
+using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Models.Search.Result;
 
 namespace SOS.ContainerIntegrationTests.Setup;
 
@@ -84,5 +86,15 @@ public class TestFixture : IAsyncLifetime
         var testContainersServices = TestContainerFixture.GetServiceCollection();
         var serviceProvider = ServiceProviderExtensions.RegisterServices(processFixtureServices, harvestFixtureServices, testContainersServices);
         return serviceProvider;
+    }
+
+    internal void ResetTaxonSumAggregationCache()
+    {
+        IClassCache<Dictionary<int, TaxonSumAggregationItem>>? cache = ApiFactory.Services.GetService<IClassCache<Dictionary<int, TaxonSumAggregationItem>>>()!;
+        var c = cache.Get();
+        if (c != null)
+        {
+            cache.Set(null!);
+        }
     }
 }

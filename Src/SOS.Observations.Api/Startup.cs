@@ -102,6 +102,7 @@ namespace SOS.Observations.Api
         private bool _isDevelopment;
         private bool _disableHangfireInit = false;
         private bool _disableHealthCheckInit = false;
+        private bool _disableCachedTaxonSumAggregationInit = false;
 
         private class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         {
@@ -163,6 +164,7 @@ namespace SOS.Observations.Api
             _isDevelopment = CurrentEnvironment.IsEnvironment("local") || CurrentEnvironment.IsEnvironment("dev") || CurrentEnvironment.IsEnvironment("st");
             _disableHangfireInit = GetDisableFeature(environmentVariable: "DISABLE_HANGFIRE_INIT");
             _disableHealthCheckInit = GetDisableFeature(environmentVariable: "DISABLE_HEALTHCHECK_INIT");
+            _disableCachedTaxonSumAggregationInit = GetDisableFeature(environmentVariable: "DISABLE_CACHED_TAXON_SUM_INIT");
 
             if (_isDevelopment)
             {
@@ -657,10 +659,13 @@ namespace SOS.Observations.Api
 
             var serviceProvider = app.ApplicationServices;
             var taxonSearchManager = serviceProvider.GetService<ITaxonSearchManager>();
-            Task.Run(() =>
+            if (!_disableCachedTaxonSumAggregationInit)
             {
-                taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { 0 });
-            });
+                Task.Run(() =>
+                {
+                    taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { 0 });
+                });
+            }
         }
 
         private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
