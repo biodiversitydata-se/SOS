@@ -45,7 +45,7 @@ public class DateFilterTests : TestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60,
-            because: "60 observations added to Elasticsearch have ProjectId = 1.");
+            because: "60 observations added to Elasticsearch have startdate and end date between 2000-02-01 and 2000-02-29.");
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class DateFilterTests : TestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60,
-            because: "60 observations added to Elasticsearch have ProjectId = 1.");
+            because: "60 observations added to Elasticsearch have startdate or end date overlapping 2000-02-01 and 2000-02-29.");
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class DateFilterTests : TestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60,
-            because: "60 observations added to Elasticsearch have ProjectId = 1.");
+            because: "60 observations added to Elasticsearch have startdate between 2000-02-01 and 2000-02-29.");
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class DateFilterTests : TestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60,
-            because: "60 observations added to Elasticsearch have ProjectId = 1.");
+            because: "60 observations added to Elasticsearch have end date between 2000-02-01 and 2000-02-29.");
     }
 
     private List<TestResultItem> DebugTestOnlyEndDateFilter(
