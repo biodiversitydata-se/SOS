@@ -543,7 +543,7 @@ namespace SOS.Observations.Api.Controllers
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 CheckAuthorization(protectionFilter);
-
+                filter = await InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
                     ValidateSearchPagingArguments(skip, take),
@@ -964,7 +964,7 @@ namespace SOS.Observations.Api.Controllers
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 CheckAuthorization(filter.ProtectionFilter);
-
+                filter = await InitializeSearchFilterAsync(filter);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
@@ -1488,7 +1488,7 @@ namespace SOS.Observations.Api.Controllers
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 CheckAuthorization(filter.ProtectionFilter);
-
+                filter = await InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
@@ -1615,7 +1615,7 @@ namespace SOS.Observations.Api.Controllers
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 CheckAuthorization(filter.ProtectionFilter);
-
+                filter = await InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
@@ -1709,7 +1709,7 @@ namespace SOS.Observations.Api.Controllers
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 CheckAuthorization(protectionFilter);
-
+                filter = await InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 const int maxTotalCount = 100000;
                 var validationResult = Result.Combine(
@@ -1997,7 +1997,7 @@ namespace SOS.Observations.Api.Controllers
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 CheckAuthorization(filter.ProtectionFilter);
-
+                filter = await InitializeSearchFilterAsync(filter);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
