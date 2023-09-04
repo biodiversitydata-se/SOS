@@ -53,7 +53,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
 
         Task<List<Dataset>> GetDatasetsByIds(IEnumerable<string> ids, IEnumerable<string> excludeFields = null, IEnumerable<SortOrderFilter> sortOrders = null);
 
-        Task<bool> DeleteAllDocumentsAsync();
+        Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false);
 
         Task WaitForIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null);
 

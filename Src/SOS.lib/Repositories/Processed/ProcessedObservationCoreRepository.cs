@@ -612,13 +612,15 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteAllDocumentsAsync(bool protectedIndex)
+        public async Task<bool> DeleteAllDocumentsAsync(bool protectedIndex, bool waitForCompletion = false)
         {
             try
             {
                 var res = await Client.DeleteByQueryAsync<Observation>(q => q
                     .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
                     .Query(q => q.MatchAll())
+                    .Refresh(waitForCompletion)
+                    .WaitForCompletion(waitForCompletion)
                 );
 
                 return res.IsValid;

@@ -210,6 +210,15 @@ public class LiveDbProcessFixture : IProcessFixture
         await _processedChecklistRepository.ClearCollectionAsync();
     }
 
+    public async Task CleanElasticsearchIndices()
+    {
+        await _datasetRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
+        await _eventRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
+        await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: false, waitForCompletion: true);
+        await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: true, waitForCompletion: true);
+        await _processedChecklistRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
+    }
+
     public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
     {
         var processedObservations = ProcessObservations(verbatimObservations);

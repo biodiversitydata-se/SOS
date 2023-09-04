@@ -93,6 +93,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync();
 
-        Task<bool> DeleteAllDocumentsAsync();
+        Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false);
     }
 }

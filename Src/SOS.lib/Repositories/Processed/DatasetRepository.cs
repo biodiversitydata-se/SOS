@@ -223,13 +223,15 @@ namespace SOS.Lib.Repositories.Processed
             });
         }
 
-        public async Task<bool> DeleteAllDocumentsAsync()
+        public async Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false)
         {
             try
             {
                 var res = await Client.DeleteByQueryAsync<Dataset>(q => q
                     .Index(IndexName)
                     .Query(q => q.MatchAll())
+                    .WaitForCompletion(waitForCompletion)
+                    .Refresh(waitForCompletion)
                 );
 
                 return res.IsValid;

@@ -43,8 +43,8 @@ public class TestBase
     public TestBase(TestFixture testFixture, ITestOutputHelper output)
     {
         TestFixture = testFixture;
-        Output = output;
-
+        Output = output;     
+        
         // Use Swedish culture info.
         var culture = new CultureInfo("sv-SE");
         CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -59,5 +59,8 @@ public class TestBase
                 new IgnoreIfNullConvention(true)
             },
             t => true);
+
+        // Make sure ES indexes are cleared before each test
+        TestFixture.ProcessFixture!.CleanElasticsearchIndices().Wait();
     }
 }

@@ -166,6 +166,15 @@ public class ProcessFixture : IProcessFixture
         await _processedChecklistRepository.ClearCollectionAsync();
     }
 
+    public async Task CleanElasticsearchIndices()
+    {
+        await _datasetRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
+        await _eventRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
+        await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: false, waitForCompletion: true);
+        await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: true, waitForCompletion: true);
+        await _processedChecklistRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
+    }
+
     public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
     {
         var processedObservations = ProcessObservations(verbatimObservations);
@@ -398,10 +407,10 @@ public class ProcessFixture : IProcessFixture
             bool clearExistingObservations = true)
     {
         if (clearExistingObservations)
-        {
+        {            
             await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
-        }
-        _processedObservationCoreRepository.AddMany(observations, protectedIndex, true);
+        }        
+        _processedObservationCoreRepository.AddMany(observations, protectedIndex, true);        
     }
 
     public DwcaObservationFactory GetDwcaObservationFactory(bool initAreaHelper)

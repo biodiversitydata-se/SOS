@@ -53,7 +53,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> VerifyCollectionAsync();
 
         Task<List<Event>> GetEventsByIds(IEnumerable<string> ids, IEnumerable<SortOrderFilter> sortOrders = null);
-        Task<bool> DeleteAllDocumentsAsync();
+        Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false);
         Task<List<AggregationItemList<TKey, TValue>>> GetAllAggregationItemsListAsync<TKey, TValue>(EventSearchFilter filter, string aggregationFieldKey, string aggregationFieldList);
         Task<List<AggregationItem>> GetAllAggregationItemsAsync(EventSearchFilter filter, string aggregationField);        
         Task<PagedResult<dynamic>> GetChunkAsync(EventSearchFilter filter, int skip, int take, bool getAllFields = false);        

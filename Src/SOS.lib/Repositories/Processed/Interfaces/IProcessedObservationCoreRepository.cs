@@ -54,8 +54,9 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Delete all documents.
         /// </summary>
         /// <param name="protectedIndex"></param>
+        /// <param name="waitForCompletion"></param>
         /// <returns></returns>
-        Task<bool> DeleteAllDocumentsAsync(bool protectedIndex);
+        Task<bool> DeleteAllDocumentsAsync(bool protectedIndex, bool waitForCompletion = false);
 
         /// <summary>
         ///  Delete observations by occurence id

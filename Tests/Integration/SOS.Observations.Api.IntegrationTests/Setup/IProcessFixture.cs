@@ -30,6 +30,7 @@ public interface IProcessFixture
     Task ImportDwcaFilesAsync(IEnumerable<(string filePath, DataProvider dataProvider)> files, ITestOutputHelper output);
     Task ImportDwcaFileUsingDwcArchiveReaderAsync(string filePath, DataProvider dataProvider, ITestOutputHelper output);
     Task InitializeElasticsearchIndices();
+    Task CleanElasticsearchIndices();
     Task ProcessAndAddChecklistsToElasticSearch(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists);
     Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations);
     List<Checklist> ProcessChecklists(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists);
