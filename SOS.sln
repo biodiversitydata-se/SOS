@@ -110,7 +110,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Analysis.Api", "Src\SOS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.ElasticSearch.Proxy.UnitTests", "Tests\Unit\SOS.ElasticSearch.Proxy.UnitTests\SOS.ElasticSearch.Proxy.UnitTests.csproj", "{73FCC760-127E-4D45-8DB3-63DC64F3B846}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.IntegrationTests", "Tests\Integration\SOS.IntegrationTests\SOS.IntegrationTests.csproj", "{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Observations.Api.IntegrationTests", "Tests\Integration\SOS.Observations.Api.IntegrationTests\SOS.Observations.Api.IntegrationTests.csproj", "{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LiveIntegration", "LiveIntegration", "{FE09BD2E-E0A8-465B-9917-D31AA720E646}"
 EndProject
