@@ -28,6 +28,11 @@ namespace SOS.Lib.Models.ApiInfo
         public Uri ApiDocumentation { get; set; }
 
         /// <summary>
+		/// A link to the API changelog.
+		/// </summary>
+        public Uri ApiChangelog { get; set; }
+
+        /// <summary>
 		/// The state or status of the API according to lifecycle management. For example. alpha, beta, active, deprecated, retired or decommissioned.
 		/// </summary>                
         public string ApiStatus { get; set; }
