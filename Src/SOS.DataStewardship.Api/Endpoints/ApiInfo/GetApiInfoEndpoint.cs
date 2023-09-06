@@ -30,10 +30,11 @@ public class GetApiInfoEndpoint : IEndpointDefinition
 
         var apiInformation = new ApiInformation
         {
-            ApiName = "Data Stewardship API",
+            ApiName = "Nature data - systematic species observations",
             ApiStatus = "active",
             ApiVersion = version,
             ApiDocumentation = new Uri("https://github.com/biodiversitydata-se/SOS"),
+            ApiChangelog = new Uri("https://github.com/biodiversitydata-se/SOS/Docs/DataStewardship/CHANGELOG.md"),
             ApiReleased = new DateTimeOffset(buildDate.ToLocalTime())            
         };
 

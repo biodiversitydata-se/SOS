@@ -24,6 +24,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{989F302C-7
 		Docs\DataStewardship.md = Docs\DataStewardship.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataStewardship", "DataStewardship", "{428724B9-0CDB-440A-AE76-A2FE8B44805C}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Docs\DataStewardShip\CHANGELOG.md = ..\..\Docs\DataStewardShip\CHANGELOG.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +66,7 @@ Global
 		{5E4908ED-6221-44E0-B54E-1D3A737354EB} = {B4C58DE1-7436-407A-8B69-A1A2C5AACED8}
 		{91ABB4A9-25B6-40EB-975A-EF15E838C544} = {FA6F93ED-7F08-451A-954D-001712177F47}
 		{989F302C-76B5-4628-9CB4-94E1FFC20706} = {4D034C63-2074-4DF4-81EA-ABCE23213A98}
+		{428724B9-0CDB-440A-AE76-A2FE8B44805C} = {989F302C-76B5-4628-9CB4-94E1FFC20706}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7FC36558-1827-4EDC-9FAA-4BC1C21B2FE7}

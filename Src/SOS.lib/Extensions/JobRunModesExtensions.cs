@@ -10,8 +10,9 @@ public static class JobRunModesExtensions
             case JobRunModes.Full:
                 return "Full";
             case JobRunModes.IncrementalActiveInstance:
-            case JobRunModes.IncrementalInactiveInstance:
                 return "Incremental";
+            case JobRunModes.IncrementalInactiveInstance:
+                return "Full";
             default:
                 return "Full";
         }
