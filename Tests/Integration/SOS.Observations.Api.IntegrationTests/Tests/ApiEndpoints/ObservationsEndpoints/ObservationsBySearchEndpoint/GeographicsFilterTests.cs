@@ -106,9 +106,9 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
             // Arrange
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(60).HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
-                .TheNext(20).HaveCoordinatesInSpan(2.00001, 2.00009, 1.00001, 1.00009, 10)
-                .TheNext(20).HaveCoordinatesInSpan(1.00001, 1.00009, 2.00001, 2.00009, 10)
+                .TheFirst(60).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
+                .TheNext(20).HaveCoordinatesInSpan(11.00001, 11.00009, 68.00001, 68.00009, 10)
+                .TheNext(20).HaveCoordinatesInSpan(11.50001, 11.50009, 68.50001, 68.50009, 10)
                 .Build();
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var apiClient = TestFixture.CreateApiClient();
@@ -117,7 +117,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                 Geographics = new GeographicsFilterDto
                 {
                     Geometries = new[] {
-                        new Point(1.00005, 1.00004).ToCircle(10).ToGeoShape()
+                        new Point(11.50005, 68.00004).ToCircle(10).ToGeoShape()
                     }
                 }
             };
@@ -138,9 +138,9 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
             // Arrange
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(60).HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
-                 .TheNext(20).HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 20)
-                 .TheNext(20).HaveCoordinatesInSpan(1.00001, 1.00009, 2.00001, 2.00009, 10)
+                .TheFirst(60).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
+                 .TheNext(20).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 20)
+                 .TheNext(20).HaveCoordinatesInSpan(11.50001, 11.50009, 69.00001, 69.00009, 10)
                 .Build();
             var apiClient = TestFixture.CreateApiClient();
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -149,7 +149,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                 Geographics = new GeographicsFilterDto
                 {
                     Geometries = new[] {
-                        new Point(1.00005, 1.00004).ToCircle(10).ToGeoShape()
+                        new Point(11.50005, 68.00004).ToCircle(10).ToGeoShape()
                     },
                     MaxAccuracy = 15
                 }
@@ -172,10 +172,10 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
             // Arrange
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(30).HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
-                 .TheNext(30).HaveCoordinatesInSpan(1.00100, 1.00900, 1.00001, 1.00009, 1000)
-                 .TheNext(20).HaveCoordinatesInSpan(2.00001, 2.00009, 1.00001, 1.00009, 10)
-                 .TheNext(20).HaveCoordinatesInSpan(1.00001, 1.00009, 2.00001, 2.00009, 10)
+                .TheFirst(30).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
+                 .TheNext(30).HaveCoordinatesInSpan(11.50100, 11.50900, 68.00001, 68.00009, 1000)
+                 .TheNext(20).HaveCoordinatesInSpan(12.00001, 12.00009, 68.00001, 68.00009, 10)
+                 .TheNext(20).HaveCoordinatesInSpan(14.00001, 16.00009, 56.00001, 56.00009, 10)
                 .Build();
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var apiClient = TestFixture.CreateApiClient();
@@ -184,7 +184,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                 Geographics = new GeographicsFilterDto
                 {
                     Geometries = new[] {
-                        new Point(1.00005, 1.00004).ToCircle(10).ToGeoShape()
+                        new Point(11.50005, 68.00004).ToCircle(10).ToGeoShape()
                     },
                     ConsiderObservationAccuracy = true
                 }
@@ -207,27 +207,28 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
             // Arrange
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(30).HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
+                .TheFirst(30).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
                              .With(o => o.TaxonId = 100011) // Disturbance radius: 2000m
-                 .TheNext(30).HaveCoordinatesInSpan(1.00100, 1.00900, 1.00001, 1.00009, 10)
+                 .TheNext(30).HaveCoordinatesInSpan(11.50100, 11.50900, 68.00001, 68.00009, 10)
                              .With(o => o.TaxonId = 100009) // Disturbance radius: 1000m
-                 .TheNext(20).HaveCoordinatesInSpan(2.00001, 2.00009, 1.00001, 1.00009, 10)
+                 .TheNext(20).HaveCoordinatesInSpan(12.00001, 12.00009, 68.00001, 68.00009, 10)
                              .With(o => o.TaxonId = 102933) // Disturbance radius: 0m
-                 .TheNext(20).HaveCoordinatesInSpan(1.00001, 1.00009, 2.00001, 2.00009, 10)
+                 .TheNext(20).HaveCoordinatesInSpan(14.50100, 16.50900, 56.00001, 56.00009, 10)
                              .With(o => o.TaxonId = 100009) // Disturbance radius: 1000m
                 .Build();
-            var apiClient = TestFixture.CreateApiClient();
+           
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var searchFilter = new SearchFilterDto
             {
                 Geographics = new GeographicsFilterDto
                 {
                     Geometries = new[] {
-                        new Point(1.00005, 1.00004).ToCircle(10).ToGeoShape()
+                        new Point(11.50005, 68.00004).ToCircle(10).ToGeoShape()
                     },
                     ConsiderDisturbanceRadius = true
                 }
             };
+            var apiClient = TestFixture.CreateApiClient();
 
             // Act            
             var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
@@ -248,9 +249,9 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
             //-----------------------------------------------------------------------------------------------------------            
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(60).HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
-                .TheNext(20).HaveCoordinatesInSpan(2.00001, 2.00009, 1.00001, 1.00009, 10)
-                .TheNext(20).HaveCoordinatesInSpan(1.00001, 1.00009, 2.00001, 2.00009, 10)
+                .TheFirst(60).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
+                .TheNext(20).HaveCoordinatesInSpan(12.00001, 12.00009, 68.00001, 68.00009, 10)
+                .TheNext(20).HaveCoordinatesInSpan(14.50100, 16.50900, 56.00001, 56.00009, 10)
                 .Build();
             var apiClient = TestFixture.CreateApiClient();
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -260,8 +261,8 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                 {
                     BoundingBox = new LatLonBoundingBoxDto
                     {
-                        BottomRight = new LatLonCoordinateDto { Latitude = 1, Longitude = 1.1 },
-                        TopLeft = new LatLonCoordinateDto { Latitude = 1.1, Longitude = 1 }
+                        BottomRight = new LatLonCoordinateDto { Latitude = 68.00001, Longitude = 11.50009 },
+                        TopLeft = new LatLonCoordinateDto { Latitude = 68.00009, Longitude = 11.50001 }
                     }
                 }
             };
