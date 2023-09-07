@@ -4,25 +4,25 @@
 
 | Identifier 	| Title 	| Creator | #Events | #Occurrences |
 |:---	|:---	|:--- |:---  |---:	|
-| Artportalen - Buskmus | Buskmus | SLU Artdatabanken | 1 580 | 2 153 |
-| Artportalen - Fladdermöss | Fladdermöss | Länsstyrelsen Jönköping | 2 724 | 10 130 |
-| Artportalen - Gaddsteklar i jordbrukslandskapet | Gaddsteklar i jordbrukslandskapet | Länsstyrelsen Västra Götaland | 517 | 13 740 |
-| Artportalen - GDP Fladdermöss | GDP Fladdermöss | Länsstyrelsen Jönköping | 1 993 | 6 757 |
-| Artportalen - GDP Kryptogamer i ädellövskog | GDP Kryptogamer i ädellövskog | Länsstyrelsen Blekinge | 51 844 | 70 353 |
-| Artportalen - GDP Skyddsvärda träd | GDP Skyddsvärda träd | SLU Artdatabanken | 869 715 | 1 038 496 |
-| Artportalen - GDP Utter barmarksinventering | GDP Utter barmarksinventering | Länsstyrelsen Norrbotten | 11 194 | 23 141 |
-| Artportalen - Grod- och kräldjur | Grod- och kräldjur | Länsstyrelsen Skåne | 1 882 | 3 018 |
+| Artportalen - Buskmus | Buskmus | SLU Artdatabanken | 1Â 580 | 2Â 153 |
+| Artportalen - FladdermÃ¶ss | FladdermÃ¶ss | LÃ¤nsstyrelsen JÃ¶nkÃ¶ping | 2Â 724 | 10Â 130 |
+| Artportalen - Gaddsteklar i jordbrukslandskapet | Gaddsteklar i jordbrukslandskapet | LÃ¤nsstyrelsen VÃ¤stra GÃ¶taland | 517 | 13Â 740 |
+| Artportalen - GDP FladdermÃ¶ss | GDP FladdermÃ¶ss | LÃ¤nsstyrelsen JÃ¶nkÃ¶ping | 1Â 993 | 6Â 757 |
+| Artportalen - GDP Kryptogamer i Ã¤dellÃ¶vskog | GDP Kryptogamer i Ã¤dellÃ¶vskog | LÃ¤nsstyrelsen Blekinge | 51Â 844 | 70Â 353 |
+| Artportalen - GDP SkyddsvÃ¤rda trÃ¤d | GDP SkyddsvÃ¤rda trÃ¤d | SLU Artdatabanken | 869Â 715 | 1Â 038Â 496 |
+| Artportalen - GDP Utter barmarksinventering | GDP Utter barmarksinventering | LÃ¤nsstyrelsen Norrbotten | 11Â 194 | 23Â 141 |
+| Artportalen - Grod- och krÃ¤ldjur | Grod- och krÃ¤ldjur | LÃ¤nsstyrelsen SkÃ¥ne | 1Â 882 | 3Â 018 |
 | Artportalen - Hasselmus | Hasselmus | SLU Artdatabanken | 725 | 846 |
-| Artportalen - Klarälvens strandarter | Klarälvens strandarter | Länsstyrelsen Värmland | 97 | 400 |
-| Artportalen - Kärlväxter | Kärlväxter | SLU Artdatabanken | 46 | 50 |
-| Artportalen - Landsnäckor | Landsnäckor | Länsstyrelsen Östergötland | 268 | 1 618 |
-| Artportalen - Mossor och lavar Eftersök i lämpliga miljöer | Mossor och lavar Eftersök i lämpliga miljöer | Länsstyrelsen Uppsala | 922 | 1 063 |
-| Artportalen - Mossor och lavar Fynd utanför UE | Mossor och lavar Fynd utanför UE | Länsstyrelsen Uppsala | 248 | 251 |
-| Artportalen - Mossor och lavar Uppföljning av kända populationer | Mossor och lavar Uppföljning av kända populationer | Länsstyrelsen Uppsala | 3 736 | 3 737 |
-| Artportalen - Skogliga indikatorarter | Skogliga indikatorarter | Länsstyrelsen Värmland | 1 549 | 4 871 |
-| Artportalen - Slåtterängar | Slåtterängar | Länsstyrelsen Västra Götaland | 3 783 | 32 100 |
-| Artportalen - Spillningslevande bladhorningar | Spillningslevande bladhorningar | Länsstyrelsen Östergötland | 654 | 13 157 |
-| Artportalen - Toppkonsumenter | Toppkonsumenter | Länsstyrelsen Västernorrland | 100 | 100 |
-| Artportalen - Trollsländor och dykarskalbaggar | Trollsländor och dykarskalbaggar | Länsstyrelsen Östergötland | 1 062 | 4 270 |
-| Artportalen - Trumgräshoppa | Trumgräshoppa | Länsstyrelsen Östergötland | 297 | 297 |
-| Artportalen - Vedlevande evertebrater | Vedlevande evertebrater | Länsstyrelsen Östergötland | 10 393 | 12 485 |
+| Artportalen - KlarÃ¤lvens strandarter | KlarÃ¤lvens strandarter | LÃ¤nsstyrelsen VÃ¤rmland | 97 | 400 |
+| Artportalen - KÃ¤rlvÃ¤xter | KÃ¤rlvÃ¤xter | SLU Artdatabanken | 46 | 50 |
+| Artportalen - LandsnÃ¤ckor | LandsnÃ¤ckor | LÃ¤nsstyrelsen Ã–stergÃ¶tland | 268 | 1Â 618 |
+| Artportalen - Mossor och lavar EftersÃ¶k i lÃ¤mpliga miljÃ¶er | Mossor och lavar EftersÃ¶k i lÃ¤mpliga miljÃ¶er | LÃ¤nsstyrelsen Uppsala | 922 | 1Â 063 |
+| Artportalen - Mossor och lavar Fynd utanfÃ¶r UE | Mossor och lavar Fynd utanfÃ¶r UE | LÃ¤nsstyrelsen Uppsala | 248 | 251 |
+| Artportalen - Mossor och lavar UppfÃ¶ljning av kÃ¤nda populationer | Mossor och lavar UppfÃ¶ljning av kÃ¤nda populationer | LÃ¤nsstyrelsen Uppsala | 3Â 736 | 3Â 737 |
+| Artportalen - Skogliga indikatorarter | Skogliga indikatorarter | LÃ¤nsstyrelsen VÃ¤rmland | 1Â 549 | 4Â 871 |
+| Artportalen - SlÃ¥tterÃ¤ngar | SlÃ¥tterÃ¤ngar | LÃ¤nsstyrelsen VÃ¤stra GÃ¶taland | 3Â 783 | 32Â 100 |
+| Artportalen - Spillningslevande bladhorningar | Spillningslevande bladhorningar | LÃ¤nsstyrelsen Ã–stergÃ¶tland | 654 | 13Â 157 |
+| Artportalen - Toppkonsumenter | Toppkonsumenter | LÃ¤nsstyrelsen VÃ¤sternorrland | 100 | 100 |
+| Artportalen - TrollslÃ¤ndor och dykarskalbaggar | TrollslÃ¤ndor och dykarskalbaggar | LÃ¤nsstyrelsen Ã–stergÃ¶tland | 1Â 062 | 4Â 270 |
+| Artportalen - TrumgrÃ¤shoppa | TrumgrÃ¤shoppa | LÃ¤nsstyrelsen Ã–stergÃ¶tland | 297 | 297 |
+| Artportalen - Vedlevande evertebrater | Vedlevande evertebrater | LÃ¤nsstyrelsen Ã–stergÃ¶tland | 10Â 393 | 12Â 485 |

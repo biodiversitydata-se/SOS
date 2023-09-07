@@ -1,80 +1,80 @@
 # Areas - Nature data - systematic species observations API
 This is a list of enum values that can be used in the API queries.
 
-- [County (Län)](#county-lan)
+- [County (LÃ¤n)](#county-lan)
 - [Province (Landskap)](#province-landskap)
 - [Municipality (Kommun)](#municipality-kommun)
 - [Parish (Socken)](#parish-socken)
 
 
-## County (Län)
+## County (LÃ¤n)
 | Title 	| Enum value |
 |---	|--- |
-| Blekinge län | BlekingeLän |
-| Dalarnas län | DalarnasLän |
-| Gotlands län | GotlandsLän |
-| Gävleborgs län | GävleborgsLän |
-| Hallands län | HallandsLän |
-| Jämtlands län | JämtlandsLän |
-| Jönköpings län | JönköpingsLän |
-| Kalmar län | KalmarLän |
-| Kronobergs län | KronobergsLän |
-| Norrbottens län | NorrbottensLän |
-| Skåne län | SkåneLän |
-| Stockholms län | StockholmsLän |
-| Södermanlands län | SödermanlandsLän |
-| Uppsala län | UppsalaLän |
-| Värmlands län | VärmlandsLän |
-| Västerbottens län | VästerbottensLän |
-| Västernorrlands län | VästernorrlandsLän |
-| Västmanlands län | VästmanlandsLän |
-| Västra Götalands län | VästraGötalandsLän |
-| Örebro län | ÖrebroLän |
-| Östergötlands län | ÖstergötlandsLän |
+| Blekinge lÃ¤n | BlekingeLÃ¤n |
+| Dalarnas lÃ¤n | DalarnasLÃ¤n |
+| Gotlands lÃ¤n | GotlandsLÃ¤n |
+| GÃ¤vleborgs lÃ¤n | GÃ¤vleborgsLÃ¤n |
+| Hallands lÃ¤n | HallandsLÃ¤n |
+| JÃ¤mtlands lÃ¤n | JÃ¤mtlandsLÃ¤n |
+| JÃ¶nkÃ¶pings lÃ¤n | JÃ¶nkÃ¶pingsLÃ¤n |
+| Kalmar lÃ¤n | KalmarLÃ¤n |
+| Kronobergs lÃ¤n | KronobergsLÃ¤n |
+| Norrbottens lÃ¤n | NorrbottensLÃ¤n |
+| SkÃ¥ne lÃ¤n | SkÃ¥neLÃ¤n |
+| Stockholms lÃ¤n | StockholmsLÃ¤n |
+| SÃ¶dermanlands lÃ¤n | SÃ¶dermanlandsLÃ¤n |
+| Uppsala lÃ¤n | UppsalaLÃ¤n |
+| VÃ¤rmlands lÃ¤n | VÃ¤rmlandsLÃ¤n |
+| VÃ¤sterbottens lÃ¤n | VÃ¤sterbottensLÃ¤n |
+| VÃ¤sternorrlands lÃ¤n | VÃ¤sternorrlandsLÃ¤n |
+| VÃ¤stmanlands lÃ¤n | VÃ¤stmanlandsLÃ¤n |
+| VÃ¤stra GÃ¶talands lÃ¤n | VÃ¤straGÃ¶talandsLÃ¤n |
+| Ã–rebro lÃ¤n | Ã–rebroLÃ¤n |
+| Ã–stergÃ¶tlands lÃ¤n | Ã–stergÃ¶tlandsLÃ¤n |
 
 ## Province (Landskap)
 | Title 	| Enum value |
 |---	|--- |
 | Blekinge | Blekinge |
-| Bohuslän | Bohuslän |
+| BohuslÃ¤n | BohuslÃ¤n |
 | Bottenhavet | Bottenhavet |
 | Bottenviken | Bottenviken |
 | Dalarna | Dalarna |
 | Dalsland | Dalsland |
 | Gotland | Gotland |
-| Gästrikland | Gästrikland |
+| GÃ¤strikland | GÃ¤strikland |
 | Halland | Halland |
-| Hälsingland | Hälsingland |
-| Härjedalen | Härjedalen |
-| Jämtland | Jämtland |
+| HÃ¤lsingland | HÃ¤lsingland |
+| HÃ¤rjedalen | HÃ¤rjedalen |
+| JÃ¤mtland | JÃ¤mtland |
 | Kattegatt | Kattegatt |
 | Lule lappmark | Lule_lappmark |
 | Lycksele lappmark | Lycksele_lappmark |
 | Medelpad | Medelpad |
 | Norrbotten | Norrbotten |
-| Närke | Närke |
+| NÃ¤rke | NÃ¤rke |
 | Pite lappmark | Pite_lappmark |
 | Skagerrak | Skagerrak |
-| Skåne | Skåne |
-| Småland | Småland |
-| Södermanland | Södermanland |
+| SkÃ¥ne | SkÃ¥ne |
+| SmÃ¥land | SmÃ¥land |
+| SÃ¶dermanland | SÃ¶dermanland |
 | Torne lappmark | Torne_lappmark |
 | Uppland | Uppland |
-| Värmland | Värmlands |
-| Västerbotten | Västerbotten |
-| Västergötland | Västergötland |
-| Västmanland | Västmanland |
-| Ångermanland | Ångermanland |
-| Åsele lappmark | Åsele_lappmark |
-| Öland | Öland |
-| Östergötland | Östergötland |
-| Östersjön | Östersjön |
+| VÃ¤rmland | VÃ¤rmlands |
+| VÃ¤sterbotten | VÃ¤sterbotten |
+| VÃ¤stergÃ¶tland | VÃ¤stergÃ¶tland |
+| VÃ¤stmanland | VÃ¤stmanland |
+| Ã…ngermanland | Ã…ngermanland |
+| Ã…sele lappmark | Ã…sele_lappmark |
+| Ã–land | Ã–land |
+| Ã–stergÃ¶tland | Ã–stergÃ¶tland |
+| Ã–stersjÃ¶n | Ã–stersjÃ¶n |
 
 ## Municipality (Kommun)
 | Title 	| Enum value |
 |---	|--- |
 | Ale | Ale |
-| Alingsås | Alingsås |
+| AlingsÃ¥s | AlingsÃ¥s |
 | Alvesta | Alvesta |
 | Aneby | Aneby |
 | Arboga | Arboga |
@@ -89,55 +89,55 @@ This is a list of enum values that can be used in the API queries.
 | Bjuv | Bjuv |
 | Boden | Boden |
 | Bollebygd | Bollebygd |
-| Bollnäs | Bollnäs |
+| BollnÃ¤s | BollnÃ¤s |
 | Borgholm | Borgholm |
-| Borlänge | Borlänge |
-| Borås | Borås |
+| BorlÃ¤nge | BorlÃ¤nge |
+| BorÃ¥s | BorÃ¥s |
 | Botkyrka | Botkyrka |
 | Boxholm | Boxholm |
-| Bromölla | Bromölla |
-| Bräcke | Bräcke |
-| Burlöv | Burlöv |
-| Båstad | Båstad |
+| BromÃ¶lla | BromÃ¶lla |
+| BrÃ¤cke | BrÃ¤cke |
+| BurlÃ¶v | BurlÃ¶v |
+| BÃ¥stad | BÃ¥stad |
 | Dals-Ed | DalsEd |
 | Danderyd | Danderyd |
 | Degerfors | Degerfors |
 | Dorotea | Dorotea |
 | Eda | Eda |
-| Ekerö | Ekerö |
-| Eksjö | Eksjö |
+| EkerÃ¶ | EkerÃ¶ |
+| EksjÃ¶ | EksjÃ¶ |
 | Emmaboda | Emmaboda |
-| Enköping | Enköping |
+| EnkÃ¶ping | EnkÃ¶ping |
 | Eskilstuna | Eskilstuna |
-| Eslöv | Eslöv |
+| EslÃ¶v | EslÃ¶v |
 | Essunga | Essunga |
 | Fagersta | Fagersta |
 | Falkenberg | Falkenberg |
-| Falköping | Falköping |
+| FalkÃ¶ping | FalkÃ¶ping |
 | Falun | Falun |
 | Filipstad | Filipstad |
-| Finspång | Finspång |
+| FinspÃ¥ng | FinspÃ¥ng |
 | Flen | Flen |
 | Forshaga | Forshaga |
-| Färgelanda | Färgelanda |
+| FÃ¤rgelanda | FÃ¤rgelanda |
 | Gagnef | Gagnef |
 | Gislaved | Gislaved |
 | Gnesta | Gnesta |
-| Gnosjö | Gnosjö |
+| GnosjÃ¶ | GnosjÃ¶ |
 | Gotland | Gotland |
 | Grums | Grums |
-| Grästorp | Grästorp |
-| Gullspång | Gullspång |
-| Gällivare | Gällivare |
-| Gävle | Gävle |
-| Göteborg | Göteborg |
-| Götene | Götene |
+| GrÃ¤storp | GrÃ¤storp |
+| GullspÃ¥ng | GullspÃ¥ng |
+| GÃ¤llivare | GÃ¤llivare |
+| GÃ¤vle | GÃ¤vle |
+| GÃ¶teborg | GÃ¶teborg |
+| GÃ¶tene | GÃ¶tene |
 | Habo | Habo |
 | Hagfors | Hagfors |
 | Hallsberg | Hallsberg |
 | Hallstahammar | Hallstahammar |
 | Halmstad | Halmstad |
-| Hammarö | Hammarö |
+| HammarÃ¶ | HammarÃ¶ |
 | Haninge | Haninge |
 | Haparanda | Haparanda |
 | Heby | Heby |
@@ -150,19 +150,19 @@ This is a list of enum values that can be used in the API queries.
 | Hudiksvall | Hudiksvall |
 | Hultsfred | Hultsfred |
 | Hylte | Hylte |
-| Håbo | Håbo |
-| Hällefors | Hällefors |
-| Härjedalen | Härjedalen |
-| Härnösand | Härnösand |
-| Härryda | Härryda |
-| Hässleholm | Hässleholm |
-| Höganäs | Höganäs |
-| Högsby | Högsby |
-| Hörby | Hörby |
-| Höör | Höör |
+| HÃ¥bo | HÃ¥bo |
+| HÃ¤llefors | HÃ¤llefors |
+| HÃ¤rjedalen | HÃ¤rjedalen |
+| HÃ¤rnÃ¶sand | HÃ¤rnÃ¶sand |
+| HÃ¤rryda | HÃ¤rryda |
+| HÃ¤ssleholm | HÃ¤ssleholm |
+| HÃ¶ganÃ¤s | HÃ¶ganÃ¤s |
+| HÃ¶gsby | HÃ¶gsby |
+| HÃ¶rby | HÃ¶rby |
+| HÃ¶Ã¶r | HÃ¶Ã¶r |
 | Jokkmokk | Jokkmokk |
-| Järfälla | Järfälla |
-| Jönköping | Jönköping |
+| JÃ¤rfÃ¤lla | JÃ¤rfÃ¤lla |
+| JÃ¶nkÃ¶ping | JÃ¶nkÃ¶ping |
 | Kalix | Kalix |
 | Kalmar | Kalmar |
 | Karlsborg | Karlsborg |
@@ -182,137 +182,137 @@ This is a list of enum values that can be used in the API queries.
 | Krokom | Krokom |
 | Kumla | Kumla |
 | Kungsbacka | Kungsbacka |
-| Kungsör | Kungsör |
-| Kungälv | Kungälv |
-| Kävlinge | Kävlinge |
-| Köping | Köping |
+| KungsÃ¶r | KungsÃ¶r |
+| KungÃ¤lv | KungÃ¤lv |
+| KÃ¤vlinge | KÃ¤vlinge |
+| KÃ¶ping | KÃ¶ping |
 | Laholm | Laholm |
 | Landskrona | Landskrona |
-| Laxå | Laxå |
+| LaxÃ¥ | LaxÃ¥ |
 | Lekeberg | Lekeberg |
 | Leksand | Leksand |
 | Lerum | Lerum |
 | Lessebo | Lessebo |
-| Lidingö | Lidingö |
-| Lidköping | Lidköping |
+| LidingÃ¶ | LidingÃ¶ |
+| LidkÃ¶ping | LidkÃ¶ping |
 | Lilla Edet | LillaEdet |
 | Lindesberg | Lindesberg |
-| Linköping | Linköping |
+| LinkÃ¶ping | LinkÃ¶ping |
 | Ljungby | Ljungby |
 | Ljusdal | Ljusdal |
 | Ljusnarsberg | Ljusnarsberg |
 | Lomma | Lomma |
 | Ludvika | Ludvika |
-| Luleå | Luleå |
+| LuleÃ¥ | LuleÃ¥ |
 | Lund | Lund |
 | Lycksele | Lycksele |
 | Lysekil | Lysekil |
-| Malmö | Malmö |
-| Malung-Sälen | MalungSälen |
-| Malå | Malå |
+| MalmÃ¶ | MalmÃ¶ |
+| Malung-SÃ¤len | MalungSÃ¤len |
+| MalÃ¥ | MalÃ¥ |
 | Mariestad | Mariestad |
 | Mark | Mark |
 | Markaryd | Markaryd |
 | Mellerud | Mellerud |
-| Mjölby | Mjölby |
+| MjÃ¶lby | MjÃ¶lby |
 | Mora | Mora |
 | Motala | Motala |
-| Mullsjö | Mullsjö |
+| MullsjÃ¶ | MullsjÃ¶ |
 | Munkedal | Munkedal |
 | Munkfors | Munkfors |
-| Mölndal | Mölndal |
-| Mönsterås | Mönsterås |
-| Mörbylånga | Mörbylånga |
+| MÃ¶lndal | MÃ¶lndal |
+| MÃ¶nsterÃ¥s | MÃ¶nsterÃ¥s |
+| MÃ¶rbylÃ¥nga | MÃ¶rbylÃ¥nga |
 | Nacka | Nacka |
 | Nora | Nora |
 | Norberg | Norberg |
 | Nordanstig | Nordanstig |
 | Nordmaling | Nordmaling |
-| Norrköping | Norrköping |
-| Norrtälje | Norrtälje |
-| Norsjö | Norsjö |
+| NorrkÃ¶ping | NorrkÃ¶ping |
+| NorrtÃ¤lje | NorrtÃ¤lje |
+| NorsjÃ¶ | NorsjÃ¶ |
 | Nybro | Nybro |
 | Nykvarn | Nykvarn |
-| Nyköping | Nyköping |
-| Nynäshamn | Nynäshamn |
-| Nässjö | Nässjö |
+| NykÃ¶ping | NykÃ¶ping |
+| NynÃ¤shamn | NynÃ¤shamn |
+| NÃ¤ssjÃ¶ | NÃ¤ssjÃ¶ |
 | Ockelbo | Ockelbo |
-| Olofström | Olofström |
+| OlofstrÃ¶m | OlofstrÃ¶m |
 | Orsa | Orsa |
 | Orust | Orust |
 | Osby | Osby |
 | Oskarshamn | Oskarshamn |
-| Ovanåker | Ovanåker |
-| Oxelösund | Oxelösund |
+| OvanÃ¥ker | OvanÃ¥ker |
+| OxelÃ¶sund | OxelÃ¶sund |
 | Pajala | Pajala |
 | Partille | Partille |
 | Perstorp | Perstorp |
-| Piteå | Piteå |
+| PiteÃ¥ | PiteÃ¥ |
 | Ragunda | Ragunda |
 | Robertsfors | Robertsfors |
 | Ronneby | Ronneby |
-| Rättvik | Rättvik |
+| RÃ¤ttvik | RÃ¤ttvik |
 | Sala | Sala |
 | Salem | Salem |
 | Sandviken | Sandviken |
 | Sigtuna | Sigtuna |
 | Simrishamn | Simrishamn |
-| Sjöbo | Sjöbo |
+| SjÃ¶bo | SjÃ¶bo |
 | Skara | Skara |
-| Skellefteå | Skellefteå |
+| SkellefteÃ¥ | SkellefteÃ¥ |
 | Skinnskatteberg | Skinnskatteberg |
 | Skurup | Skurup |
-| Skövde | Skövde |
+| SkÃ¶vde | SkÃ¶vde |
 | Smedjebacken | Smedjebacken |
-| Sollefteå | Sollefteå |
+| SollefteÃ¥ | SollefteÃ¥ |
 | Sollentuna | Sollentuna |
 | Solna | Solna |
 | Sorsele | Sorsele |
-| Sotenäs | Sotenäs |
+| SotenÃ¤s | SotenÃ¤s |
 | Staffanstorp | Staffanstorp |
 | Stenungsund | Stenungsund |
 | Stockholm | Stockholm |
 | Storfors | Storfors |
 | Storuman | Storuman |
-| Strängnäs | Strängnäs |
-| Strömstad | Strömstad |
-| Strömsund | Strömsund |
+| StrÃ¤ngnÃ¤s | StrÃ¤ngnÃ¤s |
+| StrÃ¶mstad | StrÃ¶mstad |
+| StrÃ¶msund | StrÃ¶msund |
 | Sundbyberg | Sundbyberg |
 | Sundsvall | Sundsvall |
 | Sunne | Sunne |
 | Surahammar | Surahammar |
-| Svalöv | Svalöv |
+| SvalÃ¶v | SvalÃ¶v |
 | Svedala | Svedala |
 | Svenljunga | Svenljunga |
-| Säffle | Säffle |
-| Säter | Säter |
-| Sävsjö | Sävsjö |
-| Söderhamn | Söderhamn |
-| Söderköping | Söderköping |
-| Södertälje | Södertälje |
-| Sölvesborg | Sölvesborg |
+| SÃ¤ffle | SÃ¤ffle |
+| SÃ¤ter | SÃ¤ter |
+| SÃ¤vsjÃ¶ | SÃ¤vsjÃ¶ |
+| SÃ¶derhamn | SÃ¶derhamn |
+| SÃ¶derkÃ¶ping | SÃ¶derkÃ¶ping |
+| SÃ¶dertÃ¤lje | SÃ¶dertÃ¤lje |
+| SÃ¶lvesborg | SÃ¶lvesborg |
 | Tanum | Tanum |
 | Tibro | Tibro |
 | Tidaholm | Tidaholm |
 | Tierp | Tierp |
-| Timrå | Timrå |
+| TimrÃ¥ | TimrÃ¥ |
 | Tingsryd | Tingsryd |
-| Tjörn | Tjörn |
+| TjÃ¶rn | TjÃ¶rn |
 | Tomelilla | Tomelilla |
 | Torsby | Torsby |
-| Torsås | Torsås |
+| TorsÃ¥s | TorsÃ¥s |
 | Tranemo | Tranemo |
-| Tranås | Tranås |
+| TranÃ¥s | TranÃ¥s |
 | Trelleborg | Trelleborg |
-| Trollhättan | Trollhättan |
+| TrollhÃ¤ttan | TrollhÃ¤ttan |
 | Trosa | Trosa |
-| Tyresö | Tyresö |
-| Täby | Täby |
-| Töreboda | Töreboda |
+| TyresÃ¶ | TyresÃ¶ |
+| TÃ¤by | TÃ¤by |
+| TÃ¶reboda | TÃ¶reboda |
 | Uddevalla | Uddevalla |
 | Ulricehamn | Ulricehamn |
-| Umeå | Umeå |
-| Upplands Väsby | UpplandsVäsby |
+| UmeÃ¥ | UmeÃ¥ |
+| Upplands VÃ¤sby | UpplandsVÃ¤sby |
 | Upplands-Bro | UpplandsBro |
 | Uppsala | Uppsala |
 | Uppvidinge | Uppvidinge |
@@ -329,40 +329,40 @@ This is a list of enum values that can be used in the API queries.
 | Vilhelmina | Vilhelmina |
 | Vimmerby | Vimmerby |
 | Vindeln | Vindeln |
-| Vingåker | Vingåker |
-| Vårgårda | Vårgårda |
-| Vänersborg | Vänersborg |
-| Vännäs | Vännäs |
-| Värmdö | Värmdö |
-| Värnamo | Värnamo |
-| Västervik | Västervik |
-| Västerås | Västerås |
-| Växjö | Växjö |
+| VingÃ¥ker | VingÃ¥ker |
+| VÃ¥rgÃ¥rda | VÃ¥rgÃ¥rda |
+| VÃ¤nersborg | VÃ¤nersborg |
+| VÃ¤nnÃ¤s | VÃ¤nnÃ¤s |
+| VÃ¤rmdÃ¶ | VÃ¤rmdÃ¶ |
+| VÃ¤rnamo | VÃ¤rnamo |
+| VÃ¤stervik | VÃ¤stervik |
+| VÃ¤sterÃ¥s | VÃ¤sterÃ¥s |
+| VÃ¤xjÃ¶ | VÃ¤xjÃ¶ |
 | Ydre | Ydre |
 | Ystad | Ystad |
-| Åmål | Åmål |
-| Ånge | Ånge |
-| Åre | Åre |
-| Årjäng | Årjäng |
-| Åsele | Åsele |
-| Åstorp | Åstorp |
-| Åtvidaberg | Åtvidaberg |
-| Älmhult | Älmhult |
-| Älvdalen | Älvdalen |
-| Älvkarleby | Älvkarleby |
-| Älvsbyn | Älvsbyn |
-| Ängelholm | Ängelholm |
-| Öckerö | Öckerö |
-| Ödeshög | Ödeshög |
-| Örebro | Örebro |
-| Örkelljunga | Örkelljunga |
-| Örnsköldsvik | Örnsköldsvik |
-| Östersund | Östersund |
-| Österåker | Österåker |
-| Östhammar | Östhammar |
-| Östra Göinge | ÖstraGöinge |
-| Överkalix | Överkalix |
-| Övertorneå | Övertorneå |
+| Ã…mÃ¥l | Ã…mÃ¥l |
+| Ã…nge | Ã…nge |
+| Ã…re | Ã…re |
+| Ã…rjÃ¤ng | Ã…rjÃ¤ng |
+| Ã…sele | Ã…sele |
+| Ã…storp | Ã…storp |
+| Ã…tvidaberg | Ã…tvidaberg |
+| Ã„lmhult | Ã„lmhult |
+| Ã„lvdalen | Ã„lvdalen |
+| Ã„lvkarleby | Ã„lvkarleby |
+| Ã„lvsbyn | Ã„lvsbyn |
+| Ã„ngelholm | Ã„ngelholm |
+| Ã–ckerÃ¶ | Ã–ckerÃ¶ |
+| Ã–deshÃ¶g | Ã–deshÃ¶g |
+| Ã–rebro | Ã–rebro |
+| Ã–rkelljunga | Ã–rkelljunga |
+| Ã–rnskÃ¶ldsvik | Ã–rnskÃ¶ldsvik |
+| Ã–stersund | Ã–stersund |
+| Ã–sterÃ¥ker | Ã–sterÃ¥ker |
+| Ã–sthammar | Ã–sthammar |
+| Ã–stra GÃ¶inge | Ã–straGÃ¶inge |
+| Ã–verkalix | Ã–verkalix |
+| Ã–vertorneÃ¥ | Ã–vertorneÃ¥ |
 
 
 ## Parish (Socken)
@@ -370,28 +370,28 @@ This is a list of enum values that can be used in the API queries.
 |---	|--- |
 | Abild | Abild |
 | Acklinga | Acklinga |
-| Adelsö | Adelsö |
-| Adelöv | Adelöv |
+| AdelsÃ¶ | AdelsÃ¶ |
+| AdelÃ¶v | AdelÃ¶v |
 | Agnetorp | Agnetorp |
 | Agunnaryd | Agunnaryd |
-| Akebäck | Akebäck |
+| AkebÃ¤ck | AkebÃ¤ck |
 | Ala | Ala |
-| Alanäs | Alanäs |
+| AlanÃ¤s | AlanÃ¤s |
 | Alboga | Alboga |
-| Alböke | Alböke |
-| Ale-Skövde | Ale_Skövde |
-| Alfshög | Alfshög |
+| AlbÃ¶ke | AlbÃ¶ke |
+| Ale-SkÃ¶vde | Ale_SkÃ¶vde |
+| AlfshÃ¶g | AlfshÃ¶g |
 | Alfta | Alfta |
 | Algutsboda | Algutsboda |
 | Algutsrum | Algutsrum |
 | Algutstorp | Algutstorp |
-| Alingsås | Alingsås |
+| AlingsÃ¥s | AlingsÃ¥s |
 | Allerum | Allerum |
 | Allhelgona | Allhelgona |
-| Almesåkra | Almesåkra |
+| AlmesÃ¥kra | AlmesÃ¥kra |
 | Almundsryd | Almundsryd |
 | Almunge | Almunge |
-| Alnö | Alnö |
+| AlnÃ¶ | AlnÃ¶ |
 | Alseda | Alseda |
 | Alsen | Alsen |
 | Alsike | Alsike |
@@ -400,9 +400,9 @@ This is a list of enum values that can be used in the API queries.
 | Altuna | Altuna |
 | Alunda | Alunda |
 | Alva | Alva |
-| Ambjörnarp | Ambjörnarp |
-| Amnehärad | Amnehärad |
-| Anderslöv | Anderslöv |
+| AmbjÃ¶rnarp | AmbjÃ¶rnarp |
+| AmnehÃ¤rad | AmnehÃ¤rad |
+| AnderslÃ¶v | AnderslÃ¶v |
 | Anderstorp | Anderstorp |
 | Andrarum | Andrarum |
 | Aneboda | Aneboda |
@@ -411,18 +411,18 @@ This is a list of enum values that can be used in the API queries.
 | Angelstad | Angelstad |
 | Angerdshestra | Angerdshestra |
 | Angered | Angered |
-| Annelöv | Annelöv |
+| AnnelÃ¶v | AnnelÃ¶v |
 | Annerstad | Annerstad |
-| Anundsjö | Anundsjö |
+| AnundsjÃ¶ | AnundsjÃ¶ |
 | Appuna | Appuna |
 | Arboga socken | Arboga_socken |
 | Arboga stad | Arboga_stad |
-| Arbrå | Arbrå |
+| ArbrÃ¥ | ArbrÃ¥ |
 | Arby | Arby |
 | Ardre | Ardre |
-| Aringsås | Aringsås |
+| AringsÃ¥s | AringsÃ¥s |
 | Arjeplog | Arjeplog |
-| Arnäs | Arnäs |
+| ArnÃ¤s | ArnÃ¤s |
 | Arrie | Arrie |
 | Arvidsjaur | Arvidsjaur |
 | Arvika | Arvika |
@@ -442,32 +442,32 @@ This is a list of enum values that can be used in the API queries.
 | Askum | Askum |
 | Asmundtorp | Asmundtorp |
 | Aspeboda | Aspeboda |
-| Aspås | Aspås |
-| Aspö | Aspö_K |
-| Aspö | Aspö_D |
+| AspÃ¥s | AspÃ¥s |
+| AspÃ¶ | AspÃ¶_K |
+| AspÃ¶ | AspÃ¶_D |
 | Atlingbo | Atlingbo |
 | Attmar | Attmar |
 | Augerum | Augerum |
-| Ausås | Ausås |
+| AusÃ¥s | AusÃ¥s |
 | Avesta | Avesta |
 | Axberg | Axberg |
 | Backaryd | Backaryd |
 | Baldringe | Baldringe |
 | Balingsta | Balingsta |
-| Balkåkra | Balkåkra |
+| BalkÃ¥kra | BalkÃ¥kra |
 | Baltak | Baltak |
 | Bankekind | Bankekind |
 | Bankeryd | Bankeryd |
 | Bara | Bara |
 | Barkeryd | Barkeryd |
-| Barkåkra | Barkåkra |
+| BarkÃ¥kra | BarkÃ¥kra |
 | Barlingbo | Barlingbo |
 | Barnarp | Barnarp |
-| Barne-Åsaka | Barne_Åsaka |
-| Barsebäck | Barsebäck |
+| Barne-Ã…saka | Barne_Ã…saka |
+| BarsebÃ¤ck | BarsebÃ¤ck |
 | Barva | Barva |
 | Beateberg | Beateberg |
-| Bellö | Bellö |
+| BellÃ¶ | BellÃ¶ |
 | Benestad | Benestad |
 | Berg | Berg_G |
 | Berg | Berg_O |
@@ -477,7 +477,7 @@ This is a list of enum values that can be used in the API queries.
 | Berga | Berga_O |
 | Berghem | Berghem |
 | Bergshammar | Bergshammar |
-| Bergsjö | Bergsjö |
+| BergsjÃ¶ | BergsjÃ¶ |
 | Bergstena | Bergstena |
 | Bergum | Bergum |
 | Bergunda | Bergunda |
@@ -486,61 +486,61 @@ This is a list of enum values that can be used in the API queries.
 | Billinge | Billinge |
 | Binneberg | Binneberg |
 | Biskopskulla | Biskopskulla |
-| Bjurbäck | Bjurbäck |
+| BjurbÃ¤ck | BjurbÃ¤ck |
 | Bjurholm | Bjurholm |
-| Bjursås | Bjursås |
-| Bjurtjärn | Bjurtjärn |
+| BjursÃ¥s | BjursÃ¥s |
+| BjurtjÃ¤rn | BjurtjÃ¤rn |
 | Bjurum | Bjurum |
-| Bjuråker | Bjuråker |
+| BjurÃ¥ker | BjurÃ¥ker |
 | Bjuv | Bjuv |
-| Bjälbo | Bjälbo |
-| Bjällerup | Bjällerup |
-| Bjärby | Bjärby |
-| Bjäresjö | Bjäresjö |
-| Bjärka | Bjärka |
-| Bjärshög | Bjärshög |
-| Bjärtrå | Bjärtrå |
-| Björka | Björka |
-| Björke | Björke |
-| Björkeberg | Björkeberg |
-| Björketorp | Björketorp |
-| Björklinge | Björklinge |
-| Björksta | Björksta |
-| Björkvik | Björkvik |
-| Björkö | Björkö |
-| Björkö-Arholma | Björkö_Arholma |
-| Björlanda | Björlanda |
-| Björna | Björna |
-| Björnekulla | Björnekulla |
-| Björnlunda | Björnlunda |
-| Björskog | Björskog |
-| Björsäter | Björsäter_O |
-| Björsäter | Björsäter_E |
+| BjÃ¤lbo | BjÃ¤lbo |
+| BjÃ¤llerup | BjÃ¤llerup |
+| BjÃ¤rby | BjÃ¤rby |
+| BjÃ¤resjÃ¶ | BjÃ¤resjÃ¶ |
+| BjÃ¤rka | BjÃ¤rka |
+| BjÃ¤rshÃ¶g | BjÃ¤rshÃ¶g |
+| BjÃ¤rtrÃ¥ | BjÃ¤rtrÃ¥ |
+| BjÃ¶rka | BjÃ¶rka |
+| BjÃ¶rke | BjÃ¶rke |
+| BjÃ¶rkeberg | BjÃ¶rkeberg |
+| BjÃ¶rketorp | BjÃ¶rketorp |
+| BjÃ¶rklinge | BjÃ¶rklinge |
+| BjÃ¶rksta | BjÃ¶rksta |
+| BjÃ¶rkvik | BjÃ¶rkvik |
+| BjÃ¶rkÃ¶ | BjÃ¶rkÃ¶ |
+| BjÃ¶rkÃ¶-Arholma | BjÃ¶rkÃ¶_Arholma |
+| BjÃ¶rlanda | BjÃ¶rlanda |
+| BjÃ¶rna | BjÃ¶rna |
+| BjÃ¶rnekulla | BjÃ¶rnekulla |
+| BjÃ¶rnlunda | BjÃ¶rnlunda |
+| BjÃ¶rskog | BjÃ¶rskog |
+| BjÃ¶rsÃ¤ter | BjÃ¶rsÃ¤ter_O |
+| BjÃ¶rsÃ¤ter | BjÃ¶rsÃ¤ter_E |
 | Blacksta | Blacksta |
 | Blackstad | Blackstad |
-| Bladåker | Bladåker |
+| BladÃ¥ker | BladÃ¥ker |
 | Blentarp | Blentarp |
 | Blidsberg | Blidsberg |
-| Blidö | Blidö |
+| BlidÃ¶ | BlidÃ¶ |
 | Blomskog | Blomskog |
-| Blåvik | Blåvik |
-| Blädinge | Blädinge |
+| BlÃ¥vik | BlÃ¥vik |
+| BlÃ¤dinge | BlÃ¤dinge |
 | Bo | Bo |
 | Boda | Boda_W |
 | Boda | Boda_S |
 | Bodarp | Bodarp |
-| Bodsjö | Bodsjö |
+| BodsjÃ¶ | BodsjÃ¶ |
 | Bodum | Bodum |
 | Boge | Boge |
 | Bogen | Bogen |
-| Boglösa | Boglösa |
+| BoglÃ¶sa | BoglÃ¶sa |
 | Bogsta | Bogsta |
-| Bokenäs | Bokenäs |
+| BokenÃ¤s | BokenÃ¤s |
 | Bollebygd | Bollebygd |
 | Bollerup | Bollerup |
-| Bollnäs | Bollnäs |
-| Bolmsö | Bolmsö |
-| Bolshög | Bolshög |
+| BollnÃ¤s | BollnÃ¤s |
+| BolmsÃ¶ | BolmsÃ¶ |
+| BolshÃ¶g | BolshÃ¶g |
 | Bolstad | Bolstad |
 | Bolum | Bolum |
 | Bonderup | Bonderup |
@@ -548,21 +548,21 @@ This is a list of enum values that can be used in the API queries.
 | Boo | Boo |
 | Borgeby | Borgeby |
 | Borgholm | Borgholm |
-| Borgsjö | Borgsjö |
+| BorgsjÃ¶ | BorgsjÃ¶ |
 | Borgstena | Borgstena |
 | Borgunda | Borgunda |
 | Borgvattnet | Borgvattnet |
 | Borgvik | Borgvik |
 | Borlunda | Borlunda |
-| Borlänge | Borlänge |
+| BorlÃ¤nge | BorlÃ¤nge |
 | Borrby | Borrby |
 | Borrie | Borrie |
-| Borås | Borås |
+| BorÃ¥s | BorÃ¥s |
 | Bosarp | Bosarp |
 | Bosebo | Bosebo |
-| Bosjökloster | Bosjökloster |
-| Boteå | Boteå |
-| Botilsäter | Botilsäter |
+| BosjÃ¶kloster | BosjÃ¶kloster |
+| BoteÃ¥ | BoteÃ¥ |
+| BotilsÃ¤ter | BotilsÃ¤ter |
 | Botkyrka | Botkyrka |
 | Bottna | Bottna |
 | Bottnaryd | Bottnaryd |
@@ -575,8 +575,8 @@ This is a list of enum values that can be used in the API queries.
 | Bredared | Bredared |
 | Bredaryd | Bredaryd |
 | Bredestad | Bredestad |
-| Bredsäter | Bredsäter |
-| Bredsätra | Bredsätra |
+| BredsÃ¤ter | BredsÃ¤ter |
+| BredsÃ¤tra | BredsÃ¤tra |
 | Brevik | Brevik |
 | Bringetofta | Bringetofta |
 | Brismene | Brismene |
@@ -593,65 +593,65 @@ This is a list of enum values that can be used in the API queries.
 | Brunneby | Brunneby |
 | Brunnhem | Brunnhem |
 | Brunskog | Brunskog |
-| Brågarp | Brågarp |
-| Brålanda | Brålanda |
-| Bråttensby | Bråttensby |
-| Bräcke | Bräcke |
-| Bräkne-Hoby | Bräkne_Hoby |
-| Brämhult | Brämhult |
-| Brönnestad | Brönnestad |
-| Brösarp | Brösarp |
+| BrÃ¥garp | BrÃ¥garp |
+| BrÃ¥landa | BrÃ¥landa |
+| BrÃ¥ttensby | BrÃ¥ttensby |
+| BrÃ¤cke | BrÃ¤cke |
+| BrÃ¤kne-Hoby | BrÃ¤kne_Hoby |
+| BrÃ¤mhult | BrÃ¤mhult |
+| BrÃ¶nnestad | BrÃ¶nnestad |
+| BrÃ¶sarp | BrÃ¶sarp |
 | Bunge | Bunge |
 | Bunkeflo | Bunkeflo |
-| Bureå | Bureå |
-| Burlöv | Burlöv |
+| BureÃ¥ | BureÃ¥ |
+| BurlÃ¶v | BurlÃ¶v |
 | Burs | Burs |
 | Burseryd | Burseryd |
-| Burträsk | Burträsk |
+| BurtrÃ¤sk | BurtrÃ¤sk |
 | Buttle | Buttle |
 | By | By_W |
 | By | By_S |
 | Byarum | Byarum |
-| Bygdeå | Bygdeå |
+| BygdeÃ¥ | BygdeÃ¥ |
 | Byske | Byske |
-| Båraryd | Båraryd |
-| Bårslöv | Bårslöv |
-| Båstad | Båstad |
-| Bäck | Bäck |
-| Bäckaby | Bäckaby |
-| Bäcke | Bäcke |
-| Bäckebo | Bäckebo |
-| Bäckseda | Bäckseda |
-| Bäl | Bäl |
-| Bälaryd | Bälaryd |
-| Bälinge | Bälinge_C |
-| Bälinge | Bälinge_O |
-| Bälinge | Bälinge_S |
-| Bällefors | Bällefors |
-| Bärbo | Bärbo |
-| Bäreberg | Bäreberg |
-| Bärfendal | Bärfendal |
-| Böda | Böda |
-| Böja | Böja |
-| Böne | Böne |
-| Börje | Börje |
-| Börringe | Börringe |
-| Börrum | Börrum |
-| Börstig | Börstig |
-| Börstil | Börstil |
-| Bösarp | Bösarp |
+| BÃ¥raryd | BÃ¥raryd |
+| BÃ¥rslÃ¶v | BÃ¥rslÃ¶v |
+| BÃ¥stad | BÃ¥stad |
+| BÃ¤ck | BÃ¤ck |
+| BÃ¤ckaby | BÃ¤ckaby |
+| BÃ¤cke | BÃ¤cke |
+| BÃ¤ckebo | BÃ¤ckebo |
+| BÃ¤ckseda | BÃ¤ckseda |
+| BÃ¤l | BÃ¤l |
+| BÃ¤laryd | BÃ¤laryd |
+| BÃ¤linge | BÃ¤linge_C |
+| BÃ¤linge | BÃ¤linge_O |
+| BÃ¤linge | BÃ¤linge_S |
+| BÃ¤llefors | BÃ¤llefors |
+| BÃ¤rbo | BÃ¤rbo |
+| BÃ¤reberg | BÃ¤reberg |
+| BÃ¤rfendal | BÃ¤rfendal |
+| BÃ¶da | BÃ¶da |
+| BÃ¶ja | BÃ¶ja |
+| BÃ¶ne | BÃ¶ne |
+| BÃ¶rje | BÃ¶rje |
+| BÃ¶rringe | BÃ¶rringe |
+| BÃ¶rrum | BÃ¶rrum |
+| BÃ¶rstig | BÃ¶rstig |
+| BÃ¶rstil | BÃ¶rstil |
+| BÃ¶sarp | BÃ¶sarp |
 | Dagsberg | Dagsberg |
 | Dagstorp | Dagstorp |
-| Dagsås | Dagsås |
+| DagsÃ¥s | DagsÃ¥s |
 | Dal | Dal |
 | Dala | Dala |
-| Dalarö | Dalarö |
+| DalarÃ¶ | DalarÃ¶ |
 | Dalby | Dalby_C |
 | Dalby | Dalby_M |
 | Dalby | Dalby_S |
 | Dalhem | Dalhem_I |
 | Dalhem | Dalhem_H |
-| Dalköpinge | Dalköpinge |
+| DalkÃ¶pinge | DalkÃ¶pinge |
 | Dals-Ed | Dals_Ed |
 | Dalskog | Dalskog |
 | Dalstorp | Dalstorp |
@@ -660,7 +660,7 @@ This is a list of enum values that can be used in the API queries.
 | Danmark | Danmark |
 | Dannemora | Dannemora |
 | Dannike | Dannike |
-| Dannäs | Dannäs |
+| DannÃ¤s | DannÃ¤s |
 | Daretorp | Daretorp |
 | Degeberga | Degeberga |
 | Degerfors | Degerfors_T |
@@ -668,20 +668,20 @@ This is a list of enum values that can be used in the API queries.
 | Delsbo | Delsbo |
 | Dimbo | Dimbo |
 | Dingtuna | Dingtuna |
-| Djurröd | Djurröd |
+| DjurrÃ¶d | DjurrÃ¶d |
 | Djursdala | Djursdala |
-| Djurö | Djurö |
+| DjurÃ¶ | DjurÃ¶ |
 | Dorotea | Dorotea |
 | Dragsmark | Dragsmark |
 | Drev | Drev |
 | Drothem | Drothem |
-| Drängsered | Drängsered |
+| DrÃ¤ngsered | DrÃ¤ngsered |
 | Dunker | Dunker |
-| Dädesjö | Dädesjö |
-| Dänningelanda | Dänningelanda |
-| Döderhult | Döderhult |
-| Dörarp | Dörarp |
-| Dörby | Dörby |
+| DÃ¤desjÃ¶ | DÃ¤desjÃ¶ |
+| DÃ¤nningelanda | DÃ¤nningelanda |
+| DÃ¶derhult | DÃ¶derhult |
+| DÃ¶rarp | DÃ¶rarp |
+| DÃ¶rby | DÃ¶rby |
 | Ed | Ed_Y |
 | Ed | Ed_S |
 | Ed | Ed_AB |
@@ -694,8 +694,8 @@ This is a list of enum values that can be used in the API queries.
 | Edsele | Edsele |
 | Edshult | Edshult |
 | Edsleskog | Edsleskog |
-| Edsvära | Edsvära |
-| Edåsa | Edåsa |
+| EdsvÃ¤ra | EdsvÃ¤ra |
+| EdÃ¥sa | EdÃ¥sa |
 | Eftra | Eftra |
 | Egby | Egby |
 | Eggby | Eggby |
@@ -710,24 +710,24 @@ This is a list of enum values that can be used in the API queries.
 | Ekeby | Ekeby_C |
 | Ekeby | Ekeby_M |
 | Ekebyborna | Ekebyborna |
-| Ekerö | Ekerö |
+| EkerÃ¶ | EkerÃ¶ |
 | Ekeskog | Ekeskog |
-| Ekshärad | Ekshärad |
-| Eksjö | Eksjö |
+| EkshÃ¤rad | EkshÃ¤rad |
+| EksjÃ¶ | EksjÃ¶ |
 | Eksta | Eksta |
 | Eldsberga | Eldsberga |
 | Eling | Eling |
-| Eljaröd | Eljaröd |
+| EljarÃ¶d | EljarÃ¶d |
 | Elleholm | Elleholm |
-| Emmislöv | Emmislöv |
+| EmmislÃ¶v | EmmislÃ¶v |
 | Endre | Endre |
-| Enköping | Enköping |
-| Enköpings-Näs | Enköpings_Näs |
-| Enslöv | Enslöv |
+| EnkÃ¶ping | EnkÃ¶ping |
+| EnkÃ¶pings-NÃ¤s | EnkÃ¶pings_NÃ¤s |
+| EnslÃ¶v | EnslÃ¶v |
 | Enviken | Enviken |
-| Enåker | Enåker |
-| Enånger | Enånger |
-| Enåsa | Enåsa |
+| EnÃ¥ker | EnÃ¥ker |
+| EnÃ¥nger | EnÃ¥nger |
+| EnÃ¥sa | EnÃ¥sa |
 | Eriksberg | Eriksberg |
 | Erikstad | Erikstad |
 | Eringsboda | Eringsboda |
@@ -737,18 +737,18 @@ This is a list of enum values that can be used in the API queries.
 | Eskelhem | Eskelhem |
 | Eskilstorp | Eskilstorp |
 | Eskilstuna | Eskilstuna |
-| Eskilsäter | Eskilsäter |
-| Eslöv | Eslöv |
+| EskilsÃ¤ter | EskilsÃ¤ter |
+| EslÃ¶v | EslÃ¶v |
 | Essunga | Essunga |
 | Estuna | Estuna |
 | Etelhem | Etelhem |
-| Everlöv | Everlöv |
-| Everöd | Everöd |
+| EverlÃ¶v | EverlÃ¶v |
+| EverÃ¶d | EverÃ¶d |
 | Fagered | Fagered |
 | Fagerhult | Fagerhult |
 | Fagersta | Fagersta |
 | Falkenberg | Falkenberg |
-| Falköping | Falköping |
+| FalkÃ¶ping | FalkÃ¶ping |
 | Falun | Falun |
 | Fardhem | Fardhem |
 | Farhult | Farhult |
@@ -757,22 +757,22 @@ This is a list of enum values that can be used in the API queries.
 | Fasterna | Fasterna |
 | Felestad | Felestad |
 | Fellingsbro | Fellingsbro |
-| Femsjö | Femsjö |
+| FemsjÃ¶ | FemsjÃ¶ |
 | Fide | Fide |
 | Filipstad | Filipstad |
 | Film | Film |
 | Finja | Finja |
 | Finnekumla | Finnekumla |
-| Finnerödja | Finnerödja |
+| FinnerÃ¶dja | FinnerÃ¶dja |
 | Fittja | Fittja |
 | Fivelstad | Fivelstad |
 | Fivlered | Fivlered |
 | Fjelie | Fjelie |
-| Fjälkestad | Fjälkestad |
-| Fjälkinge | Fjälkinge |
-| Fjällsjö | Fjällsjö |
-| Fjärestad | Fjärestad |
-| Fjärås | Fjärås |
+| FjÃ¤lkestad | FjÃ¤lkestad |
+| FjÃ¤lkinge | FjÃ¤lkinge |
+| FjÃ¤llsjÃ¶ | FjÃ¤llsjÃ¶ |
+| FjÃ¤restad | FjÃ¤restad |
+| FjÃ¤rÃ¥s | FjÃ¤rÃ¥s |
 | Flackarp | Flackarp |
 | Flakeberg | Flakeberg |
 | Flen | Flen |
@@ -786,13 +786,13 @@ This is a list of enum values that can be used in the API queries.
 | Floby | Floby |
 | Floda | Floda_W |
 | Floda | Floda_D |
-| Fläckebo | Fläckebo |
-| Flädie | Flädie |
-| Fogdö | Fogdö |
+| FlÃ¤ckebo | FlÃ¤ckebo |
+| FlÃ¤die | FlÃ¤die |
+| FogdÃ¶ | FogdÃ¶ |
 | Fole | Fole |
-| Folkärna | Folkärna |
+| FolkÃ¤rna | FolkÃ¤rna |
 | Follingbo | Follingbo |
-| Fornåsa | Fornåsa |
+| FornÃ¥sa | FornÃ¥sa |
 | Fors | Fors_Z |
 | Fors | Fors_O |
 | Forsa | Forsa |
@@ -801,20 +801,20 @@ This is a list of enum values that can be used in the API queries.
 | Forshaga | Forshaga |
 | Forsheda | Forsheda |
 | Forshem | Forshem |
-| Forshälla | Forshälla |
+| ForshÃ¤lla | ForshÃ¤lla |
 | Forsmark | Forsmark |
 | Forssa | Forssa |
 | Foss | Foss |
-| Fotskäl | Fotskäl |
+| FotskÃ¤l | FotskÃ¤l |
 | Fredrika | Fredrika |
 | Fredsberg | Fredsberg |
 | Fresta | Fresta |
 | Fridene | Fridene |
 | Fridlevstad | Fridlevstad |
 | Friel | Friel |
-| Friggeråker | Friggeråker |
+| FriggerÃ¥ker | FriggerÃ¥ker |
 | Frillestad | Frillestad |
-| Frillesås | Frillesås |
+| FrillesÃ¥s | FrillesÃ¥s |
 | Frinnaryd | Frinnaryd |
 | Fristad | Fristad |
 | Fritsla | Fritsla |
@@ -823,51 +823,51 @@ This is a list of enum values that can be used in the API queries.
 | Frustuna | Frustuna |
 | Fryele | Fryele |
 | Frykerud | Frykerud |
-| Fryksände | Fryksände |
-| Främmestad | Främmestad |
-| Frändefors | Frändefors |
-| Fränninge | Fränninge |
-| Fröderyd | Fröderyd |
-| Frödinge | Frödinge |
-| Fröjel | Fröjel |
-| Fröjered | Fröjered |
-| Fröskog | Fröskog |
-| Fröslunda | Fröslunda |
-| Frösthult | Frösthult |
-| Frösunda | Frösunda |
-| Frösve | Frösve |
-| Frösö | Frösö |
-| Frötuna | Frötuna |
+| FryksÃ¤nde | FryksÃ¤nde |
+| FrÃ¤mmestad | FrÃ¤mmestad |
+| FrÃ¤ndefors | FrÃ¤ndefors |
+| FrÃ¤nninge | FrÃ¤nninge |
+| FrÃ¶deryd | FrÃ¶deryd |
+| FrÃ¶dinge | FrÃ¶dinge |
+| FrÃ¶jel | FrÃ¶jel |
+| FrÃ¶jered | FrÃ¶jered |
+| FrÃ¶skog | FrÃ¶skog |
+| FrÃ¶slunda | FrÃ¶slunda |
+| FrÃ¶sthult | FrÃ¶sthult |
+| FrÃ¶sunda | FrÃ¶sunda |
+| FrÃ¶sve | FrÃ¶sve |
+| FrÃ¶sÃ¶ | FrÃ¶sÃ¶ |
+| FrÃ¶tuna | FrÃ¶tuna |
 | Fuglie | Fuglie |
 | Fullestad | Fullestad |
 | Fulltofta | Fulltofta |
-| Fullösa | Fullösa |
+| FullÃ¶sa | FullÃ¶sa |
 | Funbo | Funbo |
 | Furingstad | Furingstad |
 | Furuby | Furuby |
 | Fuxerna | Fuxerna |
 | Fyrunga | Fyrunga |
-| Fågelfors | Fågelfors |
-| Fågeltofta | Fågeltofta |
-| Fåglum | Fåglum |
-| Fårö | Fårö |
-| Fägre | Fägre |
-| Fänneslunda | Fänneslunda |
-| Färed | Färed |
-| Färentuna | Färentuna |
-| Färgaryd | Färgaryd |
-| Färgelanda | Färgelanda |
-| Färila | Färila |
-| Färingtofta | Färingtofta |
-| Färlöv | Färlöv |
-| Färnebo | Färnebo |
-| Fölene | Fölene |
-| Föllinge | Föllinge |
-| Föra | Föra |
-| Förkärla | Förkärla |
-| Förlanda | Förlanda |
-| Förlösa | Förlösa |
-| Förslöv | Förslöv |
+| FÃ¥gelfors | FÃ¥gelfors |
+| FÃ¥geltofta | FÃ¥geltofta |
+| FÃ¥glum | FÃ¥glum |
+| FÃ¥rÃ¶ | FÃ¥rÃ¶ |
+| FÃ¤gre | FÃ¤gre |
+| FÃ¤nneslunda | FÃ¤nneslunda |
+| FÃ¤red | FÃ¤red |
+| FÃ¤rentuna | FÃ¤rentuna |
+| FÃ¤rgaryd | FÃ¤rgaryd |
+| FÃ¤rgelanda | FÃ¤rgelanda |
+| FÃ¤rila | FÃ¤rila |
+| FÃ¤ringtofta | FÃ¤ringtofta |
+| FÃ¤rlÃ¶v | FÃ¤rlÃ¶v |
+| FÃ¤rnebo | FÃ¤rnebo |
+| FÃ¶lene | FÃ¶lene |
+| FÃ¶llinge | FÃ¶llinge |
+| FÃ¶ra | FÃ¶ra |
+| FÃ¶rkÃ¤rla | FÃ¶rkÃ¤rla |
+| FÃ¶rlanda | FÃ¶rlanda |
+| FÃ¶rlÃ¶sa | FÃ¶rlÃ¶sa |
+| FÃ¶rslÃ¶v | FÃ¶rslÃ¶v |
 | Gagnef | Gagnef |
 | Gamleby | Gamleby |
 | Gammalkil | Gammalkil |
@@ -879,40 +879,40 @@ This is a list of enum values that can be used in the API queries.
 | Genarp | Genarp |
 | Gerum | Gerum |
 | Gestad | Gestad |
-| Gesäter | Gesäter |
+| GesÃ¤ter | GesÃ¤ter |
 | Getinge | Getinge |
-| Gideå | Gideå |
+| GideÃ¥ | GideÃ¥ |
 | Gillberga | Gillberga_D |
 | Gillberga | Gillberga_S |
 | Gillstad | Gillstad |
 | Gingri | Gingri |
 | Giresta | Giresta |
-| Gislöv | Gislöv |
+| GislÃ¶v | GislÃ¶v |
 | Gistad | Gistad |
 | Gladhammar | Gladhammar |
 | Gladsax | Gladsax |
 | Glanshammar | Glanshammar |
 | Glava | Glava |
 | Glemminge | Glemminge |
-| Glimåkra | Glimåkra |
+| GlimÃ¥kra | GlimÃ¥kra |
 | Glostorp | Glostorp |
-| Glumslöv | Glumslöv |
-| Glömminge | Glömminge |
+| GlumslÃ¶v | GlumslÃ¶v |
+| GlÃ¶mminge | GlÃ¶mminge |
 | Gnarp | Gnarp |
-| Gnosjö | Gnosjö |
-| Godegård | Godegård |
+| GnosjÃ¶ | GnosjÃ¶ |
+| GodegÃ¥rd | GodegÃ¥rd |
 | Gothem | Gothem |
-| Gottröra | Gottröra |
-| Grangärde | Grangärde |
+| GottrÃ¶ra | GottrÃ¶ra |
+| GrangÃ¤rde | GrangÃ¤rde |
 | Granhult | Granhult |
 | Graninge | Graninge |
 | Grava | Grava |
 | Grebo | Grebo |
-| Grevbäck | Grevbäck |
+| GrevbÃ¤ck | GrevbÃ¤ck |
 | Grevie | Grevie |
 | Grimeton | Grimeton |
 | Grimmared | Grimmared |
-| Grinneröd | Grinneröd |
+| GrinnerÃ¶d | GrinnerÃ¶d |
 | Grinstad | Grinstad |
 | Grolanda | Grolanda |
 | Grovare | Grovare |
@@ -925,29 +925,29 @@ This is a list of enum values that can be used in the API queries.
 | Gryta | Gryta |
 | Gryteryd | Gryteryd |
 | Grythyttan | Grythyttan |
-| Grytnäs | Grytnäs |
-| Gränna | Gränna |
-| Gräsgård | Gräsgård |
-| Gräsmark | Gräsmark |
-| Grästorp | Grästorp |
-| Gräsö | Gräsö |
-| Gräve | Gräve |
-| Grödinge | Grödinge |
-| Grönahög | Grönahög |
-| Grönby | Grönby |
-| Grötlingbo | Grötlingbo |
-| Gualöv | Gualöv |
+| GrytnÃ¤s | GrytnÃ¤s |
+| GrÃ¤nna | GrÃ¤nna |
+| GrÃ¤sgÃ¥rd | GrÃ¤sgÃ¥rd |
+| GrÃ¤smark | GrÃ¤smark |
+| GrÃ¤storp | GrÃ¤storp |
+| GrÃ¤sÃ¶ | GrÃ¤sÃ¶ |
+| GrÃ¤ve | GrÃ¤ve |
+| GrÃ¶dinge | GrÃ¶dinge |
+| GrÃ¶nahÃ¶g | GrÃ¶nahÃ¶g |
+| GrÃ¶nby | GrÃ¶nby |
+| GrÃ¶tlingbo | GrÃ¶tlingbo |
+| GualÃ¶v | GualÃ¶v |
 | Gudhem | Gudhem |
 | Gudmundtorp | Gudmundtorp |
 | Guldrupe | Guldrupe |
 | Gullabo | Gullabo |
 | Gullered | Gullered |
 | Gullholmen | Gullholmen |
-| Gumlösa | Gumlösa |
+| GumlÃ¶sa | GumlÃ¶sa |
 | Gunnarp | Gunnarp |
-| Gunnarsjö | Gunnarsjö |
+| GunnarsjÃ¶ | GunnarsjÃ¶ |
 | Gunnarskog | Gunnarskog |
-| Gunnarsnäs | Gunnarsnäs |
+| GunnarsnÃ¤s | GunnarsnÃ¤s |
 | Gunnilbo | Gunnilbo |
 | Gustafs | Gustafs |
 | Gustav Adolf | Gustav_Adolf_O |
@@ -955,46 +955,46 @@ This is a list of enum values that can be used in the API queries.
 | Gustav Adolf | Gustav_Adolf_S |
 | Gustavsberg | Gustavsberg |
 | Gylle | Gylle |
-| Gårdby | Gårdby |
-| Gårdeby | Gårdeby |
-| Gårdsby | Gårdsby |
-| Gårdstånga | Gårdstånga |
-| Gårdveda | Gårdveda |
-| Gåsborn | Gåsborn |
-| Gåsinge-Dillnäs | Gåsinge_Dillnäs |
-| Gåxsjö | Gåxsjö |
-| Gällared | Gällared |
-| Gällaryd | Gällaryd |
-| Gällersta | Gällersta |
-| Gällinge | Gällinge |
-| Gällivare | Gällivare |
-| Gällstad | Gällstad |
-| Gärdhem | Gärdhem |
-| Gärdserum | Gärdserum |
-| Gärdslösa | Gärdslösa |
-| Gärdslöv | Gärdslöv |
-| Gässie | Gässie |
-| Gävle | Gävle |
-| Gödelöv | Gödelöv |
-| Gödestad | Gödestad |
-| Gökhem | Gökhem |
-| Görslöv | Görslöv |
-| Gösslunda | Gösslunda |
-| Göteborg | Göteborg |
-| Götene | Götene |
-| Göteryd | Göteryd |
-| Göteve | Göteve |
-| Götlunda | Götlunda_O |
-| Götlunda | Götlunda_U |
+| GÃ¥rdby | GÃ¥rdby |
+| GÃ¥rdeby | GÃ¥rdeby |
+| GÃ¥rdsby | GÃ¥rdsby |
+| GÃ¥rdstÃ¥nga | GÃ¥rdstÃ¥nga |
+| GÃ¥rdveda | GÃ¥rdveda |
+| GÃ¥sborn | GÃ¥sborn |
+| GÃ¥singe-DillnÃ¤s | GÃ¥singe_DillnÃ¤s |
+| GÃ¥xsjÃ¶ | GÃ¥xsjÃ¶ |
+| GÃ¤llared | GÃ¤llared |
+| GÃ¤llaryd | GÃ¤llaryd |
+| GÃ¤llersta | GÃ¤llersta |
+| GÃ¤llinge | GÃ¤llinge |
+| GÃ¤llivare | GÃ¤llivare |
+| GÃ¤llstad | GÃ¤llstad |
+| GÃ¤rdhem | GÃ¤rdhem |
+| GÃ¤rdserum | GÃ¤rdserum |
+| GÃ¤rdslÃ¶sa | GÃ¤rdslÃ¶sa |
+| GÃ¤rdslÃ¶v | GÃ¤rdslÃ¶v |
+| GÃ¤ssie | GÃ¤ssie |
+| GÃ¤vle | GÃ¤vle |
+| GÃ¶delÃ¶v | GÃ¶delÃ¶v |
+| GÃ¶destad | GÃ¶destad |
+| GÃ¶khem | GÃ¶khem |
+| GÃ¶rslÃ¶v | GÃ¶rslÃ¶v |
+| GÃ¶sslunda | GÃ¶sslunda |
+| GÃ¶teborg | GÃ¶teborg |
+| GÃ¶tene | GÃ¶tene |
+| GÃ¶teryd | GÃ¶teryd |
+| GÃ¶teve | GÃ¶teve |
+| GÃ¶tlunda | GÃ¶tlunda_O |
+| GÃ¶tlunda | GÃ¶tlunda_U |
 | Hablingbo | Hablingbo |
 | Habo | Habo |
 | Hacksta | Hacksta |
 | Hackvad | Hackvad |
-| Hackås | Hackås |
+| HackÃ¥s | HackÃ¥s |
 | Haga | Haga |
 | Hagby | Hagby_H |
 | Hagby | Hagby_C |
-| Hagebyhöga | Hagebyhöga |
+| HagebyhÃ¶ga | HagebyhÃ¶ga |
 | Hagelberg | Hagelberg |
 | Hagfors | Hagfors |
 | Hagshult | Hagshult |
@@ -1004,7 +1004,7 @@ This is a list of enum values that can be used in the API queries.
 | Halla | Halla_I |
 | Halla | Halla_D |
 | Hallaryd | Hallaryd |
-| Hallaröd | Hallaröd |
+| HallarÃ¶d | HallarÃ¶d |
 | Hallen | Hallen |
 | Hallingeberg | Hallingeberg |
 | Hallsberg | Hallsberg |
@@ -1016,36 +1016,36 @@ This is a list of enum values that can be used in the API queries.
 | Hammarby | Hammarby_AB |
 | Hammarby | Hammarby_D |
 | Hammarlunda | Hammarlunda |
-| Hammarlöv | Hammarlöv |
-| Hammarö | Hammarö |
-| Hammenhög | Hammenhög |
+| HammarlÃ¶v | HammarlÃ¶v |
+| HammarÃ¶ | HammarÃ¶ |
+| HammenhÃ¶g | HammenhÃ¶g |
 | Hammerdal | Hammerdal |
 | Hamneda | Hamneda |
 | Hamra | Hamra |
-| Hamrånge | Hamrånge |
+| HamrÃ¥nge | HamrÃ¥nge |
 | Hanebo | Hanebo |
-| Hangelösa | Hangelösa |
+| HangelÃ¶sa | HangelÃ¶sa |
 | Hangvar | Hangvar |
 | Hanhals | Hanhals |
 | Hannas | Hannas |
-| Hannäs | Hannäs |
+| HannÃ¤s | HannÃ¤s |
 | Haraker | Haraker |
 | Harbo | Harbo |
 | Hardeberga | Hardeberga |
 | Hardemo | Hardemo |
 | Harestad | Harestad |
 | Harg | Harg |
-| Harlösa | Harlösa |
-| Harmånger | Harmånger |
+| HarlÃ¶sa | HarlÃ¶sa |
+| HarmÃ¥nger | HarmÃ¥nger |
 | Harplinge | Harplinge |
 | Hassela | Hassela |
 | Hassle | Hassle |
-| Hasslö | Hasslö |
-| Hasslösa | Hasslösa |
-| Hasslöv | Hasslöv |
+| HasslÃ¶ | HasslÃ¶ |
+| HasslÃ¶sa | HasslÃ¶sa |
+| HasslÃ¶v | HasslÃ¶v |
 | Haurida | Haurida |
 | Havdhem | Havdhem |
-| Haverö | Haverö |
+| HaverÃ¶ | HaverÃ¶ |
 | Hed | Hed |
 | Heda | Heda |
 | Hede | Hede_O |
@@ -1056,27 +1056,27 @@ This is a list of enum values that can be used in the API queries.
 | Hejde | Hejde |
 | Hejdeby | Hejdeby |
 | Hejnum | Hejnum |
-| Helgarö | Helgarö |
+| HelgarÃ¶ | HelgarÃ¶ |
 | Helgesta | Helgesta |
 | Helgona | Helgona |
 | Helgum | Helgum |
 | Hellvi | Hellvi |
 | Helsingborg | Helsingborg |
 | Hemmesdynge | Hemmesdynge |
-| Hemmesjö | Hemmesjö |
+| HemmesjÃ¶ | HemmesjÃ¶ |
 | Hemse | Hemse |
-| Hemsjö | Hemsjö |
-| Hemsö | Hemsö |
+| HemsjÃ¶ | HemsjÃ¶ |
+| HemsÃ¶ | HemsÃ¶ |
 | Herrberga | Herrberga |
 | Herrestad | Herrestad_E |
 | Herrestad | Herrestad_O |
 | Herrljunga | Herrljunga |
-| Herråkra | Herråkra |
+| HerrÃ¥kra | HerrÃ¥kra |
 | Hidinge | Hidinge |
 | Hietaniemi | Hietaniemi |
 | Hillared | Hillared |
 | Hille | Hille |
-| Hilleshög | Hilleshög |
+| HilleshÃ¶g | HilleshÃ¶g |
 | Himmeta | Himmeta |
 | Hinneryd | Hinneryd |
 | Hishult | Hishult |
@@ -1084,16 +1084,16 @@ This is a list of enum values that can be used in the API queries.
 | Hjorted | Hjorted |
 | Hjortsberga | Hjortsberga_K |
 | Hjortsberga | Hjortsberga_G |
-| Hjulsjö | Hjulsjö |
-| Hjälmseryd | Hjälmseryd |
-| Hjälsta | Hjälsta |
-| Hjälstad | Hjälstad |
-| Hjärnarp | Hjärnarp |
-| Hjärsås | Hjärsås |
-| Hjärtum | Hjärtum |
+| HjulsjÃ¶ | HjulsjÃ¶ |
+| HjÃ¤lmseryd | HjÃ¤lmseryd |
+| HjÃ¤lsta | HjÃ¤lsta |
+| HjÃ¤lstad | HjÃ¤lstad |
+| HjÃ¤rnarp | HjÃ¤rnarp |
+| HjÃ¤rsÃ¥s | HjÃ¤rsÃ¥s |
+| HjÃ¤rtum | HjÃ¤rtum |
 | Hofterup | Hofterup |
 | Hogdal | Hogdal |
-| Hogrän | Hogrän |
+| HogrÃ¤n | HogrÃ¤n |
 | Hogstad | Hogstad |
 | Hol | Hol |
 | Holm | Holm_N |
@@ -1103,7 +1103,7 @@ This is a list of enum values that can be used in the API queries.
 | Holmby | Holmby |
 | Holmedal | Holmedal |
 | Holmestad | Holmestad |
-| Holmön | Holmön |
+| HolmÃ¶n | HolmÃ¶n |
 | Holsljunga | Holsljunga |
 | Horla | Horla |
 | Horn | Horn_O |
@@ -1121,28 +1121,28 @@ This is a list of enum values that can be used in the API queries.
 | Hovby | Hovby |
 | Hovmantorp | Hovmantorp |
 | Hovsta | Hovsta |
-| Huaröd | Huaröd |
+| HuarÃ¶d | HuarÃ¶d |
 | Hubbo | Hubbo |
 | Huddinge | Huddinge |
 | Huddunge | Huddunge |
 | Hudene | Hudene |
 | Hudiksvall | Hudiksvall |
-| Huggenäs | Huggenäs |
+| HuggenÃ¤s | HuggenÃ¤s |
 | Hulared | Hulared |
 | Hult | Hult |
 | Hulterstad | Hulterstad |
-| Hultsjö | Hultsjö |
+| HultsjÃ¶ | HultsjÃ¶ |
 | Humla | Humla |
 | Hunnestad | Hunnestad |
 | Hurva | Hurva |
 | Husaby | Husaby |
 | Husby | Husby |
-| Husby-Långhundra | Husby_Långhundra |
+| Husby-LÃ¥nghundra | Husby_LÃ¥nghundra |
 | Husby-Oppunda | Husby_Oppunda |
 | Husby-Rekarne | Husby_Rekarne |
 | Husby-Sjuhundra | Husby_Sjuhundra |
 | Husby-Sjutolft | Husby_Sjutolft |
-| Husby-Ärlinghundra | Husby_Ärlinghundra |
+| Husby-Ã„rlinghundra | Husby_Ã„rlinghundra |
 | Huskvarna | Huskvarna |
 | Hyby | Hyby |
 | Hycklinge | Hycklinge |
@@ -1150,137 +1150,137 @@ This is a list of enum values that can be used in the API queries.
 | Hyltinge | Hyltinge |
 | Hyringa | Hyringa |
 | Hyssna | Hyssna |
-| Håbo-Tibble | Håbo_Tibble |
-| Håbol | Håbol |
-| Håby | Håby |
-| Håcksvik | Håcksvik |
-| Håkantorp | Håkantorp |
-| Hålanda | Hålanda |
-| Håle | Håle |
-| Hållnäs | Hållnäs |
-| Hålta | Hålta |
-| Hånger | Hånger |
-| Hångsdala | Hångsdala |
-| Håsjö | Håsjö |
-| Håslöv | Håslöv |
-| Håstad | Håstad |
-| Håtuna | Håtuna |
-| Hägerstad | Hägerstad |
-| Häggdånger | Häggdånger |
-| Häggeby | Häggeby |
-| Häggenås | Häggenås |
-| Häggesled | Häggesled |
-| Häggum | Häggum |
-| Häglinge | Häglinge |
-| Hällaryd | Hällaryd |
-| Hälleberga | Hälleberga |
-| Hällefors | Hällefors |
-| Hällesjö | Hällesjö |
-| Hällestad | Hällestad_O |
-| Hällestad | Hällestad_M |
-| Hällestad | Hällestad_E |
-| Hällstad | Hällstad |
-| Hällum | Hällum |
-| Hälsingtuna | Hälsingtuna |
-| Händene | Händene |
-| Härad | Härad |
-| Häradshammar | Häradshammar |
-| Härja | Härja |
-| Härjevad | Härjevad |
-| Härkeberga | Härkeberga |
-| Härlunda | Härlunda_O |
-| Härlunda | Härlunda_G |
-| Härlöv | Härlöv |
-| Härna | Härna |
-| Härnevi | Härnevi |
-| Härnösand | Härnösand |
-| Härryda | Härryda |
-| Härslöv | Härslöv |
-| Hässjö | Hässjö |
-| Hässleby | Hässleby |
-| Hässleholm | Hässleholm |
-| Hässlunda | Hässlunda |
-| Hästveda | Hästveda |
-| Häverö | Häverö |
-| Hög | Hög_M |
-| Hög | Hög_X |
-| Höganäs | Höganäs |
-| Högby | Högby_H |
-| Högby | Högby_E |
-| Högerud | Högerud |
-| Högestad | Högestad |
-| Högsby | Högsby |
-| Högseröd | Högseröd |
-| Högsjö | Högsjö |
-| Högsrum | Högsrum |
-| Högstena | Högstena |
-| Högsäter | Högsäter |
-| Högås | Högås |
-| Höja | Höja |
-| Hökhuvud | Hökhuvud |
-| Hököpinge | Hököpinge |
-| Hölö | Hölö |
-| Hömb | Hömb |
-| Hörby | Hörby |
-| Höreda | Höreda |
-| Hörja | Hörja |
-| Hörnefors | Hörnefors |
-| Hörröd | Hörröd |
-| Hörsne | Hörsne |
-| Hörup | Hörup |
-| Hössna | Hössna |
-| Höör | Höör |
+| HÃ¥bo-Tibble | HÃ¥bo_Tibble |
+| HÃ¥bol | HÃ¥bol |
+| HÃ¥by | HÃ¥by |
+| HÃ¥cksvik | HÃ¥cksvik |
+| HÃ¥kantorp | HÃ¥kantorp |
+| HÃ¥landa | HÃ¥landa |
+| HÃ¥le | HÃ¥le |
+| HÃ¥llnÃ¤s | HÃ¥llnÃ¤s |
+| HÃ¥lta | HÃ¥lta |
+| HÃ¥nger | HÃ¥nger |
+| HÃ¥ngsdala | HÃ¥ngsdala |
+| HÃ¥sjÃ¶ | HÃ¥sjÃ¶ |
+| HÃ¥slÃ¶v | HÃ¥slÃ¶v |
+| HÃ¥stad | HÃ¥stad |
+| HÃ¥tuna | HÃ¥tuna |
+| HÃ¤gerstad | HÃ¤gerstad |
+| HÃ¤ggdÃ¥nger | HÃ¤ggdÃ¥nger |
+| HÃ¤ggeby | HÃ¤ggeby |
+| HÃ¤ggenÃ¥s | HÃ¤ggenÃ¥s |
+| HÃ¤ggesled | HÃ¤ggesled |
+| HÃ¤ggum | HÃ¤ggum |
+| HÃ¤glinge | HÃ¤glinge |
+| HÃ¤llaryd | HÃ¤llaryd |
+| HÃ¤lleberga | HÃ¤lleberga |
+| HÃ¤llefors | HÃ¤llefors |
+| HÃ¤llesjÃ¶ | HÃ¤llesjÃ¶ |
+| HÃ¤llestad | HÃ¤llestad_O |
+| HÃ¤llestad | HÃ¤llestad_M |
+| HÃ¤llestad | HÃ¤llestad_E |
+| HÃ¤llstad | HÃ¤llstad |
+| HÃ¤llum | HÃ¤llum |
+| HÃ¤lsingtuna | HÃ¤lsingtuna |
+| HÃ¤ndene | HÃ¤ndene |
+| HÃ¤rad | HÃ¤rad |
+| HÃ¤radshammar | HÃ¤radshammar |
+| HÃ¤rja | HÃ¤rja |
+| HÃ¤rjevad | HÃ¤rjevad |
+| HÃ¤rkeberga | HÃ¤rkeberga |
+| HÃ¤rlunda | HÃ¤rlunda_O |
+| HÃ¤rlunda | HÃ¤rlunda_G |
+| HÃ¤rlÃ¶v | HÃ¤rlÃ¶v |
+| HÃ¤rna | HÃ¤rna |
+| HÃ¤rnevi | HÃ¤rnevi |
+| HÃ¤rnÃ¶sand | HÃ¤rnÃ¶sand |
+| HÃ¤rryda | HÃ¤rryda |
+| HÃ¤rslÃ¶v | HÃ¤rslÃ¶v |
+| HÃ¤ssjÃ¶ | HÃ¤ssjÃ¶ |
+| HÃ¤ssleby | HÃ¤ssleby |
+| HÃ¤ssleholm | HÃ¤ssleholm |
+| HÃ¤sslunda | HÃ¤sslunda |
+| HÃ¤stveda | HÃ¤stveda |
+| HÃ¤verÃ¶ | HÃ¤verÃ¶ |
+| HÃ¶g | HÃ¶g_M |
+| HÃ¶g | HÃ¶g_X |
+| HÃ¶ganÃ¤s | HÃ¶ganÃ¤s |
+| HÃ¶gby | HÃ¶gby_H |
+| HÃ¶gby | HÃ¶gby_E |
+| HÃ¶gerud | HÃ¶gerud |
+| HÃ¶gestad | HÃ¶gestad |
+| HÃ¶gsby | HÃ¶gsby |
+| HÃ¶gserÃ¶d | HÃ¶gserÃ¶d |
+| HÃ¶gsjÃ¶ | HÃ¶gsjÃ¶ |
+| HÃ¶gsrum | HÃ¶gsrum |
+| HÃ¶gstena | HÃ¶gstena |
+| HÃ¶gsÃ¤ter | HÃ¶gsÃ¤ter |
+| HÃ¶gÃ¥s | HÃ¶gÃ¥s |
+| HÃ¶ja | HÃ¶ja |
+| HÃ¶khuvud | HÃ¶khuvud |
+| HÃ¶kÃ¶pinge | HÃ¶kÃ¶pinge |
+| HÃ¶lÃ¶ | HÃ¶lÃ¶ |
+| HÃ¶mb | HÃ¶mb |
+| HÃ¶rby | HÃ¶rby |
+| HÃ¶reda | HÃ¶reda |
+| HÃ¶rja | HÃ¶rja |
+| HÃ¶rnefors | HÃ¶rnefors |
+| HÃ¶rrÃ¶d | HÃ¶rrÃ¶d |
+| HÃ¶rsne | HÃ¶rsne |
+| HÃ¶rup | HÃ¶rup |
+| HÃ¶ssna | HÃ¶ssna |
+| HÃ¶Ã¶r | HÃ¶Ã¶r |
 | Idala | Idala |
 | Idenor | Idenor |
 | Idre | Idre |
-| Igelösa | Igelösa |
+| IgelÃ¶sa | IgelÃ¶sa |
 | Ignaberga | Ignaberga |
 | Ilsbo | Ilsbo |
 | Ilstorp | Ilstorp |
 | Indal | Indal |
-| Ingarö | Ingarö |
+| IngarÃ¶ | IngarÃ¶ |
 | Ingatorp | Ingatorp |
 | Ingelstorp | Ingelstorp |
 | Irsta | Irsta |
 | Istorp | Istorp |
 | Istrum | Istrum |
 | Ivetofta | Ivetofta |
-| Ivö | Ivö |
+| IvÃ¶ | IvÃ¶ |
 | Jokkmokk | Jokkmokk |
 | Jonsberg | Jonsberg |
 | Jonstorp | Jonstorp |
-| Jukkasjärvi | Jukkasjärvi |
+| JukkasjÃ¤rvi | JukkasjÃ¤rvi |
 | Julita | Julita |
 | Jumkil | Jumkil |
 | Jung | Jung |
 | Junosuando | Junosuando |
 | Junsele | Junsele |
-| Jäder | Jäder |
-| Jäla | Jäla |
-| Jällby | Jällby |
-| Jälluntofta | Jälluntofta |
-| Jämjö | Jämjö |
-| Jämshög | Jämshög |
-| Järbo | Järbo_O |
-| Järbo | Järbo_X |
-| Järeda | Järeda |
-| Järfälla | Järfälla |
-| Järlåsa | Järlåsa |
-| Järn | Järn |
-| Järna | Järna |
-| Järnboås | Järnboås |
-| Järnskog | Järnskog |
-| Järpås | Järpås |
-| Järrestad | Järrestad |
-| Järsnäs | Järsnäs |
-| Järstad | Järstad |
-| Järstorp | Järstorp |
-| Järvsö | Järvsö |
-| Jät | Jät |
-| Jättendal | Jättendal |
-| Jönköping | Jönköping |
-| Jörlanda | Jörlanda |
-| Jörn | Jörn |
+| JÃ¤der | JÃ¤der |
+| JÃ¤la | JÃ¤la |
+| JÃ¤llby | JÃ¤llby |
+| JÃ¤lluntofta | JÃ¤lluntofta |
+| JÃ¤mjÃ¶ | JÃ¤mjÃ¶ |
+| JÃ¤mshÃ¶g | JÃ¤mshÃ¶g |
+| JÃ¤rbo | JÃ¤rbo_O |
+| JÃ¤rbo | JÃ¤rbo_X |
+| JÃ¤reda | JÃ¤reda |
+| JÃ¤rfÃ¤lla | JÃ¤rfÃ¤lla |
+| JÃ¤rlÃ¥sa | JÃ¤rlÃ¥sa |
+| JÃ¤rn | JÃ¤rn |
+| JÃ¤rna | JÃ¤rna |
+| JÃ¤rnboÃ¥s | JÃ¤rnboÃ¥s |
+| JÃ¤rnskog | JÃ¤rnskog |
+| JÃ¤rpÃ¥s | JÃ¤rpÃ¥s |
+| JÃ¤rrestad | JÃ¤rrestad |
+| JÃ¤rsnÃ¤s | JÃ¤rsnÃ¤s |
+| JÃ¤rstad | JÃ¤rstad |
+| JÃ¤rstorp | JÃ¤rstorp |
+| JÃ¤rvsÃ¶ | JÃ¤rvsÃ¶ |
+| JÃ¤t | JÃ¤t |
+| JÃ¤ttendal | JÃ¤ttendal |
+| JÃ¶nkÃ¶ping | JÃ¶nkÃ¶ping |
+| JÃ¶rlanda | JÃ¶rlanda |
+| JÃ¶rn | JÃ¶rn |
 | Kaga | Kaga |
 | Kall | Kall |
 | Kalmar | Kalmar_H |
@@ -1302,11 +1302,11 @@ This is a list of enum values that can be used in the API queries.
 | Karlslunda | Karlslunda |
 | Karlstad | Karlstad |
 | Karlstorp | Karlstorp |
-| Kastlösa | Kastlösa |
+| KastlÃ¶sa | KastlÃ¶sa |
 | Katrineholm | Katrineholm |
-| Katslösa | Katslösa |
+| KatslÃ¶sa | KatslÃ¶sa |
 | Kattarp | Kattarp |
-| Kattnäs | Kattnäs |
+| KattnÃ¤s | KattnÃ¤s |
 | Kestad | Kestad |
 | Kiaby | Kiaby |
 | Kil | Kil |
@@ -1326,18 +1326,18 @@ This is a list of enum values that can be used in the API queries.
 | Klinte | Klinte |
 | Klippan | Klippan |
 | Klockrike | Klockrike |
-| Kläckeberga | Kläckeberga |
-| Klädesholmen | Klädesholmen |
-| Klövedal | Klövedal |
-| Klövsjö | Klövsjö |
+| KlÃ¤ckeberga | KlÃ¤ckeberga |
+| KlÃ¤desholmen | KlÃ¤desholmen |
+| KlÃ¶vedal | KlÃ¶vedal |
+| KlÃ¶vsjÃ¶ | KlÃ¶vsjÃ¶ |
 | Knislinge | Knislinge |
 | Knista | Knista |
 | Knivsta | Knivsta |
 | Knutby | Knutby |
-| Knäred | Knäred |
-| Knästorp | Knästorp |
-| Knätte | Knätte |
-| Kolbäck | Kolbäck |
+| KnÃ¤red | KnÃ¤red |
+| KnÃ¤storp | KnÃ¤storp |
+| KnÃ¤tte | KnÃ¤tte |
+| KolbÃ¤ck | KolbÃ¤ck |
 | Kolsva | Kolsva |
 | Konga | Konga |
 | Konungsund | Konungsund |
@@ -1356,27 +1356,27 @@ This is a list of enum values that can be used in the API queries.
 | Krokstad | Krokstad |
 | Kropp | Kropp |
 | Kroppa | Kroppa |
-| Kråkshult | Kråkshult |
-| Kråksmåla | Kråksmåla |
-| Kräcklinge | Kräcklinge |
-| Kräklingbo | Kräklingbo |
+| KrÃ¥kshult | KrÃ¥kshult |
+| KrÃ¥ksmÃ¥la | KrÃ¥ksmÃ¥la |
+| KrÃ¤cklinge | KrÃ¤cklinge |
+| KrÃ¤klingbo | KrÃ¤klingbo |
 | Kuddby | Kuddby |
 | Kulla | Kulla |
 | Kullerstad | Kullerstad |
-| Kullings-Skövde | Kullings_Skövde |
+| Kullings-SkÃ¶vde | Kullings_SkÃ¶vde |
 | Kulltorp | Kulltorp |
 | Kumla | Kumla_T |
 | Kumla | Kumla_E |
 | Kumla | Kumla_U |
 | Kung Karl | Kung_Karl |
-| Kungs-Barkarö | Kungs_Barkarö |
+| Kungs-BarkarÃ¶ | Kungs_BarkarÃ¶ |
 | Kungs-Husby | Kungs_Husby |
 | Kungsbacka | Kungsbacka |
 | Kungslena | Kungslena |
-| Kungsåra | Kungsåra |
-| Kungsängen | Kungsängen |
-| Kungsäter | Kungsäter |
-| Kungälv | Kungälv |
+| KungsÃ¥ra | KungsÃ¥ra |
+| KungsÃ¤ngen | KungsÃ¤ngen |
+| KungsÃ¤ter | KungsÃ¤ter |
+| KungÃ¤lv | KungÃ¤lv |
 | Kvarsebo | Kvarsebo |
 | Kvenneberga | Kvenneberga |
 | Kverrestad | Kverrestad |
@@ -1388,47 +1388,47 @@ This is a list of enum values that can be used in the API queries.
 | Kvinnestad | Kvinnestad |
 | Kvistbro | Kvistbro |
 | Kvistofta | Kvistofta |
-| Kvänum | Kvänum |
+| KvÃ¤num | KvÃ¤num |
 | Kymbo | Kymbo |
 | Kyrkheddinge | Kyrkheddinge |
 | Kyrkhult | Kyrkhult |
-| Kyrkoköpinge | Kyrkoköpinge |
-| Kyrkås | Kyrkås_Z |
-| Kyrkås | Kyrkås_O |
-| Kågeröd | Kågeröd |
-| Kållands-Åsaka | Kållands_Åsaka |
-| Kållered | Kållered |
-| Kållerstad | Kållerstad |
-| Kånna | Kånna |
-| Kårsta | Kårsta |
-| Källa | Källa |
-| Källby | Källby |
-| Källeryd | Källeryd |
-| Källna | Källna |
-| Källs-Nöbbelöv | Källs_Nöbbelöv |
-| Källsjö | Källsjö |
-| Källstad | Källstad |
-| Källstorp | Källstorp |
-| Källunga | Källunga |
-| Källunge | Källunge |
-| Kälvene | Kälvene |
-| Kärda | Kärda |
-| Käringön | Käringön |
-| Kärna | Kärna |
-| Kärnbo | Kärnbo |
-| Kärrbo | Kärrbo |
-| Kärråkra | Kärråkra |
-| Kättilstad | Kättilstad |
-| Kävlinge | Kävlinge |
-| Kävsjö | Kävsjö |
-| Köinge | Köinge |
-| Köla | Köla |
-| Kölaby | Kölaby |
-| Kölingared | Kölingared |
-| Köping | Köping_U |
-| Köping | Köping_H |
-| Köpinge | Köpinge |
-| Lackalänga | Lackalänga |
+| KyrkokÃ¶pinge | KyrkokÃ¶pinge |
+| KyrkÃ¥s | KyrkÃ¥s_Z |
+| KyrkÃ¥s | KyrkÃ¥s_O |
+| KÃ¥gerÃ¶d | KÃ¥gerÃ¶d |
+| KÃ¥llands-Ã…saka | KÃ¥llands_Ã…saka |
+| KÃ¥llered | KÃ¥llered |
+| KÃ¥llerstad | KÃ¥llerstad |
+| KÃ¥nna | KÃ¥nna |
+| KÃ¥rsta | KÃ¥rsta |
+| KÃ¤lla | KÃ¤lla |
+| KÃ¤llby | KÃ¤llby |
+| KÃ¤lleryd | KÃ¤lleryd |
+| KÃ¤llna | KÃ¤llna |
+| KÃ¤lls-NÃ¶bbelÃ¶v | KÃ¤lls_NÃ¶bbelÃ¶v |
+| KÃ¤llsjÃ¶ | KÃ¤llsjÃ¶ |
+| KÃ¤llstad | KÃ¤llstad |
+| KÃ¤llstorp | KÃ¤llstorp |
+| KÃ¤llunga | KÃ¤llunga |
+| KÃ¤llunge | KÃ¤llunge |
+| KÃ¤lvene | KÃ¤lvene |
+| KÃ¤rda | KÃ¤rda |
+| KÃ¤ringÃ¶n | KÃ¤ringÃ¶n |
+| KÃ¤rna | KÃ¤rna |
+| KÃ¤rnbo | KÃ¤rnbo |
+| KÃ¤rrbo | KÃ¤rrbo |
+| KÃ¤rrÃ¥kra | KÃ¤rrÃ¥kra |
+| KÃ¤ttilstad | KÃ¤ttilstad |
+| KÃ¤vlinge | KÃ¤vlinge |
+| KÃ¤vsjÃ¶ | KÃ¤vsjÃ¶ |
+| KÃ¶inge | KÃ¶inge |
+| KÃ¶la | KÃ¶la |
+| KÃ¶laby | KÃ¶laby |
+| KÃ¶lingared | KÃ¶lingared |
+| KÃ¶ping | KÃ¶ping_U |
+| KÃ¶ping | KÃ¶ping_H |
+| KÃ¶pinge | KÃ¶pinge |
+| LackalÃ¤nga | LackalÃ¤nga |
 | Lagga | Lagga |
 | Lagmansered | Lagmansered |
 | Laholm | Laholm |
@@ -1445,22 +1445,22 @@ This is a list of enum values that can be used in the API queries.
 | Lau | Lau |
 | Lavad | Lavad |
 | Laxarby | Laxarby |
-| Laxsjö | Laxsjö |
-| Laxå | Laxå |
+| LaxsjÃ¶ | LaxsjÃ¶ |
+| LaxÃ¥ | LaxÃ¥ |
 | Ledberg | Ledberg |
-| Ledsjö | Ledsjö |
+| LedsjÃ¶ | LedsjÃ¶ |
 | Lekaryd | Lekaryd |
 | Lekeryd | Lekeryd |
 | Leksand | Leksand |
 | Leksberg | Leksberg |
 | Lekvattnet | Lekvattnet |
-| Lekåsa | Lekåsa |
+| LekÃ¥sa | LekÃ¥sa |
 | Lemnhult | Lemnhult |
 | Lena | Lena_C |
 | Lena | Lena_O |
 | Lenhovda | Lenhovda |
 | Lerbo | Lerbo |
-| Lerbäck | Lerbäck |
+| LerbÃ¤ck | LerbÃ¤ck |
 | Lerdal | Lerdal |
 | Lerdala | Lerdala |
 | Lerum | Lerum |
@@ -1470,15 +1470,15 @@ This is a list of enum values that can be used in the API queries.
 | Lid | Lid |
 | Liden | Liden |
 | Lidhult | Lidhult |
-| Lidingö | Lidingö |
-| Lidköping | Lidköping |
+| LidingÃ¶ | LidingÃ¶ |
+| LidkÃ¶ping | LidkÃ¶ping |
 | Lilla Beddinge | Lilla_Beddinge |
 | Lilla Harrie | Lilla_Harrie |
 | Lilla Isie | Lilla_Isie |
 | Lilla Malma | Lilla_Malma |
-| Lilla Slågarp | Lilla_Slågarp |
-| Lillhärad | Lillhärad |
-| Lillhärdal | Lillhärdal |
+| Lilla SlÃ¥garp | Lilla_SlÃ¥garp |
+| LillhÃ¤rad | LillhÃ¤rad |
+| LillhÃ¤rdal | LillhÃ¤rdal |
 | Lillkyrka | Lillkyrka_E |
 | Lillkyrka | Lillkyrka_C |
 | Lillkyrka | Lillkyrka_T |
@@ -1486,12 +1486,12 @@ This is a list of enum values that can be used in the API queries.
 | Lindberg | Lindberg |
 | Linde | Linde_T |
 | Linde | Linde_I |
-| Linderås | Linderås |
-| Linderöd | Linderöd |
+| LinderÃ¥s | LinderÃ¥s |
+| LinderÃ¶d | LinderÃ¶d |
 | Lindesberg | Lindesberg |
 | Lindome | Lindome |
-| Lindärva | Lindärva |
-| Linköping | Linköping |
+| LindÃ¤rva | LindÃ¤rva |
+| LinkÃ¶ping | LinkÃ¶ping |
 | Linneryd | Linneryd |
 | Linsell | Linsell |
 | Lista | Lista |
@@ -1510,7 +1510,7 @@ This is a list of enum values that can be used in the API queries.
 | Ljusdal | Ljusdal |
 | Ljushult | Ljushult |
 | Ljusnarsberg | Ljusnarsberg |
-| Ljusterö | Ljusterö |
+| LjusterÃ¶ | LjusterÃ¶ |
 | Ljustorp | Ljustorp |
 | Lockarp | Lockarp |
 | Locketorp | Locketorp |
@@ -1518,7 +1518,7 @@ This is a list of enum values that can be used in the API queries.
 | Locknevi | Locknevi |
 | Lofta | Lofta |
 | Loftahammar | Loftahammar |
-| Lohärad | Lohärad |
+| LohÃ¤rad | LohÃ¤rad |
 | Lojsta | Lojsta |
 | Lokrume | Lokrume |
 | Lomma | Lomma |
@@ -1527,11 +1527,11 @@ This is a list of enum values that can be used in the API queries.
 | Long | Long |
 | Los | Los |
 | Loshult | Loshult |
-| Lovö | Lovö |
+| LovÃ¶ | LovÃ¶ |
 | Ludgo | Ludgo |
 | Ludvika | Ludvika |
-| Lugnås | Lugnås |
-| Luleå | Luleå |
+| LugnÃ¥s | LugnÃ¥s |
+| LuleÃ¥ | LuleÃ¥ |
 | Lummelunda | Lummelunda |
 | Lund | Lund |
 | Lunda | Lunda_D |
@@ -1544,57 +1544,57 @@ This is a list of enum values that can be used in the API queries.
 | Lycksele | Lycksele |
 | Lye | Lye |
 | Lyngby | Lyngby |
-| Lyngsjö | Lyngsjö |
+| LyngsjÃ¶ | LyngsjÃ¶ |
 | Lyrestad | Lyrestad |
 | Lyse | Lyse |
 | Lysekil | Lysekil |
 | Lysvik | Lysvik |
-| Långared | Långared |
-| Långaryd | Långaryd |
-| Långaröd | Långaröd |
-| Långasjö | Långasjö |
-| Långelanda | Långelanda |
-| Långemåla | Långemåla |
-| Långlöt | Långlöt |
-| Långsele | Långsele |
-| Långserud | Långserud |
-| Långtora | Långtora |
-| Låssa | Låssa |
-| Låstad | Låstad |
-| Läby | Läby |
-| Länghem | Länghem |
-| Längjum | Längjum |
-| Längnum | Längnum |
-| Länna | Länna_AB |
-| Länna | Länna_D |
-| Lännäs | Lännäs |
-| Lärbro | Lärbro |
-| Lästringe | Lästringe |
-| Löddeköpinge | Löddeköpinge |
-| Löderup | Löderup |
-| Lönneberga | Lönneberga |
-| Lönsås | Lönsås |
-| Lösen | Lösen |
-| Löt | Löt_H |
-| Löt | Löt_C |
-| Lövestad | Lövestad |
-| Lövånger | Lövånger |
-| Madesjö | Madesjö |
+| LÃ¥ngared | LÃ¥ngared |
+| LÃ¥ngaryd | LÃ¥ngaryd |
+| LÃ¥ngarÃ¶d | LÃ¥ngarÃ¶d |
+| LÃ¥ngasjÃ¶ | LÃ¥ngasjÃ¶ |
+| LÃ¥ngelanda | LÃ¥ngelanda |
+| LÃ¥ngemÃ¥la | LÃ¥ngemÃ¥la |
+| LÃ¥nglÃ¶t | LÃ¥nglÃ¶t |
+| LÃ¥ngsele | LÃ¥ngsele |
+| LÃ¥ngserud | LÃ¥ngserud |
+| LÃ¥ngtora | LÃ¥ngtora |
+| LÃ¥ssa | LÃ¥ssa |
+| LÃ¥stad | LÃ¥stad |
+| LÃ¤by | LÃ¤by |
+| LÃ¤nghem | LÃ¤nghem |
+| LÃ¤ngjum | LÃ¤ngjum |
+| LÃ¤ngnum | LÃ¤ngnum |
+| LÃ¤nna | LÃ¤nna_AB |
+| LÃ¤nna | LÃ¤nna_D |
+| LÃ¤nnÃ¤s | LÃ¤nnÃ¤s |
+| LÃ¤rbro | LÃ¤rbro |
+| LÃ¤stringe | LÃ¤stringe |
+| LÃ¶ddekÃ¶pinge | LÃ¶ddekÃ¶pinge |
+| LÃ¶derup | LÃ¶derup |
+| LÃ¶nneberga | LÃ¶nneberga |
+| LÃ¶nsÃ¥s | LÃ¶nsÃ¥s |
+| LÃ¶sen | LÃ¶sen |
+| LÃ¶t | LÃ¶t_H |
+| LÃ¶t | LÃ¶t_C |
+| LÃ¶vestad | LÃ¶vestad |
+| LÃ¶vÃ¥nger | LÃ¶vÃ¥nger |
+| MadesjÃ¶ | MadesjÃ¶ |
 | Maglarp | Maglarp |
 | Maglehem | Maglehem |
 | Magra | Magra |
 | Malexander | Malexander |
 | Malingsbo | Malingsbo |
 | Malma | Malma |
-| Malmbäck | Malmbäck |
-| Malmö | Malmö |
+| MalmbÃ¤ck | MalmbÃ¤ck |
+| MalmÃ¶ | MalmÃ¶ |
 | Malsta | Malsta |
 | Malung | Malung |
-| Malå | Malå |
+| MalÃ¥ | MalÃ¥ |
 | Mangskog | Mangskog |
 | Marby | Marby |
-| Marbäck | Marbäck_O |
-| Marbäck | Marbäck_F |
+| MarbÃ¤ck | MarbÃ¤ck_O |
+| MarbÃ¤ck | MarbÃ¤ck_F |
 | Marieby | Marieby |
 | Mariefred | Mariefred |
 | Mariestad | Mariestad |
@@ -1604,23 +1604,23 @@ This is a list of enum values that can be used in the API queries.
 | Marstrand | Marstrand |
 | Martebo | Martebo |
 | Marum | Marum |
-| Matteröd | Matteröd |
+| MatterÃ¶d | MatterÃ¶d |
 | Mattmar | Mattmar |
 | Medelplana | Medelplana |
-| Medåker | Medåker |
+| MedÃ¥ker | MedÃ¥ker |
 | Mellan-Grevie | Mellan_Grevie |
 | Mellby | Mellby_O |
 | Mellby | Mellby_F |
-| Mellösa | Mellösa |
+| MellÃ¶sa | MellÃ¶sa |
 | Millesvik | Millesvik |
-| Mistelås | Mistelås |
+| MistelÃ¥s | MistelÃ¥s |
 | Misterhult | Misterhult |
-| Mjäldrunga | Mjäldrunga |
-| Mjällby | Mjällby |
-| Mjöbäck | Mjöbäck |
-| Mjölby | Mjölby |
-| Mo | Mo_O_Åm |
-| Mo | Mo_O_Tö |
+| MjÃ¤ldrunga | MjÃ¤ldrunga |
+| MjÃ¤llby | MjÃ¤llby |
+| MjÃ¶bÃ¤ck | MjÃ¶bÃ¤ck |
+| MjÃ¶lby | MjÃ¶lby |
+| Mo | Mo_O_Ã…m |
+| Mo | Mo_O_TÃ¶ |
 | Mo | Mo_X |
 | Mo | Mo_Y |
 | Mo | Mo_O_Ta |
@@ -1628,109 +1628,109 @@ This is a list of enum values that can be used in the API queries.
 | Mogata | Mogata |
 | Moheda | Moheda |
 | Molla | Molla |
-| Mollösund | Mollösund |
+| MollÃ¶sund | MollÃ¶sund |
 | Mora | Mora |
 | Morkarla | Morkarla |
 | Morlanda | Morlanda |
 | Mortorp | Mortorp |
 | Morup | Morup |
-| Mosjö | Mosjö |
+| MosjÃ¶ | MosjÃ¶ |
 | Mossebo | Mossebo |
 | Motala | Motala |
 | Mularp | Mularp |
 | Mulseryd | Mulseryd |
-| Multrå | Multrå |
+| MultrÃ¥ | MultrÃ¥ |
 | Munka-Ljungby | Munka_Ljungby |
 | Munkarp | Munkarp |
 | Munktorp | Munktorp |
-| Munsö | Munsö |
+| MunsÃ¶ | MunsÃ¶ |
 | Murum | Murum |
-| Muskö | Muskö |
+| MuskÃ¶ | MuskÃ¶ |
 | Myckleby | Myckleby |
-| Myresjö | Myresjö |
-| Myssjö | Myssjö |
-| Målilla | Målilla |
-| Månsarp | Månsarp |
-| Månstad | Månstad |
-| Mårdaklev | Mårdaklev |
-| Mästerby | Mästerby |
-| Möja | Möja |
-| Möklinta | Möklinta |
-| Mölleberga | Mölleberga |
-| Mölltorp | Mölltorp |
-| Mölndal | Mölndal |
-| Möne | Möne |
-| Mönsterås | Mönsterås |
-| Mörarp | Mörarp |
-| Mörbylånga | Mörbylånga |
-| Mörkö | Mörkö |
-| Mörlunda | Mörlunda |
-| Mörrum | Mörrum |
-| Mörsil | Mörsil |
+| MyresjÃ¶ | MyresjÃ¶ |
+| MyssjÃ¶ | MyssjÃ¶ |
+| MÃ¥lilla | MÃ¥lilla |
+| MÃ¥nsarp | MÃ¥nsarp |
+| MÃ¥nstad | MÃ¥nstad |
+| MÃ¥rdaklev | MÃ¥rdaklev |
+| MÃ¤sterby | MÃ¤sterby |
+| MÃ¶ja | MÃ¶ja |
+| MÃ¶klinta | MÃ¶klinta |
+| MÃ¶lleberga | MÃ¶lleberga |
+| MÃ¶lltorp | MÃ¶lltorp |
+| MÃ¶lndal | MÃ¶lndal |
+| MÃ¶ne | MÃ¶ne |
+| MÃ¶nsterÃ¥s | MÃ¶nsterÃ¥s |
+| MÃ¶rarp | MÃ¶rarp |
+| MÃ¶rbylÃ¥nga | MÃ¶rbylÃ¥nga |
+| MÃ¶rkÃ¶ | MÃ¶rkÃ¶ |
+| MÃ¶rlunda | MÃ¶rlunda |
+| MÃ¶rrum | MÃ¶rrum |
+| MÃ¶rsil | MÃ¶rsil |
 | Nacka | Nacka |
 | Naum | Naum |
 | Naverstad | Naverstad |
 | Nederkalix | Nederkalix |
-| Nederluleå | Nederluleå |
-| Nedertorneå | Nedertorneå |
+| NederluleÃ¥ | NederluleÃ¥ |
+| NedertorneÃ¥ | NedertorneÃ¥ |
 | Nedre Ullerud | Nedre_Ullerud |
-| Nevishög | Nevishög |
+| NevishÃ¶g | NevishÃ¶g |
 | Nianfors | Nianfors |
 | Nittorp | Nittorp |
 | Njurunda | Njurunda |
-| Njutånger | Njutånger |
+| NjutÃ¥nger | NjutÃ¥nger |
 | Nor | Nor |
 | Nora | Nora_C |
 | Nora | Nora_T |
 | Nora | Nora_Y |
 | Norberg | Norberg |
-| Norderö | Norderö |
-| Nordingrå | Nordingrå |
+| NorderÃ¶ | NorderÃ¶ |
+| NordingrÃ¥ | NordingrÃ¥ |
 | Nordmaling | Nordmaling |
 | Nordmark | Nordmark |
-| Normlösa | Normlösa |
-| Norra Björke | Norra_Björke |
+| NormlÃ¶sa | NormlÃ¶sa |
+| Norra BjÃ¶rke | Norra_BjÃ¶rke |
 | Norra Finnskoga | Norra_Finnskoga |
-| Norra Fågelås | Norra_Fågelås |
+| Norra FÃ¥gelÃ¥s | Norra_FÃ¥gelÃ¥s |
 | Norra Hestra | Norra_Hestra |
-| Norra Härene | Norra_Härene |
+| Norra HÃ¤rene | Norra_HÃ¤rene |
 | Norra Kedum | Norra_Kedum |
 | Norra Kyrketorp | Norra_Kyrketorp |
 | Norra Lundby | Norra_Lundby |
 | Norra Mellby | Norra_Mellby |
-| Norra Möckleby | Norra_Möckleby |
+| Norra MÃ¶ckleby | Norra_MÃ¶ckleby |
 | Norra Ny | Norra_Ny |
-| Norra Nöbbelöv | Norra_Nöbbelöv |
-| Norra Råda | Norra_Råda |
-| Norra Rörum | Norra_Rörum |
+| Norra NÃ¶bbelÃ¶v | Norra_NÃ¶bbelÃ¶v |
+| Norra RÃ¥da | Norra_RÃ¥da |
+| Norra RÃ¶rum | Norra_RÃ¶rum |
 | Norra Sandby | Norra_Sandby |
-| Norra Sandsjö | Norra_Sandsjö |
-| Norra Skrävlinge | Norra_Skrävlinge |
+| Norra SandsjÃ¶ | Norra_SandsjÃ¶ |
+| Norra SkrÃ¤vlinge | Norra_SkrÃ¤vlinge |
 | Norra Solberga | Norra_Solberga |
-| Norra Strö | Norra_Strö |
-| Norra Säm | Norra_Säm |
+| Norra StrÃ¶ | Norra_StrÃ¶ |
+| Norra SÃ¤m | Norra_SÃ¤m |
 | Norra Unnaryd | Norra_Unnaryd |
 | Norra Vi | Norra_Vi |
 | Norra Ving | Norra_Ving |
 | Norra Vram | Norra_Vram |
-| Norra Vånga | Norra_Vånga |
-| Norra Åkarp | Norra_Åkarp |
-| Norra Åsarp | Norra_Åsarp |
+| Norra VÃ¥nga | Norra_VÃ¥nga |
+| Norra Ã…karp | Norra_Ã…karp |
+| Norra Ã…sarp | Norra_Ã…sarp |
 | Norrala | Norrala |
 | Norrbo | Norrbo |
 | Norrby | Norrby |
-| Norrbyås | Norrbyås |
-| Norrbärke | Norrbärke |
-| Norrfjärden | Norrfjärden |
-| Norrköping | Norrköping |
+| NorrbyÃ¥s | NorrbyÃ¥s |
+| NorrbÃ¤rke | NorrbÃ¤rke |
+| NorrfjÃ¤rden | NorrfjÃ¤rden |
+| NorrkÃ¶ping | NorrkÃ¶ping |
 | Norrlanda | Norrlanda |
 | Norrsunda | Norrsunda |
-| Norrtälje | Norrtälje |
+| NorrtÃ¤lje | NorrtÃ¤lje |
 | Norrvidinge | Norrvidinge |
-| Norsjö | Norsjö |
+| NorsjÃ¶ | NorsjÃ¶ |
 | Norum | Norum |
 | Nosaby | Nosaby |
-| Nottebäck | Nottebäck |
+| NottebÃ¤ck | NottebÃ¤ck |
 | Ny | Ny |
 | Nybro | Nybro |
 | Nydala | Nydala |
@@ -1740,47 +1740,47 @@ This is a list of enum values that can be used in the API queries.
 | Nykil | Nykil |
 | Nykyrka | Nykyrka_O |
 | Nykyrka | Nykyrka_D |
-| Nyköping | Nyköping |
-| Nymö | Nymö |
-| Nynäshamn | Nynäshamn |
+| NykÃ¶ping | NykÃ¶ping |
+| NymÃ¶ | NymÃ¶ |
+| NynÃ¤shamn | NynÃ¤shamn |
 | Nyskoga | Nyskoga |
 | Nysund | Nysund |
-| Nysätra | Nysätra_AC |
-| Nysätra | Nysätra_C |
-| Nårunga | Nårunga |
-| Nås | Nås |
-| Nämdö | Nämdö |
-| När | När |
-| Närtuna | Närtuna |
-| Näs | Näs_O |
-| Näs | Näs_I |
-| Näs | Näs_Z |
-| Näsby | Näsby_T |
-| Näsby | Näsby_F |
-| Näshult | Näshult |
-| Näshulta | Näshulta |
-| Näsinge | Näsinge |
-| Näskott | Näskott |
-| Nässja | Nässja |
-| Nässjö | Nässjö |
-| Näsum | Näsum |
-| Nätra | Nätra |
-| Nättraby | Nättraby |
-| Nävelsjö | Nävelsjö |
-| Nävlinge | Nävlinge |
-| Nöbbele | Nöbbele |
-| Nödinge | Nödinge |
-| Nössemark | Nössemark |
-| Nösslinge | Nösslinge |
-| Nöttja | Nöttja |
+| NysÃ¤tra | NysÃ¤tra_AC |
+| NysÃ¤tra | NysÃ¤tra_C |
+| NÃ¥runga | NÃ¥runga |
+| NÃ¥s | NÃ¥s |
+| NÃ¤mdÃ¶ | NÃ¤mdÃ¶ |
+| NÃ¤r | NÃ¤r |
+| NÃ¤rtuna | NÃ¤rtuna |
+| NÃ¤s | NÃ¤s_O |
+| NÃ¤s | NÃ¤s_I |
+| NÃ¤s | NÃ¤s_Z |
+| NÃ¤sby | NÃ¤sby_T |
+| NÃ¤sby | NÃ¤sby_F |
+| NÃ¤shult | NÃ¤shult |
+| NÃ¤shulta | NÃ¤shulta |
+| NÃ¤singe | NÃ¤singe |
+| NÃ¤skott | NÃ¤skott |
+| NÃ¤ssja | NÃ¤ssja |
+| NÃ¤ssjÃ¶ | NÃ¤ssjÃ¶ |
+| NÃ¤sum | NÃ¤sum |
+| NÃ¤tra | NÃ¤tra |
+| NÃ¤ttraby | NÃ¤ttraby |
+| NÃ¤velsjÃ¶ | NÃ¤velsjÃ¶ |
+| NÃ¤vlinge | NÃ¤vlinge |
+| NÃ¶bbele | NÃ¶bbele |
+| NÃ¶dinge | NÃ¶dinge |
+| NÃ¶ssemark | NÃ¶ssemark |
+| NÃ¶sslinge | NÃ¶sslinge |
+| NÃ¶ttja | NÃ¶ttja |
 | Ockelbo | Ockelbo |
 | Od | Od |
-| Odarslöv | Odarslöv |
+| OdarslÃ¶v | OdarslÃ¶v |
 | Odensala | Odensala |
-| Odensjö | Odensjö |
+| OdensjÃ¶ | OdensjÃ¶ |
 | Odensvi | Odensvi_U |
 | Odensvi | Odensvi_H |
-| Odensåker | Odensåker |
+| OdensÃ¥ker | OdensÃ¥ker |
 | Oderljunga | Oderljunga |
 | Offerdal | Offerdal |
 | Okome | Okome |
@@ -1793,7 +1793,7 @@ This is a list of enum values that can be used in the API queries.
 | Orlunda | Orlunda |
 | Ormesberga | Ormesberga |
 | Ornunga | Ornunga |
-| Ornö | Ornö |
+| OrnÃ¶ | OrnÃ¶ |
 | Orsa | Orsa |
 | Osby | Osby |
 | Oskar | Oskar |
@@ -1803,31 +1803,31 @@ This is a list of enum values that can be used in the API queries.
 | Otterstad | Otterstad |
 | Ottravad | Ottravad |
 | Ova | Ova |
-| Ovansjö | Ovansjö |
-| Ovanåker | Ovanåker |
+| OvansjÃ¶ | OvansjÃ¶ |
+| OvanÃ¥ker | OvanÃ¥ker |
 | Oviken | Oviken |
-| Oxelösund | Oxelösund |
+| OxelÃ¶sund | OxelÃ¶sund |
 | Oxie | Oxie |
 | Pajala | Pajala |
 | Partille | Partille |
 | Pelarne | Pelarne |
-| Persnäs | Persnäs |
+| PersnÃ¤s | PersnÃ¤s |
 | Perstorp | Perstorp |
-| Piteå socken | Piteå_socken |
-| Piteå stad | Piteå_stad |
-| Pjätteryd | Pjätteryd |
+| PiteÃ¥ socken | PiteÃ¥_socken |
+| PiteÃ¥ stad | PiteÃ¥_stad |
+| PjÃ¤tteryd | PjÃ¤tteryd |
 | Rackeby | Rackeby |
 | Ragunda | Ragunda |
 | Ramdala | Ramdala |
 | Ramkvilla | Ramkvilla |
-| Ramnäs | Ramnäs |
+| RamnÃ¤s | RamnÃ¤s |
 | Ramsberg | Ramsberg |
 | Ramsele | Ramsele |
-| Ramsjö | Ramsjö |
+| RamsjÃ¶ | RamsjÃ¶ |
 | Ramsta | Ramsta |
-| Ramsåsa | Ramsåsa |
+| RamsÃ¥sa | RamsÃ¥sa |
 | Ransberg | Ransberg |
-| Ransäter | Ransäter |
+| RansÃ¤ter | RansÃ¤ter |
 | Rappestad | Rappestad |
 | Rasbo | Rasbo |
 | Rasbokil | Rasbokil |
@@ -1836,30 +1836,30 @@ This is a list of enum values that can be used in the API queries.
 | Redslared | Redslared |
 | Reftele | Reftele |
 | Regna | Regna |
-| Remmarlöv | Remmarlöv |
+| RemmarlÃ¶v | RemmarlÃ¶v |
 | Remmene | Remmene |
-| Rengsjö | Rengsjö |
+| RengsjÃ¶ | RengsjÃ¶ |
 | Resele | Resele |
-| Reslöv | Reslöv |
+| ReslÃ¶v | ReslÃ¶v |
 | Resmo | Resmo |
-| Resteröd | Resteröd |
-| Revesjö | Revesjö |
+| ResterÃ¶d | ResterÃ¶d |
+| RevesjÃ¶ | RevesjÃ¶ |
 | Revinge | Revinge |
 | Revsund | Revsund |
 | Riala | Riala |
 | Rimbo | Rimbo |
-| Ringamåla | Ringamåla |
+| RingamÃ¥la | RingamÃ¥la |
 | Ringarum | Ringarum |
 | Rinkaby | Rinkaby_M |
 | Rinkaby | Rinkaby_T |
 | Rinna | Rinna |
 | Ripsa | Ripsa |
 | Riseberga | Riseberga |
-| Risekatslösa | Risekatslösa |
+| RisekatslÃ¶sa | RisekatslÃ¶sa |
 | Risinge | Risinge |
-| Roasjö | Roasjö |
+| RoasjÃ¶ | RoasjÃ¶ |
 | Rogberga | Rogberga |
-| Rogslösa | Rogslösa |
+| RogslÃ¶sa | RogslÃ¶sa |
 | Rogsta | Rogsta |
 | Rolfstorp | Rolfstorp |
 | Roma | Roma |
@@ -1883,37 +1883,37 @@ This is a list of enum values that can be used in the API queries.
 | Ryssby | Ryssby_H |
 | Rystad | Rystad |
 | Rytterne | Rytterne |
-| Råby-Rekarne | Råby_Rekarne |
-| Råby-Rönö | Råby_Rönö |
-| Råda | Råda_O_Hä |
-| Råda | Råda_O_Li |
-| Rådene | Rådene |
-| Rådmansö | Rådmansö |
-| Råggärd | Råggärd |
-| Råneå | Råneå |
-| Rångedala | Rångedala |
-| Rämmen | Rämmen |
-| Räng | Räng |
-| Rännelanda | Rännelanda |
-| Ränneslöv | Ränneslöv |
-| Räpplinge | Räpplinge |
-| Rätan | Rätan |
-| Rättvik | Rättvik |
-| Rävinge | Rävinge |
-| Rö | Rö |
-| Rödbo | Rödbo |
-| Röddinge | Röddinge |
-| Rödeby | Rödeby |
-| Rödene | Rödene |
-| Rödön | Rödön |
-| Rök | Rök |
-| Röke | Röke |
-| Rölanda | Rölanda |
-| Rönnäng | Rönnäng |
-| Rönö | Rönö |
-| Röra | Röra |
-| Rörum | Rörum |
-| Röstånga | Röstånga |
+| RÃ¥by-Rekarne | RÃ¥by_Rekarne |
+| RÃ¥by-RÃ¶nÃ¶ | RÃ¥by_RÃ¶nÃ¶ |
+| RÃ¥da | RÃ¥da_O_HÃ¤ |
+| RÃ¥da | RÃ¥da_O_Li |
+| RÃ¥dene | RÃ¥dene |
+| RÃ¥dmansÃ¶ | RÃ¥dmansÃ¶ |
+| RÃ¥ggÃ¤rd | RÃ¥ggÃ¤rd |
+| RÃ¥neÃ¥ | RÃ¥neÃ¥ |
+| RÃ¥ngedala | RÃ¥ngedala |
+| RÃ¤mmen | RÃ¤mmen |
+| RÃ¤ng | RÃ¤ng |
+| RÃ¤nnelanda | RÃ¤nnelanda |
+| RÃ¤nneslÃ¶v | RÃ¤nneslÃ¶v |
+| RÃ¤pplinge | RÃ¤pplinge |
+| RÃ¤tan | RÃ¤tan |
+| RÃ¤ttvik | RÃ¤ttvik |
+| RÃ¤vinge | RÃ¤vinge |
+| RÃ¶ | RÃ¶ |
+| RÃ¶dbo | RÃ¶dbo |
+| RÃ¶ddinge | RÃ¶ddinge |
+| RÃ¶deby | RÃ¶deby |
+| RÃ¶dene | RÃ¶dene |
+| RÃ¶dÃ¶n | RÃ¶dÃ¶n |
+| RÃ¶k | RÃ¶k |
+| RÃ¶ke | RÃ¶ke |
+| RÃ¶landa | RÃ¶landa |
+| RÃ¶nnÃ¤ng | RÃ¶nnÃ¤ng |
+| RÃ¶nÃ¶ | RÃ¶nÃ¶ |
+| RÃ¶ra | RÃ¶ra |
+| RÃ¶rum | RÃ¶rum |
+| RÃ¶stÃ¥nga | RÃ¶stÃ¥nga |
 | Sal | Sal |
 | Sala socken | Sala_socken |
 | Sala stad | Sala_stad |
@@ -1941,46 +1941,46 @@ This is a list of enum values that can be used in the API queries.
 | Segerstad | Segerstad_O |
 | Segerstad | Segerstad_H |
 | Seglora | Seglora |
-| Selånger | Selånger |
+| SelÃ¥nger | SelÃ¥nger |
 | Sevalla | Sevalla |
 | Sexdrega | Sexdrega |
 | Sibbarp | Sibbarp |
-| Sidensjö | Sidensjö |
+| SidensjÃ¶ | SidensjÃ¶ |
 | Siene | Siene |
 | Sigtuna | Sigtuna |
 | Sil | Sil |
 | Silbodal | Silbodal |
-| Siljansnäs | Siljansnäs |
+| SiljansnÃ¤s | SiljansnÃ¤s |
 | Sillerud | Sillerud |
-| Sillhövda | Sillhövda |
+| SillhÃ¶vda | SillhÃ¶vda |
 | Silte | Silte |
 | Silvberg | Silvberg |
-| Silvåkra | Silvåkra |
+| SilvÃ¥kra | SilvÃ¥kra |
 | Simlinge | Simlinge |
 | Simonstorp | Simonstorp |
 | Simris | Simris |
 | Simrishamn | Simrishamn |
 | Simtuna | Simtuna |
-| Singö | Singö |
-| Sireköpinge | Sireköpinge |
+| SingÃ¶ | SingÃ¶ |
+| SirekÃ¶pinge | SirekÃ¶pinge |
 | Sjogerstad | Sjogerstad |
 | Sjonhem | Sjonhem |
-| Själevad | Själevad |
-| Sjögestad | Sjögestad |
-| Sjörup | Sjörup |
-| Sjösås | Sjösås |
-| Sjötofta | Sjötofta |
-| Skabersjö | Skabersjö |
-| Skaftö | Skaftö |
+| SjÃ¤levad | SjÃ¤levad |
+| SjÃ¶gestad | SjÃ¶gestad |
+| SjÃ¶rup | SjÃ¶rup |
+| SjÃ¶sÃ¥s | SjÃ¶sÃ¥s |
+| SjÃ¶tofta | SjÃ¶tofta |
+| SkabersjÃ¶ | SkabersjÃ¶ |
+| SkaftÃ¶ | SkaftÃ¶ |
 | Skagershult | Skagershult |
 | Skallmeja | Skallmeja |
-| Skallsjö | Skallsjö |
+| SkallsjÃ¶ | SkallsjÃ¶ |
 | Skalunda | Skalunda |
-| Skanör m. Falsterbo | Skanör_m_Falsterbo |
+| SkanÃ¶r m. Falsterbo | SkanÃ¶r_m_Falsterbo |
 | Skara | Skara |
 | Skarhult | Skarhult |
 | Skarstad | Skarstad |
-| Skatelöv | Skatelöv |
+| SkatelÃ¶v | SkatelÃ¶v |
 | Skeby | Skeby |
 | Skeda | Skeda |
 | Skede | Skede |
@@ -1989,17 +1989,17 @@ This is a list of enum values that can be used in the API queries.
 | Skee | Skee |
 | Skeglinge | Skeglinge |
 | Skegrie | Skegrie |
-| Skellefteå socken | Skellefteå_socken |
-| Skellefteå stad | Skellefteå_stad |
+| SkellefteÃ¥ socken | SkellefteÃ¥_socken |
+| SkellefteÃ¥ stad | SkellefteÃ¥_stad |
 | Skephult | Skephult |
-| Skepparslöv | Skepparslöv |
+| SkepparslÃ¶v | SkepparslÃ¶v |
 | Skepperstad | Skepperstad |
 | Skepplanda | Skepplanda |
-| Skeppsås | Skeppsås |
+| SkeppsÃ¥s | SkeppsÃ¥s |
 | Skepptuna | Skepptuna |
 | Skillingmark | Skillingmark |
 | Skinnskatteberg | Skinnskatteberg |
-| Skirö | Skirö |
+| SkirÃ¶ | SkirÃ¶ |
 | Skivarp | Skivarp |
 | Skog | Skog |
 | Skog | Skog_ |
@@ -2010,58 +2010,58 @@ This is a list of enum values that can be used in the API queries.
 | Skrea | Skrea |
 | Skredsvik | Skredsvik |
 | Skultuna | Skultuna |
-| Skummeslöv | Skummeslöv |
+| SkummeslÃ¶v | SkummeslÃ¶v |
 | Skurup | Skurup_M_Sk |
 | Skurup | Skurup_M |
 | Skuttunge | Skuttunge |
-| Skå | Skå |
-| Skållerud | Skållerud |
-| Skånela | Skånela |
-| Skånes-Fagerhult | Skånes_Fagerhult |
-| Skånings-Åsaka | Skånings_Åsaka |
-| Skårby | Skårby |
-| Skäfthammar | Skäfthammar |
-| Skällinge | Skällinge |
-| Skällvik | Skällvik |
-| Skälvum | Skälvum |
-| Skänninge | Skänninge |
-| Skärkind | Skärkind |
-| Skärstad | Skärstad |
-| Skärv | Skärv |
-| Sköldinge | Sköldinge |
-| Sköllersta | Sköllersta |
-| Skölvene | Skölvene |
-| Skön | Skön |
-| Skönberga | Skönberga |
-| Skörstorp | Skörstorp |
-| Skövde | Skövde |
+| SkÃ¥ | SkÃ¥ |
+| SkÃ¥llerud | SkÃ¥llerud |
+| SkÃ¥nela | SkÃ¥nela |
+| SkÃ¥nes-Fagerhult | SkÃ¥nes_Fagerhult |
+| SkÃ¥nings-Ã…saka | SkÃ¥nings_Ã…saka |
+| SkÃ¥rby | SkÃ¥rby |
+| SkÃ¤fthammar | SkÃ¤fthammar |
+| SkÃ¤llinge | SkÃ¤llinge |
+| SkÃ¤llvik | SkÃ¤llvik |
+| SkÃ¤lvum | SkÃ¤lvum |
+| SkÃ¤nninge | SkÃ¤nninge |
+| SkÃ¤rkind | SkÃ¤rkind |
+| SkÃ¤rstad | SkÃ¤rstad |
+| SkÃ¤rv | SkÃ¤rv |
+| SkÃ¶ldinge | SkÃ¶ldinge |
+| SkÃ¶llersta | SkÃ¶llersta |
+| SkÃ¶lvene | SkÃ¶lvene |
+| SkÃ¶n | SkÃ¶n |
+| SkÃ¶nberga | SkÃ¶nberga |
+| SkÃ¶rstorp | SkÃ¶rstorp |
+| SkÃ¶vde | SkÃ¶vde |
 | Slaka | Slaka |
 | Slimminge | Slimminge |
-| Slädene | Slädene |
-| Släp | Släp |
-| Slätthög | Slätthög |
-| Slättåkra | Slättåkra |
-| Slöinge | Slöinge |
-| Slöta | Slöta |
+| SlÃ¤dene | SlÃ¤dene |
+| SlÃ¤p | SlÃ¤p |
+| SlÃ¤tthÃ¶g | SlÃ¤tthÃ¶g |
+| SlÃ¤ttÃ¥kra | SlÃ¤ttÃ¥kra |
+| SlÃ¶inge | SlÃ¶inge |
+| SlÃ¶ta | SlÃ¶ta |
 | Smedby | Smedby |
 | Smedstorp | Smedstorp |
 | Smula | Smula |
 | Snavlunda | Snavlunda |
-| Snårestad | Snårestad |
-| Snöstorp | Snöstorp |
+| SnÃ¥restad | SnÃ¥restad |
+| SnÃ¶storp | SnÃ¶storp |
 | Solberga | Solberga_O_Fa |
 | Solberga | Solberga_O_Ku |
 | Solberga | Solberga_M |
-| Sollefteå | Sollefteå |
+| SollefteÃ¥ | SollefteÃ¥ |
 | Sollentuna | Sollentuna |
-| Sollerön | Sollerön |
+| SollerÃ¶n | SollerÃ¶n |
 | Solna | Solna |
 | Sorsele | Sorsele |
 | Sorunda | Sorunda |
 | Spannarp | Spannarp |
-| Sparlösa | Sparlösa |
-| Sparrsätra | Sparrsätra |
-| Spekeröd | Spekeröd |
+| SparlÃ¶sa | SparlÃ¶sa |
+| SparrsÃ¤tra | SparrsÃ¤tra |
+| SpekerÃ¶d | SpekerÃ¶d |
 | Spelvik | Spelvik |
 | Spjutstorp | Spjutstorp |
 | Sproge | Sproge |
@@ -2069,15 +2069,15 @@ This is a list of enum values that can be used in the API queries.
 | Stala | Stala |
 | Stamnared | Stamnared |
 | Starby | Starby |
-| Starrkärr | Starrkärr |
+| StarrkÃ¤rr | StarrkÃ¤rr |
 | Stavby | Stavby |
-| Stavnäs | Stavnäs |
+| StavnÃ¤s | StavnÃ¤s |
 | Stehag | Stehag |
 | Stenberga | Stenberga |
 | Stenbrohult | Stenbrohult |
 | Steneby | Steneby |
 | Stenestad | Stenestad |
-| Stengårdshult | Stengårdshult |
+| StengÃ¥rdshult | StengÃ¥rdshult |
 | Steninge | Steninge |
 | Stenkumla | Stenkumla |
 | Stenkvista | Stenkvista |
@@ -2086,11 +2086,11 @@ This is a list of enum values that can be used in the API queries.
 | Stensele | Stensele |
 | Stenstorp | Stenstorp |
 | Stenum | Stenum |
-| Stenåsa | Stenåsa |
+| StenÃ¥sa | StenÃ¥sa |
 | Stiby | Stiby |
-| Stigsjö | Stigsjö |
+| StigsjÃ¶ | StigsjÃ¶ |
 | Stigtomta | Stigtomta |
-| Stjärnorp | Stjärnorp |
+| StjÃ¤rnorp | StjÃ¤rnorp |
 | Stoby | Stoby |
 | Stockaryd | Stockaryd |
 | Stockholm | Stockholm |
@@ -2099,42 +2099,42 @@ This is a list of enum values that can be used in the API queries.
 | Stora Herrestad | Stora_Herrestad |
 | Stora Kil | Stora_Kil |
 | Stora Kopparberg | Stora_Kopparberg |
-| Stora Köpinge | Stora_Köpinge |
+| Stora KÃ¶pinge | Stora_KÃ¶pinge |
 | Stora Lundby | Stora_Lundby |
 | Stora Malm | Stora_Malm |
 | Stora Mellby | Stora_Mellby |
-| Stora Mellösa | Stora_Mellösa |
-| Stora Råby | Stora_Råby |
+| Stora MellÃ¶sa | Stora_MellÃ¶sa |
+| Stora RÃ¥by | Stora_RÃ¥by |
 | Stora Skedvi | Stora_Skedvi |
-| Stora Slågarp | Stora_Slågarp |
+| Stora SlÃ¥garp | Stora_SlÃ¥garp |
 | Stora Tuna | Stora_Tuna |
-| Stora Åby | Stora_Åby |
-| Storsjö | Storsjö |
-| Strå | Strå |
-| Stråvalla | Stråvalla |
-| Strängnäs | Strängnäs |
-| Strängsered | Strängsered |
-| Strö | Strö |
-| Ström | Ström |
-| Strömstad | Strömstad |
-| Strövelstorp | Strövelstorp |
+| Stora Ã…by | Stora_Ã…by |
+| StorsjÃ¶ | StorsjÃ¶ |
+| StrÃ¥ | StrÃ¥ |
+| StrÃ¥valla | StrÃ¥valla |
+| StrÃ¤ngnÃ¤s | StrÃ¤ngnÃ¤s |
+| StrÃ¤ngsered | StrÃ¤ngsered |
+| StrÃ¶ | StrÃ¶ |
+| StrÃ¶m | StrÃ¶m |
+| StrÃ¶mstad | StrÃ¶mstad |
+| StrÃ¶velstorp | StrÃ¶velstorp |
 | Stugun | Stugun |
-| Sturkö | Sturkö |
+| SturkÃ¶ | SturkÃ¶ |
 | Styra | Styra |
-| Styrnäs | Styrnäs |
+| StyrnÃ¤s | StyrnÃ¤s |
 | Styrstad | Styrstad |
-| Styrsö | Styrsö |
-| Stånga | Stånga |
-| Stångby | Stångby |
-| Stävie | Stävie |
-| Stöde | Stöde |
+| StyrsÃ¶ | StyrsÃ¶ |
+| StÃ¥nga | StÃ¥nga |
+| StÃ¥ngby | StÃ¥ngby |
+| StÃ¤vie | StÃ¤vie |
+| StÃ¶de | StÃ¶de |
 | Sund | Sund |
 | Sundals-Ryr | Sundals_Ryr |
 | Sundborn | Sundborn |
 | Sundby | Sundby |
 | Sundbyberg | Sundbyberg |
 | Sundre | Sundre |
-| Sundsjö | Sundsjö |
+| SundsjÃ¶ | SundsjÃ¶ |
 | Sundsvall | Sundsvall |
 | Sunne | Sunne_Z |
 | Sunne | Sunne_S |
@@ -2143,12 +2143,12 @@ This is a list of enum values that can be used in the API queries.
 | Suntak | Suntak |
 | Sura | Sura |
 | Surteby-Kattunga | Surteby_Kattunga |
-| Svalöv | Svalöv |
+| SvalÃ¶v | SvalÃ¶v |
 | Svanshals | Svanshals |
 | Svanskog | Svanskog |
 | Svarteborg | Svarteborg |
-| Svartnäs | Svartnäs |
-| Svartrå | Svartrå |
+| SvartnÃ¤s | SvartnÃ¤s |
+| SvartrÃ¥ | SvartrÃ¥ |
 | Svarttorp | Svarttorp |
 | Svedala | Svedala |
 | Svedvi | Svedvi |
@@ -2158,80 +2158,80 @@ This is a list of enum values that can be used in the API queries.
 | Svenljunga | Svenljunga |
 | Svenneby | Svenneby |
 | Svennevad | Svennevad |
-| Svensköp | Svensköp |
+| SvenskÃ¶p | SvenskÃ¶p |
 | Svenstorp | Svenstorp |
 | Sventorp | Sventorp |
 | Svinhult | Svinhult |
 | Svinnegarn | Svinnegarn |
-| Svärdsjö | Svärdsjö |
-| Svärta | Svärta |
+| SvÃ¤rdsjÃ¶ | SvÃ¤rdsjÃ¶ |
+| SvÃ¤rta | SvÃ¤rta |
 | Sya | Sya |
 | Synnerby | Synnerby |
-| Sånga | Sånga_Y |
-| Sånga | Sånga_AB |
-| Säbrå | Säbrå |
-| Säby | Säby_U |
-| Säby | Säby_M |
-| Säfsnäs | Säfsnäs |
-| Sällstorp | Sällstorp |
-| Särestad | Särestad |
-| Särna | Särna |
-| Särslöv | Särslöv |
-| Säter | Säter_O |
-| Säter | Säter_W |
-| Sätila | Sätila |
-| Sättersta | Sättersta |
-| Sättna | Sättna |
-| Sätuna | Sätuna |
-| Sävar | Sävar |
-| Sävare | Sävare |
-| Säve | Säve |
-| Sävsjö | Sävsjö |
-| Söderala | Söderala |
-| Söderby-Karl | Söderby_Karl |
-| Söderbärke | Söderbärke |
-| Söderfors | Söderfors |
-| Söderhamn | Söderhamn |
-| Söderköping | Söderköping |
-| Södertälje | Södertälje |
-| Södervidinge | Södervidinge |
-| Söderåkra | Söderåkra |
-| Södra Björke | Södra_Björke |
-| Södra Finnskoga | Södra_Finnskoga |
-| Södra Fågelås | Södra_Fågelås |
-| Södra Hestra | Södra_Hestra |
-| Södra Härene | Södra_Härene |
-| Södra Kedum | Södra_Kedum |
-| Södra Kyrketorp | Södra_Kyrketorp |
-| Södra Ljunga | Södra_Ljunga |
-| Södra Lundby | Södra_Lundby |
-| Södra Mellby | Södra_Mellby |
-| Södra Möckleby | Södra_Möckleby |
-| Södra Ny | Södra_Ny |
-| Södra Råda | Södra_Råda |
-| Södra Rörum | Södra_Rörum |
-| Södra Sandby | Södra_Sandby |
-| Södra Sandsjö | Södra_Sandsjö |
-| Södra Solberga | Södra_Solberga |
-| Södra Säm | Södra_Säm |
-| Södra Unnaryd | Södra_Unnaryd |
-| Södra Vi | Södra_Vi |
-| Södra Ving | Södra_Ving |
-| Södra Vram | Södra_Vram |
-| Södra Vånga | Södra_Vånga |
-| Södra Åby | Södra_Åby |
-| Södra Åkarp | Södra_Åkarp |
-| Södra Åsarp | Södra_Åsarp |
-| Södra Åsum | Södra_Åsum |
-| Sölvesborg | Sölvesborg |
-| Söndrum | Söndrum |
-| Söne | Söne |
-| Söraby | Söraby |
-| Sörby | Sörby_O |
-| Sörby | Sörby_M |
-| Sövde | Sövde |
-| Sövestad | Sövestad |
-| Tannåker | Tannåker |
+| SÃ¥nga | SÃ¥nga_Y |
+| SÃ¥nga | SÃ¥nga_AB |
+| SÃ¤brÃ¥ | SÃ¤brÃ¥ |
+| SÃ¤by | SÃ¤by_U |
+| SÃ¤by | SÃ¤by_M |
+| SÃ¤fsnÃ¤s | SÃ¤fsnÃ¤s |
+| SÃ¤llstorp | SÃ¤llstorp |
+| SÃ¤restad | SÃ¤restad |
+| SÃ¤rna | SÃ¤rna |
+| SÃ¤rslÃ¶v | SÃ¤rslÃ¶v |
+| SÃ¤ter | SÃ¤ter_O |
+| SÃ¤ter | SÃ¤ter_W |
+| SÃ¤tila | SÃ¤tila |
+| SÃ¤ttersta | SÃ¤ttersta |
+| SÃ¤ttna | SÃ¤ttna |
+| SÃ¤tuna | SÃ¤tuna |
+| SÃ¤var | SÃ¤var |
+| SÃ¤vare | SÃ¤vare |
+| SÃ¤ve | SÃ¤ve |
+| SÃ¤vsjÃ¶ | SÃ¤vsjÃ¶ |
+| SÃ¶derala | SÃ¶derala |
+| SÃ¶derby-Karl | SÃ¶derby_Karl |
+| SÃ¶derbÃ¤rke | SÃ¶derbÃ¤rke |
+| SÃ¶derfors | SÃ¶derfors |
+| SÃ¶derhamn | SÃ¶derhamn |
+| SÃ¶derkÃ¶ping | SÃ¶derkÃ¶ping |
+| SÃ¶dertÃ¤lje | SÃ¶dertÃ¤lje |
+| SÃ¶dervidinge | SÃ¶dervidinge |
+| SÃ¶derÃ¥kra | SÃ¶derÃ¥kra |
+| SÃ¶dra BjÃ¶rke | SÃ¶dra_BjÃ¶rke |
+| SÃ¶dra Finnskoga | SÃ¶dra_Finnskoga |
+| SÃ¶dra FÃ¥gelÃ¥s | SÃ¶dra_FÃ¥gelÃ¥s |
+| SÃ¶dra Hestra | SÃ¶dra_Hestra |
+| SÃ¶dra HÃ¤rene | SÃ¶dra_HÃ¤rene |
+| SÃ¶dra Kedum | SÃ¶dra_Kedum |
+| SÃ¶dra Kyrketorp | SÃ¶dra_Kyrketorp |
+| SÃ¶dra Ljunga | SÃ¶dra_Ljunga |
+| SÃ¶dra Lundby | SÃ¶dra_Lundby |
+| SÃ¶dra Mellby | SÃ¶dra_Mellby |
+| SÃ¶dra MÃ¶ckleby | SÃ¶dra_MÃ¶ckleby |
+| SÃ¶dra Ny | SÃ¶dra_Ny |
+| SÃ¶dra RÃ¥da | SÃ¶dra_RÃ¥da |
+| SÃ¶dra RÃ¶rum | SÃ¶dra_RÃ¶rum |
+| SÃ¶dra Sandby | SÃ¶dra_Sandby |
+| SÃ¶dra SandsjÃ¶ | SÃ¶dra_SandsjÃ¶ |
+| SÃ¶dra Solberga | SÃ¶dra_Solberga |
+| SÃ¶dra SÃ¤m | SÃ¶dra_SÃ¤m |
+| SÃ¶dra Unnaryd | SÃ¶dra_Unnaryd |
+| SÃ¶dra Vi | SÃ¶dra_Vi |
+| SÃ¶dra Ving | SÃ¶dra_Ving |
+| SÃ¶dra Vram | SÃ¶dra_Vram |
+| SÃ¶dra VÃ¥nga | SÃ¶dra_VÃ¥nga |
+| SÃ¶dra Ã…by | SÃ¶dra_Ã…by |
+| SÃ¶dra Ã…karp | SÃ¶dra_Ã…karp |
+| SÃ¶dra Ã…sarp | SÃ¶dra_Ã…sarp |
+| SÃ¶dra Ã…sum | SÃ¶dra_Ã…sum |
+| SÃ¶lvesborg | SÃ¶lvesborg |
+| SÃ¶ndrum | SÃ¶ndrum |
+| SÃ¶ne | SÃ¶ne |
+| SÃ¶raby | SÃ¶raby |
+| SÃ¶rby | SÃ¶rby_O |
+| SÃ¶rby | SÃ¶rby_M |
+| SÃ¶vde | SÃ¶vde |
+| SÃ¶vestad | SÃ¶vestad |
+| TannÃ¥ker | TannÃ¥ker |
 | Tanum | Tanum |
 | Tarsled | Tarsled |
 | Taxinge | Taxinge |
@@ -2251,57 +2251,57 @@ This is a list of enum values that can be used in the API queries.
 | Tillinge | Tillinge |
 | Timmele | Timmele |
 | Timmersdala | Timmersdala |
-| Timrå | Timrå |
+| TimrÃ¥ | TimrÃ¥ |
 | Tingstad | Tingstad |
-| Tingstäde | Tingstäde |
-| Tingsås | Tingsås |
+| TingstÃ¤de | TingstÃ¤de |
+| TingsÃ¥s | TingsÃ¥s |
 | Tirup | Tirup |
 | Tisselskog | Tisselskog |
 | Tived | Tived |
 | Tjureda | Tjureda |
-| Tjurkö | Tjurkö |
-| Tjällmo | Tjällmo |
-| Tjärby | Tjärby |
-| Tjärnö | Tjärnö |
-| Tjärstad | Tjärstad |
-| Tjörnarp | Tjörnarp |
+| TjurkÃ¶ | TjurkÃ¶ |
+| TjÃ¤llmo | TjÃ¤llmo |
+| TjÃ¤rby | TjÃ¤rby |
+| TjÃ¤rnÃ¶ | TjÃ¤rnÃ¶ |
+| TjÃ¤rstad | TjÃ¤rstad |
+| TjÃ¶rnarp | TjÃ¶rnarp |
 | Toarp | Toarp |
 | Tofta | Tofta_I |
 | Tofta | Tofta_M |
 | Tofteryd | Tofteryd |
 | Tolfta | Tolfta |
 | Tolg | Tolg |
-| Tolånga | Tolånga |
-| Torbjörntorp | Torbjörntorp |
+| TolÃ¥nga | TolÃ¥nga |
+| TorbjÃ¶rntorp | TorbjÃ¶rntorp |
 | Torekov | Torekov |
 | Torestorp | Torestorp |
 | Toresund | Toresund |
 | Torhamn | Torhamn |
-| Torp | Torp_O_Fä |
+| Torp | Torp_O_FÃ¤ |
 | Torp | Torp_O_Or |
 | Torp | Torp_Y |
 | Torpa | Torpa_N |
 | Torpa | Torpa_U |
 | Torpa | Torpa_H |
 | Torpa | Torpa_G |
-| Torrlösa | Torrlösa |
+| TorrlÃ¶sa | TorrlÃ¶sa |
 | Torrskog | Torrskog |
 | Torsby | Torsby |
-| Torshälla | Torshälla |
+| TorshÃ¤lla | TorshÃ¤lla |
 | Torskinge | Torskinge |
 | Torslanda | Torslanda |
 | Torslunda | Torslunda |
 | Torstuna | Torstuna |
 | Torsvi | Torsvi |
-| Torsåker | Torsåker_D |
-| Torsåker | Torsåker_Y |
-| Torsåker | Torsåker_X |
-| Torsång | Torsång |
-| Torsås | Torsås |
-| Torsö | Torsö |
+| TorsÃ¥ker | TorsÃ¥ker_D |
+| TorsÃ¥ker | TorsÃ¥ker_Y |
+| TorsÃ¥ker | TorsÃ¥ker_X |
+| TorsÃ¥ng | TorsÃ¥ng |
+| TorsÃ¥s | TorsÃ¥s |
+| TorsÃ¶ | TorsÃ¶ |
 | Tortuna | Tortuna |
 | Torup | Torup |
-| Torö | Torö |
+| TorÃ¶ | TorÃ¶ |
 | Tossene | Tossene |
 | Tostared | Tostared |
 | Tosterup | Tosterup |
@@ -2310,29 +2310,29 @@ This is a list of enum values that can be used in the API queries.
 | Trankil | Trankil |
 | Transtrand | Transtrand |
 | Tranum | Tranum |
-| Tranås | Tranås_M |
-| Tranås | Tranås_F |
+| TranÃ¥s | TranÃ¥s_M |
+| TranÃ¥s | TranÃ¥s_F |
 | Traryd | Traryd |
-| Trehörna | Trehörna |
-| Trehörningsjö | Trehörningsjö |
+| TrehÃ¶rna | TrehÃ¶rna |
+| TrehÃ¶rningsjÃ¶ | TrehÃ¶rningsjÃ¶ |
 | Trelleborg | Trelleborg |
 | Trolle-Ljungby | Trolle_Ljungby |
-| Trollenäs | Trollenäs |
-| Trollhättan | Trollhättan |
+| TrollenÃ¤s | TrollenÃ¤s |
+| TrollhÃ¤ttan | TrollhÃ¤ttan |
 | Trosa stad | Trosa_stad |
-| Trosa-Vagnhärad | Trosa_Vagnhärad |
+| Trosa-VagnhÃ¤rad | Trosa_VagnhÃ¤rad |
 | Tryde | Tryde |
 | Tryserum | Tryserum |
-| Tråvad | Tråvad |
-| Träkumla | Träkumla |
-| Träne | Träne |
-| Träslöv | Träslöv |
-| Trässberg | Trässberg |
-| Trästena | Trästena |
-| Trävattna | Trävattna |
-| Trökörna | Trökörna |
-| Trönninge | Trönninge |
-| Trönö | Trönö |
+| TrÃ¥vad | TrÃ¥vad |
+| TrÃ¤kumla | TrÃ¤kumla |
+| TrÃ¤ne | TrÃ¤ne |
+| TrÃ¤slÃ¶v | TrÃ¤slÃ¶v |
+| TrÃ¤ssberg | TrÃ¤ssberg |
+| TrÃ¤stena | TrÃ¤stena |
+| TrÃ¤vattna | TrÃ¤vattna |
+| TrÃ¶kÃ¶rna | TrÃ¶kÃ¶rna |
+| TrÃ¶nninge | TrÃ¶nninge |
+| TrÃ¶nÃ¶ | TrÃ¶nÃ¶ |
 | Tullstorp | Tullstorp |
 | Tumberg | Tumberg |
 | Tumbo | Tumbo |
@@ -2350,73 +2350,73 @@ This is a list of enum values that can be used in the API queries.
 | Tveta | Tveta_H |
 | Tveta | Tveta_S |
 | Tving | Tving |
-| Tvååker | Tvååker |
-| Tvärred | Tvärred |
+| TvÃ¥Ã¥ker | TvÃ¥Ã¥ker |
+| TvÃ¤rred | TvÃ¤rred |
 | Tydje | Tydje |
-| Tygelsjö | Tygelsjö |
-| Tynderö | Tynderö |
-| Tyresö | Tyresö |
+| TygelsjÃ¶ | TygelsjÃ¶ |
+| TynderÃ¶ | TynderÃ¶ |
+| TyresÃ¶ | TyresÃ¶ |
 | Tysslinge | Tysslinge |
 | Tystberga | Tystberga |
-| Tåby | Tåby |
-| Tådene | Tådene |
-| Tångeråsa | Tångeråsa |
-| Tånnö | Tånnö |
-| Tåsjö | Tåsjö |
-| Tåssjö | Tåssjö |
-| Tåstarp | Tåstarp |
-| Täby | Täby_AB |
-| Täby | Täby_T |
-| Tämta | Tämta |
-| Täng | Täng |
-| Tännäs | Tännäs |
-| Tärby | Tärby |
-| Tärendö | Tärendö |
-| Tärna | Tärna_U |
-| Tärna | Tärna_AC |
-| Tävelsås | Tävelsås |
-| Töcksmark | Töcksmark |
-| Töftedal | Töftedal |
-| Töllsjö | Töllsjö |
-| Tölö | Tölö |
-| Tönnersjö | Tönnersjö |
-| Töre | Töre |
-| Töreboda | Töreboda |
-| Törnevalla | Törnevalla |
-| Törnsfall | Törnsfall |
-| Törringe | Törringe |
-| Tösse | Tösse |
+| TÃ¥by | TÃ¥by |
+| TÃ¥dene | TÃ¥dene |
+| TÃ¥ngerÃ¥sa | TÃ¥ngerÃ¥sa |
+| TÃ¥nnÃ¶ | TÃ¥nnÃ¶ |
+| TÃ¥sjÃ¶ | TÃ¥sjÃ¶ |
+| TÃ¥ssjÃ¶ | TÃ¥ssjÃ¶ |
+| TÃ¥starp | TÃ¥starp |
+| TÃ¤by | TÃ¤by_AB |
+| TÃ¤by | TÃ¤by_T |
+| TÃ¤mta | TÃ¤mta |
+| TÃ¤ng | TÃ¤ng |
+| TÃ¤nnÃ¤s | TÃ¤nnÃ¤s |
+| TÃ¤rby | TÃ¤rby |
+| TÃ¤rendÃ¶ | TÃ¤rendÃ¶ |
+| TÃ¤rna | TÃ¤rna_U |
+| TÃ¤rna | TÃ¤rna_AC |
+| TÃ¤velsÃ¥s | TÃ¤velsÃ¥s |
+| TÃ¶cksmark | TÃ¶cksmark |
+| TÃ¶ftedal | TÃ¶ftedal |
+| TÃ¶llsjÃ¶ | TÃ¶llsjÃ¶ |
+| TÃ¶lÃ¶ | TÃ¶lÃ¶ |
+| TÃ¶nnersjÃ¶ | TÃ¶nnersjÃ¶ |
+| TÃ¶re | TÃ¶re |
+| TÃ¶reboda | TÃ¶reboda |
+| TÃ¶rnevalla | TÃ¶rnevalla |
+| TÃ¶rnsfall | TÃ¶rnsfall |
+| TÃ¶rringe | TÃ¶rringe |
+| TÃ¶sse | TÃ¶sse |
 | Ucklum | Ucklum |
 | Uddevalla | Uddevalla |
 | Ugglum | Ugglum |
 | Ukna | Ukna |
 | Ullared | Ullared |
-| Ullasjö | Ullasjö |
+| UllasjÃ¶ | UllasjÃ¶ |
 | Ullene | Ullene |
 | Ullervad | Ullervad |
 | Ullstorp | Ullstorp |
-| Ullånger | Ullånger |
+| UllÃ¥nger | UllÃ¥nger |
 | Ulricehamn | Ulricehamn |
 | Ulrika | Ulrika |
-| Umeå socken | Umeå_socken |
-| Umeå stad | Umeå_stad |
-| Undenäs | Undenäs |
+| UmeÃ¥ socken | UmeÃ¥_socken |
+| UmeÃ¥ stad | UmeÃ¥_stad |
+| UndenÃ¤s | UndenÃ¤s |
 | Undersvik | Undersvik |
-| Undersåker | Undersåker |
+| UndersÃ¥ker | UndersÃ¥ker |
 | Ununge | Ununge |
-| Upphärad | Upphärad |
+| UpphÃ¤rad | UpphÃ¤rad |
 | Uppsala | Uppsala |
-| Uppsala-Näs | Uppsala_Näs |
-| Uppåkra | Uppåkra |
+| Uppsala-NÃ¤s | Uppsala_NÃ¤s |
+| UppÃ¥kra | UppÃ¥kra |
 | Urshult | Urshult |
-| Uråsa | Uråsa |
+| UrÃ¥sa | UrÃ¥sa |
 | Utby | Utby |
-| Utvängstorp | Utvängstorp |
-| Utö | Utö |
+| UtvÃ¤ngstorp | UtvÃ¤ngstorp |
+| UtÃ¶ | UtÃ¶ |
 | Uvered | Uvered |
 | Vad | Vad |
 | Vada | Vada |
-| Vadensjö | Vadensjö |
+| VadensjÃ¶ | VadensjÃ¶ |
 | Vadsbro | Vadsbro |
 | Vadstena | Vadstena |
 | Vaksala | Vaksala |
@@ -2434,31 +2434,31 @@ This is a list of enum values that can be used in the API queries.
 | Valleberga | Valleberga |
 | Vallentuna | Vallentuna |
 | Vallerstad | Vallerstad |
-| Vallkärra | Vallkärra |
+| VallkÃ¤rra | VallkÃ¤rra |
 | Vallstena | Vallstena |
 | Valstad | Valstad |
 | Valtorp | Valtorp |
-| Valö | Valö |
+| ValÃ¶ | ValÃ¶ |
 | Vamlingbo | Vamlingbo |
 | Vankiva | Vankiva |
 | Vanstad | Vanstad |
-| Vansö | Vansö |
-| Vapnö | Vapnö |
+| VansÃ¶ | VansÃ¶ |
+| VapnÃ¶ | VapnÃ¶ |
 | Vara | Vara |
 | Varberg | Varberg |
 | Varnhem | Varnhem |
 | Varnum | Varnum |
 | Varola | Varola |
-| Vartofta-Åsaka | Vartofta_Åsaka |
+| Vartofta-Ã…saka | Vartofta_Ã…saka |
 | Varv | Varv_E |
 | Varv | Varv_O |
 | Vassunda | Vassunda |
 | Vaxholm | Vaxholm |
-| Veberöd | Veberöd |
+| VeberÃ¶d | VeberÃ¶d |
 | Veckholm | Veckholm |
 | Vedby | Vedby |
 | Veddige | Veddige |
-| Vederslöv | Vederslöv |
+| VederslÃ¶v | VederslÃ¶v |
 | Veinge | Veinge |
 | Velinga | Velinga |
 | Vellinge | Vellinge |
@@ -2473,7 +2473,7 @@ This is a list of enum values that can be used in the API queries.
 | Vetlanda | Vetlanda |
 | Viby | Viby_E |
 | Viby | Viby_T |
-| Vibyggerå | Vibyggerå |
+| VibyggerÃ¥ | VibyggerÃ¥ |
 | Vickleby | Vickleby |
 | Vidbo | Vidbo |
 | Vika | Vika |
@@ -2481,7 +2481,7 @@ This is a list of enum values that can be used in the API queries.
 | Viker | Viker |
 | Vikingstad | Vikingstad |
 | Viklau | Viklau |
-| Viksjö | Viksjö |
+| ViksjÃ¶ | ViksjÃ¶ |
 | Viksta | Viksta |
 | Vilhelmina | Vilhelmina |
 | Villberga | Villberga |
@@ -2490,19 +2490,19 @@ This is a list of enum values that can be used in the API queries.
 | Vilske-Kleva | Vilske_Kleva |
 | Vimmerby | Vimmerby |
 | Vinberg | Vinberg |
-| Vinköl | Vinköl |
-| Vinslöv | Vinslöv |
+| VinkÃ¶l | VinkÃ¶l |
+| VinslÃ¶v | VinslÃ¶v |
 | Vintrosa | Vintrosa |
 | Vireda | Vireda |
 | Virestad | Virestad |
 | Virke | Virke |
 | Virserum | Virserum |
 | Visby | Visby |
-| Visingsö | Visingsö |
+| VisingsÃ¶ | VisingsÃ¶ |
 | Vislanda | Vislanda |
 | Visnum | Visnum |
 | Visnums-Kil | Visnums_Kil |
-| Vissefjärda | Vissefjärda |
+| VissefjÃ¤rda | VissefjÃ¤rda |
 | Visseltofta | Visseltofta |
 | Vist | Vist |
 | Vistorp | Vistorp |
@@ -2510,9 +2510,9 @@ This is a list of enum values that can be used in the API queries.
 | Vitsand | Vitsand |
 | Vittaryd | Vittaryd |
 | Vittinge | Vittinge |
-| Vittsjö | Vittsjö |
-| Vittskövle | Vittskövle |
-| Vollsjö | Vollsjö |
+| VittsjÃ¶ | VittsjÃ¶ |
+| VittskÃ¶vle | VittskÃ¶vle |
+| VollsjÃ¶ | VollsjÃ¶ |
 | Vomb | Vomb |
 | Voxna | Voxna |
 | Voxtorp | Voxtorp_F |
@@ -2520,283 +2520,283 @@ This is a list of enum values that can be used in the API queries.
 | Vrena | Vrena |
 | Vreta kloster | Vreta_kloster |
 | Vrigstad | Vrigstad |
-| Vrå | Vrå |
-| Våmb | Våmb |
-| Våmhus | Våmhus |
-| Vånga | Vånga_M |
-| Vånga | Vånga_E |
-| Vårdinge | Vårdinge |
-| Vårdnäs | Vårdnäs |
-| Vårdsberg | Vårdsberg |
-| Vårfrukyrka | Vårfrukyrka |
-| Vårkumla | Vårkumla |
-| Vårvik | Vårvik |
-| Våthult | Våthult |
-| Våxtorp | Våxtorp |
-| Vä | Vä |
-| Väckelsång | Väckelsång |
-| Väddö | Väddö |
-| Väderstad | Väderstad |
-| Väla | Väla |
-| Välinge | Välinge |
-| Välluv | Välluv |
-| Väne-Ryr | Väne_Ryr |
-| Väne-Åsaka | Väne_Åsaka |
-| Vänersborg | Vänersborg |
-| Vänersnäs | Vänersnäs |
-| Vänga | Vänga |
-| Vänge | Vänge_C |
-| Vänge | Vänge_I |
-| Vänjan | Vänjan |
-| Vännäs | Vännäs |
-| Väring | Väring |
-| Värmdö | Värmdö |
-| Värmskog | Värmskog |
-| Värna | Värna |
-| Värnamo | Värnamo |
-| Värsås | Värsås |
-| Värö | Värö |
-| Väsby | Väsby |
-| Väse | Väse |
-| Väskinde | Väskinde |
-| Västerbitterna | Västerbitterna |
-| Västerfärnebo | Västerfärnebo |
-| Västergarn | Västergarn |
-| Västerhaninge | Västerhaninge |
-| Västerhejde | Västerhejde |
-| Västerlanda | Västerlanda |
-| Västerljung | Västerljung |
-| Västerlösa | Västerlösa |
-| Västerlövsta | Västerlövsta |
-| Västermo | Västermo |
-| Västerplana | Västerplana |
-| Västerstad | Västerstad |
-| Västervik | Västervik |
-| Västervåla | Västervåla |
-| Västeråker | Västeråker |
-| Västerås | Västerås |
-| Västerås-Barkarö | Västerås_Barkarö |
-| Västland | Västland |
-| Västra Alstad | Västra_Alstad |
-| Västra Broby | Västra_Broby |
-| Västra Ed | Västra_Ed |
-| Västra Eneby | Västra_Eneby |
-| Västra Fågelvik | Västra_Fågelvik |
-| Västra Gerum | Västra_Gerum |
-| Västra Harg | Västra_Harg |
-| Västra Hoby | Västra_Hoby |
-| Västra Husby | Västra_Husby |
-| Västra Ingelstad | Västra_Ingelstad |
-| Västra Karaby | Västra_Karaby |
-| Västra Karup | Västra_Karup |
-| Västra Klagstorp | Västra_Klagstorp |
-| Västra Kärrstorp | Västra_Kärrstorp |
-| Västra Ny | Västra_Ny |
-| Västra Nöbbelöv | Västra_Nöbbelöv |
-| Västra Ryd | Västra_Ryd_E |
-| Västra Ryd | Västra_Ryd_AB |
-| Västra Skedvi | Västra_Skedvi |
-| Västra Stenby | Västra_Stenby |
-| Västra Strö | Västra_Strö |
-| Västra Sönnarslöv | Västra_Sönnarslöv |
-| Västra Tollstad | Västra_Tollstad |
-| Västra Tommarp | Västra_Tommarp |
-| Västra Torsås | Västra_Torsås |
-| Västra Torup | Västra_Torup |
-| Västra Tunhem | Västra_Tunhem |
-| Västra Vemmenhög | Västra_Vemmenhög |
-| Västra Vemmerlöv | Västra_Vemmerlöv |
-| Västra Vingåker | Västra_Vingåker |
-| Västra Vram | Västra_Vram |
-| Västra Ämtervik | Västra_Ämtervik |
-| Västrum | Västrum |
-| Väte | Väte |
-| Vättak | Vättak |
-| Vättlösa | Vättlösa |
-| Vätö | Vätö |
-| Väversunda | Väversunda |
-| Växjö | Växjö |
+| VrÃ¥ | VrÃ¥ |
+| VÃ¥mb | VÃ¥mb |
+| VÃ¥mhus | VÃ¥mhus |
+| VÃ¥nga | VÃ¥nga_M |
+| VÃ¥nga | VÃ¥nga_E |
+| VÃ¥rdinge | VÃ¥rdinge |
+| VÃ¥rdnÃ¤s | VÃ¥rdnÃ¤s |
+| VÃ¥rdsberg | VÃ¥rdsberg |
+| VÃ¥rfrukyrka | VÃ¥rfrukyrka |
+| VÃ¥rkumla | VÃ¥rkumla |
+| VÃ¥rvik | VÃ¥rvik |
+| VÃ¥thult | VÃ¥thult |
+| VÃ¥xtorp | VÃ¥xtorp |
+| VÃ¤ | VÃ¤ |
+| VÃ¤ckelsÃ¥ng | VÃ¤ckelsÃ¥ng |
+| VÃ¤ddÃ¶ | VÃ¤ddÃ¶ |
+| VÃ¤derstad | VÃ¤derstad |
+| VÃ¤la | VÃ¤la |
+| VÃ¤linge | VÃ¤linge |
+| VÃ¤lluv | VÃ¤lluv |
+| VÃ¤ne-Ryr | VÃ¤ne_Ryr |
+| VÃ¤ne-Ã…saka | VÃ¤ne_Ã…saka |
+| VÃ¤nersborg | VÃ¤nersborg |
+| VÃ¤nersnÃ¤s | VÃ¤nersnÃ¤s |
+| VÃ¤nga | VÃ¤nga |
+| VÃ¤nge | VÃ¤nge_C |
+| VÃ¤nge | VÃ¤nge_I |
+| VÃ¤njan | VÃ¤njan |
+| VÃ¤nnÃ¤s | VÃ¤nnÃ¤s |
+| VÃ¤ring | VÃ¤ring |
+| VÃ¤rmdÃ¶ | VÃ¤rmdÃ¶ |
+| VÃ¤rmskog | VÃ¤rmskog |
+| VÃ¤rna | VÃ¤rna |
+| VÃ¤rnamo | VÃ¤rnamo |
+| VÃ¤rsÃ¥s | VÃ¤rsÃ¥s |
+| VÃ¤rÃ¶ | VÃ¤rÃ¶ |
+| VÃ¤sby | VÃ¤sby |
+| VÃ¤se | VÃ¤se |
+| VÃ¤skinde | VÃ¤skinde |
+| VÃ¤sterbitterna | VÃ¤sterbitterna |
+| VÃ¤sterfÃ¤rnebo | VÃ¤sterfÃ¤rnebo |
+| VÃ¤stergarn | VÃ¤stergarn |
+| VÃ¤sterhaninge | VÃ¤sterhaninge |
+| VÃ¤sterhejde | VÃ¤sterhejde |
+| VÃ¤sterlanda | VÃ¤sterlanda |
+| VÃ¤sterljung | VÃ¤sterljung |
+| VÃ¤sterlÃ¶sa | VÃ¤sterlÃ¶sa |
+| VÃ¤sterlÃ¶vsta | VÃ¤sterlÃ¶vsta |
+| VÃ¤stermo | VÃ¤stermo |
+| VÃ¤sterplana | VÃ¤sterplana |
+| VÃ¤sterstad | VÃ¤sterstad |
+| VÃ¤stervik | VÃ¤stervik |
+| VÃ¤stervÃ¥la | VÃ¤stervÃ¥la |
+| VÃ¤sterÃ¥ker | VÃ¤sterÃ¥ker |
+| VÃ¤sterÃ¥s | VÃ¤sterÃ¥s |
+| VÃ¤sterÃ¥s-BarkarÃ¶ | VÃ¤sterÃ¥s_BarkarÃ¶ |
+| VÃ¤stland | VÃ¤stland |
+| VÃ¤stra Alstad | VÃ¤stra_Alstad |
+| VÃ¤stra Broby | VÃ¤stra_Broby |
+| VÃ¤stra Ed | VÃ¤stra_Ed |
+| VÃ¤stra Eneby | VÃ¤stra_Eneby |
+| VÃ¤stra FÃ¥gelvik | VÃ¤stra_FÃ¥gelvik |
+| VÃ¤stra Gerum | VÃ¤stra_Gerum |
+| VÃ¤stra Harg | VÃ¤stra_Harg |
+| VÃ¤stra Hoby | VÃ¤stra_Hoby |
+| VÃ¤stra Husby | VÃ¤stra_Husby |
+| VÃ¤stra Ingelstad | VÃ¤stra_Ingelstad |
+| VÃ¤stra Karaby | VÃ¤stra_Karaby |
+| VÃ¤stra Karup | VÃ¤stra_Karup |
+| VÃ¤stra Klagstorp | VÃ¤stra_Klagstorp |
+| VÃ¤stra KÃ¤rrstorp | VÃ¤stra_KÃ¤rrstorp |
+| VÃ¤stra Ny | VÃ¤stra_Ny |
+| VÃ¤stra NÃ¶bbelÃ¶v | VÃ¤stra_NÃ¶bbelÃ¶v |
+| VÃ¤stra Ryd | VÃ¤stra_Ryd_E |
+| VÃ¤stra Ryd | VÃ¤stra_Ryd_AB |
+| VÃ¤stra Skedvi | VÃ¤stra_Skedvi |
+| VÃ¤stra Stenby | VÃ¤stra_Stenby |
+| VÃ¤stra StrÃ¶ | VÃ¤stra_StrÃ¶ |
+| VÃ¤stra SÃ¶nnarslÃ¶v | VÃ¤stra_SÃ¶nnarslÃ¶v |
+| VÃ¤stra Tollstad | VÃ¤stra_Tollstad |
+| VÃ¤stra Tommarp | VÃ¤stra_Tommarp |
+| VÃ¤stra TorsÃ¥s | VÃ¤stra_TorsÃ¥s |
+| VÃ¤stra Torup | VÃ¤stra_Torup |
+| VÃ¤stra Tunhem | VÃ¤stra_Tunhem |
+| VÃ¤stra VemmenhÃ¶g | VÃ¤stra_VemmenhÃ¶g |
+| VÃ¤stra VemmerlÃ¶v | VÃ¤stra_VemmerlÃ¶v |
+| VÃ¤stra VingÃ¥ker | VÃ¤stra_VingÃ¥ker |
+| VÃ¤stra Vram | VÃ¤stra_Vram |
+| VÃ¤stra Ã„mtervik | VÃ¤stra_Ã„mtervik |
+| VÃ¤strum | VÃ¤strum |
+| VÃ¤te | VÃ¤te |
+| VÃ¤ttak | VÃ¤ttak |
+| VÃ¤ttlÃ¶sa | VÃ¤ttlÃ¶sa |
+| VÃ¤tÃ¶ | VÃ¤tÃ¶ |
+| VÃ¤versunda | VÃ¤versunda |
+| VÃ¤xjÃ¶ | VÃ¤xjÃ¶ |
 | Yllestad | Yllestad |
 | Ysane | Ysane |
 | Ysby | Ysby |
 | Ystad | Ystad |
 | Ytterby | Ytterby |
-| Ytterenhörna | Ytterenhörna |
+| YtterenhÃ¶rna | YtterenhÃ¶rna |
 | Yttergran | Yttergran |
 | Ytterhogdal | Ytterhogdal |
-| Ytterjärna | Ytterjärna |
-| Ytterlännäs | Ytterlännäs |
-| Ytterselö | Ytterselö |
+| YtterjÃ¤rna | YtterjÃ¤rna |
+| YtterlÃ¤nnÃ¤s | YtterlÃ¤nnÃ¤s |
+| YtterselÃ¶ | YtterselÃ¶ |
 | Yxnerum | Yxnerum |
-| Å | Å |
-| Åby | Åby |
-| Ådals-Liden | Ådals_Liden |
-| Åhus | Åhus |
-| Åker | Åker_D |
-| Åker | Åker_F |
-| Åkerby | Åkerby |
-| Ål | Ål |
-| Åland | Åland |
-| Ålem | Ålem |
-| Åmål | Åmål |
-| Ånimskog | Ånimskog |
-| Årdala | Årdala |
-| Åre | Åre |
-| Årstad | Årstad |
-| Årsunda | Årsunda |
-| Åryd | Åryd |
-| Ås | Ås_O |
-| Ås | Ås_H |
-| Ås | Ås_N |
-| Ås | Ås_F |
-| Ås | Ås_Z |
-| Åsarne | Åsarne |
-| Åsbo | Åsbo |
-| Åsbräcka | Åsbräcka |
-| Åseda | Åseda |
-| Åsele | Åsele |
-| Åsenhöga | Åsenhöga |
-| Åsle | Åsle |
-| Åtvid | Åtvid |
-| Älekulla | Älekulla |
-| Älgarås | Älgarås |
-| Älghult | Älghult |
-| Älgå | Älgå |
-| Älmeboda | Älmeboda |
-| Älvdalen | Älvdalen |
-| Älvestad | Älvestad |
-| Älvkarleby | Älvkarleby |
-| Älvros | Älvros |
-| Älvsbacka | Älvsbacka |
-| Älvsby | Älvsby |
-| Älvsered | Älvsered |
-| Älvsåker | Älvsåker |
-| Ängelholm | Ängelholm |
-| Ängersjö | Ängersjö |
-| Ängsö | Ängsö |
-| Äppelbo | Äppelbo |
-| Ärentuna | Ärentuna |
-| Ärla | Ärla |
-| Ärtemark | Ärtemark |
-| Äspered | Äspered |
-| Äsphult | Äsphult |
-| Äspinge | Äspinge |
-| Äspö | Äspö |
-| Öckerö | Öckerö |
-| Ödeborg | Ödeborg |
-| Ödeby | Ödeby |
-| Ödenäs | Ödenäs |
-| Ödeshög | Ödeshög |
-| Ödestugu | Ödestugu |
-| Ödskölt | Ödskölt |
-| Ödsmål | Ödsmål |
-| Öggestorp | Öggestorp |
-| Öglunda | Öglunda |
-| Öja | Öja_D |
-| Öja | Öja_M |
-| Öja | Öja_G |
-| Öja | Öja_I |
-| Öjaby | Öjaby |
-| Ökna | Ökna |
-| Öljehult | Öljehult |
-| Ölme | Ölme |
-| Ölmevalla | Ölmevalla |
-| Ölmstad | Ölmstad |
-| Ölserud | Ölserud |
-| Ölsremma | Ölsremma |
-| Önnarp | Önnarp |
-| Önnestad | Önnestad |
-| Önum | Önum |
-| Ör | Ör_O |
-| Ör | Ör_G |
-| Öra | Öra |
-| Örberga | Örberga |
-| Örby | Örby |
-| Örebro | Örebro |
-| Öregrund | Öregrund |
-| Öreryd | Öreryd |
-| Örja | Örja |
-| Örkelljunga | Örkelljunga |
-| Örkened | Örkened |
-| Örnsköldsvik | Örnsköldsvik |
-| Örsjö | Örsjö_M |
-| Örsjö | Örsjö_H |
-| Örslösa | Örslösa |
-| Örsås | Örsås |
-| Örtofta | Örtofta |
-| Örtomta | Örtomta |
-| Örträsk | Örträsk |
-| Ösmo | Ösmo |
-| Össeby-Garn | Össeby_Garn |
-| Össjö | Össjö |
-| Östad | Östad |
-| Österbitterna | Österbitterna |
-| Österfärnebo | Österfärnebo |
-| Östergarn | Östergarn |
-| Österhaninge | Österhaninge |
-| Österlövsta | Österlövsta |
-| Österplana | Österplana |
-| Österslöv | Österslöv |
-| Östersund | Östersund |
-| Östertälje | Östertälje |
-| Österunda | Österunda |
-| Östervallskog | Östervallskog |
-| Östervåla | Östervåla |
-| Österåker | Österåker_D |
-| Österåker | Österåker_AB |
-| Östhammar | Östhammar |
-| Östmark | Östmark |
-| Östra Broby | Östra_Broby |
-| Östra Ed | Östra_Ed |
-| Östra Frölunda | Östra_Frölunda |
-| Östra Fågelvik | Östra_Fågelvik |
-| Östra Gerum | Östra_Gerum |
-| Östra Grevie | Östra_Grevie |
-| Östra Harg | Östra_Harg |
-| Östra Herrestad | Östra_Herrestad |
-| Östra Hoby | Östra_Hoby |
-| Östra Husby | Östra_Husby |
-| Östra Ingelstad | Östra_Ingelstad |
-| Östra Karaby | Östra_Karaby |
-| Östra Karup | Östra_Karup |
-| Östra Klagstorp | Östra_Klagstorp |
-| Östra Kärrstorp | Östra_Kärrstorp |
-| Östra Ljungby | Östra_Ljungby |
-| Östra Ny | Östra_Ny |
-| Östra Nöbbelöv | Östra_Nöbbelöv |
-| Östra Ryd | Östra_Ryd_E |
-| Östra Ryd | Östra_Ryd_AB |
-| Östra Sallerup | Östra_Sallerup |
-| Östra Skrukeby | Östra_Skrukeby |
-| Östra Stenby | Östra_Stenby |
-| Östra Strö | Östra_Strö |
-| Östra Sönnarslöv | Östra_Sönnarslöv |
-| Östra Tollstad | Östra_Tollstad |
-| Östra Tommarp | Östra_Tommarp |
-| Östra Torp | Östra_Torp |
-| Östra Torsås | Östra_Torsås |
-| Östra Tunhem | Östra_Tunhem |
-| Östra Vemmenhög | Östra_Vemmenhög |
-| Östra Vemmerlöv | Östra_Vemmerlöv |
-| Östra Vingåker | Östra_Vingåker |
-| Östra Vram | Östra_Vram |
-| Östra Ämtervik | Östra_Ämtervik |
-| Östraby | Östraby |
-| Östuna | Östuna |
-| Öttum | Öttum |
-| Öved | Öved |
-| Överenhörna | Överenhörna |
-| Övergran | Övergran |
-| Överhogdal | Överhogdal |
-| Överjärna | Överjärna |
-| Överkalix | Överkalix |
-| Överluleå | Överluleå |
-| Överlännäs | Överlännäs |
-| Överselö | Överselö |
-| Övertorneå | Övertorneå |
-| Överum | Överum |
-| Övraby | Övraby_N |
-| Övraby | Övraby_M |
-| Övre Ullerud | Övre_Ullerud |
-| Öxabäck | Öxabäck |
-| Öxnevalla | Öxnevalla |
+| Ã… | Ã… |
+| Ã…by | Ã…by |
+| Ã…dals-Liden | Ã…dals_Liden |
+| Ã…hus | Ã…hus |
+| Ã…ker | Ã…ker_D |
+| Ã…ker | Ã…ker_F |
+| Ã…kerby | Ã…kerby |
+| Ã…l | Ã…l |
+| Ã…land | Ã…land |
+| Ã…lem | Ã…lem |
+| Ã…mÃ¥l | Ã…mÃ¥l |
+| Ã…nimskog | Ã…nimskog |
+| Ã…rdala | Ã…rdala |
+| Ã…re | Ã…re |
+| Ã…rstad | Ã…rstad |
+| Ã…rsunda | Ã…rsunda |
+| Ã…ryd | Ã…ryd |
+| Ã…s | Ã…s_O |
+| Ã…s | Ã…s_H |
+| Ã…s | Ã…s_N |
+| Ã…s | Ã…s_F |
+| Ã…s | Ã…s_Z |
+| Ã…sarne | Ã…sarne |
+| Ã…sbo | Ã…sbo |
+| Ã…sbrÃ¤cka | Ã…sbrÃ¤cka |
+| Ã…seda | Ã…seda |
+| Ã…sele | Ã…sele |
+| Ã…senhÃ¶ga | Ã…senhÃ¶ga |
+| Ã…sle | Ã…sle |
+| Ã…tvid | Ã…tvid |
+| Ã„lekulla | Ã„lekulla |
+| Ã„lgarÃ¥s | Ã„lgarÃ¥s |
+| Ã„lghult | Ã„lghult |
+| Ã„lgÃ¥ | Ã„lgÃ¥ |
+| Ã„lmeboda | Ã„lmeboda |
+| Ã„lvdalen | Ã„lvdalen |
+| Ã„lvestad | Ã„lvestad |
+| Ã„lvkarleby | Ã„lvkarleby |
+| Ã„lvros | Ã„lvros |
+| Ã„lvsbacka | Ã„lvsbacka |
+| Ã„lvsby | Ã„lvsby |
+| Ã„lvsered | Ã„lvsered |
+| Ã„lvsÃ¥ker | Ã„lvsÃ¥ker |
+| Ã„ngelholm | Ã„ngelholm |
+| Ã„ngersjÃ¶ | Ã„ngersjÃ¶ |
+| Ã„ngsÃ¶ | Ã„ngsÃ¶ |
+| Ã„ppelbo | Ã„ppelbo |
+| Ã„rentuna | Ã„rentuna |
+| Ã„rla | Ã„rla |
+| Ã„rtemark | Ã„rtemark |
+| Ã„spered | Ã„spered |
+| Ã„sphult | Ã„sphult |
+| Ã„spinge | Ã„spinge |
+| Ã„spÃ¶ | Ã„spÃ¶ |
+| Ã–ckerÃ¶ | Ã–ckerÃ¶ |
+| Ã–deborg | Ã–deborg |
+| Ã–deby | Ã–deby |
+| Ã–denÃ¤s | Ã–denÃ¤s |
+| Ã–deshÃ¶g | Ã–deshÃ¶g |
+| Ã–destugu | Ã–destugu |
+| Ã–dskÃ¶lt | Ã–dskÃ¶lt |
+| Ã–dsmÃ¥l | Ã–dsmÃ¥l |
+| Ã–ggestorp | Ã–ggestorp |
+| Ã–glunda | Ã–glunda |
+| Ã–ja | Ã–ja_D |
+| Ã–ja | Ã–ja_M |
+| Ã–ja | Ã–ja_G |
+| Ã–ja | Ã–ja_I |
+| Ã–jaby | Ã–jaby |
+| Ã–kna | Ã–kna |
+| Ã–ljehult | Ã–ljehult |
+| Ã–lme | Ã–lme |
+| Ã–lmevalla | Ã–lmevalla |
+| Ã–lmstad | Ã–lmstad |
+| Ã–lserud | Ã–lserud |
+| Ã–lsremma | Ã–lsremma |
+| Ã–nnarp | Ã–nnarp |
+| Ã–nnestad | Ã–nnestad |
+| Ã–num | Ã–num |
+| Ã–r | Ã–r_O |
+| Ã–r | Ã–r_G |
+| Ã–ra | Ã–ra |
+| Ã–rberga | Ã–rberga |
+| Ã–rby | Ã–rby |
+| Ã–rebro | Ã–rebro |
+| Ã–regrund | Ã–regrund |
+| Ã–reryd | Ã–reryd |
+| Ã–rja | Ã–rja |
+| Ã–rkelljunga | Ã–rkelljunga |
+| Ã–rkened | Ã–rkened |
+| Ã–rnskÃ¶ldsvik | Ã–rnskÃ¶ldsvik |
+| Ã–rsjÃ¶ | Ã–rsjÃ¶_M |
+| Ã–rsjÃ¶ | Ã–rsjÃ¶_H |
+| Ã–rslÃ¶sa | Ã–rslÃ¶sa |
+| Ã–rsÃ¥s | Ã–rsÃ¥s |
+| Ã–rtofta | Ã–rtofta |
+| Ã–rtomta | Ã–rtomta |
+| Ã–rtrÃ¤sk | Ã–rtrÃ¤sk |
+| Ã–smo | Ã–smo |
+| Ã–sseby-Garn | Ã–sseby_Garn |
+| Ã–ssjÃ¶ | Ã–ssjÃ¶ |
+| Ã–stad | Ã–stad |
+| Ã–sterbitterna | Ã–sterbitterna |
+| Ã–sterfÃ¤rnebo | Ã–sterfÃ¤rnebo |
+| Ã–stergarn | Ã–stergarn |
+| Ã–sterhaninge | Ã–sterhaninge |
+| Ã–sterlÃ¶vsta | Ã–sterlÃ¶vsta |
+| Ã–sterplana | Ã–sterplana |
+| Ã–sterslÃ¶v | Ã–sterslÃ¶v |
+| Ã–stersund | Ã–stersund |
+| Ã–stertÃ¤lje | Ã–stertÃ¤lje |
+| Ã–sterunda | Ã–sterunda |
+| Ã–stervallskog | Ã–stervallskog |
+| Ã–stervÃ¥la | Ã–stervÃ¥la |
+| Ã–sterÃ¥ker | Ã–sterÃ¥ker_D |
+| Ã–sterÃ¥ker | Ã–sterÃ¥ker_AB |
+| Ã–sthammar | Ã–sthammar |
+| Ã–stmark | Ã–stmark |
+| Ã–stra Broby | Ã–stra_Broby |
+| Ã–stra Ed | Ã–stra_Ed |
+| Ã–stra FrÃ¶lunda | Ã–stra_FrÃ¶lunda |
+| Ã–stra FÃ¥gelvik | Ã–stra_FÃ¥gelvik |
+| Ã–stra Gerum | Ã–stra_Gerum |
+| Ã–stra Grevie | Ã–stra_Grevie |
+| Ã–stra Harg | Ã–stra_Harg |
+| Ã–stra Herrestad | Ã–stra_Herrestad |
+| Ã–stra Hoby | Ã–stra_Hoby |
+| Ã–stra Husby | Ã–stra_Husby |
+| Ã–stra Ingelstad | Ã–stra_Ingelstad |
+| Ã–stra Karaby | Ã–stra_Karaby |
+| Ã–stra Karup | Ã–stra_Karup |
+| Ã–stra Klagstorp | Ã–stra_Klagstorp |
+| Ã–stra KÃ¤rrstorp | Ã–stra_KÃ¤rrstorp |
+| Ã–stra Ljungby | Ã–stra_Ljungby |
+| Ã–stra Ny | Ã–stra_Ny |
+| Ã–stra NÃ¶bbelÃ¶v | Ã–stra_NÃ¶bbelÃ¶v |
+| Ã–stra Ryd | Ã–stra_Ryd_E |
+| Ã–stra Ryd | Ã–stra_Ryd_AB |
+| Ã–stra Sallerup | Ã–stra_Sallerup |
+| Ã–stra Skrukeby | Ã–stra_Skrukeby |
+| Ã–stra Stenby | Ã–stra_Stenby |
+| Ã–stra StrÃ¶ | Ã–stra_StrÃ¶ |
+| Ã–stra SÃ¶nnarslÃ¶v | Ã–stra_SÃ¶nnarslÃ¶v |
+| Ã–stra Tollstad | Ã–stra_Tollstad |
+| Ã–stra Tommarp | Ã–stra_Tommarp |
+| Ã–stra Torp | Ã–stra_Torp |
+| Ã–stra TorsÃ¥s | Ã–stra_TorsÃ¥s |
+| Ã–stra Tunhem | Ã–stra_Tunhem |
+| Ã–stra VemmenhÃ¶g | Ã–stra_VemmenhÃ¶g |
+| Ã–stra VemmerlÃ¶v | Ã–stra_VemmerlÃ¶v |
+| Ã–stra VingÃ¥ker | Ã–stra_VingÃ¥ker |
+| Ã–stra Vram | Ã–stra_Vram |
+| Ã–stra Ã„mtervik | Ã–stra_Ã„mtervik |
+| Ã–straby | Ã–straby |
+| Ã–stuna | Ã–stuna |
+| Ã–ttum | Ã–ttum |
+| Ã–ved | Ã–ved |
+| Ã–verenhÃ¶rna | Ã–verenhÃ¶rna |
+| Ã–vergran | Ã–vergran |
+| Ã–verhogdal | Ã–verhogdal |
+| Ã–verjÃ¤rna | Ã–verjÃ¤rna |
+| Ã–verkalix | Ã–verkalix |
+| Ã–verluleÃ¥ | Ã–verluleÃ¥ |
+| Ã–verlÃ¤nnÃ¤s | Ã–verlÃ¤nnÃ¤s |
+| Ã–verselÃ¶ | Ã–verselÃ¶ |
+| Ã–vertorneÃ¥ | Ã–vertorneÃ¥ |
+| Ã–verum | Ã–verum |
+| Ã–vraby | Ã–vraby_N |
+| Ã–vraby | Ã–vraby_M |
+| Ã–vre Ullerud | Ã–vre_Ullerud |
+| Ã–xabÃ¤ck | Ã–xabÃ¤ck |
+| Ã–xnevalla | Ã–xnevalla |

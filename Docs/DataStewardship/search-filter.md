@@ -11,7 +11,7 @@ This page provides information about how to use the search filter parameters.
 	- [OnlyEndDate filter type](#onlyenddate-filter-type)
 - [Taxon filter](#taxon-filter)
 - [Geographics filter](#geographics-filter)
-	- [County (län) filter](#county-län-filter)
+	- [County (lÃ¤n) filter](#county-lÃ¤n-filter)
 	- [Province (landskap) filter](#province-landskap-filter)
 	- [Municipality (kommun) filter](#municipality-kommun-filter)
 	- [Parish (socken) filter](#parish-socken-filter)
@@ -29,7 +29,7 @@ Content-Type: application/json
 
 {
   "datasetIds": [
-    "Artportalen - Fladdermöss"
+    "Artportalen - FladdermÃ¶ss"
   ]
 }
 ```
@@ -43,8 +43,8 @@ Content-Type: application/json
   "totalCount": 1,
   "records": [
     {
-      "identifier": "Artportalen - Fladdermöss",
-      "title": "Fladdermöss",
+      "identifier": "Artportalen - FladdermÃ¶ss",
+      "title": "FladdermÃ¶ss",
       "...": "..."
     }
   ]
@@ -58,7 +58,7 @@ Content-Type: application/json
 
 {
   "datasetIds": [
-    "Artportalen - Fladdermöss"
+    "Artportalen - FladdermÃ¶ss"
   ]
 }
 ```
@@ -74,7 +74,7 @@ Content-Type: application/json
     {
       "eventID": "urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10003985154952080918",
       "dataset": {
-        "identifier": "Artportalen - Fladdermöss"
+        "identifier": "Artportalen - FladdermÃ¶ss"
       },
       "...": "..."
     }
@@ -281,7 +281,7 @@ Content-Type: application/json
   "records": [
     {
       "occurrenceID": "urn:lsid:artportalen.se:sighting:98571182",
-      "eventEndDate": "2021-06-16T02:10:00Z",
+      "eventEndDate":Â "2021-06-16T02:10:00Z",
       "...": "..."
     }
   ]
@@ -326,7 +326,7 @@ Content-Type: application/json
 
 ## Geographics filter
 
-### County (län) filter
+### County (lÃ¤n) filter
 Filter by [county enum](areas.md#county-lan).
 
 **Request sample - Search events by county filter**
@@ -336,7 +336,7 @@ Content-Type: application/json
 
 {
   "area": {
-    "county": "JönköpingsLän"
+    "county": "JÃ¶nkÃ¶pingsLÃ¤n"
   }
 }
 ```
@@ -352,8 +352,8 @@ Content-Type: application/json
     {
       "eventID": "urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10000032873271697869",
       "surveyLocation": {
-        "county": "JönköpingsLän",
-        "province": "Småland",
+        "county": "JÃ¶nkÃ¶pingsLÃ¤n",
+        "province": "SmÃ¥land",
         "municipality": "Gislaved",
         "parish": "Burseryd"
       },
@@ -373,7 +373,7 @@ Content-Type: application/json
 
 {
   "area": {
-    "county": "Östergötland"
+    "county": "Ã–stergÃ¶tland"
   }
 }
 ```
@@ -389,10 +389,10 @@ Content-Type: application/json
     {
       "eventID": "urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10000027069520469625",
       "surveyLocation": {
-        "county": "ÖstergötlandsLän",
-        "province": "Östergötland",
-        "municipality": "Linköping",
-        "parish": "Linköping"
+        "county": "Ã–stergÃ¶tlandsLÃ¤n",
+        "province": "Ã–stergÃ¶tland",
+        "municipality": "LinkÃ¶ping",
+        "parish": "LinkÃ¶ping"
       },
       "...": "..."
     }
@@ -410,7 +410,7 @@ Content-Type: application/json
 
 {
   "area": {
-    "county": "Tranås"
+    "county": "TranÃ¥s"
   }
 }
 ```
@@ -426,10 +426,10 @@ Content-Type: application/json
     {
       "eventID": "urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10026357048434813440",
       "surveyLocation": {
-        "county": "JönköpingsLän",
-        "province": "Småland",
-        "municipality": "Tranås",
-        "parish": "Linderås"
+        "county": "JÃ¶nkÃ¶pingsLÃ¤n",
+        "province": "SmÃ¥land",
+        "municipality": "TranÃ¥s",
+        "parish": "LinderÃ¥s"
       },
       "...": "..."
     }
@@ -463,9 +463,9 @@ Content-Type: application/json
     {
       "eventID": "urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10000373257902201658",
       "surveyLocation": {
-        "county": "SödermanlandsLän",
-        "province": "Södermanland",
-        "municipality": "Nyköping",
+        "county": "SÃ¶dermanlandsLÃ¤n",
+        "province": "SÃ¶dermanland",
+        "municipality": "NykÃ¶ping",
         "parish": "Tystberga"
       },
       "...": "..."
@@ -520,8 +520,8 @@ Content-Type: application/json
           ],
           "type": "point"
         },
-        "county": "JönköpingsLän",
-        "province": "Småland",
+        "county": "JÃ¶nkÃ¶pingsLÃ¤n",
+        "province": "SmÃ¥land",
         "municipality": "Vetlanda",
         "parish": "Karlstorp"
       },
@@ -571,10 +571,10 @@ Content-Type: application/json
           ],
           "type": "point"
         },
-        "county": "JönköpingsLän",
-        "province": "Småland",
-        "municipality": "Tranås",
-        "parish": "Tranås_F",        
+        "county": "JÃ¶nkÃ¶pingsLÃ¤n",
+        "province": "SmÃ¥land",
+        "municipality": "TranÃ¥s",
+        "parish": "TranÃ¥s_F",        
       },
       "...": "..."
     }
