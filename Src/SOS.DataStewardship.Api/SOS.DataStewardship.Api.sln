@@ -26,7 +26,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{989F302C-7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataStewardship", "DataStewardship", "{428724B9-0CDB-440A-AE76-A2FE8B44805C}"
 	ProjectSection(SolutionItems) = preProject
+		..\..\Docs\DataStewardship\areas.md = ..\..\Docs\DataStewardship\areas.md
 		..\..\Docs\DataStewardShip\CHANGELOG.md = ..\..\Docs\DataStewardShip\CHANGELOG.md
+		..\..\Docs\DataStewardship\datasets.md = ..\..\Docs\DataStewardship\datasets.md
+		..\..\Docs\DataStewardship\README.md = ..\..\Docs\DataStewardship\README.md
+		..\..\Docs\DataStewardship\search-filter.md = ..\..\Docs\DataStewardship\search-filter.md
 	EndProjectSection
 EndProject
 Global
