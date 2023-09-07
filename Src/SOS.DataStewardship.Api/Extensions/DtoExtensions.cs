@@ -122,8 +122,8 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.EventID = observationEvent.EventId;
             ev.ParentEventID = observationEvent.ParentEventId;
             ev.EventRemarks = observationEvent.EventRemarks;
-            ev.AssociatedMedia = observationEvent.Media.ToAssociatedMedias();
-            ev.Dataset = observationEvent?.DataStewardship.ToDatasetInfo();
+            ev.AssociatedMedia = observationEvent.Media?.ToAssociatedMedias();
+            ev.Dataset = observationEvent?.DataStewardship?.ToDatasetInfo();
             ev.EventStartDateTime = observationEvent.StartDate.Value.ToLocalTime();
             ev.EventEndDateTime = observationEvent.EndDate.Value.ToLocalTime();
             ev.EventStartDate = startDate;
@@ -440,8 +440,7 @@ namespace SOS.DataStewardship.Api.Extensions
             }
 
             occurrence.EventID = observation.Event.EventId;
-            occurrence.Dataset ??= new DatasetInfo();
-            occurrence.Dataset.Identifier = observation?.DataStewardship?.DatasetIdentifier;
+            occurrence.Dataset = observation?.DataStewardship?.ToDatasetInfo();
             occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
             occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
             occurrence.ObservationPoint = observation?.Location?.Point.ConvertCoordinateSystem(responseCoordinateSystem);

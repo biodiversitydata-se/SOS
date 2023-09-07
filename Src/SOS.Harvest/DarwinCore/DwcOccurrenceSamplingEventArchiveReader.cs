@@ -926,13 +926,15 @@ namespace SOS.Harvest.DarwinCore
             {
                 if (string.IsNullOrEmpty(occurrenceRecord.EventID)) continue;
 
-                if (observationDatasetByEventId != null && observationDatasetByEventId.TryGetValue(occurrenceRecord.EventID, out var observationDataset))
+                if (observationDatasetByEventId != null && observationDatasetByEventId.TryGetValue(occurrenceRecord.EventID, out var dataset))
                 {
-                    occurrenceRecord.DataStewardshipDatasetId = observationDataset.Identifier;
+                    occurrenceRecord.DataStewardshipDatasetId = dataset.Identifier;
+                    occurrenceRecord.DataStewardshipDatasetTitle = dataset.Title;
                 }
                 else if (defaultDataset != null)
                 {
                     occurrenceRecord.DataStewardshipDatasetId = defaultDataset.Identifier;
+                    occurrenceRecord.DataStewardshipDatasetTitle = defaultDataset.Title;
                 }
             }
         }
