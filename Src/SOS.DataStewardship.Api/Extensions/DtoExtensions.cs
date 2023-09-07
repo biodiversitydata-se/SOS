@@ -348,8 +348,7 @@ namespace SOS.DataStewardship.Api.Extensions
             County? county = location?.County?.FeatureId?.GetCounty();
             Municipality? municipality = location?.Municipality?.FeatureId?.GetMunicipality();
             Parish? parish = location?.Parish?.FeatureId?.GetParish();
-            Province? province = location?.Province?.FeatureId?.GetProvince();
-
+            Province? province = location?.Province?.FeatureId?.GetProvince();            
             return new Contracts.Models.Location()
             {
                 County = county.Value,
@@ -359,9 +358,22 @@ namespace SOS.DataStewardship.Api.Extensions
                 Locality = location?.Locality,
                 LocationID = location?.LocationId,
                 LocationRemarks = location.LocationRemarks,
-                //LocationType = // ? todo - add location type to models.
+                LocationType = GetLocationType(location),
                 Emplacement = location?.Point.ConvertCoordinateSystem(responseCoordinateSystem), // todo - decide if to use Point or PointWithBuffer                
             };
+        }
+
+        private static Contracts.Enums.LocationType GetLocationType(Lib.Models.Processed.Observation.Location location)
+        {
+            switch(location.Type)
+            {
+                case Lib.Enums.LocationType.Point:
+                    return Contracts.Enums.LocationType.Punkt;
+                case Lib.Enums.LocationType.Polygon:
+                    return Contracts.Enums.LocationType.Polygon;
+                default:
+                    return Contracts.Enums.LocationType.Punkt;
+            }
         }
 
         public static IGeoShape ConvertCoordinateSystem(this PointGeoShape point, CoordinateSystem responseCoordinateSystem)
