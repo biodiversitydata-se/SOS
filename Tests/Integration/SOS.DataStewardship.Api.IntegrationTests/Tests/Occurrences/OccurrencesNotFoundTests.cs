@@ -19,7 +19,7 @@ public class OccurrencesNotFoundTests : TestBase
         await ProcessFixture.AddObservationsToElasticsearchAsync(occurrences);
 
         // Act
-        var response = await ApiClient.GetAsync($"datastewardship/occurrences/{occurrenceId}");
+        var response = await ApiClient.GetAsync($"occurrences/{occurrenceId}");
         var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions);
 
         // Assert
@@ -40,7 +40,7 @@ public class OccurrencesNotFoundTests : TestBase
 
         // Act        
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"datastewardship/occurrences", searchFilter, jsonSerializerOptions);
+            $"occurrences", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(0);

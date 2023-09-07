@@ -3,19 +3,19 @@ using SOS.DataStewardship.Api.Extensions;
 using SOS.DataStewardship.Api.Application.Managers.Interfaces;
 using SOS.DataStewardship.Api.Contracts.Enums;
 
-namespace SOS.DataStewardship.Api.Endpoints.DataStewardship;
+namespace SOS.DataStewardship.Api.Endpoints.Occurrences;
 
 public class GetOccurrenceByIdEndpoint : IEndpointDefinition
 {
     public void DefineEndpoint(WebApplication app)
     {
-        app.MapGet("/datastewardship/occurrences/{id}", GetOccurrenceByIdAsync)
+        app.MapGet("/occurrences/{id}", GetOccurrenceByIdAsync)
             .Produces<Contracts.Models.Occurrence>(StatusCodes.Status200OK, "application/json")
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
             .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
     }
-    
+
     [SwaggerOperation(
         Description = "Get occurrence by Id. Example: urn:lsid:artportalen.se:sighting:98571689",
         OperationId = "GetOccurrenceById",

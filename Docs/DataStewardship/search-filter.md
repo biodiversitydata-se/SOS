@@ -24,7 +24,7 @@ Filter by a list of dataset identifiers.
 
 **Request sample - Search datasets by datasetIds filter**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/datasets
+POST https://api.artdatabanken.se/data-stewardship-api/v1/datasets
 Content-Type: application/json
 
 {
@@ -53,7 +53,7 @@ Content-Type: application/json
 
 **Request sample - Search events by datasetIds filter**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/events?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/events?take=1
 Content-Type: application/json
 
 {
@@ -87,7 +87,7 @@ Filter by a list of eventIds.
 
 **Request sample - Search events by eventIds filter**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/events?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/events?take=1
 Content-Type: application/json
 
 {
@@ -131,7 +131,7 @@ This filter will return occurrences/events/datasets where `observation.event.sta
 
 **Request sample - Search occurrences by date filter type OverlappingStartDateAndEndDate**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/occurrences?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/occurrences?take=1
 Content-Type: application/json
 
 {
@@ -175,7 +175,7 @@ This filter will return occurrences/events/datasets where `observation.event.sta
 
 **Request sample - Search occurrences by date filter type BetweenStartDateAndEndDate**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/occurrences?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/occurrences?take=1
 Content-Type: application/json
 
 {
@@ -217,7 +217,7 @@ This filter will return occurrences/events/datasets where `observation.event.sta
 
 **Request sample - Search occurrences by date filter type OnlyStartDate**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/occurrences?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/occurrences?take=1
 Content-Type: application/json
 
 {
@@ -259,7 +259,7 @@ This filter will return occurrences/events/datasets where `observation.event.end
 
 **Request sample - Search occurrences by date filter type OnlyEndDate**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/occurrences?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/occurrences?take=1
 Content-Type: application/json
 
 {
@@ -293,7 +293,7 @@ This filter will return occurrences/events/datasets where `observation.taxon.tax
 
 **Request sample - Search occurrences by taxonId filter**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/occurrences?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/occurrences?take=1
 Content-Type: application/json
 
 {
@@ -331,7 +331,7 @@ Filter by [county enum](areas.md#county-lan).
 
 **Request sample - Search events by county filter**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/events?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/events?take=1
 Content-Type: application/json
 
 {
@@ -368,7 +368,7 @@ Filter by [province enum](areas.md#province-landskap).
 
 **Request sample - Search events by province filter**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/events?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/events?take=1
 Content-Type: application/json
 
 {
@@ -405,7 +405,7 @@ Filter by [municipality enum](areas.md#municipality-kommun).
 
 **Request sample - Search events by municipality filter**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/events?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/events?take=1
 Content-Type: application/json
 
 {
@@ -442,7 +442,7 @@ Filter by [parish enum](areas.md#parish-socken).
 
 **Request sample - Search events by parish filter**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/events?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/events?take=1
 Content-Type: application/json
 
 {
@@ -479,7 +479,7 @@ This filter will return observations within the specified polygon. The coordinat
 
 **Request sample - Search events by polygon geometry filter**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/events?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/events?take=1
 Content-Type: application/json
 
 {
@@ -537,7 +537,7 @@ This filter will return observations within the specified circle with a radius o
 
 **Request sample - Search events by circle filter**
 ```http
-POST https://api.artdatabanken.se/data-stewardship-api/v1/datastewardship/events?take=1
+POST https://api.artdatabanken.se/data-stewardship-api/v1/events?take=1
 Content-Type: application/json
 
 {

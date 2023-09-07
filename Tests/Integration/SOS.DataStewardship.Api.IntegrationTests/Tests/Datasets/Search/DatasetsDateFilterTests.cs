@@ -38,7 +38,7 @@ public class DatasetsDateFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datastewardship/datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(6);
@@ -68,7 +68,7 @@ public class DatasetsDateFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datastewardship/datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(3);
@@ -95,7 +95,7 @@ public class DatasetsDateFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datastewardship/datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(2);
@@ -122,7 +122,7 @@ public class DatasetsDateFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datastewardship/datasets?skip=0&take=1", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=1", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(2);        

@@ -65,7 +65,7 @@ public class CreateDatasetsMarkdownTool
         public async Task<PagedResult<Contracts.Models.Dataset>> GetDatasets()
         {
             DatasetFilter datasetFilter = new DatasetFilter();
-            var response = await _client.PostAsync($"{_apiUrl}datastewardship/datasets?take=100", JsonContent.Create(datasetFilter));
+            var response = await _client.PostAsync($"{_apiUrl}datasets?take=100", JsonContent.Create(datasetFilter));
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<PagedResult<Contracts.Models.Dataset>>(JsonSerializerOptions);
@@ -84,7 +84,7 @@ public class CreateDatasetsMarkdownTool
                 DatasetIds = new List<string> { datasetIdentifier }
             };
 
-            var response = await _client.PostAsync($"{_apiUrl}datastewardship/events?take={take}", JsonContent.Create(filter));
+            var response = await _client.PostAsync($"{_apiUrl}events?take={take}", JsonContent.Create(filter));
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<PagedResult<Contracts.Models.Event>>(JsonSerializerOptions);
@@ -103,7 +103,7 @@ public class CreateDatasetsMarkdownTool
                 DatasetIds = new List<string> { datasetIdentifier }
             };
 
-            var response = await _client.PostAsync($"{_apiUrl}datastewardship/occurrences?take={take}", JsonContent.Create(filter));
+            var response = await _client.PostAsync($"{_apiUrl}occurrences?take={take}", JsonContent.Create(filter));
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<PagedResult<Contracts.Models.Occurrence>>(JsonSerializerOptions);

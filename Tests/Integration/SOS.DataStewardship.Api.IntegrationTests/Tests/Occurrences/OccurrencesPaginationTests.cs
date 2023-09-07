@@ -24,13 +24,13 @@ public class OccurrencesPaginationTests : TestBase
         for (int skip = 0; skip < observations.Count(); skip += take)
         {
             var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-                $"datastewardship/occurrences?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
+                $"occurrences?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
             occurrenceModels.AddRange(pageResult.Records);
         }
 
         // Act - Get all in one request
         var pageResultAll = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-                $"datastewardship/occurrences?skip=0&take={observations.Count()}", searchFilter, jsonSerializerOptions);
+                $"occurrences?skip=0&take={observations.Count()}", searchFilter, jsonSerializerOptions);
         allOccurrenceModels.AddRange(pageResultAll.Records);
 
         // Assert
@@ -54,7 +54,7 @@ public class OccurrencesPaginationTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"datastewardship/occurrences?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
+            $"occurrences?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(observations.Count());
@@ -76,7 +76,7 @@ public class OccurrencesPaginationTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, OccurrenceFilter>(
-            $"datastewardship/occurrences?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
+            $"occurrences?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(observations.Count());
@@ -103,16 +103,16 @@ public class OccurrencesPaginationTests : TestBase
 
         // Act
         var responseSkipNegative = await ApiClient.PostAsJsonAsync(
-            $"datastewardship/occurrences?skip={skipNegative}&take={take}", searchFilter, jsonSerializerOptions);
+            $"occurrences?skip={skipNegative}&take={take}", searchFilter, jsonSerializerOptions);
 
         var responseSkipTooLarge = await ApiClient.PostAsJsonAsync(
-            $"datastewardship/occurrences?skip={skipTooLarge}&take={take}", searchFilter, jsonSerializerOptions);
+            $"occurrences?skip={skipTooLarge}&take={take}", searchFilter, jsonSerializerOptions);
 
         var responseTakeNegative = await ApiClient.PostAsJsonAsync(
-            $"datastewardship/occurrences?skip={skip}&take={takeNegative}", searchFilter, jsonSerializerOptions);
+            $"occurrences?skip={skip}&take={takeNegative}", searchFilter, jsonSerializerOptions);
 
         var responseTakeTooLarge = await ApiClient.PostAsJsonAsync(
-            $"datastewardship/occurrences?skip={skip}&take={takeTooLarge}", searchFilter, jsonSerializerOptions);
+            $"occurrences?skip={skip}&take={takeTooLarge}", searchFilter, jsonSerializerOptions);
 
         // Assert
         responseSkipNegative.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);

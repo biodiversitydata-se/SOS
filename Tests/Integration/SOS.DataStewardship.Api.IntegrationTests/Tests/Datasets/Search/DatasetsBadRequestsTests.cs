@@ -27,7 +27,7 @@ public class DatasetsBadRequestsTests : TestBase
         
         // Act
         var response = await ApiClient.PostAsJsonAsync<DatasetFilter>(
-            $"datastewardship/datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
         var errors = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>(jsonSerializerOptions);        
 
         // Assert

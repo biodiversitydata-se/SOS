@@ -37,7 +37,7 @@ public class EventsDateFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"datastewardship/events?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"events?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(6);
@@ -67,7 +67,7 @@ public class EventsDateFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"datastewardship/events?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"events?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(3);
@@ -94,7 +94,7 @@ public class EventsDateFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"datastewardship/events?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"events?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(2);
@@ -121,7 +121,7 @@ public class EventsDateFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"datastewardship/events?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"events?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(2);

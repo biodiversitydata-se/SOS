@@ -12,7 +12,7 @@ public class GetDatasetByIdEndpoint : IEndpointDefinition
 {
     public void DefineEndpoint(WebApplication app)
     {
-        app.MapGet("/datastewardship/datasets/{id}", GetDatasetByIdAsync)
+        app.MapGet("/datasets/{id}", GetDatasetByIdAsync)
             .Produces<Dataset>(StatusCodes.Status200OK, "application/json")
             .Produces<Dataset>(StatusCodes.Status200OK, "text/csv")
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
