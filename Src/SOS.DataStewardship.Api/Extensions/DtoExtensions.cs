@@ -28,7 +28,7 @@ namespace SOS.DataStewardship.Api.Extensions
                 Creator = dataset?.Creator?.Select(m => m.ToOrganisation())?.ToList(),
                 DataStewardship = dataset.DataStewardship,
                 Description = dataset.Description,
-                EndDate = dataset.EndDate,
+                EndDate = dataset.EndDate?.ToLocalTime(),
                 EventIds = dataset.EventIds,
                 Identifier = dataset.Identifier,
                 Language = dataset.Language,
@@ -40,7 +40,7 @@ namespace SOS.DataStewardship.Api.Extensions
                 Publisher = dataset.Publisher.ToOrganisation(),
                 Purpose = dataset.Purpose.ToDatasetPurposeEnum(),
                 Spatial = dataset.Spatial,
-                StartDate = dataset.StartDate,
+                StartDate = dataset.StartDate?.ToLocalTime(),
                 Title = dataset.Title
             };
         }
@@ -124,8 +124,8 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.EventRemarks = observationEvent.EventRemarks;
             ev.AssociatedMedia = observationEvent.Media.ToAssociatedMedias();
             ev.Dataset = observationEvent?.DataStewardship.ToDatasetInfo();
-            ev.EventStartDateTime = observationEvent.StartDate.Value;
-            ev.EventEndDateTime = observationEvent.EndDate.Value;
+            ev.EventStartDateTime = observationEvent.StartDate.Value.ToLocalTime();
+            ev.EventEndDateTime = observationEvent.EndDate.Value.ToLocalTime();
             ev.EventStartDate = startDate;
             ev.EventEndDate = endDate;
             ev.EventStartTime = startTime;
@@ -445,9 +445,9 @@ namespace SOS.DataStewardship.Api.Extensions
             occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
             occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
             occurrence.ObservationPoint = observation?.Location?.Point.ConvertCoordinateSystem(responseCoordinateSystem);
-            occurrence.EventStartDate = observation.Event.StartDate;
-            occurrence.EventEndDate = observation.Event.EndDate;
-            occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;            
+            occurrence.EventStartDate = observation.Event.StartDate?.ToLocalTime();
+            occurrence.EventEndDate = observation.Event.EndDate?.ToLocalTime();
+            occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate?.ToLocalTime() : null;            
             occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
             occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
             occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? OccurrenceStatus.Observerad : OccurrenceStatus.InteObserverad;
