@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -49,6 +47,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public string Class { get; set; }
 
+        /// <summary>
+        /// Name used for display
+        /// </summary>
+        public string DisplayName { get; set; }
+        
         /// <summary>
         ///     The full scientific name of the family in which
         ///     the taxon is classified.
