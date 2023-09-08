@@ -20,7 +20,7 @@ public class EventsNotFoundTests : TestBase
         await ProcessFixture.AddEventsToElasticsearchAsync(events);
 
         // Act
-        var response = await ApiClient.GetAsync($"datastewardship/events/{eventId}");
+        var response = await ApiClient.GetAsync($"events/{eventId}");
         var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions);
         
         // Assert
@@ -41,7 +41,7 @@ public class EventsNotFoundTests : TestBase
 
         // Act        
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"datastewardship/events", searchFilter, jsonSerializerOptions);
+            $"events", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(0);

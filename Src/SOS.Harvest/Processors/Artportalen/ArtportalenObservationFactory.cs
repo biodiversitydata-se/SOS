@@ -230,6 +230,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 mappings.Add(new DatasetMapping()
                 {
                     DatasetIdentifier = dataset.Identifier,
+                    DatasetTitle = dataset.Title,
                     ProjectIdsSet = dataset.Projects.Where(p => p.ApProjectId.HasValue).Select(m => m.ApProjectId!.Value).ToHashSet(),
                 });
             }
@@ -545,12 +546,13 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 if (ProcessConfiguration.ProcessDataset)
                 {
-                    string? dataStewardshipDatasetId = GetDataStewardshipDatasetId(obs);
-                    if (dataStewardshipDatasetId != null)
+                    var dataStewardshipDatasetMapping = GetDataStewardshipDatasetMapping(obs);
+                    if (dataStewardshipDatasetMapping != null)
                     {
                         obs.DataStewardship = new Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo
                         {
-                            DatasetIdentifier = dataStewardshipDatasetId
+                            DatasetIdentifier = dataStewardshipDatasetMapping.DatasetIdentifier,
+                            DatasetTitle = dataStewardshipDatasetMapping.DatasetTitle,
                         };
                     }
                 }
@@ -960,7 +962,7 @@ namespace SOS.Harvest.Processors.Artportalen
         public static string GetOccurenceId(int sightingId) => $"urn:lsid:artportalen.se:sighting:{sightingId}";
 
 
-        protected string? GetDataStewardshipDatasetId(Observation observation)
+        protected DatasetMapping? GetDataStewardshipDatasetMapping(Observation observation)
         {            
             if (observation.Projects == null || observation.Projects.Count() == 0) return null;
 
@@ -972,13 +974,14 @@ namespace SOS.Harvest.Processors.Artportalen
                     break;
                 }
             }
-            if (datasetMapping == null) return null;
-            return datasetMapping.DatasetIdentifier;            
+            
+            return datasetMapping;            
         }        
 
         public class DatasetMapping
         {
             public string? DatasetIdentifier { get; set; }
+            public string? DatasetTitle { get; set; }
             public HashSet<int>? ProjectIdsSet { get; set; }
         }
     }

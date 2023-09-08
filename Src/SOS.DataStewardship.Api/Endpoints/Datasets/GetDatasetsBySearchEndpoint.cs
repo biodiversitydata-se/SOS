@@ -11,7 +11,7 @@ public class GetDatasetsBySearchEndpoint : IEndpointDefinition
 {
     public void DefineEndpoint(WebApplication app)
     {
-        app.MapPost("/datastewardship/datasets", GetDatasetsBySearchAsync)            
+        app.MapPost("/datasets", GetDatasetsBySearchAsync)            
             .Produces<Contracts.Models.PagedResult<Dataset>>(StatusCodes.Status200OK)
             .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)            
             .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)

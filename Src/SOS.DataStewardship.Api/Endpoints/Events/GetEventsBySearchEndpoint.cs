@@ -6,37 +6,37 @@ using SOS.DataStewardship.Api.Application.Managers.Interfaces;
 using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.DataStewardship.Api.Contracts.Models;
 
-namespace SOS.DataStewardship.Api.Endpoints.DataStewardship;
+namespace SOS.DataStewardship.Api.Endpoints.Events;
 
-public class GetOccurrencesBySearchEndpoint : IEndpointDefinition
+public class GetEventsBySearchEndpoint : IEndpointDefinition
 {
     public void DefineEndpoint(WebApplication app)
     {
-        app.MapPost("/datastewardship/occurrences", GetOccurrencesBySearchAsync)
-            .Produces<Contracts.Models.PagedResult<Contracts.Models.Occurrence>>(StatusCodes.Status200OK)
+        app.MapPost("/events", GetEventsBySearchAsync)
+            .Produces<Contracts.Models.PagedResult<Contracts.Models.Event>>(StatusCodes.Status200OK)
             .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
-            .AddEndpointFilter<ValidatorFilter<OccurrenceFilter>>()
+            .AddEndpointFilter<ValidatorFilter<EventsFilter>>()
             .AddEndpointFilter(ValidatePagingParametersAsync);
     }
-    
+
     [SwaggerOperation(
-        Description = "Get occurrences by search.",
-        OperationId = "GetOccurrencesBySearch",
+        Description = "Get events by search.",
+        OperationId = "GetEventsBySearch",
         Tags = new[] { "DataStewardship" })]
-    internal async Task<IResult> GetOccurrencesBySearchAsync(IDataStewardshipManager dataStewardshipManager,
-        [FromBody, SwaggerRequestBody("The search filter")] OccurrenceFilter filter,
+    private async Task<IResult> GetEventsBySearchAsync(IDataStewardshipManager dataStewardshipManager,
+        [FromBody, SwaggerRequestBody("The search filter")] EventsFilter filter,
         [FromQuery, SwaggerParameter("Pagination start index.")] int? skip,
         [FromQuery, SwaggerParameter("Number of items to return. 1000 items is the max to return in one call.")] int? take,
         [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json,
         [FromQuery, SwaggerParameter("The response coordinate system")] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
-        var occurrences = await dataStewardshipManager.GetOccurrencesBySearchAsync(filter,
-            skip.GetValueOrDefault(0),
-            take.GetValueOrDefault(20),
-            responseCoordinateSystem);
-        
-        return occurrences.Equals(ExportMode.Csv) ? Results.File(occurrences.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") : Results.Ok(occurrences);
+        var eventModels = await dataStewardshipManager
+            .GetEventsBySearchAsync(filter, skip.GetValueOrDefault(0), take.GetValueOrDefault(20), responseCoordinateSystem);
+
+        return exportMode.Equals(ExportMode.Csv) ?
+            Results.File(eventModels.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") :
+            Results.Ok(eventModels);
     }
 
     private async ValueTask<object> ValidatePagingParametersAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)

@@ -31,7 +31,7 @@ public class DatasetsGeographicsFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datastewardship/datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(1);
@@ -56,7 +56,7 @@ public class DatasetsGeographicsFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datastewardship/datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(1);
@@ -81,7 +81,7 @@ public class DatasetsGeographicsFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datastewardship/datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(1);
@@ -106,7 +106,7 @@ public class DatasetsGeographicsFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datastewardship/datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(1);
@@ -131,7 +131,7 @@ public class DatasetsGeographicsFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datastewardship/datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(1);
@@ -156,7 +156,7 @@ public class DatasetsGeographicsFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datastewardship/datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=0", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(1);

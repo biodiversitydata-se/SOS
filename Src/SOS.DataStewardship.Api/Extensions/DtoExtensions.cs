@@ -28,7 +28,7 @@ namespace SOS.DataStewardship.Api.Extensions
                 Creator = dataset?.Creator?.Select(m => m.ToOrganisation())?.ToList(),
                 DataStewardship = dataset.DataStewardship,
                 Description = dataset.Description,
-                EndDate = dataset.EndDate,
+                EndDate = dataset.EndDate?.ToLocalTime(),
                 EventIds = dataset.EventIds,
                 Identifier = dataset.Identifier,
                 Language = dataset.Language,
@@ -40,7 +40,7 @@ namespace SOS.DataStewardship.Api.Extensions
                 Publisher = dataset.Publisher.ToOrganisation(),
                 Purpose = dataset.Purpose.ToDatasetPurposeEnum(),
                 Spatial = dataset.Spatial,
-                StartDate = dataset.StartDate,
+                StartDate = dataset.StartDate?.ToLocalTime(),
                 Title = dataset.Title
             };
         }
@@ -122,10 +122,10 @@ namespace SOS.DataStewardship.Api.Extensions
             ev.EventID = observationEvent.EventId;
             ev.ParentEventID = observationEvent.ParentEventId;
             ev.EventRemarks = observationEvent.EventRemarks;
-            ev.AssociatedMedia = observationEvent.Media.ToAssociatedMedias();
-            ev.Dataset = observationEvent?.DataStewardship.ToDatasetInfo();
-            ev.EventStartDateTime = observationEvent.StartDate.Value;
-            ev.EventEndDateTime = observationEvent.EndDate.Value;
+            ev.AssociatedMedia = observationEvent.Media?.ToAssociatedMedias();
+            ev.Dataset = observationEvent?.DataStewardship?.ToDatasetInfo();
+            ev.EventStartDateTime = observationEvent.StartDate.Value.ToLocalTime();
+            ev.EventEndDateTime = observationEvent.EndDate.Value.ToLocalTime();
             ev.EventStartDate = startDate;
             ev.EventEndDate = endDate;
             ev.EventStartTime = startTime;
@@ -348,8 +348,7 @@ namespace SOS.DataStewardship.Api.Extensions
             County? county = location?.County?.FeatureId?.GetCounty();
             Municipality? municipality = location?.Municipality?.FeatureId?.GetMunicipality();
             Parish? parish = location?.Parish?.FeatureId?.GetParish();
-            Province? province = location?.Province?.FeatureId?.GetProvince();
-
+            Province? province = location?.Province?.FeatureId?.GetProvince();            
             return new Contracts.Models.Location()
             {
                 County = county.Value,
@@ -359,9 +358,23 @@ namespace SOS.DataStewardship.Api.Extensions
                 Locality = location?.Locality,
                 LocationID = location?.LocationId,
                 LocationRemarks = location.LocationRemarks,
-                //LocationType = // ? todo - add location type to models.
+                LocationType = GetLocationType(location),
+                CoordinateUncertaintyInMeters = location?.CoordinateUncertaintyInMeters,
                 Emplacement = location?.Point.ConvertCoordinateSystem(responseCoordinateSystem), // todo - decide if to use Point or PointWithBuffer                
             };
+        }
+
+        private static Contracts.Enums.LocationType GetLocationType(Lib.Models.Processed.Observation.Location location)
+        {
+            switch(location.Type)
+            {
+                case Lib.Enums.LocationType.Point:
+                    return Contracts.Enums.LocationType.Punkt;
+                case Lib.Enums.LocationType.Polygon:
+                    return Contracts.Enums.LocationType.Polygon;
+                default:
+                    return Contracts.Enums.LocationType.Punkt;
+            }
         }
 
         public static IGeoShape ConvertCoordinateSystem(this PointGeoShape point, CoordinateSystem responseCoordinateSystem)
@@ -428,14 +441,13 @@ namespace SOS.DataStewardship.Api.Extensions
             }
 
             occurrence.EventID = observation.Event.EventId;
-            occurrence.Dataset ??= new DatasetInfo();
-            occurrence.Dataset.Identifier = observation?.DataStewardship?.DatasetIdentifier;
+            occurrence.Dataset = observation?.DataStewardship?.ToDatasetInfo();
             occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
             occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
             occurrence.ObservationPoint = observation?.Location?.Point.ConvertCoordinateSystem(responseCoordinateSystem);
-            occurrence.EventStartDate = observation.Event.StartDate;
-            occurrence.EventEndDate = observation.Event.EndDate;
-            occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;            
+            occurrence.EventStartDate = observation.Event.StartDate?.ToLocalTime();
+            occurrence.EventEndDate = observation.Event.EndDate?.ToLocalTime();
+            occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate?.ToLocalTime() : null;            
             occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
             occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
             occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? OccurrenceStatus.Observerad : OccurrenceStatus.InteObserverad;

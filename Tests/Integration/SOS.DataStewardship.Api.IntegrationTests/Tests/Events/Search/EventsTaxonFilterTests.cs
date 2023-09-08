@@ -24,7 +24,7 @@ public class EventsTaxonFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"datastewardship/events?skip=0&take=1", searchFilter, jsonSerializerOptions);
+            $"events?skip=0&take=1", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(1);

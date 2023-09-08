@@ -118,7 +118,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             {
                 obs.DataStewardship = new Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo
                 {
-                    DatasetIdentifier = verbatim.DataStewardshipDatasetId
+                    DatasetIdentifier = verbatim.DataStewardshipDatasetId,
+                    DatasetTitle = verbatim.DataStewardshipDatasetTitle
                 };
             }
 

@@ -20,7 +20,7 @@ public class DatasetsNotFoundTests : TestBase
         await ProcessFixture.AddDatasetsToElasticsearchAsync(datasets);
 
         // Act
-        var response = await ApiClient.GetAsync($"datastewardship/datasets/{datasetId}");
+        var response = await ApiClient.GetAsync($"datasets/{datasetId}");
         var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions);
 
         // Assert
@@ -41,7 +41,7 @@ public class DatasetsNotFoundTests : TestBase
 
         // Act        
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datastewardship/datasets", searchFilter, jsonSerializerOptions);
+            $"datasets", searchFilter, jsonSerializerOptions);
 
         // Assert
         pageResult.TotalCount.Should().Be(0);
