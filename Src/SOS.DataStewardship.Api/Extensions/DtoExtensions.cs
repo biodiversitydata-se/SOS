@@ -359,6 +359,7 @@ namespace SOS.DataStewardship.Api.Extensions
                 LocationID = location?.LocationId,
                 LocationRemarks = location.LocationRemarks,
                 LocationType = GetLocationType(location),
+                CoordinateUncertaintyInMeters = location?.CoordinateUncertaintyInMeters,
                 Emplacement = location?.Point.ConvertCoordinateSystem(responseCoordinateSystem), // todo - decide if to use Point or PointWithBuffer                
             };
         }
