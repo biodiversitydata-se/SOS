@@ -1,5 +1,4 @@
 ﻿using Swashbuckle.AspNetCore.Annotations;
-using SOS.DataStewardship.Api.Application.Managers.Interfaces;
 using SOS.Lib.Models.ApiInfo;
 
 namespace SOS.DataStewardship.Api.Endpoints.ApiInfo;
@@ -15,7 +14,7 @@ public class GetApiInfoEndpoint : IEndpointDefinition
     /// <param name="app"></param>
     public void DefineEndpoint(WebApplication app)
     {
-        app.MapGet("/api_info", GetApiInfoAsync)
+        app.MapGet("/api_info", GetApiInfo)
             .Produces<ApiInformation>(StatusCodes.Status200OK, "application/json");
     }
 
@@ -23,7 +22,7 @@ public class GetApiInfoEndpoint : IEndpointDefinition
         Description = "Get API information",
         OperationId = "GetApiInfo",
         Tags = new[] { "ApiInfo" })]    
-    private async Task<IResult> GetApiInfoAsync(IDataStewardshipManager dataStewardshipManager)
+    private IResult GetApiInfo()
     {
         var buildDate = Assembly.GetExecutingAssembly().GetBuildDate();
         string version = Assembly.GetExecutingAssembly().GetVersionNumber();
