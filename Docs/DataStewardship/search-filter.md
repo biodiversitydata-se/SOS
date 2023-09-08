@@ -281,7 +281,7 @@ Content-Type: application/json
   "records": [
     {
       "occurrenceID": "urn:lsid:artportalen.se:sighting:98571182",
-      "eventEndDate": "2021-06-16T04:10:00+02:00",
+      "eventEndDate": "2021-06-16T04:10:00+02:00",
       "...": "..."
     }
   ]
