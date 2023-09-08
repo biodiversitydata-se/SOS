@@ -118,6 +118,17 @@ Content-Type: application/json
 ### OverlappingStartDateAndEndDate filter type
 This filter will return occurrences/events/datasets where `observation.event.startDate` is less than or equal to `endDate` and `observation.event.endDateDate` is greater than or equal to `startDate`. This is the **default** filter type used when no filter type is specified.
 
+**Example**
+```json
+{        
+  "dateFilter": {
+    "startDate": "2021-02-02",
+    "endDate": "2021-02-04",
+    "dateFilterType": "OverlappingStartDateAndEndDate"    
+  }
+}
+```
+
 | Observation date | Match filter? |
 |-|-|
 | obs.event.startDate=2021-02-02<br>obs.event.endDate=2021-02-03 | Yes |
@@ -164,6 +175,17 @@ Content-Type: application/json
 ### BetweenStartDateAndEndDate filter type
 This filter will return occurrences/events/datasets where `observation.event.startDate` is greater than or equal to `startDate` and `observation.event.endDate` is less than or equal to `endDate`.
 
+**Example**
+```json
+{        
+  "dateFilter": {
+    "startDate": "2021-02-02",
+    "endDate": "2021-02-04",
+    "dateFilterType": "BetweenStartDateAndEndDate"    
+  }
+}
+```
+
 | Observation date | Match filter? |
 |-|-|
 | obs.event.startDate=2021-02-02<br>obs.event.endDate=2021-02-03 | Yes |
@@ -209,6 +231,17 @@ Content-Type: application/json
 
 This filter will return occurrences/events/datasets where `observation.event.startDate`  is between `startDate` and `endDate`.
 
+**Example**
+```json
+{        
+  "dateFilter": {
+    "startDate": "2021-02-02",
+    "endDate": "2021-02-03",
+    "dateFilterType": "OnlyStartDate"    
+  }
+}
+```
+
 | Observation date | Match filter? |
 |-|-|
 | obs.event.startDate=2021-02-02 | Yes |
@@ -250,6 +283,17 @@ Content-Type: application/json
 ### OnlyEndDate filter type
 
 This filter will return occurrences/events/datasets where `observation.event.endDate`  is between `startDate` and `endDate`.
+
+**Example**
+```json
+{        
+  "dateFilter": {
+    "startDate": "2021-02-02",
+    "endDate": "2021-02-03",
+    "dateFilterType": "OnlyEndDate"    
+  }
+}
+```
 
 | Observation date | Match filter? |
 |-|-|
@@ -323,6 +367,49 @@ Content-Type: application/json
   ]
 }
 ```
+
+**Request sample - Search occurrences by taxonId filter (multiple taxonIds)**
+```http
+POST https://api.artdatabanken.se/data-stewardship-api/v1/occurrences?take=2
+Content-Type: application/json
+
+{
+  "taxon": {
+    "ids": [100077, 101656]
+  }
+}
+```
+
+**Response**
+```json
+{
+  "skip": 0,
+  "take": 2,
+  "count": 2,
+  "totalCount": 11496,
+  "records": [
+    {
+      "occurrenceID": "urn:lsid:artportalen.se:sighting:104037867",
+      "taxon": {
+        "taxonID": "100077",
+        "vernacularName": "utter",
+        "scientificName": "Lutra lutra"
+      },
+      "...": "..."
+    },
+    {
+      "occurrenceID": "urn:lsid:artportalen.se:sighting:16829955",
+      "taxon": {
+        "taxonID": "101656",
+        "vernacularName": "trumgräshoppa",
+        "scientificName": "Psophus stridulus"
+      },
+      "...": "..."
+    }
+  ]
+}
+```
+
 
 ## Geographics filter
 
