@@ -280,9 +280,10 @@ namespace SOS.Lib.Extensions
             return propertiesDescriptor
                 .KeyWordLowerCase(kwlc => kwlc.AcceptedNameUsage, false)
                 .KeyWordLowerCase(kwlc => kwlc.AcceptedNameUsageId, false)
+                .KeyWordLowerCase(kwlc => kwlc.Class, false)
+                .Keyword(kw => kw.Name(n => n.DisplayName).Index(false))
                 .KeyWordLowerCase(kwlc => kwlc.NomenclaturalCode, false)
                 .KeyWordLowerCase(kwlc => kwlc.NomenclaturalStatus, false)
-                .KeyWordLowerCase(kwlc => kwlc.Class, false)
                 .KeyWordLowerCase(kwlc => kwlc.Order, false)
                 .KeyWordLowerCase(kwlc => kwlc.TaxonId)
                 .KeyWordLowerCase(kwlc => kwlc.TaxonRemarks, false)
@@ -376,14 +377,18 @@ namespace SOS.Lib.Extensions
         }
 
 
-        public static PropertiesDescriptor<T> KeyWordLowerCase<T, TValue>(this PropertiesDescriptor<T> propertiesDescriptor, Expression<Func<T, TValue>> objectPath, bool? index = true, int? ignoreAbove = null) where T : class
+        public static PropertiesDescriptor<T> KeyWordLowerCase<T, TValue>(this PropertiesDescriptor<T> propertiesDescriptor, Expression<Func<T, TValue>> objectPath, 
+            bool? index = true, 
+            int? ignoreAbove = null,
+            bool? docValues = true) where T : class
         {
             return propertiesDescriptor
                 .Keyword(kw => kw
+                    .DocValues(docValues)
+                    .IgnoreAbove(ignoreAbove)
+                    .Index(index)
                     .Name(objectPath)
                     .Normalizer("lowercase")
-                    .Index(index)
-                    .IgnoreAbove(ignoreAbove)
                 );
         }
     }

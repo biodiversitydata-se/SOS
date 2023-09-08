@@ -128,6 +128,19 @@ namespace SOS.Lib.Extensions
             taxon.TaxonomicStatus = sourceTaxon.TaxonomicStatus;
             taxon.VernacularName = sourceTaxon.VernacularName;
             taxon.VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank;
+
+            var displayName = taxon.ScientificName?.Trim();
+            if (!string.IsNullOrEmpty(taxon.ScientificNameAuthorship))
+            {
+                var authorship = taxon.ScientificNameAuthorship.Trim();
+                displayName += $" {(authorship.StartsWith('(') ? "" : "(")}{taxon.ScientificNameAuthorship.Trim()}{(authorship.EndsWith(')') ? "" : ")")}";
+            }
+            if (!string.IsNullOrEmpty(taxon.VernacularName))
+            {
+                displayName += $", {taxon.VernacularName.Trim()}";
+            }
+            taxon.DisplayName = displayName;
+
             return taxon;
         }
 
