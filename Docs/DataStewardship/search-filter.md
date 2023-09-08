@@ -153,8 +153,8 @@ Content-Type: application/json
   "records": [
     {
       "occurrenceID": "urn:lsid:artportalen.se:sighting:98571202",
-      "eventStartDate": "2021-06-14T19:40:00Z",
-      "eventEndDate": "2021-06-16T02:10:00Z",
+      "eventStartDate": "2021-06-14T21:40:00+02:00",
+      "eventEndDate": "2021-06-16T04:10:00+02:00",
       "...": "..."
     }
   ]
@@ -197,8 +197,8 @@ Content-Type: application/json
   "records": [
     {
       "occurrenceID": "urn:lsid:artportalen.se:sighting:98571732",
-      "eventStartDate": "2021-06-16T20:00:00Z",
-      "eventEndDate": "2021-06-16T22:00:00Z",
+      "eventStartDate": "2021-06-16T22:00:00+02:00",
+      "eventEndDate": "2021-06-17T00:00:00+02:00",
       "...": "..."
     }
   ]
@@ -239,7 +239,7 @@ Content-Type: application/json
   "records": [
     {
       "occurrenceID": "urn:lsid:artportalen.se:sighting:98571198",
-      "eventStartDate": "2021-06-16T20:15:00Z",    
+      "eventStartDate": "2021-06-16T22:15:00+02:00",    
       "...": "..."
     }
   ]
@@ -281,7 +281,7 @@ Content-Type: application/json
   "records": [
     {
       "occurrenceID": "urn:lsid:artportalen.se:sighting:98571182",
-      "eventEndDate": "2021-06-16T02:10:00Z",
+      "eventEndDate": "2021-06-16T04:10:00+02:00",
       "...": "..."
     }
   ]
