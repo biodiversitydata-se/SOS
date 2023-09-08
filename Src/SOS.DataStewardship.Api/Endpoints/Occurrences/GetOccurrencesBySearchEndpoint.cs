@@ -23,7 +23,7 @@ public class GetOccurrencesBySearchEndpoint : IEndpointDefinition
     [SwaggerOperation(
         Description = "Get occurrences by search.",
         OperationId = "GetOccurrencesBySearch",
-        Tags = new[] { "DataStewardship" })]
+        Tags = new[] { "Occurrences" })]
     internal async Task<IResult> GetOccurrencesBySearchAsync(IDataStewardshipManager dataStewardshipManager,
         [FromBody, SwaggerRequestBody("The search filter")] OccurrenceFilter filter,
         [FromQuery, SwaggerParameter("Pagination start index.")] int? skip,

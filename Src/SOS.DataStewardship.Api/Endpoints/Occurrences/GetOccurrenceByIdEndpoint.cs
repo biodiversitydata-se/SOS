@@ -19,7 +19,7 @@ public class GetOccurrenceByIdEndpoint : IEndpointDefinition
     [SwaggerOperation(
         Description = "Get occurrence by Id. Example: urn:lsid:artportalen.se:sighting:98571689",
         OperationId = "GetOccurrenceById",
-        Tags = new[] { "DataStewardship" })]
+        Tags = new[] { "Occurrences" })]
     private async Task<IResult> GetOccurrenceByIdAsync(IDataStewardshipManager dataStewardshipManager,
         [FromRoute, SwaggerParameter("The occurrence id", Required = true)] string id,
         [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json,

@@ -19,7 +19,7 @@ public class GetEventByIdEndpoint : IEndpointDefinition
     [SwaggerOperation(
         Description = "Get event by Id. Example: urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10002293427000658739",
         OperationId = "GetEventById",
-        Tags = new[] { "DataStewardship" })]
+        Tags = new[] { "Events" })]
     [SwaggerResponse(404, "Not Found - The requested event doesn't exist")]
     private async Task<IResult> GetEventByIdAsync(IDataStewardshipManager dataStewardshipManager,
         [FromRoute, SwaggerParameter("The event id", Required = true)] string id,
