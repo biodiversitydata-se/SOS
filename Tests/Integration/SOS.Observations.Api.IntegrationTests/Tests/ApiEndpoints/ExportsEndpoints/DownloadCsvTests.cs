@@ -112,9 +112,9 @@ public class DownloadCsvTests : TestBase
         propertyPathEntries.First().Keys.Should()
             .BeEquivalentTo("Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity");
         swedishEntries.First().Keys.Should()
-            .BeEquivalentTo("Observation GUID", "Datakälla", "Observatör", "Aktivitet");
+            .BeEquivalentTo("Observation GUID", "Dataset namn", "Observatör", "Aktivitet (Artportalen)");
         englishEntries.First().Keys.Should()
-            .BeEquivalentTo("Occurrence Id", "Dataset", "Recorded By", "Activity");
+            .BeEquivalentTo("Occurrence ID", "Dataset name", "Recorded by", "Activity");
     }
 
     [Fact]
