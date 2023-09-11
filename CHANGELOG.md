@@ -1,5 +1,25 @@
 # Changelog
 
+## [2023 - September] - Unreleased
+
+### `Added`
+- Support for export to Sampling Event DwC-A.
+
+### `Changed`
+- Export to CSV, Excel and GeoJSON swedish and english column titles.
+- Export to CSV, Excel and GeoJSON column sort orders.
+- Harvesting of Swedish Malaise Trap Project (SMTP) from GBIF now harvests multiple datasets.
+- Daily DwC-A files is now created after the index is validated to be ok. 
+
+### `Fixed`
+- Wait for Event index creation did not always finish in expected time.
+- Removed decimals in SWEREF99TM coordinate values.
+- Stability improvement for recurring jobs (Incremental harvest, Fil exports).
+
+### Other
+- SOS Observations API integration tests now uses TestContainers and WebApplicationFactory to improve the quality of the integration tests.
+
+
 ## [2023.05.31] - Hotfix
 
 ### `Fixed`
