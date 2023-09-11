@@ -16,7 +16,7 @@
 - Removed decimals in SWEREF99TM coordinate values.
 - Stability improvement for recurring jobs (Incremental harvest, Fil exports).
 
-### Other
+### `Other`
 - SOS Observations API integration tests now uses TestContainers and WebApplicationFactory to improve the quality of the integration tests.
 
 
