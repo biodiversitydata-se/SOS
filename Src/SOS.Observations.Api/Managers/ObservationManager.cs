@@ -408,7 +408,7 @@ namespace SOS.Observations.Api.Managers
                 var match = regex.Match(occurrenceId);
                 if (int.TryParse(match.Value, out var sightingId))
                 {
-                    var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(
+                    var jobId = BackgroundJob.Enqueue<IObservationsHarvestJobIncremental>(
                         job => job.RunHarvestArtportalenObservationsAsync(new List<int> { sightingId },
                         JobCancellationToken.Null));
 

@@ -6,12 +6,11 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Lib.Jobs.Process
 {
-    public interface IProcessObservationsJob
+    public interface IProcessObservationsJobIncremental
     {
         /// <summary>
         /// Run process job
         /// </summary>
-        /// <param name="dataProviderIdOrIdentifiers"></param>
         /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -19,19 +18,8 @@ namespace SOS.Lib.Jobs.Process
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]
         Task<bool> RunAsync(
-            List<string> dataProviderIdOrIdentifiers,
             JobRunModes mode,
             IJobCancellationToken cancellationToken);
-
-        /// <summary>
-        /// Run full process job
-        /// </summary>        
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [JobDisplayName("Process verbatim observations for all active providers")]
-        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        [Queue("high")]
-        Task<bool> RunAsync(IJobCancellationToken cancellationToken);
 
         /// <summary>
         /// Process passed Artportalen verbatims

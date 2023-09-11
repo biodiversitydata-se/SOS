@@ -1,0 +1,96 @@
+﻿using Hangfire;
+using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
+using SOS.Harvest.Processors.FishData.Interfaces;
+using SOS.Harvest.Processors.Kul.Interfaces;
+using SOS.Harvest.Processors.Mvm.Interfaces;
+using SOS.Harvest.Processors.Nors.Interfaces;
+using SOS.Harvest.Processors.ObservationDatabase.Interfaces;
+using SOS.Harvest.Processors.Sers.Interfaces;
+using SOS.Harvest.Processors.Shark.Interfaces;
+using SOS.Harvest.Processors.VirtualHerbarium.Interfaces;
+using SOS.Lib.Configuration.Process;
+using SOS.Lib.Enums;
+using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Jobs.Process;
+using SOS.Lib.Extensions;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Data;
+
+namespace SOS.Harvest.Jobs
+{
+    /// <summary>
+    ///     Artportalen harvest
+    /// </summary>
+    public class ProcessObservationsJobIncremental : ProcessObservationsJobBase, IProcessObservationsJobIncremental
+    {
+
+        /// <summary>
+        /// Constructor
+        /// </summary>      
+        public ProcessObservationsJobIncremental(IProcessedObservationCoreRepository processedObservationRepository,
+            IProcessInfoRepository processInfoRepository,
+            IHarvestInfoRepository harvestInfoRepository,
+            IArtportalenObservationProcessor artportalenObservationProcessor,
+            IFishDataObservationProcessor fishDataObservationProcessor,
+            IKulObservationProcessor kulObservationProcessor,
+            IMvmObservationProcessor mvmObservationProcessor,
+            INorsObservationProcessor norsObservationProcessor,
+            IObservationDatabaseProcessor observationDatabaseProcessor,
+            ISersObservationProcessor sersObservationProcessor,
+            ISharkObservationProcessor sharkObservationProcessor,
+            IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
+            IDwcaObservationProcessor dwcaObservationProcessor,
+            ICache<int, Taxon> taxonCache,
+            IDataProviderCache dataProviderCache,
+            IProcessTimeManager processTimeManager,
+            IValidationManager validationManager,
+            IProcessTaxaJob processTaxaJob,
+            IAreaHelper areaHelper,
+            ProcessConfiguration processConfiguration,
+            ILogger<ProcessObservationsJobIncremental> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, artportalenObservationProcessor, fishDataObservationProcessor,
+            kulObservationProcessor, mvmObservationProcessor, norsObservationProcessor, observationDatabaseProcessor, sersObservationProcessor, sharkObservationProcessor, virtualHerbariumObservationProcessor,
+            dwcaObservationProcessor, taxonCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
+            logger)
+        {
+            
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> RunAsync(
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", mode.GetLoggerMode()) });
+            
+            var allDataProviders = await _dataProviderCache.GetAllAsync();
+            var dataProvidersToProcess = allDataProviders.Where(dataProvider =>
+                        dataProvider.IsActive &&
+                        (mode == JobRunModes.Full || dataProvider.SupportIncrementalHarvest))
+                    .ToList(); 
+
+            return await RunAsync(
+                dataProvidersToProcess,
+                mode,
+                cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> ProcessArtportalenObservationsAsync(IEnumerable<ArtportalenObservationVerbatim> verbatims)
+        {
+            _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", JobRunModes.IncrementalActiveInstance.GetLoggerMode()) });
+            var processor = _processorByType[DataProviderType.ArtportalenObservations] as IArtportalenObservationProcessor;
+            var provider = await _dataProviderCache.GetAsync(1);
+            var taxa = await GetTaxaAsync(JobRunModes.IncrementalActiveInstance);
+            _processedObservationRepository.LiveMode = true;
+            return await processor!.ProcessObservationsAsync(provider, taxa, verbatims);
+        }
+    }
+}

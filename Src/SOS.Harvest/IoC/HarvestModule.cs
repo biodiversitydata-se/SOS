@@ -447,9 +447,11 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<DataValidationReportJob>().As<IDataValidationReportJob>().InstancePerLifetimeScope();
             builder.RegisterType<DwcArchiveHarvestJob>().As<IDwcArchiveHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<InvalidObservationsReportsJob>().As<IInvalidObservationsReportsJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationsHarvestJobFull>().As<IObservationsHarvestJobFull>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationsHarvestJobIncremental>().As<IObservationsHarvestJobIncremental>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessChecklistsJob>().As<IProcessChecklistsJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ProcessObservationsJob>().As<IProcessObservationsJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessObservationsJobFull>().As<IProcessObservationsJobFull>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessObservationsJobIncremental>().As<IProcessObservationsJobIncremental>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessTaxaJob>().As<IProcessTaxaJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectsHarvestJob>().As<IProjectsHarvestJob>().InstancePerLifetimeScope();
             

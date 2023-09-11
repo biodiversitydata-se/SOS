@@ -24,15 +24,6 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <returns></returns>
         IActionResult RunObservationHarvestAndProcessJob();
 
-        /// <summary>
-        ///     Run harvest and process job
-        /// </summary>
-        /// <param name="harvestDataProviderIdOrIdentifiers"></param>
-        /// <param name="processDataProviderIdOrIdentifiers"></param>
-        /// <returns></returns>
-        Task<IActionResult> RunObservationHarvestAndProcessJob(
-            List<string> harvestDataProviderIdOrIdentifiers,
-            List<string> processDataProviderIdOrIdentifiers);
 
         /// <summary>
         ///  Run incremaental harvest and processing
