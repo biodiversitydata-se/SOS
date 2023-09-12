@@ -30,14 +30,10 @@ namespace SOS.Harvest.Jobs
     /// </summary>
     public class ObservationsHarvestJobBase 
     {
-        private readonly IHarvestInfoRepository _harvestInfoRepository;
+        
         private readonly IProjectHarvester _projectHarvester;
         private readonly IArtportalenDatasetMetadataHarvester _artportalenDatasetMetadataHarvester;
         private readonly ITaxonListHarvester _taxonListHarvester;
-
-        protected readonly IDataProviderManager _dataProviderManager;
-        protected readonly IDictionary<DataProviderType, IObservationHarvester> _harvestersByType;
-        protected readonly ILogger<ObservationsHarvestJobBase> _logger;
 
         /// <summary>
         /// Run harvest and start processing on success if requested
@@ -73,6 +69,12 @@ namespace SOS.Harvest.Jobs
             return harvestCount;
         }
 
+        protected readonly IHarvestInfoRepository _harvestInfoRepository;
+        protected readonly IDataProviderManager _dataProviderManager;
+        protected readonly IDictionary<DataProviderType, IObservationHarvester> _harvestersByType;
+        protected readonly ILogger<ObservationsHarvestJobBase> _logger;
+
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -211,30 +213,7 @@ namespace SOS.Harvest.Jobs
                 _logger.LogInformation($"Start {mode} observations harvesting.");
 
                 await Task.WhenAll(harvestTaskByDataProvider.Values);
-
-                if (mode == JobRunModes.Full)
-                {
-                    //---------------------------------------------------------------------------------------------------------
-                    // 3. Update harvest info
-                    //---------------------------------------------------------------------------------------------------------
-                    foreach (var task in harvestTaskByDataProvider)
-                    {
-                        var provider = task.Key;
-                        var harvestInfo = task.Value.Result;
-
-                        // Some properties can be updated for DwcA providers, update provider on success
-                        if (harvestInfo.Status == RunStatus.Success && provider.Type == DataProviderType.DwcA)
-                        {
-                            await _dataProviderManager.UpdateDataProvider(provider.Id, provider);
-                        }
-
-                        if (harvestInfo.Status != RunStatus.CanceledSuccess)
-                        {
-                            harvestInfo.Id = provider.Identifier;
-                            await _harvestInfoRepository.AddOrUpdateAsync(harvestInfo);
-                        }
-                    }
-                }
+                await PostHarvestAsync(harvestTaskByDataProvider);
 
                 ////---------------------------------------------------------------------------------------------------------
                 //// 4. Make sure all providers where successful
@@ -294,6 +273,10 @@ namespace SOS.Harvest.Jobs
             }
         }
        
+        protected virtual async Task PostHarvestAsync(IDictionary<DataProvider, Task<HarvestInfo>> harvestTaskByDataProvider)
+        {
+        }
+
         protected async Task<long> RunAsync(JobRunModes mode,
             DateTime? fromDate,
             IJobCancellationToken cancellationToken)

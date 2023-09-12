@@ -18,6 +18,8 @@ using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Jobs
@@ -28,6 +30,28 @@ namespace SOS.Harvest.Jobs
     public class ObservationsHarvestJobFull : ObservationsHarvestJobBase, IObservationsHarvestJobFull
     {
         private readonly IProcessObservationsJobFull _processObservationsJobFull;
+
+        protected override async Task PostHarvestAsync(IDictionary<DataProvider, Task<HarvestInfo>> harvestTaskByDataProvider)
+        {
+            foreach (var task in harvestTaskByDataProvider)
+            {
+                var provider = task.Key;
+                var harvestInfo = task.Value.Result;
+
+                // Some properties can be updated for DwcA providers, update provider on success
+                if (harvestInfo.Status == RunStatus.Success && provider.Type == DataProviderType.DwcA)
+                {
+                    await _dataProviderManager.UpdateDataProvider(provider.Id, provider);
+                }
+
+                if (harvestInfo.Status != RunStatus.CanceledSuccess)
+                {
+                    harvestInfo.Id = provider.Identifier;
+                    await _harvestInfoRepository.AddOrUpdateAsync(harvestInfo);
+                }
+            }
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
