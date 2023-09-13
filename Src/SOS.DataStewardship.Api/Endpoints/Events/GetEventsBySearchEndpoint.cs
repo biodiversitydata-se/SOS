@@ -23,7 +23,7 @@ public class GetEventsBySearchEndpoint : IEndpointDefinition
     [SwaggerOperation(
         Description = "Get events by search.",
         OperationId = "GetEventsBySearch",
-        Tags = new[] { "DataStewardship" })]
+        Tags = new[] { "Events" })]
     private async Task<IResult> GetEventsBySearchAsync(IDataStewardshipManager dataStewardshipManager,
         [FromBody, SwaggerRequestBody("The search filter")] EventsFilter filter,
         [FromQuery, SwaggerParameter("Pagination start index.")] int? skip,

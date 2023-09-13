@@ -1,0 +1,7 @@
+site_name: 'SOS documentation'
+docs_dir: 'Backstage/Docs'
+
+nav:
+  - Home: index.md
+  - Search filter: SearchFilter.md
+  - Branching Strategy: TrunkBasedBranchingStrategy.md

@@ -23,7 +23,7 @@ public class GetDatasetByIdEndpoint : IEndpointDefinition
     [SwaggerOperation(        
         Description = "Get dataset by id. Example: Artportalen - Fladdermöss",
         OperationId = "GetDatasetById",            
-        Tags = new[] { "DataStewardship" })]
+        Tags = new[] { "Datasets" })]
     [SwaggerResponse(404, "Not Found - The requested dataset doesn't exist")]
     private async Task<IResult> GetDatasetByIdAsync(IDataStewardshipManager dataStewardshipManager,
         [FromRoute, SwaggerParameter("The dataset id", Required = true)][Required] string id,

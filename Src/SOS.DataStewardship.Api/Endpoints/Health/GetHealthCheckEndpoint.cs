@@ -8,9 +8,9 @@ public class GetHealthCheckEndpoint : IEndpointDefinition
 {
     [SwaggerOperation(
         Description = "Get current system health status",
-        OperationId = "GetHealthCheck",
-        Tags = new[] { "External" })]
-    private async Task<IResult> GetHealthCheckAsync(HealthCheckService healthCheckService)
+        OperationId = "GetHealthCheckExternal",
+        Tags = new[] { "Health" })]
+    private async Task<IResult> GetExternalHealthCheckAsync(HealthCheckService healthCheckService)
     {
         try
         {
@@ -60,7 +60,7 @@ public class GetHealthCheckEndpoint : IEndpointDefinition
     /// <param name="app"></param>
     public void DefineEndpoint(WebApplication app)
     {
-        app.MapGet("/external/Health", GetHealthCheckAsync)
+        app.MapGet("/health/external", GetExternalHealthCheckAsync)
             .Produces<Dataset>(StatusCodes.Status200OK, "application/json")
             .Produces<Dataset>(StatusCodes.Status200OK, "text/csv")
             .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)

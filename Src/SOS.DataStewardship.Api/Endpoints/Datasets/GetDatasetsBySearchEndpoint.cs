@@ -22,7 +22,7 @@ public class GetDatasetsBySearchEndpoint : IEndpointDefinition
     [SwaggerOperation(
         Description = "Get datasets by search.",
         OperationId = "GetDatasetsBySearch",
-        Tags = new[] { "DataStewardship" })]
+        Tags = new[] { "Datasets" })]
     private async Task<IResult> GetDatasetsBySearchAsync(IDataStewardshipManager dataStewardshipManager,
         [FromBody, SwaggerRequestBody("The search filter")] DatasetFilter filter,
         [AsParameters] PagingParameters pagingParameters,        

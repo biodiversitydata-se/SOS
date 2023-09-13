@@ -92,7 +92,7 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        public static bool ValidateUniquePropertyNames()
+        public static bool ValidateUniquePropertyNames(bool validateSwedishName = false, bool validateEnglishName = false)
         {
             var propertyPathSet = new HashSet<string>();
             var propertyNameSet = new HashSet<string>();
@@ -105,9 +105,9 @@ namespace SOS.Lib.Helpers
                     return false;
                 if (propertyNameSet.Contains(field.PropertyName.ToLowerInvariant()))
                     return false;
-                if (swedishNameSet.Contains(field.GetSwedishTitle().ToLowerInvariant()))
+                if (validateSwedishName && swedishNameSet.Contains(field.GetSwedishTitle().ToLowerInvariant()))
                     return false;
-                if (englishNameSet.Contains(field.GetEnglishTitle().ToLowerInvariant()))
+                if (validateEnglishName && englishNameSet.Contains(field.GetEnglishTitle().ToLowerInvariant()))
                     return false;
 
                 propertyPathSet.Add(field.PropertyPath.ToLowerInvariant());
