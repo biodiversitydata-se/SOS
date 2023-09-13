@@ -76,7 +76,7 @@ namespace SOS.Administration.Api.Controllers
                         "One or more DwC-A data provider/s with missing download url was included in the list. Harvesting of these providers is only supported by providing a file using the Administration API.");
                 }
 
-                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunHarvestObservationsAsync(
+                BackgroundJob.Enqueue<IObservationsHarvestJobFull>(job => job.RunHarvestObservationsAsync(
                     parsedDataProvidersResult.Select(providerResult => providerResult.Value.Identifier).ToList(),
                     JobCancellationToken.Null));
 
@@ -119,8 +119,8 @@ namespace SOS.Administration.Api.Controllers
                         "A DwC-A data provider was included in the list. Currently DwC-A harvesting is only supported by providing a file using the Administration API.");
                 }
 
-                RecurringJob.AddOrUpdate<IObservationsHarvestJob>(
-                    nameof(IObservationsHarvestJob),
+                RecurringJob.AddOrUpdate<IObservationsHarvestJobFull>(
+                    nameof(IObservationsHarvestJobFull),
                     job => job.RunHarvestObservationsAsync(
                         parsedDataProvidersResult.Select(providerResult => providerResult.Value.Identifier).ToList(),
                         JobCancellationToken.Null),

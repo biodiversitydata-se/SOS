@@ -76,5 +76,10 @@ namespace SOS.Lib.Configuration.Import
         /// Use triggered observation rule if set
         /// </summary>
         public bool UseTriggeredObservationRule { get; set; }
+
+        /// <summary>
+        /// Check how old db backup is when true
+        /// </summary>
+        public bool ValidateDataBaseBackup { get; set; }
     }
 }

@@ -9,6 +9,8 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Harvest.Jobs;
+using SOS.Harvest.Jobs.Interfaces;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Jobs.Process;
@@ -22,7 +24,6 @@ using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Jobs;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
@@ -35,7 +36,7 @@ using SOS.Harvest.Processors.Sers.Interfaces;
 using SOS.Harvest.Processors.Shark.Interfaces;
 using SOS.Harvest.Processors.VirtualHerbarium.Interfaces;
 using Xunit;
-using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Jobs.Import;
 
 namespace SOS.Process.UnitTests.Jobs
 {
@@ -71,7 +72,7 @@ namespace SOS.Process.UnitTests.Jobs
             _virtualHerbariumProcessor = new Mock<IVirtualHerbariumObservationProcessor>();
             _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
             _areaHelper = new Mock<IAreaHelper>();
-            _loggerMock = new Mock<ILogger<ProcessObservationsJob>>();
+            _loggerMock = new Mock<ILogger<ProcessObservationsJobFull>>();
             _dwcaObservationProcessor = new Mock<IDwcaObservationProcessor>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _dataProviderCache = new Mock<IDataProviderCache>();
@@ -80,6 +81,7 @@ namespace SOS.Process.UnitTests.Jobs
             _artportalenDatasetProcessorMock = new Mock<IArtportalenDatasetProcessor>();
             _dwcaEventProcessorMock = new Mock<IDwcaEventProcessor>();
             _artportalenEventProcessorMock = new Mock<IArtportalenEventProcessor>();
+            _observationsHarvestJobIncrementalMock = new Mock<IObservationsHarvestJobIncremental>();
         }
 
         private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
@@ -111,10 +113,11 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IArtportalenDatasetProcessor> _artportalenDatasetProcessorMock;
         private readonly Mock<IArtportalenEventProcessor> _artportalenEventProcessorMock;
         private readonly Mock<IDwcaEventProcessor> _dwcaEventProcessorMock;
-        private readonly Mock<ILogger<ProcessObservationsJob>> _loggerMock;
+        private readonly Mock<IObservationsHarvestJobIncremental> _observationsHarvestJobIncrementalMock;
+        private readonly Mock<ILogger<ProcessObservationsJobFull>> _loggerMock;
         private readonly Mock<ProcessConfiguration> _processConfigurationMock;
 
-        private ProcessObservationsJob TestObject => new ProcessObservationsJob(
+        private ProcessObservationsJobFull TestObject => new ProcessObservationsJobFull(
             _processedObservationRepositoryMock.Object,
             _processInfoRepository.Object,
             _harvestInfoRepository.Object,
@@ -144,6 +147,7 @@ namespace SOS.Process.UnitTests.Jobs
             _artportalenDatasetProcessorMock.Object,
             _artportalenEventProcessorMock.Object,
             _dwcaEventProcessorMock.Object,
+            _observationsHarvestJobIncrementalMock.Object,
             _loggerMock.Object);
 
         /// <summary>
@@ -161,7 +165,7 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.RunAsync(It.IsAny<List<string>>(), JobRunModes.Full, JobCancellationToken.Null); };
+            Func<Task> act = async () => { await TestObject.RunAsync(JobCancellationToken.Null); };
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -184,7 +188,7 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.RunAsync(It.IsAny<List<string>>(), JobRunModes.Full, JobCancellationToken.Null); };
+            Func<Task> act = async () => { await TestObject.RunAsync(JobCancellationToken.Null); };
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -246,12 +250,6 @@ namespace SOS.Process.UnitTests.Jobs
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result = await TestObject.RunAsync(
-                new List<string>
-                {
-                    DataProviderIdentifiers.Artportalen, 
-                    DataProviderIdentifiers.KUL
-                },
-                JobRunModes.Full,
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert

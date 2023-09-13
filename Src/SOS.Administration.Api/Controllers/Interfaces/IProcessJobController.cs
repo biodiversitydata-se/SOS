@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SOS.Lib.Enums;
 
 namespace SOS.Administration.Api.Controllers.Interfaces
 {
@@ -15,15 +13,6 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>        
         /// <returns></returns>
         Task<IActionResult> RunProcessJob();
-
-        /// <summary>
-        /// Run process job for selected data providers
-        /// </summary>
-        /// <param name="dataProviderIdOrIdentifiers"></param>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        Task<IActionResult> RunProcessJob(List<string> dataProviderIdOrIdentifiers,
-            [FromQuery] JobRunModes mode);
 
         /// <summary>
         ///     Run process taxa job.
