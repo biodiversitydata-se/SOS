@@ -628,7 +628,6 @@ namespace SOS.Harvest.Jobs
             };
 
             _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
-
             _exportContainer = processConfiguration?.Export_Container ??
                                throw new ArgumentNullException(nameof(processConfiguration));
         }

@@ -30,7 +30,6 @@ namespace SOS.Harvest.Jobs
     /// </summary>
     public class ObservationsHarvestJobBase 
     {
-        
         private readonly IProjectHarvester _projectHarvester;
         private readonly IArtportalenDatasetMetadataHarvester _artportalenDatasetMetadataHarvester;
         private readonly ITaxonListHarvester _taxonListHarvester;

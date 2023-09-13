@@ -28,6 +28,22 @@ namespace SOS.Harvest.Jobs
     {
         private readonly IProcessObservationsJobIncremental _processObservationsJobIncremental;
 
+        private async Task<bool> HarvestAsync(JobRunModes mode, DateTime? fromDate, IJobCancellationToken cancellationToken)
+        {
+            var harvestCount = await RunAsync(mode, fromDate, cancellationToken);
+
+            // Always process incremental active instance in order to delete removed observations 
+            if (harvestCount == 0 && mode != JobRunModes.IncrementalActiveInstance)
+            {
+                return true;
+            }
+
+            // If harvest was successful, go on with processing
+            return await _processObservationsJobIncremental.RunAsync(
+                mode,
+                cancellationToken);
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -62,7 +78,7 @@ namespace SOS.Harvest.Jobs
             IVirtualHerbariumObservationHarvester virtualHerbariumObservationHarvester,
             IiNaturalistObservationHarvester iNaturalistObservationHarvester,
             IProjectHarvester projectHarvester,
-            IArtportalenDatasetMetadataHarvester artportalenDatasetMetadataHarvester,            
+            IArtportalenDatasetMetadataHarvester artportalenDatasetMetadataHarvester,
             ITaxonListHarvester taxonListHarvester,
             IDataProviderManager dataProviderManager,
             IHarvestInfoRepository harvestInfoRepository,
@@ -72,22 +88,6 @@ namespace SOS.Harvest.Jobs
                 projectHarvester, artportalenDatasetMetadataHarvester, taxonListHarvester, dataProviderManager, harvestInfoRepository, logger)
         {
             _processObservationsJobIncremental = processObservationsJobIncremental ?? throw new ArgumentNullException(nameof(processObservationsJobIncremental)); ;
-        }
-
-        private async Task<bool> HarvestAsync(JobRunModes mode, DateTime? fromDate, IJobCancellationToken cancellationToken)
-        {
-            var harvestCount = await RunAsync(mode, fromDate, cancellationToken);
-
-            // Always process incremental active instance in order to delete removed observations 
-            if (harvestCount == 0 && mode != JobRunModes.IncrementalActiveInstance)
-            {
-                return true;
-            }
-
-            // If harvest was successful, go on with processing
-            return await _processObservationsJobIncremental.RunAsync(
-                mode,
-                cancellationToken);
         }
 
         /// <inheritdoc />

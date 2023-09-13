@@ -44,52 +44,6 @@ namespace SOS.Harvest.Jobs
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly bool _enableTimeManager;
 
-        protected readonly IDataProviderCache _dataProviderCache;
-        protected readonly ILogger<ProcessObservationsJobBase> _logger;
-        protected readonly Dictionary<DataProviderType, IObservationProcessor> _processorByType;
-        protected readonly ProcessConfiguration _processConfiguration;
-        protected readonly IProcessedObservationCoreRepository _processedObservationRepository;
-        protected readonly IProcessTimeManager _processTimeManager;
-
-        protected async Task<IDictionary<int, Taxon>> GetTaxaAsync(JobRunModes mode)
-        {
-            // Use current taxa if we are in incremental mode, to speed things up
-            if (mode == JobRunModes.Full)
-            {
-                //----------------------------------------------------------------------
-                // Process taxa
-                //----------------------------------------------------------------------
-                _logger.LogDebug("Start harvest taxonomy");
-
-                if (!await _processTaxaJob.RunAsync())
-                {
-                    _logger.LogError("Failed to process taxonomy");
-                    return null!;
-                }
-                _taxonCache.Clear();
-                _logger.LogDebug("Finish harvest taxonomy");
-            }
-
-            //--------------------------------------
-            // Get taxonomy
-            //--------------------------------------
-            _logger.LogDebug("Start getting taxa from cache");
-
-            var taxa = await _taxonCache.GetAllAsync();
-            if (!taxa?.Any() ?? true)
-            {
-                _logger.LogError("Failed to get taxa");
-                return null!;
-            }
-
-            var taxaDictonary = new ConcurrentDictionary<int, Taxon>();
-            taxa.ForEach(t => taxaDictonary.TryAdd(t.Id, t));
-
-            _logger.LogDebug($"Finish getting taxa from cache ({taxaDictonary.Count})");
-
-            return taxaDictonary;
-        }
-
         private async Task InitializeAreaHelperAsync()
         {
             _logger.LogDebug("Start initialize area cache");
@@ -134,8 +88,6 @@ namespace SOS.Harvest.Jobs
             }
         }
 
-       
-
         /// <summary>
         /// Disable Elasticsearch indexing
         /// </summary>
@@ -150,8 +102,6 @@ namespace SOS.Harvest.Jobs
             await _processedObservationRepository.DisableIndexingAsync(true);
             _logger.LogInformation($"Finish disable indexing ({_processedObservationRepository.ProtectedIndexName})");
         }
-
-       
 
         /// <summary>
         /// Enable Elasticsearch indexing
@@ -373,6 +323,13 @@ namespace SOS.Harvest.Jobs
             }
         }
 
+        protected readonly IDataProviderCache _dataProviderCache;
+        protected readonly ILogger<ProcessObservationsJobBase> _logger;
+        protected readonly Dictionary<DataProviderType, IObservationProcessor> _processorByType;
+        protected readonly ProcessConfiguration _processConfiguration;
+        protected readonly IProcessedObservationCoreRepository _processedObservationRepository;
+        protected readonly IProcessTimeManager _processTimeManager;
+
         /// <summary>
         /// Constructor
         /// </summary>      
@@ -439,6 +396,50 @@ namespace SOS.Harvest.Jobs
 
             _enableTimeManager = processConfiguration.EnableTimeManager;
             _processConfiguration = processConfiguration;
+        }
+
+        /// <summary>
+        /// Get taxonomy
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        protected async Task<IDictionary<int, Taxon>> GetTaxaAsync(JobRunModes mode)
+        {
+            // Use current taxa if we are in incremental mode, to speed things up
+            if (mode == JobRunModes.Full)
+            {
+                //----------------------------------------------------------------------
+                // Process taxa
+                //----------------------------------------------------------------------
+                _logger.LogDebug("Start harvest taxonomy");
+
+                if (!await _processTaxaJob.RunAsync())
+                {
+                    _logger.LogError("Failed to process taxonomy");
+                    return null!;
+                }
+                _taxonCache.Clear();
+                _logger.LogDebug("Finish harvest taxonomy");
+            }
+
+            //--------------------------------------
+            // Get taxonomy
+            //--------------------------------------
+            _logger.LogDebug("Start getting taxa from cache");
+
+            var taxa = await _taxonCache.GetAllAsync();
+            if (!taxa?.Any() ?? true)
+            {
+                _logger.LogError("Failed to get taxa");
+                return null!;
+            }
+
+            var taxaDictonary = new ConcurrentDictionary<int, Taxon>();
+            taxa.ForEach(t => taxaDictonary.TryAdd(t.Id, t));
+
+            _logger.LogDebug($"Finish getting taxa from cache ({taxaDictonary.Count})");
+
+            return taxaDictonary;
         }
 
         /// <summary>
