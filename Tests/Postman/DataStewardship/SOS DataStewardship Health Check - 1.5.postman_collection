@@ -59,7 +59,7 @@
 							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      3000299\n    ]\n  }\n}"
 						},
 						"url": {
-							"raw": "{{testUrl}}/datastewardship/datasets?skip=0&take=1&exportMode=Json",
+							"raw": "{{testUrl}}/datasets?skip=0&take=1&exportMode=Json",
 							"host": [
 								"{{testUrl}}"
 							],
@@ -130,7 +130,7 @@
 							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      100077\n    ]\n  }\n}"
 						},
 						"url": {
-							"raw": "{{testUrl}}/datastewardship/datasets?skip=0&take=1&exportMode=Json",
+							"raw": "{{testUrl}}/datasets?skip=0&take=1&exportMode=Json",
 							"host": [
 								"{{testUrl}}"
 							],
@@ -211,7 +211,7 @@
 							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      3000299\n    ]\n  }\n}"
 						},
 						"url": {
-							"raw": "{{testUrl}}/datastewardship/events?skip=0&take=1&exportMode=Json&responseCoordinateSystem=EPSG4326",
+							"raw": "{{testUrl}}/events?skip=0&take=1&exportMode=Json&responseCoordinateSystem=EPSG4326",
 							"host": [
 								"{{testUrl}}"
 							],
@@ -286,7 +286,7 @@
 							"raw": "{\n  \"dateFilter\": {\n    \"startDate\": \"2021-08-12\",\n    \"endDate\": \"2021-08-13\",\n    \"dateFilterType\": \"BetweenStartDateAndEndDate\"\n  },\n  \"taxon\": {\n    \"ids\": [\n      100077\n    ]\n  }\n}"
 						},
 						"url": {
-							"raw": "{{testUrl}}/datastewardship/events?skip=0&take=1&exportMode=Json&responseCoordinateSystem=EPSG4326",
+							"raw": "{{testUrl}}/events?skip=0&take=1&exportMode=Json&responseCoordinateSystem=EPSG4326",
 							"host": [
 								"{{testUrl}}"
 							],
@@ -371,7 +371,7 @@
 							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      3000299\n    ]\n  }\n}"
 						},
 						"url": {
-							"raw": "{{testUrl}}/datastewardship/datasets?skip=0&take=1&exportMode=Json",
+							"raw": "{{testUrl}}/datasets?skip=0&take=1&exportMode=Json",
 							"host": [
 								"{{testUrl}}"
 							],
@@ -442,7 +442,7 @@
 							"raw": "{\n  \"taxon\": {\n    \"ids\": [\n      100077\n    ]\n  }\n}"
 						},
 						"url": {
-							"raw": "{{testUrl}}/datastewardship/datasets?skip=0&take=1&exportMode=Json",
+							"raw": "{{testUrl}}/datasets?skip=0&take=1&exportMode=Json",
 							"host": [
 								"{{testUrl}}"
 							],
