@@ -121,7 +121,7 @@
   {
     "PropertyName": "HigherClassification",
     "PropertyPath": "Taxon.HigherClassification",
-    "SwedishTitle": "Taxonlassificering",
+    "SwedishTitle": "Taxonklassificering",
     "EnglishTitle": "Higher classification",
     "DataType": "String",
     "DataTypeIsNullable": false,
@@ -373,7 +373,7 @@
   {
     "PropertyName": "SecondaryParentDyntaxaTaxonIds",
     "PropertyPath": "Taxon.SecondaryParentDyntaxaTaxonIds",
-    "SwedishTitle": "Sekundära överliggande taxon id´n",
+    "SwedishTitle": "Sekundära överliggande taxon id:n",
     "EnglishTitle": "Secondary Parent taxon ID´s",
     "DataType": "String",
     "DataTypeIsNullable": false,
