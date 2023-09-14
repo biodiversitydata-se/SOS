@@ -1,0 +1,44 @@
+title: sosCustom
+feature-styles:
+- rules:
+  - zoom: (min, 10)
+    symbolizers:
+    - point:
+        geometry: ${pointB}
+        uom: metre
+        size: 10000
+        symbols:
+        - mark:
+            shape: square
+            stroke-color: '#333333'
+            stroke-width: 1
+  - zoom: (11, max)
+    filter: ${true = true}
+    symbolizers:
+    - point:
+        symbols:
+        - mark:
+            shape: circle
+            stroke-width: 1
+            stroke-color: '#000000'
+            fill-color: '#DB1F48'
+  - zoom: (11, max)
+    filter: ${false = true}
+    symbolizers:
+    - point:
+        symbols:
+        - mark:
+            shape: circle
+            stroke-width: 1
+            stroke-color: '#000000'
+            fill-color: '#FF8300'
+  - else: true
+    zoom: (11, max)
+    symbolizers:
+    - point:
+        symbols:
+        - mark:
+            shape: circle
+            stroke-width: 1
+            stroke-color: '#000000'
+            fill-color: '#BDC6D9'

@@ -17,7 +17,7 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
-        var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
+        var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };        
         await ProcessFixture.ImportDwcaFileAsync(@"Data/Resources/dwca-datastewardship-single-dataset.zip", dataProvider, Output);
 
         //-----------------------------------------------------------------------------------------------------------

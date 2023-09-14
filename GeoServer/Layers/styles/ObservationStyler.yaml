@@ -1,0 +1,58 @@
+title: sosCustom
+feature-styles:
+- transform:
+    name: vec:PointStacker
+    params:
+      cellSize: 40
+  rules:
+  - zoom: (min, 12)
+    symbolizers:
+    - point:
+        size: ${6*sqrt(count)}
+        symbols:
+        - mark:
+            shape: circle
+            stroke-width: 1
+            stroke-color: '#ffffff'
+            fill-color: '#41729F'
+  - filter: count > 1
+    zoom: (min, 12)
+    symbolizers:
+    - text:
+        fill-color: '#ffffff'
+        font-family: Arial
+        font-size: 8
+        font-weight: bold
+        anchor: [0.5, 0.5]
+        label: ${count}
+- rules:
+  - zoom: (13, max)
+    filter: ${isRedlisted = true}
+    symbolizers:
+    - point:
+        symbols:
+        - mark:
+            shape: circle
+            stroke-width: 1
+            stroke-color: '#000000'
+            fill-color: '#DB1F48'
+  - zoom: (13, max)
+    filter: ${isInvasiveInSweden = true}
+    symbolizers:
+    - point:
+        symbols:
+        - mark:
+            shape: circle
+            stroke-width: 1
+            stroke-color: '#000000'
+            fill-color: '#FF8300'
+  - else: true
+    zoom: (13, max)
+    symbolizers:
+    - point:
+        symbols:
+        - mark:
+            shape: circle
+            stroke-width: 1
+            stroke-color: '#000000'
+            fill-color: '#BDC6D9'

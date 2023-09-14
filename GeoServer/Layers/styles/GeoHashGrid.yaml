@@ -1,0 +1,22 @@
+title: geo hash grid
+feature-styles:
+- transform:
+    name: vec:GeoHashGrid
+    params:
+      outputWidth: 10000
+      outputHeight: 10000
+      gridStrategy: Basic
+  rules:
+  - symbolizers:
+    - raster:
+        opacity: 0.6
+        color-map:
+          type: ramp
+          entries:
+          - ['#FFFFFF',0,0.0,null]
+          - ['#2851CC',1,1.1,null]
+          - ['#211F1F',1,10.5,null]
+          - ['#EE0F0F',1,100.0,null]
+          - ['#AAAAAA',1,1000.0,null]
+          - ['#6FEE4F',1,10000.0,null]
+          - ['#DDB02C',1,100000.0,null]
