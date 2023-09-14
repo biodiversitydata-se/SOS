@@ -1,0 +1,12 @@
+title: sosPointBlack
+feature-styles:
+- rules:
+  - symbolizers:
+    - point:
+        size: 8
+        symbols:
+        - mark:
+            shape: circle
+            stroke-width: 1
+            stroke-color: '#ffffff'
+            fill-color: '#000000'

@@ -1,0 +1,73 @@
+title: observation style
+feature-styles:
+- rules:
+  - title: not rediscovered observation
+    filter: ${isNotRediscoveredObservation = true}
+    scale: [min, max]
+    symbolizers:
+    - point:
+        size: 10
+        symbols:
+        - mark:
+            shape: circle
+            stroke-color: 'black'
+            stroke-width: 0.5
+            fill-color: 'white'
+    - point:
+        size: 6
+        rotation: 45.0
+        symbols:
+        - mark:
+            shape: cross
+            stroke-color: 'black'
+            stroke-width: 0.5
+            fill-color: 'black'
+  - title: absent observation
+    filter: ${isPresentObservation = false AND isNotRediscoveredObservation = false}    
+    scale: [min, max]
+    symbolizers:
+    - point:
+        size: 8
+        rotation: 45.0
+        symbols:
+        - mark:
+            shape: cross
+            stroke-width: 1
+            stroke-color: 'black'
+            fill-color: 'gray'
+  - title: redlisted observation
+    filter: ${isPresentObservation = true AND isRedlisted = true}
+    scale: [min, max]
+    symbolizers:
+    - point:
+        size: 8
+        symbols:
+        - mark:
+            shape: circle            
+            stroke-width: 1
+            stroke-color: '#000000'
+            fill-color: '#DB1F48'
+  - title: invasive observation
+    filter: ${isPresentObservation = true AND (isInvasiveInSweden = true OR isInvasiveEu = true)}
+    scale: [min, max]
+    symbolizers:
+    - point:
+        size: 8
+        symbols:
+        - mark:
+            shape: circle            
+            stroke-width: 1
+            stroke-color: '#000000'
+            fill-color: '#FF8300'
+  - title: observation
+    filter: ${isPresentObservation = true AND isInvasiveInSweden = false AND isInvasiveEu = false AND isRedlisted = false}
+    scale: [min, max]
+    symbolizers:
+    - point:
+        size: 8
+        symbols:
+        - mark:
+            shape: circle
+            stroke-width: 1
+            stroke-color: '#000000'
+            fill-color: '#BDC6D9'

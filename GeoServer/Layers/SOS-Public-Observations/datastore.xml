@@ -1,0 +1,29 @@
+<dataStore>
+  <id>DataStoreInfoImpl-53aa628:17eeef29587:-7ffd</id>
+  <name>SOS-Public-Observations</name>
+  <type>Elasticsearch</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl-53aa628:17eeef29587:-7fff</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="scroll_time">120</entry>
+    <entry key="scroll_enabled">false</entry>
+    <entry key="default_max_features">5000</entry>
+    <entry key="scroll_size">1000</entry>
+    <entry key="grid_size">10000</entry>
+    <entry key="source_filtering_enabled">false</entry>
+    <entry key="elasticsearch_port">443</entry>
+    <entry key="passwd"></entry>
+    <entry key="runas_geoserver_user">false</entry>
+    <entry key="grid_threshold">0.05</entry>
+    <entry key="array_encoding">JSON</entry>
+    <entry key="index_name">sos-observation</entry>
+    <entry key="user"></entry>
+    <entry key="ssl_reject_unauthorized">false</entry>
+    <entry key="elasticsearch_host">https://sos-proxy.artdata.slu.se</entry>
+  </connectionParameters>
+  <__default>false</__default>
+  <dateCreated>2022-02-17 10:16:19.523 UTC</dateCreated>
+  <dateModified>2022-11-17 09:13:45.392 UTC</dateModified>
+</dataStore>

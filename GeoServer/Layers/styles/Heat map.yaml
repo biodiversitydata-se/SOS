@@ -1,0 +1,19 @@
+title: Heatmap
+feature-styles:
+- transform:
+    name: vec:Heatmap
+    params:
+      weightAttr: pop2000
+      radiusPixels: 100
+      pixelsPerCell: 10
+  rules:
+  - symbolizers:
+    - raster:
+        opacity: 0.6
+        color-map:
+          type: ramp
+          entries:
+          - ['#FFFFFF',0,0.0,nodata]
+          - ['#4444FF',1,0.1,nodata]
+          - ['#FF0000',1,0.5,values]
+          - ['#FFFF00',1,1.0,values]
