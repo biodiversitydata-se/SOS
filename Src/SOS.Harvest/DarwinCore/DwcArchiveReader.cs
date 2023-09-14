@@ -1,6 +1,5 @@
 ﻿using DwC_A;
 using DwC_A.Terms;
-using Microsoft.Extensions.Logging;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
@@ -13,21 +12,25 @@ namespace SOS.Harvest.DarwinCore
     /// </summary>
     public class DwcArchiveReader : IDwcArchiveReader
     {
-        private readonly ILogger<DwcArchiveReader> _logger;
-        private int _initValueId;
+        private readonly int _initValueId;
+
         private IDwcArchiveReaderAsDwcObservation CreateDwcReader(string rowType)
         {
             if (rowType == RowTypes.Occurrence)
             {
-                return new DwcOccurrenceArchiveReader(_logger, _initValueId);
+                return new DwcOccurrenceArchiveReader(_initValueId);
             }
 
-            return new DwcOccurrenceSamplingEventArchiveReader(_logger, _initValueId);
+            return new DwcOccurrenceSamplingEventArchiveReader(_initValueId);
         }
 
-        public DwcArchiveReader(ILogger<DwcArchiveReader> logger)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="initValueId"></param>
+        public DwcArchiveReader(int initValueId)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _initValueId = initValueId;
         }
 
         /// <inheritdoc />
@@ -154,12 +157,6 @@ namespace SOS.Harvest.DarwinCore
         {
             var reader = CreateDwcReader(RowTypes.Event);
             return await reader.ReadEvents(archiveReaderContext);
-        }
-
-        /// <inheritdoc/>
-        public void SetIdInitValue(int value)
-        {
-            _initValueId = value;
         }
     }
 }

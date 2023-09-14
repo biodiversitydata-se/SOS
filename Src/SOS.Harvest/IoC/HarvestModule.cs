@@ -15,6 +15,7 @@ using SOS.Harvest.Harvesters.AquaSupport.Kul.Interfaces;
 using SOS.Harvest.Harvesters.AquaSupport.Nors;
 using SOS.Harvest.Harvesters.AquaSupport.Nors.Interfaces;
 using SOS.Harvest.Harvesters.AquaSupport.Sers;
+using SOS.Harvest.Harvesters.AquaSupport.Sers.Interfaces;
 using SOS.Harvest.Harvesters.Artportalen;
 using SOS.Harvest.Harvesters.Artportalen.Interfaces;
 using SOS.Harvest.Harvesters.Biologg;
@@ -32,7 +33,6 @@ using SOS.Harvest.Harvesters.Shark;
 using SOS.Harvest.Harvesters.Shark.Interfaces;
 using SOS.Harvest.Harvesters.VirtualHerbarium;
 using SOS.Harvest.Harvesters.VirtualHerbarium.Interfaces;
-using SOS.Harvest.HarvestersAquaSupport.Sers.Interfaces;
 using SOS.Harvest.Helpers;
 using SOS.Harvest.Helpers.Interfaces;
 using SOS.Harvest.Jobs;
@@ -215,20 +215,8 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<VocabulariesDiffHelper>().As<IVocabulariesDiffHelper>().SingleInstance();
             builder.RegisterType<VocabularyValueResolver>().As<IVocabularyValueResolver>().SingleInstance();
 
-            // Darwin Core
-            builder.RegisterType<DwcArchiveReader>().As<IDwcArchiveReader>().InstancePerLifetimeScope();
-
             // Containers, single instance for best performance (re-init on full harvest)
             builder.RegisterType<ArtportalenMetadataContainer>().As<IArtportalenMetadataContainer>().SingleInstance();
-
-            // Managers
-            builder.RegisterType<ApiUsageStatisticsManager>().As<IApiUsageStatisticsManager>().InstancePerLifetimeScope();
-            builder.RegisterType<CacheManager>().As<ICacheManager>().InstancePerLifetimeScope();
-            builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
-            builder.RegisterType<DataValidationReportManager>().As<IDataValidationReportManager>().InstancePerLifetimeScope();
-            builder.RegisterType<DwcaDataValidationReportManager>().As<IDwcaDataValidationReportManager>().InstancePerLifetimeScope();
-            builder.RegisterType<ProcessTimeManager>().As<IProcessTimeManager>().InstancePerLifetimeScope();
-            builder.RegisterType<ReportManager>().As<IReportManager>().InstancePerLifetimeScope();
 
             // Repositories elastic
             builder.RegisterType<ProcessedObservationCoreRepository>().As<IProcessedObservationCoreRepository>()
@@ -427,12 +415,19 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<UserService>().As<IUserService>().InstancePerLifetimeScope();
 
             // Add managers
+            builder.RegisterType<ApiUsageStatisticsManager>().As<IApiUsageStatisticsManager>().InstancePerLifetimeScope();
+            builder.RegisterType<CacheManager>().As<ICacheManager>().InstancePerLifetimeScope();
+            builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
+            builder.RegisterType<DataValidationReportManager>().As<IDataValidationReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<DiffusionManager>().As<IDiffusionManager>().InstancePerLifetimeScope();
+            builder.RegisterType<DwcaDataValidationReportManager>().As<IDwcaDataValidationReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<InvalidObservationsManager>().As<IInvalidObservationsManager>().InstancePerLifetimeScope();            
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
-            builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationHarvesterManager>().As<IObservationHarvesterManager>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationProcessorManager>().As<IObservationProcessorManager>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessManager>().As<IProcessManager>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessTimeManager>().As<IProcessTimeManager>().InstancePerLifetimeScope();
+            builder.RegisterType<ReportManager>().As<IReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<ValidationManager>().As<IValidationManager>().InstancePerLifetimeScope();
 
             // Add jobs

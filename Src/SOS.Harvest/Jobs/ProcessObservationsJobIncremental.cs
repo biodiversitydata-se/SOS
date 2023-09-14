@@ -2,15 +2,6 @@
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
-using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
-using SOS.Harvest.Processors.FishData.Interfaces;
-using SOS.Harvest.Processors.Kul.Interfaces;
-using SOS.Harvest.Processors.Mvm.Interfaces;
-using SOS.Harvest.Processors.Nors.Interfaces;
-using SOS.Harvest.Processors.ObservationDatabase.Interfaces;
-using SOS.Harvest.Processors.Sers.Interfaces;
-using SOS.Harvest.Processors.Shark.Interfaces;
-using SOS.Harvest.Processors.VirtualHerbarium.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -38,16 +29,7 @@ namespace SOS.Harvest.Jobs
         public ProcessObservationsJobIncremental(IProcessedObservationCoreRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
-            IArtportalenObservationProcessor artportalenObservationProcessor,
-            IFishDataObservationProcessor fishDataObservationProcessor,
-            IKulObservationProcessor kulObservationProcessor,
-            IMvmObservationProcessor mvmObservationProcessor,
-            INorsObservationProcessor norsObservationProcessor,
-            IObservationDatabaseProcessor observationDatabaseProcessor,
-            ISersObservationProcessor sersObservationProcessor,
-            ISharkObservationProcessor sharkObservationProcessor,
-            IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
-            IDwcaObservationProcessor dwcaObservationProcessor,
+            IObservationProcessorManager observationProcessorManager,
             ICache<int, Taxon> taxonCache,
             IDataProviderCache dataProviderCache,
             IProcessTimeManager processTimeManager,
@@ -55,9 +37,8 @@ namespace SOS.Harvest.Jobs
             IProcessTaxaJob processTaxaJob,
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
-            ILogger<ProcessObservationsJobIncremental> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, artportalenObservationProcessor, fishDataObservationProcessor,
-            kulObservationProcessor, mvmObservationProcessor, norsObservationProcessor, observationDatabaseProcessor, sersObservationProcessor, sharkObservationProcessor, virtualHerbariumObservationProcessor,
-            dwcaObservationProcessor, taxonCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
+            ILogger<ProcessObservationsJobIncremental> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, observationProcessorManager, 
+                taxonCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
             logger)
         {
             
@@ -86,7 +67,7 @@ namespace SOS.Harvest.Jobs
         public async Task<bool> ProcessArtportalenObservationsAsync(IEnumerable<ArtportalenObservationVerbatim> verbatims)
         {
             _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", JobRunModes.IncrementalActiveInstance.GetLoggerMode()) });
-            var processor = _processorByType[DataProviderType.ArtportalenObservations] as IArtportalenObservationProcessor;
+            var processor = _observationProcessorManager.GetProcessor(DataProviderType.ArtportalenObservations) as IArtportalenObservationProcessor;
             var provider = await _dataProviderCache.GetAsync(1);
             var taxa = await GetTaxaAsync(JobRunModes.IncrementalActiveInstance);
             _processedObservationRepository.LiveMode = true;

@@ -18,7 +18,7 @@ namespace SOS.Import.LiveIntegrationTests.DarwinCore
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-event-emof-vims_neamap.zip";
-            var dwcArchiveReader = new DwcSamplingEventArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcArchiveReader = new DwcSamplingEventArchiveReader(new NullLogger<DwcSamplingEventArchiveReader>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -50,7 +50,7 @@ namespace SOS.Import.LiveIntegrationTests.DarwinCore
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
-            var dwcArchiveReader = new DwcSamplingEventArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcArchiveReader = new DwcSamplingEventArchiveReader(new NullLogger<DwcSamplingEventArchiveReader>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -92,7 +92,7 @@ namespace SOS.Import.LiveIntegrationTests.DarwinCore
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
-            var dwcArchiveReader = new DwcSamplingEventArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcArchiveReader = new DwcSamplingEventArchiveReader(new NullLogger<DwcSamplingEventArchiveReader>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

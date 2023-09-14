@@ -289,7 +289,7 @@ public class LiveDbProcessFixture : IProcessFixture
         filePath = filePath.GetAbsoluteFilePath();
         string outputPath = Path.GetTempPath();
         using var archiveReader = new ArchiveReader(filePath, outputPath);
-        IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+        IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(0);
         var dwcObservations = await dwcArchiveReader.ReadArchiveAsync(
             archiveReader,
             dataProvider);

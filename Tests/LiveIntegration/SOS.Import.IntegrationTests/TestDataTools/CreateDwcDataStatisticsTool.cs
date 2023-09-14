@@ -64,7 +64,6 @@ namespace SOS.Import.LiveIntegrationTests.TestDataTools
                 );
             var dwcObservationHarvester = new DwcObservationHarvester(
                 importClient,
-                new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new DwcaConfiguration { ImportPath = @"C:\Temp" },

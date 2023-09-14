@@ -23,7 +23,6 @@ namespace SOS.Harvest.DarwinCore
     /// </summary>
     public class DwcOccurrenceSamplingEventArchiveReader : IDwcArchiveReaderAsDwcObservation
     {
-        private readonly ILogger<DwcArchiveReader> _logger;
         private int _idCounter;
         private int NextId => Interlocked.Increment(ref _idCounter);
 
@@ -40,9 +39,8 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="logger"></param>
         /// <param name="idInitValue"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public DwcOccurrenceSamplingEventArchiveReader(ILogger<DwcArchiveReader> logger, int idInitValue = 0)
+        public DwcOccurrenceSamplingEventArchiveReader(int idInitValue = 0)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _idCounter = idInitValue;
         }
 
@@ -73,27 +71,19 @@ namespace SOS.Harvest.DarwinCore
         private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
             ArchiveReader archiveReader, bool addOnlyOccurrenceData = false)
         {
-            try
-            {
-                var mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
-                if (mofFileReader == null) return;
-                var idIndex = mofFileReader.GetIdIndex();
+            var mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
+            if (mofFileReader == null) return;
+            var idIndex = mofFileReader.GetIdIndex();
 
-                var observationsByRecordId =
-                    occurrenceRecords
-                        .GroupBy(observation => observation.RecordId)
-                        .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
+            var observationsByRecordId =
+                occurrenceRecords
+                    .GroupBy(observation => observation.RecordId)
+                    .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
 
-                await foreach (var row in mofFileReader.GetDataRowsAsync())
-                {
-                    var id = row[idIndex];
-                    AddEventMof(row, id, observationsByRecordId);
-                }
-            }
-            catch (Exception e)
+            await foreach (var row in mofFileReader.GetDataRowsAsync())
             {
-                _logger.LogError(e, "Failed to add MeasurementOrFact extension data");
-                throw;
+                var id = row[idIndex];
+                AddEventMof(row, id, observationsByRecordId);
             }
         }
 
@@ -106,72 +96,56 @@ namespace SOS.Harvest.DarwinCore
         private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
             ArchiveReader archiveReader, bool addOnlyOccurrenceData = false)
         {
-            try
-            {
-                var multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
-                if (multimediaFileReader == null) return;
-                var idIndex = multimediaFileReader.GetIdIndex();
-                var observationsByRecordId =
-                    occurrenceRecords
-                        .GroupBy(observation => observation.RecordId)
-                        .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
+            var multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
+            if (multimediaFileReader == null) return;
+            var idIndex = multimediaFileReader.GetIdIndex();
+            var observationsByRecordId =
+                occurrenceRecords
+                    .GroupBy(observation => observation.RecordId)
+                    .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
 
-                await foreach (var row in multimediaFileReader.GetDataRowsAsync())
+            await foreach (var row in multimediaFileReader.GetDataRowsAsync())
+            {
+                var id = row[idIndex];
+                if (!observationsByRecordId.TryGetValue(id, out var observations)) continue;
+                foreach (var observation in observations)
                 {
-                    var id = row[idIndex];
-                    if (!observationsByRecordId.TryGetValue(id, out var observations)) continue;
-                    foreach (var observation in observations)
+                    if (observation.EventMultimedia == null)
                     {
-                        if (observation.EventMultimedia == null)
-                        {
-                            observation.EventMultimedia = new List<DwcMultimedia>();
-                        }
-
-                        var multimediaItem = DwcMultimediaFactory.Create(row);
-                        observation.EventMultimedia.Add(multimediaItem);
+                        observation.EventMultimedia = new List<DwcMultimedia>();
                     }
+
+                    var multimediaItem = DwcMultimediaFactory.Create(row);
+                    observation.EventMultimedia.Add(multimediaItem);
                 }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to add Multimedia extension data");
-                throw;
             }
         }
 
         private async Task AddAudubonMediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
             ArchiveReader archiveReader, bool addOnlyOccurrenceData = false)
         {
-            try
-            {
-                var audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
-                if (audubonFileReader == null) return;
-                var idIndex = audubonFileReader.GetIdIndex();
-                var observationsByRecordId =
-                    occurrenceRecords
-                        .GroupBy(observation => observation.RecordId)
-                        .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
+            var audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
+            if (audubonFileReader == null) return;
+            var idIndex = audubonFileReader.GetIdIndex();
+            var observationsByRecordId =
+                occurrenceRecords
+                    .GroupBy(observation => observation.RecordId)
+                    .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
 
-                await foreach (var row in audubonFileReader.GetDataRowsAsync())
+            await foreach (var row in audubonFileReader.GetDataRowsAsync())
+            {
+                var id = row[idIndex];
+                if (!observationsByRecordId.TryGetValue(id, out var observations)) continue;
+                foreach (var observation in observations)
                 {
-                    var id = row[idIndex];
-                    if (!observationsByRecordId.TryGetValue(id, out var observations)) continue;
-                    foreach (var observation in observations)
+                    if (observation.EventAudubonMedia == null)
                     {
-                        if (observation.EventAudubonMedia == null)
-                        {
-                            observation.EventAudubonMedia = new List<DwcAudubonMedia>();
-                        }
-
-                        var multimediaItem = DwcAudubonMediaFactory.Create(row);
-                        observation.EventAudubonMedia.Add(multimediaItem);
+                        observation.EventAudubonMedia = new List<DwcAudubonMedia>();
                     }
+
+                    var multimediaItem = DwcAudubonMediaFactory.Create(row);
+                    observation.EventAudubonMedia.Add(multimediaItem);
                 }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to add Audubon media description extension data");
-                throw;
             }
         }
 
@@ -240,46 +214,38 @@ namespace SOS.Harvest.DarwinCore
         private async Task AddEmofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
             ArchiveReader archiveReader, bool addOnlyOccurrenceData = false)
         {
-            try
-            {
-                var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
-                if (emofFileReader == null) return;
-                var idIndex = emofFileReader.GetIdIndex();
-                var occurrenceIdFieldMetaData = emofFileReader.TryGetFieldMetaData(Terms.occurrenceID);
-                var observationsByRecordId =
-                    occurrenceRecords
-                        .GroupBy(observation => observation.RecordId)
-                        .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
+            var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
+            if (emofFileReader == null) return;
+            var idIndex = emofFileReader.GetIdIndex();
+            var occurrenceIdFieldMetaData = emofFileReader.TryGetFieldMetaData(Terms.occurrenceID);
+            var observationsByRecordId =
+                occurrenceRecords
+                    .GroupBy(observation => observation.RecordId)
+                    .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
 
-                if (occurrenceIdFieldMetaData == null
-                ) // If there is no occurrenceID field, then add only event measurements
+            if (occurrenceIdFieldMetaData == null
+            ) // If there is no occurrenceID field, then add only event measurements
+            {
+                await foreach (var row in emofFileReader.GetDataRowsAsync())
                 {
-                    await foreach (var row in emofFileReader.GetDataRowsAsync())
+                    var id = row[idIndex];
+                    AddEventEmof(row, id, observationsByRecordId);
+                }
+            }
+            else // occurrenceID field exist, try to get both occurrence measurements and event measurements
+            {
+                var observationByOccurrenceId =
+                    occurrenceRecords.ToDictionary(v => v.OccurrenceID, v => v);
+                await foreach (var row in emofFileReader.GetDataRowsAsync())
+                {
+                    var occurrenceId = row[occurrenceIdFieldMetaData.Index];
+                    AddOccurrenceEmof(row, occurrenceId, observationByOccurrenceId);
+                    if (string.IsNullOrEmpty(occurrenceId)) // Measurement for event
                     {
                         var id = row[idIndex];
                         AddEventEmof(row, id, observationsByRecordId);
                     }
                 }
-                else // occurrenceID field exist, try to get both occurrence measurements and event measurements
-                {
-                    var observationByOccurrenceId =
-                        occurrenceRecords.ToDictionary(v => v.OccurrenceID, v => v);
-                    await foreach (var row in emofFileReader.GetDataRowsAsync())
-                    {
-                        var occurrenceId = row[occurrenceIdFieldMetaData.Index];
-                        AddOccurrenceEmof(row, occurrenceId, observationByOccurrenceId);
-                        if (string.IsNullOrEmpty(occurrenceId)) // Measurement for event
-                        {
-                            var id = row[idIndex];
-                            AddEventEmof(row, id, observationsByRecordId);
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to add ExtendedMeasurementOrFact extension data");
-                throw;
             }
         }
 
@@ -389,136 +355,120 @@ namespace SOS.Harvest.DarwinCore
         private async Task AddOccurencesDataAsync(IDictionary<string, DwcEventOccurrenceVerbatim> eventRecords,
             ArchiveReader? archiveReader)
         {
-            try
+            if (archiveReader == null)
             {
-                if (archiveReader == null)
-                {
-                    throw new Exception("ArchiveReader not initialized");
-                }
-                var occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Occurrence);
-                if (occurrenceFileReader == null)
-                {
-                    return;
-                };
-                var idIndex = occurrenceFileReader.GetIdIndex();
-
-                await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
-                {
-                    var id = row[idIndex];
-
-                    if (!eventRecords.TryGetValue(id, out var eventRecord))
-                    {
-                        continue;
-                    }
-                    var occurrenceRecord = DwcObservationVerbatimFactory.Create(NextId, row, null, idIndex);
-                    eventRecord.Observations ??= new List<DwcObservationVerbatim>();
-                    eventRecord.Observations.Add(occurrenceRecord);
-                }
+                throw new Exception("ArchiveReader not initialized");
             }
-            catch (Exception e)
+            var occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Occurrence);
+            if (occurrenceFileReader == null)
             {
-                _logger.LogError(e, "Failed to add occurrence data");
-                throw;
+                return;
+            };
+            var idIndex = occurrenceFileReader.GetIdIndex();
+
+            await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
+            {
+                var id = row[idIndex];
+
+                if (!eventRecords.TryGetValue(id, out var eventRecord))
+                {
+                    continue;
+                }
+                var occurrenceRecord = DwcObservationVerbatimFactory.Create(NextId, row, null, idIndex);
+                eventRecord.Observations ??= new List<DwcObservationVerbatim>();
+                eventRecord.Observations.Add(occurrenceRecord);
             }
         }
 
         private async Task AddTaxonListDataAsync(IDictionary<string, DwcEventOccurrenceVerbatim> eventRecords,
             string path)
         {
-            try
+            await using var xmlFileStream = File.OpenRead(Path.Combine(path, "taxonlist.xml"));
+            using var xmlReader = XmlReader.Create(xmlFileStream);
+            var xmlDoc = XDocument.Load(xmlReader);
+
+            if (xmlDoc == null)
             {
-                await using var xmlFileStream = File.OpenRead(Path.Combine(path, "taxonlist.xml"));
-                using var xmlReader = XmlReader.Create(xmlFileStream);
-                var xmlDoc = XDocument.Load(xmlReader);
+                return;
+            }
+            var ns = xmlDoc!.Root!.GetDefaultNamespace();
+            var taxonlistsElement = xmlDoc.Element(ns + "taxonlists");
 
-                if (xmlDoc == null)
+            if (taxonlistsElement == null)
+            {
+                return;
+            }
+            var taxonLists = new Dictionary<string, HashSet<DwcTaxon>>();
+
+            foreach (var taxonListElement in taxonlistsElement.Elements(ns + "taxonlist"))
+            {
+                var listId = taxonListElement.Element(ns + "samplingTaxonlistID")?.Value;
+                var taxaElement = taxonListElement.Element(ns + "taxa");
+
+                if (listId == null || taxaElement == null)
                 {
-                    return;
+                    continue;
                 }
-                var ns = xmlDoc!.Root!.GetDefaultNamespace();
-                var taxonlistsElement = xmlDoc.Element(ns + "taxonlists");
 
-                if (taxonlistsElement == null)
+                foreach (var taxonElement in taxaElement.Elements(ns + "taxon"))
                 {
-                    return;
-                }
-                var taxonLists = new Dictionary<string, HashSet<DwcTaxon>>();
-
-                foreach (var taxonListElement in taxonlistsElement.Elements(ns + "taxonlist"))
-                {
-                    var listId = taxonListElement.Element(ns + "samplingTaxonlistID")?.Value;
-                    var taxaElement = taxonListElement.Element(ns + "taxa");
-
-                    if (listId == null || taxaElement == null)
+                    if (!taxonLists.TryGetValue(listId, out var taxonList))
                     {
-                        continue;
+                        taxonList = new HashSet<DwcTaxon>();
+                        taxonLists.Add(listId, taxonList);
                     }
-
-                    foreach (var taxonElement in taxaElement.Elements(ns + "taxon"))
-                    {
-                        if (!taxonLists.TryGetValue(listId, out var taxonList))
-                        {
-                            taxonList = new HashSet<DwcTaxon>();
-                            taxonLists.Add(listId, taxonList);
-                        }
                         
-                        var taxonId = taxonElement.Elements()
-                            .Single(x => x.Name.LocalName.Equals($"{ns}taxonId", StringComparison.OrdinalIgnoreCase)).Value;
-                        var scientificName = taxonElement.Elements()
-                            .Single(x => x.Name.LocalName.Equals($"{ns}scientificName", StringComparison.OrdinalIgnoreCase)).Value;
-                        var taxonRank = taxonElement.Elements()
-                            .Single(x => x.Name.LocalName.Equals($"{ns}taxonRank", StringComparison.OrdinalIgnoreCase)).Value;
-                        var kingdom = taxonElement.Elements()
-                            .Single(x => x.Name.LocalName.Equals($"{ns}kingdom", StringComparison.OrdinalIgnoreCase)).Value;
+                    var taxonId = taxonElement.Elements()
+                        .Single(x => x.Name.LocalName.Equals($"{ns}taxonId", StringComparison.OrdinalIgnoreCase)).Value;
+                    var scientificName = taxonElement.Elements()
+                        .Single(x => x.Name.LocalName.Equals($"{ns}scientificName", StringComparison.OrdinalIgnoreCase)).Value;
+                    var taxonRank = taxonElement.Elements()
+                        .Single(x => x.Name.LocalName.Equals($"{ns}taxonRank", StringComparison.OrdinalIgnoreCase)).Value;
+                    var kingdom = taxonElement.Elements()
+                        .Single(x => x.Name.LocalName.Equals($"{ns}kingdom", StringComparison.OrdinalIgnoreCase)).Value;
                         
-                        taxonList.Add(new DwcTaxon
-                        {
-                            TaxonID = taxonId,
-                            ScientificName = scientificName,
-                            TaxonRank = taxonRank,
-                            Kingdom = kingdom
-                        });
-                    }
-                }
-
-                using var csvFileHelper = new CsvFileHelper();
-                await using var csvFileStream = File.OpenRead(Path.Combine(path, "samplingEventTaxonList.txt"));
-                csvFileHelper.InitializeRead(csvFileStream, "\t");
-
-                var taxonListEventMapping = csvFileHelper.GetRecords(SamplingEventTaxonListMapping);
-
-                csvFileHelper.FinishRead();
-                csvFileStream.Close();
-
-                if (!taxonListEventMapping?.Any() ?? true)
-                {
-                    return;
-                }
-
-                foreach (var listEventMapping in taxonListEventMapping!)
-                {
-                    if (!eventRecords.TryGetValue(listEventMapping?.EventID ?? "", out var eventRecord))
+                    taxonList.Add(new DwcTaxon
                     {
-                        continue;
-                    }
-
-                    eventRecord.BasisOfRecord = listEventMapping!.BasisOfRecord;
-                    eventRecord.IdentificationVerificationStatus = listEventMapping.IdentificationVerificationStatus;
-                    eventRecord.RecordedBy = listEventMapping.RecordedBy;
-                    eventRecord.SamplingEffortTime = listEventMapping.SamplingEffortTime;
-
-                    if (!taxonLists.TryGetValue(listEventMapping.SamplingTaxonlistID ?? "", out var taxonList))
-                    {
-                        continue;
-                    }
-
-                    eventRecord.Taxa = taxonList;
+                        TaxonID = taxonId,
+                        ScientificName = scientificName,
+                        TaxonRank = taxonRank,
+                        Kingdom = kingdom
+                    });
                 }
             }
-            catch (Exception e)
+
+            using var csvFileHelper = new CsvFileHelper();
+            await using var csvFileStream = File.OpenRead(Path.Combine(path, "samplingEventTaxonList.txt"));
+            csvFileHelper.InitializeRead(csvFileStream, "\t");
+
+            var taxonListEventMapping = csvFileHelper.GetRecords(SamplingEventTaxonListMapping);
+
+            csvFileHelper.FinishRead();
+            csvFileStream.Close();
+
+            if (!taxonListEventMapping?.Any() ?? true)
             {
-                _logger.LogError(e, "Failed to add taxon list data");
-                throw;
+                return;
+            }
+
+            foreach (var listEventMapping in taxonListEventMapping!)
+            {
+                if (!eventRecords.TryGetValue(listEventMapping?.EventID ?? "", out var eventRecord))
+                {
+                    continue;
+                }
+
+                eventRecord.BasisOfRecord = listEventMapping!.BasisOfRecord;
+                eventRecord.IdentificationVerificationStatus = listEventMapping.IdentificationVerificationStatus;
+                eventRecord.RecordedBy = listEventMapping.RecordedBy;
+                eventRecord.SamplingEffortTime = listEventMapping.SamplingEffortTime;
+
+                if (!taxonLists.TryGetValue(listEventMapping.SamplingTaxonlistID ?? "", out var taxonList))
+                {
+                    continue;
+                }
+
+                eventRecord.Taxa = taxonList;
             }
         }
 
@@ -535,15 +485,7 @@ namespace SOS.Harvest.DarwinCore
 
         private async Task<List<DwcVerbatimDataset>?> GetDatasetsFromJsonOrXmlAsync(string path)
         {
-            try
-            {
-                return (await GetDatasetsFromJsonAsync(path)) ?? (await GetDatasetsFromXmlAsync(path));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to read dataset xml/json");
-                throw;
-            }
+            return (await GetDatasetsFromJsonAsync(path)) ?? (await GetDatasetsFromXmlAsync(path));
         }
 
         private async Task<List<DwcVerbatimDataset>?> GetDatasetsFromJsonAsync(string path)
@@ -738,37 +680,29 @@ namespace SOS.Harvest.DarwinCore
         private async Task AddMofExtensionDataAsync(IDictionary<string, DwcEventOccurrenceVerbatim> eventRecords,
             ArchiveReader? archiveReader)
         {
-            try
+            if (archiveReader == null)
             {
-                if (archiveReader == null)
-                {
-                    throw new Exception("ArchiveReader not initialized");
-                }
-
-                var mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
-                if (mofFileReader == null)
-                {
-                    return;
-                };
-                var idIndex = mofFileReader.GetIdIndex();
-
-                await foreach (var row in mofFileReader.GetDataRowsAsync())
-                {
-                    var id = row[idIndex];
-
-                    if (!eventRecords.TryGetValue(id, out var eventRecord))
-                    {
-                        continue;
-                    }
-
-                    eventRecord.MeasurementOrFacts ??= new List<DwcMeasurementOrFact>();
-                    eventRecord.MeasurementOrFacts.Add(DwcMeasurementOrFactFactory.Create(row));
-                }
+                throw new Exception("ArchiveReader not initialized");
             }
-            catch (Exception e)
+
+            var mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
+            if (mofFileReader == null)
             {
-                _logger.LogError(e, "Failed to add MeasurementOrFact extension data");
-                throw;
+                return;
+            };
+            var idIndex = mofFileReader.GetIdIndex();
+
+            await foreach (var row in mofFileReader.GetDataRowsAsync())
+            {
+                var id = row[idIndex];
+
+                if (!eventRecords.TryGetValue(id, out var eventRecord))
+                {
+                    continue;
+                }
+
+                eventRecord.MeasurementOrFacts ??= new List<DwcMeasurementOrFact>();
+                eventRecord.MeasurementOrFacts.Add(DwcMeasurementOrFactFactory.Create(row));
             }
         }
 
@@ -781,37 +715,29 @@ namespace SOS.Harvest.DarwinCore
         private async Task AddEmofExtensionDataAsync(IDictionary<string, DwcEventOccurrenceVerbatim> eventRecords,
             ArchiveReader? archiveReader)
         {
-            try
+            if (archiveReader == null)
             {
-                if (archiveReader == null)
-                {
-                    throw new Exception("ArchiveReader not initialized");
-                }
-
-                var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
-                if (emofFileReader == null)
-                {
-                    return;
-                };
-                var idIndex = emofFileReader.GetIdIndex();
-
-                await foreach (var row in emofFileReader.GetDataRowsAsync())
-                {
-                    var id = row[idIndex];
-
-                    if (!eventRecords.TryGetValue(id, out var eventRecord))
-                    {
-                        continue;
-                    }
-
-                    eventRecord.ExtendedMeasurementOrFacts ??= new List<DwcExtendedMeasurementOrFact>();
-                    eventRecord.ExtendedMeasurementOrFacts.Add(DwcExtendedMeasurementOrFactFactory.Create(row));
-                }
+                throw new Exception("ArchiveReader not initialized");
             }
-            catch (Exception e)
+
+            var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
+            if (emofFileReader == null)
             {
-                _logger.LogError(e, "Failed to add MeasurementOrFact extension data");
-                throw;
+                return;
+            };
+            var idIndex = emofFileReader.GetIdIndex();
+
+            await foreach (var row in emofFileReader.GetDataRowsAsync())
+            {
+                var id = row[idIndex];
+
+                if (!eventRecords.TryGetValue(id, out var eventRecord))
+                {
+                    continue;
+                }
+
+                eventRecord.ExtendedMeasurementOrFacts ??= new List<DwcExtendedMeasurementOrFact>();
+                eventRecord.ExtendedMeasurementOrFacts.Add(DwcExtendedMeasurementOrFactFactory.Create(row));
             }
         }
 

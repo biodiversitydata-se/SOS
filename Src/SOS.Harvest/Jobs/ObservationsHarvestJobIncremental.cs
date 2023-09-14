@@ -1,18 +1,8 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
-using SOS.Harvest.Harvesters.AquaSupport.FishData.Interfaces;
-using SOS.Harvest.Harvesters.AquaSupport.Kul.Interfaces;
-using SOS.Harvest.Harvesters.AquaSupport.Nors.Interfaces;
 using SOS.Harvest.Harvesters.Artportalen.Interfaces;
-using SOS.Harvest.Harvesters.Biologg.Interfaces;
-using SOS.Harvest.Harvesters.DwC.Interfaces;
-using SOS.Harvest.Harvesters.iNaturalist.Interfaces;
 using SOS.Harvest.Harvesters.Interfaces;
-using SOS.Harvest.Harvesters.Mvm.Interfaces;
-using SOS.Harvest.Harvesters.ObservationDatabase.Interfaces;
-using SOS.Harvest.Harvesters.Shark.Interfaces;
-using SOS.Harvest.Harvesters.VirtualHerbarium.Interfaces;
-using SOS.Harvest.HarvestersAquaSupport.Sers.Interfaces;
+using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
@@ -47,44 +37,24 @@ namespace SOS.Harvest.Jobs
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="artportalenObservationHarvester"></param>
-        /// <param name="biologgObservationHarvester"></param>
-        /// <param name="dwcObservationHarvester"></param>
-        /// <param name="fishDataObservationHarvester"></param>
-        /// <param name="kulObservationHarvester"></param>
-        /// <param name="mvmObservationHarvester"></param>
-        /// <param name="norsObservationHarvester"></param>
-        /// <param name="observationDatabaseHarvester"></param>
-        /// <param name="sersObservationHarvester"></param>
-        /// <param name="sharkObservationHarvester"></param>
-        /// <param name="virtualHerbariumObservationHarvester"></param>
-        /// <param name="iNaturalistObservationHarvester"></param>
+        /// <param name="observationHarvesterManager"></param>
         /// <param name="projectHarvester"></param>
+        /// <param name="artportalenDatasetMetadataHarvester"></param>
         /// <param name="taxonListHarvester"></param>
         /// <param name="dataProviderManager"></param>
         /// <param name="harvestInfoRepository"></param>
+        /// <param name="processObservationsJobIncremental"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ObservationsHarvestJobIncremental(
-            IArtportalenObservationHarvester artportalenObservationHarvester,
-            IBiologgObservationHarvester biologgObservationHarvester,
-            IDwcObservationHarvester dwcObservationHarvester,
-            IFishDataObservationHarvester fishDataObservationHarvester,
-            IKulObservationHarvester kulObservationHarvester,
-            IMvmObservationHarvester mvmObservationHarvester,
-            INorsObservationHarvester norsObservationHarvester,
-            IObservationDatabaseHarvester observationDatabaseHarvester,
-            ISersObservationHarvester sersObservationHarvester,
-            ISharkObservationHarvester sharkObservationHarvester,
-            IVirtualHerbariumObservationHarvester virtualHerbariumObservationHarvester,
-            IiNaturalistObservationHarvester iNaturalistObservationHarvester,
+            IObservationHarvesterManager observationHarvesterManager,
             IProjectHarvester projectHarvester,
             IArtportalenDatasetMetadataHarvester artportalenDatasetMetadataHarvester,
             ITaxonListHarvester taxonListHarvester,
             IDataProviderManager dataProviderManager,
             IHarvestInfoRepository harvestInfoRepository,
             IProcessObservationsJobIncremental processObservationsJobIncremental,
-            ILogger<ObservationsHarvestJobIncremental> logger) : base(artportalenObservationHarvester, biologgObservationHarvester, dwcObservationHarvester, fishDataObservationHarvester, kulObservationHarvester,
-                mvmObservationHarvester, norsObservationHarvester, observationDatabaseHarvester, sersObservationHarvester, sharkObservationHarvester, virtualHerbariumObservationHarvester, iNaturalistObservationHarvester,
+            ILogger<ObservationsHarvestJobIncremental> logger) : base(observationHarvesterManager,
                 projectHarvester, artportalenDatasetMetadataHarvester, taxonListHarvester, dataProviderManager, harvestInfoRepository, logger)
         {
             _processObservationsJobIncremental = processObservationsJobIncremental ?? throw new ArgumentNullException(nameof(processObservationsJobIncremental)); ;
@@ -107,7 +77,7 @@ namespace SOS.Harvest.Jobs
             List<int> sightingIds,
             IJobCancellationToken cancellationToken)
         {
-            var harvester = _harvestersByType[DataProviderType.ArtportalenObservations] as IArtportalenObservationHarvester;
+            var harvester = _observationHarvesterManager.GetHarvester(DataProviderType.ArtportalenObservations) as IArtportalenObservationHarvester;
             var verbatims = await harvester!.HarvestObservationsAsync(sightingIds, cancellationToken);
 
             if (!verbatims?.Any() ?? true)

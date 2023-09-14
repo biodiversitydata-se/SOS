@@ -211,7 +211,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
                 Id = 100,
                 Identifier = "TestButterflyMonitoring"
             };
-            var dwcaReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcaReader = new DwcArchiveReader(0);
             using var archiveReader = new ArchiveReader(archivePath);
             var observations = await dwcaReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
             var dwcaProcessor = CreateDwcaObservationProcessor(false, observations);
@@ -240,7 +240,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
                 Id = 101,
                 Identifier = "TestSHARK"
             };
-            var dwcaReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcaReader = new DwcArchiveReader(0);
             using var archiveReader = new ArchiveReader(archivePath);
             var observations = await dwcaReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
             var dwcaProcessor = CreateDwcaObservationProcessor(false, observations);
