@@ -1,6 +1,6 @@
 <layer>
   <name>SpeciesObservationsInvasive</name>
-  <id>LayerInfoImpl--40b35ed2:184660c59b1:5ada</id>
+  <id>LayerInfoImpl--5811225:18a937978c2:-7904</id>
   <type>VECTOR</type>
   <defaultStyle>
     <id>StyleInfoImpl-1b348ea4:18488e85cd3:-700c</id>
@@ -10,13 +10,16 @@
       <id>StyleInfoImpl--2c64b10:184804c62a5:-6295</id>
     </style>
     <style>
-      <id>StyleInfoImpl--2c64b10:184804c62a5:-682a</id>
+      <id>StyleInfoImpl-1b348ea4:18488e85cd3:-700c</id>
     </style>
     <style>
       <id>StyleInfoImpl--2c64b10:184804c62a5:-6280</id>
     </style>
     <style>
       <id>StyleInfoImpl--2c64b10:184804c62a5:-623a</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-1b348ea4:18488e85cd3:-6fd6</id>
     </style>
     <style>
       <id>StyleInfoImpl--2c64b10:184804c62a5:-62a1</id>
@@ -39,20 +42,14 @@
     <style>
       <id>StyleInfoImpl--2c64b10:184804c62a5:-629f</id>
     </style>
-    <style>
-      <id>StyleInfoImpl-1b348ea4:18488e85cd3:-700c</id>
-    </style>
-    <style>
-      <id>StyleInfoImpl-1b348ea4:18488e85cd3:-6fd6</id>
-    </style>
   </styles>
   <resource class="featureType">
-    <id>FeatureTypeInfoImpl--40b35ed2:184660c59b1:5ad9</id>
+    <id>FeatureTypeInfoImpl--5811225:18a937978c2:-7905</id>
   </resource>
   <attribution>
     <logoWidth>0</logoWidth>
     <logoHeight>0</logoHeight>
   </attribution>
-  <dateCreated>2022-11-14 13:21:18.984 UTC</dateCreated>
-  <dateModified>2023-06-15 07:23:19.870 UTC</dateModified>
+  <dateCreated>2023-09-14 11:59:57.871 UTC</dateCreated>
+  <dateModified>2023-09-14 13:00:45.906 UTC</dateModified>
 </layer>
