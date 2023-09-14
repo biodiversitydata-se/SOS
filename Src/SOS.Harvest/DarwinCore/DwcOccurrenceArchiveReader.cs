@@ -14,7 +14,6 @@ namespace SOS.Harvest.DarwinCore
     /// </summary>
     public class DwcOccurrenceArchiveReader : IDwcArchiveReaderAsDwcObservation
     {
-        private readonly ILogger<DwcArchiveReader> _logger;
         private int _idCounter;
         private int NextId => Interlocked.Increment(ref _idCounter);
 
@@ -24,9 +23,8 @@ namespace SOS.Harvest.DarwinCore
         /// <param name="logger"></param>
         /// <param name="idInitValue"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public DwcOccurrenceArchiveReader(ILogger<DwcArchiveReader> logger, int idInitValue = 0)
+        public DwcOccurrenceArchiveReader(int idInitValue = 0)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _idCounter = idInitValue;
         }
 
@@ -110,93 +108,69 @@ namespace SOS.Harvest.DarwinCore
         private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
             ArchiveReader archiveReader)
         {
-            try
+            var multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
+            if (multimediaFileReader == null) return;
+            var idIndex = multimediaFileReader.GetIdIndex();
+            var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
+            await foreach (var row in multimediaFileReader.GetDataRowsAsync())
             {
-                var multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
-                if (multimediaFileReader == null) return;
-                var idIndex = multimediaFileReader.GetIdIndex();
-                var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
-                await foreach (var row in multimediaFileReader.GetDataRowsAsync())
+                var id = row[idIndex];
+                if (observationByRecordId.TryGetValue(id, out var obs))
                 {
-                    var id = row[idIndex];
-                    if (observationByRecordId.TryGetValue(id, out var obs))
+                    if (obs.ObservationMultimedia == null)
                     {
-                        if (obs.ObservationMultimedia == null)
-                        {
-                            obs.ObservationMultimedia = new List<DwcMultimedia>();
-                        }
-
-                        var multimediaItem = DwcMultimediaFactory.Create(row);
-                        obs.ObservationMultimedia.Add(multimediaItem);
+                        obs.ObservationMultimedia = new List<DwcMultimedia>();
                     }
+
+                    var multimediaItem = DwcMultimediaFactory.Create(row);
+                    obs.ObservationMultimedia.Add(multimediaItem);
                 }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to add Multimedia extension data");
-                throw;
             }
         }
 
         private async Task AddAudubonMediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
             ArchiveReader archiveReader)
         {
-            try
+            var audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
+            if (audubonFileReader == null) return;
+            var idIndex = audubonFileReader.GetIdIndex();
+            var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
+            await foreach (var row in audubonFileReader.GetDataRowsAsync())
             {
-                var audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
-                if (audubonFileReader == null) return;
-                var idIndex = audubonFileReader.GetIdIndex();
-                var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
-                await foreach (var row in audubonFileReader.GetDataRowsAsync())
+                var id = row[idIndex];
+                if (observationByRecordId.TryGetValue(id, out var obs))
                 {
-                    var id = row[idIndex];
-                    if (observationByRecordId.TryGetValue(id, out var obs))
+                    if (obs.ObservationAudubonMedia == null)
                     {
-                        if (obs.ObservationAudubonMedia == null)
-                        {
-                            obs.ObservationAudubonMedia = new List<DwcAudubonMedia>();
-                        }
-
-                        var audubonItem = DwcAudubonMediaFactory.Create(row);
-                        obs.ObservationAudubonMedia.Add(audubonItem);
+                        obs.ObservationAudubonMedia = new List<DwcAudubonMedia>();
                     }
+
+                    var audubonItem = DwcAudubonMediaFactory.Create(row);
+                    obs.ObservationAudubonMedia.Add(audubonItem);
                 }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to add Audubon media description extension data");
-                throw;
             }
         }
 
         private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
             ArchiveReader archiveReader)
         {
-            try
+            var mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
+            if (mofFileReader == null) return;
+            var idIndex = mofFileReader.GetIdIndex();
+            var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
+            await foreach (var row in mofFileReader.GetDataRowsAsync())
             {
-                var mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
-                if (mofFileReader == null) return;
-                var idIndex = mofFileReader.GetIdIndex();
-                var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
-                await foreach (var row in mofFileReader.GetDataRowsAsync())
+                var id = row[idIndex];
+                if (observationByRecordId.TryGetValue(id, out var obs))
                 {
-                    var id = row[idIndex];
-                    if (observationByRecordId.TryGetValue(id, out var obs))
+                    if (obs.ObservationMeasurementOrFacts == null)
                     {
-                        if (obs.ObservationMeasurementOrFacts == null)
-                        {
-                            obs.ObservationMeasurementOrFacts = new List<DwcMeasurementOrFact>();
-                        }
-
-                        var mofItem = DwcMeasurementOrFactFactory.Create(row);
-                        obs.ObservationMeasurementOrFacts.Add(mofItem);
+                        obs.ObservationMeasurementOrFacts = new List<DwcMeasurementOrFact>();
                     }
+
+                    var mofItem = DwcMeasurementOrFactFactory.Create(row);
+                    obs.ObservationMeasurementOrFacts.Add(mofItem);
                 }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to add MeasurementOrFact extension data");
-                throw;
             }
         }
 
@@ -209,8 +183,6 @@ namespace SOS.Harvest.DarwinCore
         private async Task AddEmofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
             ArchiveReader archiveReader)
         {
-            try
-            {
                 var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
                 if (emofFileReader == null) return;
                 var idIndex = emofFileReader.GetIdIndex();
@@ -230,12 +202,6 @@ namespace SOS.Harvest.DarwinCore
                         obs.ObservationExtendedMeasurementOrFacts.Add(emofItem);
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to add ExtendedMeasurementOrFact extension data");
-                throw;
-            }
         }
 
         /// <summary>

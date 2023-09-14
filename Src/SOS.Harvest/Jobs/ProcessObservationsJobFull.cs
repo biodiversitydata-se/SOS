@@ -3,14 +3,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
-using SOS.Harvest.Processors.FishData.Interfaces;
-using SOS.Harvest.Processors.Kul.Interfaces;
-using SOS.Harvest.Processors.Mvm.Interfaces;
-using SOS.Harvest.Processors.Nors.Interfaces;
-using SOS.Harvest.Processors.ObservationDatabase.Interfaces;
-using SOS.Harvest.Processors.Sers.Interfaces;
-using SOS.Harvest.Processors.Shark.Interfaces;
-using SOS.Harvest.Processors.VirtualHerbarium.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -576,16 +568,7 @@ namespace SOS.Harvest.Jobs
         public ProcessObservationsJobFull(IProcessedObservationCoreRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
-            IArtportalenObservationProcessor artportalenObservationProcessor,
-            IFishDataObservationProcessor fishDataObservationProcessor,
-            IKulObservationProcessor kulObservationProcessor,
-            IMvmObservationProcessor mvmObservationProcessor,
-            INorsObservationProcessor norsObservationProcessor,
-            IObservationDatabaseProcessor observationDatabaseProcessor,
-            ISersObservationProcessor sersObservationProcessor,
-            ISharkObservationProcessor sharkObservationProcessor,
-            IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
-            IDwcaObservationProcessor dwcaObservationProcessor,
+            IObservationProcessorManager observationProcessorManager,
             ICache<int, Taxon> taxonCache,
             IDataProviderCache dataProviderCache,
             ICacheManager cacheManager,
@@ -603,9 +586,8 @@ namespace SOS.Harvest.Jobs
             IArtportalenEventProcessor artportalenEventProcessor,
             IDwcaEventProcessor dwcaEventProcessor,
             IObservationsHarvestJobIncremental observationsIncrementalHarvestJob,
-            ILogger<ProcessObservationsJobFull> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, artportalenObservationProcessor, fishDataObservationProcessor,
-            kulObservationProcessor, mvmObservationProcessor, norsObservationProcessor, observationDatabaseProcessor, sersObservationProcessor, sharkObservationProcessor, virtualHerbariumObservationProcessor,
-            dwcaObservationProcessor, taxonCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
+            ILogger<ProcessObservationsJobFull> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, observationProcessorManager, 
+                taxonCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
             logger)
         {
             _dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));

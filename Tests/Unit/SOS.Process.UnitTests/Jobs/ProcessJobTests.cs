@@ -7,15 +7,12 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Harvest.Jobs;
-using SOS.Harvest.Jobs.Interfaces;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
@@ -27,14 +24,6 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
-using SOS.Harvest.Processors.FishData.Interfaces;
-using SOS.Harvest.Processors.Kul.Interfaces;
-using SOS.Harvest.Processors.Mvm.Interfaces;
-using SOS.Harvest.Processors.Nors.Interfaces;
-using SOS.Harvest.Processors.ObservationDatabase.Interfaces;
-using SOS.Harvest.Processors.Sers.Interfaces;
-using SOS.Harvest.Processors.Shark.Interfaces;
-using SOS.Harvest.Processors.VirtualHerbarium.Interfaces;
 using Xunit;
 using SOS.Lib.Jobs.Import;
 
@@ -62,15 +51,7 @@ namespace SOS.Process.UnitTests.Jobs
             _validationManager = new Mock<IValidationManager>();
             _taxonCache =new Mock<ICache<int, Taxon>>();
             _processTaxaJob = new Mock<IProcessTaxaJob>();
-            _fishDataProcessor = new Mock<IFishDataObservationProcessor>();
-            _kulProcessor = new Mock<IKulObservationProcessor>();
-            _mvmProcessor = new Mock<IMvmObservationProcessor>();
-            _norsProcessor = new Mock<INorsObservationProcessor>();
-            _observationDatabaseProcessorMock = new Mock<IObservationDatabaseProcessor>();
-            _sersProcessor = new Mock<ISersObservationProcessor>();
-            _sharkProcessor = new Mock<ISharkObservationProcessor>();
-            _virtualHerbariumProcessor = new Mock<IVirtualHerbariumObservationProcessor>();
-            _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
+            _observationProcessorManagerMock = new Mock<IObservationProcessorManager>();
             _areaHelper = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<ProcessObservationsJobFull>>();
             _dwcaObservationProcessor = new Mock<IDwcaObservationProcessor>();
@@ -91,15 +72,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
         private readonly Mock<IProcessTaxaJob> _processTaxaJob;
-        private readonly Mock<IFishDataObservationProcessor> _fishDataProcessor;
-        private readonly Mock<IKulObservationProcessor> _kulProcessor;
-        private readonly Mock<IMvmObservationProcessor> _mvmProcessor;
-        private readonly Mock<INorsObservationProcessor> _norsProcessor;
-        private readonly Mock<IObservationDatabaseProcessor> _observationDatabaseProcessorMock;
-        private readonly Mock<ISersObservationProcessor> _sersProcessor;
-        private readonly Mock<ISharkObservationProcessor> _sharkProcessor;
-        private readonly Mock<IVirtualHerbariumObservationProcessor> _virtualHerbariumProcessor;
-        private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
+        private readonly Mock<IObservationProcessorManager> _observationProcessorManagerMock;
         private readonly Mock<ICache<int, Taxon>> _taxonCache;
         private readonly Mock<ICacheManager> _cacheManager;
         private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
@@ -121,16 +94,7 @@ namespace SOS.Process.UnitTests.Jobs
             _processedObservationRepositoryMock.Object,
             _processInfoRepository.Object,
             _harvestInfoRepository.Object,
-            _artportalenProcessor.Object,
-            _fishDataProcessor.Object,
-            _kulProcessor.Object,
-            _mvmProcessor.Object,
-            _norsProcessor.Object,
-            _observationDatabaseProcessorMock.Object,
-            _sersProcessor.Object,
-            _sharkProcessor.Object,
-            _virtualHerbariumProcessor.Object,
-            _dwcaObservationProcessor.Object,
+            _observationProcessorManagerMock.Object,
             _taxonCache.Object,
             _dataProviderCache.Object,
             _cacheManager.Object,
@@ -223,18 +187,10 @@ namespace SOS.Process.UnitTests.Jobs
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenObservationVerbatim)))
                 .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now));
-            _artportalenProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),  JobRunModes.Full, JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen,
-                    DataProviderType.ArtportalenObservations, DateTime.Now, DateTime.Now, 1, 1, 0));
-
+            
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(KulObservationVerbatim)))
                 .ReturnsAsync(new HarvestInfo("Identifier",
                     DateTime.Now));
-            _kulProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),JobRunModes.Full,  JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.KUL, DataProviderType.KULObservations,
-                    DateTime.Now, DateTime.Now, 1, 1, 0));
 
             _processedObservationRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()));
             _processInfoRepository.Setup(r => r.VerifyCollectionAsync());

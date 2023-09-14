@@ -3,7 +3,7 @@ using System.Xml.Linq;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Harvest.HarvestersAquaSupport.Sers.Interfaces;
+using SOS.Harvest.Harvesters.AquaSupport.Sers.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Harvesters.AquaSupport;
 using SOS.Lib.Configuration.Import;

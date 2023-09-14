@@ -20,7 +20,7 @@ namespace SOS.Import.LiveIntegrationTests.DarwinCore
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-occurrence-emof-lifewatch-artportalen.zip";
-            var dwcArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcArchiveReader = new DwcOccurrenceArchiveReader();
             var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
                 Id = 100,
@@ -53,7 +53,7 @@ namespace SOS.Import.LiveIntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader();
             const string archivePath = @"C:\DwC-A\SOS dev\dwca-nrm-ringedbirds-v19.3.zip";
             const int batchSize = 50000;
             const int totalNrObservationsToRead = 150000;
@@ -90,7 +90,7 @@ namespace SOS.Import.LiveIntegrationTests.DarwinCore
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-occurrence-audubonmedia-rrel-cumv_amph.zip";
-            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader();
             var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
                 Id = 102,
@@ -128,7 +128,7 @@ namespace SOS.Import.LiveIntegrationTests.DarwinCore
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-occurrence-emof-lifewatch.zip";
-            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader();
             var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
                 Id = 103,
@@ -158,7 +158,7 @@ namespace SOS.Import.LiveIntegrationTests.DarwinCore
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/measurementorfact/bdrs1.zip";
-            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader();
             var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
                 Id = 104,
@@ -186,7 +186,7 @@ namespace SOS.Import.LiveIntegrationTests.DarwinCore
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-occurrence-multimedia-verbatimoccurrence.zip";
-            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader();
             var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
                 Id = 101,

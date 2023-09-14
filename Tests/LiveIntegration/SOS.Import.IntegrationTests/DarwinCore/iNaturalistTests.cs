@@ -83,7 +83,7 @@ namespace SOS.Import.LiveIntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader();
             const string archivePath = @"C:\TEMP\gbif-observations-dwca.zip";
             const int batchSize = 50000;
             const int totalNrObservationsToRead = 150000;

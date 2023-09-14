@@ -12,9 +12,9 @@ namespace SOS.Harvest.DarwinCore
     /// </summary>
     public class DwcSamplingEventArchiveReader
     {
-        private readonly ILogger<DwcArchiveReader> _logger;
+        private readonly ILogger<DwcSamplingEventArchiveReader> _logger;
 
-        public DwcSamplingEventArchiveReader(ILogger<DwcArchiveReader> logger)
+        public DwcSamplingEventArchiveReader(ILogger<DwcSamplingEventArchiveReader> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }

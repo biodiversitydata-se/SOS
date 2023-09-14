@@ -165,7 +165,7 @@ namespace SOS.Import.LiveIntegrationTests.Managers
             var processConfiguration = new ProcessConfiguration();
 
             var validationReportManager = new DwcaDataValidationReportManager(
-                new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
+                new DwcArchiveReader(0),
                 vocabularyRepository,
                 CreateValidationManager(),
                 areaHelper,
