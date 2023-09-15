@@ -93,7 +93,7 @@ public class TestContainersFixture : IAsyncLifetime
     {
         string filePath = "Resources/MongoDb/mongodb-sos-dev.gz".GetAbsoluteFilePath();
         byte[] mongoDbBackupBytes = await File.ReadAllBytesAsync(filePath);
-        await mongoDbTestcontainer.CopyFileAsync("/dump/mongodb-sos-dev.gz", mongoDbBackupBytes);
+        await mongoDbTestcontainer.CopyAsync(mongoDbBackupBytes, "/dump/mongodb-sos-dev.gz");
         var cmds = new List<string>()
             {
                 "mongorestore", "--gzip", "--archive=/dump/mongodb-sos-dev.gz", "--username", MONGODB_USERNAME, "--password", MONGODB_PASSWORD

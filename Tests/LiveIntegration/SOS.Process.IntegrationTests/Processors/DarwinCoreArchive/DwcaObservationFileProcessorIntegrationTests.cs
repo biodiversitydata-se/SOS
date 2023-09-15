@@ -211,9 +211,9 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
                 Id = 100,
                 Identifier = "TestButterflyMonitoring"
             };
-            var dwcaReader = new DwcArchiveReader(0);
+            var dwcaReader = new DwcArchiveReader(dataProviderIdIdentifierTuple, 0);
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcaReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
+            var observations = await dwcaReader.ReadArchiveAsync(archiveReader);
             var dwcaProcessor = CreateDwcaObservationProcessor(false, observations);
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
 
@@ -240,9 +240,9 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
                 Id = 101,
                 Identifier = "TestSHARK"
             };
-            var dwcaReader = new DwcArchiveReader(0);
+            var dwcaReader = new DwcArchiveReader(dataProviderIdIdentifierTuple, 0);
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcaReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
+            var observations = await dwcaReader.ReadArchiveAsync(archiveReader);
             var dwcaProcessor = CreateDwcaObservationProcessor(false, observations);
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
 

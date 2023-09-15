@@ -25,7 +25,7 @@ namespace SOS.Harvest.Managers
     /// </summary>
     public class DwcaDataValidationReportManager : IDwcaDataValidationReportManager
     {
-        private readonly IVocabularyValueResolver _vocabularyValueResolver;        
+        private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly IValidationManager _validationManager;
         private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly IAreaHelper _areaHelper;
@@ -40,7 +40,6 @@ namespace SOS.Harvest.Managers
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="dwcArchiveReader"></param>
         /// <param name="processedVocabularyRepository"></param>
         /// <param name="validationManager"></param>
         /// <param name="areaHelper"></param>
@@ -109,11 +108,9 @@ namespace SOS.Harvest.Managers
                 _processConfiguration);
 
             var totalNumberOfObservations = archiveReader.GetNumberOfRowsInOccurrenceFile();
-            var dwcArchiveReader = new DwcArchiveReader(0);
+            var dwcArchiveReader = new DwcArchiveReader(dataProvider, 0);
             var observationsBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(
-                archiveReader,
-                dataProvider);
-
+                archiveReader);
 
             var validObservations = new List<ValidObservationTuple<DwcObservationVerbatim, Observation>>();
             var invalidObservations = new List<InvalidObservationTuple<DwcObservationVerbatim>>();

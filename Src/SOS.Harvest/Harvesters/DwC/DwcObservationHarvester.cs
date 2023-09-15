@@ -113,12 +113,12 @@ namespace SOS.Harvest.Harvesters.DwC
 
                     _logger.LogDebug($"Start storing DwC-A observations for {dataProvider.Identifier}");
                 }
-                var dwcArchiveReader = new DwcArchiveReader(await dwcArchiveVerbatimRepository.GetMaxIdAsync());
+                var dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcArchiveVerbatimRepository.GetMaxIdAsync());
                 var observationCount = 0;
                 using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
 
                 var observationBatches =
-                    dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, dataProvider,
+                    dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader,
                         _dwcaConfiguration.BatchSize);
                 await foreach (var verbatimObservationsBatch in observationBatches)
                 {
@@ -203,7 +203,7 @@ namespace SOS.Harvest.Harvesters.DwC
        
                 // Read datasets
                 List<Lib.Models.Processed.DataStewardship.Dataset.DwcVerbatimDataset>? datasets = null;
-                var dwcArchiveReader = new DwcArchiveReader(await dwcCollectionRepository.DatasetRepository.GetMaxIdAsync());
+                var dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.DatasetRepository.GetMaxIdAsync());
                 try
                 {
                     datasets = await dwcArchiveReader.ReadDatasetsAsync(dwcCollectionArchiveReaderContext);
@@ -215,7 +215,7 @@ namespace SOS.Harvest.Harvesters.DwC
 
                 // Read observations
                 int observationCount = 0;
-                dwcArchiveReader = new DwcArchiveReader(await dwcCollectionRepository.OccurrenceRepository.GetMaxIdAsync());
+                dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.OccurrenceRepository.GetMaxIdAsync());
                 var observationBatches = dwcArchiveReader.ReadOccurrencesInBatchesAsync(dwcCollectionArchiveReaderContext);
                 await foreach (var verbatimObservationsBatch in observationBatches)
                 {
@@ -234,7 +234,7 @@ namespace SOS.Harvest.Harvesters.DwC
                 // Read events
                 try
                 {
-                    dwcArchiveReader = new DwcArchiveReader(await dwcCollectionRepository.EventRepository.GetMaxIdAsync());
+                    dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.EventRepository.GetMaxIdAsync());
                     var events = (await dwcArchiveReader.ReadEventsAsync(dwcCollectionArchiveReaderContext))?.ToList();
                     if (events != null && events.Any())
                     {

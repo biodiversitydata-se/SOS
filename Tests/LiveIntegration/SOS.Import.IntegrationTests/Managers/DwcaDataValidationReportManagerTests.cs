@@ -11,10 +11,12 @@ using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
+using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Json;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -163,8 +165,7 @@ namespace SOS.Import.LiveIntegrationTests.Managers
                 processClient,
                 new NullLogger<TaxonRepository>());
             var processConfiguration = new ProcessConfiguration();
-
-            var validationReportManager = new DwcaDataValidationReportManager(                
+            var validationReportManager = new DwcaDataValidationReportManager(
                 vocabularyRepository,
                 CreateValidationManager(),
                 areaHelper,
