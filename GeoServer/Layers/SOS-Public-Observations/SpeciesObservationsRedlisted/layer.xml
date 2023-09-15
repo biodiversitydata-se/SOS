@@ -1,6 +1,6 @@
 <layer>
   <name>SpeciesObservationsRedlisted</name>
-  <id>LayerInfoImpl--e296ba4:18051d5b990:-7ff7</id>
+  <id>LayerInfoImpl-3fe02a88:18a929e824d:-68c4</id>
   <type>VECTOR</type>
   <defaultStyle>
     <id>StyleInfoImpl--2c64b10:184804c62a5:-6280</id>
@@ -10,22 +10,10 @@
       <id>StyleInfoImpl--2c64b10:184804c62a5:-6295</id>
     </style>
     <style>
-      <id>StyleInfoImpl--2c64b10:184804c62a5:-682a</id>
-    </style>
-    <style>
-      <id>StyleInfoImpl--2c64b10:184804c62a5:-6280</id>
-    </style>
-    <style>
       <id>StyleInfoImpl--2c64b10:184804c62a5:-623a</id>
     </style>
     <style>
       <id>StyleInfoImpl--2c64b10:184804c62a5:-62a1</id>
-    </style>
-    <style>
-      <id>StyleInfoImpl--2c64b10:184804c62a5:-629c</id>
-    </style>
-    <style>
-      <id>StyleInfoImpl--2c64b10:184804c62a5:-62a5</id>
     </style>
     <style>
       <id>StyleInfoImpl--2c64b10:184804c62a5:-6263</id>
@@ -34,22 +22,34 @@
       <id>StyleInfoImpl--2c64b10:184804c62a5:-6298</id>
     </style>
     <style>
+      <id>StyleInfoImpl--2c64b10:184804c62a5:-682a</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-1b348ea4:18488e85cd3:-6fd6</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--2c64b10:184804c62a5:-6280</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--2c64b10:184804c62a5:-629c</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--2c64b10:184804c62a5:-62a5</id>
+    </style>
+    <style>
       <id>StyleInfoImpl--2c64b10:184804c62a5:-7fff</id>
     </style>
     <style>
       <id>StyleInfoImpl--2c64b10:184804c62a5:-629f</id>
     </style>
-    <style>
-      <id>StyleInfoImpl-1b348ea4:18488e85cd3:-6fd6</id>
-    </style>
   </styles>
   <resource class="featureType">
-    <id>FeatureTypeInfoImpl--e296ba4:18051d5b990:-7ff8</id>
+    <id>FeatureTypeInfoImpl-3fe02a88:18a929e824d:-68c5</id>
   </resource>
   <attribution>
     <logoWidth>0</logoWidth>
     <logoHeight>0</logoHeight>
   </attribution>
-  <dateCreated>2022-04-25 14:15:00.869 UTC</dateCreated>
-  <dateModified>2023-09-14 08:08:36.541 UTC</dateModified>
+  <dateCreated>2023-09-14 11:11:27.139 UTC</dateCreated>
+  <dateModified>2023-09-14 11:47:06.38 UTC</dateModified>
 </layer>

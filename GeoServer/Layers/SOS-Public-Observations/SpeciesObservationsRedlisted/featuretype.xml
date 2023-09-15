@@ -1,5 +1,5 @@
 <featureType>
-  <id>FeatureTypeInfoImpl--e296ba4:18051d5b990:-7ff8</id>
+  <id>FeatureTypeInfoImpl-3fe02a88:18a929e824d:-68c5</id>
   <name>SpeciesObservationsRedlisted</name>
   <nativeName>sos-observation</nativeName>
   <namespace>
@@ -25,14 +25,12 @@
     <maxx>24.17</maxx>
     <miny>54.96</miny>
     <maxy>69.07</maxy>
-    <crs>EPSG:4326</crs>
   </nativeBoundingBox>
   <latLonBoundingBox>
     <minx>10.03</minx>
     <maxx>24.17</maxx>
     <miny>54.96</miny>
     <maxy>69.07</maxy>
-    <crs>EPSG:4326</crs>
   </latLonBoundingBox>
   <projectionPolicy>FORCE_DECLARED</projectionPolicy>
   <enabled>true</enabled>
@@ -261,7 +259,7 @@
             <type>java.lang.String</type>
             <use>true</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
             <order>170</order>
@@ -287,7 +285,7 @@
             <type>java.lang.String</type>
             <use>true</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
             <order>190</order>
@@ -300,7 +298,7 @@
             <type>java.lang.String</type>
             <use>true</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
             <order>200</order>
@@ -338,7 +336,7 @@
             <type>java.lang.String</type>
             <use>true</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
             <order>230</order>
@@ -368,7 +366,7 @@
             <stored>false</stored>
             <nested>false</nested>
             <order>250</order>
-            <customName>taxonVernacularName</customName>
+            <customName>vernacularName</customName>
           </esAttribute>
           <esAttribute>
             <name>taxon.scientificName</name>
@@ -381,7 +379,7 @@
             <stored>false</stored>
             <nested>false</nested>
             <order>260</order>
-            <customName>taxonScientificName</customName>
+            <customName>scientificName</customName>
           </esAttribute>
           <esAttribute>
             <name>taxon.attributes.isRedlisted</name>
@@ -487,7 +485,7 @@
             <shortName>natura2000HabitatsDirectiveArticle4</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.Boolean</type>
-            <use>false</use>
+            <use>true</use>
             <defaultGeometry>false</defaultGeometry>
             <stored>false</stored>
             <nested>false</nested>
@@ -499,7 +497,7 @@
             <shortName>natura2000HabitatsDirectiveArticle5</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.Boolean</type>
-            <use>false</use>
+            <use>true</use>
             <defaultGeometry>false</defaultGeometry>
             <stored>false</stored>
             <nested>false</nested>
@@ -874,7 +872,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -1037,7 +1035,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -1088,7 +1086,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -1396,7 +1394,7 @@
           </esAttribute>
           <esAttribute>
             <name>defects.item.fields.keyword</name>
-            <shortName>defects.item.fields.keyword</shortName>
+            <shortName>keyword</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.String</type>
             <use>false</use>
@@ -1412,7 +1410,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -1423,7 +1421,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -1444,7 +1442,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -1517,7 +1515,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -1594,7 +1592,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -1671,7 +1669,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -1737,7 +1735,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -1856,7 +1854,7 @@
             <shortName>plainEndDate</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.String</type>
-            <use>true</use>
+            <use>false</use>
             <defaultGeometry>false</defaultGeometry>
             <analyzed>false</analyzed>
             <stored>false</stored>
@@ -1879,7 +1877,7 @@
             <shortName>plainStartDate</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.String</type>
-            <use>true</use>
+            <use>false</use>
             <defaultGeometry>false</defaultGeometry>
             <analyzed>false</analyzed>
             <stored>false</stored>
@@ -2209,7 +2207,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2307,7 +2305,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2338,11 +2336,10 @@
             <shortName>validated</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.Boolean</type>
-            <use>true</use>
+            <use>false</use>
             <defaultGeometry>false</defaultGeometry>
             <stored>false</stored>
             <nested>false</nested>
-            <customName>validated</customName>
           </esAttribute>
           <esAttribute>
             <name>identification.validationStatus.id</name>
@@ -2404,7 +2401,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2458,7 +2455,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2490,7 +2487,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2501,7 +2498,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2512,7 +2509,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2608,7 +2605,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2619,7 +2616,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2652,7 +2649,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2783,7 +2780,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2886,7 +2883,7 @@
             <useShortName>false</useShortName>
             <type>org.locationtech.jts.geom.Geometry</type>
             <geometryType>GEO_SHAPE</geometryType>
-            <use>false</use>
+            <use>true</use>
             <defaultGeometry>false</defaultGeometry>
             <srid>4326</srid>
             <stored>false</stored>
@@ -2913,7 +2910,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -2961,6 +2958,7 @@
             <defaultGeometry>false</defaultGeometry>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>sweref99TmX</customName>
           </esAttribute>
           <esAttribute>
             <name>location.sweref99TmY</name>
@@ -2971,6 +2969,7 @@
             <defaultGeometry>false</defaultGeometry>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>sweref99TmY</customName>
           </esAttribute>
           <esAttribute>
             <name>location.verbatimCoordinateSystem</name>
@@ -3231,7 +3230,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3242,7 +3241,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3253,7 +3252,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3264,7 +3263,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3275,7 +3274,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3299,6 +3298,7 @@
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>behavior</customName>
           </esAttribute>
           <esAttribute>
             <name>occurrence.biotope.id</name>
@@ -3328,7 +3328,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3390,7 +3390,7 @@
             <shortName>individualCount</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.String</type>
-            <use>true</use>
+            <use>false</use>
             <defaultGeometry>false</defaultGeometry>
             <analyzed>false</analyzed>
             <stored>false</stored>
@@ -3404,7 +3404,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3435,7 +3435,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3446,7 +3446,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3457,7 +3457,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3468,7 +3468,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3479,7 +3479,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3490,7 +3490,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3501,7 +3501,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3512,7 +3512,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3523,7 +3523,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3534,7 +3534,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3545,7 +3545,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3556,7 +3556,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3567,7 +3567,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3578,7 +3578,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3589,7 +3589,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3608,7 +3608,7 @@
             <shortName>occurrence.occurrenceStatus.value</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.String</type>
-            <use>true</use>
+            <use>false</use>
             <defaultGeometry>false</defaultGeometry>
             <analyzed>false</analyzed>
             <stored>false</stored>
@@ -3625,6 +3625,7 @@
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>organismQuantity</customName>
           </esAttribute>
           <esAttribute>
             <name>occurrence.organismQuantityUnit.id</name>
@@ -3654,7 +3655,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3710,6 +3711,7 @@
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>reproductiveCondition</customName>
           </esAttribute>
           <esAttribute>
             <name>occurrence.sensitivityCategory</name>
@@ -3738,7 +3740,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3779,7 +3781,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3822,7 +3824,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3876,7 +3878,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3887,7 +3889,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3898,7 +3900,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -3929,12 +3931,11 @@
             <shortName>category</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.String</type>
-            <use>true</use>
+            <use>false</use>
             <defaultGeometry>false</defaultGeometry>
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
-            <customName>projectCategory</customName>
           </esAttribute>
           <esAttribute>
             <name>projects.categorySwedish</name>
@@ -3954,7 +3955,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -3994,12 +3995,11 @@
             <shortName>projects.name</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.String</type>
-            <use>true</use>
+            <use>false</use>
             <defaultGeometry>false</defaultGeometry>
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
-            <customName>projectName</customName>
           </esAttribute>
           <esAttribute>
             <name>projects.owner</name>
@@ -4030,7 +4030,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -4073,7 +4073,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>true</nested>
           </esAttribute>
@@ -4294,12 +4294,11 @@
             <shortName>swedishHistory</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.String</type>
-            <use>true</use>
+            <use>false</use>
             <defaultGeometry>false</defaultGeometry>
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
-            <customName>swedishHistory</customName>
           </esAttribute>
           <esAttribute>
             <name>taxon.attributes.swedishOccurrence</name>
@@ -4426,7 +4425,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -4547,7 +4546,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -4558,7 +4557,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -4569,7 +4568,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -4700,7 +4699,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -4722,7 +4721,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -4755,7 +4754,7 @@
             <type>java.lang.String</type>
             <use>false</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
           </esAttribute>
@@ -4787,7 +4786,7 @@
   <store class="dataStore">
     <id>DataStoreInfoImpl-53aa628:17eeef29587:-7ffd</id>
   </store>
-  <serviceConfiguration>false</serviceConfiguration>
+  <serviceConfiguration>true</serviceConfiguration>
   <simpleConversionEnabled>false</simpleConversionEnabled>
   <internationalTitle/>
   <internationalAbstract/>
@@ -4795,7 +4794,7 @@
   <maxFeatures>5000</maxFeatures>
   <numDecimals>100</numDecimals>
   <padWithZeros>false</padWithZeros>
-  <forcedDecimal>true</forcedDecimal>
+  <forcedDecimal>false</forcedDecimal>
   <overridingServiceSRS>false</overridingServiceSRS>
   <skipNumberMatched>false</skipNumberMatched>
   <circularArcPresent>false</circularArcPresent>

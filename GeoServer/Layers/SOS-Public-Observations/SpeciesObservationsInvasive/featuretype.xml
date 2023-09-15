@@ -1,5 +1,5 @@
 <featureType>
-  <id>FeatureTypeInfoImpl--40b35ed2:184660c59b1:5ad9</id>
+  <id>FeatureTypeInfoImpl--5811225:18a937978c2:-7905</id>
   <name>SpeciesObservationsInvasive</name>
   <nativeName>sos-observation</nativeName>
   <namespace>
@@ -26,18 +26,27 @@
     <maxx>24.17</maxx>
     <miny>54.96</miny>
     <maxy>69.07</maxy>
-    <crs>EPSG:4326</crs>
   </nativeBoundingBox>
   <latLonBoundingBox>
     <minx>10.03</minx>
     <maxx>24.17</maxx>
     <miny>54.96</miny>
     <maxy>69.07</maxy>
-    <crs>EPSG:4326</crs>
   </latLonBoundingBox>
   <projectionPolicy>FORCE_DECLARED</projectionPolicy>
   <enabled>true</enabled>
+  <advertised>true</advertised>
   <metadata>
+    <entry key="elevation">
+      <dimensionInfo>
+        <enabled>false</enabled>
+      </dimensionInfo>
+    </entry>
+    <entry key="time">
+      <dimensionInfo>
+        <enabled>false</enabled>
+      </dimensionInfo>
+    </entry>
     <entry key="cachingEnabled">false</entry>
     <entry key="ElasticLayerConfiguration">
       <elasticLayerConfiguration>
@@ -71,17 +80,6 @@
             <customName>url</customName>
           </esAttribute>
           <esAttribute>
-            <name>dataProviderId</name>
-            <shortName>dataProviderId</shortName>
-            <useShortName>false</useShortName>
-            <type>java.lang.Integer</type>
-            <use>true</use>
-            <defaultGeometry>false</defaultGeometry>
-            <stored>false</stored>
-            <nested>false</nested>
-            <order>30</order>
-          </esAttribute>
-          <esAttribute>
             <name>occurrence.isPositiveObservation</name>
             <shortName>isPositiveObservation</shortName>
             <useShortName>false</useShortName>
@@ -94,6 +92,17 @@
             <customName>isPresentObservation</customName>
           </esAttribute>
           <esAttribute>
+            <name>dataProviderId</name>
+            <shortName>dataProviderId</shortName>
+            <useShortName>false</useShortName>
+            <type>java.lang.Integer</type>
+            <use>true</use>
+            <defaultGeometry>false</defaultGeometry>
+            <stored>false</stored>
+            <nested>false</nested>
+            <order>40</order>
+          </esAttribute>
+          <esAttribute>
             <name>datasetName</name>
             <shortName>datasetName</shortName>
             <useShortName>false</useShortName>
@@ -103,7 +112,7 @@
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
-            <order>40</order>
+            <order>50</order>
           </esAttribute>
           <esAttribute>
             <name>event.startDate</name>
@@ -290,7 +299,7 @@
             <type>java.lang.String</type>
             <use>true</use>
             <defaultGeometry>false</defaultGeometry>
-            <analyzed>true</analyzed>
+            <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
             <order>200</order>
@@ -1386,7 +1395,7 @@
           </esAttribute>
           <esAttribute>
             <name>defects.item.fields.keyword</name>
-            <shortName>defects.item.fields.keyword</shortName>
+            <shortName>keyword</shortName>
             <useShortName>false</useShortName>
             <type>java.lang.String</type>
             <use>false</use>
@@ -1851,6 +1860,7 @@
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>endDateString</customName>
           </esAttribute>
           <esAttribute>
             <name>event.plainEndTime</name>
@@ -1873,6 +1883,7 @@
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>startDateString</customName>
           </esAttribute>
           <esAttribute>
             <name>event.plainStartTime</name>
@@ -2873,11 +2884,12 @@
             <useShortName>false</useShortName>
             <type>org.locationtech.jts.geom.Geometry</type>
             <geometryType>GEO_SHAPE</geometryType>
-            <use>false</use>
+            <use>true</use>
             <defaultGeometry>false</defaultGeometry>
             <srid>4326</srid>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>point</customName>
           </esAttribute>
           <esAttribute>
             <name>location.pointLocation</name>
@@ -2890,6 +2902,7 @@
             <srid>4326</srid>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>pointLocation</customName>
           </esAttribute>
           <esAttribute>
             <name>location.pointRadiusSpatialFit</name>
@@ -2946,6 +2959,7 @@
             <defaultGeometry>false</defaultGeometry>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>sweref99TmX</customName>
           </esAttribute>
           <esAttribute>
             <name>location.sweref99TmY</name>
@@ -2956,6 +2970,7 @@
             <defaultGeometry>false</defaultGeometry>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>sweref99TmY</customName>
           </esAttribute>
           <esAttribute>
             <name>location.verbatimCoordinateSystem</name>
@@ -3284,6 +3299,7 @@
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>behavior</customName>
           </esAttribute>
           <esAttribute>
             <name>occurrence.biotope.id</name>
@@ -3380,6 +3396,7 @@
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>individualCount</customName>
           </esAttribute>
           <esAttribute>
             <name>occurrence.individualId</name>
@@ -3597,6 +3614,7 @@
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>occurrenceStatus</customName>
           </esAttribute>
           <esAttribute>
             <name>occurrence.organismQuantity</name>
@@ -3608,6 +3626,7 @@
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>organismQuantity</customName>
           </esAttribute>
           <esAttribute>
             <name>occurrence.organismQuantityUnit.id</name>
@@ -3693,6 +3712,7 @@
             <analyzed>false</analyzed>
             <stored>false</stored>
             <nested>false</nested>
+            <customName>reproductiveCondition</customName>
           </esAttribute>
           <esAttribute>
             <name>occurrence.sensitivityCategory</name>
@@ -4767,15 +4787,15 @@
   <store class="dataStore">
     <id>DataStoreInfoImpl-53aa628:17eeef29587:-7ffd</id>
   </store>
-  <serviceConfiguration>false</serviceConfiguration>
+  <serviceConfiguration>true</serviceConfiguration>
   <simpleConversionEnabled>false</simpleConversionEnabled>
   <internationalTitle/>
   <internationalAbstract/>
-  <cqlFilter>isInvasiveInSweden= true</cqlFilter>
+  <cqlFilter>isInvasiveInSweden = true</cqlFilter>
   <maxFeatures>5000</maxFeatures>
   <numDecimals>100</numDecimals>
   <padWithZeros>false</padWithZeros>
-  <forcedDecimal>true</forcedDecimal>
+  <forcedDecimal>false</forcedDecimal>
   <overridingServiceSRS>false</overridingServiceSRS>
   <skipNumberMatched>false</skipNumberMatched>
   <circularArcPresent>false</circularArcPresent>
