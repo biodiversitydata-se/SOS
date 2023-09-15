@@ -1,6 +1,6 @@
 ﻿using DwC_A;
 using Microsoft.Extensions.Logging;
-using SOS.Harvest.DarwinCore.Interfaces;
+using SOS.Harvest.DarwinCore;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Configuration.Process;
@@ -25,8 +25,7 @@ namespace SOS.Harvest.Managers
     /// </summary>
     public class DwcaDataValidationReportManager : IDwcaDataValidationReportManager
     {
-        private readonly IVocabularyValueResolver _vocabularyValueResolver;
-        private readonly IDwcArchiveReader _dwcArchiveReader;
+        private readonly IVocabularyValueResolver _vocabularyValueResolver;        
         private readonly IValidationManager _validationManager;
         private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly IAreaHelper _areaHelper;
@@ -51,7 +50,7 @@ namespace SOS.Harvest.Managers
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public DwcaDataValidationReportManager(IDwcArchiveReader dwcArchiveReader,
+        public DwcaDataValidationReportManager(
             IVocabularyRepository processedVocabularyRepository,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
@@ -61,8 +60,7 @@ namespace SOS.Harvest.Managers
             ProcessConfiguration processConfiguration,
             ILogger<DwcaDataValidationReportManager> logger)
         {
-            _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
-            _dwcArchiveReader = dwcArchiveReader ?? throw new ArgumentNullException(nameof(dwcArchiveReader));
+            _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));            
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             _processedVocabularyRepository = processedVocabularyRepository ?? throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -111,9 +109,11 @@ namespace SOS.Harvest.Managers
                 _processConfiguration);
 
             var totalNumberOfObservations = archiveReader.GetNumberOfRowsInOccurrenceFile();
-            var observationsBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(
+            var dwcArchiveReader = new DwcArchiveReader(0);
+            var observationsBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(
                 archiveReader,
                 dataProvider);
+
 
             var validObservations = new List<ValidObservationTuple<DwcObservationVerbatim, Observation>>();
             var invalidObservations = new List<InvalidObservationTuple<DwcObservationVerbatim>>();
