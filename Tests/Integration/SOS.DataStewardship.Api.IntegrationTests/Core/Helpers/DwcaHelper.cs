@@ -11,7 +11,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Helpers
         public static async Task<DwcaComposite> ReadDwcaFileAsync(string filePath, DataProvider dataProvider)
         {
             filePath = filePath.GetAbsoluteFilePath();            
-            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(0);
             string outputPath = Path.GetTempPath();
             using var archiveReader = new ArchiveReader(filePath, outputPath); // @"C:\Temp\DwcaImport");
             var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
