@@ -164,8 +164,7 @@ namespace SOS.Import.LiveIntegrationTests.Managers
                 new NullLogger<TaxonRepository>());
             var processConfiguration = new ProcessConfiguration();
 
-            var validationReportManager = new DwcaDataValidationReportManager(
-                new DwcArchiveReader(0),
+            var validationReportManager = new DwcaDataValidationReportManager(                
                 vocabularyRepository,
                 CreateValidationManager(),
                 areaHelper,
