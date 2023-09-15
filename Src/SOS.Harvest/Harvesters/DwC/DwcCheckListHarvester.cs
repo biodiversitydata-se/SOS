@@ -3,7 +3,7 @@ using DwC_A;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Harvest.DarwinCore.Interfaces;
+using SOS.Harvest.DarwinCore;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
@@ -23,7 +23,6 @@ namespace SOS.Harvest.Harvesters.DwC
     public class DwcChecklistHarvester : IDwcChecklistHarvester
     {
         private readonly IVerbatimClient _verbatimClient;
-        private readonly IDwcArchiveReader _dwcArchiveReader;
         private readonly IFileDownloadService _fileDownloadService;
         private readonly IFileService _fileService;
         private readonly IDataProviderRepository _dataProviderRepository;
@@ -42,7 +41,6 @@ namespace SOS.Harvest.Harvesters.DwC
         /// <param name="logger"></param>
         public DwcChecklistHarvester(
             IVerbatimClient verbatimClient,
-            IDwcArchiveReader dwcArchiveReader,
             IFileDownloadService fileDownloadService,
             IFileService fileService,
             IDataProviderRepository dataProviderRepository,
@@ -50,7 +48,6 @@ namespace SOS.Harvest.Harvesters.DwC
             ILogger<DwcChecklistHarvester> logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
-            _dwcArchiveReader = dwcArchiveReader ?? throw new ArgumentNullException(nameof(dwcArchiveReader));
             _fileDownloadService = fileDownloadService ?? throw new ArgumentNullException(nameof(fileDownloadService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dataProviderRepository =
@@ -99,9 +96,8 @@ namespace SOS.Harvest.Harvesters.DwC
                 _logger.LogDebug($"Start storing DwC-A checklists for {dataProvider.Identifier}");
 
                 using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
-
-                var checklists = await
-                    _dwcArchiveReader.ReadSamplingEventArchiveAsync(archiveReader, dataProvider);
+                var dwcArchiveReader = new DwcArchiveReader(dataProvider, 0);
+                var checklists = await dwcArchiveReader.ReadSamplingEventArchiveAsync(archiveReader);
 
                 cancellationToken?.ThrowIfCancellationRequested();
 

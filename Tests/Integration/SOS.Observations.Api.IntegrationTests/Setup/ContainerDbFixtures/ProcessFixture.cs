@@ -245,10 +245,9 @@ public class ProcessFixture : IProcessFixture
         filePath = filePath.GetAbsoluteFilePath();
         string outputPath = Path.GetTempPath();
         using var archiveReader = new ArchiveReader(filePath, outputPath);
-        IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(0);
+        IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(dataProvider, 0);
         var dwcObservations = await dwcArchiveReader.ReadArchiveAsync(
-            archiveReader,
-            dataProvider);
+            archiveReader);
         var observationFactory = GetDwcaObservationFactory(true);
         var processedObservations = dwcObservations
             .Select(m => observationFactory.CreateProcessedObservation(m, false))

@@ -32,7 +32,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-datastewardship-bats-taxalists.zip";
             var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
-            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(0);
+            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(dataProvider, 0);
             using var archiveReader = new ArchiveReader(archivePath, @"C:\Temp\DwcaImport");
             var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
 
@@ -103,7 +103,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
             try
             {
                 var dataProvider = new DataProvider { Id = 200, Identifier = "TestDataset", Type = DataProviderType.DwcA };
-                IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(0);
+                IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(dataProvider, 0);
                 using var archiveReader = new ArchiveReader(archivePath, @"C:\Temp\DwcaImport");
                 var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
                 var datasets = await dwcArchiveReader.ReadDatasetsAsync(archiveReaderContext);
@@ -125,7 +125,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-datastewardship-bats-taxalists.zip";
             var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
-            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(0);
+            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(dataProvider, 0);
             using var archiveReader = new ArchiveReader(archivePath, @"C:\temp");
             var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
 
@@ -152,7 +152,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-datastewardship-bats.zip";
             var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
-            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(0);
+            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(dataProvider, 0);
             using var archiveReader = new ArchiveReader(archivePath, @"C:\temp");
             var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
 
@@ -179,15 +179,15 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-datastewardship-bats.zip";
             var dataProvider = new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA };
-            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(0);
+            IDwcArchiveReader dwcArchiveReader = new DwcArchiveReader(dataProvider, 0);
             using var archiveReader = new ArchiveReader(archivePath, @"C:\temp");
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var datasets = await dwcArchiveReader.ReadDatasetsAsync(archiveReader);
-            var occurrences = await dwcArchiveReader.ReadArchiveAsync(archiveReader, dataProvider);
-            var events = await dwcArchiveReader.ReadSamplingEventArchiveAsync(archiveReader, dataProvider);
+            var occurrences = await dwcArchiveReader.ReadArchiveAsync(archiveReader);
+            var events = await dwcArchiveReader.ReadSamplingEventArchiveAsync(archiveReader);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
