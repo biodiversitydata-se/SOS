@@ -38,7 +38,7 @@ steps:
   inputs:
     command: 'custom'
     workingDir: Tests/Postman
-    customCommand: 'install newman-reporter-htmlextra'
+    customCommand: 'install newman'
     verbose: false
 - task: Npm@1
   displayName: Install newman-reporter-htmlextra
