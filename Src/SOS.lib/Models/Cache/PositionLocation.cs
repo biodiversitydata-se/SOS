@@ -10,6 +10,11 @@ namespace SOS.Lib.Models.Cache
         public Area Atlas5x5 { get; set; }
 
         /// <summary>
+        /// Atlas square 10x10 km
+        /// </summary>
+        public Area Atlas10x10 { get; set; }
+
+        /// <summary>
         ///     Country region property
         /// </summary>
         public Area CountryRegion { get; set; }

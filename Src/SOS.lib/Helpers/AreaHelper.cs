@@ -23,6 +23,7 @@ namespace SOS.Lib.Helpers
     {
         private readonly AreaType[] _areaTypesInStrTree = {
             AreaType.Atlas5x5,
+            AreaType.Atlas10x10,
             AreaType.CountryRegion,
             AreaType.County, 
             AreaType.Province, 
@@ -36,6 +37,132 @@ namespace SOS.Lib.Helpers
         private STRtree<IFeature> _strTree;
         private SemaphoreSlim _initializeSemaphoreSlim = new SemaphoreSlim(1, 1);
         private static readonly object _lockObject = new object();
+
+        /// <summary>
+        ///     Get all features where position is inside area
+        /// </summary>
+        /// <param name="longitude"></param>
+        /// <param name="latitude"></param>
+        /// <returns></returns>
+        private IEnumerable<IFeature> GetPointFeatures(double longitude, double latitude)
+        {
+            var factory = new GeometryFactory();
+            var point = factory.CreatePoint(new Coordinate(longitude, latitude));
+
+            var featuresContainingPoint = new List<IFeature>();
+            var possibleFeatures = _strTree.Query(point.EnvelopeInternal);
+            foreach (var feature in possibleFeatures)
+            {
+                if (feature.Geometry.Contains(point))
+                {
+                    featuresContainingPoint.Add(feature);
+                }
+            }
+
+            return featuresContainingPoint;
+        }
+
+        private PositionLocation GetPositionLocations(double decimalLongitude, double decimalLatitude)
+        {
+            // Round coordinates to 5 decimals (roughly 1m)
+            var key = $"{Math.Round(decimalLongitude, 5)}-{Math.Round(decimalLatitude, 5)}";
+
+            // Try to get areas from cache. If areas not found for that position, try to get from repository
+            if (!_featureCache.TryGetValue(key, out var positionLocation))
+            {
+                lock (_lockObject)
+                {
+                    var features = GetPointFeatures(decimalLongitude, decimalLatitude);
+                    positionLocation = new PositionLocation();
+
+                    if (features != null)
+                    {
+                        foreach (var feature in features)
+                        {
+                            if (Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
+                                out var areaType))
+                            {
+                                var featureId = feature.Attributes.GetOptionalValue("featureId")?.ToString();
+                                var name = feature.Attributes.GetOptionalValue("name")?.ToString();
+                                var area = string.IsNullOrEmpty(featureId) ? null! : new Area
+                                {
+                                    FeatureId = featureId,
+                                    Name = string.IsNullOrEmpty(name) ? null : name // Make sure name equals null if empty. To prevent empty string and null to be handled different when aggregation on the field
+                                };
+                                switch ((AreaType)areaType)
+                                {
+                                    case AreaType.Atlas5x5:
+                                        positionLocation.Atlas5x5 = area;
+                                        break;
+                                    case AreaType.Atlas10x10:
+                                        positionLocation.Atlas10x10 = area;
+                                        break;
+                                    case AreaType.CountryRegion:
+                                        positionLocation.CountryRegion = area;
+                                        break;
+                                    case AreaType.County:
+                                        positionLocation.County = area;
+                                        break;
+                                    case AreaType.Municipality:
+                                        positionLocation.Municipality = area;
+                                        break;
+                                    case AreaType.Parish:
+                                        positionLocation.Parish = area;
+                                        break;
+                                    case AreaType.Province:
+                                        positionLocation.Province = area;
+                                        break;
+                                    case AreaType.EconomicZoneOfSweden:
+                                        positionLocation.EconomicZoneOfSweden = true;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!_featureCache.ContainsKey(key))
+                    {
+                        _featureCache.TryAdd(key, positionLocation);
+                    }
+                }
+            }
+
+            return positionLocation;
+        }
+
+        private static string GetProvincePartIdByCoordinate(string provinceFeatureId)
+        {
+            if (new[]
+            {
+                ProvinceIds.LuleLappmark,
+                ProvinceIds.LyckseleLappmark,
+                ProvinceIds.PiteLappmark,
+                ProvinceIds.TorneLappmark,
+                ProvinceIds.ÅseleLappmark
+            }.Contains(provinceFeatureId))
+            {
+                return SpecialProvincePartId.Lappland;
+            }
+
+            return provinceFeatureId;
+        }
+
+        private static string GetCountyPartIdByCoordinate(string countyFeatureId, string provinceFeatureId)
+        {
+            if (countyFeatureId == CountyId.Kalmar)
+            {
+                if (provinceFeatureId == ProvinceIds.Öland)
+                {
+                    return SpecialCountyPartId.Öland;
+                }
+                else
+                {
+                    return SpecialCountyPartId.KalmarFastland;
+                }
+            }
+
+            return countyFeatureId;
+        }
 
         /// <summary>
         ///     Constructor
@@ -62,6 +189,7 @@ namespace SOS.Lib.Helpers
             var positionLocations = GetPositionLocations(processedLocation.DecimalLongitude.Value,
                 processedLocation.DecimalLatitude.Value);
             processedLocation.Atlas5x5 = positionLocations?.Atlas5x5;
+            processedLocation.Atlas10x10 = positionLocations?.Atlas10x10;
             processedLocation.CountryRegion = positionLocations?.CountryRegion;
             processedLocation.County = positionLocations?.County;
             processedLocation.Municipality = positionLocations?.Municipality;
@@ -175,127 +303,6 @@ namespace SOS.Lib.Helpers
             return featuresContainingPoint;
         }
 
-        /// <summary>
-        ///     Get all features where position is inside area
-        /// </summary>
-        /// <param name="longitude"></param>
-        /// <param name="latitude"></param>
-        /// <returns></returns>
-        private IEnumerable<IFeature> GetPointFeatures(double longitude, double latitude)
-        {
-            var factory = new GeometryFactory();
-            var point = factory.CreatePoint(new Coordinate(longitude, latitude));
-
-            var featuresContainingPoint = new List<IFeature>();
-            var possibleFeatures = _strTree.Query(point.EnvelopeInternal);
-            foreach (var feature in possibleFeatures)
-            {
-                if (feature.Geometry.Contains(point))
-                {
-                    featuresContainingPoint.Add(feature);
-                }
-            }
-
-            return featuresContainingPoint;
-        }
-
-        private PositionLocation GetPositionLocations(double decimalLongitude, double decimalLatitude)
-        {
-            // Round coordinates to 5 decimals (roughly 1m)
-            var key = $"{Math.Round(decimalLongitude, 5)}-{Math.Round(decimalLatitude, 5)}";
-
-            // Try to get areas from cache. If areas not found for that position, try to get from repository
-            if (!_featureCache.TryGetValue(key, out var positionLocation))
-            {
-                lock (_lockObject)
-                {
-                    var features = GetPointFeatures(decimalLongitude, decimalLatitude);
-                    positionLocation = new PositionLocation();
-
-                    if (features != null)
-                    {
-                        foreach (var feature in features)
-                        {
-                            if (Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
-                                out var areaType))
-                            {
-                                var featureId = feature.Attributes.GetOptionalValue("featureId")?.ToString();
-                                var name = feature.Attributes.GetOptionalValue("name")?.ToString();
-                                var area = string.IsNullOrEmpty(featureId) ? null! : new Area
-                                {
-                                    FeatureId = featureId,
-                                    Name =  string.IsNullOrEmpty(name) ? null : name // Make sure name equals null if empty. To prevent empty string and null to be handled different when aggregation on the field
-                                };
-                                switch ((AreaType)areaType)
-                                {
-                                    case AreaType.Atlas5x5:
-                                        positionLocation.Atlas5x5 = area;
-                                        break;
-                                    case AreaType.CountryRegion:
-                                        positionLocation.CountryRegion = area;
-                                        break;
-                                    case AreaType.County:
-                                        positionLocation.County = area;
-                                        break;
-                                    case AreaType.Municipality:
-                                        positionLocation.Municipality = area;
-                                        break;
-                                    case AreaType.Parish:
-                                        positionLocation.Parish = area;
-                                        break;
-                                    case AreaType.Province:
-                                        positionLocation.Province = area;
-                                        break;
-                                    case AreaType.EconomicZoneOfSweden:
-                                        positionLocation.EconomicZoneOfSweden = true;
-                                        break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (!_featureCache.ContainsKey(key))
-                    {
-                        _featureCache.TryAdd(key, positionLocation);
-                    }
-                }
-            }
-
-            return positionLocation;
-        }
-
-        private static string GetProvincePartIdByCoordinate(string provinceFeatureId)
-        {
-            if (new[]
-            {
-                ProvinceIds.LuleLappmark,
-                ProvinceIds.LyckseleLappmark,
-                ProvinceIds.PiteLappmark,
-                ProvinceIds.TorneLappmark,
-                ProvinceIds.ÅseleLappmark
-            }.Contains(provinceFeatureId))
-            {
-               return SpecialProvincePartId.Lappland;
-            }
-
-            return provinceFeatureId;
-        }
-
-        private static string GetCountyPartIdByCoordinate(string countyFeatureId, string provinceFeatureId)
-        {
-            if (countyFeatureId == CountyId.Kalmar)
-            {
-                if (provinceFeatureId == ProvinceIds.Öland)
-                {
-                    return SpecialCountyPartId.Öland;
-                }
-                else
-                {
-                    return SpecialCountyPartId.KalmarFastland;
-                }
-            }
-
-            return countyFeatureId;
-        }
+        
     }
 }

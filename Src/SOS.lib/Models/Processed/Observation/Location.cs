@@ -34,6 +34,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public Area Atlas5x5 { get; set; }
 
         /// <summary>
+        /// Atlas square 10x10 km
+        /// </summary>
+        public Area Atlas10x10 { get; set; }
+
+        /// <summary>
         /// Location attributes.
         /// </summary>
         public LocationAttributes Attributes { get; set; }

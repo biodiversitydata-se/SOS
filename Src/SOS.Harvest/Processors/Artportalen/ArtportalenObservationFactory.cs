@@ -350,6 +350,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 {
                     var site = verbatimObservation.Site;
                     obs.Location.Atlas5x5 = CastToArea(site.Atlas5x5!);
+                    obs.Location.Atlas10x10 = CastToArea(site.Atlas10x10!);
                     obs.Location.Attributes.CountyPartIdByCoordinate = site.CountyPartIdByCoordinate;
                     obs.Location.Attributes.ExternalId = site.ExternalId;
                     obs.Location.Attributes.IsPrivate = site.IsPrivate;
