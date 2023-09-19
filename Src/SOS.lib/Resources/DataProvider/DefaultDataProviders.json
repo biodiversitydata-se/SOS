@@ -76,7 +76,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": true,
-        "SupportEvents": true
+        "SupportEvents": true,
+        "CreateEventDwC": false
     },
     {
         "Id": 3,
@@ -145,7 +146,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 4,
@@ -219,7 +221,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 5,
@@ -288,7 +291,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 6,
@@ -357,7 +361,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 7,
@@ -429,7 +434,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 8,
@@ -503,7 +509,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 9,
@@ -577,7 +584,8 @@
         "Categories": [ "Terrestrial", "Vertebrates" ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 10,
@@ -657,7 +665,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 11,
@@ -1045,7 +1054,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": true
+        "SupportEvents": true,
+        "CreateEventDwC": true
     },
     {
         "Id": 12,
@@ -1123,7 +1133,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 13,
@@ -1199,7 +1210,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": true,
+        "CreateEventDwC": true
     },
     {
         "Id": 14,
@@ -1337,7 +1349,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": true,
+        "CreateEventDwC": true
     },
     {
         "Id": 16,
@@ -1405,7 +1418,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": true,
+        "CreateEventDwC": true
     },
     {
         "Id": 17,
@@ -1480,7 +1494,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 18,
@@ -1556,7 +1571,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 19,
@@ -1632,7 +1648,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": false,
+        "CreateEventDwC": false
     },
     {
         "Id": 20,
@@ -1707,7 +1724,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": true,
+        "CreateEventDwC": true
     },
     {
         "Id": 21,
@@ -1782,7 +1800,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": true,
+        "CreateEventDwC": true
     },
     {
         "Id": 22,
@@ -1857,7 +1876,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": true,
+        "CreateEventDwC": true
     },
     {
         "Id": 23,
@@ -1933,7 +1953,8 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
-        "SupportEvents": false
+        "SupportEvents": true,
+        "CreateEventDwC": true
     },
     {
         "Id": 24,
@@ -2080,6 +2101,7 @@
         ],
         "HarvestSchedule": "* * * * *",
         "SupportDatasets": true,
-        "SupportEvents": true
+        "SupportEvents": true,
+        "CreateEventDwC": true
     }
 ]
