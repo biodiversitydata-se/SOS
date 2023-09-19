@@ -15,6 +15,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Globalization;
+using SOS.Lib.Enums;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -58,6 +59,9 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Get all data providers.
         /// </summary>
+        /// <param name="categories">Category/ies to match. DataHostesship, RegionalInventory, CitizenSciencePlatform, Atlas, 
+        /// Terrestrial, Freshwater, Marine, Vertebrates, Arthropods, Microorganisms, Plants_Bryophytes_Lichens,
+        /// Fungi, Algae</param>
         /// <param name="cultureCode">Culture code.</param>
         /// <param name="includeProvidersWithNoObservations">If false, data providers with no observations are excluded from the result.</param>
         /// <returns>List of data providers.</returns>
@@ -66,13 +70,14 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetDataProvidersAsync(
+            [FromQuery] IEnumerable<DataProviderCategory> categories,
             [FromQuery] string cultureCode = "sv-SE", 
             [FromQuery] bool includeProvidersWithNoObservations = false)
         {
             try
             {
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var dataProviders = await _dataProviderManager.GetDataProvidersAsync(false, cultureCode, includeProvidersWithNoObservations);
+                var dataProviders = await _dataProviderManager.GetDataProvidersAsync(false, cultureCode, includeProvidersWithNoObservations, categories);
 
                 if (!dataProviders?.Any() ?? true)
                 {
