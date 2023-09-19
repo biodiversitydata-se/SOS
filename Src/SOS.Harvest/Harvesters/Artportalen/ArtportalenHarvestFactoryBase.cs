@@ -181,24 +181,27 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             foreach (var area in areas!)
             {
-                switch ((AreaType)area.AreaDatasetId)
+                switch (area.AreaDatasetId)
                 {
-                    case AreaType.BirdValidationArea:
+                    case 24: // AreaType.Atlas5x5
+                        site.Atlas5x5 = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                        break;
+                    case (int)AreaType.BirdValidationArea:
                         (site.BirdValidationAreaIds ??= new List<string>()).Add(area.FeatureId);
                         break;
-                    case AreaType.CountryRegion:
+                    case (int)AreaType.CountryRegion:
                         site.CountryRegion = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
                         break;
-                    case AreaType.County:
+                    case (int)AreaType.County:
                         site.County = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
                         break;
-                    case AreaType.Municipality:
+                    case (int)AreaType.Municipality:
                         site.Municipality = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
                         break;
-                    case AreaType.Parish:
+                    case (int)AreaType.Parish:
                         site.Parish = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
                         break;
-                    case AreaType.Province:
+                    case (int)AreaType.Province:
                         site.Province = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
                         break;
                 }

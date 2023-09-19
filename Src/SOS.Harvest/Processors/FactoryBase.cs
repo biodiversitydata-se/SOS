@@ -8,9 +8,9 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
-using Location = SOS.Lib.Models.Processed.Observation.Location;
 using SOS.Lib.Configuration.Process;
 using MongoDB.Driver.GeoJsonObjectModel;
+using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Harvest.Processors
 {
@@ -77,7 +77,7 @@ namespace SOS.Harvest.Processors
             location.Sweref99TmY = sweRef99TmPoint.Coordinate.Y;
            
             var etrs89Point = point.Transform(CoordinateSys.WGS84, CoordinateSys.ETRS89_LAEA_Europe);
-            location.Etrs89X =etrs89Point.Coordinate.X;
+            location.Etrs89X = etrs89Point.Coordinate.X;
             location.Etrs89Y = etrs89Point.Coordinate.Y;
             TimeManager.Stop(ProcessTimeManager.TimerTypes.CoordinateConversion, coordinateConversionTimerSessionId);
 
