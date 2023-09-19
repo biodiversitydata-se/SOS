@@ -5,6 +5,11 @@ namespace SOS.Lib.Models.Cache
     public class PositionLocation
     {
         /// <summary>
+        /// Atlas square 5x5 km
+        /// </summary>
+        public Area Atlas5x5 { get; set; }
+
+        /// <summary>
         ///     Country region property
         /// </summary>
         public Area CountryRegion { get; set; }

@@ -15,6 +15,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int Accuracy { get; set; }
 
         /// <summary>
+        ///     Atlas square 5x5 km
+        /// </summary>
+        public GeographicalArea Atlas5x5 { get; set; }
+
+        /// <summary>
         /// Bird validation areas
         /// </summary>
         public ICollection<string> BirdValidationAreaIds { get; set; }

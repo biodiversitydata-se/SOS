@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
@@ -23,6 +22,7 @@ namespace SOS.Lib.Helpers
     public class AreaHelper : IAreaHelper
     {
         private readonly AreaType[] _areaTypesInStrTree = {
+            AreaType.Atlas5x5,
             AreaType.CountryRegion,
             AreaType.County, 
             AreaType.Province, 
@@ -61,6 +61,7 @@ namespace SOS.Lib.Helpers
 
             var positionLocations = GetPositionLocations(processedLocation.DecimalLongitude.Value,
                 processedLocation.DecimalLatitude.Value);
+            processedLocation.Atlas5x5 = positionLocations?.Atlas5x5;
             processedLocation.CountryRegion = positionLocations?.CountryRegion;
             processedLocation.County = positionLocations?.County;
             processedLocation.Municipality = positionLocations?.Municipality;
@@ -227,6 +228,9 @@ namespace SOS.Lib.Helpers
                                 };
                                 switch ((AreaType)areaType)
                                 {
+                                    case AreaType.Atlas5x5:
+                                        positionLocation.Atlas5x5 = area;
+                                        break;
                                     case AreaType.CountryRegion:
                                         positionLocation.CountryRegion = area;
                                         break;
