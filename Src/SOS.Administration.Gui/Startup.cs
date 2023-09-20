@@ -23,6 +23,7 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
+using System.Globalization;
 
 namespace SOS.Administration.Gui
 {
@@ -60,6 +61,11 @@ namespace SOS.Administration.Gui
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Use Swedish culture info.
+            var culture = new CultureInfo("sv-SE");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+
             services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

@@ -43,6 +43,7 @@ using SOS.Analysis.Api.ApplicationInsights;
 using SOS.Lib.Middleware;
 using SOS.Analysis.Api.Middleware;
 using Microsoft.Extensions.Options;
+using System.Globalization;
 
 namespace SOS.Analysis.Api
 {
@@ -142,6 +143,11 @@ namespace SOS.Analysis.Api
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            // Use Swedish culture info.
+            var culture = new CultureInfo("sv-SE");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+
             services.AddMemoryCache();
 
             services.AddControllers()

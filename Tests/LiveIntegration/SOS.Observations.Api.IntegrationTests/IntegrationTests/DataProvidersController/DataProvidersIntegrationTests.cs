@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.DataProvide
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.DataProvidersController.GetDataProvidersAsync("sv-SE", true);
+            var response = await _fixture.DataProvidersController.GetDataProvidersAsync(null, "sv-SE", true);
             var dataProviders = response.GetResult<List<DataProviderDto>>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.DataProvide
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.DataProvidersController.GetDataProvidersAsync();
+            var response = await _fixture.DataProvidersController.GetDataProvidersAsync(null);
             var dataProviders = response.GetResult<List<DataProviderDto>>();
 
             //-----------------------------------------------------------------------------------------------------------

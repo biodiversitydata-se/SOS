@@ -35,6 +35,7 @@ using SOS.Lib.Models.TaxonTree;
 using MassTransit;
 using SOS.Hangfire.JobServer.ServiceBus.Consumers;
 using SOS.Lib.Context;
+using System.Globalization;
 
 namespace SOS.Hangfire.JobServer
 {
@@ -112,6 +113,11 @@ namespace SOS.Hangfire.JobServer
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
+                    // Use Swedish culture info.
+                    var culture = new CultureInfo("sv-SE");
+                    CultureInfo.DefaultThreadCurrentCulture = culture;
+                    CultureInfo.DefaultThreadCurrentUICulture = culture;
+
                     services.AddMemoryCache();
                     services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
                     services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
