@@ -19,6 +19,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.ElasticSearch.Proxy.Configuration;
 using Microsoft.ApplicationInsights.Extensibility;
 using SOS.Lib.ApplicationInsights;
+using System.Globalization;
 
 namespace SOS.ElasticSearch.Proxy
 {
@@ -63,6 +64,10 @@ namespace SOS.ElasticSearch.Proxy
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            // Use Swedish culture info.
+            var culture = new CultureInfo("sv-SE");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
             // services.AddMemoryCache();
 
             // Add Mvc Core services

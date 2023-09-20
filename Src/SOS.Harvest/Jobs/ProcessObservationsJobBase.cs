@@ -347,8 +347,6 @@ namespace SOS.Harvest.Jobs
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             
-            
-
             _enableTimeManager = processConfiguration.EnableTimeManager;
             _processConfiguration = processConfiguration;
         }

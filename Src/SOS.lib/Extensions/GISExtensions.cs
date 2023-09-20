@@ -580,7 +580,7 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static IFeature ToFeature(this IGeoShape geoShape, IDictionary<string, object> attributes = null)
         {
-            return geoShape?.ToFeature(attributes);
+            return geoShape?.ToGeometry().ToFeature(attributes);
         }
 
         /// <summary>

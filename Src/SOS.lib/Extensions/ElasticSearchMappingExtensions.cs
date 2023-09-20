@@ -200,7 +200,20 @@ namespace SOS.Lib.Extensions
                     )
                 )
                 .Object<Area>(c => c
-                    .AutoMap()
+                    .Name(nm => nm.Atlas10x10)
+                    .Properties(ps => ps
+                        .Keyword(kw => kw.Name(n => n.FeatureId))
+                        .KeyWordLowerCase(kwlc => kwlc.Name)
+                    )
+                )
+                .Object<Area>(c => c
+                    .Name(nm => nm.Atlas5x5)
+                    .Properties(ps => ps
+                        .Keyword(kw => kw.Name(n => n.FeatureId))
+                        .KeyWordLowerCase(kwlc => kwlc.Name)
+                    )
+                )
+                .Object<Area>(c => c
                     .Name(nm => nm.CountryRegion)
                     .Properties(ps => ps
                         .KeyWordLowerCase(kwlc => kwlc.FeatureId)
@@ -208,7 +221,6 @@ namespace SOS.Lib.Extensions
                     )
                 )
                 .Object<Area>(c => c
-                    .AutoMap()
                     .Name(nm => nm.County)
                     .Properties(ps => ps
                         .KeyWordLowerCase(kwlc => kwlc.FeatureId)
@@ -216,7 +228,6 @@ namespace SOS.Lib.Extensions
                     )
                 )
                 .Object<Area>(c => c
-                    .AutoMap()
                     .Name(nm => nm.Municipality)
                     .Properties(ps => ps
                         .KeyWordLowerCase(kwlc => kwlc.FeatureId)
@@ -224,7 +235,6 @@ namespace SOS.Lib.Extensions
                     )
                 )
                 .Object<Area>(c => c
-                    .AutoMap()
                     .Name(nm => nm.Parish)
                     .Properties(ps => ps
                         .KeyWordLowerCase(kwlc => kwlc.FeatureId)
@@ -232,7 +242,6 @@ namespace SOS.Lib.Extensions
                     )
                 )
                 .Object<Area>(c => c
-                    .AutoMap()
                     .Name(nm => nm.Province)
                     .Properties(ps => ps
                         .KeyWordLowerCase(kwlc => kwlc.FeatureId)
