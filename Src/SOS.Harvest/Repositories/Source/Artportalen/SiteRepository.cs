@@ -94,7 +94,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     INNER JOIN @sid s ON sa.SiteId = s.Id
 		            INNER JOIN Area a ON sa.AreasId = a.Id 
                 WHERE
-                    a.AreaDatasetId IN (1, 13, 16, 18, 19, 21, 24)";
+                    a.AreaDatasetId IN (1, 13, 16, 18, 19, 21, 24, 25)";
 
                 var siteAreaEntities = (await QueryAsync<SiteAreaEntity>(query,
                     new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();

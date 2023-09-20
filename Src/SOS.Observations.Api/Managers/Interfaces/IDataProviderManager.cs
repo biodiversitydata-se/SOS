@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using SOS.Lib.Enums;
 using SOS.Observations.Api.Dtos;
 
 namespace SOS.Observations.Api.Managers.Interfaces
@@ -16,8 +17,11 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="includeInactive"></param>
         /// <param name="cultureCode"></param>
         /// <param name="includeProvidersWithNoObservations"></param>
+        /// <param name="categories">Category/ies to match. DataHostesship, RegionalInventory, CitizenSciencePlatform, Atlas, 
+        /// Terrestrial, Freshwater, Marine, Vertebrates, Arthropods, Microorganisms, Plants_Bryophytes_Lichens,
+        /// Fungi, Algae</param>
         /// <returns></returns>
-        Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true);
+        Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true, IEnumerable<DataProviderCategory> categories = null);
 
         /// <summary>
         /// Get provider EML file

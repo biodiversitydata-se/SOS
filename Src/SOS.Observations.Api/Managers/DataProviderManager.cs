@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -44,7 +45,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true)
+        public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true, IEnumerable<DataProviderCategory> categories = null)
         {
             var dataProviderDtos = new List<DataProviderDto>();
             var processInfosActive = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
@@ -56,7 +57,6 @@ namespace SOS.Observations.Api.Managers
             // Add process data
             foreach (var dataProvider in selectedDataProviders)
             {
-               
                 var providerInfo =
                     processInfosActive?.ProvidersInfo?.FirstOrDefault(provider => provider.DataProviderId == dataProvider.Id);
 
@@ -65,6 +65,10 @@ namespace SOS.Observations.Api.Managers
                     if (!includeProvidersWithNoObservations &&
                         providerInfo.PublicProcessCount.GetValueOrDefault(0) == 0 &&
                         providerInfo.ProtectedProcessCount.GetValueOrDefault(0) == 0)
+                    {
+                        continue;
+                    }
+                    if ((categories?.Any() ?? false) && !(dataProvider.Categories?.Any(c => categories.Contains(c)) ?? true))
                     {
                         continue;
                     }
@@ -97,6 +101,6 @@ namespace SOS.Observations.Api.Managers
             }
 
             return await eml?.ToBytesAsync();
-        }
+        }   
     }
 }

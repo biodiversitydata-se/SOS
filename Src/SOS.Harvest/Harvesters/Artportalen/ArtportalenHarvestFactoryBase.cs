@@ -186,6 +186,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     case 24: // AreaType.Atlas5x5
                         site.Atlas5x5 = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
                         break;
+                    case 25: // AreaType.Atlas10x10
+                        site.Atlas10x10 = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                        break;
                     case (int)AreaType.BirdValidationArea:
                         (site.BirdValidationAreaIds ??= new List<string>()).Add(area.FeatureId);
                         break;
