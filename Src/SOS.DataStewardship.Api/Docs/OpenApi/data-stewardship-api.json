@@ -1,9 +1,15 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "SOS.DataStewardship.Api",
-    "version": "1.0"
+    "title": "Data Stewardship API",
+    "description": "The Data Stewardship API contains endpoints for querying datasets, events and occurrences.",
+    "version": "v1"
   },
+  "servers": [
+    {
+      "url": "https://api.artdatabanken.se/data-stewardship-api/v1"
+    }
+  ],
   "paths": {
     "/caches/{cache}": {
       "delete": {
@@ -67,10 +73,31 @@
         }
       }
     },
-    "/datastewardship/datasets/{id}": {
+    "/api_info": {
       "get": {
         "tags": [
-          "DataStewardship"
+          "ApiInfo"
+        ],
+        "description": "Get API information",
+        "operationId": "GetApiInfo",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiInformation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datasets/{id}": {
+      "get": {
+        "tags": [
+          "Datasets"
         ],
         "description": "Get dataset by id. Example: Artportalen - Fladdermöss",
         "operationId": "GetDatasetById",
@@ -137,10 +164,10 @@
         }
       }
     },
-    "/datastewardship/datasets": {
+    "/datasets": {
       "post": {
         "tags": [
-          "DataStewardship"
+          "Datasets"
         ],
         "description": "Get datasets by search.",
         "operationId": "GetDatasetsBySearch",
@@ -216,10 +243,10 @@
         }
       }
     },
-    "/datastewardship/events/{id}": {
+    "/events/{id}": {
       "get": {
         "tags": [
-          "DataStewardship"
+          "Events"
         ],
         "description": "Get event by Id. Example: urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10002293427000658739",
         "operationId": "GetEventById",
@@ -294,10 +321,10 @@
         }
       }
     },
-    "/datastewardship/events": {
+    "/events": {
       "post": {
         "tags": [
-          "DataStewardship"
+          "Events"
         ],
         "description": "Get events by search.",
         "operationId": "GetEventsBySearch",
@@ -381,13 +408,13 @@
         }
       }
     },
-    "/external/Health": {
+    "/health/external": {
       "get": {
         "tags": [
-          "External"
+          "Health"
         ],
         "description": "Get current system health status",
-        "operationId": "GetHealthCheck",
+        "operationId": "GetHealthCheckExternal",
         "responses": {
           "200": {
             "description": "Success",
@@ -422,10 +449,10 @@
         }
       }
     },
-    "/datastewardship/occurrences/{id}": {
+    "/occurrences/{id}": {
       "get": {
         "tags": [
-          "DataStewardship"
+          "Occurrences"
         ],
         "description": "Get occurrence by Id. Example: urn:lsid:artportalen.se:sighting:98571689",
         "operationId": "GetOccurrenceById",
@@ -500,10 +527,10 @@
         }
       }
     },
-    "/datastewardship/occurrences": {
+    "/occurrences": {
       "post": {
         "tags": [
-          "DataStewardship"
+          "Occurrences"
         ],
         "description": "Get occurrences by search.",
         "operationId": "GetOccurrencesBySearch",
@@ -644,6 +671,38 @@
         ],
         "type": "string",
         "description": "Activity or behavior of the observed organism."
+      },
+      "ApiInformation": {
+        "type": "object",
+        "properties": {
+          "apiName": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiReleased": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "apiDocumentation": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "apiChangelog": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "apiStatus": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "AssociatedMedia": {
         "required": [
@@ -1272,7 +1331,7 @@
             "readOnly": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "IGeoShape": {
         "type": "object",
@@ -1344,6 +1403,12 @@
           },
           "locationType": {
             "$ref": "#/components/schemas/LocationType"
+          },
+          "coordinateUncertaintyInMeters": {
+            "type": "integer",
+            "description": "When the Emplacement is a point, this is the horizontal distance (in meters) \r\nfrom the given CoordinateX and CoordinateY describing the\r\nsmallest circle containing the whole of the Location.",
+            "format": "int32",
+            "nullable": true
           },
           "emplacement": {
             "$ref": "#/components/schemas/IGeoShape"
@@ -4399,7 +4464,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "ProgrammeArea": {
         "enum": [
@@ -4721,7 +4786,7 @@
   },
   "security": [
     {
-      "Bearer": [ ]
+      "Bearer": []
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Data Stewardship API",
-    "description": "The Data Stewardship API contains endpoints for querying datasets, events and occurrences.",
+    "title": "Nature data - systematic species observations API",
+    "description": "This is an API where you can search for datasets, events and occurrences regarding species observations that are systematically collected in Sweden.",
     "version": "v1"
   },
   "servers": [
@@ -11,10 +11,10 @@
     }
   ],
   "paths": {
-    "/datastewardship/datasets/{id}": {
+    "/datasets/{id}": {
       "get": {
         "tags": [
-          "DataStewardship"
+          "Datasets"
         ],
         "summary": "GetDatasetById",
         "description": "Get dataset by id. Example: Artportalen - Fladdermöss",
@@ -109,10 +109,10 @@
         }
       }
     },
-    "/datastewardship/datasets": {
+    "/datasets": {
       "post": {
         "tags": [
-          "DataStewardship"
+          "Datasets"
         ],
         "summary": "GetDatasetsBySearch",
         "description": "Get datasets by search.",
@@ -291,10 +291,10 @@
         }
       }
     },
-    "/datastewardship/events/{id}": {
+    "/events/{id}": {
       "get": {
         "tags": [
-          "DataStewardship"
+          "Events"
         ],
         "summary": "GetEventById",
         "description": "Get event by Id. Example: urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10002293427000658739",
@@ -338,17 +338,18 @@
                   "eventID": "string",
                   "eventType": "string",
                   "parentEventID": "string",
-                  "eventStartDate": "string",
-                  "eventEndDate": "string",
-                  "plainStartDate": "string",
-                  "plainEndDate": "string",
-                  "plainStartTime": "string",
-                  "plainEndTime": "string",
+                  "eventStartDateTime": "2020-04-15T02:00:00.0000000+00:00",
+                  "eventEndDateTime": "2020-04-15T03:45:00.0000000+00:00",
+                  "eventStartDate": "2020-04-15",
+                  "eventEndDate": "2020-04-15",
+                  "eventStartTime": "2023-09-20",
+                  "eventEndTime": "2023-09-20",
                   "locationProtected": true,
                   "surveyLocation": {
                     "locationID": "string",
                     "locality": "string",
                     "locationType": "Block",
+                    "coordinateUncertaintyInMeters": 0,
                     "emplacement": {
                       "type": "string"
                     },
@@ -469,10 +470,10 @@
         }
       }
     },
-    "/datastewardship/events": {
+    "/events": {
       "post": {
         "tags": [
-          "DataStewardship"
+          "Events"
         ],
         "summary": "GetEventsBySearch",
         "description": "Get events by search.",
@@ -521,7 +522,6 @@
                 "$ref": "#/components/schemas/EventsFilter"
               },
               "example": {
-                "exportMode": "Json",
                 "datasetIds": [
                   "string"
                 ],
@@ -572,17 +572,18 @@
                       "eventID": "string",
                       "eventType": "string",
                       "parentEventID": "string",
-                      "eventStartDate": "string",
-                      "eventEndDate": "string",
-                      "plainStartDate": "string",
-                      "plainEndDate": "string",
-                      "plainStartTime": "string",
-                      "plainEndTime": "string",
+                      "eventStartDateTime": "2020-04-15T02:00:00.0000000+00:00",
+                      "eventEndDateTime": "2020-04-15T03:45:00.0000000+00:00",
+                      "eventStartDate": "2020-04-15",
+                      "eventEndDate": "2020-04-15",
+                      "eventStartTime": "2023-09-20",
+                      "eventEndTime": "2023-09-20",
                       "locationProtected": true,
                       "surveyLocation": {
                         "locationID": "string",
                         "locality": "string",
                         "locationType": "Block",
+                        "coordinateUncertaintyInMeters": 0,
                         "emplacement": {
                           "type": "string"
                         },
@@ -688,10 +689,10 @@
         }
       }
     },
-    "/datastewardship/occurrences/{id}": {
+    "/occurrences/{id}": {
       "get": {
         "tags": [
-          "DataStewardship"
+          "Occurrences"
         ],
         "summary": "GetOccurrenceById",
         "description": "Get occurrence by Id. Example: urn:lsid:artportalen.se:sighting:98571689",
@@ -833,10 +834,10 @@
         }
       }
     },
-    "/datastewardship/occurrences": {
+    "/occurrences": {
       "post": {
         "tags": [
-          "DataStewardship"
+          "Occurrences"
         ],
         "summary": "GetOccurrencesBySearch",
         "description": "Get occurrences by search.",
@@ -1017,6 +1018,36 @@
           }
         }
       }
+    },
+    "/api_info": {
+      "get": {
+        "tags": [
+          "ApiInfo"
+        ],
+        "summary": "GetApiInfo",
+        "description": "Get API information",
+        "operationId": "GetApiInfo",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiInformation"
+                },
+                "example": {
+                  "apiName": "string",
+                  "apiVersion": "string",
+                  "apiReleased": "string",
+                  "apiDocumentation": "string",
+                  "apiChangelog": "string",
+                  "apiStatus": "string"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1075,6 +1106,38 @@
         ],
         "type": "string",
         "description": "Activity or behavior of the observed organism."
+      },
+      "ApiInformation": {
+        "type": "object",
+        "properties": {
+          "apiName": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiReleased": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "apiDocumentation": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "apiChangelog": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "apiStatus": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "AssociatedMedia": {
         "required": [
@@ -1457,13 +1520,13 @@
             "type": "string",
             "description": "Date and Time for when the survey started (local time).",
             "format": "date-time",
-            "example": "2020-04-15T14:00:00+02:00"
+            "example": "2020-04-15T02:00:00.0000000+00:00"
           },
           "eventEndDateTime": {
             "type": "string",
             "description": "Date and Time for when the survey ended (local time).",
             "format": "date-time",
-            "example": "2020-04-15T15:45:00+02:00"
+            "example": "2020-04-15T03:45:00.0000000+00:00"
           },
           "eventStartDate": {
             "type": "string",
@@ -1592,9 +1655,6 @@
       "EventsFilter": {
         "type": "object",
         "properties": {
-          "exportMode": {
-            "$ref": "#/components/schemas/ExportMode"
-          },
           "datasetIds": {
             "type": "array",
             "items": {
@@ -1778,6 +1838,12 @@
           },
           "locationType": {
             "$ref": "#/components/schemas/LocationType"
+          },
+          "coordinateUncertaintyInMeters": {
+            "type": "integer",
+            "description": "When the Emplacement is a point, this is the horizontal distance (in meters) \r\nfrom the given CoordinateX and CoordinateY describing the\r\nsmallest circle containing the whole of the Location.",
+            "format": "int32",
+            "nullable": true
           },
           "emplacement": {
             "$ref": "#/components/schemas/IGeoShape"
