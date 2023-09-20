@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SOS.Analysis.Api.Dtos.Enums;
 using SOS.Analysis.Api.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Enums;
-using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Analysis.Api.Controllers.Interfaces
 {
@@ -43,6 +43,20 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             string aggregationField,
             int take,
             AggregationSortOrder sortOrder);
+
+        /// <summary>
+        /// Atlas square aggregation
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="searchFilter"></param>
+        /// <param name="atlasSize"></param>
+        /// <returns></returns>
+        Task<IActionResult> AtlasAggregateAsync(
+            int? roleId,
+            string? authorizationApplicationIdentifier,
+            SearchFilterInternalDto searchFilter,
+            AtlasAreaSizeDto atlasSize = AtlasAreaSizeDto.Km10x10);
 
         /// <summary>
         /// Calculate AOO and EOO and get geometry showing coverage 

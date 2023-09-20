@@ -2,6 +2,7 @@
 using NetTopologySuite.Features;
 using SOS.Analysis.Api.Configuration;
 using SOS.Analysis.Api.Controllers.Interfaces;
+using SOS.Analysis.Api.Dtos.Enums;
 using SOS.Analysis.Api.Dtos.Filter;
 using SOS.Analysis.Api.Dtos.Search;
 using SOS.Analysis.Api.Extensions.Dto;
@@ -143,6 +144,51 @@ namespace SOS.Analysis.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Aggregate by user field error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost("/internal/atlas")]
+        [ProducesResponseType(typeof(PagedAggregationResultDto<UserAggregationResponseDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> AtlasAggregateAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto searchFilter,
+            [FromQuery] AtlasAreaSizeDto atlasSize = AtlasAreaSizeDto.Km10x10)
+        {
+            try
+            {
+                CheckAuthorization(searchFilter.ProtectionFilter);
+                searchFilter = await InitializeSearchFilterAsync(searchFilter);
+                var validationResult = ValidateSearchFilter(searchFilter!);
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
+
+                var result = await _analysisManager.AtlasAggregateAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    filter,
+                    atlasSize
+                );
+
+                return new OkObjectResult(result!);
+            }
+            catch (AuthenticationRequiredException)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Atlas square aggregation failed.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

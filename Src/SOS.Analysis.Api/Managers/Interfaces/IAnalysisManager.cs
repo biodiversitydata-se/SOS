@@ -1,4 +1,5 @@
 ﻿using NetTopologySuite.Features;
+using SOS.Analysis.Api.Dtos.Enums;
 using SOS.Analysis.Api.Dtos.Search;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Enums;
@@ -43,6 +44,20 @@ namespace SOS.Analysis.Api.Managers.Interfaces
             string aggregationField,
             int take,
             AggregationSortOrder sortOrder);
+
+        /// <summary>
+        /// Aggregate by atlas square
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="atlasSize"></param>
+        /// <returns></returns>
+        Task<FeatureCollection> AtlasAggregateAsync(
+        int? roleId,
+        string? authorizationApplicationIdentifier,
+        SearchFilter filter,
+        AtlasAreaSizeDto atlasSize);
 
         /// <summary>
         /// Calculate AOO and EOO

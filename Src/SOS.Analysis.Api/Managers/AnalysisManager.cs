@@ -1,9 +1,14 @@
 ﻿using AgileObjects.AgileMapper.Extensions;
+using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using ProjNet.CoordinateSystems;
+using SOS.Analysis.Api.Dtos.Enums;
 using SOS.Analysis.Api.Dtos.Search;
 using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Analysis.Api.Repositories.Interfaces;
+using SOS.Lib.Cache;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
@@ -19,6 +24,7 @@ namespace SOS.Analysis.Api.Managers
     {
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IFilterManager _filterManager;
+        private readonly IAreaCache _areaCache;
         private readonly ILogger<AnalysisManager> _logger;
 
         /// <summary>
@@ -59,15 +65,18 @@ namespace SOS.Analysis.Api.Managers
         /// </summary>
         /// <param name="filterManager"></param>
         /// <param name="processedObservationRepository"></param>
+        /// <param name="areaCache"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public AnalysisManager(
             IFilterManager filterManager,
             IProcessedObservationRepository processedObservationRepository,
+            IAreaCache areaCache,
             ILogger<AnalysisManager> logger)
         {
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
+            _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -108,6 +117,36 @@ namespace SOS.Analysis.Api.Managers
             var result = await _processedObservationRepository.GetAggregationItemsAsync(filter, aggregationField, take, sortOrder);
 
             return result?.Select(i => new AggregationItemDto { AggregationKey = i.AggregationKey, DocCount = i.DocCount })!;
+        }
+
+        public async Task<FeatureCollection> AtlasAggregateAsync(
+        int? roleId,
+        string? authorizationApplicationIdentifier,
+        SearchFilter filter,
+        AtlasAreaSizeDto atlasSize)
+        {
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            var aggregationField = $"location.{(atlasSize == AtlasAreaSizeDto.Km5x5 ? "atlas5x5" : "atlas10x10")}.featureId";
+          
+            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, null, 10000);
+            var futureCollection = new FeatureCollection();
+            while (result?.Records?.Any() ?? false)
+            {
+                foreach(var record in result.Records)
+                {
+                    var area = (IGeoShape)await _areaCache.GetGeometryAsync(atlasSize switch { AtlasAreaSizeDto.Km5x5 => AreaType.Atlas5x5, _ => AreaType.Atlas10x10 }, record.AggregationField);
+                    futureCollection.Add(
+                        area.ToFeature(new Dictionary<string, object> {
+                            { "observationCount", (int)record.DocCount },
+                            { "taxonCount", (int)record.UniqueTaxon }
+                        })
+                    );
+                }
+
+                result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, (string)result.SearchAfter?.FirstOrDefault()!, 10000);
+            }
+
+            return futureCollection;
         }
 
         /// <inheritdoc/>
