@@ -61,6 +61,6 @@ public class TestBase
             t => true);
 
         // Make sure ES indexes are cleared before each test
-        TestFixture.ProcessFixture!.CleanElasticsearchIndices().Wait();
+        TestFixture.ProcessFixture!.CleanElasticsearchIndices().Wait();        
     }
 }

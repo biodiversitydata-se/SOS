@@ -69,6 +69,11 @@ public class LiveDbProcessFixture : IProcessFixture
         get => _taxa!;
     }
 
+    public Dictionary<int, Taxon> TaxonById
+    {
+        get => _taxaById!;
+    }
+
     public LiveDbProcessFixture(IAreaHelper areaHelper,
         IProcessClient processClient,
         IVocabularyRepository vocabularyRepository,
@@ -110,7 +115,7 @@ public class LiveDbProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
         serviceCollection.AddSingleton<ITaxonRepository, TaxonRepository>();
         serviceCollection.AddSingleton<IProcessTimeManager, ProcessTimeManager>();
-        serviceCollection.AddSingleton<ProcessConfiguration>();
+        serviceCollection.AddSingleton(GetProcessConfiguration());
         serviceCollection.AddSingleton<TelemetryClient>();
         serviceCollection.AddSingleton<IDatasetRepository, DatasetRepository>();
         serviceCollection.AddSingleton<IEventRepository, EventRepository>();
@@ -147,6 +152,37 @@ public class LiveDbProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<IElasticClientManager>(elasticClientManager);
 
         return serviceCollection;
+    }
+
+    private static ProcessConfiguration GetProcessConfiguration()
+    {
+        return new ProcessConfiguration
+        {
+            NoOfThreads = 4,
+            RunIncrementalAfterFull = true,
+            VocabularyConfiguration = new VocabularyConfiguration
+            {
+                ResolveValues = false,
+                LocalizationCultureCode = "sv-SE"
+            },
+            TaxonAttributeServiceConfiguration = new TaxonAttributeServiceConfiguration
+            {
+                BaseAddress = "https://taxonattributeservice.artdata.slu.se/api",
+                AcceptHeaderContentType = "application/json"
+            },
+            TaxonServiceConfiguration = new TaxonServiceConfiguration
+            {
+                AcceptHeaderContentType = "application/text",
+                BaseAddress = "https://taxonapi.artdata.slu.se/darwincore/download?version=custom"
+            },
+            Export_Container = "sos-export",
+            MinObservationCount = 0,
+            MinObservationProtectedCount = 0,
+            MinPercentObservationCount = 0,
+            ArtportalenUrl = "https://www.artportalen.se",
+            ProcessUserObservation = false,
+            ProcessDataset = true
+        };
     }
 
     private static MongoDbConfiguration GetMongoDbConfiguration()

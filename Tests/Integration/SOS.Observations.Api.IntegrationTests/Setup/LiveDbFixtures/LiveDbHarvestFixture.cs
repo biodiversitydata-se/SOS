@@ -7,13 +7,13 @@ using SOS.Lib.Models.Shared;
 using Microsoft.Extensions.Logging;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup.LiveDbFixtures;
-public class HarvestFixture
+public class LiveDbHarvestFixture : IHarvestFixture
 {
     private IVerbatimClient _verbatimClient;
     public IArtportalenVerbatimRepository ArtportalenVerbatimRepository { get; set; }
     public ArtportalenChecklistVerbatimRepository ArtportalenChecklistVerbatimRepository { get; set; }
 
-    public HarvestFixture(IVerbatimClient verbatimClient,
+    public LiveDbHarvestFixture(IVerbatimClient verbatimClient,
         IArtportalenVerbatimRepository artportalenVerbatimRepository,
         ArtportalenChecklistVerbatimRepository artportalenChecklistVerbatimRepository)
     {
@@ -36,7 +36,7 @@ public class HarvestFixture
         serviceCollection.AddSingleton<IVerbatimClient>(importClient);
         serviceCollection.AddSingleton<IArtportalenVerbatimRepository, ArtportalenVerbatimRepository>();
         serviceCollection.AddSingleton<ArtportalenChecklistVerbatimRepository>();
-        serviceCollection.AddSingleton<HarvestFixture>();
+        serviceCollection.AddSingleton<IHarvestFixture, LiveDbHarvestFixture>();
 
         return serviceCollection;
     }

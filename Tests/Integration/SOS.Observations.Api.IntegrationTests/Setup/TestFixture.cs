@@ -1,5 +1,6 @@
 ﻿using Microsoft.ApplicationInsights.Extensibility;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Search.Result;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
@@ -13,7 +14,10 @@ namespace SOS.Observations.Api.IntegrationTests.Setup;
 /// </summary>
 public class TestFixture : IAsyncLifetime
 {
-    private ProcessFixtureDbMode _processFixtureDbMode = ProcessFixtureDbMode.ContainerDb;
+    private DbHostingMode _processFixtureDbMode = DbHostingMode.ContainerDb;
+    
+    // Change this to LiveDb when creating test data.
+    private DbHostingMode _harvestFixtureDbMode = DbHostingMode.ContainerDb;
 
     /// <summary>
     /// The <see cref="ObservationsApiWebApplicationFactory"/> used to create the API client.
@@ -22,7 +26,7 @@ public class TestFixture : IAsyncLifetime
 
     public TestContainersFixture TestContainerFixture { get; private set; }
     public ServiceProvider? ServiceProvider { get; private set; }
-    public HarvestFixture? HarvestFixture { get; private set; }
+    public IHarvestFixture? HarvestFixture { get; private set; }
     public IProcessFixture? ProcessFixture { get; private set; }
 
     /// <summary>
@@ -57,43 +61,48 @@ public class TestFixture : IAsyncLifetime
     }
 
     public async Task InitializeAsync()
-    {
-        ServiceCollection[] services = null!;
-        if (_processFixtureDbMode == ProcessFixtureDbMode.ContainerDb)
+    {        
+        if (_processFixtureDbMode == DbHostingMode.ContainerDb)
         {
-            await TestContainerFixture.InitializeAsync();
-            services = GetContainerModeServices();
-        }
-        else if (_processFixtureDbMode == ProcessFixtureDbMode.LiveDb)
-        {
-            services = GetLiveDbModeServices();
-        }
+            await TestContainerFixture.InitializeAsync();            
+        }        
 
+        var services = GetServiceCollections();
         ServiceProvider = ServiceProviderExtensions.RegisterServices(services);
         ApiFactory.ServiceProvider = ServiceProvider;
         using var scope = ServiceProvider.CreateScope();
         ProcessFixture = scope.ServiceProvider.GetService<IProcessFixture>();
         await ProcessFixture!.InitializeElasticsearchIndices();
-        HarvestFixture = scope.ServiceProvider.GetService<HarvestFixture>();
-    }
+        HarvestFixture = scope.ServiceProvider.GetService<IHarvestFixture>();        
+    }   
 
-    private ServiceCollection[] GetContainerModeServices()
+    private ServiceCollection[] GetServiceCollections()
     {
-        return new ServiceCollection[]
+        var collections = new List<ServiceCollection>();
+        if (_processFixtureDbMode == DbHostingMode.ContainerDb)
         {
-            ContainerDbFixtures.ProcessFixture.GetServiceCollection(),
-            HarvestFixture.GetServiceCollection(),
-            TestContainerFixture.GetServiceCollection()
-        };
-    }
+            collections.Add(ContainerDbFixtures.ProcessFixture.GetServiceCollection());            
+        }
+        else
+        {
+            collections.Add(LiveDbProcessFixture.GetServiceCollection());
+        }
 
-    private ServiceCollection[] GetLiveDbModeServices()
-    {
-        return new ServiceCollection[]
+        if (_harvestFixtureDbMode == DbHostingMode.ContainerDb)
         {
-            LiveDbProcessFixture.GetServiceCollection(),
-            HarvestFixture.GetServiceCollection()
-        };
+            collections.Add(ContainerDbFixtures.HarvestFixture.GetServiceCollection());
+        }
+        else
+        {
+            collections.Add(LiveDbHarvestFixture.GetServiceCollection());
+        }
+
+        if (_processFixtureDbMode == DbHostingMode.ContainerDb || _harvestFixtureDbMode == DbHostingMode.ContainerDb)
+        {
+            collections.Add(TestContainerFixture.GetServiceCollection());
+        }
+
+        return collections.ToArray();
     }
 
     /// <summary>
@@ -115,7 +124,14 @@ public class TestFixture : IAsyncLifetime
         }
     }
 
-    private enum ProcessFixtureDbMode
+    internal async Task InitializeAreasAsync()
+    {
+        // Make sure areas are initialized
+        var areaHelper = ServiceProvider!.GetService<IAreaHelper>()!;
+        await areaHelper.InitializeAsync();
+    }
+
+    private enum DbHostingMode
     {
         /// <summary>
         /// Run Elasticsearch and MongoDB in container

@@ -11,7 +11,7 @@ namespace SOS.Observations.Api.IntegrationTests.Setup;
 public interface IProcessFixture
 {
     List<Taxon> Taxa { get; }
-
+    Dictionary<int, Taxon> TaxonById { get; }
     Task AddDatasetsToElasticsearchAsync(IEnumerable<Dataset> datasets, bool clearExistingObservations = true, int delayInMs = 1000);
     Task AddDataToElasticsearchAsync(IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, IEnumerable<Observation> observations, bool clearExistingObservations = true);
     Task AddDataToElasticsearchAsync(List<Dataset> datasets, List<Lib.Models.Processed.DataStewardship.Event.Event> events, List<Observation> observations, bool clearExistingObservations = true);

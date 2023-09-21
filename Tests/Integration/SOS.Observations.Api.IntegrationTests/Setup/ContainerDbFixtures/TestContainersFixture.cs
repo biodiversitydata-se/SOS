@@ -22,11 +22,13 @@ public class TestContainersFixture : IAsyncLifetime
 
     public ElasticsearchContainer ElasticsearchContainer { get; set; }
     public MongoDbContainer MongoDbContainer { get; set; }
+    public MongoDbContainer MongoDbHarvestDbContainer { get; set; }
     public TestSubstituteModels TestSubstitutes { get; set; }
 
     public class TestSubstituteModels
     {
         public IProcessClient? ProcessClient { get; set; } = null;
+        public IVerbatimClient VerbatimClient { get; set; } = null!;
         public IElasticClient? ElasticClient { get; set; }
     }
 
@@ -38,10 +40,12 @@ public class TestContainersFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         var processClient = await InitializeMongoDbAsync();
+        var verbatimClient = await InitializeMongoDbHarvestDbAsync();
         var elasticClient = await InitializeElasticsearchAsync();
         TestSubstitutes = new TestSubstituteModels
         {
             ProcessClient = processClient,
+            VerbatimClient = verbatimClient,
             ElasticClient = elasticClient
         };
     }
@@ -50,13 +54,15 @@ public class TestContainersFixture : IAsyncLifetime
     {
         await ElasticsearchContainer.DisposeAsync();
         await MongoDbContainer.DisposeAsync();
+        await MongoDbHarvestDbContainer.DisposeAsync();
     }
 
     public ServiceCollection GetServiceCollection()
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddSingleton(TestSubstitutes.ProcessClient!);
-        serviceCollection.AddSingleton(TestSubstitutes.ElasticClient!);
+        serviceCollection.AddSingleton(TestSubstitutes.VerbatimClient);
+        serviceCollection.AddSingleton(TestSubstitutes.ElasticClient!);        
 
         return serviceCollection;
     }
@@ -115,6 +121,21 @@ public class TestContainersFixture : IAsyncLifetime
             .EnableApiVersioningHeader()
         .EnableDebugMode());
         return elasticClient;
+    }
+
+    private async Task<VerbatimClient> InitializeMongoDbHarvestDbAsync()
+    {
+        MongoDbHarvestDbContainer = new MongoDbBuilder()
+            .WithImage(MONGODB_IMAGE_NAME)
+            .WithCleanUp(true)
+            .WithUsername(MONGODB_USERNAME)
+            .WithPassword(MONGODB_PASSWORD)
+            .Build();
+
+        await MongoDbHarvestDbContainer.StartAsync().ConfigureAwait(false);
+        var mongoClientSettings = MongoClientSettings.FromConnectionString(MongoDbHarvestDbContainer.GetConnectionString());
+        var verbatimClient = new VerbatimClient(mongoClientSettings, "sos-harvest-dev", 10000, 10000);
+        return verbatimClient;
     }
 
     private async Task<ProcessClient> InitializeMongoDbAsync()
