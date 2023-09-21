@@ -44,14 +44,14 @@ public class HarvestJobTests : TestBase
     {
         // Arrange
         DataProvider dataProvider = new DataProvider() { Id = 13 };
-        IDwcObservationHarvester dwcObservationHarvester = TestFixture.ServiceProvider!.GetService<IDwcObservationHarvester>()!;
-        IDwcaObservationProcessor dwcaObservationProcessor = TestFixture.ServiceProvider!.GetService<IDwcaObservationProcessor>()!;
-        IProcessedObservationRepository processedObservationRepository = TestFixture.ServiceProvider!.GetService<IProcessedObservationRepository>()!;
+        IDwcObservationHarvester dwcObservationHarvester = TestFixture.ServiceProvider.GetService<IDwcObservationHarvester>()!;
+        IDwcaObservationProcessor dwcaObservationProcessor = TestFixture.ServiceProvider.GetService<IDwcaObservationProcessor>()!;
+        IProcessedObservationRepository processedObservationRepository = TestFixture.ServiceProvider.GetService<IProcessedObservationRepository>()!;
         await TestFixture.InitializeAreasAsync();
 
         // Act
         await dwcObservationHarvester.HarvestObservationsAsync(@"Resources/Dwca/dwca-datastewardship-single-dataset.zip", dataProvider, JobCancellationToken.Null);
-        await dwcaObservationProcessor.ProcessAsync(dataProvider, TestFixture.ProcessFixture!.TaxonById, JobRunModes.Full, JobCancellationToken.Null);
+        await dwcaObservationProcessor.ProcessAsync(dataProvider, TestFixture.ProcessFixture.TaxonById, JobRunModes.Full, JobCancellationToken.Null);
         await processedObservationRepository.WaitForPublicIndexCreation(15, TimeSpan.FromSeconds(15));
         var observations = await processedObservationRepository.GetAllAsync();
 
@@ -61,7 +61,7 @@ public class HarvestJobTests : TestBase
 
     private async Task<DwcaData> ReadDwcaDataAsync(DataProvider dataProvider)
     {
-        IVerbatimClient verbatimClient = TestFixture.ServiceProvider!.GetService<IVerbatimClient>()!;
+        IVerbatimClient verbatimClient = TestFixture.ServiceProvider.GetService<IVerbatimClient>()!;
         using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, verbatimClient, new NullLogger<DwcCollectionRepository>());
         var occurrences = await dwcCollectionRepository.OccurrenceRepository.GetAllAsync();
         var events = await dwcCollectionRepository.EventRepository.GetAllAsync();

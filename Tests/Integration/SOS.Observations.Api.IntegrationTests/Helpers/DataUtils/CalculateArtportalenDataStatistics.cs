@@ -16,7 +16,7 @@ public class CalculateArtportalenDataStatistics : TestBase
     public async Task CalculateArtportalenVerbatimDataStatistics()
     {
         // Read observations from MongoDB
-        using var cursor = await TestFixture.HarvestFixture!.ArtportalenVerbatimRepository.GetAllByCursorAsync();
+        using var cursor = await TestFixture.HarvestFixture.ArtportalenVerbatimRepository.GetAllByCursorAsync();
         const int NrRowsToRead = 1000;
         int nrRowsRead = 0;
         var verbatimObservations = new List<ArtportalenObservationVerbatim>();

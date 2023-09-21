@@ -25,9 +25,9 @@ public class TestFixture : IAsyncLifetime
     public ObservationsApiWebApplicationFactory ApiFactory { get; set; }
 
     public TestContainersFixture TestContainerFixture { get; private set; }
-    public ServiceProvider? ServiceProvider { get; private set; }
-    public IHarvestFixture? HarvestFixture { get; private set; }
-    public IProcessFixture? ProcessFixture { get; private set; }
+    public ServiceProvider ServiceProvider { get; private set; } = null!;
+    public IHarvestFixture HarvestFixture { get; private set; } = null!;
+    public IProcessFixture ProcessFixture { get; private set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestFixture"/> class.    
@@ -71,9 +71,9 @@ public class TestFixture : IAsyncLifetime
         ServiceProvider = ServiceProviderExtensions.RegisterServices(services);
         ApiFactory.ServiceProvider = ServiceProvider;
         using var scope = ServiceProvider.CreateScope();
-        ProcessFixture = scope.ServiceProvider.GetService<IProcessFixture>();
-        await ProcessFixture!.InitializeElasticsearchIndices();
-        HarvestFixture = scope.ServiceProvider.GetService<IHarvestFixture>();        
+        ProcessFixture = scope.ServiceProvider.GetService<IProcessFixture>()!;
+        await ProcessFixture.InitializeElasticsearchIndices();
+        HarvestFixture = scope.ServiceProvider.GetService<IHarvestFixture>()!;
     }   
 
     private ServiceCollection[] GetServiceCollections()
@@ -127,7 +127,7 @@ public class TestFixture : IAsyncLifetime
     internal async Task InitializeAreasAsync()
     {
         // Make sure areas are initialized
-        var areaHelper = ServiceProvider!.GetService<IAreaHelper>()!;
+        var areaHelper = ServiceProvider.GetService<IAreaHelper>()!;
         await areaHelper.InitializeAsync();
     }
 
