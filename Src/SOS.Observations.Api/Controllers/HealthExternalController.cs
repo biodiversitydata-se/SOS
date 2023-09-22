@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.Linq;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -51,6 +52,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet()]
         [ProducesResponseType(typeof(object), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public async Task<IActionResult> HealthCheck()
         {
             try

@@ -47,8 +47,7 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpGet("")]
         [ProducesResponseType(typeof(EnvironmentInformationDto), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]        
         public IActionResult Get()
         {
             try

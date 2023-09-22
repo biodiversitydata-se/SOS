@@ -70,6 +70,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("Copyright")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public IActionResult Copyright()
         {
             try
@@ -91,8 +92,7 @@ namespace SOS.Observations.Api.Controllers
         /// <returns>Meta data about processing. E.g, Start time, end time, number of observations processed...</returns>
         [HttpGet("ProcessInformation")]
         [ProducesResponseType(typeof(ProcessInfoDto), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> GetProcessInfo([FromQuery] bool active)
         {
             try

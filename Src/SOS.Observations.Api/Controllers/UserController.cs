@@ -46,8 +46,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<UserInformationDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> GetUserInformation(
             [FromQuery] string applicationIdentifier = null,
             [FromQuery] string cultureCode = "sv-SE")

@@ -63,7 +63,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("CalculateTrend")]
         [ProducesResponseType(typeof(TaxonTrendResult), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> CalculateTrendAsync([FromBody] CalculateTrendFilterDto filter)
         {
             try
@@ -93,7 +93,7 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(ChecklistDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> GetChecklistByIdAsync([FromQuery] string id)
         {
             try
