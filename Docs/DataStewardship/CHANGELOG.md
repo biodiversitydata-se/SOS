@@ -1,6 +1,6 @@
-# Changelog - Nature data - systematic species observations
+# Changelog: Nature data - systematic species observations API
 
-## Version 1.0.5 (Unreleased)
+## Version 1.0.5 (2023-09-20)
 
 ### Fixed
 - Change urls from `/datastewardship/occurrences` to `/occurrences`.

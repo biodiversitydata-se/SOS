@@ -19,7 +19,7 @@ public class TestBase
     /// </summary>
     protected ITestOutputHelper Output { get; private set; }
 
-    protected IProcessFixture ProcessFixture => TestFixture.ProcessFixture!;
+    protected IProcessFixture ProcessFixture => TestFixture.ProcessFixture;
 
     /// <summary>
     /// Standard JSON serializer options used in the integration tests for serialization/deserialization operations.
@@ -61,6 +61,6 @@ public class TestBase
             t => true);
 
         // Make sure ES indexes are cleared before each test
-        TestFixture.ProcessFixture!.CleanElasticsearchIndices().Wait();
+        TestFixture.ProcessFixture.CleanElasticsearchIndices().Wait();        
     }
 }

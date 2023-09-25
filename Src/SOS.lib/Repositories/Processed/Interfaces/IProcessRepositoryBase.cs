@@ -1,5 +1,6 @@
 ﻿using SOS.Lib.Models.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
@@ -55,5 +56,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Batch size used for write
         /// </summary>
         int WriteBatchSize { get; }
+
+        /// <summary>
+        /// Get all records.
+        /// </summary>
+        /// <param name="take">The max number of records to get.</param>
+        /// <returns></returns>
+        Task<List<TEntity>> GetAllAsync(int take = 10000);
     }
 }

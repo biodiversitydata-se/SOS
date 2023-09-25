@@ -74,6 +74,8 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.ApplicationInsights;
 using SOS.Observations.Api.Configuration;
+using SOS.Observations.Api.HealthChecks;
+using SOS.Observations.Api.HealthChecks.Custom;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;

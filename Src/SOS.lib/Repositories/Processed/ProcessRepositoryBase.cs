@@ -10,13 +10,15 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System.Collections.Generic;
+using SOS.Lib.Extensions;
 
 namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public abstract class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
+    public abstract class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryBase<TEntity, TKey> where TEntity : class, IEntity<TKey>
     {
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
@@ -208,5 +210,21 @@ namespace SOS.Lib.Repositories.Processed
 
         /// <inheritdoc />
         public int WriteBatchSize => _elasticSearchIndexConfiguration.WriteBatchSize;
+
+        /// <summary>
+        /// Get all records.
+        /// </summary>
+        /// <param name="take">The max number of records to get.</param>
+        /// <returns></returns>
+        public async Task<List<TEntity>> GetAllAsync(int take = 10000)
+        {
+            var searchResponse = await Client.SearchAsync<TEntity>(s => s
+                .Index(IndexName)
+                .Query(q => q.MatchAll())
+                .Size(take));
+
+            searchResponse.ThrowIfInvalid();
+            return searchResponse.Documents.ToList();
+        }
     }
 }

@@ -20,9 +20,9 @@ public class CreateArtportalenJsonTestData : TestBase
     {
         // Read observations from MongoDB 
         const int NrObservationsToAdd = 10000;
-        long nrItemsInCollection = await TestFixture.HarvestFixture!.ArtportalenVerbatimRepository.CountAllDocumentsAsync();
+        long nrItemsInCollection = await TestFixture.HarvestFixture.ArtportalenVerbatimRepository.CountAllDocumentsAsync();
         int skipInterval = (int)nrItemsInCollection / NrObservationsToAdd - 50; // -50 because some observations are protected
-        using var cursor = await TestFixture.HarvestFixture!.ArtportalenVerbatimRepository.GetAllByCursorAsync();
+        using var cursor = await TestFixture.HarvestFixture.ArtportalenVerbatimRepository.GetAllByCursorAsync();
         int skipCounter = skipInterval;
         int nrObservationsAdded = 0;
         var verbatimObservations = new List<ArtportalenObservationVerbatim>();
@@ -75,9 +75,9 @@ public class CreateArtportalenJsonTestData : TestBase
     {
         // Read observations from MongoDB            
         const int NrChecklistsToAdd = 1000;
-        long nrItemsInCollection = await TestFixture.HarvestFixture!.ArtportalenChecklistVerbatimRepository.CountAllDocumentsAsync();
+        long nrItemsInCollection = await TestFixture.HarvestFixture.ArtportalenChecklistVerbatimRepository.CountAllDocumentsAsync();
         int skipInterval = (int)nrItemsInCollection / NrChecklistsToAdd;
-        using var cursor = await TestFixture.HarvestFixture!.ArtportalenChecklistVerbatimRepository.GetAllByCursorAsync();
+        using var cursor = await TestFixture.HarvestFixture.ArtportalenChecklistVerbatimRepository.GetAllByCursorAsync();
         int skipCounter = skipInterval;
         int nrChecklistsAdded = 0;
         var verbatimChecklists = new List<ArtportalenChecklistVerbatim>();

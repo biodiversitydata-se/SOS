@@ -20,7 +20,7 @@ public class CreateDarwinCoreJsonTestData : TestBase
     {
         // Read observations from MongoDB            
         const int NrObservationsToAdd = 1000;
-        var repository = TestFixture.HarvestFixture!.GetDwcCollectionRepository(new DataProvider() { Id = 13, Identifier = "ButterflyMonitoring" });
+        var repository = TestFixture.HarvestFixture.GetDwcCollectionRepository(new DataProvider() { Id = 13, Identifier = "ButterflyMonitoring" });
         long nrItemsInCollection = await repository.OccurrenceRepository.CountAllDocumentsAsync();
         using var cursor = await repository.OccurrenceRepository.GetAllByCursorAsync();
         int nrObservationsAdded = 0;
