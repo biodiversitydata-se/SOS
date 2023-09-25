@@ -137,16 +137,22 @@ namespace SOS.Hangfire.JobServer
                                 _hangfireDbConfiguration.DatabaseName,
                                 new MongoStorageOptions
                                 {
+                                    
+                                    CheckConnection = true,
+                                    CheckQueuedJobsStrategy = _hangfireDbConfiguration.Hosts.Length == 1 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
+                                    CountersAggregateInterval = TimeSpan.FromMinutes(10), // Default 5
+                                    // ConnectionCheckTimeout = TimeSpan.FromSeconds(5),
+                                    //  DistributedLockLifetime = TimeSpan.FromSeconds(30),
+                                    JobExpirationCheckInterval = TimeSpan.FromMinutes(10),
+                                    InvisibilityTimeout = null,
+                                   // MigrationLockTimeout = TimeSpan.FromMinutes(1),
                                     MigrationOptions = new MongoMigrationOptions
                                     {
                                         MigrationStrategy = new MigrateMongoMigrationStrategy(),
                                         BackupStrategy = new CollectionMongoBackupStrategy()
                                     },
-                                    CheckQueuedJobsStrategy = _hangfireDbConfiguration.Hosts.Length == 1 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
-                                    QueuePollInterval = TimeSpan.FromSeconds(1),
                                     Prefix = "hangfire",
-                                    CheckConnection = true,
-                                    JobExpirationCheckInterval = TimeSpan.FromMinutes(10)
+                                    QueuePollInterval = TimeSpan.FromSeconds(5) // Deafult 15
                                 })
                     );
                     GlobalJobFilters.Filters.Add(
