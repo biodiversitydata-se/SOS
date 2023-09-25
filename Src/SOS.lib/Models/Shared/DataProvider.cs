@@ -37,11 +37,6 @@ namespace SOS.Lib.Models.Shared
         public bool IncludeInSearchByDefault { get; set; }
 
         /// <summary>
-        ///     Download URL (for DwC-A files).
-        /// </summary>
-        public string DownloadUrl { get; set; }
-
-        /// <summary>
         ///     Some providers have multiple dataset 
         /// </summary>
         public IEnumerable<DataProviderDataset> Datasets { get; set; }
@@ -255,7 +250,6 @@ namespace SOS.Lib.Models.Shared
                     Email = ""
                 },
                 Url = "",
-                DownloadUrl = "",
                 Datasets = null
             };
 
@@ -284,7 +278,6 @@ namespace SOS.Lib.Models.Shared
                     Email = ""
                 },
                 Url = "",
-                DownloadUrl = "",
                 Datasets = null
             };
     }

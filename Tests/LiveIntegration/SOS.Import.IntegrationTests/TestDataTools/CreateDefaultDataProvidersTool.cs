@@ -456,10 +456,15 @@ namespace SOS.Import.LiveIntegrationTests.TestDataTools
                     },
                     Url =
                         "http://www.nrm.se/forskningochsamlingar/miljoforskningochovervakning/ringmarkningscentralen.214.html",
-                    DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
-                    DownloadUrls = new []
+                    Datasets = new[]
                     {
-                        new DownloadUrl{ Type = DownloadUrl.DownloadType.Observations, Url = "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds"}
+                        new DataProviderDataset{  
+                            DataUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
+                            Identifier = "nrm-ringedbirds",
+                            IsActive = true,
+                            Name = "BirdRingingCentre",
+                            Type = DataProviderDataset.DatasetType.Observations
+                        }
                     },
                     Type = DataProviderType.DwcA,
                     IsActive = false,
@@ -516,10 +521,15 @@ namespace SOS.Import.LiveIntegrationTests.TestDataTools
                         LastName = ""
                     },
                     Url = "http://www.gbif.org/dataset/9940af5a-3271-4e6a-ad71-ced986b9a9a5",
-                    DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
-                    DownloadUrls = new []
+                    Datasets = new[]
                     {
-                        new DownloadUrl{ Type = DownloadUrl.DownloadType.Observations, Url = "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm"}
+                        new DataProviderDataset{
+                            DataUrl = "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
+                            Identifier = "nhrs-nrm",
+                            IsActive = true,
+                            Name = "EntomologicalCollection",
+                            Type = DataProviderDataset.DatasetType.Observations
+                        }
                     },
                     Type = DataProviderType.DwcA,
                     IsActive = false,
@@ -576,10 +586,15 @@ namespace SOS.Import.LiveIntegrationTests.TestDataTools
                         LastName = ""
                     },
                     Url = "http://www.gbif.org/dataset/38c1351d-9cfe-42c0-97da-02d2c8be141c",
-                    DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=smtp-nrm",
-                    DownloadUrls = new []
+                    Datasets = new[]
                     {
-                        new DownloadUrl{ Type = DownloadUrl.DownloadType.Observations, Url = "http://www.gbif.se/ipt/archive.do?r=smtp-nrm"}
+                        new DataProviderDataset{
+                            DataUrl = "http://www.gbif.se/ipt/archive.do?r=smtp-nrm",
+                            Identifier = "smtp-nrm",
+                            IsActive = true,
+                            Name = "MalaiseTrap",
+                            Type = DataProviderDataset.DatasetType.Observations
+                        }
                     },
                     Type = DataProviderType.DwcA,
                     IsActive = false,
@@ -636,10 +651,15 @@ namespace SOS.Import.LiveIntegrationTests.TestDataTools
                         LastName = ""
                     },
                     Url = "http://www.gbif.org/dataset/6aa7c400-0c66-11dd-84d2-b8a03c50a862",
-                    DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
-                    DownloadUrls = new []
+                    Datasets = new[]
                     {
-                        new DownloadUrl{ Type = DownloadUrl.DownloadType.Observations, Url = "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises"}
+                        new DataProviderDataset{
+                            DataUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
+                            Identifier = "nrm-porpoises",
+                            IsActive = true,
+                            Name = "Porpoises",
+                            Type = DataProviderDataset.DatasetType.Observations
+                        }
                     },
                     Type = DataProviderType.DwcA,
                     IsActive = false,
@@ -691,10 +711,15 @@ namespace SOS.Import.LiveIntegrationTests.TestDataTools
                         LastName = ""
                     },
                     Url = "https://www.dagfjarilar.lu.se/",
-                    DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=lu_sebms",
-                    DownloadUrls = new []
+                    Datasets = new[]
                     {
-                        new DownloadUrl{ Type = DownloadUrl.DownloadType.Observations, Url = "http://www.gbif.se/ipt/archive.do?r=lu_sebms"}
+                        new DataProviderDataset{
+                            DataUrl = "http://www.gbif.se/ipt/archive.do?r=lu_sebms",
+                            Identifier = "lu_sebms",
+                            IsActive = true,
+                            Name = "ButterflyMonitoring",
+                            Type = DataProviderDataset.DatasetType.Observations
+                        }
                     },
                     Type = DataProviderType.DwcA,
                     IsActive = false,
@@ -741,7 +766,6 @@ namespace SOS.Import.LiveIntegrationTests.TestDataTools
                         LastName = "Sundqvist"
                     },
                     Url = "http://sharkdata.se/",
-                    DownloadUrl = "",
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
