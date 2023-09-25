@@ -119,6 +119,7 @@ namespace SOS.Analysis.Api.Managers
             return result?.Select(i => new AggregationItemDto { AggregationKey = i.AggregationKey, DocCount = i.DocCount })!;
         }
 
+        /// <inheritdoc/>
         public async Task<FeatureCollection> AtlasAggregateAsync(
         int? roleId,
         string? authorizationApplicationIdentifier,
@@ -145,7 +146,7 @@ namespace SOS.Analysis.Api.Managers
 
                 result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, (string)result.SearchAfter?.FirstOrDefault()!, 10000);
             }
-
+          
             return futureCollection;
         }
 

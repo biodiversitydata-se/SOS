@@ -42,9 +42,9 @@ namespace SOS.Lib.Models.Shared
         public string DownloadUrl { get; set; }
 
         /// <summary>
-        ///     Download URL's
+        ///     Some providers have multiple dataset 
         /// </summary>
-        public IEnumerable<DownloadUrl> DownloadUrls { get; set; }
+        public IEnumerable<DataProviderDataset> Datasets { get; set; }
 
         /// <summary>
         ///     Descriptions of the data provider 
@@ -256,7 +256,7 @@ namespace SOS.Lib.Models.Shared
                 },
                 Url = "",
                 DownloadUrl = "",
-                DownloadUrls = null
+                Datasets = null
             };
 
         /// <summary>
@@ -285,7 +285,7 @@ namespace SOS.Lib.Models.Shared
                 },
                 Url = "",
                 DownloadUrl = "",
-                DownloadUrls = null
+                Datasets = null
             };
     }
 }

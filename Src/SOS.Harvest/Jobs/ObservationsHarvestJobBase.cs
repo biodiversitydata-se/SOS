@@ -152,12 +152,6 @@ namespace SOS.Harvest.Jobs
                 await Task.WhenAll(harvestTaskByDataProvider.Values);
                 await PostHarvestAsync(harvestTaskByDataProvider);
 
-                ////---------------------------------------------------------------------------------------------------------
-                //// 4. Make sure all providers where successful
-                ////---------------------------------------------------------------------------------------------------------
-                //var success = harvestTaskByDataProvider
-                //    .All(r => r.Value.Result.Status == RunStatus.Success);
-
                 //---------------------------------------------------------------------------------------------------------
                 // 4. Make sure mandatory providers where successful
                 //---------------------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@ using DwC_A;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
@@ -138,7 +139,7 @@ namespace SOS.Harvest.Harvesters.DwC
 
                     observationCount += verbatimObservationsBatch!.Count();
                     await dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
-                }                
+                }
 
                 if (dataProvider.UseVerbatimFileInExport)
                 {
@@ -187,12 +188,12 @@ namespace SOS.Harvest.Harvesters.DwC
             using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(dataProvider, _verbatimClient, _logger) { TempMode = true };
 
             try
-            {                
+            {
                 using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
                 var dwcCollectionArchiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider, _dwcaConfiguration);
                 var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, _logger);
                 dwcCollectionRepository.BeginTempMode();
-               
+
                 if (initializeTempCollection)
                 {
                     _logger.LogDebug($"Clear DwC-A observations for {dataProvider.Identifier}");
@@ -200,14 +201,14 @@ namespace SOS.Harvest.Harvesters.DwC
                     await dwcCollectionRepository.OccurrenceRepository.AddCollectionAsync();
                     _logger.LogDebug($"Start storing DwC-A observations for {dataProvider.Identifier}");
                 }
-       
+
                 // Read datasets
                 List<Lib.Models.Processed.DataStewardship.Dataset.DwcVerbatimDataset>? datasets = null;
                 var dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.DatasetRepository.GetMaxIdAsync());
                 try
                 {
                     datasets = await dwcArchiveReader.ReadDatasetsAsync(dwcCollectionArchiveReaderContext);
-                } 
+                }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, $"Error reading DwC-A datasets for {dataProvider.Identifier}");
@@ -244,9 +245,9 @@ namespace SOS.Harvest.Harvesters.DwC
                             _logger.LogDebug($"Start storing DwC-A events for {dataProvider.Identifier}");
                             await dwcCollectionRepository.EventRepository.AddCollectionAsync();
                         }
-                        await dwcCollectionRepository.EventRepository.AddManyAsync(events);   
+                        await dwcCollectionRepository.EventRepository.AddManyAsync(events);
                     }
-                    
+
                 }
                 catch (Exception ex)
                 {
@@ -255,7 +256,7 @@ namespace SOS.Harvest.Harvesters.DwC
 
                 // Save datasets lasts, since DataSet.EventIds could been changed after reading Events
                 try
-                {                    
+                {
                     if (datasets != null && datasets.Any())
                     {
                         if (initializeTempCollection)
@@ -263,7 +264,7 @@ namespace SOS.Harvest.Harvesters.DwC
                             _logger.LogDebug($"Start storing DwC-A datasets for {dataProvider.Identifier}");
                             await dwcCollectionRepository.DatasetRepository.AddCollectionAsync();
                         }
-                        await dwcCollectionRepository.DatasetRepository.AddManyAsync(datasets);    
+                        await dwcCollectionRepository.DatasetRepository.AddManyAsync(datasets);
                     }
                 }
                 catch (Exception ex)
@@ -273,15 +274,15 @@ namespace SOS.Harvest.Harvesters.DwC
 
                 if (permanentizeTempCollection)
                 {
-                    if(await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync())
+                    if (await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync())
                     {
                         _logger.LogDebug($"Finish storing DwC-A observations for {dataProvider.Identifier}");
                     }
-                    if(await dwcCollectionRepository.EventRepository.PermanentizeCollectionAsync())
+                    if (await dwcCollectionRepository.EventRepository.PermanentizeCollectionAsync())
                     {
                         _logger.LogDebug($"Finish storing DwC-A events for {dataProvider.Identifier}");
                     }
-                    if(await dwcCollectionRepository.DatasetRepository.PermanentizeCollectionAsync())
+                    if (await dwcCollectionRepository.DatasetRepository.PermanentizeCollectionAsync())
                     {
                         _logger.LogDebug($"Finish storing DwC-A datasets for {dataProvider.Identifier}");
                     }
@@ -296,11 +297,11 @@ namespace SOS.Harvest.Harvesters.DwC
                     await dwcArchiveVerbatimRepository.StoreSourceFileAsync(dataProvider.Id, fileStream);
                     _logger.LogDebug($"Finish storing source file for {dataProvider.Identifier}");
                 }
-                
+
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
-                harvestInfo.Count = observationCount;                
+                harvestInfo.Count = observationCount;
             }
             catch (JobAbortedException e)
             {
@@ -319,18 +320,18 @@ namespace SOS.Harvest.Harvesters.DwC
         private async Task<int> CreateAndStoreAbsentObservations(DataProvider dataProvider, DwcCollectionRepository dwcCollectionRepository, List<DwcEventOccurrenceVerbatim>? events)
         {
             try
-            {           
+            {
                 if (!events?.Any() ?? true)
                 {
                     return 0;
                 }
 
                 _logger.LogDebug($"Start storing absent DwC-A occurrences for {dataProvider.Identifier}");
-               // dwcCollectionRepository.OccurrenceRepository.TempMode = false;
+                // dwcCollectionRepository.OccurrenceRepository.TempMode = false;
                 int observationCount = 0;
                 var batchAbsentObservations = new List<DwcObservationVerbatim>();
                 var id = await dwcCollectionRepository.OccurrenceRepository.GetMaxIdAsync();
-                _logger.LogDebug($"MaxId={id} before adding absent observations");                
+                _logger.LogDebug($"MaxId={id} before adding absent observations");
                 for (int i = 0; i < events!.Count; i++)
                 {
                     DwcEventOccurrenceVerbatim? ev = events[i];
@@ -360,7 +361,7 @@ namespace SOS.Harvest.Harvesters.DwC
             }
             finally
             {
-                dwcCollectionRepository.OccurrenceRepository.TempMode = true;                
+                dwcCollectionRepository.OccurrenceRepository.TempMode = true;
             }
 
             return 0;
@@ -407,7 +408,7 @@ namespace SOS.Harvest.Harvesters.DwC
             {
                 _logger.LogError(e, $"Failed count number of observations for {dataProvider.Identifier}");
                 return null;
-            }            
+            }
         }
 
         /// inheritdoc />
@@ -420,58 +421,64 @@ namespace SOS.Harvest.Harvesters.DwC
             XDocument emlDocument = null!;
             _logger.LogInformation($"Start harvesting sightings for {provider.Identifier} data provider.");
 
-            var downloadUrlEml = provider.DownloadUrls
-                ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.ObservationEml))?.Url;
-
-            if (!string.IsNullOrEmpty(downloadUrlEml))
+            var datasets = provider.Datasets?.Where(ds => ds.Type.Equals(DataProviderDataset.DatasetType.Observations));
+            if (datasets?.Any() ?? false)
             {
-                try
+                var datasetCount = datasets.Count();
+                var datsetIndex = 1;
+                foreach (var dataset in datasets)
                 {
-                    // Try to get eml document from ipt
-                    emlDocument = await _fileDownloadService.GetXmlFileAsync(downloadUrlEml);
-                    if (emlDocument != null)
+                    if (string.IsNullOrEmpty(dataset.DataUrl))
                     {
-                        if (DateTime.TryParse(
-                            emlDocument?.Root?.Element("dataset")?.Element("pubDate")?.Value,
-                            out var pubDate))
-                        {
-                            // If dataset not has changed since last harvest and there exist observations in MongoDB, don't harvest again
-                            if (provider.SourceDate == pubDate.ToUniversalTime() && !_dwcaConfiguration.ForceHarvestUnchangedDwca)
-                            {
-                                var nrExistingObservations = await GetNumberOfObservationsInExistingCollectionAsync(provider);
-                                if (nrExistingObservations.GetValueOrDefault() > 0)
-                                {
-                                    _logger.LogInformation($"Harvest of {provider.Identifier} canceled, No new data");
-                                    harvestInfo.Status = RunStatus.CanceledSuccess;
-                                    return harvestInfo;
-                                }
-                            }
-                            
-                            provider.SourceDate = pubDate;
-                        };
+                        // Since download url is missing. Assume this dataset is manually handled
+                        harvestInfo.Count = -1;
+                        harvestInfo.Status = RunStatus.Success;
+                        continue;
                     }
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, $"Error getting EML file for {provider.Identifier}");
-                }
-            }
 
-            var path = Path.Combine(_dwcaConfiguration.ImportPath, $"dwca-{provider.Identifier}.zip");
-            var downloadUrls = provider.DownloadUrls?
-                .Where(u => u.Type.Equals(DownloadUrl.DownloadType.Observations))
-                .Select(u => u.Url);
-            if (downloadUrls?.Any() ?? false)
-            {
-                foreach (var downloadUrl in downloadUrls)
-                {
-                    if (!await _fileDownloadService.GetFileAndStoreAsync(downloadUrl, path, "application/zip"))
+                    if (!string.IsNullOrEmpty(dataset.EmlUrl) && datasetCount.Equals(1)) // Todo handle multiple EML
+                    {
+                        try
+                        {
+                            // Try to get eml document from ipt
+                            emlDocument = await _fileDownloadService.GetXmlFileAsync(dataset.EmlUrl);
+                            if (emlDocument != null) // Todo handle multiple EML
+                            {
+                                if (DateTime.TryParse(
+                                    emlDocument?.Root?.Element("dataset")?.Element("pubDate")?.Value,
+                                    out var pubDate))
+                                {
+                                    // If dataset not has changed since last harvest and there exist observations in MongoDB, don't harvest again
+                                    if (provider.SourceDate == pubDate.ToUniversalTime() && !_dwcaConfiguration.ForceHarvestUnchangedDwca)
+                                    {
+                                        var nrExistingObservations = await GetNumberOfObservationsInExistingCollectionAsync(provider);
+                                        if (nrExistingObservations.GetValueOrDefault() > 0)
+                                        {
+                                            _logger.LogInformation($"Harvest of {provider.Identifier}:{dataset.Identifier} canceled, No new data");
+                                            harvestInfo.Status = RunStatus.CanceledSuccess;
+                                            return harvestInfo;
+                                        }
+                                    }
+
+                                    provider.SourceDate = pubDate;
+                                };
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e, $"Error getting EML file for {provider.Identifier}:{dataset.Identifier}");
+                        }
+                    }
+
+                    var path = Path.Combine(_dwcaConfiguration.ImportPath, $"dwca-{dataset.Identifier}.zip");
+
+                    if (!await _fileDownloadService.GetFileAndStoreAsync(dataset.DataUrl, path, "application/zip"))
                     {
                         return harvestInfo;
                     }
 
                     // Harvest file
-                    var latestHarvestInfo = await HarvestObservationsAsync(path, provider, downloadUrls.First().Equals(downloadUrl), downloadUrls.Last().Equals(downloadUrl), cancellationToken);
+                    var latestHarvestInfo = await HarvestObservationsAsync(path, provider, datsetIndex == 1, datsetIndex == datasetCount, cancellationToken);
 
                     if (File.Exists(path))
                     {
@@ -489,6 +496,8 @@ namespace SOS.Harvest.Harvesters.DwC
                         harvestInfo.DataLastModified = latestHarvestInfo.DataLastModified;
                     }
                     harvestInfo.End = latestHarvestInfo.End;
+
+                    datsetIndex++;
                 }
             }
 

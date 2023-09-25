@@ -13,7 +13,7 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [JobExpirationTimeout(Minutes = 60 * 24 * 3)]
-        [DisableConcurrentExecution(45)]
+        [DisableConcurrentExecution(timeoutInSeconds: 60 * 60)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [JobDisplayName("Full Observations Harvest")]
         [Queue("high")]
@@ -25,7 +25,7 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="harvestDataProviderIdOrIdentifiers"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [DisableConcurrentExecution(45)]
+        [DisableConcurrentExecution(timeoutInSeconds: 60 * 60)]
         [JobDisplayName("Harvest observations from passed provides")]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]

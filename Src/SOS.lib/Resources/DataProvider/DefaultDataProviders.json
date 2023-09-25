@@ -571,14 +571,14 @@
             "LastName": "",
             "Email": ""
         },
-        "DownloadUrls": [
+        "Datasets": [
             {
-                "type": "Observations",
-                "url": "https://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds"
-            },
-            {
-                "type": "ObservationEml",
-                "url": "https://www.gbif.se/ipt/eml.do?r=nrm-ringedbirds"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=nrm-ringedbirds",
+                "identifier": "nrm-ringedbirds",
+                "isActive": true,
+                "name": "Bird Ringing Centre in Sweden (NRM)",
+                "type": "Observations"
             }
         ],
         "Categories": [ "Terrestrial", "Vertebrates" ],
@@ -646,14 +646,14 @@
             "LastName": "",
             "Email": ""
         },
-        "DownloadUrls": [
+        "Datasets": [
             {
-                "type": "Observations",
-                "url": "https://www.gbif.se/ipt/archive.do?r=nhrs-nrm"
-            },
-            {
-                "type": "ObservationEml",
-                "url": "https://www.gbif.se/ipt/eml.do?r=nhrs-nrm"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=nhrs-nrm",
+                "identifier": "nhrs-nrm",
+                "isActive": true,
+                "name": "Entomological Collections (NHRS), Swedish Museum of Natural History (NRM)",
+                "type": "Observations"
             }
         ],
         "Categories": [
@@ -727,14 +727,14 @@
             "LastName": "",
             "Email": ""
         },
-        "DownloadUrls": [
+        "Datasets": [
             {
-              "type": "Observations",
-              "url": "https://www.gbif.se/ipt/archive.do?r=smtp-nrm"
-            },
-            {
-              "type": "ObservationEml",
-              "url": "https://www.gbif.se/ipt/eml.do?r=smtp-nrm"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=smtp-nrm",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=smtp-nrm",
+                "identifier": "smtp-nrm",
+                "isActive": true,
+                "name": "Swedish Malaise Trap Project (SMTP) from GBIF",
+                "type": "Observations"
             }
         ],
         "Categories": [
@@ -808,14 +808,14 @@
             "LastName": "",
             "Email": ""
         },
-        "DownloadUrls": [
+        "Datasets": [
             {
-                "type": "Observations",
-                "url": "https://www.gbif.se/ipt/archive.do?r=nrm-porpoises"
-            },
-            {
-                "type": "ObservationEml",
-                "url": "https://www.gbif.se/ipt/eml.do?r=nrm-porpoises"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=nrm-porpoises",
+                "identifier": "nrm-porpoises",
+                "isActive": true,
+                "name": "Porpoise Observation Database (NRM)",
+                "type": "Observations"
             }
         ],
         "Categories": [
@@ -883,14 +883,14 @@
             "LastName": "",
             "Email": ""
         },
-        "DownloadUrls": [
+        "Datasets": [
             {
-                "type": "Observations",
-                "url": "https://www.gbif.se/ipt/archive.do?r=lu_sebms"
-            },
-            {
-                "type": "ObservationEml",
-                "url": "https://www.gbif.se/ipt/eml.do?r=lu_sebms"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sebms",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sebms",
+                "identifier": "lu_sebms",
+                "isActive": true,
+                "name": "Swedish Butterfly Monitoring Scheme (SeBMS)",
+                "type": "Observations"
             }
         ],
         "Categories": [
@@ -1398,14 +1398,14 @@
             "LastName": "Haas",
             "Email": "fageltaxering@biol.lu.se"
         },
-        "DownloadUrls": [
+        "Datasets": [
             {
-                "type": "Observations",
-                "url": "https://www.gbif.se/ipt/archive.do?r=lu_sft_kfr"
-            },
-            {
-                "type": "ObservationEml",
-                "url": "https://www.gbif.se/ipt/eml.do?r=lu_sft_kfr"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_kfr",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sft_kfr",
+                "identifier": "lu_sft_kfr",
+                "isActive": true,
+                "name": "Swedish Bird Survey: Swedish coastal bird monitoring programme (Nationella kustfågelövervakningen)",
+                "type": "Observations"
             }
         ],
         "Categories": [
@@ -1445,7 +1445,7 @@
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
-                "Value": "he summer point count routes (“punktrutterna”) is one of several schemes within the Swedish Bird Survey, run by the Department of Biology at Lund University. The summer point count routes were initiated in 1975 as a standardised method for detecting and reporting changes in the abundance of birds and their distributions in Sweden over time. The surveys are initiated and carried out by volunteer ornithologists who use standardised methods to count birds along routes of their own choice. More than 3000 point count routes have been surveyed at least once up to and including the year 2019, and approximately 1200 of these have been surveyed during the summer. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
+                "Value": "The summer point count routes (“punktrutterna”) is one of several schemes within the Swedish Bird Survey, run by the Department of Biology at Lund University. The summer point count routes were initiated in 1975 as a standardised method for detecting and reporting changes in the abundance of birds and their distributions in Sweden over time. The surveys are initiated and carried out by volunteer ornithologists who use standardised methods to count birds along routes of their own choice. More than 3000 point count routes have been surveyed at least once up to and including the year 2019, and approximately 1200 of these have been surveyed during the summer. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
             }
         ],
         "Organizations": [
@@ -1474,14 +1474,14 @@
             "LastName": "Lindström",
             "Email": "fageltaxering@biol.lu.se"
         },
-        "DownloadUrls": [
+        "Datasets": [
             {
-                "type": "Observations",
-                "url": "https://www.gbif.se/ipt/archive.do?r=lu_sft_spkt"
-            },
-            {
-                "type": "ObservationEml",
-                "url": "https://www.gbif.se/ipt/eml.do?r=lu_sft_spkt"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_spkt",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sft_spkt",
+                "identifier": "lu_sft_spkt",
+                "isActive": true,
+                "name": "Swedish Bird Survey: Summer point count routes (Sommarpunktrutterna)",
+                "type": "Observations"
             }
         ],
         "Categories": [
@@ -1550,14 +1550,14 @@
             "LastName": "Lindström",
             "Email": "fageltaxering@biol.lu.se"
         },
-        "DownloadUrls": [
+        "Datasets": [
             {
-                "type": "Observations",
-                "url": "https://www.gbif.se/ipt/archive.do?r=lu_sft_std"
-            },
-            {
-                "type": "ObservationEml",
-                "url": "https://www.gbif.se/ipt/eml.do?r=lu_sft_std"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_std",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sft_std",
+                "identifier": "lu_sft_std",
+                "isActive": true,
+                "name": "Swedish Bird Survey: Fixed routes (Standardrutterna)",
+                "type": "Observations"
             }
         ],
         "Categories": [
@@ -1626,14 +1626,14 @@
             "LastName": "Nilsson",
             "Email": "peter.nilsson@lansstyrelsen.se"
         },
-        "DownloadUrls": [
+        "Datasets": [
             {
-                "type": "Observations",
-                "url": "https://www.gbif.se/ipt/archive.do?r=lu_kbv"
-            },
-            {
-                "type": "ObservationEml",
-                "url": "https://www.gbif.se/ipt/eml.do?r=lu_kbv"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_kbv",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_kbv",
+                "identifier": "lu_kbv",
+                "isActive": true,
+                "name": "Coastal birds in the Gulf of Bothnia",
+                "type": "Observations"
             }
         ],
         "Categories": [
@@ -1707,14 +1707,14 @@
             "LastName": "Lindh",
             "Email": "Susanne.lindh@jordbruksverket.se"
         },
-        "DownloadUrls": [
+        "Datasets": [
             {
-                "type": "Observations",
-                "url": "https://www.gbif.se/ipt/archive.do?r=sjv-tuva"
-            },
-            {
-                "type": "ObservationEml",
-                "url": "https://www.gbif.se/ipt/eml.do?r=sjv-tuva"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=sjv-tuva",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=sjv-tuva",
+                "identifier": "sjv-tuva",
+                "isActive": true,
+                "name": "National Meadow and Pasture Inventory (TUVA)",
+                "type": "Observations"
             }
         ],
         "Categories": [
@@ -1795,5 +1795,105 @@
         "SupportDatasets": true,
         "SupportEvents": true,
         "CreateEventDwC": true
+    },
+    {
+        "Id": 26,
+        "Identifier": "GNM",
+        "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": false,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "DwcA",
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Gothenburg Natural History Mueum (GNM)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Göteborgs naturhistoriska museum (GNM)"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": ""
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": ""
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "SLU"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "SLU"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Gothenburg Natural History Mueum" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "Göteborgs naturhistoriska museum" ]
+            }
+        ],
+        "Url": "https://www.gnm.se/",
+        "ContactPerson": {
+            "FirstName": "",
+            "LastName": "",
+            "Email": ""
+        },
+        "Datasets": [
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-ent",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-ent",
+                "identifier": "gnm-ent",
+                "isActive": true,
+                "name": "Entomological Collection (GNM)",
+                "type": "Observations"
+            },
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-everte",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-everte",
+                "identifier": "gnm-everte",
+                "isActive": true,
+                "name": "Invertebrates of the Gothenburg Natural History Museum",
+                "type": "Observations"
+            },
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-molluscs",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-molluscs",
+                "identifier": "gnm-molluscs",
+                "isActive": true,
+                "name": "Molluscs of the Gothenburg Natural History Museum (GNM)",
+                "type": "Observations"
+            },
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-verte",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-verte",
+                "identifier": "gnm-verte",
+                "isActive": true,
+                "name": "Vertebrates of the Gothenburg Natural History Museum (GNM)",
+                "type": "Observations"
+            }
+        ],
+        "Categories": [
+        ],
+        "HarvestSchedule": "* * * * *",
+        "SupportDatasets": false,
+        "SupportEvents": false,
+        "CreateEventDwC": false
     }
 ]

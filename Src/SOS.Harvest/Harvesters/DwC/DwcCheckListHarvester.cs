@@ -3,6 +3,7 @@ using DwC_A;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -163,75 +164,86 @@ namespace SOS.Harvest.Harvesters.DwC
             };
             XDocument emlDocument = null!;
 
-            var downloadUrlEml = provider.DownloadUrls
-                ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.ChecklistEml))?.Url;
-            if (!string.IsNullOrEmpty(downloadUrlEml))
+            var datasets = provider.Datasets?.Where(ds => ds.Type.Equals(DataProviderDataset.DatasetType.Checklists));
+            if (datasets?.Any() ?? false)
             {
-                try
-                {
-                    // Make up to 3 attempts with 1 sek sleep between the attempts 
-                    emlDocument = await PollyHelper.GetRetryPolicy(3, 1000).ExecuteAsync(async () =>
-                    {
-                        return await _fileDownloadService.GetXmlFileAsync(downloadUrlEml);
-                    });
-                   
-                    if (emlDocument != null)
-                    {
-                        if (DateTime.TryParse(
-                            emlDocument!.Root?.Element("dataset")?.Element("pubDate")?.Value,
-                            out var pubDate))
-                        {
-                            // If data set not has changed since last harvest, don't harvest again
-                            if (provider.SourceDate == pubDate.ToUniversalTime())
-                            {
-                                _logger.LogInformation($"Harvest of {provider.Identifier} canceled, No new data");
-                                harvestInfo.Status = RunStatus.CanceledSuccess;
-                                return harvestInfo;
-                            }
+                var datasetCount = datasets.Count();
 
-                            provider.SourceDate = pubDate;
-                        };
+                if (datasetCount > 1)
+                {
+                    throw new Exception("Multiple check list dataset not implemented");
+                }
+
+                var datsetIndex = 1;
+                foreach (var dataset in datasets)
+                {
+                    if (string.IsNullOrEmpty(dataset.DataUrl))
+                    {
+                        // Since download url is missing. Assume this dataset is manually handled
+                        harvestInfo.Count = -1;
+                        harvestInfo.Status = RunStatus.Success;
+                        continue;
                     }
+
+                    if (!string.IsNullOrEmpty(dataset.EmlUrl)) 
+                    {
+                        try
+                        {
+                            // Make up to 3 attempts with 1 sek sleep between the attempts 
+                            emlDocument = await PollyHelper.GetRetryPolicy(3, 1000).ExecuteAsync(async () =>
+                            {
+                                return await _fileDownloadService.GetXmlFileAsync(dataset.EmlUrl);
+                            });
+
+                            if (emlDocument != null)
+                            {
+                                if (DateTime.TryParse(
+                                    emlDocument!.Root?.Element("dataset")?.Element("pubDate")?.Value,
+                                    out var pubDate))
+                                {
+                                    // If data set not has changed since last harvest, don't harvest again
+                                    if (provider.SourceDate == pubDate.ToUniversalTime())
+                                    {
+                                        _logger.LogInformation($"Harvest of {provider.Identifier}:{dataset.Identifier} canceled, No new data");
+                                        harvestInfo.Status = RunStatus.CanceledSuccess;
+                                        return harvestInfo;
+                                    }
+
+                                    provider.SourceDate = pubDate;
+                                };
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e, $"Error getting EML file for {provider.Identifier}:{dataset.Identifier}");
+                        }
+                    }
+                    
+                    var path = Path.Combine(_dwcaConfiguration.ImportPath, $"dwca-{dataset.Identifier}.zip");
+
+                    // Try to get DwcA file from IPT and store it locally
+                    if (!await _fileDownloadService.GetFileAndStoreAsync(dataset.DataUrl, path))
+                    {
+                        return harvestInfo;
+                    }
+
+                    // Harvest file
+                    harvestInfo = await HarvestChecklistsAsync(path, provider, cancellationToken);
+
+                    if (harvestInfo.Status == RunStatus.Success && emlDocument != null)
+                    {
+                        if (!await _dataProviderRepository.StoreEmlAsync(provider.Id, emlDocument))
+                        {
+                            _logger.LogWarning($"Error updating EML for {provider.Identifier}");
+                        }
+                    }
+
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
+                    datsetIndex++;
                 }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, $"Error getting EML file for {provider.Identifier}");
-                }
-            }
-
-            var path = Path.Combine(_dwcaConfiguration.ImportPath, $"dwca-{provider.Identifier}.zip");
-
-            // Try to get DwcA file from IPT and store it locally
-            var downloadUrl = provider.DownloadUrls
-                ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.Checklists))?.Url;
-
-            if (string.IsNullOrEmpty(downloadUrl))
-            {
-                // Since download url is missing. Assume this provider is manually handled
-                harvestInfo.Count = -1; 
-                harvestInfo.Status = RunStatus.Success;
-                return harvestInfo;
-            }
-
-            if (!await _fileDownloadService.GetFileAndStoreAsync(downloadUrl, path))
-            {
-                return harvestInfo;       
-            }
-
-            // Harvest file
-            harvestInfo = await HarvestChecklistsAsync(path, provider, cancellationToken);
-
-            if (harvestInfo.Status == RunStatus.Success && emlDocument != null)
-            {
-                if (!await _dataProviderRepository.StoreEmlAsync(provider.Id, emlDocument))
-                {
-                    _logger.LogWarning($"Error updating EML for {provider.Identifier}");
-                }
-            }
-
-            if (File.Exists(path))
-            {
-                File.Delete(path);
             }
 
             return harvestInfo;

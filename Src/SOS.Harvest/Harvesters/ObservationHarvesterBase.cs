@@ -43,7 +43,6 @@ namespace SOS.Harvest.Harvesters
             VerbatimRepository.TempMode = false;
             var preHarvestCount = await VerbatimRepository.CountAllDocumentsAsync();
             VerbatimRepository.TempMode = useTempMode;
-
             // Make sure we have an empty collection.
             Logger.LogInformation($"Start empty collection for {_provider} verbatim collection");
             await VerbatimRepository.DeleteCollectionAsync();

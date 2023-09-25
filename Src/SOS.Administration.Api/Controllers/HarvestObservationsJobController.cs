@@ -69,7 +69,7 @@ namespace SOS.Administration.Api.Controllers
 
                 if (parsedDataProvidersResult.Any(providerResult =>
                     providerResult.Value.Type == DataProviderType.DwcA &&
-                    string.IsNullOrEmpty(providerResult.Value.DownloadUrls?.FirstOrDefault(u => u.Type.Equals(DownloadUrl.DownloadType.Observations))?.Url))
+                    string.IsNullOrEmpty(providerResult.Value.Datasets?.FirstOrDefault(ds => ds.Type.Equals(DataProviderDataset.DatasetType.Observations))?.DataUrl))
                 )
                 {
                     return new BadRequestObjectResult(

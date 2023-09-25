@@ -12,7 +12,7 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [DisableConcurrentExecution(45)]
+        [DisableConcurrentExecution(timeoutInSeconds: 60 * 30)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [DisplayName("Harvest Checklists")]
         Task<bool> RunAsync(IJobCancellationToken cancellationToken);
