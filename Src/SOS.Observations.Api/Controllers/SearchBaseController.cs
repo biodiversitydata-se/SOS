@@ -122,6 +122,39 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
+        /// <summary>
+        /// Validate geometries
+        /// </summary>
+        /// <param name="geometries"></param>
+        /// <returns></returns>
+        protected Result ValidateGeometries(
+            IEnumerable<Nest.IGeoShape> geometries)
+        {
+            if (!geometries?.Any() ?? true)
+            {
+                Result.Success();
+            }
+
+            try
+            {
+                foreach(var geoemtry in geometries)
+                {
+                    var geom = geoemtry.ToGeometry();
+
+                    if (!geom.IsValid)
+                    {
+                        throw new Exception("Invalid geometry");
+                    }
+                }
+            }
+            catch
+            {
+                return Result.Failure($"Invalid geometry");
+            }
+
+            return Result.Success();
+        }
+
         protected Result ValidateEmail(string email)
         {
             var errors = new List<string>();

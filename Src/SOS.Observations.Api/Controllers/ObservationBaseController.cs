@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NetTopologySuite.Geometries;
@@ -83,11 +82,16 @@ namespace SOS.Observations.Api.Controllers
                 // If geometries passed, adjust bounding box to them
                 if (filter?.Geometries?.Any() ?? false)
                 {
-                    foreach (var geoShape in filter.Geometries)
+                    try
                     {
-                        var geometry = geoShape.ToGeometry();
-                        geometryUnion = geometryUnion == null ? geometry : geometryUnion.Union(geometry);
+                        foreach (var geoShape in filter.Geometries)
+                        {
+                            var geometry = geoShape.ToGeometry();
+                            geometryUnion = geometryUnion == null ? geometry : geometryUnion.Union(geometry);
+                        }
                     }
+                    catch
+                    { }
                 }
 
                 if (geometryUnion != null)

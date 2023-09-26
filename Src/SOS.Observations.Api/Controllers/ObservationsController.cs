@@ -278,7 +278,8 @@ namespace SOS.Observations.Api.Controllers
 
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries));
                 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
@@ -376,6 +377,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
                     await ValidateTilesLimitAsync(_tilesLimitPublic, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
@@ -453,6 +455,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
                     await ValidateMetricTilesLimitAsync(_tilesLimitPublic, boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
                     );
@@ -549,6 +552,7 @@ namespace SOS.Observations.Api.Controllers
                     ValidateSearchPagingArguments(skip, take),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
@@ -825,6 +829,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateTaxonAggregationPagingArguments(skip, take),
                     await ValidateTilesLimitAsync(_tilesLimitPublic, boundingBox, 1, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
@@ -967,7 +972,8 @@ namespace SOS.Observations.Api.Controllers
                 filter = await InitializeSearchFilterAsync(filter);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
@@ -1125,6 +1131,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
                     await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
@@ -1206,6 +1213,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
                     await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
@@ -1318,6 +1326,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
                     await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
@@ -1392,6 +1401,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
                     await ValidateMetricTilesLimitAsync(_tilesLimitInternal, boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
                 );
@@ -1493,6 +1503,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateSearchPagingArgumentsInternal(skip, take),
                     ValidateTranslationCultureCode(translationCultureCode));
@@ -1620,6 +1631,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidateAggregationPagingArguments(skip, take, true),
                     ValidateTranslationCultureCode(translationCultureCode));
 
@@ -1715,6 +1727,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     take <= 10000 ? Result.Success() : Result.Failure("You can't take more than 10 000 at a time."),
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateTranslationCultureCode(translationCultureCode));
@@ -1861,6 +1874,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateTaxonAggregationPagingArguments(skip, take),
                     await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, 1, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
@@ -2001,6 +2015,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries),
                     ValidateTaxonExists(filter),
                     ValidateGeographicalAreaExists(filter?.Geographics));
 
@@ -2059,7 +2074,8 @@ namespace SOS.Observations.Api.Controllers
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false)
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateGeometries(filter?.Geographics?.Geometries)
                 );
 
                 if (validationResult.IsFailure)
@@ -2115,7 +2131,8 @@ namespace SOS.Observations.Api.Controllers
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                   ValidateBoundingBox(filter?.Geographics?.BoundingBox, false)
+                   ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                   ValidateGeometries(filter?.Geographics?.Geometries)
                 );
 
                 if (validationResult.IsFailure)
@@ -2174,7 +2191,8 @@ namespace SOS.Observations.Api.Controllers
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
                   validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                  ValidateBoundingBox(filter?.Geographics?.BoundingBox, false)
+                  ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                  ValidateGeometries(filter?.Geographics?.Geometries)
                );
 
                 if (validationResult.IsFailure)
