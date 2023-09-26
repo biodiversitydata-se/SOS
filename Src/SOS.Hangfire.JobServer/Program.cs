@@ -152,7 +152,7 @@ namespace SOS.Hangfire.JobServer
                                         BackupStrategy = new CollectionMongoBackupStrategy()
                                     },
                                     Prefix = "hangfire",
-                                    QueuePollInterval = TimeSpan.FromSeconds(5) // Deafult 15
+                                    QueuePollInterval = TimeSpan.FromSeconds(10) // Deafult 15
                                 })
                     );
                     GlobalJobFilters.Filters.Add(
