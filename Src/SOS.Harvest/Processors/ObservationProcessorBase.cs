@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Text;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
@@ -454,6 +455,10 @@ namespace SOS.Harvest.Processors
             var validateObservationsTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ValidateObservations);
             var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
             TimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateObservations, validateObservationsTimerSessionId);
+            if (dataProvider.Id == DataProviderIdentifiers.ArtportalenId)
+            {
+                LogInvalidObservations(dataProvider, invalidObservations);
+            }
 
             var mongoDbWriteTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbWrite);
             await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
@@ -461,6 +466,29 @@ namespace SOS.Harvest.Processors
             Logger.LogDebug($"End validating {dataProvider.Identifier} batch: {batchId}");
 
             return observations;
+        }
+
+        private void LogInvalidObservations(DataProvider dataProvider, ICollection<Lib.Models.Processed.Validation.InvalidObservation> invalidObservations)
+        {
+            const int maxChars = 5000;
+
+            try
+            {
+                if (invalidObservations == null) return;
+                StringBuilder sb = new StringBuilder();
+                sb.Append($"Invalid observations for {dataProvider}. Count={invalidObservations.Count}. ");
+                foreach (var observation in invalidObservations) 
+                {
+                    sb.Append($"OccurrenceID=\"{observation.OccurrenceID}\", Defects=\"{string.Join(", ", observation.Defects.Select(m => m.Information))}\". ");
+                    if (sb.Length > maxChars) break;
+                }
+
+                Logger.LogInformation(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "An error occurred in LogArtportalenInvalidObservations()");
+            }
         }
 
         protected int WriteBatchSize => ProcessedObservationRepository.WriteBatchSize;
