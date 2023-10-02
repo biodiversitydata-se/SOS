@@ -14,8 +14,8 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="fromDate"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [DisableConcurrentExecution(timeoutInSeconds: 0)]
         [JobExpirationTimeout(Minutes = 0)] // Prevent jobs to be stored to long in success 
+        [SkipWhenPreviousJobIsRunning]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [JobDisplayName("Incremental Harvest Observations, active instance")]
         [Queue("high")]
@@ -26,8 +26,8 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [DisableConcurrentExecution(timeoutInSeconds: 0)]
         [JobExpirationTimeout(Minutes = 60)]
+        [SkipWhenPreviousJobIsRunning]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [JobDisplayName("Incremental Harvest Observations, inactive instance")]
         [Queue("high")]
