@@ -17,8 +17,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="7.1.0" />
-		<PackageReference Include="CSharpFunctionalExtensions" Version="2.40.1" />
-		<PackageReference Include="Dapper" Version="2.0.151" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="2.40.2" />
+		<PackageReference Include="Dapper" Version="2.1.4" />
 		<PackageReference Include="Hangfire.Core" Version="1.8.5" />
 		<PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />

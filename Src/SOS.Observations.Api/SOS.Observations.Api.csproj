@@ -39,15 +39,15 @@
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
-		<PackageReference Include="CSharpFunctionalExtensions" Version="2.40.1" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="2.40.2" />
 		<PackageReference Include="HangFire" Version="1.8.5" />
 		<PackageReference Include="HangFire.Autofac" Version="2.4.1" />
-		<PackageReference Include="HangFire.Mongo" Version="1.9.9" />
+		<PackageReference Include="HangFire.Mongo" Version="1.9.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.11" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.11" />
-		<PackageReference Include="Microsoft.OpenApi" Version="1.6.8" />
+		<PackageReference Include="Microsoft.OpenApi" Version="1.6.9" />
 		<PackageReference Include="MongoDB.Driver" Version="2.21.0" />
 		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.21.0" />
 		<PackageReference Include="NGeoHash" Version="1.2.0" />
