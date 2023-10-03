@@ -20,17 +20,12 @@ public class TestContainersFixture : IAsyncLifetime
     private const string MONGODB_PASSWORD = "admin";
     private const string MONGODB_IMAGE_NAME = "mongo:6.0.5";
 
-    public ElasticsearchContainer ElasticsearchContainer { get; set; }
-    public MongoDbContainer MongoDbContainer { get; set; }
-    public MongoDbContainer MongoDbHarvestDbContainer { get; set; }
-    public TestSubstituteModels TestSubstitutes { get; set; }
-
-    public class TestSubstituteModels
-    {
-        public IProcessClient? ProcessClient { get; set; } = null;
-        public IVerbatimClient VerbatimClient { get; set; } = null!;
-        public IElasticClient? ElasticClient { get; set; }
-    }
+    private ElasticsearchContainer _elasticsearchContainer { get; set; }
+    private MongoDbContainer _mongoDbContainer { get; set; }
+    private MongoDbContainer _mongoDbHarvestDbContainer { get; set; }    
+    private IProcessClient _processClient { get; set; }
+    private IVerbatimClient _verbatimClient { get; set; }
+    private IElasticClient _elasticClient { get; set; }
 
     public TestContainersFixture()
     {
@@ -39,30 +34,24 @@ public class TestContainersFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var processClient = await InitializeMongoDbAsync();
-        var verbatimClient = await InitializeMongoDbHarvestDbAsync();
-        var elasticClient = await InitializeElasticsearchAsync();
-        TestSubstitutes = new TestSubstituteModels
-        {
-            ProcessClient = processClient,
-            VerbatimClient = verbatimClient,
-            ElasticClient = elasticClient
-        };
+        _processClient = await InitializeMongoDbAsync();
+        _verbatimClient = await InitializeMongoDbHarvestDbAsync();
+        _elasticClient = await InitializeElasticsearchAsync();
     }
 
     public async Task DisposeAsync()
     {
-        await ElasticsearchContainer.DisposeAsync();
-        await MongoDbContainer.DisposeAsync();
-        await MongoDbHarvestDbContainer.DisposeAsync();
+        await _elasticsearchContainer.DisposeAsync();
+        await _mongoDbContainer.DisposeAsync();
+        await _mongoDbHarvestDbContainer.DisposeAsync();
     }
 
     public ServiceCollection GetServiceCollection()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddSingleton(TestSubstitutes.ProcessClient!);
-        serviceCollection.AddSingleton(TestSubstitutes.VerbatimClient);
-        serviceCollection.AddSingleton(TestSubstitutes.ElasticClient!);        
+        serviceCollection.AddSingleton(_processClient!);
+        serviceCollection.AddSingleton(_verbatimClient);
+        serviceCollection.AddSingleton(_elasticClient!);        
 
         return serviceCollection;
     }
@@ -74,13 +63,13 @@ public class TestContainersFixture : IAsyncLifetime
             return await InitializeElasticsearchWithKibanaAsync();
         }
 
-        ElasticsearchContainer = new ElasticsearchBuilder()
+        _elasticsearchContainer = new ElasticsearchBuilder()
             .WithImage(ELASTIC_IMAGE_NAME)
             .WithCleanUp(true)
             .WithPassword(ELASTIC_PASSWORD)                        
         .Build();
-        await ElasticsearchContainer.StartAsync().ConfigureAwait(false);               
-        var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
+        await _elasticsearchContainer.StartAsync().ConfigureAwait(false);               
+        var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(_elasticsearchContainer.GetConnectionString()))
             .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
             .EnableApiVersioningHeader()
         .EnableDebugMode());
@@ -94,7 +83,7 @@ public class TestContainersFixture : IAsyncLifetime
             .WithName(Guid.NewGuid().ToString("D"))
         .Build();
 
-        ElasticsearchContainer = new ElasticsearchBuilder()
+        _elasticsearchContainer = new ElasticsearchBuilder()
             .WithImage(ELASTIC_IMAGE_NAME)
             .WithCleanUp(true)            
             .WithPortBinding(9200, 9200)
@@ -112,10 +101,10 @@ public class TestContainersFixture : IAsyncLifetime
         .Build();
 
         await network.CreateAsync().ConfigureAwait(false);
-        await ElasticsearchContainer.StartAsync().ConfigureAwait(false);
+        await _elasticsearchContainer.StartAsync().ConfigureAwait(false);
         await kibanaContainer.StartAsync().ConfigureAwait(false);
         
-        var elasticUri = new UriBuilder(Uri.UriSchemeHttp, ElasticsearchContainer.Hostname, ElasticsearchContainer.GetMappedPublicPort(9200)).ToString();
+        var elasticUri = new UriBuilder(Uri.UriSchemeHttp, _elasticsearchContainer.Hostname, _elasticsearchContainer.GetMappedPublicPort(9200)).ToString();
         var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(elasticUri))
             .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
             .EnableApiVersioningHeader()
@@ -125,31 +114,31 @@ public class TestContainersFixture : IAsyncLifetime
 
     private async Task<VerbatimClient> InitializeMongoDbHarvestDbAsync()
     {
-        MongoDbHarvestDbContainer = new MongoDbBuilder()
+        _mongoDbHarvestDbContainer = new MongoDbBuilder()
             .WithImage(MONGODB_IMAGE_NAME)
             .WithCleanUp(true)
             .WithUsername(MONGODB_USERNAME)
             .WithPassword(MONGODB_PASSWORD)
             .Build();
 
-        await MongoDbHarvestDbContainer.StartAsync().ConfigureAwait(false);
-        var mongoClientSettings = MongoClientSettings.FromConnectionString(MongoDbHarvestDbContainer.GetConnectionString());
+        await _mongoDbHarvestDbContainer.StartAsync().ConfigureAwait(false);
+        var mongoClientSettings = MongoClientSettings.FromConnectionString(_mongoDbHarvestDbContainer.GetConnectionString());
         var verbatimClient = new VerbatimClient(mongoClientSettings, "sos-harvest-dev", 10000, 10000);
         return verbatimClient;
     }
 
     private async Task<ProcessClient> InitializeMongoDbAsync()
     {
-        MongoDbContainer = new MongoDbBuilder()
+        _mongoDbContainer = new MongoDbBuilder()
             .WithImage(MONGODB_IMAGE_NAME)
             .WithCleanUp(true)
             .WithUsername(MONGODB_USERNAME)
             .WithPassword(MONGODB_PASSWORD)
             .Build();
 
-        await MongoDbContainer.StartAsync().ConfigureAwait(false);
-        await RestoreMongoDbBackup(MongoDbContainer);
-        var mongoClientSettings = MongoClientSettings.FromConnectionString(MongoDbContainer.GetConnectionString());
+        await _mongoDbContainer.StartAsync().ConfigureAwait(false);
+        await RestoreMongoDbBackup(_mongoDbContainer);
+        var mongoClientSettings = MongoClientSettings.FromConnectionString(_mongoDbContainer.GetConnectionString());
         var processClient = new ProcessClient(mongoClientSettings, "sos-dev", 10000, 10000);
         return processClient;
     }
