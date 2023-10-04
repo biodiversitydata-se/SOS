@@ -42,12 +42,34 @@ namespace SOS.Harvest.Services.Taxon
             try
             {
                 _logger.LogInformation("Start fetching dwca file from taxonservice:" + _taxonDwcUrl);
-                await using var zipFileContentStream = await _taxonServiceProxy.GetDwcaFileAsync(_taxonDwcUrl);         
+                await using var zipFileContentStream = await _taxonServiceProxy.GetDwcaFileAsync(_taxonDwcUrl);
                 if (zipFileContentStream == null)
                 {
                     _logger.LogError("Failed to fetch dwca file from taxon service:" + _taxonDwcUrl);
                     return null!;
                 }
+
+                return GetTaxaFromDwcaFileStream(zipFileContentStream);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+            }
+
+            return null!;
+        }
+
+        public IEnumerable<DarwinCoreTaxon> GetTaxaFromDwcaFile(string filePath)
+        {
+            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            return GetTaxaFromDwcaFileStream(fileStream);
+        }
+
+        public IEnumerable<DarwinCoreTaxon> GetTaxaFromDwcaFileStream(Stream zipFileContentStream)
+        {
+            try
+            {                
+                if (zipFileContentStream == null) return null!;                
                 using var zipArchive = new ZipArchive(zipFileContentStream, ZipArchiveMode.Read, false);
                 var missingFiles = new[] {
                     "Taxon.csv",
@@ -62,7 +84,7 @@ namespace SOS.Harvest.Services.Taxon
                     _logger.LogError($"Missing files in Taxon DwC ({string.Join(',', missingFiles)})");
                     return null!;
                 }
-                    
+
                 var csvFieldDelimiter = GetCsvFieldDelimiterFromMetaFile(zipArchive);
                 var taxa = GetTaxonCoreData(zipArchive, csvFieldDelimiter);
                 AddVernacularNames(taxa, zipArchive, csvFieldDelimiter);
