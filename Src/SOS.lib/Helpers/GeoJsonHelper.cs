@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
@@ -26,27 +25,37 @@ namespace SOS.Lib.Helpers
         /// <summary>
         /// Add missing grid cells to grid
         /// </summary>
-        /// <param name="gridCellFeaturesSweRef99"></param>
-        /// <param name="envelope"></param>
+        /// <param name="metricGridCellFeatures"></param>
+        /// <param name="metricEooGeometries"></param>
         /// <param name="gridCellsInMeters"></param>
         /// <param name="attributes"></param>
-        public static void FillInBlanks(IDictionary<string, IFeature> gridCellFeaturesSweRef99,
-            Envelope envelope,
+        /// <param name="alphaValues"></param>
+        /// <param name="useCenterPoint"></param>
+        public static void FillInBlanks(
+            IDictionary<string, IFeature> metricGridCellFeatures,
+            IDictionary<double, Geometry> metricEooGeometries,
             int gridCellsInMeters, 
-            IEnumerable<KeyValuePair<string, object>> attributes)
+            IEnumerable<KeyValuePair<string, object>> attributes,
+            IEnumerable<double> alphaValues,
+            bool useCenterPoint)
         {
-            // Start at top left gridcell bottom left corner
-            var x = envelope.MinX;
-            var y = envelope.MaxY - gridCellsInMeters;
+            var emptyGridCellFeaturesSweRef99 = new Dictionary<string, IFeature>();
 
-            while (y >= envelope.MinY)
+            // Start at top left gridcell bottom left corner
+           
+            var minX = metricGridCellFeatures.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.X));
+            var maxX = metricGridCellFeatures.Max(gc => gc.Value.Geometry.Coordinates.Max(c => c.X));
+            var minY = metricGridCellFeatures.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.Y));
+            var x = minX;
+            var y = metricGridCellFeatures.Max(gc => gc.Value.Geometry.Coordinates.Max(c => c.Y)) - gridCellsInMeters;
+            while (y >= minY)
             {
-                while (x < envelope.MaxX)
+                while (x < maxX)
                 {
                     var id = GeoJsonHelper.GetGridCellId(gridCellsInMeters, (int)x, (int)y);
 
                     // Try to get grid cell
-                    if (!gridCellFeaturesSweRef99.TryGetValue(id, out var feature))
+                    if (!metricGridCellFeatures.TryGetValue(id, out var feature))
                     {
                         // Grid cell is missing, create a new one
                         feature = new Feature(
@@ -67,14 +76,55 @@ namespace SOS.Lib.Helpers
                             )
                         );
 
-                        gridCellFeaturesSweRef99.Add(id, feature);
+                        var emptyCellAdded = false;
+                        foreach (var metricEoo in metricEooGeometries)
+                        {
+                            if (emptyCellAdded)
+                            {
+                                continue;
+                            }
+
+                            var alphaValue = metricEoo.Key;
+                            var eooGeometry = metricEoo.Value;
+                            var emptyCell = feature.Geometry;
+                            if (!eooGeometry.Intersects(emptyCell))
+                            {
+                                continue;
+                            }
+
+                            foreach (var gridCellFeature in metricGridCellFeatures)
+                            {
+                                var gridCell = gridCellFeature.Value.Geometry;
+                                if (useCenterPoint)
+                                {
+                                    if (gridCell.Centroid.Distance(emptyCell.Centroid) <= alphaValue)
+                                    {
+                                        emptyGridCellFeaturesSweRef99.TryAdd(id, feature);
+                                        emptyCellAdded = true;
+                                    }
+                                    continue;
+                                }
+
+                                if (gridCell.Distance(emptyCell) <= alphaValue)
+                                {
+                                    emptyGridCellFeaturesSweRef99.TryAdd(id, feature);
+                                    emptyCellAdded = true;
+                                }
+                            }
+                        } 
                     }
 
                     x += gridCellsInMeters;
                 }
 
-                x = envelope.MinX;
+                x = minX;
                 y -= gridCellsInMeters;
+            }
+
+            // Add empty grid cells to result set
+            foreach(var emptyGridCellFeature in emptyGridCellFeaturesSweRef99)
+            {
+                metricGridCellFeatures.Add(emptyGridCellFeature);
             }
         }
 
