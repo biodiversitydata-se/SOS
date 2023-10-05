@@ -24,6 +24,7 @@ namespace SOS.Analysis.Api.Controllers
                 ApiStatus = "active",
                 ApiVersion = version,
                 ApiDocumentation = new Uri("https://github.com/biodiversitydata-se/SOS"),
+                ApiChangelog = new Uri("https://github.com/biodiversitydata-se/SOS/blob/master/CHANGELOG.md"),
                 ApiReleased = new DateTimeOffset(buildDate.ToLocalTime())
             };
 

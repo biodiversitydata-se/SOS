@@ -132,7 +132,7 @@ namespace SOS.Observations.Api.Controllers
         {
             if (!geometries?.Any() ?? true)
             {
-                Result.Success();
+                return Result.Success();
             }
 
             try
