@@ -200,7 +200,7 @@ namespace SOS.Analysis.Api.Managers
                 var futureCollection = new FeatureCollection { 
                     BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem) 
                 };
-
+                var metricEooGeometries = new Dictionary<double, Geometry>();
                 foreach (var alphaValue in alphaValues)
                 {
                     var eooGeometry = gridCellFeaturesMetric
@@ -211,7 +211,7 @@ namespace SOS.Analysis.Api.Managers
                     {
                         return null!;
                     }
-
+                    metricEooGeometries.Add(alphaValue, eooGeometry);
                     var area = eooGeometry.Area / 1000000; //Calculate area in km2
                     var eoo = Math.Round(area, 0);
                     var transformedEooGeometry = eooGeometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
@@ -235,20 +235,17 @@ namespace SOS.Analysis.Api.Managers
                 }
 
                 // Add empty grid cell where no observation was found too complete grid
-                if (includeEmptyCells)
+                if (includeEmptyCells && !useEdgeLengthRatio)
                 {
                     GeoJsonHelper.FillInBlanks(
                         gridCellFeaturesMetric,
-                        new Envelope(
-                            gridCellFeaturesMetric.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.X)),
-                            gridCellFeaturesMetric.Max(gc => gc.Value.Geometry.Coordinates.Max(c => c.X)),
-                            gridCellFeaturesMetric.Max(gc => gc.Value.Geometry.Coordinates.Max(c => c.Y)),
-                            gridCellFeaturesMetric.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.Y))
-                        ),
+                        metricEooGeometries,
                         gridCellsInMeters, new[] {
                             new KeyValuePair<string, object>("observationsCount", 0),
                             new KeyValuePair<string, object>("taxaCount", 0)
-                        }
+                        },
+                        alphaValues,
+                        useCenterPoint
                     );
                 }
 

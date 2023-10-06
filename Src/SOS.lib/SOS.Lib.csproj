@@ -24,7 +24,7 @@
 		<PackageReference Include="CycleDetection" Version="2.0.0" />
 		<PackageReference Include="DeepCloner" Version="0.10.4" />
 		<PackageReference Include="DotNetCore.Mapping" Version="17.58.0" />
-		<PackageReference Include="EPPlus" Version="6.2.9" />
+		<PackageReference Include="EPPlus" Version="6.2.10" />
 		<PackageReference Include="Hangfire.Core" Version="1.8.5" />
 		<PackageReference Include="MailKit" Version="4.2.0" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
