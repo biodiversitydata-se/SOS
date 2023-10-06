@@ -17,6 +17,7 @@ namespace SOS.Harvest.Jobs
     public class ObservationsHarvestJobIncremental : ObservationsHarvestJobBase, IObservationsHarvestJobIncremental
     {
         private readonly IProcessObservationsJobIncremental _processObservationsJobIncremental;
+        private static SemaphoreSlim incrementalHarvestSemaphore = new SemaphoreSlim(1, 1);
 
         private async Task<bool> HarvestAsync(JobRunModes mode, DateTime? fromDate, IJobCancellationToken cancellationToken)
         {
@@ -63,7 +64,15 @@ namespace SOS.Harvest.Jobs
         /// <inheritdoc />
         public async Task<bool> RunIncrementalActiveAsync(DateTime? fromDate, IJobCancellationToken cancellationToken)
         {
-            return await HarvestAsync(JobRunModes.IncrementalActiveInstance, fromDate, cancellationToken);
+            if (!await incrementalHarvestSemaphore.WaitAsync(0)) return false; // If semaphore is already taken then return false.
+            try
+            {
+                return await HarvestAsync(JobRunModes.IncrementalActiveInstance, fromDate, cancellationToken);
+            }
+            finally
+            {
+                incrementalHarvestSemaphore.Release();
+            }
         }
 
         /// <inheritdoc />
