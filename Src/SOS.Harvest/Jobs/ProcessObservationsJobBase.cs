@@ -32,6 +32,7 @@ namespace SOS.Harvest.Jobs
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly bool _enableTimeManager;
+        private static SemaphoreSlim getTaxaSemaphore = new SemaphoreSlim(1, 1);
 
         private async Task InitializeAreaHelperAsync()
         {
@@ -349,7 +350,7 @@ namespace SOS.Harvest.Jobs
             
             _enableTimeManager = processConfiguration.EnableTimeManager;
             _processConfiguration = processConfiguration;
-        }
+        }        
 
         /// <summary>
         /// Get taxonomy
@@ -364,35 +365,49 @@ namespace SOS.Harvest.Jobs
                 //----------------------------------------------------------------------
                 // Process taxa
                 //----------------------------------------------------------------------
-                _logger.LogDebug("Start harvest taxonomy");
+                _logger.LogInformation("Start harvest taxa");
 
                 if (!await _processTaxaJob.RunAsync())
                 {
-                    _logger.LogError("Failed to process taxonomy");
+                    _logger.LogError("Failed to process taxa");
                     return null!;
                 }
-                _taxonCache.Clear();
-                _logger.LogDebug("Finish harvest taxonomy");
+                
+                _logger.LogInformation("Finish harvest taxa");
             }
 
-            //--------------------------------------
-            // Get taxonomy
-            //--------------------------------------
-            _logger.LogDebug("Start getting taxa from cache");
-
-            var taxa = await _taxonCache.GetAllAsync();
-            if (!taxa?.Any() ?? true)
+            await getTaxaSemaphore.WaitAsync();
+            try
             {
-                _logger.LogError("Failed to get taxa");
-                return null!;
+                if (mode == JobRunModes.Full)
+                {
+                    _taxonCache.Clear();
+                    _logger.LogInformation("Taxa cache cleared.");
+                }
+
+                //--------------------------------------
+                // Get taxonomy
+                //--------------------------------------
+                _logger.LogDebug("Start getting taxa from cache");
+
+                var taxa = await _taxonCache.GetAllAsync();
+                if (!taxa?.Any() ?? true)
+                {
+                    _logger.LogError("Failed to get taxa");
+                    return null!;
+                }
+
+                var taxaDictonary = new ConcurrentDictionary<int, Taxon>();
+                taxa.ForEach(t => taxaDictonary.TryAdd(t.Id, t));
+
+                _logger.LogInformation($"Finish getting taxa from cache (taxaDictionary.Count={taxaDictonary.Count}, taxa.Count={taxa?.Count()})");
+
+                return taxaDictonary;
             }
-
-            var taxaDictonary = new ConcurrentDictionary<int, Taxon>();
-            taxa.ForEach(t => taxaDictonary.TryAdd(t.Id, t));
-
-            _logger.LogDebug($"Finish getting taxa from cache ({taxaDictonary.Count})");
-
-            return taxaDictonary;
+            finally
+            {
+                getTaxaSemaphore.Release();
+            }
         }
 
         /// <summary>
