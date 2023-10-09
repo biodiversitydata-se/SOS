@@ -359,32 +359,29 @@ namespace SOS.Harvest.Jobs
         /// <returns></returns>
         protected async Task<IDictionary<int, Taxon>> GetTaxaAsync(JobRunModes mode)
         {
-            // Use current taxa if we are in incremental mode, to speed things up
-            if (mode == JobRunModes.Full)
-            {
-                //----------------------------------------------------------------------
-                // Process taxa
-                //----------------------------------------------------------------------
-                _logger.LogInformation("Start harvest taxa");
-
-                if (!await _processTaxaJob.RunAsync())
-                {
-                    _logger.LogError("Failed to process taxa");
-                    return null!;
-                }
-                
-                _logger.LogInformation("Finish harvest taxa");
-            }
-
             await getTaxaSemaphore.WaitAsync();
             try
             {
+                // Use current taxa if we are in incremental mode, to speed things up
                 if (mode == JobRunModes.Full)
                 {
+                    //----------------------------------------------------------------------
+                    // Process taxa
+                    //----------------------------------------------------------------------
+                    _logger.LogInformation("Start harvest taxa");
+
+                    if (!await _processTaxaJob.RunAsync())
+                    {
+                        _logger.LogError("Failed to process taxa");
+                        return null!;
+                    }
+                
+                    _logger.LogInformation("Finish harvest taxa");
+
                     _taxonCache.Clear();
                     _logger.LogInformation("Taxa cache cleared.");
                 }
-
+                
                 //--------------------------------------
                 // Get taxonomy
                 //--------------------------------------
