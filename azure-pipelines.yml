@@ -32,6 +32,10 @@ variables:
       value: prod.postman_environment.json
 
 steps:
+- task: DeleteFiles@1
+  displayName: 'Remove old files'
+  inputs:
+    contents: $(build.artifactstagingdirectory)\Results\**\*.xml
 - checkout: self
 - task: Npm@1
   displayName: Install newman
