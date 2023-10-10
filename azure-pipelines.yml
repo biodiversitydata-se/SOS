@@ -32,10 +32,6 @@ variables:
       value: prod.postman_environment.json
 
 steps:
-- task: DeleteFiles@1
-  displayName: 'Remove old files'
-  inputs:
-    contents: $(build.artifactstagingdirectory)\Results\**\*.xml
 - checkout: self
 - task: Npm@1
   displayName: Install newman
@@ -48,11 +44,11 @@ steps:
   displayName: Run tests
   inputs:
     workingDirectory: Tests/Postman
-#script: ./node_modules/.bin/newman run "SOS Health Check - 1.5.postman_collection" -e $(env_variables) -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\JunitResults.xml
+#script: ./node_modules/.bin/newman run "SOS Health Check - 1.5.postman_collection" -e $(env_variables) -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\SOS_Search\JunitResults.xml
     script: ./node_modules/.bin/newman run "SOS Health Check - 1.5.postman_collection" -e $(env_variables) -x -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\SOS_Search\JunitResults.xml
 - task: PublishTestResults@2
   displayName: Publish Test Results
   inputs:
     testResultsFiles: '**\*.xml'
-    searchFolder: $(build.artifactstagingdirectory)\Results\SOS_Search
+    searchFolder: $(build.artifactstagingdirectory)\Results\SOS_Searchx
 
