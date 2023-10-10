@@ -45,10 +45,10 @@ steps:
   inputs:
     workingDirectory: Tests/Postman
 #script: ./node_modules/.bin/newman run "SOS Health Check - 1.5.postman_collection" -e $(env_variables) -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\JunitResults.xml
-    script: ./node_modules/.bin/newman run "SOS Health Check - 1.5.postman_collection" -e $(env_variables) -x -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\SOS_SearchResults.xml 
+    script: ./node_modules/.bin/newman run "SOS Health Check - 1.5.postman_collection" -e $(env_variables) -x -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\SOS_Search\JunitResults.xml
 - task: PublishTestResults@2
   displayName: Publish Test Results
   inputs:
-    testResultsFiles: 'SOS_SearchResults.xml'
-    searchFolder: $(build.artifactstagingdirectory)\Results
+    testResultsFiles: '**\*.xml'
+    searchFolder: $(build.artifactstagingdirectory)\Results\SOS_Search
 
