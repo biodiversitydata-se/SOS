@@ -49,8 +49,6 @@ steps:
 - task: PublishTestResults@2
   displayName: Publish Test Results
   inputs:
-    testResultsFiles: '**\SOS_SearchResults.xml'
+    testResultsFiles: 'SOS_SearchResults.xml'
     searchFolder: $(build.artifactstagingdirectory)\Results
-
-#$(build.artifactstagingdirectory)
 
