@@ -50,5 +50,5 @@ steps:
   displayName: Publish Test Results
   inputs:
     testResultsFiles: '**\*.xml'
-    searchFolder: $(build.artifactstagingdirectory)\Results\SOS_Searchx
+    searchFolder: $(build.artifactstagingdirectory)\Results\SOS_Search
 
