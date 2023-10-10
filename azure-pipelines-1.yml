@@ -44,12 +44,12 @@ steps:
   displayName: Run tests
   inputs:
     workingDirectory: Tests/Postman/DataStewardship
-    script: ./node_modules/.bin/newman run "SOS DataStewardship Health Check - 1.5.postman_collection" -e $(env_variables) -x -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\DataStewardship\JunitResults.xml
+    script: ./node_modules/.bin/newman run "SOS DataStewardship Health Check - 1.5.postman_collection" -e $(env_variables) -x -r junit --reporter-junit-export $(build.artifactstagingdirectory)\Results\JunitResults.xml
 - task: PublishTestResults@2
   displayName: Publish Test Results
   inputs:
     testResultsFiles: '**\*.xml'
-    searchFolder: $(build.artifactstagingdirectory)\Results\DataStewardship
+    searchFolder: $(build.artifactstagingdirectory)\Results
 
 #$(build.artifactstagingdirectory)
 
