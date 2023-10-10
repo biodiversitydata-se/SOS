@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "9e4664dc-2dda-4022-b73b-802ff2e0ee50",
+		"_postman_id": "d51830ed-ae66-4339-b0f9-6aae845078a6",
 		"name": "SOS Health Check",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "5495698"
+		"_exporter_id": "8524282"
 	},
 	"item": [
 		{
@@ -2601,7 +2601,6 @@
 								"{{dataStewardshipApiUrl}}"
 							],
 							"path": [
-								"datastewardship",
 								"datasets"
 							],
 							"query": [
@@ -2679,7 +2678,6 @@
 								"{{dataStewardshipApiUrl}}"
 							],
 							"path": [
-								"datastewardship",
 								"datasets"
 							],
 							"query": [
@@ -2757,7 +2755,6 @@
 								"{{dataStewardshipApiUrl}}"
 							],
 							"path": [
-								"datastewardship",
 								"events"
 							],
 							"query": [
@@ -2834,7 +2831,6 @@
 								"{{dataStewardshipApiUrl}}"
 							],
 							"path": [
-								"datastewardship",
 								"events"
 							],
 							"query": [
@@ -2912,7 +2908,6 @@
 								"{{dataStewardshipApiUrl}}"
 							],
 							"path": [
-								"datastewardship",
 								"occurrences"
 							],
 							"query": [
@@ -2981,7 +2976,6 @@
 								"{{dataStewardshipApiUrl}}"
 							],
 							"path": [
-								"datastewardship",
 								"occurrences"
 							],
 							"query": [
