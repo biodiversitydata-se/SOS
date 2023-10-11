@@ -13,10 +13,8 @@ namespace SOS.Harvest.Services.Taxon.Interfaces
         /// <returns></returns>
         Task<IEnumerable<DarwinCoreTaxon>> GetTaxaAsync();
 
-        /// <summary>
-        ///     Gets the sort orders from the service
-        /// </summary>
-        /// <param name="taxonIds"></param>
-        /// <returns></returns>        
+        IEnumerable<DarwinCoreTaxon> GetTaxaFromDwcaFile(string filePath);
+
+        IEnumerable<DarwinCoreTaxon> GetTaxaFromDwcaFileStream(Stream zipFileContentStream);
     }
 }
