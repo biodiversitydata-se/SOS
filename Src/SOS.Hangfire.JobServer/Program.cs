@@ -139,7 +139,7 @@ namespace SOS.Hangfire.JobServer
                                 {
                                     
                                     CheckConnection = true,
-                                    CheckQueuedJobsStrategy = _hangfireDbConfiguration.Hosts.Length == 1 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
+                                    CheckQueuedJobsStrategy = CheckQueuedJobsStrategy.TailNotificationsCollection,//_hangfireDbConfiguration.Hosts.Length == 1 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
                                     CountersAggregateInterval = TimeSpan.FromMinutes(10), // Default 5
                                     // ConnectionCheckTimeout = TimeSpan.FromSeconds(5),
                                     //  DistributedLockLifetime = TimeSpan.FromSeconds(30),
