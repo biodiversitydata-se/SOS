@@ -414,6 +414,8 @@ namespace SOS.Harvest.Processors.Taxon
 
                 _logger.LogDebug("Start saving processed taxa");
                 var success = await _processedTaxonRepository.AddManyAsync(taxa!.Values);
+                await _processedTaxonRepository.WaitForDataInsert(taxa!.Values.Count, TimeSpan.FromMinutes(5));
+                await Task.Delay(TimeSpan.FromSeconds(15)); // Extra wait security.
                 _logger.LogDebug("Finish saving processed taxa");
 
                 return success ? taxa.Count : -1;

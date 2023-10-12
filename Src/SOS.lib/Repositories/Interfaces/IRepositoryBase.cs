@@ -337,5 +337,7 @@ namespace SOS.Lib.Repositories.Interfaces
         /// <param name="mongoCollection"></param>
         /// <returns></returns>
         Task<bool> UpdateAsync(TKey id, TEntity entity, IMongoCollection<TEntity> mongoCollection);
+
+        Task WaitForDataInsert(long expectedRecordsCount, TimeSpan? timeout = null);
     }
 }

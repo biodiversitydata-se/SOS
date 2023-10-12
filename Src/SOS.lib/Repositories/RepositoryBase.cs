@@ -243,6 +243,34 @@ namespace SOS.Lib.Repositories
             return await AddManyAsync(items, MongoCollection);
         }
 
+        public async Task WaitForDataInsert(long expectedRecordsCount, TimeSpan? timeout = null)
+        {
+            Logger.LogInformation($"Begin waiting for MongoDB data. Collection={MongoCollection}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
+            if (timeout == null) timeout = TimeSpan.FromMinutes(10);
+            var sleepTime = TimeSpan.FromSeconds(5);
+            int nrIterations = (int)(Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));            
+            long docCount = await CountAllDocumentsAsync();
+            var iterations = 0;
+
+            // Compare number of documents retrieved with actually db count
+            // If docCount is less than process count, indexing is not ready yet
+            while (docCount < expectedRecordsCount && iterations < nrIterations)
+            {
+                iterations++; // Safety to prevent infinite loop.                                
+                await Task.Delay(sleepTime);
+                docCount = await CountAllDocumentsAsync();
+            }
+
+            if (iterations == nrIterations)
+            {
+                Logger.LogError($"Failed waiting for index creation due to timeout. Collection={MongoCollection}. ExpectedRecordsCount={expectedRecordsCount}, DocCount={docCount}");
+            }
+            else
+            {
+                Logger.LogInformation($"Finish waiting for index creation. Collection={MongoCollection}.");
+            }
+        }
+
         /// <inheritdoc />
         public async Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
         {
