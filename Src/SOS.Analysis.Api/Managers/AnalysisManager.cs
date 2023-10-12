@@ -244,7 +244,6 @@ namespace SOS.Analysis.Api.Managers
                             new KeyValuePair<string, object>("observationsCount", 0),
                             new KeyValuePair<string, object>("taxaCount", 0)
                         },
-                        alphaValues,
                         useCenterPoint
                     );
                 }

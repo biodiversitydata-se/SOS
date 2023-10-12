@@ -29,14 +29,12 @@ namespace SOS.Lib.Helpers
         /// <param name="metricEooGeometries"></param>
         /// <param name="gridCellsInMeters"></param>
         /// <param name="attributes"></param>
-        /// <param name="alphaValues"></param>
         /// <param name="useCenterPoint"></param>
         public static void FillInBlanks(
             IDictionary<string, IFeature> metricGridCellFeatures,
             IDictionary<double, Geometry> metricEooGeometries,
             int gridCellsInMeters, 
             IEnumerable<KeyValuePair<string, object>> attributes,
-            IEnumerable<double> alphaValues,
             bool useCenterPoint)
         {
             var emptyGridCellFeaturesSweRef99 = new Dictionary<string, IFeature>();
