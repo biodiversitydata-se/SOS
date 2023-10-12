@@ -87,7 +87,7 @@ namespace SOS.Lib.Helpers
                             var alphaValue = metricEoo.Key;
                             var eooGeometry = metricEoo.Value;
                             var emptyCell = feature.Geometry;
-                            if (!eooGeometry.Intersects(emptyCell))
+                            if (!eooGeometry.Contains(emptyCell))
                             {
                                 continue;
                             }
