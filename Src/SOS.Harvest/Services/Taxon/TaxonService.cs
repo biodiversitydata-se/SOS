@@ -389,7 +389,9 @@ namespace SOS.Harvest.Services.Taxon
             csvFileHelper.InitializeRead(vernacularNameFile.Open(), csvFieldDelimiter);
            
             // Get all vernacular names from file
-            var vernacularNames = csvFileHelper.GetRecords(VernacularNameMapping);
+            var vernacularNames = csvFileHelper
+                .GetRecords(VernacularNameMapping)
+                .Where(m => !string.IsNullOrEmpty(m.Language));
             var vernacularNamesByTaxonId = vernacularNames
                 .GroupBy(m => m.TaxonID)
                 .ToDictionary(g => g.Key, g => g.Select(m => m));
