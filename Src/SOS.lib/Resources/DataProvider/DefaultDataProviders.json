@@ -1054,7 +1054,7 @@
         "SupportIncrementalHarvest": false,
         "SupportDynamicEml": false,
         "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": true,
+        "UseVerbatimFileInExport": false,
         "CoordinateUncertaintyInMeters": 5000,
         "Type": "DwcA",
         "Names": [
