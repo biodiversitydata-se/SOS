@@ -1,5 +1,10 @@
 # Changelog
 
+## [2023.10.17] - Hotfix
+
+### `Fixed`
+- If `OccurrenceStatus` filter is not set, only present observations are returned.
+
 ## [2023.09.20]
 
 ### `Added`
