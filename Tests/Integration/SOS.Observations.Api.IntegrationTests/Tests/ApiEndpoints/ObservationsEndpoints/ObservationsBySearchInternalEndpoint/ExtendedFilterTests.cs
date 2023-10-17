@@ -747,6 +747,37 @@ public class ExtendedFilterTests : TestBase
     }
 
     [Fact]
+    public async Task GetObservationsWithIncludeNotPresent()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All()
+               .HaveValuesFromPredefinedObservations()
+           .TheFirst(60)
+                .With(o => o.NotPresent = true)
+            .TheNext(40)
+                .With(o => o.NotPresent = false)
+           .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(100);
+    }
+
+    [Fact]
     public async Task GetObservationsWithOnlyNotPresent()
     {
         // Arrange

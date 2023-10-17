@@ -27,26 +27,26 @@ namespace SOS.Observations.Api.Extensions
 {
     public static class DtoExtensions
     {
-      /*  public static StatusVerificationDto ToStatusVerification(this StatusValidationDto statusValidationDto)
-        {
-            switch (statusValidationDto)
-            {
-                case StatusValidationDto.NotValidated:
-                    return StatusVerificationDto.NotVerified;
-                case StatusValidationDto.Validated:
-                    return StatusVerificationDto.Verified;
-                case StatusValidationDto.BothValidatedAndNotValidated:
-                    return StatusVerificationDto.BothVerifiedAndNotVerified;
-                default: return StatusVerificationDto.BothVerifiedAndNotVerified;
-            }
-        }*/
+        /*  public static StatusVerificationDto ToStatusVerification(this StatusValidationDto statusValidationDto)
+          {
+              switch (statusValidationDto)
+              {
+                  case StatusValidationDto.NotValidated:
+                      return StatusVerificationDto.NotVerified;
+                  case StatusValidationDto.Validated:
+                      return StatusVerificationDto.Verified;
+                  case StatusValidationDto.BothValidatedAndNotValidated:
+                      return StatusVerificationDto.BothVerifiedAndNotVerified;
+                  default: return StatusVerificationDto.BothVerifiedAndNotVerified;
+              }
+          }*/
 
         private static SearchFilterBase PopulateFilter(SearchFilterBaseDto searchFilterBaseDto, int userId, ProtectionFilterDto? protectionFilter, string translationCultureCode)
         {
             if (searchFilterBaseDto == null) return default;
 
-            var filter = searchFilterBaseDto is SearchFilterInternalBaseDto ? 
-                new SearchFilterInternal(userId, protectionFilter.ToFilter()) : 
+            var filter = searchFilterBaseDto is SearchFilterInternalBaseDto ?
+                new SearchFilterInternal(userId, protectionFilter.ToFilter()) :
                 new SearchFilter(userId, protectionFilter.ToFilter());
             filter.Taxa = searchFilterBaseDto.Taxon?.ToTaxonFilter();
             filter.DataStewardship = PopulateDataStewardshipFilter(searchFilterBaseDto.DataStewardship);
@@ -70,6 +70,39 @@ namespace SOS.Observations.Api.Extensions
                 };
             filter.ExtendedAuthorization.ObservedByMe = searchFilterBaseDto.ObservedByMe;
             filter.ExtendedAuthorization.ReportedByMe = searchFilterBaseDto.ReportedByMe;
+            bool isOnlyNotPresentOrRecoveredFilterSet = false;
+            if (searchFilterBaseDto.NotRecoveredFilter == SearchFilterBaseDto.SightingNotRecoveredFilterDto.OnlyNotRecovered)
+            {
+                isOnlyNotPresentOrRecoveredFilterSet = true;
+            }
+
+            filter.DiffusionStatuses = searchFilterBaseDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus)dsd)?.ToList();
+            filter.DeterminationFilter = (SightingDeterminationFilter)searchFilterBaseDto.DeterminationFilter;
+            filter.Output = new OutputFilter();
+            if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
+            {
+                filter.Output.Fields = searchFilterDto.Output?.Fields?.ToList();
+                filter.Output.PopulateFields(searchFilterDto.Output?.FieldSet);
+            }
+
+            if (searchFilterBaseDto is SearchFilterInternalBaseDto searchFilterInternalBaseDto)
+            {
+                var filterInternal = (SearchFilterInternal)filter;
+                PopulateInternalBase(searchFilterInternalBaseDto, filterInternal);
+                if (filterInternal.NotPresentFilter == SightingNotPresentFilter.OnlyNotPresent || 
+                    filterInternal.NotPresentFilter == SightingNotPresentFilter.IncludeNotPresent)
+                {
+                    isOnlyNotPresentOrRecoveredFilterSet = true;
+                }
+
+                if (searchFilterBaseDto is SearchFilterInternalDto searchFilterInternalDto)
+                {
+                    filterInternal.IncludeRealCount = searchFilterInternalDto.IncludeRealCount;
+                    filterInternal.Output.Fields = searchFilterInternalDto.Output?.Fields?.ToList();
+                    filterInternal.Output.PopulateFields(searchFilterInternalDto.Output?.FieldSet);
+                    filterInternal.Output.SortOrders = searchFilterInternalDto.Output?.SortOrders?.Select(so => new SortOrderFilter { SortBy = so.SortBy, SortOrder = so.SortOrder });
+                }
+            }
 
             if (searchFilterBaseDto.OccurrenceStatus != null)
             {
@@ -86,29 +119,9 @@ namespace SOS.Observations.Api.Extensions
                         break;
                 }
             }
-
-            filter.DiffusionStatuses = searchFilterBaseDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus)dsd)?.ToList();
-            filter.DeterminationFilter = (SightingDeterminationFilter)searchFilterBaseDto.DeterminationFilter;
-
-            filter.Output = new OutputFilter();
-            if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
+            else if (!isOnlyNotPresentOrRecoveredFilterSet)
             {
-                filter.Output.Fields = searchFilterDto.Output?.Fields?.ToList();
-                filter.Output.PopulateFields(searchFilterDto.Output?.FieldSet);
-            }
-
-            if (searchFilterBaseDto is SearchFilterInternalBaseDto searchFilterInternalBaseDto)
-            {
-                var filterInternal = (SearchFilterInternal)filter;
-                PopulateInternalBase(searchFilterInternalBaseDto, filterInternal);
-
-                if (searchFilterBaseDto is SearchFilterInternalDto searchFilterInternalDto)
-                {
-                    filterInternal.IncludeRealCount = searchFilterInternalDto.IncludeRealCount;
-                    filterInternal.Output.Fields = searchFilterInternalDto.Output?.Fields?.ToList();
-                    filterInternal.Output.PopulateFields(searchFilterInternalDto.Output?.FieldSet);
-                    filterInternal.Output.SortOrders = searchFilterInternalDto.Output?.SortOrders?.Select(so => new SortOrderFilter { SortBy = so.SortBy, SortOrder = so.SortOrder });
-                }
+                filter.PositiveSightings = true;
             }
 
             if (searchFilterBaseDto.ExcludeFilter != null)
