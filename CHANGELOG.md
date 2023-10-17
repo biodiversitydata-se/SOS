@@ -3,7 +3,7 @@
 ## [2023.10.17] - Hotfix
 
 ### `Fixed`
-- If `OccurrenceStatus` filter is not set, only present observations are returned.
+- If `OccurrenceStatus` filter is not set, only present observations will be returned.
 
 ## [2023.09.20]
 
