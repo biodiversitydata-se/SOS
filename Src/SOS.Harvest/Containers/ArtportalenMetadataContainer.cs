@@ -352,6 +352,8 @@ namespace SOS.Harvest.Containers
                 _metadataRepository.Live = value;
                 _personRepository.Live = value;
                 _projectRepository.Live = value;
+                _diaryEntryRepository.Live = value;
+                _projectRepository.Live = value;                
             }
         }
 
