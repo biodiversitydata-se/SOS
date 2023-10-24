@@ -70,7 +70,8 @@ namespace SOS.Harvest.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error when executing QueryAsync(...)");
+                string? connectionString = live ? Configuration?.ConnectionStringLive : Configuration?.ConnectionStringBackup;
+                _logger.LogError(e, $"Error when executing QueryAsync(...). ConnectionString={connectionString}");
                 throw;
             }
         }
