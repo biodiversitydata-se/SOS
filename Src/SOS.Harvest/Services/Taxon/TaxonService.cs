@@ -128,25 +128,52 @@ namespace SOS.Harvest.Services.Taxon
 
         private IVariableLengthReaderBuilder<TaxonProperties<string>> TaxonPropertiesMapping => new VariableLengthReaderBuilder<TaxonProperties<string>>()
             .Map(t => t.TaxonId, indexColumn: 0)
+            .Map(t => t.ScientificName, 1)
+            .Map(t => t.VernacularName, 2)
             .Map(t => t.SortOrder, 3)
             .Map(t => t.TaxonCategoryId, 4)
             .Map(t => t.TaxonCategorySwedishName, 5)
             .Map(t => t.TaxonCategoryEnglishName, 6)
             .Map(t => t.TaxonCategoryDarwinCoreName, 7)
-            .Map(t => t.GbifTaxonId, 10);
+            .Map(t => t.OrganismLabel1, 8)
+            .Map(t => t.OrganismLabel2, 9)
+            .Map(t => t.GbifTaxonId, 10)
+            .Map(t => t.ProtectionLevel, 11)
+            .Map(t => t.DisturbanceRadius, 12)
+            .Map(t => t.IucnRedlistCategory, 13)
+            .Map(t => t.IucnRedlistCategoryDerived, 14)
+            .Map(t => t.RedlistCategory, 15)
+            .Map(t => t.BannedForReporting, 16)
+            .Map(t => t.ExcludeFromReportingSystem, 17)
+            .Map(t => t.ActionPlan, 18)
+            .Map(t => t.BirdDirective, 19)
+            .Map(t => t.EuRegulation_1143_2014, 20)
+            .Map(t => t.RiskLista, 21)
+            .Map(t => t.InvasiveRiskAssessmentCategory, 22)
+            .Map(t => t.IsInvasiveInSweden, 23)
+            .Map(t => t.Natura2000HabitatsDirectiveArticle2, 24)
+            .Map(t => t.Natura2000HabitatsDirectiveArticle4, 25)
+            .Map(t => t.Natura2000HabitatsDirectiveArticle5, 26)
+            .Map(t => t.ProtectedByLaw, 27)
+            .Map(t => t.SwedishOccurrence, 28)
+            .Map(t => t.SwedishHistory, 29);
 
         private IVariableLengthReaderBuilder<DarwinCoreVernacularName> VernacularNameMapping =>
             new VariableLengthReaderBuilder<DarwinCoreVernacularName>()
                 .Map(t => t.TaxonID, indexColumn: 0)
-                .Map(t => t.VernacularName, 1)
-                .Map(t => t.Language, 2)
-                .Map(t => t.CountryCode, 3)
-                .Map(t => t.Source, 4)
-                .Map(t => t.IsPreferredName, 5)
-                .Map(t => t.TaxonRemarks, 6)
-                .Map(t => t.ValidForSighting, 7);
-
-
+                .Map(t => t.TaxonNameID, 1)
+                .Map(t => t.Name, 2)
+                .Map(t => t.Author, 3)
+                .Map(t => t.Language, 4)
+                .Map(t => t.CountryCode, 5)
+                .Map(t => t.Source, 6)
+                .Map(t => t.IsPreferredName, 7)
+                .Map(t => t.TaxonRemarks, 8)
+                .Map(t => t.ValidForSighting, 9)
+                .Map(t => t.NameCategoryId, 10)
+                .Map(t => t.NameCategory, 11)
+                .Map(t => t.NameStatusTypeId, 12)
+                .Map(t => t.IsOkForObsSystems, 13);
 
         private string GetCsvFieldDelimiterFromMetaFile(ZipArchive zipArchive)
         {
@@ -404,7 +431,7 @@ namespace SOS.Harvest.Services.Taxon
                 {
                     taxon.VernacularNames = dwcVernacularNames;
                     taxon.VernacularName = dwcVernacularNames
-                        .FirstOrDefault(m => m.Language == "sv" && m.IsPreferredName)?.VernacularName;
+                        .FirstOrDefault(m => m.Language == "sv" && m.IsPreferredName)?.Name;
                 }
             }
             _logger.LogDebug("Finish adding vernacular names to taxon");

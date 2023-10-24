@@ -14,6 +14,8 @@
         /// </summary>
         public string TaxonID { get; set; }
 
+        public string TaxonNameID { get; set; }
+
         /// <summary>
         ///     Preferred name
         /// </summary>
@@ -42,6 +44,11 @@
         /// <summary>
         ///     Vernacular Name
         /// </summary>
-        public string VernacularName { get; set; }
+        public string Name { get; set; }
+        public string NameCategory { get; set; }
+        public string Author { get; set; }
+        public bool IsOkForObsSystems { get; set; }
+        public int NameCategoryId { get; set; }
+        public int NameStatusTypeId { get; set; }
     }
 }
