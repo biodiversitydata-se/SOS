@@ -75,10 +75,18 @@ namespace SOS.Harvest.Jobs
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc />        
         public async Task<bool> RunIncrementalInactiveAsync(IJobCancellationToken cancellationToken)
-        {
-            return await HarvestAsync(JobRunModes.IncrementalInactiveInstance, null, cancellationToken);
+        {            
+            await incrementalHarvestSemaphore.WaitAsync();
+            try
+            {
+                return await HarvestAsync(JobRunModes.IncrementalInactiveInstance, null, cancellationToken);
+            }
+            finally
+            {                
+                incrementalHarvestSemaphore.Release();
+            }
         }
 
         /// <inheritdoc />
