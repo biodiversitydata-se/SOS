@@ -22,6 +22,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         }
         public enum SightingNotPresentFilterDto
         {
+            NoFilter,
             DontIncludeNotPresent,
             OnlyNotPresent,
             IncludeNotPresent

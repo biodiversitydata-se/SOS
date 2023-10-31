@@ -98,6 +98,7 @@ namespace SOS.Lib.Enums
 
     public enum SightingNotPresentFilter
     {
+        NoFilter,
         DontIncludeNotPresent,
         OnlyNotPresent,
         IncludeNotPresent
