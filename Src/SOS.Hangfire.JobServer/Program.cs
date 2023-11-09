@@ -126,7 +126,7 @@ namespace SOS.Hangfire.JobServer
 
                     services.AddHangfire(configuration =>
                         configuration
-                            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                             .UseSimpleAssemblyNameTypeSerializer()
                             .UseRecommendedSerializerSettings(m =>
                             {
@@ -139,7 +139,7 @@ namespace SOS.Hangfire.JobServer
                                 {
                                     
                                     CheckConnection = true,
-                                    CheckQueuedJobsStrategy = CheckQueuedJobsStrategy.TailNotificationsCollection,//_hangfireDbConfiguration.Hosts.Length == 1 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
+                                    CheckQueuedJobsStrategy = CheckQueuedJobsStrategy.Watch,
                                     CountersAggregateInterval = TimeSpan.FromMinutes(10), // Default 5
                                     // ConnectionCheckTimeout = TimeSpan.FromSeconds(5),
                                     //  DistributedLockLifetime = TimeSpan.FromSeconds(30),

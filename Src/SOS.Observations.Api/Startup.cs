@@ -347,7 +347,7 @@ namespace SOS.Observations.Api
                 var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
                 services.AddHangfire(configuration =>
                     configuration
-                        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                        .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                         .UseSimpleAssemblyNameTypeSerializer()
                         .UseRecommendedSerializerSettings(m =>
                         {
