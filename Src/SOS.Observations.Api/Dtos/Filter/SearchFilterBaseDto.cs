@@ -20,7 +20,8 @@ namespace SOS.Observations.Api.Dtos.Filter
         {
             NoFilter,
             OnlyNotRecovered,
-            DontIncludeNotRecovered
+            DontIncludeNotRecovered,
+            IncludeNotRecovered
         }
 
         /*[Obsolete]

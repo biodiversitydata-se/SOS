@@ -113,5 +113,19 @@ public class OccurrenceStatusTests : TestBase
         var allExceptNotRecoveredResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(allExceptNotRecoveredSearchFilter));
         var allExceptNotRecoveredResult = await allExceptNotRecoveredResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
         allExceptNotRecoveredResult!.TotalCount.Should().Be(90);
+
+        // Scenario 7 - All except not present (Alla (exkl. ej funna))
+        var allExceptNotPresentSearchFilter = new SearchFilterInternalDto
+        {
+            OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent,
+            NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.IncludeNotRecovered,
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.DontIncludeNotPresent
+            }
+        };
+        var allExceptNotPresentSearchFilterResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(allExceptNotPresentSearchFilter));
+        var allExceptNotPresentSearchFilterResult = await allExceptNotPresentSearchFilterResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        allExceptNotPresentSearchFilterResult!.TotalCount.Should().Be(80);
     }
 }

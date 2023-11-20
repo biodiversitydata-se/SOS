@@ -71,7 +71,8 @@ namespace SOS.Observations.Api.Extensions
             filter.ExtendedAuthorization.ObservedByMe = searchFilterBaseDto.ObservedByMe;
             filter.ExtendedAuthorization.ReportedByMe = searchFilterBaseDto.ReportedByMe;
             bool isOnlyNotPresentOrRecoveredFilterSet = false;
-            if (searchFilterBaseDto.NotRecoveredFilter == SearchFilterBaseDto.SightingNotRecoveredFilterDto.OnlyNotRecovered)
+            if (searchFilterBaseDto.NotRecoveredFilter == SearchFilterBaseDto.SightingNotRecoveredFilterDto.OnlyNotRecovered ||
+                searchFilterBaseDto.NotRecoveredFilter == SearchFilterBaseDto.SightingNotRecoveredFilterDto.IncludeNotRecovered)
             {
                 isOnlyNotPresentOrRecoveredFilterSet = true;
             }

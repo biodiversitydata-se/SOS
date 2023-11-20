@@ -605,7 +605,7 @@ namespace SOS.Lib
                 case SightingNotRecoveredFilter.OnlyNotRecovered:
                     query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", true);
                     break;
-            }
+            }            
         }
 
         /// <summary>

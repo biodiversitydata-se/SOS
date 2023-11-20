@@ -93,7 +93,8 @@ namespace SOS.Lib.Enums
     {
         NoFilter,
         OnlyNotRecovered,
-        DontIncludeNotRecovered
+        DontIncludeNotRecovered,
+        IncludeNotRecovered
     }
 
     public enum SightingNotPresentFilter
