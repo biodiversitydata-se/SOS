@@ -64,7 +64,7 @@ namespace SOS.Analysis.Api.Dtos.Filter
         /// <summary>
         /// Filter for observation not recovered
         /// </summary>
-        public SightingNotRecoveredFilterDto NotRecoveredFilter { get; set; } = SightingNotRecoveredFilterDto.DontIncludeNotRecovered;
+        public SightingNotRecoveredFilterDto NotRecoveredFilter { get; set; }
 
         /// <summary>
         /// Only get observations observed by me

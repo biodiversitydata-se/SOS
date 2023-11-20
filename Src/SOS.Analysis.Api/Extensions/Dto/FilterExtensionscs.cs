@@ -4,6 +4,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
+using static SOS.Analysis.Api.Dtos.Filter.ExtendedFilterDto;
 
 namespace SOS.Analysis.Api.Extensions.Dto
 {
@@ -34,23 +35,45 @@ namespace SOS.Analysis.Api.Extensions.Dto
                 };
             filter.ExtendedAuthorization.ObservedByMe = searchFilterDto.ObservedByMe ?? false;
             filter.ExtendedAuthorization.ReportedByMe = searchFilterDto.ReportedByMe ?? false;
-
-            if (searchFilterDto.OccurrenceStatus.HasValue)
+            bool isOnlyNotPresentOrRecoveredFilterSet = false;
+            if (searchFilterDto.NotRecoveredFilter == SightingNotRecoveredFilterDto.OnlyNotRecovered ||
+                searchFilterDto.NotRecoveredFilter == SightingNotRecoveredFilterDto.IncludeNotRecovered)
             {
-                filter.PositiveSightings = searchFilterDto.OccurrenceStatus.Value switch
-                {
-                    OccurrenceStatusFilterValuesDto.Present => true,
-                    OccurrenceStatusFilterValuesDto.Absent => false,
-                    _ => null
-                };
+                isOnlyNotPresentOrRecoveredFilterSet = true;
             }
-
+            
             filter.DiffusionStatuses = searchFilterDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus)dsd)?.ToList();
             filter.DeterminationFilter = (SightingDeterminationFilter)searchFilterDto.DeterminationFilter;
 
             if (searchFilterDto is SearchFilterInternalDto searchFilterInternalDto)
             {
                 PopulateInternalBase(searchFilterInternalDto, filter);
+                if (searchFilterInternalDto.ExtendedFilter != null &&
+                    (searchFilterInternalDto.ExtendedFilter.NotPresentFilter == SightingNotPresentFilterDto.OnlyNotPresent ||
+                    searchFilterInternalDto.ExtendedFilter.NotPresentFilter == SightingNotPresentFilterDto.IncludeNotPresent))
+                {
+                    isOnlyNotPresentOrRecoveredFilterSet = true;
+                }
+            }
+
+            if (searchFilterDto.OccurrenceStatus != null)
+            {
+                switch (searchFilterDto.OccurrenceStatus)
+                {
+                    case OccurrenceStatusFilterValuesDto.Present:
+                        filter.PositiveSightings = true;
+                        break;
+                    case OccurrenceStatusFilterValuesDto.Absent:
+                        filter.PositiveSightings = false;
+                        break;
+                    case OccurrenceStatusFilterValuesDto.BothPresentAndAbsent:
+                        filter.PositiveSightings = null;
+                        break;
+                }
+            }
+            else if (!isOnlyNotPresentOrRecoveredFilterSet)
+            {
+                filter.PositiveSightings = true;
             }
 
             if (searchFilterDto.ExcludeFilter != null)

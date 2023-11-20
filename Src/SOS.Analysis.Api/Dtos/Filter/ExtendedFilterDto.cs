@@ -19,6 +19,7 @@
         }
         public enum SightingNotPresentFilterDto
         {
+            NoFilter,
             DontIncludeNotPresent,
             OnlyNotPresent,
             IncludeNotPresent

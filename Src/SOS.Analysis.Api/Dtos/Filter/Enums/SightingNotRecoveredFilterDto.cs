@@ -4,6 +4,7 @@
     {
         NoFilter,
         OnlyNotRecovered,
-        DontIncludeNotRecovered
+        DontIncludeNotRecovered,
+        IncludeNotRecovered
     }
 }
