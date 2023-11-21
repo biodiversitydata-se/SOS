@@ -149,14 +149,14 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 if (occurrenceIdsByEventId.TryGetValue(eventPair.Key.ToLower(), out var occurrenceIds))
                 {
                     if (occurrenceIds != null && eventPair.Value.OccurrenceIds != null && occurrenceIds.Count != eventPair.Value.OccurrenceIds.Count)
-                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed={occurrenceIds.Count}, EventId={eventPair.Key}, DataProvider={dataProvider}");
+                        Logger.LogDebug($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed={occurrenceIds.Count}, EventId={eventPair.Key}, DataProvider={dataProvider}");
                     eventPair.Value.OccurrenceIds = occurrenceIds;
                 }
                 else
                 {
                     occurrenceIdsByEventId.Add(eventPair.Key, new List<string>());
                     if (eventPair.Value.OccurrenceIds != null && eventPair.Value.OccurrenceIds.Count > 0)
-                        Logger.LogInformation($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed=0, EventId={eventPair.Key}, DataProvider={dataProvider}");
+                        Logger.LogDebug($"Event.OccurrenceIds differs. #Verbatim={eventPair.Value.OccurrenceIds.Count}, #Processed=0, EventId={eventPair.Key}, DataProvider={dataProvider}");
                     eventPair.Value.OccurrenceIds = null;
                 }
             }
