@@ -113,6 +113,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="sendMailFromZendTo"></param>
         /// <param name="encryptPassword"></param>
         /// <param name="confirmEncryptPassword"></param>
+        /// <param name="roleId"></param>
+        /// <param name="applicationIdentifier"></param>
         /// <returns></returns>
         private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(
             SearchFilterBaseDto filter,
@@ -122,7 +124,9 @@ namespace SOS.Observations.Api.Controllers
             ProtectionFilterDto? protectionFilter,
             bool sendMailFromZendTo,
             string encryptPassword,
-            string confirmEncryptPassword)
+            string confirmEncryptPassword,
+            int? roleId,
+            string applicationIdentifier)
         {
             var validationResults = Result.Combine(
                 validateSearchFilter ? ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
@@ -139,7 +143,7 @@ namespace SOS.Observations.Api.Controllers
             }
 
             var exportFilter = filter.ToSearchFilter(UserId, protectionFilter ?? ProtectionFilterDto.Public, "en-GB");
-            var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter.Clone());
+            var matchCount = await ObservationManager.GetMatchCountAsync(roleId, applicationIdentifier, exportFilter.Clone());
             if (matchCount == 0)
             {
                 return (Result: NoContent(), Count: 0);
@@ -715,7 +719,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -797,7 +801,7 @@ namespace SOS.Observations.Api.Controllers
                 CheckAuthorization(protectionFilter);
 
                 var userExports = await GetUserExportsAsync();
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -886,7 +890,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -980,7 +984,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1380,7 +1384,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1463,7 +1467,7 @@ namespace SOS.Observations.Api.Controllers
                 CheckAuthorization(filter.ProtectionFilter);
 
                 var userExports = await GetUserExportsAsync();
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1552,7 +1556,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1645,7 +1649,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
