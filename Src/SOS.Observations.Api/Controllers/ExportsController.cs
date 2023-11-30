@@ -159,8 +159,15 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="filter"></param>
         /// <param name="validateSearchFilter"></param>
         /// <param name="protectionFilter"></param>
+        /// <param name="roleId"></param>
+        /// <param name="applicationIdentifier"></param>
         /// <returns></returns>
-        private async Task<IActionResult> DownloadValidateAsync(SearchFilterBaseDto filter, bool validateSearchFilter, ProtectionFilterDto? protectionFilter)
+        private async Task<IActionResult> DownloadValidateAsync(
+            SearchFilterBaseDto filter, 
+            bool validateSearchFilter, 
+            ProtectionFilterDto? protectionFilter,
+            int? roleId,
+            string applicationIdentifier)
         {
             var validationResults = Result.Combine(
                 validateSearchFilter ? ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
@@ -172,8 +179,8 @@ namespace SOS.Observations.Api.Controllers
                 return BadRequest(validationResults);
             }
 
-            var exportFilter = filter.ToSearchFilter(UserId, protectionFilter ?? ProtectionFilterDto.Public, "en-GB");
-            var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter);
+            var exportFilter = filter.ToSearchFilter(UserId, protectionFilter ?? ProtectionFilterDto.Public, "en-GB");            
+            var matchCount = await ObservationManager.GetMatchCountAsync(roleId, applicationIdentifier, exportFilter);
 
             if (matchCount == 0)
             {
@@ -380,7 +387,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                
-                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -452,7 +459,7 @@ namespace SOS.Observations.Api.Controllers
                 CheckAuthorization(protectionFilter);
                 filter.Output = new OutputFilterDto { FieldSet = OutputFieldSet.All };
 
-                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
@@ -533,7 +540,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 
-                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -617,7 +624,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 
-                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
@@ -1051,7 +1058,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
 
-                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -1122,7 +1129,7 @@ namespace SOS.Observations.Api.Controllers
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 CheckAuthorization(filter.ProtectionFilter);
 
-                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
@@ -1198,7 +1205,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
 
-                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -1282,7 +1289,7 @@ namespace SOS.Observations.Api.Controllers
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
 
-                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter);
+                var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;

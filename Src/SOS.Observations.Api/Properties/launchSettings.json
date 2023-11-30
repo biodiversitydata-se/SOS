@@ -22,7 +22,10 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Dev"
+        "ASPNETCORE_ENVIRONMENT": "Dev",
+        "DISABLE_HANGFIRE_INIT": "true",
+        "DISABLE_HEALTHCHECK_INIT": "true",
+        "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     },
@@ -31,7 +34,22 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "ST"
+        "ASPNETCORE_ENVIRONMENT": "ST",
+        "DISABLE_HANGFIRE_INIT": "true",
+        "DISABLE_HEALTHCHECK_INIT": "true",
+        "DISABLE_CACHED_TAXON_SUM_INIT": "true"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    },
+    "SOS.Observations.Api (Prod)": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Prod",
+        "DISABLE_HANGFIRE_INIT": "true",
+        "DISABLE_HEALTHCHECK_INIT": "true",
+        "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     },
@@ -43,7 +61,7 @@
         "ASPNETCORE_ENVIRONMENT": "ST",
         "ASPNETCORE_URLS": "https://localhost:5001;http://localhost:5000"
       },
-      "distributionName": "Ubuntu"      
+      "distributionName": "Ubuntu"
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",

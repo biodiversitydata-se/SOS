@@ -166,13 +166,17 @@ namespace SOS.Observations.Api
             _disableHealthCheckInit = GetDisableFeature(environmentVariable: "DISABLE_HEALTHCHECK_INIT");
             _disableCachedTaxonSumAggregationInit = GetDisableFeature(environmentVariable: "DISABLE_CACHED_TAXON_SUM_INIT");
 
+            // Add user secrets if debug or if development mode.            
+            // (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
+            // In production you should store the secret values as environment variables.
+#if DEBUG
+            builder.AddUserSecrets<Startup>();
+#else
             if (_isDevelopment)
-            {
-                // If Development mode, add secrets stored on developer machine 
-                // (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
-                // In production you should store the secret values as environment variables.
+            {                
                 builder.AddUserSecrets<Startup>();
             }
+#endif
 
             Configuration = builder.Build();
         }
