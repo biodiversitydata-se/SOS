@@ -15,6 +15,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
         /// <param name="aggregationField"></param>
+        /// <param name="precisionThreshold"></param>
         /// <param name="afterKey"></param>
         /// <param name="take"></param>
         /// <returns></returns>
@@ -23,6 +24,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto searchFilter,
             string aggregationField,
+            int? precisionThreshold,
             string? afterKey,
             int? take);
 
@@ -33,6 +35,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="aggregationField"></param>
+        /// <param name="precisionThreshold"></param>
         /// <param name="take"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
@@ -41,6 +44,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto filter,
             string aggregationField,
+            int? precisionThreshold,
             int take,
             AggregationSortOrder sortOrder);
 

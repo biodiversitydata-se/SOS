@@ -167,6 +167,7 @@ namespace SOS.Observations.Api.Managers
                 "event.eventId",
                 skip,
                 take,
+                precisionThreshold: 40000,
                 Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);
             int count = eventIdPageResult.Records.Count();
             int totalCount = Convert.ToInt32(eventIdPageResult.TotalCount);
@@ -260,6 +261,7 @@ namespace SOS.Observations.Api.Managers
                 "dataStewardship.datasetIdentifier",
                 skip,
                 take,
+                precisionThreshold: 40000,
                 Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);
 
             int totalCount = Convert.ToInt32(aggregationResult.TotalCount);

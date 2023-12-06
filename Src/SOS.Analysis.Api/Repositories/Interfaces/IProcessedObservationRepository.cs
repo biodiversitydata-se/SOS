@@ -11,9 +11,10 @@ namespace SOS.Analysis.Api.Repositories.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="aggregationField"></param>
+        /// <param name="precisionThreshold"></param>
         /// <param name="afterKey"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, string? afterKey, int? take = 10);
+        Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, int? precisionThreshold, string? afterKey = null, int? take = 10);
     }
 }

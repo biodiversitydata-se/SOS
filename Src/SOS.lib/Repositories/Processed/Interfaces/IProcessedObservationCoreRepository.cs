@@ -280,14 +280,16 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> VerifyCollectionAsync(bool protectedIndex);
         
         Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
-            string aggregationField, 
+            string aggregationField,
+            int? precisionThreshold,
             int size = 65536, 
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
 
         Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
-            string aggregationField,            
+            string aggregationField,
             int skip,
             int take,
+            int? precisionThreshold,
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
 
         /// <summary>

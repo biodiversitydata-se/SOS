@@ -23,7 +23,7 @@ namespace SOS.Analysis.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, string? afterKey, int? take = 10)
+        public async Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, int? precisionThreshold, string? afterKey = null, int? take = 10)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -63,6 +63,7 @@ namespace SOS.Analysis.Api.Repositories
                         .Aggregations(a => a
                             .Cardinality("unique_taxonids", c => c
                                 .Field("taxon.id")
+                                .PrecisionThreshold(precisionThreshold)
                             )
                         )
                     )

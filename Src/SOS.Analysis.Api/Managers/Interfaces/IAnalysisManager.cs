@@ -16,6 +16,7 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="aggregationField"></param>
+        /// <param name="precisionThreshold"></param>
         /// <param name="afterKey"></param>
         /// <param name="take"></param>
         /// <returns></returns>
@@ -24,6 +25,7 @@ namespace SOS.Analysis.Api.Managers.Interfaces
             string? authorizationApplicationIdentifier,
             SearchFilter filter, 
             string aggregationField,
+            int? precisionThreshold,
             string? afterKey, 
             int? take);
 
@@ -34,6 +36,7 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="aggregationField"></param>
+        /// <param name="precisionThreshold"></param>
         /// <param name="take"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
@@ -42,8 +45,9 @@ namespace SOS.Analysis.Api.Managers.Interfaces
             string? authorizationApplicationIdentifier,
             SearchFilter filter,
             string aggregationField,
+            int? precisionThreshold,
             int take,
-            AggregationSortOrder sortOrder);
+            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
 
         /// <summary>
         /// Aggregate by atlas square

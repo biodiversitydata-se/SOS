@@ -59,6 +59,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
             [FromQuery] string aggregationField,
+            [FromQuery] int? precisionThreshold,
             [FromQuery] string? afterKey,
             [FromQuery] int? take = 10)
         {
@@ -81,6 +82,7 @@ namespace SOS.Analysis.Api.Controllers
                     authorizationApplicationIdentifier,
                     filter,
                     aggregationField,
+                    precisionThreshold,
                     afterKey,
                     take
                 );
@@ -109,6 +111,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
             [FromQuery] string aggregationField,
+            [FromQuery] int? precisionThreshold,
             [FromQuery] int take = 10,
             [FromQuery] AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
@@ -131,6 +134,7 @@ namespace SOS.Analysis.Api.Controllers
                     authorizationApplicationIdentifier,
                     filter,
                     aggregationField,
+                    precisionThreshold,
                     take,
                     sortOrder
                 );

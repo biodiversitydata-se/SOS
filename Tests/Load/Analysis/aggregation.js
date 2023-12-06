@@ -1,22 +1,17 @@
 import http from 'k6/http';
 import { randomItem } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 
-const url = 'https://sos-analysis-st.artdata.slu.se/internal/aggregation?aggregationField=event.startYear&take=10';
-const taxonIds = [
-    206011, 2002112, 103024, 103025, 103023, 103026, 103032, 100001, 100943, 101260,
-    101248, 222135, 221100, 219680, 222110
-];
+const taxonIds = JSON.parse(open('./data-taxonIds.json')).taxonIds;
 
-export const options = {
-  // Key configurations for avg load test in this section
-  stages: [
-    { duration: '1m', target: 100 }, // traffic ramp-up from 1 to 100 users over 5 minutes.
-    { duration: '5m', target: 100 }, // stay at 100 users for 30 minutes
-    { duration: '1m', target: 0 }, // ramp-down to 0 users
-  ],
-};
+export const options = JSON.parse(open('./options.json'));
 
 export default function () {
+  let url = 'https://sos-analysis-st.artdata.slu.se/internal/aggregation?aggregationField=event.startYear&take=10';
+  const precisionThreshold = __ENV.PT;
+  if (precisionThreshold){
+    url += '&precisionThreshold=' + precisionThreshold
+  }
+
   let filter = {
     "date": {
       "startDate": "2018-01-01T00:00:00",

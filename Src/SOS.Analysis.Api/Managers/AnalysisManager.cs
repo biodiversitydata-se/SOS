@@ -2,12 +2,10 @@
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using ProjNet.CoordinateSystems;
 using SOS.Analysis.Api.Dtos.Enums;
 using SOS.Analysis.Api.Dtos.Search;
 using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Analysis.Api.Repositories.Interfaces;
-using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -86,11 +84,12 @@ namespace SOS.Analysis.Api.Managers
             string? authorizationApplicationIdentifier,
             SearchFilter filter, 
             string aggregationField,
+            int? precisionThreshold,
             string? afterKey,
             int? take)
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, afterKey, take);
+            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, precisionThreshold, afterKey, take);
 
             return new PagedAggregationResultDto<UserAggregationResponseDto>
             {
@@ -110,11 +109,12 @@ namespace SOS.Analysis.Api.Managers
             string? authorizationApplicationIdentifier,
             SearchFilter filter,
             string aggregationField,
-            int take = 65536,
+            int? precisionThreshold,
+            int take,
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            var result = await _processedObservationRepository.GetAggregationItemsAsync(filter, aggregationField, take, sortOrder);
+            var result = await _processedObservationRepository.GetAggregationItemsAsync(filter, aggregationField, precisionThreshold ?? 40000, take, sortOrder);
 
             return result?.Select(i => new AggregationItemDto { AggregationKey = i.AggregationKey, DocCount = i.DocCount })!;
         }
@@ -129,7 +129,7 @@ namespace SOS.Analysis.Api.Managers
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var aggregationField = $"location.{(atlasSize == AtlasAreaSizeDto.Km5x5 ? "atlas5x5" : "atlas10x10")}.featureId";
           
-            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, null, 10000);
+            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, precisionThreshold: 40000, afterKey: null, 10000);
             var futureCollection = new FeatureCollection();
             while (result?.Records?.Any() ?? false)
             {
@@ -144,7 +144,7 @@ namespace SOS.Analysis.Api.Managers
                     );
                 }
 
-                result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, (string)result.SearchAfter?.FirstOrDefault()!, 10000);
+                result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, precisionThreshold: 40000, afterKey: (string)result.SearchAfter?.FirstOrDefault()!, 10000);
             }
           
             return futureCollection;

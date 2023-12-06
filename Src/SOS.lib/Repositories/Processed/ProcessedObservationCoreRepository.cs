@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Elasticsearch.Net;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
@@ -1424,7 +1421,8 @@ namespace SOS.Lib.Repositories.Processed
         }        
 
         public async Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
-            string aggregationField, 
+            string aggregationField,
+            int? precisionThreshold,
             int size = 65536, 
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
@@ -1449,7 +1447,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                     .Cardinality("cardinalityAggregation", t => t
                         .Field(aggregationField)
-                        .PrecisionThreshold(40000)
+                        .PrecisionThreshold(precisionThreshold)
                     )
                 )
                 .Size(0)
@@ -1470,6 +1468,7 @@ namespace SOS.Lib.Repositories.Processed
             string aggregationField,            
             int skip, 
             int take,
+            int? precisionThreshold,
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
             var indexNames = GetCurrentIndex(filter);
@@ -1493,7 +1492,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                     .Cardinality("cardinalityAggregation", t => t
                         .Field(aggregationField)
-                        .PrecisionThreshold(40000)                        
+                        .PrecisionThreshold(precisionThreshold)                        
                     )
                 )                
                 .Size(0)
