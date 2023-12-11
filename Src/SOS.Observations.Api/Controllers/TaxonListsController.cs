@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Helpers;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -47,7 +48,8 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<TaxonListDefinitionDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureInternalApi]
         public async Task<IActionResult> GetTaxonLists([FromQuery] string cultureCode = "sv-SE")
         {
             try
@@ -78,6 +80,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<TaxonListTaxonInformationDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureInternalApi]
         public async Task<IActionResult> GetTaxa([FromRoute] int taxonListId)
         {
             try

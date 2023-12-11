@@ -33,7 +33,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
@@ -74,8 +73,6 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.ApplicationInsights;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.HealthChecks;
-using SOS.Observations.Api.HealthChecks.Custom;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
@@ -97,7 +94,10 @@ namespace SOS.Observations.Api
     {
         private const string InternalApiName = "InternalSosObservations";
         private const string PublicApiName = "PublicSosObservations";
+        private const string AzureInternalApiName = "AzureInternalSosObservations";
+        private const string AzurePublicApiName = "AzurePublicSosObservations";
         private const string InternalApiPrefix = "Internal";
+        private const string AzureApiPrefix = "Azure";
         private IWebHostEnvironment CurrentEnvironment { get; set; }
         private bool _isDevelopment;
         private bool _disableHangfireInit = false;
@@ -123,7 +123,6 @@ namespace SOS.Observations.Api
                                Version = description.ApiVersion.ToString(),
                                Description = "Species Observation System (SOS) - Observations API. Internal API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
                            });
-
                     options.SwaggerDoc(
                         $"{PublicApiName}{description.GroupName}",
                         new OpenApiInfo()
@@ -131,6 +130,22 @@ namespace SOS.Observations.Api
                             Title = $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}",
                             Version = description.ApiVersion.ToString(),
                             Description = "Species Observation System (SOS) - Observations API. Public API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
+                        });
+                    options.SwaggerDoc(
+                           $"{AzureInternalApiName}{description.GroupName}",
+                           new OpenApiInfo()
+                           {
+                               Title = $"SOS Observations API (Internal - Azure) {description.GroupName.ToUpperInvariant()}",
+                               Version = description.ApiVersion.ToString(),
+                               Description = "Species Observation System (SOS) - Observations API. Internal - Azure API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
+                           });
+                    options.SwaggerDoc(
+                        $"{AzurePublicApiName}{description.GroupName}",
+                        new OpenApiInfo()
+                        {
+                            Title = $"SOS Observations API (Public - Azure) {description.GroupName.ToUpperInvariant()}",
+                            Version = description.ApiVersion.ToString(),
+                            Description = "Species Observation System (SOS) - Observations API. Public - Azure API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
                         });
                     //var schemaHelper = new SwashbuckleSchemaHelper();
                     //swagger.CustomSchemaIds(type => schemaHelper.GetSchemaId(type)); // temporarily used when checking for schema duplicates.
@@ -294,12 +309,35 @@ namespace SOS.Observations.Api
                     options.DocInclusionPredicate((documentName, apiDescription) =>
                     {
                         var apiVersions = GetApiVersions(apiDescription);
-                        bool isEndpointInternalApi = apiDescription.ActionDescriptor.EndpointMetadata.Any(x => x.GetType() == typeof(InternalApiAttribute));
-                        if (isEndpointInternalApi && !documentName.StartsWith(InternalApiPrefix)) return false;
-                        return apiVersions.Any(v =>
+                        var versionMatch = apiVersions.Any(v =>
                                    $"{InternalApiName}v{v}" == documentName) ||
                                apiVersions.Any(v =>
-                                   $"{PublicApiName}v{v}" == documentName);
+                                   $"{PublicApiName}v{v}" == documentName) ||
+                               apiVersions.Any(v =>
+                                   $"{AzureInternalApiName}v{v}" == documentName) ||
+                               apiVersions.Any(v =>
+                                   $"{AzurePublicApiName}v{v}" == documentName);
+
+                        var isAzurePublicApi = apiDescription.ActionDescriptor.EndpointMetadata.Any(x => x.GetType() == typeof(AzureApiAttribute));
+                        var isAzurePublicDocument = documentName.Contains(AzureApiPrefix, StringComparison.CurrentCultureIgnoreCase) && !documentName.Contains(InternalApiPrefix, StringComparison.CurrentCultureIgnoreCase);
+                        var isAzureInternalApi = apiDescription.ActionDescriptor.EndpointMetadata.Any(x => x.GetType() == typeof(AzureInternalApiAttribute));
+                        var isAzureInternalDocument = documentName.Contains(AzureApiPrefix, StringComparison.CurrentCultureIgnoreCase) && documentName.Contains(InternalApiPrefix, StringComparison.CurrentCultureIgnoreCase);
+                        var isInternalApi = apiDescription.ActionDescriptor.EndpointMetadata.Any(x => x.GetType() == typeof(InternalApiAttribute));
+                        var isInternalDocument = documentName.Contains(InternalApiPrefix, StringComparison.CurrentCultureIgnoreCase) && !documentName.Contains(AzureApiPrefix, StringComparison.CurrentCultureIgnoreCase);
+
+                        if (isAzureInternalApi)
+                        {
+                            var t = 9;
+                        }
+
+                        return
+                            versionMatch && (
+                                (isAzurePublicApi && isAzurePublicDocument) ||
+                                (isAzureInternalApi && isAzureInternalDocument) 
+                            ) || (
+                            !isAzurePublicDocument && !isAzureInternalDocument &&
+                            (isInternalDocument || !isInternalApi)
+                        );
                     });
 
                     options.AddSecurityDefinition("Bearer", //Name the security scheme
@@ -593,6 +631,14 @@ namespace SOS.Observations.Api
                     options.SwaggerEndpoint(
                         $"/swagger/{PublicApiName}{description.GroupName}/swagger.json",
                         $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}");
+
+                    options.SwaggerEndpoint(
+                       $"/swagger/{AzureInternalApiName}{description.GroupName}/swagger.json",
+                       $"SOS Observations API (Internal - Azure) {description.GroupName.ToUpperInvariant()}");
+
+                    options.SwaggerEndpoint(
+                        $"/swagger/{AzurePublicApiName}{description.GroupName}/swagger.json",
+                        $"SOS Observations API (Public - Azure) {description.GroupName.ToUpperInvariant()}");
 
                     options.DisplayOperationId();
                     options.DocExpansion(DocExpansion.None);

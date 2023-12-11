@@ -1447,7 +1447,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                     .Cardinality("cardinalityAggregation", t => t
                         .Field(aggregationField)
-                        .PrecisionThreshold(precisionThreshold)
+                        .PrecisionThreshold(precisionThreshold ?? 40000)
                     )
                 )
                 .Size(0)
@@ -1492,7 +1492,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                     .Cardinality("cardinalityAggregation", t => t
                         .Field(aggregationField)
-                        .PrecisionThreshold(precisionThreshold)                        
+                        .PrecisionThreshold(precisionThreshold ?? 40000)                        
                     )
                 )                
                 .Size(0)

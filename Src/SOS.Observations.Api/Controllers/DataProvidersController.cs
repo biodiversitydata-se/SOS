@@ -16,6 +16,7 @@ using SOS.Lib.Helpers;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Globalization;
 using SOS.Lib.Enums;
+using SOS.Lib.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -69,6 +70,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(List<DataProviderDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetDataProvidersAsync(
             [FromQuery] IEnumerable<DataProviderCategory> categories,
             [FromQuery] string cultureCode = "sv-SE", 
@@ -102,6 +104,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<DateTime>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetLastModifiedDateByIdAsync([FromRoute] int providerId)
         {
             try
@@ -129,6 +132,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetEMLAsync([FromRoute] int providerId)
         {
             try

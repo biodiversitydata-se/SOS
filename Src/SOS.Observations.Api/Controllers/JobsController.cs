@@ -3,6 +3,7 @@ using System.Net;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -34,6 +35,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public IActionResult GetStatus([FromRoute] string jobId)
         {
             try

@@ -281,7 +281,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         
         Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
             string aggregationField,
-            int? precisionThreshold,
+            int? precisionThreshold = null,
             int size = 65536, 
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
 

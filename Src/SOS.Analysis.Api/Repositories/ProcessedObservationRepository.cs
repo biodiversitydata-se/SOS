@@ -63,7 +63,7 @@ namespace SOS.Analysis.Api.Repositories
                         .Aggregations(a => a
                             .Cardinality("unique_taxonids", c => c
                                 .Field("taxon.id")
-                                .PrecisionThreshold(precisionThreshold)
+                                .PrecisionThreshold(precisionThreshold ?? 3000)
                             )
                         )
                     )

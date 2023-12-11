@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.ApiInfo ;
+using SOS.Lib.Swagger;
 using System;
 using System.Net;
 using System.Reflection;
@@ -13,6 +14,7 @@ namespace SOS.Analysis.Api.Controllers
     {
         [HttpGet]
         [ProducesResponseType(typeof(ApiInformation), (int)HttpStatusCode.OK)]
+        [AzureApi, AzureInternalApi]
         public IActionResult GetApiInfoAsync()
         {
             var buildDate = Assembly.GetExecutingAssembly().GetBuildDate();

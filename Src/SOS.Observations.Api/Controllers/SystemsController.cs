@@ -92,7 +92,8 @@ namespace SOS.Observations.Api.Controllers
         /// <returns>Meta data about processing. E.g, Start time, end time, number of observations processed...</returns>
         [HttpGet("ProcessInformation")]
         [ProducesResponseType(typeof(ProcessInfoDto), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]        
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [AzureInternalApi]
         public async Task<IActionResult> GetProcessInfo([FromQuery] bool active)
         {
             try

@@ -275,6 +275,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<Lib.Models.Misc.File>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetDatasetsListAsync()
         {
             try
@@ -304,6 +305,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<ExportJobInfoDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetMyExportsAsync()
         {
             try
@@ -334,6 +336,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(ExportJobInfoDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetMyExportAsync([FromRoute] string id)
         {
             try
@@ -370,6 +373,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/Csv")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> DownloadCsvAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -445,7 +449,8 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpPost("Download/DwC")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> DownloadDwCAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -521,7 +526,8 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpPost("Download/Excel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> DownloadExcelAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -603,7 +609,8 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpPost("Download/GeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> DownloadGeoJsonAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -696,6 +703,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> OrderCsvAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -782,6 +790,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> OrderDwCAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -867,6 +876,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> OrderExcelAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -959,6 +969,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> OrderGeoJsonAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1041,7 +1052,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Internal/Download/Csv")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> DownloadCsvInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1117,7 +1128,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Internal/Download/DwC")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> DownloadDwCInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1187,7 +1198,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Internal/Download/Excel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> DownloadExcelInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1269,7 +1280,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Internal/Download/GeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> DownloadGeoJsonInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1361,7 +1372,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> OrderCsvInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1448,7 +1459,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> OrderDwCInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1533,7 +1544,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> OrderExcelInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1624,7 +1635,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> OrderGeoJsonInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,

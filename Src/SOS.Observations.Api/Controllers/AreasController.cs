@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -46,6 +47,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet()]
         [ProducesResponseType(typeof(PagedResult<AreaBaseDto>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetAreas([FromQuery] IEnumerable<AreaTypeDto> areaTypes = null,
             [FromQuery] string searchString = null, [FromQuery] int skip = 0, [FromQuery] int take = 100)
         {
@@ -69,6 +71,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("{areaType}/{featureId}")]
         [ProducesResponseType(typeof(AreaBaseDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetArea([FromRoute] AreaTypeDto areaType, [FromRoute] string featureId)
         {
             try
@@ -93,6 +96,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetExport(
             [FromRoute] AreaTypeDto areaType, 
             [FromRoute] string featureId, 

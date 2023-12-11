@@ -203,6 +203,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetObservationById(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -262,6 +263,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> Count(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -355,6 +357,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GeogridAggregation(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -435,6 +438,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> MetricGridAggregationAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -529,6 +533,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> ObservationsBySearch(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -609,6 +614,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> ObservationsBySearchDwc(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -741,6 +747,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> ObservationByIdDwc(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -806,6 +813,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> TaxonAggregation(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -894,7 +902,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> GetObservationByIdInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -956,7 +964,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> CountInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1011,7 +1019,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> CachedCountInternal(
             [FromQuery] int taxonId)
         {
@@ -1040,7 +1048,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> MultipleCachedCountInternal(
             [FromBody] IEnumerable<int> taxonIds)
         {
@@ -1107,7 +1115,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> GeogridAggregationInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1141,8 +1149,6 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return BadRequest(validationResult.Error);
                 }
-
-               
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
               
@@ -1189,7 +1195,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1303,7 +1309,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> GeogridTaxaAggregationInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1377,7 +1383,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> MetricGridAggregationInternalAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1479,7 +1485,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> ObservationsBySearchInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1609,7 +1615,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> SearchAggregatedInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1703,7 +1709,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> ObservationsScroll(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1780,7 +1786,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> SignalSearchInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1848,7 +1854,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> TaxonAggregationInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -1938,7 +1944,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> TaxonSumAggregationInternal(
             [FromBody] TaxonFilterDto taxonFilter,
             [FromQuery] int? skip = null,
@@ -1998,7 +2004,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [InternalApi, AzureInternalApi]
         public async Task<IActionResult> TaxonExistsIndicationInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,

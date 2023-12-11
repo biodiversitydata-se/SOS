@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
@@ -54,6 +55,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(LocationDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureInternalApi]
         public async Task<IActionResult> GetLocationsByIds([FromBody]IEnumerable<string> locationIds)
         {
             try
@@ -93,6 +95,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<LocationSearchResultDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureInternalApi]
         public async Task<IActionResult> SearchAsync([FromBody] GeographicsFilterDto filter, [FromQuery] int skip = 0, [FromQuery] int take = 100, [FromQuery] bool sensitiveObservations = false, [FromQuery] int? roleId = null,
             [FromQuery] string authorizationApplicationIdentifier = null)
         {
