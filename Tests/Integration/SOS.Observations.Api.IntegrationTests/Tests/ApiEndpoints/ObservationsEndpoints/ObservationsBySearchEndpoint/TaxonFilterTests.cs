@@ -169,6 +169,74 @@ public class TaxonFilterTests : TestBase
     }
 
     [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsNoObservations_WhenTaxonListFilterResultsInNoTaxa()
+    {
+        // Arrange        
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+             .TheFirst(20).With(o => o.TaxonId = TaxonIds.ViolettGuldvinge) // Protected by law
+             .TheNext(20).With(o => o.TaxonId = TaxonIds.ViolettGuldvinge) // Protected by law
+             .TheNext(20).With(o => o.TaxonId = TaxonIds.ViolettGuldvinge) // Protected by law
+             .TheNext(20).With(o => o.TaxonId = TaxonIds.SvartfläckigBlåvinge) // Protected by law
+             .TheNext(20).With(o => o.TaxonId = TaxonIds.Jättebalsamin) // Not protected by law
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto
+        {
+            Taxon = new TaxonFilterDto
+            {
+                TaxonListIds = new[] { (int)TaxonListId.ProtectedByLaw },
+                Ids = new List<int> { TaxonIds.Jättebalsamin }, // Not protected by law
+                TaxonListOperator = TaxonListOperatorDto.Filter
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(0,
+            because: "The taxon filter results in no taxa");
+    }
+
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenTaxonListFilterWithoutTaxonIds()
+    {
+        // Arrange        
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+             .TheFirst(20).With(o => o.TaxonId = TaxonIds.ViolettGuldvinge) // Protected by law
+             .TheNext(20).With(o => o.TaxonId = TaxonIds.ViolettGuldvinge) // Protected by law
+             .TheNext(20).With(o => o.TaxonId = TaxonIds.ViolettGuldvinge) // Protected by law
+             .TheNext(20).With(o => o.TaxonId = TaxonIds.SvartfläckigBlåvinge) // Protected by law
+             .TheNext(20).With(o => o.TaxonId = TaxonIds.Jättebalsamin) // Not protected by law
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto
+        {
+            Taxon = new TaxonFilterDto
+            {
+                TaxonListIds = new[] { (int)TaxonListId.ProtectedByLaw },                
+                TaxonListOperator = TaxonListOperatorDto.Filter
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(80,
+            because: "80 observations are protected by law. No TaxonIds is given, which means all taxa filtered by protected by law taxa.");
+    }
+
+
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilterByTaxonCategories()
     {
         // Arrange        
@@ -196,5 +264,37 @@ public class TaxonFilterTests : TestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60,
             because: "60 record has taxon category 17 or 18.");
+    }
+
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsNoObservations_WhenFilterByTaxonCategoriesThatNoObservationsHave()
+    {
+        // Arrange        
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+             .TheFirst(20).HaveTaxonCategoryTaxonId(17)
+             .TheNext(20).HaveTaxonCategoryTaxonId(17)
+             .TheNext(20).HaveTaxonCategoryTaxonId(18)
+             .TheNext(20).HaveTaxonCategoryTaxonId(14)
+             .TheNext(20).HaveTaxonCategoryTaxonId(11)
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto
+        {
+            Taxon = new TaxonFilterDto
+            {
+                TaxonCategories = new int[] { 1, 2 }
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(0,
+            because: "0 record has taxon category 1 or 2.");
     }
 }

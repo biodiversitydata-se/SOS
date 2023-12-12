@@ -212,6 +212,13 @@ namespace SOS.Lib.Managers
             var taxaSet = new HashSet<int>();
             taxaSet.UnionWith(taxaIds);
             taxaSet.IntersectWith(taxonListIdsSet);
+
+            // When TaxonListOp.Filter is used and there are no taxa in the result, this should result in no observations result.
+            if (listOperator == TaxonFilter.TaxonListOp.Filter && taxaSet.Count == 0)
+            {
+                return new List<int> { -1 };
+            }
+
             return taxaSet.ToList();
         }
 
