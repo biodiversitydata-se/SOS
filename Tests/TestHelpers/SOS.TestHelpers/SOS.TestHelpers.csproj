@@ -14,9 +14,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MongoDB.Driver" Version="2.21.0" />
-		<PackageReference Include="Hangfire.Core" Version="1.8.5" />
-		<PackageReference Include="MessagePack" Version="2.5.129" />
+		<PackageReference Include="MongoDB.Driver" Version="2.23.0" />
+		<PackageReference Include="Hangfire.Core" Version="1.8.6" />
+		<PackageReference Include="MessagePack" Version="2.5.140" />
 	</ItemGroup>
 
 	<ItemGroup>
