@@ -200,7 +200,7 @@ namespace SOS.Observations.Api.Managers
         {
             await _filterManager.PrepareFilterAsync(null, null, filter);
             var records = Enumerable.Empty<DsEventDto>();
-            var allEventIds = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "event.eventId");
+            var allEventIds = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "event.eventId", precisionThreshold: 40000);
             int totalCount = allEventIds.Count();
             if (allEventIds.Any())
             {
