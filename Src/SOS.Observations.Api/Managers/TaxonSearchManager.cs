@@ -13,8 +13,8 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Extensions;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Repositories.Interfaces;
 using ITaxonSearchManager = SOS.Observations.Api.Managers.Interfaces.ITaxonSearchManager;
 

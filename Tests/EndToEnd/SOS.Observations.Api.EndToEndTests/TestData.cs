@@ -1,5 +1,5 @@
-﻿using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.Dtos.Filter;
+﻿using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.EndToEndTests
 {

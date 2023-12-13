@@ -1,6 +1,6 @@
 ﻿using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Filter;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;

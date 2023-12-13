@@ -1,8 +1,9 @@
 ﻿using FizzWare.NBuilder;
 using MongoDB.Driver.GeoJsonObjectModel;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -60,7 +61,7 @@ public class GeoGridAggregationInternalTests : TestBase
         {
             Geographics = new GeographicsFilterDto
             {
-                Areas = new[] { new AreaFilterDto { AreaType = Dtos.Enum.AreaTypeDto.County, FeatureId = "6" } }
+                Areas = new[] { new AreaFilterDto { AreaType = AreaTypeDto.County, FeatureId = "6" } }
             },
             Taxon = new TaxonFilterDto
             {

@@ -1,7 +1,7 @@
 ﻿using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Filter;
 using System.Text.RegularExpressions;
 
 namespace SOS.Observations.Api.IntegrationTests.Helpers;

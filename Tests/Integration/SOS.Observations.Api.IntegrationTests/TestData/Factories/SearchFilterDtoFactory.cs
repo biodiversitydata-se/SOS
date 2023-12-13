@@ -1,4 +1,5 @@
-﻿using SOS.Observations.Api.Dtos.Filter;
+﻿using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.IntegrationTests.TestData.Factories;
 internal static class SearchFilterDtoFactory
@@ -11,7 +12,7 @@ internal static class SearchFilterDtoFactory
             {
                 Areas = featureIds.Select(id => new AreaFilterDto
                 {
-                    AreaType = Dtos.Enum.AreaTypeDto.Municipality,
+                    AreaType = AreaTypeDto.Municipality,
                     FeatureId = id
                 })
             }

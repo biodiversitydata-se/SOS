@@ -12,7 +12,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;

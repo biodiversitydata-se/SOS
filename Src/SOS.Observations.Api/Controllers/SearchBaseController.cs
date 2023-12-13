@@ -9,9 +9,9 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
 using Microsoft.ApplicationInsights.DataContracts;
 

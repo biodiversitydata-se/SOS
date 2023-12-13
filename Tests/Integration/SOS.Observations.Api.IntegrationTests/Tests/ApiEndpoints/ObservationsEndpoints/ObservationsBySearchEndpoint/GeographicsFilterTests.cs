@@ -3,8 +3,9 @@ using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Dtos;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.Factories;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -84,8 +85,8 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                 Geographics = new GeographicsFilterDto
                 {
                     Areas = new[] {
-                        new AreaFilterDto { AreaType = Dtos.Enum.AreaTypeDto.Province, FeatureId = "Province1" },
-                        new AreaFilterDto { AreaType = Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "Municipality1" }
+                        new AreaFilterDto { AreaType = AreaTypeDto.Province, FeatureId = "Province1" },
+                        new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "Municipality1" }
                     }
                 }
             };

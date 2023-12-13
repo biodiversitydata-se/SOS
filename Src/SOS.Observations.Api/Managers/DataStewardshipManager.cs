@@ -6,8 +6,8 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Processed;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.DataStewardship;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.DataStewardship;
 using SOS.Observations.Api.Managers.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -15,8 +15,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using SOS.Observations.Api.Dtos.DataStewardship.Extensions;
-using SOS.Observations.Api.Extensions;
+using SOS.Shared.Api.Dtos.DataStewardship.Extensions;
+using SOS.Shared.Api.Extensions.Dto;
 
 namespace SOS.Observations.Api.Managers
 {

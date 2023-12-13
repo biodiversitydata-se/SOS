@@ -5,7 +5,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Observations.Api.Dtos;
+using SOS.Shared.Api.Dtos;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {

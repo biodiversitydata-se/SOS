@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace SOS.Observations.Api.Extensions
+namespace SOS.Shared.Api.Extensions.Dto
 {
     public static class HealthCheckExtensions
     {

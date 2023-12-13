@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.EndToEndTests.Fixtures;
 using Xunit;
 

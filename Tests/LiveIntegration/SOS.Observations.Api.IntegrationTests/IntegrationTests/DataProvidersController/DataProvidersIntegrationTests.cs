@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Vocabulary;
+using SOS.Shared.Api.Dtos;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;

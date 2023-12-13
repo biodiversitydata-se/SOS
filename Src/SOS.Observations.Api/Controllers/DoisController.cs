@@ -12,8 +12,8 @@ using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Extensions;
+using SOS.Shared.Api.Dtos.Filter;
+using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
@@ -81,7 +81,7 @@ namespace SOS.Observations.Api.Controllers
                 }
                 
                 var creatorEmail = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
-                var exportFilter = filter.ToSearchFilter(UserId, Dtos.Enum.ProtectionFilterDto.Public, "en-GB");
+                var exportFilter = filter.ToSearchFilter(UserId, Shared.Api.Dtos.Enum.ProtectionFilterDto.Public, "en-GB");
                 var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter);
 
                 if (matchCount == 0)

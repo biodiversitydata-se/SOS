@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Observations.Api.Dtos;
+using SOS.Shared.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 using Newtonsoft.Json;

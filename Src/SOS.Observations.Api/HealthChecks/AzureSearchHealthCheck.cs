@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Filter;
 using System;
 using System.Diagnostics;
 using System.Threading;

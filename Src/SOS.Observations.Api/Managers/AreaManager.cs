@@ -19,8 +19,8 @@ using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
 using ArgumentException = System.ArgumentException;
 

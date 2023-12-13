@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SOS.Lib.Enums;
-using SOS.Observations.Api.Dtos.Vocabulary;
+using SOS.Shared.Api.Dtos.Vocabulary;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 

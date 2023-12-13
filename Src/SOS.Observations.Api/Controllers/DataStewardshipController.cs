@@ -9,12 +9,12 @@ using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Dtos.DataStewardship;
-using SOS.Observations.Api.Dtos.DataStewardship.Enums;
-using SOS.Observations.Api.Dtos.DataStewardship.Extensions;
-using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Extensions;
+using SOS.Shared.Api.Dtos.DataStewardship;
+using SOS.Shared.Api.Dtos.DataStewardship.Enums;
+using SOS.Shared.Api.Dtos.DataStewardship.Extensions;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
+using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
 using Result = CSharpFunctionalExtensions.Result;
 

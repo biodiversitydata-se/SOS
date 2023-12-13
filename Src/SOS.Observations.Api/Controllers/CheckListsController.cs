@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Swagger;
-using SOS.Observations.Api.Dtos.Checklist;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Extensions;
+using SOS.Shared.Api.Dtos.Checklist;
+using SOS.Shared.Api.Dtos.Filter;
+using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers

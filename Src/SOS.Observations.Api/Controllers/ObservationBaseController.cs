@@ -8,8 +8,8 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 

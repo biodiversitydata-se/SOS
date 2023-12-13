@@ -7,7 +7,7 @@ using System.Runtime.Versioning;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Observations.Api.Dtos;
+using SOS.Shared.Api.Dtos;
 using SOS.Lib.Swagger;
 
 namespace SOS.Observations.Api.Controllers

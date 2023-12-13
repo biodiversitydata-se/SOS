@@ -4,8 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.EndToEndTests.EndToEndTests
 {

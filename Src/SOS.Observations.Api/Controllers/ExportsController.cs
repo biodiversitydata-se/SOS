@@ -21,10 +21,10 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Dtos.Export;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.Extensions;
+using SOS.Shared.Api.Dtos.Export;
+using SOS.Shared.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
