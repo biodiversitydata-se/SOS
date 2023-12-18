@@ -161,6 +161,7 @@ public class DataStewardshipManager : IDataStewardshipManager
             "event.eventId", 
             skip, 
             take,
+            precisionThreshold: null,
             Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);
         int count = eventIdPageResult.Records.Count();
         int totalCount = Convert.ToInt32(eventIdPageResult.TotalCount);
@@ -257,7 +258,8 @@ public class DataStewardshipManager : IDataStewardshipManager
         var aggregationResult = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, 
             "dataStewardship.datasetIdentifier",
             skip,
-            take,            
+            take,
+            precisionThreshold: null,
             Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);        
         int count = aggregationResult.Records.Count();
         int totalCount = Convert.ToInt32(aggregationResult.TotalCount);
