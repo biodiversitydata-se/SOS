@@ -33,8 +33,8 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                VerificationStatus = Shared.Api.Dtos.Enum.StatusVerificationDto.BothVerifiedAndNotVerified,
+                OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -73,8 +73,8 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                VerificationStatus = Shared.Api.Dtos.Enum.StatusVerificationDto.BothVerifiedAndNotVerified,
+                OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -99,8 +99,8 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
             SearchFilterDto searchFilter = new SearchFilterDto
             {
                 Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Wolf }, IncludeUnderlyingTaxa = true },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                VerificationStatus = Shared.Api.Dtos.Enum.StatusVerificationDto.BothVerifiedAndNotVerified,
+                OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------

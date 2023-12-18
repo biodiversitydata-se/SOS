@@ -1,9 +1,9 @@
 ﻿using NetTopologySuite.Features;
-using SOS.Analysis.Api.Dtos.Enums;
-using SOS.Analysis.Api.Dtos.Search;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Search;
 
 namespace SOS.Analysis.Api.Managers.Interfaces
 {

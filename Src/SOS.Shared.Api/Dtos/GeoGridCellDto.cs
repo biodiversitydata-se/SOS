@@ -1,4 +1,6 @@
-﻿namespace SOS.Shared.Api.Dtos
+﻿using SOS.Shared.Api.Dtos.Filter;
+
+namespace SOS.Shared.Api.Dtos
 {
     public class GeoGridCellDto
     {

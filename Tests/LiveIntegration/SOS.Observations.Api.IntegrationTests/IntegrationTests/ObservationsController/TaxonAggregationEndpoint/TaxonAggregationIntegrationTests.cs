@@ -39,7 +39,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
                     Geometries = new List<IGeoShape> { new PointGeoShape(new GeoCoordinate(58.01563, 14.99047)) },
                     MaxDistanceFromPoint = 5000
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
+                VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
+                VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 
@@ -102,7 +102,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
+                VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 
@@ -322,7 +322,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
+                VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
                 Geographics = new GeographicsFilterDto
                 {

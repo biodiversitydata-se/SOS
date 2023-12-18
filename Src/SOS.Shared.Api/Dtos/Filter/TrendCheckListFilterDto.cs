@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SOS.Shared.Api.Dtos.Enum;
 
 namespace SOS.Shared.Api.Dtos.Filter
 {
@@ -41,7 +40,7 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Requested verification status.
         /// </summary>
-        public SearchFilterBaseDto.StatusVerificationDto VerificationStatus { get; set; }
+        public StatusVerificationDto VerificationStatus { get; set; }
     }
 
     /// <summary>

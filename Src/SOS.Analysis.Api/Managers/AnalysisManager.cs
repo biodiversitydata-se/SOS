@@ -2,8 +2,6 @@
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using SOS.Analysis.Api.Dtos.Enums;
-using SOS.Analysis.Api.Dtos.Search;
 using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.Cache.Interfaces;
@@ -14,6 +12,8 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Search;
 using System.Globalization;
 
 namespace SOS.Analysis.Api.Managers

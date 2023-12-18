@@ -2,6 +2,7 @@
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -31,7 +32,7 @@ public class OccurrenceStatusTests : TestBase
         // Scenario 1 - Get only present observations (Noterade)
         var onlyPresentSearchFilter = new SearchFilterInternalDto {
             OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-            NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.NoFilter,
+            NotRecoveredFilter = SightingNotRecoveredFilterDto.NoFilter,
             ExtendedFilter = new ExtendedFilterDto {
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.DontIncludeNotPresent
             }
@@ -44,7 +45,7 @@ public class OccurrenceStatusTests : TestBase
         var notPresentSearchFilter = new SearchFilterInternalDto
         {
             OccurrenceStatus = OccurrenceStatusFilterValuesDto.Absent,
-            NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.NoFilter,
+            NotRecoveredFilter = SightingNotRecoveredFilterDto.NoFilter,
             ExtendedFilter = new ExtendedFilterDto
             {
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
@@ -58,7 +59,7 @@ public class OccurrenceStatusTests : TestBase
         var notRecoveredSearchFilter = new SearchFilterInternalDto
         {
             OccurrenceStatus = OccurrenceStatusFilterValuesDto.Absent,
-            NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.OnlyNotRecovered,
+            NotRecoveredFilter = SightingNotRecoveredFilterDto.OnlyNotRecovered,
             ExtendedFilter = new ExtendedFilterDto
             {
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
@@ -72,7 +73,7 @@ public class OccurrenceStatusTests : TestBase
         var allObsSearchFilter = new SearchFilterInternalDto
         {
             OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent,
-            NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.NoFilter,
+            NotRecoveredFilter = SightingNotRecoveredFilterDto.NoFilter,
             ExtendedFilter = new ExtendedFilterDto
             {
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
@@ -90,7 +91,7 @@ public class OccurrenceStatusTests : TestBase
         var notPresentExceptRecoveredSearchFilter = new SearchFilterInternalDto
         {
             OccurrenceStatus = OccurrenceStatusFilterValuesDto.Absent,
-            NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.DontIncludeNotRecovered,
+            NotRecoveredFilter = SightingNotRecoveredFilterDto.DontIncludeNotRecovered,
             ExtendedFilter = new ExtendedFilterDto
             {
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
@@ -104,7 +105,7 @@ public class OccurrenceStatusTests : TestBase
         var allExceptNotRecoveredSearchFilter = new SearchFilterInternalDto
         {
             OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent,
-            NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.DontIncludeNotRecovered,
+            NotRecoveredFilter = SightingNotRecoveredFilterDto.DontIncludeNotRecovered,
             ExtendedFilter = new ExtendedFilterDto
             {
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
@@ -118,7 +119,7 @@ public class OccurrenceStatusTests : TestBase
         var allExceptNotPresentSearchFilter = new SearchFilterInternalDto
         {
             OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent,
-            NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.IncludeNotRecovered,
+            NotRecoveredFilter = SightingNotRecoveredFilterDto.IncludeNotRecovered,
             ExtendedFilter = new ExtendedFilterDto
             {
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.DontIncludeNotPresent

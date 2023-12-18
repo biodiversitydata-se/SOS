@@ -79,6 +79,11 @@ using SOS.Observations.Api.Middleware;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Observations.Api.Services.Interfaces;
+using SOS.Shared.Api.Configuration;
+using SOS.Shared.Api.Utilities.Objects;
+using SOS.Shared.Api.Utilities.Objects.Interfaces;
+using SOS.Shared.Api.Validators;
+using SOS.Shared.Api.Validators.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
@@ -435,6 +440,7 @@ namespace SOS.Observations.Api
             services.AddSingleton(blobStorageConfiguration);
             services.AddSingleton(Configuration.GetSection("DevOpsConfiguration").Get<DevOpsConfiguration>());
             services.AddSingleton(elasticConfiguration);
+            services.AddSingleton(Configuration.GetSection("InputValaidationConfiguration").Get<InputValaidationConfiguration>()!);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
             services.AddSingleton(healthCheckConfiguration);
             services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
@@ -550,6 +556,12 @@ namespace SOS.Observations.Api
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IArtportalenApiService, ArtportalenApiService>();
+
+            // Add Utilites
+            services.AddScoped<ISearchFilterUtility, SearchFilterUtility>();
+
+            // Add Validators
+            services.AddScoped<IInputValidator, InputValidator>();
 
             // Add writers
             services.AddScoped<IDwcArchiveFileWriter, DwcArchiveFileWriter>();

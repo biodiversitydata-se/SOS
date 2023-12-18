@@ -4,6 +4,7 @@ using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
@@ -38,7 +39,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
             _fixture.UseMockUserService(authority);
             var searchFilter = new SearchFilterInternalDto
             {
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
+                VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
                 Geographics = new GeographicsFilterDto
                 {
@@ -95,7 +96,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
             _fixture.UseMockUserService(authority);
             var searchFilter = new SearchFilterInternalDto
             {
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
+                VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
                 Geographics = new GeographicsFilterDto
                 {

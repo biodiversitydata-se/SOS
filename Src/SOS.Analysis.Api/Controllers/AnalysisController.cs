@@ -2,17 +2,20 @@
 using NetTopologySuite.Features;
 using SOS.Analysis.Api.Configuration;
 using SOS.Analysis.Api.Controllers.Interfaces;
-using SOS.Analysis.Api.Dtos.Enums;
-using SOS.Analysis.Api.Dtos.Filter;
-using SOS.Analysis.Api.Dtos.Search;
-using SOS.Analysis.Api.Extensions.Dto;
 using SOS.Analysis.Api.Managers.Interfaces;
-using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Swagger;
+using SOS.Shared.Api.Configuration;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Search;
+using SOS.Shared.Api.Extensions.Controller;
+using SOS.Shared.Api.Extensions.Dto;
+using SOS.Shared.Api.Utilities.Objects.Interfaces;
+using SOS.Shared.Api.Validators.Interfaces;
 using System.Net;
 using Result = CSharpFunctionalExtensions.Result;
 
@@ -25,26 +28,36 @@ namespace SOS.Analysis.Api.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class AnalysisController : BaseController, IAnalysisController
+    public class AnalysisController : ControllerBase, IAnalysisController
     {
         private readonly IAnalysisManager _analysisManager;
+        private readonly ISearchFilterUtility _searchFilterUtility;
+        private readonly IInputValidator _inputValidator;
+        private readonly AnalysisConfiguration _analysisConfiguration;
         private readonly ILogger<AnalysisController> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="analysisManager"></param>
-        /// <param name="areaCache"></param>
+        /// <param name="searchFilterUtility"></param>
+        /// <param name="inputValidator"></param>
         /// <param name="analysisConfiguration"></param>
+        /// <param name="inputValaidationConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public AnalysisController(
             IAnalysisManager analysisManager,
-            IAreaCache areaCache,
+            ISearchFilterUtility searchFilterUtility,
+            IInputValidator inputValidator,
             AnalysisConfiguration analysisConfiguration,
-            ILogger<AnalysisController> logger) : base(areaCache, analysisConfiguration?.ProtectedScope!, analysisConfiguration?.TilesLimit ?? 350000, analysisConfiguration?.CountFactor ?? 1.0)
+            InputValaidationConfiguration inputValaidationConfiguration,
+            ILogger<AnalysisController> logger) 
         {
             _analysisManager = analysisManager ?? throw new ArgumentNullException(nameof(analysisManager));
+            _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
+            _searchFilterUtility = searchFilterUtility ?? throw new ArgumentNullException(nameof(searchFilterUtility));
+            _analysisConfiguration = analysisConfiguration ?? throw new ArgumentNullException(nameof(analysisConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
        
@@ -65,18 +78,19 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                CheckAuthorization(searchFilter.ProtectionFilter);
-                searchFilter = await InitializeSearchFilterAsync(searchFilter);
-
-                var validationResult = Result.Combine(ValidateSearchFilter(searchFilter!), ValidateFields(new[] { aggregationField }));
+                this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
+                searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
+                var validationResult = Result.Combine(
+                    _inputValidator.ValidateSearchFilter(searchFilter!), 
+                    _inputValidator.ValidateFields(new[] { aggregationField })
+                );
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
-
+                var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
                 var result = await _analysisManager.AggregateByUserFieldAsync(
                     roleId,
                     authorizationApplicationIdentifier,
@@ -117,17 +131,20 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                CheckAuthorization(searchFilter.ProtectionFilter);
-                searchFilter = await InitializeSearchFilterAsync(searchFilter);
+                this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
+                searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
 
-                var validationResult = Result.Combine(ValidateSearchFilter(searchFilter!), ValidateFields(new[] { aggregationField }), ValidateInt(take, 1, 250, "take"));
+                var validationResult = Result.Combine(
+                    _inputValidator.ValidateSearchFilter(searchFilter!),
+                    _inputValidator.ValidateFields(new[] { aggregationField }),
+                    _inputValidator.ValidateInt(take, 1, 250, "take"));
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
+                var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
 
                 var result = await _analysisManager.AggregateByUserFieldAsync(
                     roleId,
@@ -166,17 +183,17 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                CheckAuthorization(searchFilter.ProtectionFilter);
-                searchFilter = await InitializeSearchFilterAsync(searchFilter);
-                var validationResult = ValidateSearchFilter(searchFilter!);
+                this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
+                searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
+                var validationResult = _inputValidator.ValidateSearchFilter(searchFilter!);
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
-
+                var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
+               
                 var result = await _analysisManager.AtlasAggregateAsync(
                     roleId,
                     authorizationApplicationIdentifier,
@@ -239,14 +256,14 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                CheckAuthorization(searchFilter.ProtectionFilter);
-                searchFilter = await InitializeSearchFilterAsync(searchFilter);
+                this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
+                searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var edgeLengthValidation = Result.Success();
                 if ((useEdgeLengthRatio ?? false) && (alphaValues?.Any() ?? false))
                 {
                     foreach(var edgeLength in alphaValues)
                     {
-                        edgeLengthValidation = ValidateDouble(edgeLength, 0.0, 1.0, "Alpha value");
+                        edgeLengthValidation = _inputValidator.ValidateDouble(edgeLength, 0.0, 1.0, "Alpha value");
                         if (edgeLengthValidation.IsFailure)
                         {
                             break;
@@ -254,17 +271,18 @@ namespace SOS.Analysis.Api.Controllers
                     }
                 }
 
-                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
+                var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
 
                 var validationResult = Result.Combine(
                     edgeLengthValidation,
                     alphaValues?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one alpha value"),
-                    ValidateSearchFilter(searchFilter!),
-                    ValidateInt(gridCellSizeInMeters!.Value, minLimit: 100, maxLimit: 100000, "Grid cell size in meters"),
-                    await ValidateMetricTilesLimitAsync(
+                    _inputValidator.ValidateSearchFilter(searchFilter!),
+                    _inputValidator.ValidateInt(gridCellSizeInMeters!.Value, minLimit: 100, maxLimit: 100000, "Grid cell size in meters"),
+                    await _inputValidator.ValidateTilesLimitMetricAsync(
                         searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), 
                         gridCellSizeInMeters.Value,
-                        _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter)
+                        _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter),
+                        true
                     ));
 
                 if (validationResult.IsFailure)

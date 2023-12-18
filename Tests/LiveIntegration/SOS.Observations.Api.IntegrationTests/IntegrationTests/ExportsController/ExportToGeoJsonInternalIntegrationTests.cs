@@ -70,7 +70,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
                         259038
                     }
                 },
-                NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.DontIncludeNotRecovered,
+                NotRecoveredFilter = SightingNotRecoveredFilterDto.DontIncludeNotRecovered,
                 ExtendedFilter = new ExtendedFilterDto
                 {
                     SightingTypeSearchGroupIds = new List<int>
@@ -82,7 +82,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
                         128
                     }
                 },
-                DeterminationFilter = SearchFilterBaseDto.SightingDeterminationFilterDto.NotUnsureDetermination,
+                DeterminationFilter = SightingDeterminationFilterDto.NotUnsureDetermination,
                 Output = new OutputFilterExtendedDto
                 {
                     Fields = new List<string>

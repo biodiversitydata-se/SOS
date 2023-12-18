@@ -43,7 +43,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
+                VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 
@@ -76,7 +76,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
+                VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 
@@ -141,8 +141,8 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
                 },
                 DiffusionStatuses = new[] { DiffusionStatusDto.NotDiffused },
                 IncludeRealCount = true,
-                DeterminationFilter = SearchFilterBaseDto.SightingDeterminationFilterDto.NotUnsureDetermination,
-                NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.NoFilter,
+                DeterminationFilter = SightingDeterminationFilterDto.NotUnsureDetermination,
+                NotRecoveredFilter = SightingNotRecoveredFilterDto.NoFilter,
                 ExtendedFilter = new ExtendedFilterDto()
                 {
                     UsePeriodForAllYears = false,

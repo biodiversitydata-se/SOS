@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Shared.Api.Dtos.Enum;
 
 namespace SOS.Shared.Api.Dtos.Filter
 {

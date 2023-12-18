@@ -49,7 +49,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
                     },
                     ConsiderObservationAccuracy = true
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
+                VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 

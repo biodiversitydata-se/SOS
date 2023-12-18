@@ -4,6 +4,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
+using static SOS.Lib.Models.Search.Filters.SearchFilterBase;
 
 namespace SOS.Shared.Api.Extensions.Dto
 {
@@ -11,9 +12,13 @@ namespace SOS.Shared.Api.Extensions.Dto
     {
         private static SearchFilterBase PopulateFilter(SearchFilterBaseDto searchFilterBaseDto, int userId, ProtectionFilterDto? protectionFilter, string translationCultureCode)
         {
-            if (searchFilterBaseDto == null) return default!;
+            if (searchFilterBaseDto == null)
+            {
+                return default!;
+            }
+            protectionFilter ??= ProtectionFilterDto.Public;
 
-            var filter = searchFilterBaseDto is SearchFilterInternalBaseDto ?
+             var filter = searchFilterBaseDto is SearchFilterInternalBaseDto ?
                 new SearchFilterInternal(userId, protectionFilter.ToFilter()) :
                 new SearchFilter(userId, protectionFilter.ToFilter());
             filter.Taxa = searchFilterBaseDto.Taxon?.ToTaxonFilter();
@@ -22,9 +27,9 @@ namespace SOS.Shared.Api.Extensions.Dto
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.Event = PopulateEventFilter(searchFilterBaseDto.Event);
             filter.FieldTranslationCultureCode = translationCultureCode;
-            filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
+            filter.NotRecoveredFilter = (SightingNotRecoveredFilter)(searchFilterBaseDto.NotRecoveredFilter ?? SightingNotRecoveredFilterDto.NoFilter);
             //filter.VerificationStatus = searchFilterBaseDto.ValidationStatus.HasValue ? (SearchFilterBase.StatusVerification)searchFilterBaseDto.ValidationStatus.Value.ToStatusVerification() : (SearchFilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
-            filter.VerificationStatus = (SearchFilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
+            filter.VerificationStatus = (SearchFilterBase.StatusVerification)(searchFilterBaseDto.VerificationStatus ?? StatusVerificationDto.BothVerifiedAndNotVerified);
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
@@ -39,14 +44,14 @@ namespace SOS.Shared.Api.Extensions.Dto
             filter.ExtendedAuthorization.ObservedByMe = searchFilterBaseDto.ObservedByMe;
             filter.ExtendedAuthorization.ReportedByMe = searchFilterBaseDto.ReportedByMe;
             bool isOnlyNotPresentOrRecoveredFilterSet = false;
-            if (searchFilterBaseDto.NotRecoveredFilter == SearchFilterBaseDto.SightingNotRecoveredFilterDto.OnlyNotRecovered ||
-                searchFilterBaseDto.NotRecoveredFilter == SearchFilterBaseDto.SightingNotRecoveredFilterDto.IncludeNotRecovered)
+            if (searchFilterBaseDto.NotRecoveredFilter == SightingNotRecoveredFilterDto.OnlyNotRecovered ||
+                searchFilterBaseDto.NotRecoveredFilter == SightingNotRecoveredFilterDto.IncludeNotRecovered)
             {
                 isOnlyNotPresentOrRecoveredFilterSet = true;
             }
 
             filter.DiffusionStatuses = searchFilterBaseDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus)dsd)?.ToList();
-            filter.DeterminationFilter = (SightingDeterminationFilter)searchFilterBaseDto.DeterminationFilter;
+            filter.DeterminationFilter = (SightingDeterminationFilter)(searchFilterBaseDto.DeterminationFilter ?? SightingDeterminationFilterDto.NoFilter);
             filter.Output = new OutputFilter();
             if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
             {

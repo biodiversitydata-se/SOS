@@ -43,8 +43,8 @@ namespace SOS.Observations.Api.HealthChecks
                     Ids = new[] { 103032 },
                     IncludeUnderlyingTaxa = true
                 },                
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
+                VerificationStatus = Shared.Api.Dtos.Enum.StatusVerificationDto.BothVerifiedAndNotVerified,
+                OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present,
                 Output = new OutputFilterDto
                 {
                     Fields = new[] { "taxon.id" }

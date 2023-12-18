@@ -1754,7 +1754,7 @@ namespace SOS.Lib.Repositories.Processed
 
             if (filter is SearchFilterInternal internalFilter)
             {
-                includeRealCount = internalFilter.IncludeRealCount;
+                includeRealCount = internalFilter.IncludeRealCount ?? false;
             }
 
             if (includeRealCount)

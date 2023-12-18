@@ -52,7 +52,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
                     },
                     ConsiderObservationAccuracy = false
                 },
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
                     },
                     ConsiderObservationAccuracy = false
                 },
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------

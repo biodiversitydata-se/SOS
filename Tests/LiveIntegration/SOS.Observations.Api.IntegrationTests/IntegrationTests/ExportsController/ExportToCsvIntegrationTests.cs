@@ -5,6 +5,7 @@ using FluentAssertions;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
+using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
@@ -48,7 +49,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
                     },
                     ConsiderObservationAccuracy = true
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
+                VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 

@@ -117,7 +117,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// <summary>
         /// Project id's to match.
         /// </summary>
-        public List<int> ProjectIds { get; set; }
+        public ICollection<int> ProjectIds { get; set; }
 
         /// <summary>
         ///     True to return only positive sightings, false to return negative sightings, null to return both positive and

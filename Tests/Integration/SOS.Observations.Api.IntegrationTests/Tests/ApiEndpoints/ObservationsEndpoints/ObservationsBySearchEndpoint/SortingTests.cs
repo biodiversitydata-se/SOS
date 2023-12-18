@@ -2,6 +2,7 @@
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -27,7 +28,7 @@ public class SortingTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present};
 
         // Act
         var responseAsc = await apiClient.PostAsync($"/observations/search?sortBy=taxon.id&sortOrder=asc", JsonContent.Create(searchFilter));

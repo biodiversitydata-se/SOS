@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using SOS.Shared.Api.Dtos.Enum;
+﻿using SOS.Shared.Api.Dtos.Enum;
 
 namespace SOS.Shared.Api.Dtos.Filter
 {
@@ -9,36 +7,6 @@ namespace SOS.Shared.Api.Dtos.Filter
     /// </summary>
     public class SearchFilterBaseDto
     {
-        public enum SightingDeterminationFilterDto
-        {
-            NoFilter,
-            NotUnsureDetermination,
-            OnlyUnsureDetermination
-        }
-
-        public enum SightingNotRecoveredFilterDto
-        {
-            NoFilter,
-            OnlyNotRecovered,
-            DontIncludeNotRecovered,
-            IncludeNotRecovered
-        }
-
-        /*[Obsolete]
-        public enum StatusValidationDto
-        {
-            BothValidatedAndNotValidated,
-            Validated,
-            NotValidated
-        }*/
-
-        public enum StatusVerificationDto
-        {
-            BothVerifiedAndNotVerified,
-            Verified,
-            NotVerified
-        }
-
         /// <summary>
         /// Limit returned observations based on bird nest activity level.
         /// Only bird observations in Artportalen are affected
@@ -51,57 +19,57 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         ///     Only get data from these providers.
         /// </summary>
-        public DataProviderFilterDto DataProvider { get; set; }
+        public DataProviderFilterDto? DataProvider { get; set; }
 
         /// <summary>
         ///  DataStewardship filter
         /// </summary>
-        public DataStewardshipFilterDto DataStewardship { get; set; }
+        public DataStewardshipFilterDto? DataStewardship { get; set; }
 
         /// <summary>
         /// Date filter.
         /// </summary>
-        public DateFilterDto Date { get; set; }
+        public DateFilterDto? Date { get; set; }
 
         /// <summary>
         /// Filter by uncertain determination
         /// </summary>
-        public SightingDeterminationFilterDto DeterminationFilter { get; set; }
+        public SightingDeterminationFilterDto? DeterminationFilter { get; set; }
 
         /// <summary>
         /// Filter by diffusion status.
         /// </summary>
-        public IEnumerable<DiffusionStatusDto> DiffusionStatuses { get; set; }
+        public IEnumerable<DiffusionStatusDto>? DiffusionStatuses { get; set; }
 
         /// <summary>
         /// Event related filter
         /// </summary>
-        public EventFilterDto Event { get; set; }
+        public EventFilterDto? Event { get; set; }
 
         /// <summary>
         /// Exclude filter
         /// </summary>
-        public ExcludeFilterDto ExcludeFilter { get; set; }
+        public ExcludeFilterDto? ExcludeFilter { get; set; }
 
         /// <summary>
         /// Geographics filter 
         /// </summary>
-        public GeographicsFilterDto Geographics { get; set; }
+        public GeographicsFilterDto? Geographics { get; set; }
 
         /// <summary>
         /// Observation modified filter
         /// </summary>
-        public ModifiedDateFilterDto ModifiedDate { get; set; }
+        public ModifiedDateFilterDto? ModifiedDate { get; set; }
 
         /// <summary>
         /// Filter for observation not recovered
         /// </summary>
-        public SightingNotRecoveredFilterDto NotRecoveredFilter { get; set; }
+        public SightingNotRecoveredFilterDto? NotRecoveredFilter { get; set; }
 
         /// <summary>
         /// Only get observations observed by me
         /// </summary>
-        public bool ObservedByMe { get; set; }
+        public bool? ObservedByMe { get; set; }
 
         /// <summary>
         /// This property indicates whether to search for present observations and/or absent observations.
@@ -112,21 +80,21 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Project id's to match.
         /// </summary>
-        public List<int> ProjectIds { get; set; }
+        public ICollection<int>? ProjectIds { get; set; }
 
         /// <summary>
         /// Only get observations reported by me
         /// </summary>
-        public bool ReportedByMe { get; set; }
+        public bool? ReportedByMe { get; set; }
 
         /// <summary>
         /// Taxon filter.
         /// </summary>
-        public TaxonFilterDto Taxon { get; set; }
+        public TaxonFilterDto? Taxon { get; set; }
 
         /// <summary>
         /// Requested verification status.
         /// </summary>
-        public StatusVerificationDto VerificationStatus { get; set; }
+        public StatusVerificationDto? VerificationStatus { get; set; }
     }
 }

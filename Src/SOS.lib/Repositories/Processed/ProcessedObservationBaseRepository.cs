@@ -45,8 +45,8 @@ namespace SOS.Lib.Repositories.Processed
         {
             if (
                 (
-                    (filter.ExtendedAuthorization.ObservedByMe) || 
-                    (filter.ExtendedAuthorization.ReportedByMe) || 
+                    (filter.ExtendedAuthorization.ObservedByMe ?? false) || 
+                    (filter.ExtendedAuthorization.ReportedByMe ?? false) || 
                     (!filter.ExtendedAuthorization.ProtectionFilter.Equals(ProtectionFilter.Public))
                 ) &&
                 (filter?.ExtendedAuthorization.UserId ?? 0) == 0

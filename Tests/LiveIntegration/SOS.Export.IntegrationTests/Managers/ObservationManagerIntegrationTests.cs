@@ -24,7 +24,6 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
 using Xunit;
-using SOS.Export.LiveIntegrationTests;
 
 namespace SOS.Export.LiveIntegrationTests.Managers
 {
@@ -88,7 +87,8 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                 .Setup(us => us
                     .PrepareFilterAsync(0, null, new SearchFilter(0, ProtectionFilter.Public), "Sighting", 0, false, false, true)
                 );
-
+            var zendToService = new Mock<IZendToService>();
+            zendToService.Setup(zs => zs.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>()));
             var observationManager = new ObservationManager(
                 dwcArchiveFileWriter,
                 dwcArchiveEventFileWriter,
@@ -99,7 +99,7 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                 new ProcessInfoRepository(processClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,
-                new Mock<IZendToService>().Object,
+                zendToService.Object,
                 new FileDestination { Path = exportConfiguration.FileDestination.Path },
                 filterManager.Object,
                 new Mock<ILogger<ObservationManager>>().Object);
