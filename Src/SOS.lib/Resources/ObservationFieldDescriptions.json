@@ -3125,7 +3125,7 @@
   {
     "PropertyName": "InstitutionCodeId",
     "PropertyPath": "InstitutionCode.Id",
-    "SwedishTitle": "Institution id",
+    "SwedishTitle": "Institution kod id",
     "EnglishTitle": "Institution code ID",
     "DataType": "Int32",
     "DataTypeIsNullable": false,

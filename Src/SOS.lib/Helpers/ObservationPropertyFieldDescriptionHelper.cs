@@ -261,7 +261,7 @@ namespace SOS.Lib.Helpers
             return fields;
         }
 
-        public static List<PropertyFieldDescription> GetExportFieldsFromOutputFields(IEnumerable<string> outputFields)
+        public static List<PropertyFieldDescription> GetExportFieldsFromOutputFields(IEnumerable<string> outputFields, bool removeDuplicates = false)
         {
             if (!outputFields?.Any() ?? true) return FieldsByFieldSet[OutputFieldSet.AllWithValues].ToList();
 
@@ -290,7 +290,35 @@ namespace SOS.Lib.Helpers
                 }
             }
 
+            if (removeDuplicates)
+            {
+                RemoveDuplicates(propertyFields);
+            }
+
             return propertyFields;
         }
+
+        private static void RemoveDuplicates(List<PropertyFieldDescription> propertyFields)
+        {
+            var propertyFieldsByPropertyPath = propertyFields.ToDictionary(m => m.PropertyPath, m => m);
+            foreach (var duplicateProperty in _duplicateProperties)
+            {
+                if (propertyFieldsByPropertyPath.ContainsKey(duplicateProperty.PrimaryPropertyPath) &&
+                    propertyFieldsByPropertyPath.ContainsKey(duplicateProperty.SecondaryPropertyPath))
+                {
+                    propertyFields.Remove(propertyFieldsByPropertyPath[duplicateProperty.SecondaryPropertyPath]);                    
+                }
+            }
+        }
+
+        private static List<(string PrimaryPropertyPath, string SecondaryPropertyPath)> _duplicateProperties = new List<(string PrimaryPropertyPath, string SecondaryPropertyPath)>
+        {
+            ("Taxon.Attributes.TaxonCategory", "Taxon.TaxonRank"),
+            ("Location.County", "Location.County.Name"),
+            ("Location.Parish", "Location.Parish.Name"),
+            ("Location.Municipality", "Location.Municipality.Name"),
+            ("Location.Province", "Location.Province.Name"),
+            ("Location.Country", "Location.Country.Value")            
+        };
     }
 }

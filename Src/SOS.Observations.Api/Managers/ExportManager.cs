@@ -108,7 +108,7 @@ namespace SOS.Observations.Api.Managers
                        cancellationToken);
                 }
                 var propertyFields =
-                   ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter?.Output?.Fields);
+                   ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter?.Output?.Fields, true);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().
                    Where(fd => propertyFields.Select(pf => pf.DwcIdentifier.ToLower()).Contains(fd.DwcIdentifier.ToLower()));
 
