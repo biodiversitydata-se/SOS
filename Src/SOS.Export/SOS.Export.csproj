@@ -19,8 +19,8 @@
 	  <PackageReference Include="Hangfire.Core" Version="1.8.6" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-	  <PackageReference Include="MongoDB.Driver" Version="2.23.0" />
-	  <PackageReference Include="MongoDB.Driver.GridFS" Version="2.23.0" />
+	  <PackageReference Include="MongoDB.Driver" Version="2.23.1" />
+	  <PackageReference Include="MongoDB.Driver.GridFS" Version="2.23.1" />
 	  <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     </ItemGroup>
 
