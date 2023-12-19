@@ -263,13 +263,32 @@ namespace SOS.Lib.Helpers
 
         public static List<PropertyFieldDescription> GetExportFieldsFromOutputFields(IEnumerable<string> outputFields, bool removeDuplicates = false)
         {
-            if (!outputFields?.Any() ?? true) return FieldsByFieldSet[OutputFieldSet.AllWithValues].ToList();
+            List<PropertyFieldDescription> propertyFields;
+            if (!outputFields?.Any() ?? true)
+            {
+                propertyFields = FieldsByFieldSet[OutputFieldSet.AllWithValues].ToList();
+            }
+            else
+            {
+                propertyFields = GetPropertyFieldsFromOutputFields(outputFields);
+            }
 
+            if (removeDuplicates)
+            {
+                RemoveDuplicates(propertyFields);
+            }
+
+            return propertyFields;
+        }
+
+        private static List<PropertyFieldDescription> GetPropertyFieldsFromOutputFields(IEnumerable<string> outputFields)
+        {
+            List<PropertyFieldDescription> propertyFields = new List<PropertyFieldDescription>();
             var fieldsSet = new HashSet<string>();
             foreach (var outputField in outputFields)
             {
                 if (ExportFormatFieldByJsonFormatField.TryGetValue(outputField.ToLower(), out string exportField))
-                {                    
+                {
                     fieldsSet.Add(exportField);
                 }
                 else
@@ -278,7 +297,6 @@ namespace SOS.Lib.Helpers
                 }
             }
 
-            var propertyFields = new List<PropertyFieldDescription>();
             foreach (var field in fieldsSet)
             {
                 if (FieldByPropertyPath.TryGetValue(field.ToLower(), out var propertyField))
@@ -288,11 +306,6 @@ namespace SOS.Lib.Helpers
                         propertyFields.Add(propertyField);
                     }
                 }
-            }
-
-            if (removeDuplicates)
-            {
-                RemoveDuplicates(propertyFields);
             }
 
             return propertyFields;
