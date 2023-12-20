@@ -1,5 +1,12 @@
 # Changelog
 
+## [2023.12.20] - Hotfix
+
+### `Fixed`
+- Export to `GeoJSON` when using swedish or english property names resulted in duplicate properties and Exception when using all fields in export.
+- Taxon List `Filter` operator didn't work properly when resulting taxa set resulted in empty list.
+- In certain cases sensitive species observations could not be exported to `Excel`, `GeoJSON` and `CSV`.
+
 ## [2023.10.17] - Hotfix
 
 ### `Fixed`
