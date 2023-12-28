@@ -71,8 +71,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="alphaValues">One or more alpha values used to calculate AOO and EEO</param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="useCenterPoint">If true, grid cell center point will be used, else grid cell corner points will be used.</param>
-        /// <param name="useEdgeLengthRatio">Change behavior of alpha values. When true: 
-        /// Computes the concave hull of the vertices in a geometry using the target criterion of maximum alpha ratio. 
+        /// <param name="useEdgeLengthRatio">Change behavior of alpha values. When true: Computes the concave hull of the vertices in a geometry using the target criterion of maximum alpha ratio. 
         /// The alpha factor is a fraction of the length difference between the longest and shortest edges in the Delaunay Triangulation of the input points.
         /// When false: 
         /// Computes the concave hull of the vertices in a geometry using the target criterion of maximum edge length.</param>
@@ -81,6 +80,10 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="includeEmptyCells">Include grid cells with no observations</param>
         /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
         /// <param name="coordinateSystem">Gemometry coordinate system</param>
+        /// Computes the concave hull of the vertices in a geometry using the target criterion of maximum alpha ratio. 
+        /// The alpha factor is a fraction of the length difference between the longest and shortest edges in the Delaunay Triangulation of the input points.
+        /// When false: 
+        /// Computes the concave hull of the vertices in a geometry using the target criterion of maximum edge length.</param>
         /// <returns></returns>
         Task<IActionResult> CalculateAooAndEooInternalAsync(
             int? roleId,
@@ -93,6 +96,26 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             bool? allowHoles = false,
             bool? returnGridCells = false,
             bool? includeEmptyCells = false,
+            MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
+            CoordinateSys? coordinateSystem = CoordinateSys.WGS84);
+
+        /// <summary>
+        /// Calculate AOO and EOO and get geometry showing coverage 
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="searchFilter"></param>
+        /// <param name="alphaValues">One or more alpha values used to calculate AOO and EEO</param>
+        /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
+        /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
+        /// <param name="coordinateSystem">Gemometry coordinate system</param>
+        /// <returns></returns>
+        Task<IActionResult> CalculateAooAndEooArticle17InternalAsync(
+            int? roleId,
+            string? authorizationApplicationIdentifier,
+            SearchFilterInternalDto searchFilter,
+            double[] alphaValues,
+            int? gridCellSizeInMeters = 2000,
             MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
             CoordinateSys? coordinateSystem = CoordinateSys.WGS84);
     }

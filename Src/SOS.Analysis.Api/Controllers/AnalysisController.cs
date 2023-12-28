@@ -284,7 +284,83 @@ namespace SOS.Analysis.Api.Controllers
                     returnGridCells!.Value,
                     includeEmptyCells!.Value,
                     metricCoordinateSys!.Value,
-                    coordinateSystem!.Value
+                    coordinateSystem!.Value,
+                    article17: false
+                );
+                return new OkObjectResult(result!);
+            }
+            catch (AuthenticationRequiredException)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "GetAooAndEoo error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Calculate AOO and EOO and get geometry showing coverage 
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="searchFilter"></param>
+        /// <param name="alphaValues">One or more alpha values used to calculate AOO and EEO</param>
+        /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
+        /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
+        /// <param name="coordinateSystem">Gemometry coordinate system</param>
+        /// <returns></returns>
+        [HttpPost("/internal/aoo_eoo/article17")]
+        [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> CalculateAooAndEooArticle17InternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto searchFilter,
+            [FromQuery] double[] alphaValues,
+            [FromQuery] int? gridCellSizeInMeters = 2000,
+            [FromQuery] MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
+            [FromQuery] CoordinateSys? coordinateSystem = CoordinateSys.WGS84)
+        {
+            try
+            {
+                CheckAuthorization(searchFilter.ProtectionFilter);
+                searchFilter = await InitializeSearchFilterAsync(searchFilter);
+                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
+
+                var validationResult = Result.Combine(
+                    alphaValues?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one alpha value"),
+                    ValidateSearchFilter(searchFilter!),
+                    ValidateInt(gridCellSizeInMeters!.Value, minLimit: 100, maxLimit: 100000, "Grid cell size in meters"),
+                    await ValidateMetricTilesLimitAsync(
+                        searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
+                        gridCellSizeInMeters.Value,
+                        _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter)
+                    ));
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var result = await _analysisManager.CalculateAooAndEooAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    filter,
+                    gridCellSizeInMeters!.Value,
+                    useCenterPoint: true,
+                    alphaValues!,
+                    useEdgeLengthRatio: false,
+                    allowHoles: false,
+                    returnGridCells: true,
+                    includeEmptyCells: false,
+                    metricCoordinateSys!.Value,
+                    coordinateSystem!.Value,
+                    article17: true
                 );
                 return new OkObjectResult(result!);
             }

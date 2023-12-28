@@ -9,6 +9,7 @@ using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
+using NetTopologySuite.Triangulate;
 using NetTopologySuite.Utilities;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
@@ -88,12 +89,35 @@ namespace SOS.Lib.Extensions
             }
         }
 
-        /// <summary>
-        ///     Get coordinate system wkt
-        /// </summary>
-        /// <param name="coordinateSystem"></param>
-        /// <returns></returns>
-        private static string GetCoordinateSystemWkt(CoordinateSys coordinateSystem)
+        private static IEnumerable<Point> CalculationPoints(this IEnumerable<Polygon> polygons, bool useCenterPoint = true)
+        {
+            if (!polygons?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var points = new HashSet<Point>();
+            if (useCenterPoint)
+            {
+                //Create a geometry with all grid cell points, this is faster than using the gridcells because it's less coordinates
+                polygons.ForEach(p => points.Add(p.Centroid));
+            }
+            else
+            {
+                foreach (var tile in polygons)
+                {
+                    tile.Coordinates.ForEach(c => points.Add(new Point(c)));
+                }
+            }
+
+            return points;
+        }
+            /// <summary>
+            ///     Get coordinate system wkt
+            /// </summary>
+            /// <param name="coordinateSystem"></param>
+            /// <returns></returns>
+            private static string GetCoordinateSystemWkt(CoordinateSys coordinateSystem)
         {
             return coordinateSystem switch
             {
@@ -113,6 +137,41 @@ namespace SOS.Lib.Extensions
                     @"GEOGCS[""GCS_WGS_1984"", DATUM[""WGS_1984"", SPHEROID[""WGS_1984"",6378137,298.257223563]], PRIMEM[""Greenwich"",0], UNIT[""Degree"",0.017453292519943295]]",
                 _ => throw new ArgumentException("Not handled coordinate system id " + coordinateSystem)
             };
+        }
+
+        /// <summary>
+        /// Return tiles within passed distance
+        /// </summary>
+        /// <param name="polygons"></param>
+        /// <param name="maxDistance"></param>
+        /// <returns></returns>
+        private static IEnumerable<Polygon> WithinDistance(this Polygon[] polygons, int maxDistance)
+        {
+            var tilesInRange = new HashSet<Polygon>();
+            var tileCount = polygons.Length;
+
+            for (var i = 0; i < tileCount; i++)
+            {
+                var startTile = polygons[i];
+                var startTileAdded = false;
+                for (var j = i + 1; j < tileCount; j++)
+                {
+                    var endTile = polygons[j];
+                    var disance = startTile.Centroid.Distance(endTile.Centroid);
+                    if (disance <= maxDistance)
+                    {
+                        if (!startTileAdded)
+                        {
+                            tilesInRange.Add(startTile);
+                            startTileAdded = true;
+                        }
+
+                        tilesInRange.Add(endTile);
+                    }
+                }
+            }
+
+            return tilesInRange;
         }
 
         /// <summary>
@@ -266,7 +325,7 @@ namespace SOS.Lib.Extensions
             {
                 return boundingBox;
             }
-
+            
             return boundingBox.Intersection(envelope);
         }
 
@@ -289,6 +348,32 @@ namespace SOS.Lib.Extensions
             var maxTilesTot = (long)(maxLonTiles * maxLatTiles);
 
             return maxTilesTot;
+        }
+
+        /// <summary>
+        /// Calculate traingels from point set
+        /// </summary>
+        /// <param name="polygons">metric coorinates</param>
+        /// <param name="useCenterPoint"></param>
+        /// <param name="maxDistance"></param>
+        /// <returns></returns>
+        public static MultiPolygon CalculateTraiangels(this Polygon[] polygons, bool useCenterPoint = true, int maxDistance = 0)
+        {
+            var tilesInRange = polygons.WithinDistance(maxDistance);
+            var points = tilesInRange.CalculationPoints(useCenterPoint);
+   
+            // we need at least tree points to make a traingle
+            if ((points?.Count() ?? 0) < 3)
+            {
+                return null!;
+            }
+
+            var triangulationBuilder = new ConformingDelaunayTriangulationBuilder();
+            triangulationBuilder.SetSites(new MultiPoint(points.ToArray()));
+            var geometryFactory = new GeometryFactory();
+            var triangles = triangulationBuilder.GetTriangles(geometryFactory);
+
+            return new MultiPolygon(triangles.Select(t => new Polygon(new LinearRing(t.Coordinates)))?.ToArray());
         }
 
         /// <summary>
@@ -323,28 +408,12 @@ namespace SOS.Lib.Extensions
         /// longest and shortest edges in the Delaunay Triangulation of the input points</param>
         /// <param name="allowHoles"></param>
         /// <returns></returns>
-        public static Geometry ConcaveHull(this Polygon[] polygons, bool useCenterPoint = true, double alphaValue = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
+        public static Geometry ConcaveHull(this Polygon[] polygons, bool useCenterPoint = true, double alphaValue = 0, bool useEdgeLengthRatio = false, bool allowHoles = false, bool article17 = false)
         {
-            var points = new HashSet<Point>();
-            if (useCenterPoint)
-            {
-                //Create a geometry with all grid cell points, this is faster than using the gridcells because it's less coordinates
-                polygons.ForEach(p => points.Add(p.Centroid));
-            }
-            else
-            {
-                foreach(var polygon in polygons)
-                {
-                    polygon.Coordinates.ForEach(c => points.Add(new Point(c)));
-                }
-            }
+            var tilesInRange = useEdgeLengthRatio || !article17 ? polygons : polygons.WithinDistance((int)alphaValue);
+            var points = tilesInRange.CalculationPoints(useCenterPoint);
 
             return points.ToArray().ConcaveHull(alphaValue, useEdgeLengthRatio, allowHoles);
-        }
-
-        public static Geometry ConcaveHull(this MultiPolygon multiPolygon, bool useCenterPoint = true, double alphaValue = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
-        {
-            return ConcaveHull(multiPolygon?.Geometries.Select(g => g as Polygon)?.ToArray(), useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles);
         }
 
         /// <summary>
