@@ -78,7 +78,7 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="includeEmptyCells"></param>
         /// <param name="metricCoordinateSys"></param>
         /// <param name="coordinateSystem"></param>
-        /// <param name="article17"></param>
+        /// <param name="onlyUseTilesInRange"></param>
         /// <returns></returns>
         Task<FeatureCollection> CalculateAooAndEooAsync(
             int? roleId,
@@ -93,7 +93,7 @@ namespace SOS.Analysis.Api.Managers.Interfaces
             bool includeEmptyCells,
             MetricCoordinateSys metricCoordinateSys,
             CoordinateSys coordinateSystem,
-            bool article17);
+            bool onlyUseTilesInRange);
 
         /// <summary>
         /// Get count of observations matching search criteria

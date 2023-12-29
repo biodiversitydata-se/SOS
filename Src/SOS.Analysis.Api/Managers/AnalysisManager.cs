@@ -164,7 +164,7 @@ namespace SOS.Analysis.Api.Managers
             bool includeEmptyCells,
             MetricCoordinateSys metricCoordinateSys,
             CoordinateSys coordinateSystem,
-            bool article17)
+            bool onlyUseTilesInRange)
         {
             try
             {
@@ -207,7 +207,7 @@ namespace SOS.Analysis.Api.Managers
                     var eooGeometry = gridCellFeaturesMetric
                         .Select(f => f.Value.Geometry as Polygon)
                             .ToArray()
-                                .ConcaveHull(useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles, article17);
+                                .ConcaveHull(useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles, onlyUseTilesInRange);
 
                     if (eooGeometry == null)
                     {
