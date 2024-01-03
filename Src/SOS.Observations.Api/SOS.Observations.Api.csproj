@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
 		<UserSecretsId>92cd2cdb-499c-480d-9f04-feaf7a68f89c</UserSecretsId>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -26,34 +26,36 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DocumentationFile>bin\Release\netcoreapp3.0\SOS.Observations.Api.xml</DocumentationFile>
 	</PropertyGroup>
+
 	<ItemGroup>
-		<PackageReference Include="AspNetCore.HealthChecks.Hangfire" Version="7.0.0" />
-		<PackageReference Include="AspNetCore.HealthChecks.MongoDb" Version="7.0.0" />
-		<PackageReference Include="AspNetCore.HealthChecks.Network" Version="7.0.0" />
-		<PackageReference Include="AspNetCore.HealthChecks.System" Version="7.0.0" />
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.Hangfire" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.MongoDb" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.Network" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.System" Version="8.0.0" />
 		<PackageReference Include="AspNetCore.HealthChecks.SystemMemory" Version="1.0.1" />
-		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="7.1.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.0" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
 		<PackageReference Include="Elastic.Apm.NLog" Version="8.6.1" />
 		<PackageReference Include="Elastic.CommonSchema.NLog" Version="8.6.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
 		<PackageReference Include="CSharpFunctionalExtensions" Version="2.40.3" />
-		<PackageReference Include="HangFire" Version="1.8.6" />
+		<PackageReference Include="HangFire" Version="1.8.7" />
 		<PackageReference Include="HangFire.Autofac" Version="2.4.1" />
 		<PackageReference Include="HangFire.Mongo" Version="1.9.15" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="8.0.0" />
 		<PackageReference Include="Microsoft.OpenApi" Version="1.6.11" />
 		<PackageReference Include="MongoDB.Driver" Version="2.23.1" />
 		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.23.1" />
 		<PackageReference Include="NGeoHash" Version="1.2.0" />
 		<PackageReference Include="NLog.Targets.ElasticSearch" Version="7.7.0" />
-		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.7" />
-		<PackageReference Include="SauceControl.InheritDoc" Version="1.4.0">
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.8" />
+		<PackageReference Include="SauceControl.InheritDoc" Version="2.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

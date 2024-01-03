@@ -10,12 +10,12 @@
 	</PropertyGroup>
 	
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="MongoDB.Driver" Version="2.23.1" />
-		<PackageReference Include="Hangfire.Core" Version="1.8.6" />
+		<PackageReference Include="Hangfire.Core" Version="1.8.7" />
 		<PackageReference Include="MessagePack" Version="2.5.140" />
 	</ItemGroup>
 

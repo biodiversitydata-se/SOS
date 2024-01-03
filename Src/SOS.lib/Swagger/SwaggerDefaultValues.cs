@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -20,10 +19,6 @@ namespace SOS.Lib.Swagger
         /// <param name="context">The current operation filter context.</param>
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            var apiDescription = context.ApiDescription;
-
-            operation.Deprecated |= apiDescription.IsDeprecated();
-
             if (operation.Parameters == null)
             {
                 return;
@@ -33,7 +28,7 @@ namespace SOS.Lib.Swagger
             // REF: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/pull/413
             foreach (var parameter in operation.Parameters)
             {
-                var description = apiDescription.ParameterDescriptions.First(p => p.Name == parameter.Name);
+                var description = context.ApiDescription.ParameterDescriptions.First(p => p.Name == parameter.Name);
 
                 if (parameter.Description == null)
                 {

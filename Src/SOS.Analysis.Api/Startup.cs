@@ -2,10 +2,8 @@
 using System.Text.Json.Serialization;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
@@ -44,6 +42,8 @@ using SOS.Lib.Middleware;
 using SOS.Analysis.Api.Middleware;
 using Microsoft.Extensions.Options;
 using System.Globalization;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 
 namespace SOS.Analysis.Api
 {
@@ -194,25 +194,21 @@ namespace SOS.Analysis.Api
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
-            services.AddApiVersioning(o =>
+            services.AddApiVersioning(options =>
             {
-                o.AssumeDefaultVersionWhenUnspecified = true;
-                o.DefaultApiVersion = new ApiVersion(1, 5);
-                o.ReportApiVersions = true;
-                o.ApiVersionReader = new HeaderApiVersionReader("X-Api-Version");
+                options.DefaultApiVersion = new ApiVersion(1, 5);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ReportApiVersions = true;
+                options.ApiVersionReader = new HeaderApiVersionReader("X-Api-Version");
+            }).AddApiExplorer(options =>
+            {
+                // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+                // note: the specified format code will format the version as "'v'major[.minor][-status]"
+                options.GroupNameFormat = "'v'VV";
+                // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
+                // can also be used to control the format of the API version in route templates
+                options.SubstituteApiVersionInUrl = true;
             });
-
-            services.AddVersionedApiExplorer(
-                options =>
-                {
-                    // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
-                    // note: the specified format code will format the version as "'v'major[.minor][-status]"
-                    options.GroupNameFormat = "'v'VV";
-
-                    // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
-                    // can also be used to control the format of the API version in route templates
-                    options.SubstituteApiVersionInUrl = true;
-                });
 
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
@@ -349,17 +345,17 @@ namespace SOS.Analysis.Api
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <param name="apiVersionDescriptionProvider"></param>
-        /// <param name="configuration"></param>
+        /// <param name="telemetryConfiguration"></param>
         /// <param name="applicationInsightsConfiguration"></param>
         /// <param name="statisticsConfiguration"></param>
         public void Configure(
             IApplicationBuilder app, 
-            IWebHostEnvironment env, 
-            IApiVersionDescriptionProvider apiVersionDescriptionProvider, 
-            TelemetryConfiguration configuration, 
+            TelemetryConfiguration telemetryConfiguration, 
+            IApiVersionDescriptionProvider apiVersionDescriptionProvider,
             Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration, 
             AnalysisConfiguration statisticsConfiguration)
         {
+            
             if (statisticsConfiguration.EnableResponseCompression)
             {
                 app.UseResponseCompression();
@@ -376,7 +372,7 @@ namespace SOS.Analysis.Api
 
             if (_isDevelopment)
             {
-                configuration.DisableTelemetry = true;
+                telemetryConfiguration.DisableTelemetry = true;
             }
 
             if (applicationInsightsConfiguration.EnableRequestBodyLogging)
@@ -421,8 +417,8 @@ namespace SOS.Analysis.Api
         
         private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
         {
-            var actionApiVersionModel = apiDescription.ActionDescriptor
-                .GetApiVersionModel(ApiVersionMapping.Explicit | ApiVersionMapping.Implicit);
+            var apiVersionMetadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();
+            var actionApiVersionModel = apiVersionMetadata.Map(ApiVersionMapping.Explicit | ApiVersionMapping.Implicit);
 
             var apiVersions = actionApiVersionModel.DeclaredApiVersions.Any()
                 ? actionApiVersionModel.DeclaredApiVersions
