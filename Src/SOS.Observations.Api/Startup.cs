@@ -4,10 +4,13 @@ using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
+using HealthChecks.UI.Client;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -60,6 +63,8 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.ApplicationInsights;
 using SOS.Observations.Api.Configuration;
+using SOS.Observations.Api.HealthChecks;
+using SOS.Observations.Api.HealthChecks.Custom;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
@@ -431,7 +436,7 @@ namespace SOS.Observations.Api
 #if !DEBUG
             if (!_disableHealthCheckInit)
             {
-               services.AddSingleton<IHealthCheckPublisher, SOS.Observations.Api.HealthChecks.Custom.HealthReportCachePublisher>();
+               services.AddSingleton<IHealthCheckPublisher, HealthReportCachePublisher>();
                services.Configure<HealthCheckPublisherOptions>(options => {
                     options.Delay = TimeSpan.FromSeconds(10);
                     options.Period = TimeSpan.FromSeconds(90); // Create new health check every 90 sek and cache reult
@@ -451,22 +456,22 @@ namespace SOS.Observations.Api
                         tags: new[] { "disk" })
                     .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" })
                     .AddHangfire(a => a.MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
-                    .AddCheck<SOS.Observations.Api.HealthChecks.DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
-                    .AddCheck<SOS.Observations.Api.HealthChecks.SearchDataProvidersHealthCheck>("Search data providers", tags: new[] { "database", "elasticsearch", "query" })
-                    .AddCheck<SOS.Observations.Api.HealthChecks.SearchPerformanceHealthCheck>("Search performance", tags: new[] { "database", "elasticsearch", "query", "performance" })
-                    .AddCheck<SOS.Observations.Api.HealthChecks.AzureSearchHealthCheck>("Azure search API health check", tags: new[] { "azure", "database", "elasticsearch", "query" })
-                    .AddCheck<SOS.Observations.Api.HealthChecks.DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
-                    .AddCheck<SOS.Observations.Api.HealthChecks.ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
-                    .AddCheck<SOS.Observations.Api.HealthChecks.DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
-                    .AddCheck<SOS.Observations.Api.HealthChecks.ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" })
-                    .AddCheck<SOS.Observations.Api.HealthChecks.DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" })
-                    .AddCheck<SOS.Observations.Api.HealthChecks.APDbRestoreHealthCheck>("Artportalen database backup restore", tags: new[] { "database", "sql server" });
+                    .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
+                    .AddCheck<SearchDataProvidersHealthCheck>("Search data providers", tags: new[] { "database", "elasticsearch", "query" })
+                    .AddCheck<SearchPerformanceHealthCheck>("Search performance", tags: new[] { "database", "elasticsearch", "query", "performance" })
+                    .AddCheck<AzureSearchHealthCheck>("Azure search API health check", tags: new[] { "azure", "database", "elasticsearch", "query" })
+                    .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
+                    .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
+                    .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
+                    .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" })
+                    .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" })
+                    .AddCheck<APDbRestoreHealthCheck>("Artportalen database backup restore", tags: new[] { "database", "sql server" });
 
                 if (CurrentEnvironment.IsEnvironment("prod"))
                 {
-                    healthChecks.AddCheck<SOS.Observations.Api.HealthChecks.DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
-                    healthChecks.AddCheck<SOS.Observations.Api.HealthChecks.ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
-                    healthChecks.AddCheck<SOS.Observations.Api.HealthChecks.WFSHealthCheck>("WFS", tags: new[] { "wfs" }); // add this to ST environment when we have a GeoServer test environment.
+                    healthChecks.AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
+                    healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
+                    healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] { "wfs" }); // add this to ST environment when we have a GeoServer test environment.
                 }
             }
 #endif
@@ -648,7 +653,7 @@ namespace SOS.Observations.Api
                     endpoints.MapHealthChecks("/health", new HealthCheckOptions()
                     {
                         Predicate = _ => false,
-                        ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.LatestNoWfs)
+                        ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthChecks.Custom.HealthReportCachePublisher.LatestNoWfs)
                     });
                     endpoints.MapHealthChecks("/health-json", new HealthCheckOptions()
                     {
@@ -656,7 +661,7 @@ namespace SOS.Observations.Api
                         ResponseWriter = async (context, _) =>
                         {
                             var report = HealthReportCachePublisher.LatestAll;
-                            var result = report == null ? "{}" : JsonConvert.SerializeObject(
+                            var result = report == null ? "{}" : Newtonsoft.Json.JsonConvert.SerializeObject(
                                 new
                                 {
                                     status = report.Status.ToString(),
@@ -670,19 +675,19 @@ namespace SOS.Observations.Api
                                             e.Value.Status),
                                         tags = e.Value.Tags
                                     }).ToList()
-                                }, Formatting.None,
-                                new JsonSerializerSettings
+                                }, Newtonsoft.Json.Formatting.None,
+                                new Newtonsoft.Json.JsonSerializerSettings
                                 {
-                                    NullValueHandling = NullValueHandling.Ignore
+                                    NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
                                 });
-                            context.Response.ContentType = MediaTypeNames.Application.Json;
+                            context.Response.ContentType = System.Net.Mime.MediaTypeNames.Application.Json;
                             await context.Response.WriteAsync(result);
                         }
                     });
                     endpoints.MapHealthChecks("/health-wfs", new HealthCheckOptions()
                     {
                         Predicate = _ => false,
-                        ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthReportCachePublisher.LatestOnlyWfs)
+                        ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, HealthChecks.Custom.HealthReportCachePublisher.LatestOnlyWfs)
                     });
                 }
 #endif
