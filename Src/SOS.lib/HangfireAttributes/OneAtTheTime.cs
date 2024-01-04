@@ -1,7 +1,7 @@
-﻿using System;
-using Hangfire.Common;
+﻿using Hangfire.Common;
 using Hangfire.States;
 using Hangfire.Storage;
+using System;
 
 namespace SOS.Lib.HangfireAttributes
 {
@@ -13,7 +13,7 @@ namespace SOS.Lib.HangfireAttributes
         {
             Reason = $"Execution was blocked by background job {blockedBy}, all attempts exhausted"
         };
- 
+
         private IState CreateScheduledState(string blockedBy, int currentAttempt)
         {
             var reason = $"Execution is blocked by background job {blockedBy}, retry attempt: {currentAttempt}";
@@ -49,7 +49,7 @@ namespace SOS.Lib.HangfireAttributes
         /// <summary>
         /// Time between retry attempts
         /// </summary>
-        public int RetryInSeconds { get; set; } 
+        public int RetryInSeconds { get; set; }
 
         /// <summary>
         /// On state election event
@@ -97,7 +97,7 @@ namespace SOS.Lib.HangfireAttributes
                         0,
                         0);
 
-                    foreach(var jobId in range)
+                    foreach (var jobId in range)
                     {
                         var jobData = storageConnection.GetJobData(jobId);
 
@@ -170,7 +170,8 @@ namespace SOS.Lib.HangfireAttributes
         /// <param name="transaction"></param>
         public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
         {
-            if (context.BackgroundJob.Job == null || context.OldStateName != ProcessingState.StateName) {
+            if (context.BackgroundJob.Job == null || context.OldStateName != ProcessingState.StateName)
+            {
                 return;
             };
 

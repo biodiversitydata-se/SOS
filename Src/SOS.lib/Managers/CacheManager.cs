@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Managers.Interfaces;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Lib.Managers
 {
@@ -27,7 +27,7 @@ namespace SOS.Lib.Managers
                 }
 
                 _logger.LogInformation($"Cache cleared ({requestUri})");
-               
+
 
                 return true;
             }
@@ -64,7 +64,7 @@ namespace SOS.Lib.Managers
                     success = success && await ClearAsync(client, requestUri);
                 }
             }
-            
+
             if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.ElasticSearchProxyAddresses?.Any() ?? false))
             {
                 foreach (var elasticSearchProxyAddress in _sosApiConfiguration.ElasticSearchProxyAddresses)

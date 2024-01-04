@@ -1,9 +1,7 @@
-﻿using System.Xml.Linq;
-using DwC_A;
+﻿using DwC_A;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -15,6 +13,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services.Interfaces;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Harvesters.DwC
 {
@@ -185,7 +184,7 @@ namespace SOS.Harvest.Harvesters.DwC
                         continue;
                     }
 
-                    if (!string.IsNullOrEmpty(dataset.EmlUrl)) 
+                    if (!string.IsNullOrEmpty(dataset.EmlUrl))
                     {
                         try
                         {
@@ -218,7 +217,7 @@ namespace SOS.Harvest.Harvesters.DwC
                             _logger.LogError(e, $"Error getting EML file for {provider.Identifier}:{dataset.Identifier}");
                         }
                     }
-                    
+
                     var path = Path.Combine(_dwcaConfiguration.ImportPath, $"dwca-{dataset.Identifier}.zip");
 
                     // Try to get DwcA file from IPT and store it locally

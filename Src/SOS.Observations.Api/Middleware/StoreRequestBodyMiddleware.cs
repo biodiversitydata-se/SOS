@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace SOS.Observations.Api.Middleware
 {
@@ -35,7 +35,7 @@ namespace SOS.Observations.Api.Middleware
                     context.Items.Add("Request-body", body);
                 }
             }
-            finally 
+            finally
             {
                 await _next(context);
             }

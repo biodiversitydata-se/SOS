@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.UserService
         public string PostalAddress2 { get; set; }
         public string ZipCode { get; set; }
         public string City { get; set; }
-        public string CountryA2 { get; set; }        
+        public string CountryA2 { get; set; }
         public string PhoneNumber { get; set; }
         public bool? ShowEmail { get; set; }
         public bool ShowAddresses { get; set; }

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Administration.Gui.Managers.Interfaces;
 using SOS.Administration.Gui.Models;
 using SOS.Lib.Models.Log;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Gui.Managers
 {
@@ -71,8 +71,8 @@ namespace SOS.Administration.Gui.Managers
         /// <param name="protectedLogRepository"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
-        public ProtectedLogManager(IProtectedLogRepository protectedLogRepository, 
-            IProcessedObservationCoreRepository processedObservationRepository, 
+        public ProtectedLogManager(IProtectedLogRepository protectedLogRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             ILogger<ProtectedLogManager> logger)
         {
             _protectedLogRepository =

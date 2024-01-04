@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Repositories.Interfaces
 {
@@ -36,7 +36,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
             SearchFilter filter,
             int? skip,
             int? take,
-            bool sumUnderlyingTaxa = false);        
+            bool sumUnderlyingTaxa = false);
 
         /// <summary>
         /// Get taxon sum aggregation. Including underlying taxa and province count.

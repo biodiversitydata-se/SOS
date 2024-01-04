@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Helpers

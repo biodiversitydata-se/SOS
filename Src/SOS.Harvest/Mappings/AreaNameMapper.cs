@@ -1,8 +1,8 @@
-﻿using System.Reflection;
-using System.Text.Json;
-using SOS.Harvest.Mappings.Interfaces;
+﻿using SOS.Harvest.Mappings.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Shared;
+using System.Reflection;
+using System.Text.Json;
 
 namespace SOS.Harvest.Mappings
 {

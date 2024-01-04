@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -74,7 +70,8 @@ namespace SOS.Harvest.Factories.Vocabularies
                 Description = "Activity"
             };
 
-            if (vocabularyValues?.Any() ?? false){
+            if (vocabularyValues?.Any() ?? false)
+            {
                 var dwcMappingSynonyms = GetDwcMappingSynonyms();
                 var dwcMappings = CreateDwcMappings(vocabularyValues, dwcMappingSynonyms);
                 mappingField.Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList();
@@ -87,7 +84,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         private Dictionary<string, string> GetDwcMappingSynonyms()
         {
             return new Dictionary<string, string>
-            {                
+            {
             };
         }
     }

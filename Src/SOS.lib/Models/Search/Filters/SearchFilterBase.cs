@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed.Observation;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Models.Search.Filters
 {
@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// </summary>
         public SearchFilterBase() : this(0)
         {
-            
+
         }
 
         /// <summary>

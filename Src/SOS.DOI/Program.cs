@@ -1,9 +1,9 @@
-using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Web;
+using System;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace SOS.DOI

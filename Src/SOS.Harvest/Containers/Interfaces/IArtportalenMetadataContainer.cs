@@ -10,7 +10,7 @@ namespace SOS.Harvest.Containers.Interfaces
     public interface IArtportalenMetadataContainer
     {
         bool IsInitialized { get; }
-      
+
         /// <summary>
         ///  Initialize static meta data 
         /// </summary>

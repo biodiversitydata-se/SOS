@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.DataStewardship.Enums;
+﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
+using SOS.Lib.Models.Processed.DataStewardship.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
 {
     public class DwcVerbatimDataset : IEntity<int>
-    {        
+    {
         /// <summary>
         ///     MongoDb Id. // todo - should we use Id, RecordId or occurrenceID as Id field?
         /// </summary>

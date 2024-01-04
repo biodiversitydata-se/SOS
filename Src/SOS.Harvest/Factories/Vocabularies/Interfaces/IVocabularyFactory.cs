@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace SOS.Harvest.Factories.Vocabularies.Interfaces
+﻿namespace SOS.Harvest.Factories.Vocabularies.Interfaces
 {
     /// <summary>
     ///     Interface for creating vocabulary.

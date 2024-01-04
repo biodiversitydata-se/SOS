@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Unicode;
-using System.Threading.Tasks;
-using Hangfire;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
+﻿using Hangfire;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -22,6 +12,14 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.GeoJson
 {
@@ -43,7 +41,7 @@ namespace SOS.Lib.IO.GeoJson
         public GeoJsonFileWriter(IProcessedObservationCoreRepository processedObservationRepository,
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
-            ILogger<GeoJsonFileWriter> logger) 
+            ILogger<GeoJsonFileWriter> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
                                                     throw new ArgumentNullException(
@@ -71,10 +69,10 @@ namespace SOS.Lib.IO.GeoJson
             try
             {
                 var nrObservations = 0;
-                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);                
+                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var propertyFields =
-                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, true);
-                EnsureCoordinatesAreRetrievedFromDb(filter.Output);                
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
+                EnsureCoordinatesAreRetrievedFromDb(filter.Output);
                 JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
@@ -95,7 +93,7 @@ namespace SOS.Lib.IO.GeoJson
                 jsonWriter.WriteString("crs", "EPSG:4326");
                 jsonWriter.WritePropertyName("features");
                 jsonWriter.WriteStartArray();
-               
+
                 var searchAfterResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);
 
                 while (searchAfterResult?.Records?.Any() ?? false)
@@ -133,7 +131,7 @@ namespace SOS.Lib.IO.GeoJson
                     // Get next batch of observations.
                     searchAfterResult = await searchAfterResultTask;
                 }
-                
+
                 jsonWriter.WriteEndArray();
                 jsonWriter.WriteEndObject();
                 await jsonWriter.FlushAsync();
@@ -157,7 +155,7 @@ namespace SOS.Lib.IO.GeoJson
                     };
                 }
                 else
-                {                                        
+                {
                     var destinationFilePath = Path.Combine(exportPath, $"{fileName}.geojson");
                     File.Move(observationsFilePath, destinationFilePath);
                     return new FileExportResult
@@ -165,7 +163,7 @@ namespace SOS.Lib.IO.GeoJson
                         FilePath = destinationFilePath,
                         NrObservations = nrObservations
                     };
-                }                
+                }
             }
             catch (Exception e)
             {
@@ -255,7 +253,7 @@ namespace SOS.Lib.IO.GeoJson
         }
 
         private async Task WriteFeature(
-            IDictionary<string, object> record, 
+            IDictionary<string, object> record,
             ICollection<string> outputFields,
             Utf8JsonWriter utf8JsonWriter,
             JsonSerializerOptions jsonSerializerOptions)
@@ -274,7 +272,7 @@ namespace SOS.Lib.IO.GeoJson
 
         private async Task WriteFeature(
             Geometry geometry,
-            AttributesTable attributesTable, 
+            AttributesTable attributesTable,
             string id,
             Utf8JsonWriter jsonWriter,
             JsonSerializerOptions jsonSerializerOptions)
@@ -390,7 +388,7 @@ namespace SOS.Lib.IO.GeoJson
 
             return occurrenceId;
         }
-        
+
         private Geometry GetFeatureGeometry(Observation observation)
         {
             double? decimalLatitude = observation?.Location?.DecimalLatitude;

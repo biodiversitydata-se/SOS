@@ -1,5 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.VirtualHerbarium.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -9,15 +11,13 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.VirtualHerbarium.Interfaces;
 
 namespace SOS.Harvest.Processors.VirtualHerbarium
 {
     /// <summary>
     ///     Process factory class
     /// </summary>
-    public class VirtualHerbariumObservationProcessor : 
+    public class VirtualHerbariumObservationProcessor :
         ObservationProcessorBase<VirtualHerbariumObservationProcessor, VirtualHerbariumObservationVerbatim, IVirtualHerbariumObservationVerbatimRepository>,
         IVirtualHerbariumObservationProcessor
     {
@@ -27,7 +27,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         /// <inheritdoc />
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {

@@ -1,11 +1,11 @@
-﻿using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Harvest.Harvesters.AquaSupport.Sers;
 using SOS.Harvest.Services;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.Services

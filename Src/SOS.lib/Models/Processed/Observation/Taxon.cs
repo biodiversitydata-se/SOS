@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -51,7 +51,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Name used for display
         /// </summary>
         public string DisplayName { get; set; }
-        
+
         /// <summary>
         ///     The full scientific name of the family in which
         ///     the taxon is classified.

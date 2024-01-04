@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
@@ -10,10 +12,8 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
+using System.Text.RegularExpressions;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
-using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -25,7 +25,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
-       
+
         private string _englishDataproviderName;
 
         /// <summary>
@@ -169,9 +169,9 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             // Populate generic data
             PopulateGenericData(obs);
 
-            obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, obs.Taxon);            
+            obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, obs.Taxon);
             return obs;
-        }        
+        }
 
         private static void AddVerbatimObservationAsJson(Observation obs,
             DwcObservationVerbatim verbatim)
@@ -186,7 +186,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         }
 
         private ICollection<Multimedia>? CreateProcessedMultimedia(
-            ICollection<DwcMultimedia> verbatimMultimedia, 
+            ICollection<DwcMultimedia> verbatimMultimedia,
             ICollection<DwcAudubonMedia> verbatimAudubonMedia)
         {
             if (verbatimMultimedia.HasItems())
@@ -328,13 +328,13 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
         private Location CreateProcessedLocation(DwcObservationVerbatim verbatim)
         {
-           
-           
+
+
             var processedLocation = new Location(LocationType.Point);
             processedLocation.Continent = GetSosId(
                 verbatim.Continent,
                 _vocabularyById[VocabularyId.Continent],
-                (int) ContinentId.Europe,
+                (int)ContinentId.Europe,
                 MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CoordinatePrecision = verbatim.CoordinatePrecision.ParseDouble();
             processedLocation.CoordinateUncertaintyInMeters =
@@ -342,7 +342,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedLocation.Country = GetSosId(
                 verbatim.Country,
                 _vocabularyById[VocabularyId.Country],
-                (int) CountryId.Sweden,
+                (int)CountryId.Sweden,
                 MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CountryCode = verbatim.CountryCode;
             processedLocation.FootprintSpatialFit = verbatim.FootprintSpatialFit;
@@ -378,14 +378,14 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedLocation.VerbatimElevation = verbatim.VerbatimElevation;
             processedLocation.VerbatimLocality = processedLocation.Locality;
             processedLocation.WaterBody = verbatim.WaterBody;
-            
+
             return processedLocation;
         }
 
 
         private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatim, Lib.Models.Processed.Observation.Taxon? taxon, AccessRightsId? accessRightsId)
         {
-            var processedOccurrence = new Occurrence();            
+            var processedOccurrence = new Occurrence();
             processedOccurrence.AssociatedMedia = verbatim.AssociatedMedia;
             processedOccurrence.AssociatedReferences = verbatim.AssociatedReferences;
             processedOccurrence.AssociatedSequences = verbatim.AssociatedSequences;
@@ -425,15 +425,15 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedOccurrence.IsNaturalOccurrence = true;
             processedOccurrence.IsNeverFoundObservation = false;
             processedOccurrence.IsNotRediscoveredObservation = false;
-            processedOccurrence.IsPositiveObservation = true; 
-            if (processedOccurrence.OccurrenceStatus?.Id == (int) OccurrenceStatusId.Absent)
+            processedOccurrence.IsPositiveObservation = true;
+            if (processedOccurrence.OccurrenceStatus?.Id == (int)OccurrenceStatusId.Absent)
             {
                 processedOccurrence.IsPositiveObservation = false;
                 processedOccurrence.IsNeverFoundObservation = true;
             }
 
             //processedOccurrence.ProtectionLevel = CalculateProtectionLevel(taxon, accessRightsId);
-            processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);            
+            processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);
             return processedOccurrence;
         }
 
@@ -452,15 +452,15 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                         parsedTaxonId = -1;
                     }
                 }
-                
+
                 if (verbatim.TaxonID.StartsWith("urn:lsid:dyntaxa"))
                 {
                     string lastInteger = Regex.Match(verbatim.TaxonID, @"\d+", RegexOptions.RightToLeft).Value;
-                    if(!int.TryParse(lastInteger, out parsedTaxonId))
+                    if (!int.TryParse(lastInteger, out parsedTaxonId))
                     {
                         parsedTaxonId = -1;
                     }
-                }                
+                }
             }
 
             return GetTaxon(parsedTaxonId, new[]
@@ -477,22 +477,22 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {
             if (string.IsNullOrWhiteSpace(val) || sosIdByValue == null)
             {
-                return defaultValue.HasValue ? new VocabularyValue {Id = defaultValue.Value} : null;
+                return defaultValue.HasValue ? new VocabularyValue { Id = defaultValue.Value } : null;
             }
 
             var lookupVal = val.ToLower();
             if (sosIdByValue.TryGetValue(lookupVal, out var sosId))
             {
-                return new VocabularyValue {Id = sosId};
+                return new VocabularyValue { Id = sosId };
             }
 
             if (mappingNotFoundLogic == MappingNotFoundLogic.UseDefaultValue && defaultValue.HasValue)
             {
-                return new VocabularyValue {Id = defaultValue.Value};
+                return new VocabularyValue { Id = defaultValue.Value };
             }
 
             return new VocabularyValue
-                {Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
+            { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val };
         }
 
         /// <summary>

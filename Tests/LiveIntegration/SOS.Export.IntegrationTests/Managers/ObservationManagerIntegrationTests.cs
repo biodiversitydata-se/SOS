@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -12,7 +10,6 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
-using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
@@ -23,8 +20,10 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
+using SOS.Lib.Services.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
-using SOS.Export.LiveIntegrationTests;
 
 namespace SOS.Export.LiveIntegrationTests.Managers
 {

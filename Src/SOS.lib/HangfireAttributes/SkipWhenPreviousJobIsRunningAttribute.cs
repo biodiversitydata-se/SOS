@@ -14,7 +14,7 @@ namespace SOS.Lib.HangfireAttributes
             var connection = context.Connection as JobStorageConnection;
 
             // We can't handle old storages
-            if (connection == null) 
+            if (connection == null)
             {
                 return;
             };

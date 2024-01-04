@@ -1,13 +1,12 @@
-﻿using SOS.Lib.JsonConverters;
-using System.Text.Json.Serialization;
+﻿using FluentAssertions;
+using Nest;
+using SOS.Lib.JsonConverters;
 using System.Text.Json;
 using Xunit;
-using Nest;
-using FluentAssertions;
 
 namespace SOS.Lib.UnitTests.JsonConverters
 {
-    public  class GeoShapeConverterTests
+    public class GeoShapeConverterTests
     {
         [Fact]
         public void DeserializeJsonString_CanParsePointGeoShape_GivenValidInput()
@@ -15,12 +14,13 @@ namespace SOS.Lib.UnitTests.JsonConverters
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var jsonSerializerOptions = new JsonSerializerOptions {                
-                Converters = {                    
-                    new GeoShapeConverter()                    
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                Converters = {
+                    new GeoShapeConverter()
                 }
             };
-            
+
             var strJson = """
                          {"type":"point","coordinates":[13.44774, 55.97684]}
                          """;

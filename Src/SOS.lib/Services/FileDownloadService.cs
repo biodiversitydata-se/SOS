@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.Services
 {
@@ -14,28 +14,28 @@ namespace SOS.Lib.Services
         private readonly IHttpClientService _httpClientService;
         private readonly ILogger<FileDownloadService> _logger;
 
-       /// <summary>
-       /// Download file
-       /// </summary>
-       /// <param name="url"></param>
-       /// <param name="acceptHeaderContentType"></param>
-       /// <returns></returns>
+        /// <summary>
+        /// Download file
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="acceptHeaderContentType"></param>
+        /// <returns></returns>
         private async Task<Stream> GetFileStreamAsync(string url, string acceptHeaderContentType)
         {
             try
             {
-               return await _httpClientService.GetFileStreamAsync(
-                    new Uri(url),
-                    new Dictionary<string, string>(new[]
-                        {
+                return await _httpClientService.GetFileStreamAsync(
+                     new Uri(url),
+                     new Dictionary<string, string>(new[]
+                         {
                             new KeyValuePair<string, string>("Accept", acceptHeaderContentType),
-                        }
-                    )
-                );
+                         }
+                     )
+                 );
             }
             catch (Exception e)
             {
-                _logger.LogError($"Failed to get file: { url }", e);
+                _logger.LogError($"Failed to get file: {url}", e);
                 return null;
             }
         }
@@ -65,7 +65,7 @@ namespace SOS.Lib.Services
                 {
                     throw new NullReferenceException(nameof(xmlStream));
                 }
-                
+
                 xmlStream.Seek(0, SeekOrigin.Begin);
 
                 var xDocument = await XDocument.LoadAsync(xmlStream, LoadOptions.None, CancellationToken.None);
@@ -101,7 +101,7 @@ namespace SOS.Lib.Services
                 dwcAStream.CopyTo(fileStream);
                 dwcAStream.Close();
                 fileStream.Close();
-                
+
                 return true;
             }
             catch

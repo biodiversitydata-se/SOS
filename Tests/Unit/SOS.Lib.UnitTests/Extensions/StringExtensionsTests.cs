@@ -15,7 +15,7 @@ namespace SOS.Lib.UnitTests.Extensions
             "".HasValue().Should().BeFalse();
             "   ".HasValue().Should().BeFalse();
             "a".HasValue().Should().BeTrue();
-            ((string) null).HasValue().Should().BeFalse();
+            ((string)null).HasValue().Should().BeFalse();
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace SOS.Lib.UnitTests.Extensions
             "  3,141592  ".TryParseDouble(out var result3).Should().BeTrue();
             "coffee".TryParseDouble(out var result4).Should().BeFalse();
             "".TryParseDouble(out var result5).Should().BeFalse();
-            ((string) null).TryParseDouble(out var result6).Should().BeFalse();
+            ((string)null).TryParseDouble(out var result6).Should().BeFalse();
         }
     }
 }

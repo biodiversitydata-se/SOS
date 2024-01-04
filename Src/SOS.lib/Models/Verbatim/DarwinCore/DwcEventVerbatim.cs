@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Models.Interfaces;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Verbatim.DarwinCore
 {

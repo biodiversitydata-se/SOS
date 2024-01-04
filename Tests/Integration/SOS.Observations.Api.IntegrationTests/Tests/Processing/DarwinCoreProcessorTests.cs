@@ -1,9 +1,9 @@
 ﻿using FizzWare.NBuilder;
 using LinqStatistics;
-using System.ComponentModel;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
+using System.ComponentModel;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.Processing;
 

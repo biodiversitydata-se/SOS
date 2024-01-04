@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Nest;
+﻿using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {

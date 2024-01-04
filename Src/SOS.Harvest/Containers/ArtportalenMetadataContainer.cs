@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Text.RegularExpressions;
-using DnsClient.Internal;
+﻿using DnsClient.Internal;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Containers.Interfaces;
 using SOS.Harvest.Entities.Artportalen;
@@ -8,6 +6,8 @@ using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 
 namespace SOS.Harvest.Containers
 {
@@ -37,12 +37,12 @@ namespace SOS.Harvest.Containers
         private ConcurrentDictionary<int, Metadata<int>>? _validationStatus;
 
         #region Diary Entries
-        private async Task PopulateWeatherAsync() 
+        private async Task PopulateWeatherAsync()
         {
             _diaryEntries = new ConcurrentDictionary<(DateTime, int, int), ICollection<DiaryEntry>>();
             var diaryEntries = await _diaryEntryRepository.GetAsync();
 
-            foreach(var diaryEntry in diaryEntries)
+            foreach (var diaryEntry in diaryEntries)
             {
                 if (!_diaryEntries.TryGetValue((diaryEntry.IssueDate, diaryEntry.ProjectId, diaryEntry.UserId), out var dateDiaryEntries))
                 {
@@ -116,7 +116,7 @@ namespace SOS.Harvest.Containers
             var metadataItems = new Dictionary<T, MetadataWithCategory<T>>();
             foreach (var entity in entities!)
             {
-                
+
                 if (!metadataItems.ContainsKey(entity.Id))
                 {
                     metadataItems.Add(entity.Id, new MetadataWithCategory<T>(entity.Id, entity.CategoryId));
@@ -353,7 +353,7 @@ namespace SOS.Harvest.Containers
                 _personRepository.Live = value;
                 _projectRepository.Live = value;
                 _diaryEntryRepository.Live = value;
-                _projectRepository.Live = value;                
+                _projectRepository.Live = value;
             }
         }
 
@@ -570,7 +570,7 @@ namespace SOS.Harvest.Containers
             }
 
             var regexSpaces = new Regex("\\s+");
-            source = regexSpaces.Replace(source," ").Trim();
+            source = regexSpaces.Replace(source, " ").Trim();
             return source!;
         }
 

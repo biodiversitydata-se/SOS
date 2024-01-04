@@ -1,26 +1,26 @@
-﻿using Hangfire;
+﻿using Elasticsearch.Net;
+using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.IO.DwcArchive.Interfaces;
+using SOS.Lib.Jobs.Export;
+using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System.Data;
-using SOS.Lib.Jobs.Import;
-using SOS.Harvest.Managers;
-using SOS.Lib.Jobs.Export;
-using Elasticsearch.Net;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Processed;
-using SOS.Harvest.Processors.Interfaces;
 
 namespace SOS.Harvest.Jobs
 {
@@ -247,7 +247,7 @@ namespace SOS.Harvest.Jobs
                     if (providerActive.ProtectedProcessCount > 0 && providerInactive.ProtectedProcessCount <= percentLimit * providerActive.ProtectedProcessCount)
                     {
                         _logger.LogError($"Validation failed. Protected observation count for {providerInactive.DataProviderIdentifier} is less than {_processConfiguration.MinPercentObservationCount}% of last run. Count this time={providerInactive.ProtectedProcessCount}. Count previous time={providerActive.ProtectedProcessCount}.");
-                       return false;
+                        return false;
                     }
                 }
             }
@@ -402,7 +402,7 @@ namespace SOS.Harvest.Jobs
                         throw new Exception("Failed to harvest incremetal inactive instance");
                     }
                 } // We only need to delete duplicates if incremental not should run (Incremental take care of it in that case)
-                else if(!await _processedObservationRepository.EnsureNoDuplicatesAsync())
+                else if (!await _processedObservationRepository.EnsureNoDuplicatesAsync())
                 {
                     _logger.LogError($"Failed to delete duplicates");
                 }
@@ -586,7 +586,7 @@ namespace SOS.Harvest.Jobs
             IArtportalenEventProcessor artportalenEventProcessor,
             IDwcaEventProcessor dwcaEventProcessor,
             IObservationsHarvestJobIncremental observationsIncrementalHarvestJob,
-            ILogger<ProcessObservationsJobFull> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, observationProcessorManager, 
+            ILogger<ProcessObservationsJobFull> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, observationProcessorManager,
                 taxonCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
             logger)
         {

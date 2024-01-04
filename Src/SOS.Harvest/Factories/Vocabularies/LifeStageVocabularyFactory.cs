@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -38,7 +34,7 @@ namespace SOS.Harvest.Factories.Vocabularies
         {
             var stages = await _metadataRepository.GetStagesAsync();
             var vocabularyValues = base.ConvertToLocalizedVocabularyValues(stages.ToArray()) ?? new List<VocabularyValueInfo>();
-            
+
             int id = vocabularyValues!.Max(f => f.Id);
             vocabularyValues.Add(CreateVocabularyValue(++id, "Nauplius larva", "Nauplius larv"));
             vocabularyValues.Add(CreateVocabularyValue(++id, "Copepodite", "Copepodit"));

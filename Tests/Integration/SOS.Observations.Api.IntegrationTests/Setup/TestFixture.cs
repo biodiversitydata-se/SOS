@@ -15,7 +15,7 @@ namespace SOS.Observations.Api.IntegrationTests.Setup;
 public class TestFixture : IAsyncLifetime
 {
     private DbHostingMode _processFixtureDbMode = DbHostingMode.ContainerDb;
-    
+
     // Change this to LiveDb when creating test data.
     private DbHostingMode _harvestFixtureDbMode = DbHostingMode.ContainerDb;
 
@@ -61,11 +61,11 @@ public class TestFixture : IAsyncLifetime
     }
 
     public async Task InitializeAsync()
-    {        
+    {
         if (_processFixtureDbMode == DbHostingMode.ContainerDb)
         {
-            await TestContainerFixture.InitializeAsync();            
-        }        
+            await TestContainerFixture.InitializeAsync();
+        }
 
         var services = GetServiceCollections();
         ServiceProvider = ServiceProviderExtensions.RegisterServices(services);
@@ -74,14 +74,14 @@ public class TestFixture : IAsyncLifetime
         ProcessFixture = scope.ServiceProvider.GetService<IProcessFixture>()!;
         await ProcessFixture.InitializeElasticsearchIndices();
         HarvestFixture = scope.ServiceProvider.GetService<IHarvestFixture>()!;
-    }   
+    }
 
     private ServiceCollection[] GetServiceCollections()
     {
         var collections = new List<ServiceCollection>();
         if (_processFixtureDbMode == DbHostingMode.ContainerDb)
         {
-            collections.Add(ContainerDbFixtures.ProcessFixture.GetServiceCollection());            
+            collections.Add(ContainerDbFixtures.ProcessFixture.GetServiceCollection());
         }
         else
         {

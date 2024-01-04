@@ -1,11 +1,11 @@
-﻿using System.Collections.Concurrent;
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using System.Collections.Concurrent;
 
 namespace SOS.Harvest.Harvesters.Artportalen
 {
@@ -38,7 +38,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             {
                 _cachedSites.Clear();
             }
-            
+
             _disposed = true;
         }
 
@@ -64,7 +64,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             var skip = 0;
             var siteIdBatch = siteIds!.Take(SITE_BATCH_SIZE);
-           
+
             while (siteIdBatch.Any())
             {
                 await _semaphore.WaitAsync();
@@ -72,8 +72,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 if (siteBatch?.Any() ?? false)
                 {
-                    foreach(var site in siteBatch)
-                {
+                    foreach (var site in siteBatch)
+                    {
                         _cachedSites.TryAdd(site.Id, site);
                     }
                 }
@@ -240,7 +240,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 {
                     sites.AddRange(siteBatch);
                 }
-               
+
                 skip += SITE_BATCH_SIZE;
                 siteIdBatch = siteIds!.Skip(skip).Take(SITE_BATCH_SIZE);
             }
@@ -285,7 +285,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         protected async Task<IDictionary<int, Site>> GetBatchSitesAsync(IEnumerable<int>? siteIds)
         {
             var sites = new Dictionary<int, Site>();
-            
+
             if (!siteIds?.Any() ?? true)
             {
                 return sites;
@@ -328,7 +328,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <returns></returns>
         protected bool IsSiteLoaded(int siteId) => _cachedSites.ContainsKey(siteId);
 
-        protected Site? TryGetSite(int siteId) {
+        protected Site? TryGetSite(int siteId)
+        {
             _cachedSites.TryGetValue(siteId, out var site);
 
             return site;

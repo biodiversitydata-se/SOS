@@ -1,20 +1,20 @@
-﻿using System.ComponentModel;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Jobs.Process;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Lib.Managers.Interfaces;
+using System.ComponentModel;
 
 namespace SOS.Harvest.Jobs
 {

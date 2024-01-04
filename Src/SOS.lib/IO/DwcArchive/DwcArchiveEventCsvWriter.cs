@@ -1,24 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -250,7 +250,8 @@ namespace SOS.Lib.IO.DwcArchive
         {
             try
             {
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
                     using var csvFileHelper = new CsvFileHelper();
                     csvFileHelper.InitializeWrite(streamWriter, "\t");
@@ -262,7 +263,7 @@ namespace SOS.Lib.IO.DwcArchive
                     }
                     csvFileHelper.FinishWrite();
                 });
-                
+
             }
             catch (Exception e)
             {

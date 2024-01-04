@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using SOS.Lib.Models.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
@@ -9,7 +9,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     ///     Processed data class
     /// </summary>
     public interface IMongoDbProcessedRepositoryBase<TEntity, in TKey> where TEntity : IEntity<TKey>
-    {        
+    {
         /// <summary>
         ///     Add one item
         /// </summary>

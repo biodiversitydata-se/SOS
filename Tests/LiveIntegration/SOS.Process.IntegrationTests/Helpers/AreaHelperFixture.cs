@@ -1,11 +1,10 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Resource;
-using SOS.Process.LiveIntegrationTests;
+using System;
 
 namespace SOS.Process.LiveIntegrationTests.Helpers
 {

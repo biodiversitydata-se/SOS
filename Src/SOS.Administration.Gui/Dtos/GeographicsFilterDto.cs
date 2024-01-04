@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Nest;
+﻿using Nest;
+using System.Collections.Generic;
 
 namespace SOS.Administration.Gui.Dtos
 {

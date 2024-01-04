@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SOS.Lib.JsonConverters;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using SOS.Lib.JsonConverters;
 
 namespace SOS.Observations.Api.Dtos.Filter
 {
@@ -28,7 +28,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         /// Only EndDate of the observation must be within the specified interval
         /// </summary>
-        OnlyEndDate       
+        OnlyEndDate
     }
 
     public enum TimeRangeDto

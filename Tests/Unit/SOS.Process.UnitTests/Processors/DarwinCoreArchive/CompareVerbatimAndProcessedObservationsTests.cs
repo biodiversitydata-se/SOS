@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Newtonsoft.Json;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Helpers;
@@ -7,6 +6,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.Process.UnitTests.TestHelpers.Factories;
 using SOS.TestHelpers.Helpers.Builders;
+using System.Collections.Generic;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
@@ -35,7 +35,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             var vocabularyRepositoryStub = VocabularyRepositoryStubFactory.Create();
             var vocabularyValueResolver = new VocabularyValueResolver(vocabularyRepositoryStub.Object,
-                new VocabularyConfiguration {LocalizationCultureCode = "sv-SE", ResolveValues = true});
+                new VocabularyConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
                 .WithDefaultValues()
@@ -46,7 +46,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var processedObservation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
-            vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation> {processedObservation});
+            vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation> { processedObservation });
             var compareResult = new CompareObservation
             {
                 VerbatimObservation = dwcaObservation,

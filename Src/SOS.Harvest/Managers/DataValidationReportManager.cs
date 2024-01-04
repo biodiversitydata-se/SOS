@@ -18,7 +18,7 @@ namespace SOS.Harvest.Managers
             MvmDataValidationReportFactory mvmDataValidationReportFactory,
             KulDataValidationReportFactory kulDataValidationReportFactory,
             SersDataValidationReportFactory sersDataValidationReportFactory,
-            NorsDataValidationReportFactory norsDataValidationReportFactory, 
+            NorsDataValidationReportFactory norsDataValidationReportFactory,
             VirtualHerbariumValidationReportFactory virtualHerbariumDataValidationReportFactory)
         {
             if (fishDataValidationReportFactory == null) throw new ArgumentNullException(nameof(fishDataValidationReportFactory));
@@ -43,9 +43,9 @@ namespace SOS.Harvest.Managers
         }
 
         public async Task<DataValidationReport<object, Observation>> CreateDataValidationReport(
-            DataProvider dataProvider, 
+            DataProvider dataProvider,
             int maxNrObservationsToRead = 100000,
-            int nrValidObservationsInReport = 10, 
+            int nrValidObservationsInReport = 10,
             int nrInvalidObservationsInReport = 100)
         {
             _reportCreatorByType.TryGetValue(dataProvider.Type, out var reportCreator);

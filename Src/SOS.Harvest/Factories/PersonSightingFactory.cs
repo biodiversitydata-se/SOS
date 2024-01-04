@@ -1,9 +1,9 @@
-﻿using System.Text;
-using SOS.Harvest.Entities.Artportalen;
+﻿using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Extensions;
 using SOS.Harvest.Repositories.Source.Artportalen.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using System.Text;
 
 namespace SOS.Harvest.Factories
 {
@@ -39,7 +39,7 @@ namespace SOS.Harvest.Factories
                         personSightingBySightingId.Add(pair.Key, new PersonSighting { SpeciesCollection = pair.Value });
                     }
                 }
-                
+
                 //------------------------------------------------------------------------------
                 // Add VerifiedBy values
                 //------------------------------------------------------------------------------
@@ -60,8 +60,8 @@ namespace SOS.Harvest.Factories
                         if (pair.Value.confirmator != null)
                         {
                             users.Add(pair.Value.confirmator);
-                        } 
-                         
+                        }
+
                         if (!personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
                         {
                             personSighting = new PersonSighting();
@@ -73,7 +73,7 @@ namespace SOS.Harvest.Factories
                     }
                 }
             }
-            
+
             //------------------------------------------------------------------------------
             // Add Observers values
             //------------------------------------------------------------------------------
@@ -128,7 +128,7 @@ namespace SOS.Harvest.Factories
             {
                 if (string.IsNullOrEmpty(pair.Value.Observers) && !string.IsNullOrEmpty(pair.Value.ReportedBy))
                 {
-                    pair.Value.Observers = "Via " + pair.Value.ReportedBy;                    
+                    pair.Value.Observers = "Via " + pair.Value.ReportedBy;
                 }
             }
 
@@ -196,7 +196,7 @@ namespace SOS.Harvest.Factories
             }
 
             var query = sightingRelations!
-                .Where(y => y.SightingRelationTypeId == (int) SightingRelationTypeId.Observer && y.IsPublic)
+                .Where(y => y.SightingRelationTypeId == (int)SightingRelationTypeId.Observer && y.IsPublic)
                 .GroupBy(y => y.SightingId);
             foreach (var grouping in query)
             {
@@ -231,7 +231,7 @@ namespace SOS.Harvest.Factories
             }
 
             var query = sightingRelations!
-                .Where(y => y.SightingRelationTypeId == (int) SightingRelationTypeId.Reporter && y.IsPublic);
+                .Where(y => y.SightingRelationTypeId == (int)SightingRelationTypeId.Reporter && y.IsPublic);
             foreach (var sightingRelation in query)
             {
                 if (personsByUserId!.TryGetValue(sightingRelation.UserId, out var person))
@@ -276,7 +276,7 @@ namespace SOS.Harvest.Factories
             }
 
             var determinerQuery = sightingRelations!.Where(x =>
-                x.SightingRelationTypeId == (int) SightingRelationTypeId.Determiner
+                x.SightingRelationTypeId == (int)SightingRelationTypeId.Determiner
                 && x.IsPublic
                 && x.Sort == 0);
 
@@ -298,8 +298,9 @@ namespace SOS.Harvest.Factories
                     if (personsByUserId.TryGetValue(determinerRelation.UserId, out var person))
                     {
                         vbd.DeterminerName = person.FullName;
-                        vbd.DeterminerInternal = new UserInternal { 
-                            Id = person.UserId, 
+                        vbd.DeterminerInternal = new UserInternal
+                        {
+                            Id = person.UserId,
                             PersonId = person.Id,
                             UserAlias = person.Alias,
                             UserServiceUserId = person.UserServiceUserId
@@ -309,7 +310,7 @@ namespace SOS.Harvest.Factories
             }
 
             var confirmatorQuery = sightingRelations!.Where(x =>
-                x.SightingRelationTypeId == (int) SightingRelationTypeId.Confirmator
+                x.SightingRelationTypeId == (int)SightingRelationTypeId.Confirmator
                 && x.IsPublic
                 && x.Sort == 0);
 
@@ -328,9 +329,10 @@ namespace SOS.Harvest.Factories
                 if (personsByUserId?.TryGetValue(confirmatorRelation.UserId, out var person) ?? false)
                 {
                     vbd.ConfirmatorName = person.FullName;
-                    vbd.ConfirmatorInternal = new UserInternal {
-                        Id = person.UserId, 
-                        PersonId = person.Id, 
+                    vbd.ConfirmatorInternal = new UserInternal
+                    {
+                        Id = person.UserId,
+                        PersonId = person.Id,
                         UserAlias = person.Alias,
                         UserServiceUserId = person.UserServiceUserId
                     };

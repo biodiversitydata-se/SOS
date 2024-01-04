@@ -1,10 +1,5 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Xml;
-using System.Xml.Linq;
-using DwC_A;
+﻿using DwC_A;
 using DwC_A.Terms;
-using Microsoft.Extensions.Logging;
 using RecordParser.Builders.Reader;
 using SOS.Harvest.DarwinCore.Factories;
 using SOS.Harvest.DarwinCore.Interfaces;
@@ -13,8 +8,11 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.DataStewardship.Enums;
-
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.DarwinCore
 {
@@ -327,7 +325,7 @@ namespace SOS.Harvest.DarwinCore
                 return;
             }
 
-            var archiveReader  = archiveReaderContext.ArchiveReader;
+            var archiveReader = archiveReaderContext.ArchiveReader;
             var eventDictionary = eventRecords?.ToDictionary(e => e.RecordId, e => e);
 
             if (eventDictionary == null)
@@ -417,7 +415,7 @@ namespace SOS.Harvest.DarwinCore
                         taxonList = new HashSet<DwcTaxon>();
                         taxonLists.Add(listId, taxonList);
                     }
-                        
+
                     var taxonId = taxonElement.Elements()
                         .Single(x => x.Name.LocalName.Equals($"{ns}taxonId", StringComparison.OrdinalIgnoreCase)).Value;
                     var scientificName = taxonElement.Elements()
@@ -426,7 +424,7 @@ namespace SOS.Harvest.DarwinCore
                         .Single(x => x.Name.LocalName.Equals($"{ns}taxonRank", StringComparison.OrdinalIgnoreCase)).Value;
                     var kingdom = taxonElement.Elements()
                         .Single(x => x.Name.LocalName.Equals($"{ns}kingdom", StringComparison.OrdinalIgnoreCase)).Value;
-                        
+
                     taxonList.Add(new DwcTaxon
                     {
                         TaxonID = taxonId,
@@ -763,7 +761,7 @@ namespace SOS.Harvest.DarwinCore
             csvHelper.NextRecord();
             foreach (var eve in events)
             {
-                var notFoundTaxa = eve.Taxa?.Where(t => !(eve.Observations?.Any(o => t.TaxonID.Equals(o.TaxonID)) ?? false)).ToList();                
+                var notFoundTaxa = eve.Taxa?.Where(t => !(eve.Observations?.Any(o => t.TaxonID.Equals(o.TaxonID)) ?? false)).ToList();
                 if (notFoundTaxa == null)
                 {
                     continue;
@@ -840,14 +838,14 @@ namespace SOS.Harvest.DarwinCore
             await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
             AddDatasetInformation(occurrenceRecords, observationDatasetByEventId, observationDatasets!.FirstOrDefault()!);
             yield return occurrenceRecords;
-        }        
+        }
 
-        private void AddDatasetInformation(List<DwcObservationVerbatim> occurrenceRecords, 
-            Dictionary<string, DwcVerbatimDataset>? observationDatasetByEventId, 
+        private void AddDatasetInformation(List<DwcObservationVerbatim> occurrenceRecords,
+            Dictionary<string, DwcVerbatimDataset>? observationDatasetByEventId,
             DwcVerbatimDataset? defaultDataset)
         {
             if (observationDatasetByEventId == null && defaultDataset == null) return;
-            
+
             foreach (var occurrenceRecord in occurrenceRecords)
             {
                 if (string.IsNullOrEmpty(occurrenceRecord.EventID)) continue;
@@ -918,7 +916,7 @@ namespace SOS.Harvest.DarwinCore
             {
                 return null;
             }
-            
+
             var idIndex = eventFileReader.GetIdIndex();
             var events = new List<DwcEventOccurrenceVerbatim>();
 
@@ -955,9 +953,9 @@ namespace SOS.Harvest.DarwinCore
             {
                 return;
             }
-           
+
             if (!archiveReaderContext!.OccurrenceIdsByEventId!.ContainsKey(occurrence.EventID))
-            {                
+            {
                 archiveReaderContext.OccurrenceIdsByEventId.Add(occurrence.EventID, new List<string>());
             }
 
@@ -977,7 +975,7 @@ namespace SOS.Harvest.DarwinCore
             var idIndex = occurrenceFileReader.GetIdIndex();
             if (archiveReaderContext.OccurrenceIdsByEventId == null) archiveReaderContext.OccurrenceIdsByEventId = new Dictionary<string, List<string>>();
             if (archiveReaderContext.DatasetByEventId == null) await ReadDatasetsAsync(archiveReaderContext);
-            
+
             await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
             {
                 var occurrenceRecord = DwcObservationVerbatimFactory.Create(NextId, row, archiveReaderContext.DataProvider, idIndex);
@@ -1030,8 +1028,8 @@ namespace SOS.Harvest.DarwinCore
             await AddDataFromExtensionsAsync(archiveReaderContext, events);
             AddDatasetInformation(events, archiveReaderContext!.DatasetByEventId, archiveReaderContext.Datasets?.FirstOrDefault()!);
             foreach (var eve in events)
-            {                
-                eve.NotFoundTaxa = GetNotFoundTaxa(eve.Taxa, eve.Observations);                
+            {
+                eve.NotFoundTaxa = GetNotFoundTaxa(eve.Taxa, eve.Observations);
                 eve.NotFoundTaxonIds = eve?.NotFoundTaxa?.Select(m => m.TaxonID).ToList();
             }
 
@@ -1041,7 +1039,7 @@ namespace SOS.Harvest.DarwinCore
             //}
 
             return events;
-        }      
+        }
 
         private List<DwcTaxon>? GetNotFoundTaxa(ICollection<DwcTaxon> taxaList, ICollection<DwcObservationVerbatim> observations)
         {
@@ -1063,8 +1061,8 @@ namespace SOS.Harvest.DarwinCore
 
         private bool IsTaxonMatch(DwcTaxon taxon, DwcObservationVerbatim observation)
         {
-            if (!string.IsNullOrEmpty(observation.TaxonID) 
-             && observation.TaxonID.Equals(taxon.TaxonID,StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(observation.TaxonID)
+             && observation.TaxonID.Equals(taxon.TaxonID, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }

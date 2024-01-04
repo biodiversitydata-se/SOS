@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Models.DataCite;
+﻿using SOS.Lib.Models.DataCite;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Configuration.Export
 {

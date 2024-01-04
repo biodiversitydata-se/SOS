@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Harvesters.Biologg.Interfaces;
@@ -10,6 +9,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using System.Net.Http.Headers;
 
 namespace SOS.Harvest.Harvesters.Biologg
 {
@@ -77,7 +77,7 @@ namespace SOS.Harvest.Harvesters.Biologg
                     new AuthenticationHeaderValue("Bearer", _biologgConfiguration.Token);
 
                 var response = await httpClient.GetAsync(_biologgConfiguration.Url);
-                
+
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new Exception("Failed to retrieve download url for Biologg");

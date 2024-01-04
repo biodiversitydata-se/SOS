@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using MvmService;
-using System.ServiceModel;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
+using System.ServiceModel;
 
 namespace SOS.Harvest.Services
 {
@@ -40,7 +40,7 @@ namespace SOS.Harvest.Services
             catch (FaultException e)
             {
                 _logger.LogError(e, $"Failed to get MVM observations from id: {getFromId}, attempt: {attempt}");
-               
+
                 throw;
             }
             catch (Exception e)

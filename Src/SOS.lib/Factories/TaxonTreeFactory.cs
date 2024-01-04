@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using QuikGraph;
+﻿using QuikGraph;
 using QuikGraph.Algorithms;
 using QuikGraph.Algorithms.Observers;
 using QuikGraph.Algorithms.Search;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Lib.Factories
 {
@@ -25,7 +25,7 @@ namespace SOS.Lib.Factories
                 return null;
             }
 
-            return CreateTaxonTree(taxa.ToDictionary(t => t.Key, t => (IBasicTaxon) t.Value));
+            return CreateTaxonTree(taxa.ToDictionary(t => t.Key, t => (IBasicTaxon)t.Value));
         }
 
         public static TaxonTree<IBasicTaxon> CreateTaxonTree(IDictionary<int, IBasicTaxon> taxa)
@@ -124,9 +124,9 @@ namespace SOS.Lib.Factories
         /// <param name="treeNodes"></param>
         public static void TestQuickGraphDfs(IEnumerable<TaxonTreeNode<IBasicTaxon>> treeNodes)
         {
-            var graph = CreateAdjencyGraph(treeNodes);            
-            var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);            
-            var observer = new VertexPredecessorRecorderObserver<int, Edge<int>>();            
+            var graph = CreateAdjencyGraph(treeNodes);
+            var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);
+            var observer = new VertexPredecessorRecorderObserver<int, Edge<int>>();
             using (observer.Attach(dfs)) // Attach/detach to DFS events
             {
                 dfs.Compute(4000107); // DFS for Mammalia
@@ -148,11 +148,11 @@ namespace SOS.Lib.Factories
                     .TopologicalSort()
                     .Reverse()
                     .Select((Value, Index) => new { Value, Index })
-                    .ToDictionary(m => m.Value, m => m.Index);                
+                    .ToDictionary(m => m.Value, m => m.Index);
 
                 return topoSortByTaxonId;
             }
-            catch (Exception) 
+            catch (Exception)
             {
                 // Temporary catch exceptions as long as the graph isn't a directed acyclic graph (DAG)
                 return new Dictionary<int, int>();

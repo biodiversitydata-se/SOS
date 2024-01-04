@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace SOS.Lib.Helpers
 {
@@ -46,7 +45,7 @@ namespace SOS.Lib.Helpers
             }
 
             if (!date2.HasValue || date1 == date2)
-            {                
+            {
                 return date1.Value.ToString(startDateFormat, CultureInfo.InvariantCulture);
             }
 
@@ -75,9 +74,9 @@ namespace SOS.Lib.Helpers
                 startDateFormat = "yyyy-MM-dd'T'HH:mm:ssK";
             }
 
-            if (!endDate.HasValue || startDate == endDate 
+            if (!endDate.HasValue || startDate == endDate
                 || startDate.Value.Year == endDate.Value.Year && startDate.Value.Month == endDate.Value.Month && startDate.Value.Day == endDate.Value.Day && startTime == endTime)
-            {                
+            {
                 return startDate.Value.ToString(startDateFormat, CultureInfo.InvariantCulture);
             }
 
@@ -119,6 +118,6 @@ namespace SOS.Lib.Helpers
                 "{0}/{1}",
                 date1.Value.ToString("HH:mm:ssK", CultureInfo.InvariantCulture),
                 date2.Value.ToString("HH:mm:ssK", CultureInfo.InvariantCulture));
-        }        
+        }
     }
 }

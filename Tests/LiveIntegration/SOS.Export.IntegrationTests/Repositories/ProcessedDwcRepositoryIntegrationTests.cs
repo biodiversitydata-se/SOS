@@ -1,17 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
-using SOS.Export.LiveIntegrationTests;
 using SOS.Lib.Cache;
 using SOS.Lib.Database;
 using SOS.Lib.Managers;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Export.LiveIntegrationTests.Repositories

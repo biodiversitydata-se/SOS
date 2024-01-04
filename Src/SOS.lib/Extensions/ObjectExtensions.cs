@@ -67,7 +67,7 @@ namespace SOS.Lib.Extensions
             return type.IsAssignableTo(typeof(IEnumerable));
         }
 
-        
+
 
         /// <summary>
         /// Get object property
@@ -76,13 +76,13 @@ namespace SOS.Lib.Extensions
         /// <param name="propertyName"></param>
         /// <returns></returns>
         public static PropertyInfo GetProperty(this object source, string propertyName)
-        { 
+        {
             var sourceType = source.GetType();
             return sourceType.GetProperty(propertyName,
                 BindingFlags.SetProperty | BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
         }
 
-       
+
         /// <summary>
         /// Get property type
         /// </summary>
@@ -140,7 +140,7 @@ namespace SOS.Lib.Extensions
             {
                 return;
             }
-           
+
             var targetPropertyType = property.GetPropertyType();
 
             // Make sure decimal separator is dot
@@ -174,7 +174,7 @@ namespace SOS.Lib.Extensions
         }
 
         public static dynamic ToDynamic(this object value)
-        {            
+        {
             var expando = ToExpando(value);
             return expando;
         }

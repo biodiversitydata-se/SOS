@@ -34,7 +34,7 @@ namespace SOS.Harvest.Jobs
                 .Where(j => j.Value.InProcessingState && filter.Contains(j.Value?.Job?.Type.Name, StringComparer.CurrentCultureIgnoreCase))
                 .Select(j => j.Key)?.ToArray()!;
         }
-         
+
         protected void RestartJobs(IEnumerable<string> jobIds)
         {
             if (!jobIds?.Any() ?? true)

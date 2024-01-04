@@ -1,26 +1,24 @@
-﻿using System.Collections.Concurrent;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
-using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Collections.Concurrent;
 
 namespace SOS.Harvest.Processors
 {
     public abstract class DatasetProcessorBase<TClass, TVerbatim, TVerbatimRepository> : ProcessorBase<TClass>
         where TVerbatim : IEntity<int>
-        where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int> 
-    {        
+        where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int>
+    {
         protected IDatasetRepository DatasetRepository;
 
         /// <summary>
@@ -57,7 +55,7 @@ namespace SOS.Harvest.Processors
             try
             {
                 Logger.LogDebug($"Datasets - Start storing {dataProvider.Identifier} batch: {batchId}");
-                var processedCount = await DatasetRepository.AddManyAsync(processedDatasets);                
+                var processedCount = await DatasetRepository.AddManyAsync(processedDatasets);
                 Logger.LogDebug($"Datasets - Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
 
                 return processedCount;
@@ -92,7 +90,7 @@ namespace SOS.Harvest.Processors
             DataProvider dataProvider,
             int startId,
             int endId,
-            IDatasetFactory<TVerbatim> datasetFactory,            
+            IDatasetFactory<TVerbatim> datasetFactory,
             TVerbatimRepository datasetVerbatimRepository,
             IJobCancellationToken cancellationToken)
         {
@@ -114,7 +112,7 @@ namespace SOS.Harvest.Processors
 
                 foreach (var verbatimDataset in datasetsBatch!)
                 {
-                    var dataset = datasetFactory.CreateProcessedDataset(verbatimDataset);                    
+                    var dataset = datasetFactory.CreateProcessedDataset(verbatimDataset);
 
                     if (dataset == null)
                     {
@@ -127,7 +125,7 @@ namespace SOS.Harvest.Processors
 
                 Logger.LogDebug($"Dataset - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
 
-                return await ValidateAndStoreDatasets(dataProvider, datasets.Values, $"{startId}-{endId}");                
+                return await ValidateAndStoreDatasets(dataProvider, datasets.Values, $"{startId}-{endId}");
             }
             catch (JobAbortedException)
             {
@@ -143,7 +141,7 @@ namespace SOS.Harvest.Processors
             {
                 ProcessManager.Release();
             }
-        }                
+        }
 
         /// <summary>
         /// Method to override in parent class 
@@ -240,6 +238,6 @@ namespace SOS.Harvest.Processors
                 Logger.LogError(e, $"Failed to process {dataProvider.Identifier} datasets");
                 return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
             }
-        }        
+        }
     }
 }

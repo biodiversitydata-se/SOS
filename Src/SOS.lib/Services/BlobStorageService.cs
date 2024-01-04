@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using File = SOS.Lib.Models.Misc.File;
 
 namespace SOS.Lib.Services
@@ -69,7 +69,7 @@ namespace SOS.Lib.Services
 
                 var targetBlobClient = GetBlobClient(targetContainer, targetFileName);
 
-                await  targetBlobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+                await targetBlobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
                 await using var sourceStream = sourceBlobClient.OpenRead(new BlobOpenReadOptions(false));
 
                 await targetBlobClient.UploadAsync(sourceStream);

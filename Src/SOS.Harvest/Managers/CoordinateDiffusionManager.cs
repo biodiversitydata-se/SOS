@@ -39,8 +39,8 @@ namespace SOS.Harvest.Managers
         }
 
         private DiffusedCoordinateInfo CreateDiffusedCoordinateInfo(
-            int protectionLevel, 
-            (double lon, double lat) wgs84Coordinate, 
+            int protectionLevel,
+            (double lon, double lat) wgs84Coordinate,
             CoordinateSys diffusionCoordinateSys = CoordinateSys.WebMercator)
         {
             var (mod, add) = GetDiffusionValues(protectionLevel);
@@ -70,8 +70,8 @@ namespace SOS.Harvest.Managers
             else if (diffusionCoordinateSys == CoordinateSys.SWEREF99_TM)
             {
                 diffusedPointSweref99Tm = new NetTopologySuite.Geometries.Point(
-                    originalPointSweref99Tm.Coordinates[0].X - originalPointSweref99Tm.Coordinates[0].X % mod + (mod/2.0),
-                    originalPointSweref99Tm.Coordinates[0].Y - originalPointSweref99Tm.Coordinates[0].Y % mod + (mod/2.0));
+                    originalPointSweref99Tm.Coordinates[0].X - originalPointSweref99Tm.Coordinates[0].X % mod + (mod / 2.0),
+                    originalPointSweref99Tm.Coordinates[0].Y - originalPointSweref99Tm.Coordinates[0].Y % mod + (mod / 2.0));
 
                 diffusedPointWgs84 = diffusedPointSweref99Tm.Transform(CoordinateSys.SWEREF99_TM,
                         CoordinateSys.WGS84);

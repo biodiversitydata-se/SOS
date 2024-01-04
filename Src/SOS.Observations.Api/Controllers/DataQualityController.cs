@@ -1,10 +1,10 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DataQuality;
+using System;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -37,9 +37,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="organismGroup">Organism group filter.</param>
         /// <returns>List of observations that can be duplicates</returns>
         [HttpGet("report/{organismGroup}")]
-        [ProducesResponseType(typeof(DataQualityReport), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetReport([FromRoute]string organismGroup)
+        [ProducesResponseType(typeof(DataQualityReport), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetReport([FromRoute] string organismGroup)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting data quality report");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }

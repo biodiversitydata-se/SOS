@@ -1,8 +1,8 @@
-﻿using FizzWare.NBuilder.Implementation;
-using FizzWare.NBuilder;
+﻿using FizzWare.NBuilder;
+using FizzWare.NBuilder.Implementation;
+using Nest;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
-using Nest;
 using SOS.Observations.Api.IntegrationTests.Helpers;
 
 namespace SOS.Observations.Api.IntegrationTests.TestData.Factories;

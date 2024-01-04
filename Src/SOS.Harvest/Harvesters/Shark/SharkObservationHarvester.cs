@@ -45,7 +45,7 @@ namespace SOS.Harvest.Harvesters.Shark
             try
             {
                 initValues.preHarvestCount = await InitializeHarvestAsync(true);
-               
+
                 var dataSetsInfo = await _sharkObservationService.GetDataSetsAsync();
 
                 if (!dataSetsInfo?.Rows.Any() ?? true)

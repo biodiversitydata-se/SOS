@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -21,12 +16,12 @@ namespace SOS.Administration.Gui.Controllers
         private IWebHostEnvironment _hostingEnvironment;
         private readonly string _hangfireUrl;
 
-        public HostingEnvironmentController(IWebHostEnvironment hostingEnvironment, IOptionsMonitor<ApiTestConfiguration> optionsMonitor) 
+        public HostingEnvironmentController(IWebHostEnvironment hostingEnvironment, IOptionsMonitor<ApiTestConfiguration> optionsMonitor)
         {
             _hostingEnvironment = hostingEnvironment;
             _hangfireUrl = optionsMonitor.CurrentValue.HangfireUrl;
         }
-        [HttpGet]        
+        [HttpGet]
         public EnvironmentDto Get()
         {
             return new EnvironmentDto()

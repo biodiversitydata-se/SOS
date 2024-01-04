@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Export;
@@ -13,6 +9,10 @@ using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.DataCite;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SOS.Export.Jobs
 {
@@ -38,7 +38,7 @@ namespace SOS.Export.Jobs
         /// <param name="configuration"></param>
         /// <param name="doiConfiguration"></param>
         /// <param name="logger"></param>
-        public ExportToDoiJob(IBlobStorageService blobStorageService, 
+        public ExportToDoiJob(IBlobStorageService blobStorageService,
             IDataCiteService dataCiteService,
             IDataProviderRepository dataProviderRepository,
             BlobStorageConfiguration configuration,
@@ -65,7 +65,7 @@ namespace SOS.Export.Jobs
                 var fileSuffix = Regex.Match(fileName, @"\.[0-9a-z]+$").Value;
 
                 var dataProviders = (await _dataProviderRepository.GetAllAsync())?.Where(dp => dp.IsActive);
-                
+
                 var metaData = new DOIMetadata
                 {
                     Attributes = new DOIAttributes
@@ -135,7 +135,7 @@ namespace SOS.Export.Jobs
             }
             catch (Exception e)
             {
-                _logger.LogInformation("Failed to create DOI from export.", e);
+                _logger.LogInformation(e, "Failed to create DOI from export.");
             }
             return false;
         }

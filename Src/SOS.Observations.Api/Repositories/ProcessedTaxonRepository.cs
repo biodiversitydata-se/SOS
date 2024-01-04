@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using DotNetCore.Mapping;
+﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
@@ -18,6 +13,10 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Processed;
 using SOS.Observations.Api.Repositories.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Repositories
@@ -198,19 +197,19 @@ namespace SOS.Observations.Api.Repositories
             var tree = _taxonManager.TaxonTree;
             foreach (var item in tree.TreeNodeById.Values)
             {
-                 var (observationCount, firstSighting, lastSighting) = observationCountByTaxonId.GetValueOrDefault(item.TaxonId);
-                 var sumNode = new TaxonAggregationTreeNodeSum
-                 {
-                     FirstSighting = firstSighting,
-                     LastSighting = lastSighting,
-                     TopologicalIndex = tree.ReverseTopologicalSortById[item.TaxonId],
-                     TreeNode = item,
-                     ObservationCount = observationCount,
-                     SumObservationCount = observationCount,
-                     DependentTaxonIds = new HashSet<int>() { item.TaxonId }
-                 };
-                 treeNodeSumByTaxonId.Add(item.TaxonId, sumNode);
-             }
+                var (observationCount, firstSighting, lastSighting) = observationCountByTaxonId.GetValueOrDefault(item.TaxonId);
+                var sumNode = new TaxonAggregationTreeNodeSum
+                {
+                    FirstSighting = firstSighting,
+                    LastSighting = lastSighting,
+                    TopologicalIndex = tree.ReverseTopologicalSortById[item.TaxonId],
+                    TreeNode = item,
+                    ObservationCount = observationCount,
+                    SumObservationCount = observationCount,
+                    DependentTaxonIds = new HashSet<int>() { item.TaxonId }
+                };
+                treeNodeSumByTaxonId.Add(item.TaxonId, sumNode);
+            }
 
             foreach (var sumNode in treeNodeSumByTaxonId.Values.OrderBy(m => m.TopologicalIndex))
             {
@@ -223,7 +222,7 @@ namespace SOS.Observations.Api.Repositories
                         // parentSumNode.MainChildren.Add(sumNode); // Uncomment to use for debug purpose
                         var newDependentTaxonIds = sumNode.DependentTaxonIds.Except(parentSumNode.DependentTaxonIds);
                         parentSumNode.DependentTaxonIds.UnionWith(newDependentTaxonIds);
-                      //  parentSumNode.Hits = parentSumNode.Hits == null ? sumNode.Hits : parentSumNode.Hits.Union(sumNode.Hits).OrderByDescending(h => h.Item1).Take(noOfLatestHits);
+                        //  parentSumNode.Hits = parentSumNode.Hits == null ? sumNode.Hits : parentSumNode.Hits.Union(sumNode.Hits).OrderByDescending(h => h.Item1).Take(noOfLatestHits);
                         foreach (var taxonId in newDependentTaxonIds)
                         {
                             var childSumNode = treeNodeSumByTaxonId[taxonId];
@@ -348,7 +347,7 @@ namespace SOS.Observations.Api.Repositories
             CompositeKey nextPage)
         {
             ISearchResponse<dynamic> searchResponse;
-         
+
             searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(PublicIndexName)
                 .Query(q => q
@@ -367,7 +366,7 @@ namespace SOS.Observations.Api.Repositories
                         .Terms("taxon", tt => tt
                             .Field("taxon.id").Order(SortOrder.Ascending)
                         ))))
-                
+
                 .Size(0)
                 .Source(s => s.ExcludeAll())
                 .TrackTotalHits(false)
@@ -411,15 +410,15 @@ namespace SOS.Observations.Api.Repositories
                             .Max("lastSighting", m => m
                                 .Field("event.startDate")
                             )
-                           /*.TopHits("latestRecordedObservations", th => th
-                                .Size(noOfLatestHits)
-                                .Source(src => src
-                                    .Includes(inc => inc
-                                        .Fields("event.startDate", "occurrence.occurrenceId")
-                                    )
-                                )
-                                .Sort(s => s.Descending("event.startDate"))
-                            )*/
+                        /*.TopHits("latestRecordedObservations", th => th
+                             .Size(noOfLatestHits)
+                             .Source(src => src
+                                 .Includes(inc => inc
+                                     .Fields("event.startDate", "occurrence.occurrenceId")
+                                 )
+                             )
+                             .Sort(s => s.Descending("event.startDate"))
+                         )*/
                         )
                     )
                 )
@@ -457,7 +456,7 @@ namespace SOS.Observations.Api.Repositories
                         .Terms("provinceId", p => p
                             .Field("location.province.featureId"))
                         )))
-                
+
                 .Size(0)
                 .Source(s => s.ExcludeAll())
                 .TrackTotalHits(false)
@@ -537,7 +536,7 @@ namespace SOS.Observations.Api.Repositories
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }
 
-        
+
         /// <summary>
         /// Aggregate observations by GeoTile and Taxa. This method handles all paging and returns the complete result.
         /// </summary>
@@ -664,11 +663,11 @@ namespace SOS.Observations.Api.Repositories
             var taxaResult = observationCountByTaxonId
                 .Select(b => TaxonAggregationItem.Create(
                         b.Key,
-                        b.Value.Item1, 
-                        b.Value.Item2, 
+                        b.Value.Item1,
+                        b.Value.Item2,
                         b.Value.Item3
                     )
-                  //  b.Value.Item4?.Select(h => new TaxonAggregationHit { EventStartDate = h.Item1, OccurrenceId = h.Item2 }))
+                //  b.Value.Item4?.Select(h => new TaxonAggregationHit { EventStartDate = h.Item1, OccurrenceId = h.Item2 }))
                 )
                 .OrderByDescending(m => m.ObservationCount)
                 .ThenBy(m => m.TaxonId)
@@ -731,7 +730,7 @@ namespace SOS.Observations.Api.Repositories
                 treeNodeSumByTaxonId.Add(item.TaxonId, sumNode);
             }
             treeNodeSumByTaxonId = treeNodeSumByTaxonId.OrderBy(m => m.Value.TopologicalIndex).ToDictionary(tn => tn.Key, tn => tn.Value);
-            
+
             foreach (var sumNode in treeNodeSumByTaxonId.Values)
             {
                 // Main parent

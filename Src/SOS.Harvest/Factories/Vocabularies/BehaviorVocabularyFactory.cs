@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
+﻿using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
@@ -39,7 +35,7 @@ namespace SOS.Harvest.Factories.Vocabularies
                 int id = activities.Max(f => f.Id);
                 vocabularyValues.Add(CreateVocabularyValue(++id, "roosting"));
             }
-           
+
             return vocabularyValues;
         }
 
@@ -75,7 +71,7 @@ namespace SOS.Harvest.Factories.Vocabularies
                 var dwcMappings = CreateDwcMappings(vocabularyValues, dwcMappingSynonyms);
                 mappingField.Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList();
             }
-           
+
             externalSystemMapping.Mappings.Add(mappingField);
             return externalSystemMapping;
         }

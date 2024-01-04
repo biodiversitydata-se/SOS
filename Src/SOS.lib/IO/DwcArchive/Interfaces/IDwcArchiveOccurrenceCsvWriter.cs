@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using SOS.Export.Models;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.DwcArchive.Interfaces
 {
@@ -52,7 +52,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="csvFileHelper"></param>
         /// <param name="fieldDescriptions"></param>
         void WriteHeaderRow(
-            CsvFileHelper csvFileHelper, 
+            CsvFileHelper csvFileHelper,
             IEnumerable<FieldDescription> fieldDescriptions);
     }
 }

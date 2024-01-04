@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Shared;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Resource
 {
@@ -43,7 +43,7 @@ namespace SOS.Lib.Repositories.Resource
                 .ToList();
 
             if (list.Count == 1)
-            {                
+            {
                 return list.First().Date.ToLocalTime();
             }
 

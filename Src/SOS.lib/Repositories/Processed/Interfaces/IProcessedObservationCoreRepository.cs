@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Elasticsearch.Net;
+﻿using Elasticsearch.Net;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
@@ -11,6 +8,9 @@ using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
@@ -118,7 +118,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="afterKey"></param>
         /// <returns></returns>
         Task<GeoGridMetricResult> GetMetricGridAggregationAsync(
-            SearchFilter filter, 
+            SearchFilter filter,
             int gridCellSizeInMeters,
             MetricCoordinateSys metricCoordinateSys,
             bool skipAuthorizationFilters = false,
@@ -156,7 +156,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<IEnumerable<Observation>> GetObservationsAsync(
             IEnumerable<string> occurrenceIds,
-            IEnumerable<string> outputFields, 
+            IEnumerable<string> outputFields,
             bool protectedIndex);
 
         /// <summary>
@@ -278,11 +278,11 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="protectedIndex"></param>
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync(bool protectedIndex);
-        
-        Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
+
+        Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
             string aggregationField,
             int? precisionThreshold = null,
-            int size = 65536, 
+            int size = 65536,
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
 
         Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
@@ -299,7 +299,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="aggregationField"></param>
         /// <returns></returns>
         Task<List<AggregationItem>> GetAllAggregationItemsAsync(SearchFilter filter, string aggregationField);
-        
+
         /// <summary>
         /// Aggregate by a key field and a list field and return the distinct value list for each key field.
         /// </summary>
@@ -310,7 +310,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="aggregationFieldList"></param>
         /// <returns></returns>
         Task<List<AggregationItemList<TKey, TValue>>> GetAllAggregationItemsListAsync<TKey, TValue>(SearchFilter filter, string aggregationFieldKey, string aggregationFieldList);
-        
+
         /// <summary>
         /// Get occurrence ids for events.
         /// </summary>

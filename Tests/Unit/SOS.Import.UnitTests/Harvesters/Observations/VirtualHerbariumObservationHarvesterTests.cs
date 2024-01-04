@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,6 +7,9 @@ using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Harvesters.Observations
@@ -25,7 +25,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 new Mock<IVirtualHerbariumObservationVerbatimRepository>();
             _virtualHerbariumObservationServiceMock = new Mock<IVirtualHerbariumObservationService>();
             _virtualHerbariumServiceConfiguration = new VirtualHerbariumServiceConfiguration
-                {MaxNumberOfSightingsHarvested = 1};
+            { MaxNumberOfSightingsHarvested = 1 };
             _loggerMock = new Mock<ILogger<VirtualHerbariumObservationHarvester>>();
         }
 

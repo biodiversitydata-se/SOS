@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -10,10 +13,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.DarwinCoreArchive;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
-using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Factories.Validation
 {
@@ -21,7 +21,7 @@ namespace SOS.Harvest.Factories.Validation
     /// DwC data validation manager.
     /// </summary>
     public class DwcaDataValidationReportFactory : DataValidationReportFactoryBase<DwcObservationVerbatim>
-    {        
+    {
         private DwcaObservationFactory? _dwcaObservationFactory;
         private readonly IVerbatimClient _verbatimClient;
         private readonly ILoggerFactory _loggerFactory;
@@ -48,7 +48,7 @@ namespace SOS.Harvest.Factories.Validation
                 dataProvider,
                 _verbatimClient,
                 new Logger<DwcCollectionRepository>(_loggerFactory));
-           
+
             return await dwcArchiveCollectionRepository.OccurrenceRepository.GetAllByCursorAsync();
         }
 
@@ -58,7 +58,7 @@ namespace SOS.Harvest.Factories.Validation
                 dataProvider,
                 _verbatimClient,
                 new Logger<DwcCollectionRepository>(_loggerFactory));
-            
+
             return await dwcArchiveCollectionRepository.OccurrenceRepository.CountAllDocumentsAsync();
         }
 
@@ -69,7 +69,7 @@ namespace SOS.Harvest.Factories.Validation
                 var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
                 _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
                 return processedObservation;
-            }); 
+            });
         }
 
         protected override void ValidateVerbatimTaxon(

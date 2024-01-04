@@ -1,14 +1,5 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
@@ -17,6 +8,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Caching.Memory;
@@ -76,9 +68,17 @@ using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Observations.Api.Services.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using IDataProviderManager = SOS.Observations.Api.Managers.Interfaces.IDataProviderManager;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 
 namespace SOS.Observations.Api
 {
@@ -218,7 +218,7 @@ namespace SOS.Observations.Api
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
-           
+
             services.AddMemoryCache();
 
             services.AddControllers()
@@ -276,7 +276,7 @@ namespace SOS.Observations.Api
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             services.AddSwaggerGen(
                 options =>
-                {                    
+                {
                     // add a custom operation filters
                     options.OperationFilter<SwaggerDefaultValues>();
                     options.OperationFilter<SwaggerAddOptionalHeaderParameters>();
@@ -317,15 +317,10 @@ namespace SOS.Observations.Api
                         var isInternalApi = apiDescription.ActionDescriptor.EndpointMetadata.Any(x => x.GetType() == typeof(InternalApiAttribute));
                         var isInternalDocument = documentName.Contains(InternalApiPrefix, StringComparison.CurrentCultureIgnoreCase) && !documentName.Contains(AzureApiPrefix, StringComparison.CurrentCultureIgnoreCase);
 
-                        if (isAzureInternalApi)
-                        {
-                            var t = 9;
-                        }
-
                         return
                             versionMatch && (
                                 (isAzurePublicApi && isAzurePublicDocument) ||
-                                (isAzureInternalApi && isAzureInternalDocument) 
+                                (isAzureInternalApi && isAzureInternalDocument)
                             ) || (
                             !isAzurePublicDocument && !isAzureInternalDocument &&
                             (isInternalDocument || !isInternalApi)
@@ -533,7 +528,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IProjectInfoRepository, ProjectInfoRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
             services.AddScoped<IUserExportRepository, UserExportRepository>();
-             
+
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();
             services.AddSingleton<ICryptoService, CryptoService>();
@@ -693,8 +688,8 @@ namespace SOS.Observations.Api
 #endif
             });
 
-                // make sure protected log is created and indexed
-                if (protectedLogRepository.VerifyCollectionAsync().Result)
+            // make sure protected log is created and indexed
+            if (protectedLogRepository.VerifyCollectionAsync().Result)
             {
                 protectedLogRepository.CreateIndexAsync();
             }
@@ -722,7 +717,7 @@ namespace SOS.Observations.Api
         }
 
         private static bool GetDisableFeature(string environmentVariable)
-        {            
+        {
             string value = Environment.GetEnvironmentVariable(environmentVariable);
 
             if (value != null)

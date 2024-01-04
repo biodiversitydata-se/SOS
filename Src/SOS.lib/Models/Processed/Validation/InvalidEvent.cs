@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Models.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Lib.Models.Processed.Validation
 {

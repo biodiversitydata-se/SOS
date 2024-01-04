@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Moq;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.VirtualHerbarium;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -17,8 +15,10 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.VirtualHerbarium;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors
@@ -63,13 +63,13 @@ namespace SOS.Process.UnitTests.Processors
             _virtualHerbariumObservationVerbatimRepositoryMock.Object,
             _areaHelper.Object,
             _processedObservationRepositoryMock.Object,
-            _vocabularyResolverMock.Object, 
+            _vocabularyResolverMock.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processManagerMock.Object,
             _validationManagerMock.Object,
             _diffusionManagerMock.Object,
             _processTimeManagerMock.Object,
-            new ProcessConfiguration{Diffusion = false},
+            new ProcessConfiguration { Diffusion = false },
             _loggerMock.Object);
 
         private DataProvider CreateDataProvider()
@@ -94,7 +94,7 @@ namespace SOS.Process.UnitTests.Processors
             var dataprovider = CreateDataProvider();
             _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>()))
                 .ThrowsAsync(new Exception("Failed"));
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -138,7 +138,7 @@ namespace SOS.Process.UnitTests.Processors
             _processedObservationRepositoryMock
                 .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .ReturnsAsync(1);
-            
+
             var dataProvider = CreateDataProvider();
             var taxa = new Dictionary<int, Taxon>
             {

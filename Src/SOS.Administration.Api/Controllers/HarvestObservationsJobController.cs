@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,6 +10,12 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -47,9 +47,9 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("Run")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> RunObservationsHarvestJob([FromQuery] List<string> dataProviderIdOrIdentifiers)
         {
             try
@@ -86,15 +86,15 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing process job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("Schedule/Daily")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> AddObservationsHarvestJob([FromQuery] List<string> dataProviderIdOrIdentifiers,
             [FromQuery] int hour, [FromQuery] int minute)
         {
@@ -132,7 +132,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing process job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
@@ -143,9 +143,9 @@ namespace SOS.Administration.Api.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("DwcArchive/Run")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [DisableRequestSizeLimit]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> RunDwcArchiveHarvestJob([FromForm] UploadDwcArchiveModelDto model)
@@ -185,7 +185,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing DwC-A harvest job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 

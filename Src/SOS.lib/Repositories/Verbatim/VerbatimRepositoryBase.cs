@@ -1,16 +1,16 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Verbatim
 {

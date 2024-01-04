@@ -12,7 +12,8 @@ namespace SOS.Lib.UnitTests.Extensions
         public void ToProgrammeArea_can_parse_existing_enum_value()
         {
             // Arrange
-            var apProgrammeArea = new ArtportalenDatasetMetadata.ProgrammeArea {
+            var apProgrammeArea = new ArtportalenDatasetMetadata.ProgrammeArea
+            {
                 Id = (int)Lib.Models.Processed.DataStewardship.Enums.ProgrammeArea.Fjäll
             };
 
@@ -27,7 +28,8 @@ namespace SOS.Lib.UnitTests.Extensions
         public void ToProgrammeArea_throws_exception_given_non_existing_enum_value()
         {
             // Arrange
-            var apProgrammeArea = new ArtportalenDatasetMetadata.ProgrammeArea {
+            var apProgrammeArea = new ArtportalenDatasetMetadata.ProgrammeArea
+            {
                 Id = 1000
             };
 

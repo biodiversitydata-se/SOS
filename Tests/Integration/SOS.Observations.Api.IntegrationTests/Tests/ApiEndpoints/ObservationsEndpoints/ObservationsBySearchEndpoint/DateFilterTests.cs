@@ -1,11 +1,11 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Filter;
+using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Observations.Api.IntegrationTests.Helpers;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 

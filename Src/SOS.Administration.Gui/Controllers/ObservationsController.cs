@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -11,6 +8,9 @@ using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Gui.Controllers
 {
@@ -33,7 +33,7 @@ namespace SOS.Administration.Gui.Controllers
     [Route("[controller]")]
     [ApiController]
     public class ObservationsController : ControllerBase
-    {        
+    {
         private readonly ISearchService _service;
         private MongoClient _client;
         private MongoDbConfiguration _configuration;
@@ -45,15 +45,15 @@ namespace SOS.Administration.Gui.Controllers
             mongoSettings.SocketTimeout = new TimeSpan(0, 2, 0);
             _client = new MongoClient(mongoDbSettings.CurrentValue.GetMongoDbSettings());
             _configuration = mongoDbSettings.CurrentValue;
-        }        
+        }
         [HttpGet]
         [Route("real/{occurrenceId}")]
         public async Task<RealObservationDto> GetRealObservation(string occurrenceId)
         {
-            
+
             var databaseName = "harvest";
             var suffix = "";
-            if(_configuration.DatabaseName.Contains("-"))
+            if (_configuration.DatabaseName.Contains("-"))
             {
                 suffix = _configuration.DatabaseName.Substring(_configuration.DatabaseName.LastIndexOf("-"));
             }
@@ -66,7 +66,7 @@ namespace SOS.Administration.Gui.Controllers
             var filter = Builders<ArtportalenObservationVerbatim>.Filter.Eq(p => p.SightingId, sightingId);
 
             var observations = await observationCollection.FindAsync(filter);
-            try 
+            try
             {
                 var obs = await observations.FirstAsync();
                 var point = (GeoJsonPoint<GeoJson2DCoordinates>)obs?.Site?.Point;
@@ -87,10 +87,10 @@ namespace SOS.Administration.Gui.Controllers
         [Route("")]
         public async Task<PagedResult<ObservationDto>> SearchSOS(SearchFilterDto searchFilterDto)
         {
-           
-           
+
+
             PagedResult<ObservationDto> result = new PagedResult<ObservationDto>();
-           
+
             try
             {
                 var sosResult = await _service.SearchSOS(searchFilterDto, 100, 0);

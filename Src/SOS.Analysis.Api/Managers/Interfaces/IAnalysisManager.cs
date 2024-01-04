@@ -23,10 +23,10 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         Task<PagedAggregationResultDto<UserAggregationResponseDto>?> AggregateByUserFieldAsync(
             int? roleId,
             string? authorizationApplicationIdentifier,
-            SearchFilter filter, 
+            SearchFilter filter,
             string aggregationField,
             int? precisionThreshold,
-            string? afterKey, 
+            string? afterKey,
             int? take);
 
         /// <summary>

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -8,7 +5,9 @@ using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Constants;
-using SOS.Lib.Models.Shared;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen

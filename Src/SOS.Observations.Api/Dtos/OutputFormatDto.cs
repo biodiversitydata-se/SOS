@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json.Converters;
+using System.Text.Json.Serialization;
 
 namespace SOS.Observations.Api.Dtos
 {

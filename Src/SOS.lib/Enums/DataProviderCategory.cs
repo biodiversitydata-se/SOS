@@ -6,7 +6,7 @@ namespace SOS.Lib.Enums
         DataHostesship,
 
         NationalInventory,
-        RegionalInventory, 
+        RegionalInventory,
         MuseumCollections,
         HerbariaCollections,
         CitizenSciencePlatform,

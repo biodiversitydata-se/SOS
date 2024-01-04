@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Harvest.Factories.Vocabularies

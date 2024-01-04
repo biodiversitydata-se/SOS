@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Nest;
-using SOS.Lib.Enums;
-using SOS.Lib.Enums.Artportalen;
+﻿using Nest;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Filters;
+using System;
+using System.Collections.Generic;
 using static SOS.Lib.Extensions.SearchExtensionsGeneric;
 
 namespace SOS.Lib

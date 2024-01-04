@@ -151,7 +151,7 @@ namespace SOS.Lib.Extensions
                         .Keyword(kw => kw
                             .Name("raw")
                         )
-                    ) 
+                    )
                 )
                 .KeyWordLowerCase(kwlc => kwlc.LocationRemarks, false)
                 .KeyWordLowerCase(kwlc => kwlc.LocationAccordingTo, false)
@@ -164,7 +164,7 @@ namespace SOS.Lib.Extensions
                 .KeyWordLowerCase(kwlc => kwlc.VerbatimCoordinateSystem, false)
                 .KeyWordLowerCase(kwlc => kwlc.VerbatimDepth, false)
                 .KeyWordLowerCase(kwlc => kwlc.VerbatimElevation, false)
-                .KeyWordLowerCase(kwlc => kwlc.VerbatimLatitude, false)  
+                .KeyWordLowerCase(kwlc => kwlc.VerbatimLatitude, false)
                 .KeyWordLowerCase(kwlc => kwlc.VerbatimLocality) // WFS
                 .KeyWordLowerCase(kwlc => kwlc.VerbatimLongitude, false)
                 .KeyWordLowerCase(kwlc => kwlc.VerbatimSRS, false)
@@ -354,10 +354,10 @@ namespace SOS.Lib.Extensions
                                 .KeyWordLowerCase(kwlc => kwlc.Language, false)
                             )
                         )
-                       /* .Object<VocabularyValue>(c => c
-                            .Name(nm => nm.ProtectionLevel)
-                            .Properties(ps => ps.GetMapping())
-                        )*/
+                        /* .Object<VocabularyValue>(c => c
+                             .Name(nm => nm.ProtectionLevel)
+                             .Properties(ps => ps.GetMapping())
+                         )*/
                         .Object<VocabularyValue>(c => c
                             .Name(nm => nm.SensitivityCategory)
                             .Properties(ps => ps.GetMapping())
@@ -386,8 +386,8 @@ namespace SOS.Lib.Extensions
         }
 
 
-        public static PropertiesDescriptor<T> KeyWordLowerCase<T, TValue>(this PropertiesDescriptor<T> propertiesDescriptor, Expression<Func<T, TValue>> objectPath, 
-            bool? index = true, 
+        public static PropertiesDescriptor<T> KeyWordLowerCase<T, TValue>(this PropertiesDescriptor<T> propertiesDescriptor, Expression<Func<T, TValue>> objectPath,
+            bool? index = true,
             int? ignoreAbove = null,
             bool? docValues = true) where T : class
         {

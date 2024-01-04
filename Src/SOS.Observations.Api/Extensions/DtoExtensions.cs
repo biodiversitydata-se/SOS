@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using NetTopologySuite.Features;
+﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -21,6 +18,9 @@ using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Location;
 using SOS.Observations.Api.Dtos.Observation;
 using SOS.Observations.Api.Dtos.Vocabulary;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Observations.Api.Extensions
@@ -90,7 +90,7 @@ namespace SOS.Observations.Api.Extensions
             {
                 var filterInternal = (SearchFilterInternal)filter;
                 PopulateInternalBase(searchFilterInternalBaseDto, filterInternal);
-                if (filterInternal.NotPresentFilter == SightingNotPresentFilter.OnlyNotPresent || 
+                if (filterInternal.NotPresentFilter == SightingNotPresentFilter.OnlyNotPresent ||
                     filterInternal.NotPresentFilter == SightingNotPresentFilter.IncludeNotPresent)
                 {
                     isOnlyNotPresentOrRecoveredFilterSet = true;
@@ -272,7 +272,7 @@ namespace SOS.Observations.Api.Extensions
                 MaxAccuracy = filter.MaxAccuracy
             };
         }
-        
+
         private static TaxonFilter PopulateTaxa(TaxonFilterBaseDto filterDto)
         {
             if (filterDto == null)
@@ -373,7 +373,7 @@ namespace SOS.Observations.Api.Extensions
             };
 
             foreach (var gridCell in geoGridMetricResult.GridCells)
-            {                
+            {
                 var polygon = new Polygon(new LinearRing(new[]
                     {
                         new Coordinate(gridCell.MetricBoundingBox.TopLeft.X, gridCell.MetricBoundingBox.BottomRight.Y),
@@ -384,9 +384,9 @@ namespace SOS.Observations.Api.Extensions
                     }));
 
                 var wgs84Polygon = polygon.Transform((CoordinateSys)metricCoordinateSys, CoordinateSys.WGS84);
-                
+
                 var feature = new Feature
-                {                    
+                {
                     Attributes = new AttributesTable(new[]
                     {
                         new KeyValuePair<string, object>("id", gridCell.Id),
@@ -398,13 +398,13 @@ namespace SOS.Observations.Api.Extensions
                         new KeyValuePair<string, object>("metricTop", Convert.ToInt32(gridCell.MetricBoundingBox.TopLeft.Y)),
                         new KeyValuePair<string, object>("metricRight", Convert.ToInt32(gridCell.MetricBoundingBox.BottomRight.X)),
                         new KeyValuePair<string, object>("metricBottom", Convert.ToInt32(gridCell.MetricBoundingBox.BottomRight.Y))
-                    }),                    
+                    }),
                     Geometry = wgs84Polygon,
                     BoundingBox = wgs84Polygon.EnvelopeInternal
                 };
                 featureCollection.Add(feature);
             }
-           
+
             return featureCollection;
         }
 
@@ -938,7 +938,7 @@ namespace SOS.Observations.Api.Extensions
                 searchFilterDto.Output ??= new OutputFilterExtendedDto();
                 searchFilterDto.Output.SortOrders = new[] { new SortOrderDto { SortBy = sortBy, SortOrder = sortOrder } };
             }
- 
+
             return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter, translationCultureCode);
         }
 
@@ -949,7 +949,7 @@ namespace SOS.Observations.Api.Extensions
 
         public static TaxonFilter ToTaxonFilterFilter(this TaxonFilterDto taxonFilterDto)
         {
-            return PopulateTaxa(taxonFilterDto);            
+            return PopulateTaxa(taxonFilterDto);
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterAggregationInternalDto searchFilterDto, int userId, string translationCultureCode)
@@ -1289,7 +1289,7 @@ namespace SOS.Observations.Api.Extensions
                 ShortName = userRole.ShortName,
                 Description = userRole.Description,
                 HasSensitiveSpeciesAuthority = userRole.HasSensitiveSpeciesAuthority,
-                HasSightingIndicationAuthority = userRole.HasSightingIndicationAuthority,                
+                HasSightingIndicationAuthority = userRole.HasSightingIndicationAuthority,
                 Authorities = userRole.Authorities?.Select(a => a.ToUserAuthorityDto()).ToList()
             };
         }

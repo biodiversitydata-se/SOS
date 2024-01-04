@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Nest;
+﻿using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Extensions
 {
@@ -201,7 +201,7 @@ namespace SOS.Lib.Extensions
 
         public static Func<TermsOrderDescriptor<T>, IPromise<IList<TermsOrder>>> GetTermsOrder<T>(this AggregationSortOrder sortOrder) where T : class
         {
-            switch(sortOrder)
+            switch (sortOrder)
             {
                 case AggregationSortOrder.CountDescending:
                     return m => m.CountDescending();
@@ -211,7 +211,7 @@ namespace SOS.Lib.Extensions
                     return m => m.KeyDescending();
                 case AggregationSortOrder.KeyAscending:
                     return m => m.KeyAscending();
-                default:                
+                default:
                     return m => m.CountDescending();
             }
         }
@@ -541,7 +541,7 @@ namespace SOS.Lib.Extensions
             {
                 return;
             }
-            
+
             if (filter.DateFilterType == DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate)
             {
                 query.TryAddDateRangeCriteria(startDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
@@ -626,14 +626,14 @@ namespace SOS.Lib.Extensions
         }
 
         public static void AddExistsCriteria<TQueryContainer>(
-            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field) where TQueryContainer : class        
+            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field) where TQueryContainer : class
         {
             query.Add(q => q
                 .Exists(e => e
                     .Field(field)
                 )
             );
-        }         
+        }
 
         /// <summary>
         /// Try to add query criteria

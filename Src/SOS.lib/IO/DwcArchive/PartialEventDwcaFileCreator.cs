@@ -1,8 +1,8 @@
 ﻿using SOS.Lib.Helpers;
 using System;
 using System.Collections.Generic;
-using System.IO.Compression;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 
@@ -41,7 +41,7 @@ namespace SOS.Lib.IO.DwcArchive
             Directory.CreateDirectory(destinationFolder);
             File.WriteAllText(Path.Join(destinationFolder, "meta.xml"), dwcaFileComponents.Meta);
             File.WriteAllText(Path.Join(destinationFolder, "eml.xml"), dwcaFileComponents.Eml);
-            File.WriteAllLines(Path.Join(destinationFolder, dwcaFileComponents.EventComponent.Filename), dwcaFileComponents.EventComponent.GetRowsWithHeader());            
+            File.WriteAllLines(Path.Join(destinationFolder, dwcaFileComponents.EventComponent.Filename), dwcaFileComponents.EventComponent.GetRowsWithHeader());
             foreach (var extensionComponent in dwcaFileComponents.Extensions)
             {
                 File.WriteAllLines(Path.Join(destinationFolder, extensionComponent.Filename), extensionComponent.GetRowsWithHeader());
@@ -76,7 +76,7 @@ namespace SOS.Lib.IO.DwcArchive
                     {
                         var extensionComponent = ReadExtensionCsvFile(occurrenceEntry, eventComponent.EventIds);
                         dwcaFileComponents.Extensions.Add(extensionComponent);
-                    }                    
+                    }
 
                     var multimediaEntry = archive.Entries.FirstOrDefault(m => m.FullName.StartsWith("multimedia", StringComparison.InvariantCultureIgnoreCase));
                     if (multimediaEntry != null)
@@ -169,7 +169,7 @@ namespace SOS.Lib.IO.DwcArchive
         {
             public string Meta { get; set; }
             public string Eml { get; set; }
-            public DwcaEventComponent EventComponent { get; set; }            
+            public DwcaEventComponent EventComponent { get; set; }
             public List<DwcaExtensionComponent> Extensions { get; set; } = new List<DwcaExtensionComponent>();
         }
 

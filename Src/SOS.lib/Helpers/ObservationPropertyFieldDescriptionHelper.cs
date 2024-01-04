@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.Enums;
+using SOS.Lib.Models;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using SOS.Lib.Enums;
-using SOS.Lib.Models;
 
 namespace SOS.Lib.Helpers
 {

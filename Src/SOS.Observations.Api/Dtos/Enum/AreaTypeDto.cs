@@ -1,6 +1,6 @@
 ﻿namespace SOS.Observations.Api.Dtos.Enum
 {
-   
+
     /// <summary>
     /// Area type dto
     /// </summary>
@@ -17,12 +17,12 @@
         Parish = 19,
         Spa = 20,
         County = 21,
-        ProtectedNature = 22,        
+        ProtectedNature = 22,
         SwedishForestAgencyDistricts = 24,
         Sci = 26,
         WaterArea = 27,
         Atlas5x5 = 29,
-        Atlas10x10 = 30, 
+        Atlas10x10 = 30,
         SfvDistricts = 34,
         Campus = 35
     }

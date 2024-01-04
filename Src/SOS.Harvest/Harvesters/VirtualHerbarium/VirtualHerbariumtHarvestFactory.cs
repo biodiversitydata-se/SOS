@@ -1,15 +1,15 @@
-﻿using System.Globalization;
-using System.Xml.Linq;
-using SOS.Harvest.Harvesters.Interfaces;
+﻿using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
+using System.Globalization;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Harvesters.VirtualHerbarium
 {
     public class VirtualHerbariumHarvestFactory : HarvestBaseFactory, IHarvestFactory<XDocument, VirtualHerbariumObservationVerbatim>
     {
         private readonly IDictionary<string, (double lon, double lat, int? coordinatePrecision)> _localities;
-        
+
         /// <summary>
         ///     Create virtual herbarium verbatim from one row of data
         /// </summary>
@@ -32,16 +32,16 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                 {
                     observation.SetProperty(propertyMapping[index], value);
                 }
-                
+
                 index++;
             }
-            
+
             // If position is missing, try to get it from locality file
             if ((observation.DecimalLatitude.Equals(0) || observation.DecimalLongitude.Equals(0)) &&
                 !string.IsNullOrEmpty(observation.Province) &&
                 !string.IsNullOrEmpty(observation.District))
             {
-                
+
                 if (_localities.TryGetValue(
                     GetLocalityKey(observation.Province, observation.District, observation.Locality),
                     out var locality))
@@ -101,7 +101,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                 var header = table.Elements().FirstOrDefault();
                 var propertyMapping = new Dictionary<string, int>();
                 var index = 0;
-                
+
                 if (header != null)
                 {
                     foreach (var cell in header.Elements())
@@ -115,7 +115,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                         index++;
                     }
                 }
-          
+
                 // Data in all rows where country is sweden
                 var rows = table.Elements(xmlns + "Row").Where(r =>
                     r.Elements().ToArray()[propertyMapping["country"]].Value
@@ -134,7 +134,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                     {
                         coordinatePrecision = coorPrec;
                     }
-                    
+
                     if (!localities.ContainsKey(key))
                     {
                         localities.Add(key, (lon, lat, coordinatePrecision));
@@ -150,7 +150,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
         /// </summary>
         /// <param name="xDocument"></param>
         public VirtualHerbariumHarvestFactory(
-            XDocument xDocument): base()
+            XDocument xDocument) : base()
         {
             _localities = InitializeLocalities(xDocument);
         }
@@ -187,7 +187,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                             index++;
                         }
                     }
-            
+
                     // Data in all rows except first one
                     var rows = table.Elements(xmlns + "Row").Skip(1);
 

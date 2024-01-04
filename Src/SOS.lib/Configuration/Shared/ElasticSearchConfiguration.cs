@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Elasticsearch.Net;
+using Nest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Elasticsearch.Net;
-using Nest;
 
 namespace SOS.Lib.Configuration.Shared
 {
@@ -66,7 +66,7 @@ namespace SOS.Lib.Configuration.Shared
             set => _indexPrefix = value;
         }
 
-       
+
         /// <summary>
         /// Get client created with current configuration
         /// </summary>
@@ -87,7 +87,7 @@ namespace SOS.Lib.Configuration.Shared
                     .SniffOnConnectionFault(true)
                     .SniffLifeSpan(new TimeSpan(0, 30, 0))
                     .ServerCertificateValidationCallback(CertificateValidations.AllowAll);
-             
+
                 if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
                 {
                     settings.BasicAuthentication(UserName, Password);

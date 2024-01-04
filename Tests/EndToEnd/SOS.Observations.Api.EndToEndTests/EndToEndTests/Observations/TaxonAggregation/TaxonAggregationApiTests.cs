@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.EndToEndTests.Fixtures;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.TaxonAggregation
@@ -70,12 +70,12 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.TaxonAgg
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result = await _fixture.SosApiClient.SearchSosTaxonAggregation(
-                searchFilter, 
-                500, 
+                searchFilter,
+                500,
                 0,
-                17.9296875, 
-                59.355596110016315, 
-                18.28125, 
+                17.9296875,
+                59.355596110016315,
+                18.28125,
                 59.17592824927137);
 
             //-----------------------------------------------------------------------------------------------------------

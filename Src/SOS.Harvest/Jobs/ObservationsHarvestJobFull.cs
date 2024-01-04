@@ -56,12 +56,12 @@ namespace SOS.Harvest.Jobs
         public ObservationsHarvestJobFull(
             IObservationHarvesterManager observationHarvesterManager,
             IProjectHarvester projectHarvester,
-            IArtportalenDatasetMetadataHarvester artportalenDatasetMetadataHarvester,            
+            IArtportalenDatasetMetadataHarvester artportalenDatasetMetadataHarvester,
             ITaxonListHarvester taxonListHarvester,
             IDataProviderManager dataProviderManager,
             IHarvestInfoRepository harvestInfoRepository,
             IProcessObservationsJobFull processObservationsJobFull,
-            ILogger<ObservationsHarvestJobFull> logger) : base (observationHarvesterManager, 
+            ILogger<ObservationsHarvestJobFull> logger) : base(observationHarvesterManager,
                 projectHarvester, artportalenDatasetMetadataHarvester, taxonListHarvester, dataProviderManager, harvestInfoRepository, logger)
         {
             _processObservationsJobFull = processObservationsJobFull ?? throw new ArgumentNullException(nameof(processObservationsJobFull));

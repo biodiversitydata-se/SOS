@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -16,6 +12,10 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -170,7 +170,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<int> AddManyAsync(IEnumerable<Checklist> items)
         {
-            return await Task.Run(() => {
+            return await Task.Run(() =>
+            {
                 // Save valid processed data
                 Logger.LogDebug($"Start indexing checklist batch for searching with {items.Count()} items");
                 var indexResult = WriteToElastic(items);
@@ -235,7 +236,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Field("_id")
                             .Value(id))))
                     )
-                
+
                 .Size(1)
                 .Source(s => s
                     .Excludes(e => internalCall ? null : e.Field(f => f.ArtportalenInternal))
@@ -285,13 +286,13 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         public async Task<int> GetChecklistCountAsync(ChecklistSearchFilter filter)
         {
-            var query = filter.ToQuery<Checklist>();            
+            var query = filter.ToQuery<Checklist>();
 
             var countResponse = await Client.CountAsync<Checklist>(s => s
                 .Index(IndexName)
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(query)                        
+                        .Filter(query)
                     )
                 )
             );
@@ -323,7 +324,7 @@ namespace SOS.Lib.Repositories.Processed
             countResponse.ThrowIfInvalid();
 
             return Convert.ToInt32(countResponse.Count);
-        }               
+        }
 
         /// <summary>
         /// Count number of absent observations (Using taxonIdsFound property) matching the search filter.

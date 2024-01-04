@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Harvest.Entities.ObservationsDatabase;
+﻿using SOS.Harvest.Entities.ObservationsDatabase;
 
 namespace SOS.Harvest.Repositories.Source.ObservationsDatabase.Interfaces
 {

@@ -76,7 +76,7 @@ namespace SOS.Lib.Services
             return Encoding.Unicode.GetString(output.ToArray());
         }
 
-       
+
 
         /// <inheritdoc/>
         public async Task<string> EncryptAsync(string clearText)

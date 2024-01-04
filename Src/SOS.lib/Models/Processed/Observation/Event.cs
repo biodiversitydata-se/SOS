@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SOS.Lib.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
-using SOS.Lib.Helpers;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -51,7 +51,7 @@ namespace SOS.Lib.Models.Processed.Observation
             }
 
             EndDate = endDate?.ToUniversalTime();
-            StartDate = startDate?.ToUniversalTime();            
+            StartDate = startDate?.ToUniversalTime();
             VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
 
             if (startDate != null)
@@ -98,7 +98,7 @@ namespace SOS.Lib.Models.Processed.Observation
             PlainEndTime = endTime?.ToString("hh\\:mm");
             VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), startTime, endDate?.ToLocalTime(), endTime);
         }
-        
+
         /// <summary>
         ///     An identifier for the set of information associated with an Event (something that occurs at a place and time). 
         /// </summary>

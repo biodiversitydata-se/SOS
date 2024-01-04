@@ -1,13 +1,13 @@
-﻿using SOS.Lib.Constants;
+﻿using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.FishData;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
-using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.FishData
 {
@@ -25,7 +25,7 @@ namespace SOS.Harvest.Processors.FishData
         /// <exception cref="ArgumentNullException"></exception>
         public FishDataObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager, 
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
         {
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -41,9 +41,9 @@ namespace SOS.Harvest.Processors.FishData
         {
             var taxon = GetTaxon(verbatim.DyntaxaTaxonId);
             var obs = new Observation
-            {                
+            {
                 DataProviderId = DataProvider.Id,
-                BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
+                BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.FishData}",
                 DatasetName = "Fish data",
                 DiffusionStatus = DiffusionStatus.NotDiffused,
@@ -115,10 +115,10 @@ namespace SOS.Harvest.Processors.FishData
         {
             if (dyntaxaTaxonId == 0)
             {
-                return new VocabularyValue {Id = (int) OccurrenceStatusId.Absent};
+                return new VocabularyValue { Id = (int)OccurrenceStatusId.Absent };
             }
 
-            return new VocabularyValue {Id = (int) OccurrenceStatusId.Present};
+            return new VocabularyValue { Id = (int)OccurrenceStatusId.Present };
         }
 
         /// <summary>

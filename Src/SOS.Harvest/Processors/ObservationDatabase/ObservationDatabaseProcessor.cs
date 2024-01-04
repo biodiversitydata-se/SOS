@@ -1,5 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.ObservationDatabase.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -8,17 +10,15 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ObservationDatabase;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.ObservationDatabase.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Processors.ObservationDatabase
 {
     /// <summary>
     ///     Process factory class
     /// </summary>
-    public class ObservationDatabaseProcessor : ObservationProcessorBase<ObservationDatabaseProcessor, ObservationDatabaseVerbatim, IObservationDatabaseVerbatimRepository>, 
+    public class ObservationDatabaseProcessor : ObservationProcessorBase<ObservationDatabaseProcessor, ObservationDatabaseVerbatim, IObservationDatabaseVerbatimRepository>,
         IObservationDatabaseProcessor
     {
         private readonly IObservationDatabaseVerbatimRepository _observationDatabaseVerbatimRepository;
@@ -69,7 +69,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
             IValidationManager validationManager,
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
-            ILogger<ObservationDatabaseProcessor> logger) : 
+            ILogger<ObservationDatabaseProcessor> logger) :
                 base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
         {
             _observationDatabaseVerbatimRepository = observationDatabaseVerbatimRepository ??

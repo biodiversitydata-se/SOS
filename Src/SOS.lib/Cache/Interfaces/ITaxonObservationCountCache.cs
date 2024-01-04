@@ -13,7 +13,7 @@ namespace SOS.Lib.Cache.Interfaces
         /// <param name="cacheKey"></param>
         /// <param name="taxonCount"></param>
         public void Add(TaxonObservationCountCacheKey cacheKey, TaxonCount taxonCount);
-        
+
         /// <summary>
         /// Try get cached count.
         /// </summary>

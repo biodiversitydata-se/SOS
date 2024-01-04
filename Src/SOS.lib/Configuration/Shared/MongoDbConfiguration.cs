@@ -1,7 +1,7 @@
-﻿using System.Linq;
+﻿using MongoDB.Driver;
+using System.Linq;
 using System.Security.Authentication;
 using System.Text;
-using MongoDB.Driver;
 
 namespace SOS.Lib.Configuration.Shared
 {
@@ -67,9 +67,9 @@ namespace SOS.Lib.Configuration.Shared
                 ReadPreference = ReadPreference.PrimaryPreferred,
                 Servers = Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)).ToArray(),
                 SslSettings = UseTls ? new SslSettings
-                    {
-                        EnabledSslProtocols = SslProtocols.Tls12
-                    }
+                {
+                    EnabledSslProtocols = SslProtocols.Tls12
+                }
                     : null,
                 UseTls = UseTls
             };
@@ -90,7 +90,7 @@ namespace SOS.Lib.Configuration.Shared
             }
             else
             {
-               
+
                 //mongoSettings.ConnectionMode = ConnectionMode.ReplicaSet;
                 mongoSettings.DirectConnection = false;
                 mongoSettings.ReplicaSetName = ReplicaSetName;

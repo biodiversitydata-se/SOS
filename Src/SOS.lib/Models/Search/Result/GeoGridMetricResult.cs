@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Nest;
+﻿using Nest;
 using SOS.Lib.Models.Gis;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Search.Result
 {

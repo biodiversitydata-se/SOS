@@ -1,14 +1,14 @@
-﻿using System;
+﻿using FluentAssertions;
+using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
+using SOS.Lib.IO.DwcArchive;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using FluentAssertions;
-using SOS.Lib.Enums;
-using SOS.Lib.Helpers;
-using SOS.Lib.IO.DwcArchive;
 using Xunit;
 
 namespace SOS.Export.UnitTests.IO.DwcArchive

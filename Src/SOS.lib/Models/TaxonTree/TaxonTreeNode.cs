@@ -80,7 +80,7 @@ namespace SOS.Lib.Models.TaxonTree
                 return false;
             }
 
-            return Equals((TaxonTreeNode<T>) obj);
+            return Equals((TaxonTreeNode<T>)obj);
         }
 
         /// <summary>

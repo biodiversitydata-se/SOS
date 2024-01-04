@@ -14,7 +14,7 @@ namespace SOS.Lib.UnitTests.Helpers
         public void Test_GetGridCellId(
             int gridCellSizeInMeters,
             int lowerLeftX,
-            int lowerLeftY,             
+            int lowerLeftY,
             string expected)
         {
             //-----------------------------------------------------------------------------------------------------------

@@ -29,7 +29,7 @@ namespace SOS.ElasticSearch.Proxy.UnitTests.Extensions
             string expected = """
                 {"size":1,"query":{"match_all":{}},"from":0,"sort":[{"event.endDate":{"order":"desc"}}]}
                 """;
-            strResult.Should().Be(expected);                        
+            strResult.Should().Be(expected);
         }
 
         [Fact]

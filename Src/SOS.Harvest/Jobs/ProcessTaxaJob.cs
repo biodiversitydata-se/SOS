@@ -47,7 +47,7 @@ namespace SOS.Harvest.Jobs
                 End = DateTime.Now,
                 Status = success ? RunStatus.Success : RunStatus.Failed
             });
-           
+
             _logger.LogDebug("Finish updating process info for taxa");
 
             return success ? true : throw new Exception("Process taxa job failed");

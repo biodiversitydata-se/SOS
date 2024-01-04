@@ -1,9 +1,9 @@
 ﻿using FizzWare.NBuilder;
-using SOS.Lib.Models.Verbatim.Artportalen;
-using System.ComponentModel;
 using LinqStatistics;
+using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
+using System.ComponentModel;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.Processing;
 

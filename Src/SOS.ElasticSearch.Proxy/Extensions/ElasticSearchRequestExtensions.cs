@@ -20,13 +20,13 @@ namespace SOS.ElasticSearch.Proxy.Extensions
                 if (((IDictionary<string, object>)source).TryGetValue("exclude", out var exclude))
                 {
                     var queryExcludeFields = (IEnumerable<object>)exclude;
-                    foreach(var queryExcludeField in queryExcludeFields)
+                    foreach (var queryExcludeField in queryExcludeFields)
                     {
                         uniqueExcludeFields.Add(queryExcludeField);
                     }
                 }
             }
-            
+
             bodyDictionary["_source"] = new { exclude = uniqueExcludeFields };
         }
 
@@ -79,14 +79,14 @@ namespace SOS.ElasticSearch.Proxy.Extensions
 
             ICollection<IDictionary<string, object>> sightingTypeQuery = new List<IDictionary<string, object>>();
             // Only Artportalen observations with specified default sightingTypeSearchGroupId
-            sightingTypeQuery.Add(new Dictionary<string, object>() { { "terms", 
-                new Dictionary<string, object>() { { "artportalenInternal.sightingTypeSearchGroupId", 
+            sightingTypeQuery.Add(new Dictionary<string, object>() { { "terms",
+                new Dictionary<string, object>() { { "artportalenInternal.sightingTypeSearchGroupId",
                     new[] { 1, 4, 16, 32, 128 } } } } }
             );// Non AP observations don't have sightingTypeSearchGroupId, get them as well
             sightingTypeQuery.Add(
-                new Dictionary<string, object>() { { "bool", 
-                    new Dictionary<string, object>() { { "must_not", 
-                            new Dictionary<string, object>() { { "exists", 
+                new Dictionary<string, object>() { { "bool",
+                    new Dictionary<string, object>() { { "must_not",
+                            new Dictionary<string, object>() { { "exists",
                                 new { field = "artportalenInternal.sightingTypeSearchGroupId" } } } } } } }
             );
             // Add OR query

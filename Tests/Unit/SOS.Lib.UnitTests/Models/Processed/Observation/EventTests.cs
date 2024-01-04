@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.Processed.Observation
@@ -15,22 +15,22 @@ namespace SOS.Lib.UnitTests.Models.Processed.Observation
             DateTime? startDate,
             TimeSpan? startTime,
             DateTime? endDate,
-            TimeSpan? endTime,            
+            TimeSpan? endTime,
             DateTime? expectedStartDate,
             DateTime? expectedEndDate,
             string expextedPlainStartDate,
             string expextedPlainStartTime,
-            string expextedPlainEndDate,            
+            string expextedPlainEndDate,
             string expextedPlainEndTime,
             string expectedVerbatimEventDate,
             string expectedDwcEventDate,
             string expectedDwcEventTime)
-        {            
+        {
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------            
             var ev = new Event(startDate, startTime, endDate, endTime);
-            var evDwc = ProcessedExtensions.ToDarwinCore(ev);            
+            var evDwc = ProcessedExtensions.ToDarwinCore(ev);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -39,7 +39,7 @@ namespace SOS.Lib.UnitTests.Models.Processed.Observation
             ev.EndDate.Value.Should().Be(expectedEndDate);
             ev.PlainStartDate.Should().Be(expextedPlainStartDate);
             ev.PlainStartTime.Should().Be(expextedPlainStartTime);
-            ev.PlainEndDate.Should().Be(expextedPlainEndDate);            
+            ev.PlainEndDate.Should().Be(expextedPlainEndDate);
             ev.PlainEndTime.Should().Be(expextedPlainEndTime);
             ev.VerbatimEventDate.Should().Be(expectedVerbatimEventDate);
             evDwc.EventDate.Should().Be(expectedDwcEventDate);
@@ -241,6 +241,6 @@ namespace SOS.Lib.UnitTests.Models.Processed.Observation
                     "2009-02-20T09:40:00+01:00/2009-02-21T11:30:00+01:00", // expectedDwcEventDate
                     "09:40:00+01:00/11:30:00+01:00" // expectedDwcEventTime
                 },
-            };      
+            };
     }
 }

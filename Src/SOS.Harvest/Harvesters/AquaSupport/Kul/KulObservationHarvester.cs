@@ -1,6 +1,4 @@
-﻿using System.Text;
-using System.Xml.Linq;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Harvesters.AquaSupport.Kul.Interfaces;
@@ -12,6 +10,8 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Text;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Harvesters.AquaSupport.Kul
 {
@@ -49,8 +49,8 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Kul
             _kulObservationService =
                 kulObservationService ?? throw new ArgumentNullException(nameof(kulObservationService));
             _kulServiceConfiguration = kulServiceConfiguration ??
-                                       throw new ArgumentNullException(nameof(kulServiceConfiguration));        
-        } 
+                                       throw new ArgumentNullException(nameof(kulServiceConfiguration));
+        }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
@@ -63,7 +63,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Kul
                 initValues.preHarvestCount = await InitializeHarvestAsync(true);
                 Logger.LogInformation(GetKulHarvestSettingsInfoString());
 
-                var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
                 var verbatimFactory = new AquaSupportHarvestFactory<KulObservationVerbatim>();
 
                 var startDate = new DateTime(_kulServiceConfiguration.StartHarvestYear, 1, 1);

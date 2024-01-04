@@ -1,27 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.IO.DwcArchive.Interfaces;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Factories;
+using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services.Interfaces;
-using SOS.Lib.Enums.VocabularyValues;
-using SOS.Lib.Factories;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.DwcArchive
 {
     public class DwcArchiveFileWriterCoordinator : IDwcArchiveFileWriterCoordinator
-    {     
+    {
         private readonly IFileService _fileService;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
         private readonly IDwcArchiveEventFileWriter _dwcArchiveEventFileWriter;
@@ -128,7 +128,8 @@ namespace SOS.Lib.IO.DwcArchive
 
             try
             {
-                if (string.IsNullOrEmpty(dataProvider?.Identifier)) {
+                if (string.IsNullOrEmpty(dataProvider?.Identifier))
+                {
                     return false;
                 }
 
@@ -149,7 +150,7 @@ namespace SOS.Lib.IO.DwcArchive
                     filePathByEventFilePart = dwcaFilePartsInfo.GetOrCreateEventFilePathByFilePart(batchId);
                 }
                 finally
-                {                    
+                {
                     _semaphore.Release();
                 }
 
@@ -180,13 +181,13 @@ namespace SOS.Lib.IO.DwcArchive
                     if (writeEventBatchTask != null)
                     {
                         UpdateWriteSummary(dwcaFilePartsInfo.EventDwcaWriteSummary, writeEventBatchTask.Result);
-                    }                    
+                    }
                 }
                 finally
                 {
                     _semaphore.Release();
-                }                
-            
+                }
+
                 return true;
             }
             catch (Exception e)
@@ -203,7 +204,7 @@ namespace SOS.Lib.IO.DwcArchive
             summary.MultimediaCount += batch.MultimediaCount;
             summary.EmofCount += batch.EmofCount;
         }
-      
+
         /// <summary>
         /// Create DwC-A for each data provider and DwC-A for all data providers combined.
         /// </summary>
@@ -257,7 +258,7 @@ namespace SOS.Lib.IO.DwcArchive
                     dwcaCreationTasks.Add((provider, false), _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(provider,
                         _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
                     if (provider.CreateEventDwC)
-                    {                        
+                    {
                         dwcaCreationTasks.Add((provider, true), _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileAsync(provider,
                         _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
                     }
@@ -272,7 +273,7 @@ namespace SOS.Lib.IO.DwcArchive
 
                 foreach (var task in dwcaCreationTasks)
                 {
-                    var dataProvider = task.Key.dataProvider;                    
+                    var dataProvider = task.Key.dataProvider;
                     var filePath = task.Value.Result;
 
                     // Id 0 = complete Dwc archive file
@@ -287,14 +288,14 @@ namespace SOS.Lib.IO.DwcArchive
                     if (task.Key.eventBased)
                     {
                         var writeSummary = filePartsInfo.EventDwcaWriteSummary;
-                        _logger.LogInformation($"Generated event based DwC-A file for {dataProvider}. EventCount={writeSummary.EventCount:N0} OccurrenceCount={writeSummary.OccurrenceCount:N0}, EmofCount={writeSummary.EmofCount:N0}, MultimediaCount={writeSummary.MultimediaCount:N0}, Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");                        
+                        _logger.LogInformation($"Generated event based DwC-A file for {dataProvider}. EventCount={writeSummary.EventCount:N0} OccurrenceCount={writeSummary.OccurrenceCount:N0}, EmofCount={writeSummary.EmofCount:N0}, MultimediaCount={writeSummary.MultimediaCount:N0}, Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
                     }
                     else
                     {
                         var writeSummary = filePartsInfo.OccurrenceDwcaWriteSummary;
                         _logger.LogInformation($"Generated DwC-A file for {dataProvider}. OccurrenceCount={writeSummary.OccurrenceCount:N0}, EmofCount={writeSummary.EmofCount:N0}, MultimediaCount={writeSummary.MultimediaCount:N0}, Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
                     }
-                    
+
                     if (dataProvider.LatestUploadedFileHash == hash)
                     {
                         continue;

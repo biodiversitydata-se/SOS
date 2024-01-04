@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Verbatim
 {
@@ -105,7 +105,7 @@ namespace SOS.Lib.Repositories.Verbatim
         private async Task<bool> CollectionExistsAsync(string collectionName)
         {
             var filter = new BsonDocument("name", collectionName);
-            var collections = await Database.ListCollectionsAsync(new ListCollectionsOptions {Filter = filter});
+            var collections = await Database.ListCollectionsAsync(new ListCollectionsOptions { Filter = filter });
             return await collections.AnyAsync();
         }
     }

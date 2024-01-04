@@ -1,17 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Filters;
-using Xunit;
-using System.IO;
-using System;
-using FeatureCollection = NetTopologySuite.Features.FeatureCollection;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Xunit;
+using FeatureCollection = NetTopologySuite.Features.FeatureCollection;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Diffusion
 {

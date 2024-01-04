@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.AggregatedResult;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.LiveIntegrationTests;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchAggregated

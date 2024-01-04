@@ -1,10 +1,10 @@
-﻿using System;
+﻿using FluentAssertions;
+using SOS.Lib.Factories;
+using SOS.Lib.Models.Shared;
+using System;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.XPath;
-using FluentAssertions;
-using SOS.Lib.Factories;
-using SOS.Lib.Models.Shared;
 using Xunit;
 
 namespace SOS.Export.UnitTests.IO.DwcArchive

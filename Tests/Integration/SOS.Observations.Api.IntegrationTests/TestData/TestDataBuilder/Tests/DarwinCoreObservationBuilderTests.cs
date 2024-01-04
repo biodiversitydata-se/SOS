@@ -1,14 +1,5 @@
 ﻿using FizzWare.NBuilder;
-using FluentAssertions;
-using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder.Tests
 {

@@ -1,5 +1,5 @@
-﻿using System;
-using SOS.Lib.Constants;
+﻿using SOS.Lib.Constants;
+using System;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -30,13 +30,13 @@ namespace SOS.Lib.Models.Processed.Observation
 
         public static VocabularyValue Create(int? val)
         {
-            return !val.HasValue ? null : new VocabularyValue {Id = val.Value};
+            return !val.HasValue ? null : new VocabularyValue { Id = val.Value };
         }
 
         public static VocabularyValue Create(string val)
         {
             return new VocabularyValue
-                {Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
+            { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val };
         }
 
         protected bool Equals(VocabularyValue other)
@@ -49,7 +49,7 @@ namespace SOS.Lib.Models.Processed.Observation
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((VocabularyValue) obj);
+            return Equals((VocabularyValue)obj);
         }
 
         public override int GetHashCode()

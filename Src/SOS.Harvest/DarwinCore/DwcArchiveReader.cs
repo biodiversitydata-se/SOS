@@ -122,7 +122,7 @@ namespace SOS.Harvest.DarwinCore
         }
 
         public async Task<IEnumerable<DwcObservationVerbatim>?> ReadOccurrencesAsync(ArchiveReaderContext archiveReaderContext)
-        {            
+        {
             var observationsBatches = ReadOccurrencesInBatchesAsync(archiveReaderContext);
 
             var observations = new List<DwcObservationVerbatim>();

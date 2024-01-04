@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Helpers;
@@ -10,6 +6,10 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -19,7 +19,7 @@ namespace SOS.Observations.Api.Controllers
     [Route("[controller]")]
     [ApiController]
     public class UserController : ControllerBase
-    {        
+    {
         private readonly ILogger<UserController> _logger;
         private readonly IUserManager _userManager;
 

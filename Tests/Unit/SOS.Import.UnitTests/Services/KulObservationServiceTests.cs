@@ -1,12 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Harvest.Services;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
+using System;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Services

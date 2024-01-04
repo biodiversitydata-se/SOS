@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using AutoBogus;
+﻿using AutoBogus;
 using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models;
 using SOS.Lib.Models.Processed.Observation;
+using System.Collections.Generic;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.Processed.Observation
@@ -33,7 +33,7 @@ namespace SOS.Lib.UnitTests.Models.Processed.Observation
                     string stringValue = flatObservation.GetStringValue(field);
                     stringValueByProperty.Add(field.PropertyPath, stringValue);
                 }
-                catch 
+                catch
                 {
                     propertiesWithErrors.Add(field);
                 }

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using MongoDB.Driver.GeoJsonObjectModel;
+﻿using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Enums;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
 {
@@ -128,7 +128,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// 
         /// </summary>
         public string ProvincePartIdByCoordinate { get; set; }
-        
+
         /// <summary>
         /// Id of project
         /// </summary>

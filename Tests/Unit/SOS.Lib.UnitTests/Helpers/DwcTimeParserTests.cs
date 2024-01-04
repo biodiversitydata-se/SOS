@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Helpers;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Helpers
@@ -44,7 +44,7 @@ namespace SOS.Lib.UnitTests.Helpers
                     .Add(TimeSpan.FromHours(6)).ToLocalTime()},
                 new object[] { "08:40:21Z", new DateTime(2021,1,1), DateTime.SpecifyKind(new DateTime(2021, 1, 1, 8, 40, 21), DateTimeKind.Utc)
                     .ToLocalTime()},
-                
+
             };
 
         [Theory]

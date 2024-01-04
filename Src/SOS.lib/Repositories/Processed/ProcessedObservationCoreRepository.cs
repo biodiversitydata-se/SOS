@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Nest;
@@ -24,6 +19,11 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -45,7 +45,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             var createIndexResponse = await Client.Indices.CreateAsync(protectedIndex ? ProtectedIndexName : PublicIndexName, s => s
                 .Settings(s => s
-                    .NumberOfShards(protectedIndex ? NumberOfShardsProtected : NumberOfShards) 
+                    .NumberOfShards(protectedIndex ? NumberOfShardsProtected : NumberOfShards)
                     .NumberOfReplicas(NumberOfReplicas)
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
@@ -60,7 +60,7 @@ namespace SOS.Lib.Repositories.Processed
                         .KeyWordLowerCase(kwlc => kwlc.CollectionId, false)
                         .KeyWordLowerCase(kwlc => kwlc.CollectionCode, false)
                         .KeyWordLowerCase(kwlc => kwlc.DataGeneralizations, false)
-                        .KeyWordLowerCase(kwlc => kwlc.DatasetId, false)                        
+                        .KeyWordLowerCase(kwlc => kwlc.DatasetId, false)
                         .KeyWordLowerCase(kwlc => kwlc.DatasetName) // WFS
                         .KeyWordLowerCase(kwlc => kwlc.InstitutionId)
                         .KeyWordLowerCase(kwlc => kwlc.Language, false)
@@ -123,7 +123,7 @@ namespace SOS.Lib.Repositories.Processed
                             .AutoMap()
                             .Name(nm => nm.ArtportalenInternal)
                             .Properties(ps => ps
-                               // .KeyWordLowerCase(kwlc => kwlc.LocationExternalId)
+                                // .KeyWordLowerCase(kwlc => kwlc.LocationExternalId)
                                 .KeyWordLowerCase(kwlc => kwlc.LocationPresentationNameParishRegion, false)
                                 .KeyWordLowerCase(kwlc => kwlc.ParentLocality)
                                 .KeyWordLowerCase(kwlc => kwlc.ReportedByUserAlias)
@@ -253,7 +253,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .KeyWordLowerCase(kwlc => kwlc.AssociatedSequences, false)
                                 .KeyWordLowerCase(kwlc => kwlc.AssociatedTaxa, false)
                                 .KeyWordLowerCase(kwlc => kwlc.BiotopeDescription, false)
-                              //  .KeyWordLowerCase(kwlc => kwlc.IndividualId, false)
+                                //  .KeyWordLowerCase(kwlc => kwlc.IndividualId, false)
                                 .KeyWordLowerCase(kwlc => kwlc.RecordedBy)
                                 .KeyWordLowerCase(kwlc => kwlc.CatalogNumber)
                                 .KeyWordLowerCase(kwlc => kwlc.Disposition, false)
@@ -372,14 +372,14 @@ namespace SOS.Lib.Repositories.Processed
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create observation index. Error: {createIndexResponse.DebugInformation}");
         }
 
-        
+
         /// <summary>
         /// Make sure Elasticserach nodes are up
         /// </summary>
         /// <param name="clusterCount"></param>
         private void CheckNodes(int clusterCount)
         {
-            CheckNode(PublicIndexName, Math.Max(1, clusterCount-1)); // Subtract 1 since we are using replicas in prod
+            CheckNode(PublicIndexName, Math.Max(1, clusterCount - 1)); // Subtract 1 since we are using replicas in prod
             CheckNode(ProtectedIndexName, Math.Max(1, clusterCount - 1)); // Subtract 1 since we are using replicas in prod
         }
 
@@ -498,7 +498,7 @@ namespace SOS.Lib.Repositories.Processed
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Failed to get last modified date for provider: { providerId }, index: { (protectedIndex ? ProtectedIndexName : PublicIndexName) }");
+                Logger.LogError(e, $"Failed to get last modified date for provider: {providerId}, index: {(protectedIndex ? ProtectedIndexName : PublicIndexName)}");
                 return DateTime.MinValue;
             }
         }
@@ -524,7 +524,7 @@ namespace SOS.Lib.Repositories.Processed
                 return null;
             }
             Logger.LogDebug($"Current diskusage in cluster: {percentageUsed}%");
-            
+
             var count = 0;
             return Client.BulkAll(items, b => b
                     .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
@@ -541,7 +541,7 @@ namespace SOS.Lib.Repositories.Processed
                     {
                         if (r.Error != null)
                         {
-                            Logger.LogError($"OccurrenceId: {o?.Occurrence?.OccurrenceId}, { r.Error.Reason }");
+                            Logger.LogError($"OccurrenceId: {o?.Occurrence?.OccurrenceId}, {r.Error.Reason}");
                         }
                     })
                 )
@@ -585,7 +585,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<int> AddManyAsync(IEnumerable<Observation> items, bool protectedIndex, bool refreshIndex = false)
         {
-            return await Task.Run(() => {
+            return await Task.Run(() =>
+            {
                 return AddMany(items, protectedIndex, refreshIndex);
             });
         }
@@ -894,13 +895,13 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Aggregations(a => a
                     .Composite("gridCells", c => c
-                        .Size(maxBuckets ?? MaxNrElasticSearchAggregationBuckets + 1) 
-                        .After(afterKey ?? null) 
+                        .Size(maxBuckets ?? MaxNrElasticSearchAggregationBuckets + 1)
+                        .After(afterKey ?? null)
                         .Sources(s => s
                             .Terms("metric_x", t => t
                                 .Script(sct => sct
                                     .Source(
-                                        $"(Math.floor(doc['location.{( metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) || metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89_LAEA_Europe) ? "etrs89X" : "sweref99TmX")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
+                                        $"(Math.floor(doc['location.{(metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) || metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89_LAEA_Europe) ? "etrs89X" : "sweref99TmX")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()")
                                 )
                             )
                             .Terms("metric_y", t => t
@@ -912,7 +913,7 @@ namespace SOS.Lib.Repositories.Processed
                         )
                         .Aggregations(a => a
                             .Cardinality("taxa_count", c => c
-                                .Field("taxon.id")                                
+                                .Field("taxon.id")
                             )
                         )
                     )
@@ -968,7 +969,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 var response = await Client.Cluster
-                        .HealthAsync(new []{ Indices.Index(PublicIndexName), Indices.Index(ProtectedIndexName) }, chr => chr
+                        .HealthAsync(new[] { Indices.Index(PublicIndexName), Indices.Index(ProtectedIndexName) }, chr => chr
                             .Level(Level.Indices)
                             .Timeout(TimeSpan.FromSeconds(waitForSeconds))
                             .WaitForStatus(waitForStatus)
@@ -1084,8 +1085,8 @@ namespace SOS.Lib.Repositories.Processed
                     .Includes(fieldsDescriptor => fieldsDescriptor
                         .Field("occurrence.occurrenceId")
                         .Field("event.eventId")
-                        .Field("measurementOrFacts"))), 
-                pointInTimeId, 
+                        .Field("measurementOrFacts"))),
+                pointInTimeId,
                 searchAfter
             );
 
@@ -1133,7 +1134,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<SearchAfterResult<T>> GetObservationsBySearchAfterAsync<T>(
             SearchFilter filter,
             string pointInTimeId = null,
-            IEnumerable<object> searchAfter = null) 
+            IEnumerable<object> searchAfter = null)
         {
             var searchIndex = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -1173,9 +1174,9 @@ namespace SOS.Lib.Repositories.Processed
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
-            
+
             var sortDescriptor = await Client.GetSortDescriptorAsync<dynamic>(indexNames, filter?.Output?.SortOrders);
- 
+
             // Retry policy by Polly
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
@@ -1196,7 +1197,7 @@ namespace SOS.Lib.Repositories.Processed
                         .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
 
                 queryResponse.ThrowIfInvalid();
-   
+
                 return queryResponse;
             });
 
@@ -1271,7 +1272,7 @@ namespace SOS.Lib.Repositories.Processed
                     .TrackTotalHits(false)
                 );
                 searchResponse.ThrowIfInvalid();
-                
+
                 return searchResponse.Documents;
             }
             catch (Exception e)
@@ -1294,7 +1295,7 @@ namespace SOS.Lib.Repositories.Processed
                 );
 
                 countResponse.ThrowIfInvalid();
-                
+
                 return countResponse.Count;
             }
             catch (Exception e)
@@ -1310,10 +1311,10 @@ namespace SOS.Lib.Repositories.Processed
             Logger.LogInformation($"Begin waiting for index creation. Index={IndexName}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
             if (timeout == null) timeout = TimeSpan.FromMinutes(10);
             var sleepTime = TimeSpan.FromSeconds(5);
-            int nrIterations = (int) (Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
+            int nrIterations = (int)(Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
             long docCount = await IndexCountAsync(false);
             var iterations = 0;
-            
+
             // Compare number of documents processed with actually db count
             // If docCount is less than process count, indexing is not ready yet
             while (docCount < expectedRecordsCount && iterations < nrIterations)
@@ -1351,7 +1352,7 @@ namespace SOS.Lib.Repositories.Processed
             );
 
             searchResponse.ThrowIfInvalid();
-           
+
             return searchResponse.Aggregations.Terms("OccurrenceIdDuplicatesExists").Buckets?.Select(b => b.Key);
         }
 
@@ -1418,12 +1419,12 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             return !response.Exists;
-        }        
+        }
 
-        public async Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
+        public async Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
             string aggregationField,
             int? precisionThreshold,
-            int size = 65536, 
+            int size = 65536,
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
             var indexNames = GetCurrentIndex(filter);
@@ -1464,9 +1465,9 @@ namespace SOS.Lib.Repositories.Processed
             return result;
         }
 
-        public async Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter, 
-            string aggregationField,            
-            int skip, 
+        public async Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
+            string aggregationField,
+            int skip,
             int take,
             int? precisionThreshold,
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
@@ -1485,16 +1486,16 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .Aggregations(a => a
-                    .Terms("termAggregation", t => t                        
+                    .Terms("termAggregation", t => t
                         .Size(size)
                         .Field(aggregationField)
-                        .Order(termsOrder)                        
+                        .Order(termsOrder)
                     )
                     .Cardinality("cardinalityAggregation", t => t
                         .Field(aggregationField)
-                        .PrecisionThreshold(precisionThreshold ?? 40000)                        
+                        .PrecisionThreshold(precisionThreshold ?? 40000)
                     )
-                )                
+                )
                 .Size(0)
                 .Source(s => s.ExcludeAll())
                 .TrackTotalHits(false)
@@ -1531,7 +1532,7 @@ namespace SOS.Lib.Repositories.Processed
                 var searchResponse = await PageAggregationItemListAsync(indexName, aggregationFieldKey, aggregationFieldList, query, excludeQuery, nextPageKey, pageTaxaAsyncTake);
                 var compositeAgg = searchResponse.Aggregations.Composite("compositeAggregation");
                 foreach (var bucket in compositeAgg.Buckets)
-                {                    
+                {
                     TKey keyValue = (TKey)bucket.Key[aggregationFieldKey];
                     TValue listValue = (TValue)bucket.Key[aggregationFieldList];
                     if (!aggregationDictionary.ContainsKey(keyValue))
@@ -1542,7 +1543,7 @@ namespace SOS.Lib.Repositories.Processed
                 nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
             } while (nextPageKey != null);
 
-            var items = aggregationDictionary.Select(m => new AggregationItemList<TKey, TValue> {  AggregationKey = m.Key, Items = m.Value }).ToList();
+            var items = aggregationDictionary.Select(m => new AggregationItemList<TKey, TValue> { AggregationKey = m.Key, Items = m.Value }).ToList();
             return items;
         }
 
@@ -1658,7 +1659,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<List<EventOccurrenceAggregationItem>> GetEventOccurrenceItemsAsync(SearchFilter filter)
         {
             var indexName = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);  
+            var (query, excludeQuery) = GetCoreQueries(filter);
             var occurrencesByEventId = new Dictionary<string, List<string>>();
             CompositeKey nextPageKey = null;
             var take = MaxNrElasticSearchAggregationBuckets;
@@ -1684,7 +1685,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         private async Task<ISearchResponse<dynamic>> PageEventOccurrenceItemAsync(
-            string indexName,            
+            string indexName,
             ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
             ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
             CompositeKey nextPage,
@@ -1724,7 +1725,7 @@ namespace SOS.Lib.Repositories.Processed
 
             return searchResponse;
         }
-        
+
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, bool getAllFields = false)
         {
@@ -1733,7 +1734,7 @@ namespace SOS.Lib.Repositories.Processed
 
             var sortDescriptor = await Client.GetSortDescriptorAsync<Observation>(indexNames, filter?.Output?.SortOrders);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)                
+                .Index(indexNames)
                 .Source(getAllFields ? p => new SourceFilterDescriptor<dynamic>() : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .From(skip)
                 .Size(take)
@@ -1797,7 +1798,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .Size(1)
-                .Source(getAllFields ? p => new SourceFilterDescriptor<dynamic>() : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))                
+                .Source(getAllFields ? p => new SourceFilterDescriptor<dynamic>() : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .TrackTotalHits(false)
             );
 

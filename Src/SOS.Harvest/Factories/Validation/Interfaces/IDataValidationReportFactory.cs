@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using SOS.Lib.Models.DataValidation;
+﻿using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 

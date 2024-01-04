@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using SOS.Lib.Models.ApiManagement;
+﻿using SOS.Lib.Models.ApiManagement;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Services.Interfaces
 {

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Lib.Models.Shared;
+﻿using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Resource.Interfaces
 {

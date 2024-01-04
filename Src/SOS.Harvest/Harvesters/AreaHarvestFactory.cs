@@ -22,7 +22,7 @@ namespace SOS.Harvest.Harvesters
             return await Task.Run(() =>
             {
                 return entities
-                    .Select(e => new Area((AreaType) e.AreaDatasetId, e.FeatureId)
+                    .Select(e => new Area((AreaType)e.AreaDatasetId, e.FeatureId)
                     {
                         Name = e.Name,
                         BoundingBox = LatLonBoundingBox.Create(_geometries[((AreaType)e.AreaDatasetId).ToAreaId(e.FeatureId)].EnvelopeInternal)

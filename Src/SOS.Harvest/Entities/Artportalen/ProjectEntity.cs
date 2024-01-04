@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SOS.Harvest.Entities.Artportalen
+﻿namespace SOS.Harvest.Entities.Artportalen
 {
     /// <summary>
     ///     Project class

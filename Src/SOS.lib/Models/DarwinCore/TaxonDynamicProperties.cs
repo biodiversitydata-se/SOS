@@ -96,7 +96,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// Category if alien in Sweden
         /// </summary>
         public string SwedishHistoryCategory { get; set; }
-       
+
         /// <summary>
         ///     Do taxon occur in sweden
         /// </summary>
@@ -106,7 +106,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// Dyntaxa taxon category id.
         /// </summary>
         public int? TaxonCategoryId { get; set; }
-        
+
         /// <summary>
         /// Dyntaxa taxon category swedish name.
         /// </summary>
@@ -116,7 +116,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// Dyntaxa taxon category english name.
         /// </summary>
         public string TaxonCategoryEnglishName { get; set; }
-        
+
         /// <summary>
         /// Darwin Core taxon category name.
         /// </summary>

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Models.Interfaces;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Verbatim.DarwinCore
 {
@@ -724,7 +724,7 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// </summary>
         public string Municipality { get; set; }
 
-        
+
         /// <summary>
         ///     Darwin Core term name: pointRadiusSpatialFit.
         ///     The ratio of the area of the point-radius

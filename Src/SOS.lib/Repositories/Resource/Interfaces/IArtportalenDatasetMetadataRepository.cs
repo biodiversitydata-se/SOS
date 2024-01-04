@@ -1,5 +1,4 @@
-﻿using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Observation;
+﻿using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Interfaces;
 
 namespace SOS.Lib.Repositories.Resource.Interfaces

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Reflection;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using SOS.TestHelpers;
+using System;
+using System.Reflection;
 
 namespace SOS.Observations.Api.EndToEndTests.Fixtures
 {

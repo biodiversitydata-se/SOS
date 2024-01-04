@@ -1,8 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using SOS.Lib.Enums;
@@ -11,6 +7,10 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers
 {
@@ -53,7 +53,7 @@ namespace SOS.Lib.Managers
         {
             try
             {
-                await _apiUsageStatisticsRepository.VerifyCollection();                
+                await _apiUsageStatisticsRepository.VerifyCollection();
                 var dayToProcess = (await GetLastHarvestDate()).AddDays(1).Date;
 
                 var usageStatisticsFactory = new UsageStatisticsFactory(_apiManagementUserService, _userService);
@@ -128,7 +128,7 @@ namespace SOS.Lib.Managers
         public async Task<DateTime> GetLastHarvestDate()
         {
             DateTime? latestHarvestDate = await _apiUsageStatisticsRepository.GetLatestHarvestDate();
-            if (latestHarvestDate.HasValue) return latestHarvestDate.Value;            
+            if (latestHarvestDate.HasValue) return latestHarvestDate.Value;
             return DateTime.Now.AddDays(-91).Date;
         }
 
@@ -153,7 +153,7 @@ namespace SOS.Lib.Managers
             private const int RequestCountColumnIndex = 14;
             private const int FailureCountColumnIndex = 15;
             private const int AverageDurationColumnIndex = 16;
-            private const int SumResponseCountColumnIndex = 17;            
+            private const int SumResponseCountColumnIndex = 17;
 
             public ApiUsageStatisticsExcelWriter(IApiUsageStatisticsRepository apiUsageStatisticsRepository)
             {
@@ -235,7 +235,7 @@ namespace SOS.Lib.Managers
                 worksheet.Cells[1, RequestCountColumnIndex].Value = "RequestCount";
                 worksheet.Cells[1, FailureCountColumnIndex].Value = "FailureCount";
                 worksheet.Cells[1, AverageDurationColumnIndex].Value = "AverageDuration";
-                worksheet.Cells[1, SumResponseCountColumnIndex].Value = "ObservationCount";                
+                worksheet.Cells[1, SumResponseCountColumnIndex].Value = "ObservationCount";
 
                 // Format style by columns in first row
                 using (var range = worksheet.Cells[1, 1, 1, SumResponseCountColumnIndex])

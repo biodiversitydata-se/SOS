@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
-using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Jobs.Process;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -37,11 +37,11 @@ namespace SOS.Harvest.Jobs
             IProcessTaxaJob processTaxaJob,
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
-            ILogger<ProcessObservationsJobIncremental> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, observationProcessorManager, 
+            ILogger<ProcessObservationsJobIncremental> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, observationProcessorManager,
                 taxonCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
             logger)
         {
-            
+
         }
 
         /// <inheritdoc />
@@ -50,12 +50,12 @@ namespace SOS.Harvest.Jobs
             IJobCancellationToken cancellationToken)
         {
             _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", mode.GetLoggerMode()) });
-            
+
             var allDataProviders = await _dataProviderCache.GetAllAsync();
             var dataProvidersToProcess = allDataProviders.Where(dataProvider =>
                         dataProvider.IsActive &&
                         (mode == JobRunModes.Full || dataProvider.SupportIncrementalHarvest))
-                    .ToList(); 
+                    .ToList();
 
             return await RunAsync(
                 dataProvidersToProcess,

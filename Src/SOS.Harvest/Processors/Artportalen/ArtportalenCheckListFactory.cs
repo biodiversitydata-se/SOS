@@ -1,15 +1,15 @@
 ﻿using NetTopologySuite.Geometries;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
-using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.Artportalen
 {

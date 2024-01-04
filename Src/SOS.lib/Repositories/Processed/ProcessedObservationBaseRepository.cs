@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -13,6 +10,9 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -27,7 +27,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="filter"></param>
         /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
-        protected (ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>) 
+        protected (ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>)
             GetCoreQueries(SearchFilterBase filter, bool skipAuthorizationFilters = false)
         {
             var query = filter.ToQuery(skipAuthorizationFilters: skipAuthorizationFilters);
@@ -45,8 +45,8 @@ namespace SOS.Lib.Repositories.Processed
         {
             if (
                 (
-                    (filter.ExtendedAuthorization.ObservedByMe) || 
-                    (filter.ExtendedAuthorization.ReportedByMe) || 
+                    (filter.ExtendedAuthorization.ObservedByMe) ||
+                    (filter.ExtendedAuthorization.ReportedByMe) ||
                     (!filter.ExtendedAuthorization.ProtectionFilter.Equals(ProtectionFilter.Public))
                 ) &&
                 (filter?.ExtendedAuthorization.UserId ?? 0) == 0

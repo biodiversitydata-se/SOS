@@ -1,11 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.Models.Processed.Observation;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Checklist;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Models.Statistics;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {

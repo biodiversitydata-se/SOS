@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -21,12 +20,12 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
-using SOS.Harvest.Managers;
-using SOS.Harvest.Processors.DarwinCoreArchive;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
-using SOS.Lib.Configuration.Import;
-using SOS.Process.LiveIntegrationTests;
 
 namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
 {

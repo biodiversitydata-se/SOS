@@ -1,10 +1,10 @@
-﻿using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Lib.Services.Interfaces;
+using System.Text;
 
 namespace SOS.Harvest.Services
 {

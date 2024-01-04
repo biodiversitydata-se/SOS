@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.DataCite
 {

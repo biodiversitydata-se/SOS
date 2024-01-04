@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,8 +12,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Services.Interfaces;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Lib.Services
@@ -58,7 +58,7 @@ namespace SOS.Lib.Services
                         ClientCertificateOptions = ClientCertificateOption.Manual,
                         ServerCertificateCustomValidationCallback =
                             (httpRequestMessage, cert, cetChain, policyErrors) => true
-                    }) : 
+                    }) :
                     new HttpClient();
 
             httpClient.Timeout = TimeSpan.FromMinutes(30);
@@ -156,7 +156,7 @@ namespace SOS.Lib.Services
         public async Task<T> GetDataAsync<T>(Uri requestUri, IDictionary<string, string> headerData)
         {
             var httpClient = GetClient(headerData);
-            
+
             var responsePhrase = string.Empty;
             try
             {
@@ -173,7 +173,7 @@ namespace SOS.Lib.Services
             {
                 httpClient.Dispose();
             }
-            
+
             return default;
         }
 
@@ -181,9 +181,9 @@ namespace SOS.Lib.Services
         public async Task<Stream> GetFileStreamAsync(Uri requestUri, IDictionary<string, string> headerData = null)
         {
             var httpClient = GetClient(headerData, true);
-         
+
             var response = await httpClient.GetAsync(requestUri, HttpCompletionOption.ResponseContentRead);
-           
+
             return response.StatusCode == HttpStatusCode.OK ? await response.Content.ReadAsStreamAsync() : null;
         }
 
@@ -218,7 +218,7 @@ namespace SOS.Lib.Services
             {
                 httpClient.Dispose();
             }
-            
+
             return default;
         }
 
@@ -242,7 +242,7 @@ namespace SOS.Lib.Services
             {
                 var httpResponseMessage = await httpClient.PutAsync(requestUri, new JsonContent(model, contentType));
                 httpResponseMessage.EnsureSuccessStatusCode();
-               
+
                 return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerializationHelper.SerializerOptions);
             }
             catch (Exception ex)
@@ -253,7 +253,7 @@ namespace SOS.Lib.Services
             {
                 httpClient.Dispose();
             }
-           
+
 
             return default;
         }
@@ -277,7 +277,7 @@ namespace SOS.Lib.Services
             {
                 httpClient.Dispose();
             }
-            
+
             return default;
         }
     }
@@ -295,7 +295,7 @@ namespace SOS.Lib.Services
         public JsonContent(object obj, string contentType) :
             base(JsonSerializer.Serialize(obj, JsonSerializationHelper.SerializerOptions), Encoding.UTF8, contentType)
         {
-  
+
         }
     }
 }

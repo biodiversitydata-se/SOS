@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
@@ -12,6 +6,12 @@ using SOS.Lib.Swagger;
 using SOS.Observations.Api.Dtos.Vocabulary;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -90,8 +90,8 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return ObservationPropertyFieldDescriptionHelper.AllFields
                     .Where(m => m.FieldSets is { Count: > 0 }).ToList();
-                }); 
-                
+                });
+
                 if (!fieldDescriptions?.Any() ?? true)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);

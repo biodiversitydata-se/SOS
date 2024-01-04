@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
@@ -10,9 +12,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
-using SOS.Lib.Configuration.Process;
+using System.Text.RegularExpressions;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {

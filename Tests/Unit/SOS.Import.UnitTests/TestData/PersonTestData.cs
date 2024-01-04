@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Models.Verbatim.Artportalen;
+﻿using SOS.Lib.Models.Verbatim.Artportalen;
+using System.Collections.Generic;
 
 namespace SOS.Import.UnitTests.TestData
 {

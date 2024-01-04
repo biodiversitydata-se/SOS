@@ -1,14 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
+using System;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -38,9 +38,9 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("Run")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> RunProcessJob()
         {
             try
@@ -59,14 +59,14 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing process job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("Taxa/Daily")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult ScheduleDailyProcessTaxaJob([FromQuery] int hour, [FromQuery] int minute)
         {
             try
@@ -78,14 +78,14 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Adding Process job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("Taxa/Run")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult RunProcessTaxaJob()
         {
             try
@@ -96,8 +96,8 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing process taxa job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }        
+        }
     }
 }

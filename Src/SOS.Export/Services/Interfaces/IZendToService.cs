@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using SOS.Export.Models.ZendTo;
+﻿using SOS.Export.Models.ZendTo;
 using SOS.Lib.Enums;
+using System.Threading.Tasks;
 
 namespace SOS.Export.Services.Interfaces
 {
@@ -19,6 +19,6 @@ namespace SOS.Export.Services.Interfaces
         /// <param name="encryptPassword"></param>
         /// <returns></returns>
         Task<ZendToResponse> SendFile(string emailAddress, string description, string filePath, ExportFormat exportFormat,
-           bool informRecipients = true, bool informPasscode = true,  bool encryptFile = false, string encryptPassword = null);
+           bool informRecipients = true, bool informPasscode = true, bool encryptFile = false, string encryptPassword = null);
     }
 }

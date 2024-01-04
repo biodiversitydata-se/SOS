@@ -1,9 +1,9 @@
-﻿using System.Text;
-using Autofac;
+﻿using Autofac;
 using SOS.Administration.Api.Managers;
 using SOS.Administration.Api.Managers.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
+using System.Text;
 
 namespace SOS.Administration.Api.IoC
 {

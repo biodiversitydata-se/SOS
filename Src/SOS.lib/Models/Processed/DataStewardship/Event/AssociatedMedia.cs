@@ -1,6 +1,5 @@
 ﻿using SOS.Lib.Models.Processed.DataStewardship.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 
 namespace SOS.Lib.Models.Processed.DataStewardship.Event
 {

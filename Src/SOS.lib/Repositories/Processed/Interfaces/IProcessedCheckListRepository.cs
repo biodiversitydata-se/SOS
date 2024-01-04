@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
@@ -75,7 +75,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<int> GetAbsentCountAsync(ChecklistSearchFilter filter);     
+        Task<int> GetAbsentCountAsync(ChecklistSearchFilter filter);
 
         /// <summary>
         /// Name of index 

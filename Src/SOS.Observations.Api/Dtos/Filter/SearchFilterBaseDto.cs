@@ -1,6 +1,5 @@
-﻿using System;
+﻿using SOS.Observations.Api.Dtos.Enum;
 using System.Collections.Generic;
-using SOS.Observations.Api.Dtos.Enum;
 
 namespace SOS.Observations.Api.Dtos.Filter
 {

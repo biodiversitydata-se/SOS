@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Misc;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers
 {

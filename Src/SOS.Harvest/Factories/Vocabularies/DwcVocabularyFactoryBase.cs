@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using SOS.Harvest.Extensions;
+﻿using SOS.Harvest.Extensions;
 using SOS.Harvest.Factories.Vocabularies.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using System.Text.RegularExpressions;
 
 namespace SOS.Harvest.Factories.Vocabularies
 {

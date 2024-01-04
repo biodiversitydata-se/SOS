@@ -9,7 +9,7 @@
         ///     Configuration for Artportalen
         /// </summary>
         public ArtportalenConfiguration ArtportalenConfiguration { get; set; }
-        
+
         /// <summary>
         /// Biologg configuration
         /// </summary>
@@ -19,7 +19,7 @@
         ///     Configuration for DwC-A
         /// </summary>
         public DwcaConfiguration DwcaConfiguration { get; set; }
-        
+
         /// <summary>
         ///     Configuration for clam tree service
         /// </summary>

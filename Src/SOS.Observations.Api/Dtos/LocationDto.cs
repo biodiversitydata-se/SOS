@@ -154,7 +154,7 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         /// Point with disturbance buffer
         /// </summary>
-        public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }        
+        public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }
 
         /// <summary>
         /// Id of project

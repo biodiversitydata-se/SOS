@@ -1,8 +1,7 @@
-﻿using System.Globalization;
-using System.Text;
-using SOS.Harvest.Harvesters.Interfaces;
+﻿using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Verbatim.Shark;
+using System.Text;
 
 namespace SOS.Harvest.Harvesters.Shark
 {
@@ -39,8 +38,8 @@ namespace SOS.Harvest.Harvesters.Shark
 
                 // If file don't contains taxon id or sample id there's no reason to go on 
                 if (
-                    (sampleIdIndex.Equals(0) && sharksampleidmd5Index.Equals(0)) || 
-                    (dyntaxaidIndex.Equals(0) && scientificnameIndex.Equals(0) && reportedscientificnameIndex.Equals(0)) 
+                    (sampleIdIndex.Equals(0) && sharksampleidmd5Index.Equals(0)) ||
+                    (dyntaxaidIndex.Equals(0) && scientificnameIndex.Equals(0) && reportedscientificnameIndex.Equals(0))
                 )
                 {
                     return null!;
@@ -57,7 +56,7 @@ namespace SOS.Harvest.Harvesters.Shark
                     var sampleId = string.Empty;
                     // If we have md5 col, try get sample id from it
                     if (!sharksampleidmd5Index.Equals(0))
-                    { 
+                    {
                         sampleId = row[sharksampleidmd5Index];
                     }
                     // No md5 id, try sample id 
@@ -119,7 +118,7 @@ namespace SOS.Harvest.Harvesters.Shark
 
                         verbatims.Add(sampleId, verbatim);
                     }
-                    
+
                     verbatim.Parameters.Add(new SharkParameter
                     {
                         Name = parameterIndex == 0 ? "N/A" : row[parameterIndex],

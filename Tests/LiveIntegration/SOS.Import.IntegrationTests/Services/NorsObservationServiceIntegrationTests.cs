@@ -1,12 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using SOS.Harvest.Services;
-using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Services;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.Services

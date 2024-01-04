@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using Microsoft.ApplicationInsights.AspNetCore.TelemetryInitializers;
+﻿using Microsoft.ApplicationInsights.AspNetCore.TelemetryInitializers;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using System;
+using System.Linq;
 
 namespace SOS.Observations.Api.ApplicationInsights
 {
@@ -31,7 +31,7 @@ namespace SOS.Observations.Api.ApplicationInsights
 
             if (new[] { "get", "post", "put" }.Contains(platformContext.Request.Method, StringComparer.CurrentCultureIgnoreCase))
             {
-                
+
                 if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Protected-observations"))
                 {
                     requestTelemetry.Context.GlobalProperties.Add("Protected-observations", value);

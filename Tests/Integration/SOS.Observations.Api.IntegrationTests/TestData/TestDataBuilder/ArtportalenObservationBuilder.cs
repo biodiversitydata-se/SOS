@@ -1,13 +1,13 @@
 ﻿using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
+using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Geometries;
+using SOS.Lib.Enums.Artportalen;
+using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
-using SOS.Lib.Enums.Artportalen;
-using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 
 namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
@@ -172,9 +172,9 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
                 DateTime endDate = obsTimeSpan == null ? startDate : startDate.Add(obsTimeSpan.Value);
                 DateTime reportedDate = endDate.Add(_faker.Date.Timespan(TimeSpan.FromDays(5)));
                 DateTime editDate = reportedDate;
-                List<UserInternal> verifiedByInternal = GetRandomUserInternals(_verifiersProbability);
+                List<UserInternal>? verifiedByInternal = GetRandomUserInternals(_verifiersProbability);
                 string? verifiedBy = verifiedByInternal == null ? null : string.Join(", ", verifiedByInternal.Select(m => m.UserAlias));
-                List<UserInternal> observersInternal = GetRandomUserInternals(_verifiersProbability);
+                List<UserInternal>? observersInternal = GetRandomUserInternals(_verifiersProbability);
                 string? observers = observersInternal == null ? null : string.Join(", ", observersInternal.Select(m => m.UserAlias));
                 UserInternal reportedByInternal = GetRandomUserInternal();
 
@@ -433,7 +433,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
             builder.With((obs, index) =>
             {
-                foreach (var verbatimObservation in VerbatimArtportalenObservationsFromJsonFile(sensitive))
+                foreach (var verbatimObservation in VerbatimArtportalenObservationsFromJsonFile(sensitive)!)
                 {
                     if (verbatimObservation.Projects != null && verbatimObservation.Projects.Any())
                     {
@@ -457,7 +457,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
             builder.With((obs, index) =>
             {
-                foreach (var verbatimObservation in VerbatimArtportalenObservationsFromJsonFile(sensitive))
+                foreach (var verbatimObservation in VerbatimArtportalenObservationsFromJsonFile(sensitive)!)
                 {
                     if (verbatimObservation.Media != null && verbatimObservation.Media.Count() > 1)
                     {
@@ -586,7 +586,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
     {
         public int UserId { get; set; }
         public int TaxonId { get; set; }
-        public string ProvinceId { get; set; }
-        public string MunicipalityId { get; set; }
+        public string? ProvinceId { get; set; }
+        public string? MunicipalityId { get; set; }
     }
 }

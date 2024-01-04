@@ -1,27 +1,25 @@
-﻿using System;
+﻿using Hangfire;
+using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.IO.Excel.Interfaces;
+using SOS.Lib.Models;
+using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Services.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Hangfire;
-using Microsoft.Extensions.Logging;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
-using SOS.Lib.Enums;
-using SOS.Lib.IO.Excel.Interfaces;
-using SOS.Lib.Helpers;
-using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Models;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Services.Interfaces;
-using SOS.Lib.Models.Export;
-using SOS.Lib.Models.Search.Filters;
-using System.Diagnostics;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 
 namespace SOS.Lib.IO.Excel
 {
@@ -62,7 +60,7 @@ namespace SOS.Lib.IO.Excel
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public ExcelFileWriter(IProcessedObservationCoreRepository processedObservationRepository, 
+        public ExcelFileWriter(IProcessedObservationCoreRepository processedObservationRepository,
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
             ILogger<ExcelFileWriter> logger)
@@ -75,10 +73,10 @@ namespace SOS.Lib.IO.Excel
                                        throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        
-        public async Task<FileExportResult> CreateFileAync(SearchFilter filter, 
+
+        public async Task<FileExportResult> CreateFileAync(SearchFilter filter,
             string exportPath,
-            string fileName, 
+            string fileName,
             string culture,
             PropertyLabelType propertyLabelType,
             bool gzip,
@@ -91,19 +89,19 @@ namespace SOS.Lib.IO.Excel
                 string excelFilePath = null;
                 int nrObservations = 0;
                 var propertyFields =
-                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, true);
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
                 {
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
-                
+
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var stopwatch = Stopwatch.StartNew();
                 _logger.LogDebug($"Excel export. Begin ES Scroll call for file: {fileName}");
                 var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
                 stopwatch.Stop();
-                _logger.LogDebug($"Excel export. End ES Scroll call for file: {fileName}. Elapsed: {stopwatch.ElapsedMilliseconds/1000}s");
+                _logger.LogDebug($"Excel export. End ES Scroll call for file: {fileName}. Elapsed: {stopwatch.ElapsedMilliseconds / 1000}s");
                 var fileCount = 0;
                 var rowIndex = 0;
                 ExcelPackage package = null;
@@ -119,10 +117,10 @@ namespace SOS.Lib.IO.Excel
 
                     // Fetch observations from ElasticSearch.
                     var processedObservations = searchResult.Records.ToArray();
-                    
+
                     // Resolve vocabulary values.
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
-                    
+
                     // Write occurrence rows to CSV file.
                     foreach (var observation in processedObservations)
                     {
@@ -159,7 +157,7 @@ namespace SOS.Lib.IO.Excel
 
                         rowIndex++;
                     }
-                    
+
                     nrObservations += processedObservations.Length;
                     // Get next batch of observations.
                     stopwatch.Restart();
@@ -187,7 +185,7 @@ namespace SOS.Lib.IO.Excel
                     }
 
                     var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
-                    
+
                     return new FileExportResult
                     {
                         FilePath = zipFilePath,
@@ -238,7 +236,7 @@ namespace SOS.Lib.IO.Excel
             }
             _logger.LogDebug($"Finish write Excel header");
         }
-        
+
         private void FormatColumns(ExcelWorksheet worksheet, List<PropertyFieldDescription> propertyFields)
         {
             const int firstDataRow = 2;
@@ -256,8 +254,8 @@ namespace SOS.Lib.IO.Excel
                     "Int32" or "Int64" => "0",
                     _ => "General"
                 };
-                
-                worksheet.Cells[firstDataRow, columnIndex, 500000+1, columnIndex].Style.Numberformat.Format = format;
+
+                worksheet.Cells[firstDataRow, columnIndex, 500000 + 1, columnIndex].Style.Numberformat.Format = format;
                 columnIndex++;
             }
         }

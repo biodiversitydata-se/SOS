@@ -46,7 +46,7 @@ namespace SOS.Harvest.DarwinCore
                 ArchiveReader = archiveReader,
                 DataProvider = dataProvider,
                 MaxNrObservationsToReturn = dwcaConfiguration.MaxNumberOfSightingsHarvested.GetValueOrDefault(int.MaxValue),
-                BatchSize= dwcaConfiguration.BatchSize
+                BatchSize = dwcaConfiguration.BatchSize
             };
         }
     }

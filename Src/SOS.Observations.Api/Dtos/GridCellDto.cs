@@ -19,7 +19,7 @@
         /// Number of observations in cell
         /// </summary>
         public long? ObservationsCount { get; set; }
-        
+
         /// <summary>
         /// Cell coordinates in SWEREF99 TM
         /// </summary>

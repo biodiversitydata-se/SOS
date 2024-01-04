@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.ApplicationInsights;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +22,7 @@ using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Security;
@@ -36,16 +32,19 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Controllers;
 using SOS.Observations.Api.HealthChecks;
+using SOS.Observations.Api.LiveIntegrationTests.Repositories;
+using SOS.Observations.Api.LiveIntegrationTests.Repositories.Interfaces;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.TestHelpers;
-using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using SOS.Observations.Api.Services.Interfaces;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Observations.Api.LiveIntegrationTests.Repositories;
-using SOS.Observations.Api.LiveIntegrationTests.Repositories.Interfaces;
+using SOS.TestHelpers;
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
 {
@@ -375,7 +374,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var userServiceConfiguration = GetUserServiceConfiguration();
             IHttpContextAccessor contextAccessor = new HttpContextAccessor();
             contextAccessor.HttpContext = new DefaultHttpContext();
-            contextAccessor.HttpContext.Request.Headers.Add("Authorization", token);
+            contextAccessor.HttpContext.Request.Headers.TryAdd("Authorization", token);
             IAuthorizationProvider authorizationProvider = new CurrentUserAuthorization(contextAccessor);
             var userService = new UserService(authorizationProvider,
                 new HttpClientService(new NullLogger<HttpClientService>()), userServiceConfiguration, new NullLogger<UserService>());

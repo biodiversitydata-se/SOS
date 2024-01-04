@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Hangfire;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Hangfire;
 
 namespace SOS.Lib.Jobs.Process
 {

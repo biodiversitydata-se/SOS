@@ -12,7 +12,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             var vocabularies = MessagePackHelper.CreateListFromMessagePackFile<Vocabulary>(filename);
             var vocabularyRepositoryStub = new Mock<IVocabularyRepository>();
             vocabularyRepositoryStub
-                .Setup(pfmr =>pfmr.GetAllAsync())
+                .Setup(pfmr => pfmr.GetAllAsync())
                 .ReturnsAsync(vocabularies);
 
             return vocabularyRepositoryStub;

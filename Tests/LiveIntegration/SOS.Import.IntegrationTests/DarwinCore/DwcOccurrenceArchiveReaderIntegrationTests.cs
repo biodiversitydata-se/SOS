@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DwC_A;
+﻿using DwC_A;
 using FluentAssertions;
-using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Harvest.DarwinCore;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.DarwinCore

@@ -1,24 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -61,7 +61,7 @@ namespace SOS.Lib.IO.DwcArchive
             if (writeField[(int)FieldDescriptionId.References]) csvFileHelper.WriteField(dwcObservation.References);
             if (writeField[(int)FieldDescriptionId.RightsHolder]) csvFileHelper.WriteField(dwcObservation.RightsHolder);
             if (writeField[(int)FieldDescriptionId.Type]) csvFileHelper.WriteField(dwcObservation.Type);
-            
+
             if (!isEventCore)
             {
                 if (writeField[(int)FieldDescriptionId.Day]) csvFileHelper.WriteField(dwcObservation.Event.Day.HasValue ? dwcObservation.Event.Day.ToString() : null);
@@ -83,7 +83,7 @@ namespace SOS.Lib.IO.DwcArchive
                 if (writeField[(int)FieldDescriptionId.VerbatimEventDate]) csvFileHelper.WriteField(dwcObservation.Event.VerbatimEventDate);
                 if (writeField[(int)FieldDescriptionId.Year]) csvFileHelper.WriteField(dwcObservation.Event.Year.HasValue ? dwcObservation.Event.Year.ToString() : null);
             }
-            
+
             if (writeField[(int)FieldDescriptionId.DateIdentified]) csvFileHelper.WriteField(dwcObservation.Identification.DateIdentified);
             if (writeField[(int)FieldDescriptionId.IdentificationID]) csvFileHelper.WriteField(dwcObservation.Identification.IdentificationID);
             if (writeField[(int)FieldDescriptionId.IdentificationQualifier]) csvFileHelper.WriteField(dwcObservation.Identification.IdentificationQualifier);
@@ -246,7 +246,8 @@ namespace SOS.Lib.IO.DwcArchive
         {
             try
             {
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
                     //await using StreamWriter streamWriter = new StreamWriter(stream, Encoding.UTF8);
                     using var csvFileHelper = new CsvFileHelper();
@@ -259,7 +260,7 @@ namespace SOS.Lib.IO.DwcArchive
                     }
                     csvFileHelper.FinishWrite();
                 });
-               
+
                 //_logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
             }
             catch (Exception e)
@@ -277,7 +278,7 @@ namespace SOS.Lib.IO.DwcArchive
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        
+
 
         public async Task<int> CreateOccurrenceCsvFileAsync(
             SearchFilter filter,
@@ -309,7 +310,7 @@ namespace SOS.Lib.IO.DwcArchive
                     cancellationToken?.ThrowIfCancellationRequested();
                     // Start fetching next batch of observations.
                     var searchResultTask = processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
-                    
+
                     elasticRetrievalStopwatch.Start();
                     var processedObservations = searchResult.Records.ToArray();
                     elasticRetrievalStopwatch.Stop();

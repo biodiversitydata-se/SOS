@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace SOS.Lib.Json
 {
@@ -57,7 +57,7 @@ namespace SOS.Lib.Json
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             JsonProperty property = base.CreateProperty(member, memberSerialization);
-            
+
             // Exclude ignored properties
             if (IsIgnored(property.DeclaringType, property.PropertyName)
                 || IsIgnored(property.DeclaringType.BaseType, property.PropertyName))
@@ -75,7 +75,7 @@ namespace SOS.Lib.Json
             {
                 property.DefaultValueHandling = handling;
             }
-            else if(KeepTypesWithDefaultValue.TryGetValue(property.DeclaringType, out handling))
+            else if (KeepTypesWithDefaultValue.TryGetValue(property.DeclaringType, out handling))
             {
                 property.DefaultValueHandling = handling;
             }

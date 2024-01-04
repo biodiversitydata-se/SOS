@@ -1,6 +1,5 @@
 ﻿using DwC_A;
 using DwC_A.Terms;
-using Microsoft.Extensions.Logging;
 using SOS.Harvest.DarwinCore.Factories;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Lib.Models.Interfaces;
@@ -183,25 +182,25 @@ namespace SOS.Harvest.DarwinCore
         private async Task AddEmofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
             ArchiveReader archiveReader)
         {
-                var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
-                if (emofFileReader == null) return;
-                var idIndex = emofFileReader.GetIdIndex();
+            var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
+            if (emofFileReader == null) return;
+            var idIndex = emofFileReader.GetIdIndex();
 
-                var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
-                await foreach (var row in emofFileReader.GetDataRowsAsync())
+            var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
+            await foreach (var row in emofFileReader.GetDataRowsAsync())
+            {
+                var id = row[idIndex];
+                if (observationByRecordId.TryGetValue(id, out var obs))
                 {
-                    var id = row[idIndex];
-                    if (observationByRecordId.TryGetValue(id, out var obs))
+                    if (obs.ObservationExtendedMeasurementOrFacts == null)
                     {
-                        if (obs.ObservationExtendedMeasurementOrFacts == null)
-                        {
-                            obs.ObservationExtendedMeasurementOrFacts = new List<DwcExtendedMeasurementOrFact>();
-                        }
-
-                        var emofItem = DwcExtendedMeasurementOrFactFactory.Create(row);
-                        obs.ObservationExtendedMeasurementOrFacts.Add(emofItem);
+                        obs.ObservationExtendedMeasurementOrFacts = new List<DwcExtendedMeasurementOrFact>();
                     }
+
+                    var emofItem = DwcExtendedMeasurementOrFactFactory.Create(row);
+                    obs.ObservationExtendedMeasurementOrFacts.Add(emofItem);
                 }
+            }
         }
 
         /// <summary>

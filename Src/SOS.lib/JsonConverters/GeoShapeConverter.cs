@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Nest;
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Nest;
 
 namespace SOS.Lib.JsonConverters
 {
@@ -162,15 +162,15 @@ namespace SOS.Lib.JsonConverters
             switch (type?.ToLower())
             {
                 case "point":
-                    var point = (PointGeoShape) value;
+                    var point = (PointGeoShape)value;
                     WritePoint(writer, point.Coordinates);
                     break;
                 case "polygon":
-                    var polygon = (PolygonGeoShape) value;
+                    var polygon = (PolygonGeoShape)value;
                     WritePolygon(writer, polygon.Coordinates);
                     break;
                 case "multipolygon":
-                    var muliPolygon = (MultiPolygonGeoShape) value;
+                    var muliPolygon = (MultiPolygonGeoShape)value;
                     writer.WriteStartArray();
                     foreach (var poly in muliPolygon.Coordinates)
                     {

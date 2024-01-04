@@ -11,7 +11,7 @@ namespace SOS.Administration.Gui.Dtos
         ///     Type of area
         /// </summary>
         public AreaTypeDto AreaType { get; set; }
-       
+
         /// <summary>
         ///    Feature
         /// </summary>

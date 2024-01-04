@@ -5,8 +5,8 @@ using Xunit;
 namespace SOS.Lib.UnitTests.Helpers
 {
     public class DwcFormatterTests
-    {        
-        [Theory]     
+    {
+        [Theory]
         [InlineData("EKALLN", "EKALLN")] //DCS
         [InlineData("TvetaValsta", "TvetaValsta")] //STX
         [InlineData("Lövskog  SÖ", "Lövskog  SÖ")] //DEL
@@ -22,18 +22,18 @@ namespace SOS.Lib.UnitTests.Helpers
         [InlineData("Testar\nnyrad\n", "Testar nyrad")]
         [InlineData("Testar\"citation\"", "Testar\"citation\"")]
         public void TestRemoveInvalidCharacters(
-           string str,           
+           string str,
            string expectedCleanStr)
         {
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = str.Clean();                
+            var result = str.Clean();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().Be(expectedCleanStr);            
+            result.Should().Be(expectedCleanStr);
         }
     }
 }

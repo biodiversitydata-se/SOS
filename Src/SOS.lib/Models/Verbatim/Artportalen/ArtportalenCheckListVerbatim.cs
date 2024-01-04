@@ -1,7 +1,6 @@
-﻿using System;
+﻿using SOS.Lib.Models.Interfaces;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
 {

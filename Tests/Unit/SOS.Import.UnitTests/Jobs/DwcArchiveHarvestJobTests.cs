@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -11,6 +9,8 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Managers
@@ -58,7 +58,7 @@ namespace SOS.Import.UnitTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             Func<Task> act = async () => { await TestObject.RunAsync(0, "", DwcaTarget.Observation, JobCancellationToken.Null); };
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ namespace SOS.Import.UnitTests.Managers
             _dwcObservationHarvesterMock.Setup(ts =>
                     ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DataProvider>(),
                         JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now) {Status = RunStatus.Failed});
+                .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now) { Status = RunStatus.Failed });
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ namespace SOS.Import.UnitTests.Managers
             _dwcObservationHarvesterMock.Setup(ts =>
                     ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DataProvider>(),
                         JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now) {Status = RunStatus.Success, Count = 1 });
+                .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now) { Status = RunStatus.Success, Count = 1 });
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
 

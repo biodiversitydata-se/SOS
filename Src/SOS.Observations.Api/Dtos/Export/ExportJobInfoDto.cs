@@ -1,6 +1,6 @@
-﻿using System;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
+using System;
 
 namespace SOS.Observations.Api.Dtos.Export
 {

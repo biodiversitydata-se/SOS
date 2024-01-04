@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Models.Cache;
+using System;
+using System.Collections.Concurrent;
 
 namespace SOS.Lib.Cache
 {
@@ -37,7 +37,7 @@ namespace SOS.Lib.Cache
 
         public void Add(TaxonObservationCountCacheKey taxonObservationCountCacheKey, TaxonCount taxonCount)
         {
-            lock(_lockObject)
+            lock (_lockObject)
             {
                 _entriesCounter++;
                 if (_entriesCounter > NumberOfEntriesCleanupLimit)

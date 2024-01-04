@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Shared;
+﻿using SOS.Lib.Models.Processed.ProcessInfo;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
@@ -9,6 +7,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// </summary>
     public interface IProcessInfoRepository : IMongoDbProcessedRepositoryBase<ProcessInfo, string>
     {
-        
+
     }
 }

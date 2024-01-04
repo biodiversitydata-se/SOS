@@ -1,10 +1,7 @@
-﻿using System.Text;
-using Autofac;
+﻿using Autofac;
 using Microsoft.ApplicationInsights;
 using SOS.Harvest.Containers;
 using SOS.Harvest.Containers.Interfaces;
-using SOS.Harvest.DarwinCore;
-using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Factories.Validation;
 using SOS.Harvest.Factories.Vocabularies;
 using SOS.Harvest.Harvesters;
@@ -97,7 +94,7 @@ using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
-
+using System.Text;
 using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
 using IAreaRepository = SOS.Lib.Repositories.Resource.Interfaces.IAreaRepository;
 using ITaxonRepository = SOS.Lib.Repositories.Resource.Interfaces.ITaxonRepository;
@@ -421,7 +418,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<DataValidationReportManager>().As<IDataValidationReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<DiffusionManager>().As<IDiffusionManager>().InstancePerLifetimeScope();
             builder.RegisterType<DwcaDataValidationReportManager>().As<IDwcaDataValidationReportManager>().InstancePerLifetimeScope();
-            builder.RegisterType<InvalidObservationsManager>().As<IInvalidObservationsManager>().InstancePerLifetimeScope();            
+            builder.RegisterType<InvalidObservationsManager>().As<IInvalidObservationsManager>().InstancePerLifetimeScope();
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationHarvesterManager>().As<IObservationHarvesterManager>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationProcessorManager>().As<IObservationProcessorManager>().InstancePerLifetimeScope();
@@ -449,13 +446,13 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<ProcessObservationsJobIncremental>().As<IProcessObservationsJobIncremental>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessTaxaJob>().As<IProcessTaxaJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectsHarvestJob>().As<IProjectsHarvestJob>().InstancePerLifetimeScope();
-            
+
             builder.RegisterType<TaxonListsHarvestJob>().As<ITaxonListsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<VocabulariesImportJob>().As<IVocabulariesImportJob>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenDatasetMetadataHarvestJob>().As<IArtportalenDatasetMetadataHarvestJob>().InstancePerLifetimeScope();
 
             // Application insights            
-            var telemetryConfiguration = new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration();            
+            var telemetryConfiguration = new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration();
             if (!string.IsNullOrEmpty(Configurations.ApplicationInsightsConfiguration?.InstrumentationKey))
             {
                 telemetryConfiguration.ConnectionString = $"InstrumentationKey={Configurations.ApplicationInsightsConfiguration.InstrumentationKey}";
@@ -465,7 +462,7 @@ namespace SOS.Harvest.IoC.Modules
             {
                 telemetryConfiguration.DisableTelemetry = true;
             }
-                        
+
             var telemetryClient = new TelemetryClient(telemetryConfiguration);
             builder.RegisterInstance(telemetryClient).As<TelemetryClient>()
                     .SingleInstance();

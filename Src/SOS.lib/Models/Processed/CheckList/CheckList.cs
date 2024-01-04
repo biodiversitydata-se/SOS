@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Processed.Checklist
 {

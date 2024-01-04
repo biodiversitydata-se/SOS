@@ -1,16 +1,16 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
+using SOS.Observations.Api.Managers.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
-using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -22,7 +22,7 @@ namespace SOS.Observations.Api.Managers
         private readonly ILogger<VocabularyManager> _logger;
         private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
         private Dictionary<VocabularyId, Dictionary<int, string>> _nonLocalizedTranslationDictionary;
-        
+
         /// <summary>
         ///     A dictionary with translations grouped by the following properties in order:
         ///     VocabularyId, SosId, CultureCode.

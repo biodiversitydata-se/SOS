@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Log;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -31,7 +31,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task CreateIndexAsync()
         {
-            var indexModels = new []
+            var indexModels = new[]
             {
                 new CreateIndexModel<ProtectedLog>(
                     Builders<ProtectedLog>.IndexKeys.Ascending(pl => pl.UserId)),

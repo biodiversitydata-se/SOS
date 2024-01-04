@@ -14,9 +14,9 @@ namespace SOS.Observations.Api.Configuration
     /// </summary>
     public class DevOpsConfiguration
     {
-       /// <summary>
-       /// Base address
-       /// </summary>
+        /// <summary>
+        /// Base address
+        /// </summary>
         public string BaseAddress { get; set; }
 
         /// <summary>

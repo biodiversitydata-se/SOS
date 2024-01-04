@@ -1,13 +1,13 @@
-﻿using System;
-using System.Net;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
+using System;
+using System.Net;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -62,7 +62,7 @@ namespace SOS.Observations.Api.Controllers
             }
         }
         */
-        
+
         /// <summary>
         /// Get copyright including system build time
         /// </summary>
@@ -91,8 +91,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="active">True: get information about last processing, false get information about previous processing</param>
         /// <returns>Meta data about processing. E.g, Start time, end time, number of observations processed...</returns>
         [HttpGet("ProcessInformation")]
-        [ProducesResponseType(typeof(ProcessInfoDto), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ProcessInfoDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [AzureInternalApi]
         public async Task<IActionResult> GetProcessInfo([FromQuery] bool active)
         {
@@ -103,7 +103,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting process information");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }

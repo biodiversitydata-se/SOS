@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +11,8 @@ using SOS.Harvest.IoC.Modules;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
+using System;
+using System.IO;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace SOS.Administration.Api
@@ -37,7 +37,7 @@ namespace SOS.Administration.Api
         {
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             var logger = LogManager.Setup().LoadConfigurationFromAppSettings(environment: env).GetCurrentClassLogger();
-            
+
             logger.Debug("Starting Service");
             try
             {

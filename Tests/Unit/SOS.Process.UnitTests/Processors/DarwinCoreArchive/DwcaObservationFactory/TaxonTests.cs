@@ -1,8 +1,7 @@
-﻿using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
-using SOS.TestHelpers.Taxonomy;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFactory
@@ -20,7 +19,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         /// <remarks>
         /// Only Mammalia taxon and its underlying taxa is available in this unit test to keep the execution time fast.
         /// </remarks>
-        [Theory]        
+        [Theory]
         [InlineData(null, "urn:lsid:dyntaxa.se:Taxon:233622", 233622)] // find integer in guid
         [InlineData("equus asinus", null, 233622)] // find by scientific name
         //[InlineData("Felis lynx", null, 100057)] // find by synonyme (synonyms aren't yet included in test data)

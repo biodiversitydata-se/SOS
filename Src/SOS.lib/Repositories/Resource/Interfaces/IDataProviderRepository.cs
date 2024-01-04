@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using System.Xml.Linq;
-using SOS.Lib.Models.Shared;
+﻿using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Interfaces;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SOS.Lib.Repositories.Resource.Interfaces
 {

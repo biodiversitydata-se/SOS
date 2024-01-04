@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
+﻿using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
@@ -55,8 +55,8 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<List<Event>> GetEventsByIds(IEnumerable<string> ids, IEnumerable<SortOrderFilter> sortOrders = null);
         Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false);
         Task<List<AggregationItemList<TKey, TValue>>> GetAllAggregationItemsListAsync<TKey, TValue>(EventSearchFilter filter, string aggregationFieldKey, string aggregationFieldList);
-        Task<List<AggregationItem>> GetAllAggregationItemsAsync(EventSearchFilter filter, string aggregationField);        
-        Task<PagedResult<dynamic>> GetChunkAsync(EventSearchFilter filter, int skip, int take, bool getAllFields = false);        
+        Task<List<AggregationItem>> GetAllAggregationItemsAsync(EventSearchFilter filter, string aggregationField);
+        Task<PagedResult<dynamic>> GetChunkAsync(EventSearchFilter filter, int skip, int take, bool getAllFields = false);
         Task WaitForIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null);
 
         /// <summary>

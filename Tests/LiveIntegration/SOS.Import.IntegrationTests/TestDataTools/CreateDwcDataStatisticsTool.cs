@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using OfficeOpenXml;
-using SOS.Harvest.DarwinCore;
 using SOS.Harvest.Harvesters.DwC;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
@@ -15,6 +9,11 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
 using Xunit;
 using Xunit.Abstractions;
 

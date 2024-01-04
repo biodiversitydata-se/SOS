@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Hangfire.Common;
+﻿using Hangfire.Common;
 using Hangfire.States;
 using Hangfire.Storage;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Context;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.HangfireAttributes
 {
@@ -48,7 +48,7 @@ namespace SOS.Lib.HangfireAttributes
             jobInfo.ProcessEndDate = DateTime.UtcNow;
             jobInfo.Status = ExportJobStatus.Failed;
             jobInfo.ErrorMsg = errorMsg;
-            await userExportRepository.UpdateAsync(userId, userExport);            
+            await userExportRepository.UpdateAsync(userId, userExport);
             var logger = HangfireJobServerContext.Host.Services.GetService(typeof(ILogger<HandleFileExportFailureAttribute>)) as ILogger<HandleFileExportFailureAttribute>;
             logger.LogInformation($"Set status to Failed for export job with Id={jobId} for UserId={userId}. ErrorMsg={errorMsg}");
         }
@@ -56,6 +56,6 @@ namespace SOS.Lib.HangfireAttributes
         public void OnStateUnapplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
         {
             // Required to match IApplyStateFilter
-        }        
+        }
     }
 }

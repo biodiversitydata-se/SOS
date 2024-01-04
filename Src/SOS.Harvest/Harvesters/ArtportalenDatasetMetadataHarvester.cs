@@ -3,9 +3,9 @@ using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Harvest.Harvesters
 {
@@ -15,7 +15,7 @@ namespace SOS.Harvest.Harvesters
     public class ArtportalenDatasetMetadataHarvester : IArtportalenDatasetMetadataHarvester
     {
         private readonly IDatasetRepository _artportalenDatasetRepository;
-        private readonly IArtportalenDatasetMetadataRepository _artportalenDatasetMetadataRepository;        
+        private readonly IArtportalenDatasetMetadataRepository _artportalenDatasetMetadataRepository;
         //private readonly ICacheManager _cacheManager;
         private readonly ILogger<ArtportalenDatasetMetadataHarvester> _logger;
 
@@ -32,7 +32,7 @@ namespace SOS.Harvest.Harvesters
             ILogger<ArtportalenDatasetMetadataHarvester> logger)
         {
             _artportalenDatasetRepository = artportalenDatasetRepository ?? throw new ArgumentNullException(nameof(artportalenDatasetRepository));
-            _artportalenDatasetMetadataRepository = artportalenDatasetMetadataRepository ?? throw new ArgumentNullException(nameof(artportalenDatasetMetadataRepository));            
+            _artportalenDatasetMetadataRepository = artportalenDatasetMetadataRepository ?? throw new ArgumentNullException(nameof(artportalenDatasetMetadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -57,7 +57,7 @@ namespace SOS.Harvest.Harvesters
                 {
                     if (await _artportalenDatasetMetadataRepository.AddCollectionAsync())
                     {
-                        await _artportalenDatasetMetadataRepository.AddManyAsync(datasets);                        
+                        await _artportalenDatasetMetadataRepository.AddManyAsync(datasets);
 
                         // Update harvest info
                         harvestInfo.End = DateTime.Now;
@@ -152,7 +152,7 @@ namespace SOS.Harvest.Harvesters
                 Description = dsDataset.Description,
                 Title = dsDataset.Title,
                 Spatial = dsDataset.Spatial,
-                DescriptionAccessRights = dsDataset.DescriptionAccessRights,        
+                DescriptionAccessRights = dsDataset.DescriptionAccessRights,
                 DatasetAccessRights = accessRightsById?.ContainsKey(dsDataset.AccessRightsId) ?? false ? accessRightsById[dsDataset.AccessRightsId] : null,
                 DatasetPurpose = purposeById?.ContainsKey(dsDataset.PurposeId) ?? false ? purposeById[dsDataset.PurposeId] : null,
                 DatasetProgrammeArea = programmeAreaById?.ContainsKey(dsDataset.ProgrammeAreaId) ?? false ? programmeAreaById[dsDataset.ProgrammeAreaId] : null
@@ -207,7 +207,7 @@ namespace SOS.Harvest.Harvesters
             };
         }
 
-        private ArtportalenDatasetMetadata.Project CastToProject(DatasetEntities.DS_Project dsProject, 
+        private ArtportalenDatasetMetadata.Project CastToProject(DatasetEntities.DS_Project dsProject,
             Dictionary<int, ArtportalenDatasetMetadata.ProjectType>? projectTypeById)
         {
             return new ArtportalenDatasetMetadata.Project

@@ -1,9 +1,9 @@
 ﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Lib.Helpers.Interfaces

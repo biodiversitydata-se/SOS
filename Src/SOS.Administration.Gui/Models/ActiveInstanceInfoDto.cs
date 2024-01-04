@@ -1,7 +1,7 @@
 ﻿namespace SOS.Administration.Gui.Models
 {
     public class ActiveInstanceInfoDto
-    { 
+    {
         /// <summary>
         ///     Active instance 0 or 1
         /// </summary>

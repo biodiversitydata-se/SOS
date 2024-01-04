@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Analysis.Api.Controllers.Interfaces;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.ApiInfo ;
+using SOS.Lib.Models.ApiInfo;
 using System.Net;
 using System.Reflection;
 

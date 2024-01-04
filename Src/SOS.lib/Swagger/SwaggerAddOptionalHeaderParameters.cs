@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Swagger
 {
@@ -26,7 +26,7 @@ namespace SOS.Lib.Swagger
                 Required = false,
                 Schema = new OpenApiSchema()
                 {
-                    Type = "string"                    
+                    Type = "string"
                 }
             });
         }

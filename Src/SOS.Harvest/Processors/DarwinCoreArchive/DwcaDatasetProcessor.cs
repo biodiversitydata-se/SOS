@@ -1,19 +1,19 @@
 ﻿using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
-using SOS.Lib.Configuration.Process;
-using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using SOS.Harvest.Processors.Interfaces;
-using Hangfire.Server;
 using System.Collections.Concurrent;
-using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -24,7 +24,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         IDwcaDatasetProcessor
     {
         private readonly IVerbatimClient _verbatimClient;
-        private readonly IEventRepository _eventRepository;        
+        private readonly IEventRepository _eventRepository;
 
         public override DataProviderType Type => DataProviderType.DwcA;
 
@@ -43,7 +43,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             IEventRepository observationEventRepository,
             IDatasetRepository processedDatasetsRepository,
             IProcessManager processManager,
-            IProcessTimeManager processTimeManager,            
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<DwcaDatasetProcessor> logger) :
                 base(processedDatasetsRepository, processManager, processTimeManager, processConfiguration, logger)
@@ -72,10 +72,10 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         }
 
         protected override async Task<int> ProcessBatchAsync(
-            DataProvider dataProvider, 
-            int startId, 
-            int endId, IDatasetFactory<DwcVerbatimDataset> datasetFactory, 
-            IVerbatimRepositoryBase<DwcVerbatimDataset, int> datasetVerbatimRepository, 
+            DataProvider dataProvider,
+            int startId,
+            int endId, IDatasetFactory<DwcVerbatimDataset> datasetFactory,
+            IVerbatimRepositoryBase<DwcVerbatimDataset, int> datasetVerbatimRepository,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -106,7 +106,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     datasets.TryAdd(dataset.Identifier.ToString(), dataset);
                 }
 
-                await UpdateDatasetEventsAsync(datasets, dataProvider);                
+                await UpdateDatasetEventsAsync(datasets, dataProvider);
                 Logger.LogDebug($"Dataset - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 return await ValidateAndStoreDatasets(dataProvider, datasets.Values, $"{startId}-{endId}");
             }
@@ -149,7 +149,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     }
                 }
             }
-            catch { }            
+            catch { }
         }
 
         private async Task UpdateDatasetEventsAsync(ConcurrentDictionary<string, Dataset> processedDatasets, DataProvider dataProvider)
@@ -170,7 +170,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             var filter = new EventSearchFilter();
             filter.DatasetIds = processedDatasets.Keys.ToList();
             var datasetEventIds = await _eventRepository.GetAllAggregationItemsListAsync<string, string>(filter, "dataStewardship.datasetIdentifier", "eventId");
-            Dictionary<string, List<string>> eventIdsByDatasetId = datasetEventIds.ToDictionary(m => m.AggregationKey.ToLower(), m => m.Items);            
+            Dictionary<string, List<string>> eventIdsByDatasetId = datasetEventIds.ToDictionary(m => m.AggregationKey.ToLower(), m => m.Items);
             DebugLogEventIdsByDatasetId(processedDatasets, eventIdsByDatasetId, _eventRepository.IndexName);
 
             foreach (var datasetPair in processedDatasets)

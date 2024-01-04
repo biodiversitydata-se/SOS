@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using SOS.Lib.Models.Shared;
+using System.Threading.Tasks;
 using System.Xml.Linq;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Cache.Interfaces
 {
@@ -9,19 +9,19 @@ namespace SOS.Lib.Cache.Interfaces
     /// </summary>
     public interface IDataProviderCache : ICache<int, DataProvider>
     {
-       /// <summary>
-       /// Get eml data
-       /// </summary>
-       /// <param name="providerId"></param>
-       /// <returns></returns>
+        /// <summary>
+        /// Get eml data
+        /// </summary>
+        /// <param name="providerId"></param>
+        /// <returns></returns>
         Task<XDocument> GetEmlAsync(int providerId);
 
-       /// <summary>
-       ///  Store eml data
-       /// </summary>
-       /// <param name="providerId"></param>
-       /// <param name="eml"></param>
-       /// <returns></returns>
+        /// <summary>
+        ///  Store eml data
+        /// </summary>
+        /// <param name="providerId"></param>
+        /// <param name="eml"></param>
+        /// <returns></returns>
         Task<bool> StoreEmlAsync(int providerId, XDocument eml);
     }
 }

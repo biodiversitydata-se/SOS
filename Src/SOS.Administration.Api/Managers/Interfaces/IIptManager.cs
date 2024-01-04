@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Administration.Api.Models.Ipt;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Administration.Api.Models.Ipt;
 
 namespace SOS.Administration.Api.Managers.Interfaces
 {

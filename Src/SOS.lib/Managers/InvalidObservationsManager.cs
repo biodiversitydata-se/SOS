@@ -1,14 +1,14 @@
-﻿using System;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers
 {
@@ -134,7 +134,7 @@ namespace SOS.Lib.Managers
                                 }
                             }
                         }
-                        
+
                         rowIndex++;
                     }
                 }
@@ -145,7 +145,7 @@ namespace SOS.Lib.Managers
                 const int firstDataRow = 2;
                 var lastDataRow = MaxNumberOfExcelRows + 1;
 
-                worksheet.Cells[firstDataRow, ModifiedDateColumnIndex, lastDataRow, ModifiedDateColumnIndex].Style.Numberformat.Format = "yyyy-MM-dd";                
+                worksheet.Cells[firstDataRow, ModifiedDateColumnIndex, lastDataRow, ModifiedDateColumnIndex].Style.Numberformat.Format = "yyyy-MM-dd";
             }
 
             private void AddHeaders(ExcelWorksheet worksheet)
@@ -158,7 +158,7 @@ namespace SOS.Lib.Managers
                 worksheet.Cells[1, MissingMandatoryFieldColumnIndex].Value = "MissingMandatoryField";
                 worksheet.Cells[1, LocationOutsideOfSwedenColumnIndex].Value = "LocationOutsideSweden";
                 worksheet.Cells[1, ValueOutOfRangeColumnIndex].Value = "ValueOutOfRange";
-                worksheet.Cells[1, LogicErrorColumnIndex].Value = "LogicError";                
+                worksheet.Cells[1, LogicErrorColumnIndex].Value = "LogicError";
 
                 // Format style by columns in first row
                 using (var range = worksheet.Cells[1, 1, 1, LogicErrorColumnIndex])

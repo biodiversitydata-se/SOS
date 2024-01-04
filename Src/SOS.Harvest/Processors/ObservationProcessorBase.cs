@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Text;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Extensions;
@@ -21,6 +19,8 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Collections.Concurrent;
+using System.Text;
 
 namespace SOS.Harvest.Processors
 {
@@ -126,7 +126,7 @@ namespace SOS.Harvest.Processors
                 cancellationToken?.ThrowIfCancellationRequested();
                 Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({batchId})");
                 var mongoDbReadTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbRead);
- 
+
                 // Make up to 3 attempts with 0,5 sek sleep between the attempts 
                 var verbatimObservationsBatch = await PollyHelper.GetRetryPolicy(3, 500).ExecuteAsync(async () =>
                 {
@@ -255,7 +255,7 @@ namespace SOS.Harvest.Processors
             var startId = 1;
             var maxId = await observationVerbatimRepository.GetMaxIdAsync();
             var observationCount = await observationVerbatimRepository.CountAllDocumentsAsync();
-            var processBatchTasks = new List<Task<(int publicCount, int protectedCount, int failedCount)>>();            
+            var processBatchTasks = new List<Task<(int publicCount, int protectedCount, int failedCount)>>();
             Logger.LogInformation($"Start processing {dataProvider} data. MaxId={maxId}, Mode={mode}, Count={observationCount}");
 
             Logger.LogDebug($"{dataProvider.Identifier}");
@@ -267,9 +267,9 @@ namespace SOS.Harvest.Processors
                 var batchEndId = startId + WriteBatchSize - 1;
                 processBatchTasks.Add(FetchAndProcessBatchAsync(
                     dataProvider,
-                    startId, 
-                    batchEndId, 
-                    mode, 
+                    startId,
+                    batchEndId,
+                    mode,
                     observationFactory,
                     observationVerbatimRepository,
                     cancellationToken));
@@ -321,7 +321,7 @@ namespace SOS.Harvest.Processors
                             Logger.LogDebug($"Garbage chars {dataProvider.Identifier}, id: {observation.Occurrence?.OccurrenceId}, field/s: {string.Join('|', propsWithGarabageChars)}");
                         }
                     }
-                    
+
                     // If observation is protected
                     if (observation.ShallBeProtected())
                     {
@@ -393,7 +393,7 @@ namespace SOS.Harvest.Processors
                 var publicCount = validateAndStoreTasks[0].Result.SuccessCount;
                 var protectedCount = validateAndStoreTasks[1].Result.SuccessCount;
                 var failedCount = validateAndStoreTasks[0].Result.FailedCount + validateAndStoreTasks[1].Result.FailedCount;
-                
+
                 return (publicCount, protectedCount, failedCount);
             }
             catch (JobAbortedException)
@@ -421,14 +421,14 @@ namespace SOS.Harvest.Processors
             var preValidationCount = observations!.Count;
             observations =
                 await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
-            
+
             if (!observations?.Any() ?? true)
             {
                 return (0, preValidationCount);
             }
-         
+
             var processedCount = await CommitBatchAsync(dataProvider, protectedObservations, observations!, batchId);
-            
+
             if (mode == JobRunModes.Full && !protectedObservations && dwcArchiveFileWriterCoordinator.Enabled)
             {
                 await WriteObservationsToDwcaCsvFiles(observations!, dataProvider, batchId);
@@ -477,7 +477,7 @@ namespace SOS.Harvest.Processors
                 if (invalidObservations == null) return;
                 StringBuilder sb = new StringBuilder();
                 sb.Append($"Invalid observations for {dataProvider}. Count={invalidObservations.Count}. ");
-                foreach (var observation in invalidObservations) 
+                foreach (var observation in invalidObservations)
                 {
                     sb.Append($"OccurrenceID=\"{observation.OccurrenceID}\", Defects=\"{string.Join(", ", observation.Defects.Select(m => m.Information))}\". ");
                     if (sb.Length > maxChars) break;
@@ -515,7 +515,7 @@ namespace SOS.Harvest.Processors
             try
             {
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
-                var processCount = await ProcessObservationsAsync(dataProvider, taxa, mode, cancellationToken);                
+                var processCount = await ProcessObservationsAsync(dataProvider, taxa, mode, cancellationToken);
                 Logger.LogInformation($"Finish processing {dataProvider.Identifier} data. publicCount={processCount.publicCount}, protectedCount={processCount.protectedCount}, failedCount={processCount.failedCount}");
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount, processCount.failedCount);

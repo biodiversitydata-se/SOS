@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using AgileObjects.AgileMapper.Extensions;
+﻿using AgileObjects.AgileMapper.Extensions;
 using MongoDB.Driver.GeoJsonObjectModel;
 using Nest;
 using NetTopologySuite.Features;
@@ -15,6 +10,11 @@ using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Lib.Extensions
 {
@@ -54,8 +54,8 @@ namespace SOS.Lib.Extensions
                 }
             }
 
-            _wktReader = new WKTReader(); 
-    }
+            _wktReader = new WKTReader();
+        }
 
         #region Private
 
@@ -112,19 +112,19 @@ namespace SOS.Lib.Extensions
 
             return points;
         }
-            /// <summary>
-            ///     Get coordinate system wkt
-            /// </summary>
-            /// <param name="coordinateSystem"></param>
-            /// <returns></returns>
-            private static string GetCoordinateSystemWkt(CoordinateSys coordinateSystem)
+        /// <summary>
+        ///     Get coordinate system wkt
+        /// </summary>
+        /// <param name="coordinateSystem"></param>
+        /// <returns></returns>
+        private static string GetCoordinateSystemWkt(CoordinateSys coordinateSystem)
         {
             return coordinateSystem switch
             {
                 CoordinateSys.ETRS89 =>
                     @"GEOGCS[""ETRS89"", DATUM[""European_Terrestrial_Reference_System_1989"",  SPHEROID[""GRS 1980"", 6378137, 298.257222101, AUTHORITY[""EPSG"", ""7019""]], AUTHORITY[""EPSG"", ""6258""]], PRIMEM[""Greenwich"",0, AUTHORITY[""EPSG"", ""8901""]], UNIT[""degree"", 0.0174532925199433,AUTHORITY[""EPSG"", ""9122""]], AUTHORITY[""EPSG"", ""4258""]]",
                 CoordinateSys.ETRS89_LAEA_Europe =>
-                    @"PROJCS[""ETRS89 / LAEA Europe"",GEOGCS[""ETRS89"",DATUM[""European_Terrestrial_Reference_System_1989"",SPHEROID[""GRS 1980"",6378137,298.257222101,AUTHORITY[""EPSG"",""7019""]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[""EPSG"",""6258""]],PRIMEM[""Greenwich"",0,AUTHORITY[""EPSG"",""8901""]],UNIT[""degree"",0.0174532925199433,AUTHORITY[""EPSG"",""9122""]],AUTHORITY[""EPSG"",""4258""]],PROJECTION[""Lambert_Azimuthal_Equal_Area""],PARAMETER[""latitude_of_center"",52],PARAMETER[""longitude_of_center"",10],PARAMETER[""false_easting"",4321000],PARAMETER[""false_northing"",3210000],UNIT[""metre"",1,AUTHORITY[""EPSG"",""9001""]],AUTHORITY[""EPSG"",""3035""]]",                    
+                    @"PROJCS[""ETRS89 / LAEA Europe"",GEOGCS[""ETRS89"",DATUM[""European_Terrestrial_Reference_System_1989"",SPHEROID[""GRS 1980"",6378137,298.257222101,AUTHORITY[""EPSG"",""7019""]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[""EPSG"",""6258""]],PRIMEM[""Greenwich"",0,AUTHORITY[""EPSG"",""8901""]],UNIT[""degree"",0.0174532925199433,AUTHORITY[""EPSG"",""9122""]],AUTHORITY[""EPSG"",""4258""]],PROJECTION[""Lambert_Azimuthal_Equal_Area""],PARAMETER[""latitude_of_center"",52],PARAMETER[""longitude_of_center"",10],PARAMETER[""false_easting"",4321000],PARAMETER[""false_northing"",3210000],UNIT[""metre"",1,AUTHORITY[""EPSG"",""9001""]],AUTHORITY[""EPSG"",""3035""]]",
                 CoordinateSys.Rt90_25_gon_v =>
                     @"PROJCS[""SWEREF99 / RT90 2.5 gon V emulation"", GEOGCS[""SWEREF99"", DATUM[""SWEREF99"", SPHEROID[""GRS 1980"",6378137.0,298.257222101, AUTHORITY[""EPSG"",""7019""]], TOWGS84[0.0,0.0,0.0,0.0,0.0,0.0,0.0], AUTHORITY[""EPSG"",""6619""]], PRIMEM[""Greenwich"",0.0, AUTHORITY[""EPSG"",""8901""]], UNIT[""degree"",0.017453292519943295], AXIS[""Geodetic latitude"",NORTH], AXIS[""Geodetic longitude"",EAST], AUTHORITY[""EPSG"",""4619""]], PROJECTION[""Transverse Mercator""], PARAMETER[""central_meridian"",15.806284529444449], PARAMETER[""latitude_of_origin"",0.0], PARAMETER[""scale_factor"",1.00000561024], PARAMETER[""false_easting"",1500064.274], PARAMETER[""false_northing"",-667.711], UNIT[""m"",1.0], AXIS[""Northing"",NORTH], AXIS[""Easting"",EAST], AUTHORITY[""EPSG"",""3847""]]",
                 CoordinateSys.SWEREF99 =>
@@ -197,8 +197,8 @@ namespace SOS.Lib.Extensions
         private static ArrayList ToGeoJsonPolygonCoordinates(this Polygon polygon)
         {
             var coordinates = new List<double[][]>();
-            var exteriorRing = polygon.ExteriorRing.Coordinates.Select(p => new[] {p.X, p.Y}).ToArray();
-            var holes = polygon.Holes.Select(h => h.Coordinates.Select(p => new[] {p.X, p.Y}).ToArray()).ToArray();
+            var exteriorRing = polygon.ExteriorRing.Coordinates.Select(p => new[] { p.X, p.Y }).ToArray();
+            var holes = polygon.Holes.Select(h => h.Coordinates.Select(p => new[] { p.X, p.Y }).ToArray()).ToArray();
 
             coordinates.Add(exteriorRing);
             coordinates.AddRange(holes);
@@ -325,7 +325,7 @@ namespace SOS.Lib.Extensions
             {
                 return boundingBox;
             }
-            
+
             return boundingBox.Intersection(envelope);
         }
 
@@ -336,7 +336,7 @@ namespace SOS.Lib.Extensions
             {
                 return 0;
             }
-    
+
             var tileWidthInDegrees = 360.0 / Math.Pow(2, zoom + 1);
             var latCentre = (envelope.MaxY + envelope.MinY) / 2;
             var tileHeightInDegrees = tileWidthInDegrees * Math.Cos(latCentre.ToRadians());
@@ -361,7 +361,7 @@ namespace SOS.Lib.Extensions
         {
             var tilesInRange = polygons.WithinDistance(maxDistance);
             var points = tilesInRange.CalculationPoints(useCenterPoint);
-   
+
             // we need at least tree points to make a traingle
             if ((points?.Count() ?? 0) < 3)
             {
@@ -549,7 +549,7 @@ namespace SOS.Lib.Extensions
             switch (geometry.OgcGeometryType)
             {
                 case OgcGeometryType.Polygon:
-                    var polygon = (Polygon) geometry;
+                    var polygon = (Polygon)geometry;
 
                     var shell = polygon.Shell.TryMakeRingValid();
                     var holes = polygon.Holes?.Select(h => h.TryMakeRingValid());
@@ -591,7 +591,7 @@ namespace SOS.Lib.Extensions
         /// <returns>The Srid.</returns>
         public static int Srid(this CoordinateSys coordinateSystem)
         {
-            return (int) coordinateSystem; // the enum value is the same as SRID.
+            return (int)coordinateSystem; // the enum value is the same as SRID.
         }
 
         /// <summary>
@@ -612,7 +612,7 @@ namespace SOS.Lib.Extensions
             }
 
             var shapeFactory = new GeometricShapeFactory();
-            
+
             shapeFactory.NumPoints = accuracy < 1000 ? 32 : accuracy < 10000 ? 64 : 128;
             shapeFactory.Centre = point.Coordinate;
             var diameterInMeters = (double)accuracy * 2;
@@ -636,7 +636,7 @@ namespace SOS.Lib.Extensions
 
                     break;
             }
-            
+
             var circle = shapeFactory.CreateCircle();
             circle.SRID = point.SRID;
             return circle;
@@ -681,8 +681,8 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static Envelope ToEnvelope(this LatLonBoundingBox boundingBox)
         {
-            return boundingBox?.BottomRight == null || boundingBox?.TopLeft == null ? 
-                null : 
+            return boundingBox?.BottomRight == null || boundingBox?.TopLeft == null ?
+                null :
                 new Envelope(new Coordinate(boundingBox.BottomRight.Longitude, boundingBox.BottomRight.Latitude), new Coordinate(boundingBox.TopLeft.Longitude, boundingBox.TopLeft.Latitude));
         }
 
@@ -702,10 +702,10 @@ namespace SOS.Lib.Extensions
             switch (geometry.OgcGeometryType)
             {
                 case OgcGeometryType.Point:
-                    var point = (Point) geometry;
+                    var point = (Point)geometry;
                     return new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(point.Coordinate.X, point.Coordinate.Y));
                 case OgcGeometryType.Polygon:
-                    var polygon = (Polygon) geometry;
+                    var polygon = (Polygon)geometry;
 
                     return new GeoJsonPolygon<GeoJson2DCoordinates>(new GeoJsonPolygonCoordinates<GeoJson2DCoordinates>(
                             new GeoJsonLinearRingCoordinates<GeoJson2DCoordinates>(
@@ -719,7 +719,7 @@ namespace SOS.Lib.Extensions
                         )
                     );
                 case OgcGeometryType.MultiPolygon:
-                    var multiPolygon = (MultiPolygon) geometry;
+                    var multiPolygon = (MultiPolygon)geometry;
                     var multiPolygonCoordinates = new List<GeoJsonPolygonCoordinates<GeoJson2DCoordinates>>();
                     foreach (Polygon poly in multiPolygon.Geometries)
                     {
@@ -727,7 +727,8 @@ namespace SOS.Lib.Extensions
                     }
 
                     return new GeoJsonMultiPolygon<GeoJson2DCoordinates>(new GeoJsonMultiPolygonCoordinates<GeoJson2DCoordinates>(multiPolygonCoordinates))
- ;                default:
+ ;
+                default:
                     throw new ArgumentException($"Not handled geometry type: {geometry.GeometryType}");
             }
         }
@@ -806,13 +807,13 @@ namespace SOS.Lib.Extensions
                     var multiPolygon = (MultiPolygonGeoShape)geoShape;
                     var multiPolygonCoordinates = new List<GeoJsonPolygonCoordinates<GeoJson2DCoordinates>>();
 
-                    foreach(var coordinates in multiPolygon.Coordinates)
+                    foreach (var coordinates in multiPolygon.Coordinates)
                     {
                         var mExterior = new GeoJsonLinearRingCoordinates<GeoJson2DCoordinates>(coordinates?.FirstOrDefault()?.Select(c => new GeoJson2DCoordinates(c.Longitude, c.Latitude)));
                         var mHoles = coordinates?.Skip(1)?.Select(h => new GeoJsonLinearRingCoordinates<GeoJson2DCoordinates>(h?.Select(c => new GeoJson2DCoordinates(c.Longitude, c.Latitude))));
                         multiPolygonCoordinates.Add(new GeoJsonPolygonCoordinates<GeoJson2DCoordinates>(mExterior, mHoles));
                     }
-                    
+
                     return new GeoJsonMultiPolygon<GeoJson2DCoordinates>(new GeoJsonMultiPolygonCoordinates<GeoJson2DCoordinates>(multiPolygonCoordinates));
                 default:
                     return null;
@@ -846,7 +847,7 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
-            var point = (PointGeoShape) geometry;
+            var point = (PointGeoShape)geometry;
 
             return new GeoLocation(point.Coordinates.Latitude, point.Coordinates.Longitude);
         }
@@ -902,33 +903,33 @@ namespace SOS.Lib.Extensions
             switch (geometry.OgcGeometryType)
             {
                 case OgcGeometryType.Point:
-                    var point = (Point) geometry;
+                    var point = (Point)geometry;
 
                     return point.X.Equals(0) || point.Y.Equals(0)
                         ? null
                         : new PointGeoShape(new GeoCoordinate(point.Y, point.X));
                 case OgcGeometryType.LineString:
-                    var lineString = (LineString) geometry;
+                    var lineString = (LineString)geometry;
 
                     return new LineStringGeoShape(lineString.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray());
                 case OgcGeometryType.MultiLineString:
-                    var multiLineString = (MultiLineString) geometry;
+                    var multiLineString = (MultiLineString)geometry;
 
                     return new MultiLineStringGeoShape(multiLineString.Geometries.Select(mls =>
                         mls.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray()));
                 case OgcGeometryType.MultiPoint:
-                    var multiPoint = (MultiPoint) geometry;
+                    var multiPoint = (MultiPoint)geometry;
 
                     return new MultiPointGeoShape(multiPoint.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray());
                 case OgcGeometryType.Polygon:
-                    var polygon = (Polygon) geometry;
+                    var polygon = (Polygon)geometry;
 
                     return new PolygonGeoShape(((Polygon)polygon.TryMakeValid()).ToGeoShapePolygonCoordinates());
                 case OgcGeometryType.MultiPolygon:
-                    var multiPolygon = (MultiPolygon) geometry;
+                    var multiPolygon = (MultiPolygon)geometry;
 
                     return new MultiPolygonGeoShape(multiPolygon.Geometries.Select(p =>
-                        ((Polygon) p.TryMakeValid()).ToGeoShapePolygonCoordinates()));
+                        ((Polygon)p.TryMakeValid()).ToGeoShapePolygonCoordinates()));
                 default:
                     throw new ArgumentException($"Not handled geometry type: {geometry.GeometryType}");
             }
@@ -943,7 +944,7 @@ namespace SOS.Lib.Extensions
             this string wkt)
         {
             var geometry = _wktReader.Read(wkt);
-  
+
             return geometry;
         }
 
@@ -1070,7 +1071,7 @@ namespace SOS.Lib.Extensions
                     new Tuple<CoordinateSys, CoordinateSys>(fromCoordinateSystem, toCoordinateSystem)];
             var transformedGeometry = geometry.Copy();
             transformedGeometry.Apply(mathTransformFilter);
-            transformedGeometry.SRID = (int) toCoordinateSystem;
+            transformedGeometry.SRID = (int)toCoordinateSystem;
 
             // Remove decimals for some coordinate systems
             if (toCoordinateSystem == CoordinateSys.ETRS89_LAEA_Europe ||
@@ -1078,7 +1079,7 @@ namespace SOS.Lib.Extensions
                 toCoordinateSystem == CoordinateSys.SWEREF99_TM ||
                 toCoordinateSystem == CoordinateSys.WebMercator)
             {
-                foreach(var coordinate in transformedGeometry.Coordinates)
+                foreach (var coordinate in transformedGeometry.Coordinates)
                 {
                     coordinate.X = Math.Round(coordinate.X, 0);
                     coordinate.Y = Math.Round(coordinate.Y, 0);

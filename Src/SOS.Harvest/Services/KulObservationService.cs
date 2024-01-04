@@ -1,7 +1,7 @@
-﻿using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Services
 {
@@ -39,7 +39,7 @@ namespace SOS.Harvest.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get data from KUL", e);
+                _logger.LogError(e, "Failed to get data from KUL");
                 throw;
             }
         }

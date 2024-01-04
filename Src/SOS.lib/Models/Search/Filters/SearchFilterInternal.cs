@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SOS.Lib.Enums;
+using System;
 using System.Collections.Generic;
-using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Search.Filters
 {

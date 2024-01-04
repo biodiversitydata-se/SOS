@@ -1,25 +1,25 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Administration.Gui.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Gui.Controllers
 {
     [Route("[controller]")]
     [ApiController]
     public class TestsController : ControllerBase
-    {        
+    {
         private readonly ITestService _service;
 
         public TestsController(ITestService testService)
         {
             _service = testService;
         }
-        [HttpGet]        
+        [HttpGet]
         public IEnumerable<Test> GetTests()
         {
             return _service.GetTests();
-        }        
+        }
         [HttpGet]
         [Route("Test_SearchOtter")]
         public async Task<TestResults> Test_SearchOtter()

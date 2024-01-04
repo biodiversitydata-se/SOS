@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SOS.Harvest.Entities.ObservationsDatabase
+﻿namespace SOS.Harvest.Entities.ObservationsDatabase
 {
     public class ObservationEntity
     {
@@ -15,7 +13,7 @@ namespace SOS.Harvest.Entities.ObservationsDatabase
         public string? CollectionId { get; set; }
 
         public string? County { get; set; }
-        
+
         public DateTime EditDate { get; set; }
 
         public DateTime? EndDate { get; set; }

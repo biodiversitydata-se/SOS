@@ -386,7 +386,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [SwaggerExclude]
         public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }
-        
+
         /// <summary>
         ///     The ratio of the area of the point-radius
         ///     (decimalLatitude, decimalLongitude,

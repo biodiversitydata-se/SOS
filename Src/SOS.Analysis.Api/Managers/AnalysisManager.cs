@@ -82,7 +82,7 @@ namespace SOS.Analysis.Api.Managers
         public async Task<PagedAggregationResultDto<UserAggregationResponseDto>?> AggregateByUserFieldAsync(
             int? roleId,
             string? authorizationApplicationIdentifier,
-            SearchFilter filter, 
+            SearchFilter filter,
             string aggregationField,
             int? precisionThreshold,
             string? afterKey,
@@ -128,12 +128,12 @@ namespace SOS.Analysis.Api.Managers
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var aggregationField = $"location.{(atlasSize == AtlasAreaSizeDto.Km5x5 ? "atlas5x5" : "atlas10x10")}.featureId";
-          
+
             var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, precisionThreshold: 40000, afterKey: null, 10000);
             var futureCollection = new FeatureCollection();
             while (result?.Records?.Any() ?? false)
             {
-                foreach(var record in result.Records)
+                foreach (var record in result.Records)
                 {
                     var area = (IGeoShape)await _areaCache.GetGeometryAsync(atlasSize switch { AtlasAreaSizeDto.Km5x5 => AreaType.Atlas5x5, _ => AreaType.Atlas10x10 }, record.AggregationField);
                     futureCollection.Add(
@@ -146,7 +146,7 @@ namespace SOS.Analysis.Api.Managers
 
                 result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, precisionThreshold: 40000, afterKey: (string)result.SearchAfter?.FirstOrDefault()!, 10000);
             }
-          
+
             return futureCollection;
         }
 
@@ -172,7 +172,7 @@ namespace SOS.Analysis.Api.Managers
                 var gridCells = new List<GridCell>();
                 const int pageSize = 10000;
                 var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize);
-                while((result?.GridCellCount ?? 0) > 0)
+                while ((result?.GridCellCount ?? 0) > 0)
                 {
                     gridCells.AddRange(result!.GridCells);
                     result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize, result.AfterKey);
@@ -182,7 +182,7 @@ namespace SOS.Analysis.Api.Managers
                 {
                     return null!;
                 }
-                    
+
                 var gridCellCount = gridCells.Count();
                 var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
                 var aoo = Math.Round((double)gridCellCount * gridCellArea, 0);
@@ -198,8 +198,9 @@ namespace SOS.Analysis.Api.Managers
                     })
                 ).ToDictionary(f => (string)f.Attributes["id"], f => f);
 
-                var futureCollection = new FeatureCollection { 
-                    BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem) 
+                var futureCollection = new FeatureCollection
+                {
+                    BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)
                 };
                 var metricEooGeometries = new Dictionary<double, Geometry>();
                 foreach (var alphaValue in alphaValues)
@@ -217,7 +218,7 @@ namespace SOS.Analysis.Api.Managers
                     var area = eooGeometry.Area / 1000000; //Calculate area in km2
                     var eoo = Math.Round(area, 0);
                     var transformedEooGeometry = eooGeometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
-                    
+
                     futureCollection.Add(new Feature(
                         transformedEooGeometry,
                         new AttributesTable(new KeyValuePair<string, object>[] {
@@ -231,8 +232,9 @@ namespace SOS.Analysis.Api.Managers
                         )
                     ));
                 }
-                
-                if (!returnGridCells){
+
+                if (!returnGridCells)
+                {
                     return futureCollection;
                 }
 
@@ -251,16 +253,16 @@ namespace SOS.Analysis.Api.Managers
                 }
 
                 // Add all grid cells features
-                foreach(var gridCellFeatureMetric in gridCellFeaturesMetric.OrderBy(gc => gc.Key))
+                foreach (var gridCellFeatureMetric in gridCellFeaturesMetric.OrderBy(gc => gc.Key))
                 {
                     if (coordinateSystem != (CoordinateSys)metricCoordinateSys)
                     {
                         gridCellFeatureMetric.Value.Geometry = gridCellFeatureMetric.Value.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
                     }
-                    
+
                     futureCollection.Add(gridCellFeatureMetric.Value);
                 }
- 
+
                 return futureCollection;
             }
             catch (ArgumentOutOfRangeException e)

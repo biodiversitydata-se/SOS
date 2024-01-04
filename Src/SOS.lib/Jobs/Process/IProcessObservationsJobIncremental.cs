@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Jobs.Process
 {

@@ -1,5 +1,4 @@
-﻿using SOS.Lib.Enums;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SOS.Observations.Api.Dtos
 {

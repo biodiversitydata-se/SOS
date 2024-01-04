@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Harvesters.Mvm.Interfaces;
@@ -10,6 +9,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Mvm;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Text;
 
 namespace SOS.Harvest.Harvesters.Mvm
 {
@@ -44,7 +44,7 @@ namespace SOS.Harvest.Harvesters.Mvm
             _mvmObservationService =
                 mvmObservationService ?? throw new ArgumentNullException(nameof(mvmObservationService));
             _mvmServiceConfiguration = mvmServiceConfiguration ??
-                                       throw new ArgumentNullException(nameof(mvmServiceConfiguration));           
+                                       throw new ArgumentNullException(nameof(mvmServiceConfiguration));
         }
 
         /// inheritdoc />
@@ -59,7 +59,7 @@ namespace SOS.Harvest.Harvesters.Mvm
                 Logger.LogInformation(GetMvmHarvestSettingsInfoString());
 
                 var result = await _mvmObservationService.GetAsync(0);
-               
+
                 var dataLastModified = DateTime.MinValue;
                 var verbatimFactory = new MvmHarvestFactory();
 
@@ -69,7 +69,7 @@ namespace SOS.Harvest.Harvesters.Mvm
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(result.Observations))?.ToArray();
-                    
+
                     if (verbatims?.Any() ?? false)
                     {
                         result.Observations = null!;

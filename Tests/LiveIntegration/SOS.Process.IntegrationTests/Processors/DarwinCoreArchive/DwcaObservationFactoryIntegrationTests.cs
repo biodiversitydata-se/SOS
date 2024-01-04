@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Process.LiveIntegrationTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
 using Xunit;

@@ -127,7 +127,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 		            AND p.IsHideAll = 0";
 
                 return await QueryAsync<ProjectParameterEntity>(
-                    query, 
+                    query,
                     new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
             }
             catch (Exception e)

@@ -1,12 +1,10 @@
 ﻿using SOS.Lib.Helpers;
 using System;
 using System.Collections.Generic;
-using System.IO.Compression;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -30,7 +28,7 @@ namespace SOS.Lib.IO.DwcArchive
            string outputFilename,
            int nrRowsLimit,
            int startRow = 0)
-        {            
+        {
             var dwcaFileComponents = GetDwcaFileComponents(sourceFilePath, nrRowsLimit, startRow);
             string filePath = CreateDwcaFileFromComponents(dwcaFileComponents, outputFolder, outputFilename);
             return filePath;
@@ -65,7 +63,7 @@ namespace SOS.Lib.IO.DwcArchive
                     var metaEntry = archive.Entries.Single(m => m.FullName.Equals("meta.xml", StringComparison.InvariantCultureIgnoreCase));
                     dwcaFileComponents.Meta = ReadZipEntryAsString(metaEntry);
                     var emlEntry = archive.Entries.Single(m => m.FullName.Equals("eml.xml", StringComparison.InvariantCultureIgnoreCase));
-                    dwcaFileComponents.Eml = ReadZipEntryAsString(emlEntry);                    
+                    dwcaFileComponents.Eml = ReadZipEntryAsString(emlEntry);
                     var occurrenceEntry = archive.Entries.FirstOrDefault(m => m.FullName.StartsWith("occurrence", StringComparison.InvariantCultureIgnoreCase)
                                                                              || m.FullName.StartsWith("observation", StringComparison.InvariantCultureIgnoreCase));
                     var occurrenceComponent = ReadOccurrenceCsvFile(nrRowsLimit, startRow, occurrenceEntry);
@@ -141,10 +139,10 @@ namespace SOS.Lib.IO.DwcArchive
                 using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
                 {
                     var metaEntry = archive.Entries.Single(m => m.FullName.Equals("meta.xml", StringComparison.InvariantCultureIgnoreCase));
-                    dwcaFileComponents.Meta = ReadZipEntryAsString(metaEntry);                    
+                    dwcaFileComponents.Meta = ReadZipEntryAsString(metaEntry);
                     var occurrenceEntry = archive.Entries.FirstOrDefault(m => m.FullName.StartsWith("occurrence", StringComparison.InvariantCultureIgnoreCase)
                                                                              || m.FullName.StartsWith("observation", StringComparison.InvariantCultureIgnoreCase));
-                    distinctValues = GetDistinctValuesFromOccurrenceCsvFile(nrRowsLimit, startRow, term, occurrenceEntry);                    
+                    distinctValues = GetDistinctValuesFromOccurrenceCsvFile(nrRowsLimit, startRow, term, occurrenceEntry);
                 }
 
                 return distinctValues;
@@ -179,7 +177,7 @@ namespace SOS.Lib.IO.DwcArchive
                 {
                     string[] values = line.Split('\t');
                     var value = values[termIndex];
-                    distinctValues.Add(value);                    
+                    distinctValues.Add(value);
                     nrObservations++;
                 }
 

@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using System.Xml.Linq;
-using SOS.Lib.Cache.Interfaces;
+﻿using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SOS.Lib.Cache
 {
@@ -11,7 +11,7 @@ namespace SOS.Lib.Cache
     /// </summary>
     public class DataProviderCache : CacheBase<int, DataProvider>, IDataProviderCache
     {
-        
+
         /// <summary>
         /// Constructor
         /// </summary>

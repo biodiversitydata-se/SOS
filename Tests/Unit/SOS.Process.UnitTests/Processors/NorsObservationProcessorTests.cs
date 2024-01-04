@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Moq;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Nors;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -17,8 +15,10 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Nors;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Nors;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors
@@ -158,7 +158,7 @@ namespace SOS.Process.UnitTests.Processors
             _processedObservationRepository
                 .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .ReturnsAsync(1);
-            
+
             var taxa = new Dictionary<int, Taxon>
             {
                 {0, new Taxon {Id = 0, TaxonId = "taxon:0", ScientificName = "Biota"}}
@@ -168,7 +168,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, taxa,JobRunModes.Full, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, taxa, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

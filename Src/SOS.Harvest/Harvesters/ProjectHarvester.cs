@@ -5,8 +5,8 @@ using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Harvest.Harvesters
@@ -105,7 +105,7 @@ namespace SOS.Harvest.Harvesters
                 Description = projectEntity.Description?.Clean(),
                 IsPublic = projectEntity.IsPublic,
                 Owner = projectEntity.Owner,
-                ProjectURL =projectEntity.ProjectURL,
+                ProjectURL = projectEntity.ProjectURL,
                 SurveyMethod = projectEntity.SurveyMethod,
                 SurveyMethodUrl = projectEntity.SurveyMethodUrl
             };

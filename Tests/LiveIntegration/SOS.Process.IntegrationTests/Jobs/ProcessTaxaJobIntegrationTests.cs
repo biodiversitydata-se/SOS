@@ -1,11 +1,11 @@
-﻿using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
+using SOS.Harvest.Jobs;
+using SOS.Harvest.Processors.Taxon;
 using SOS.Lib.Database;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Verbatim;
-using SOS.Harvest.Jobs;
-using SOS.Harvest.Processors.Taxon;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Process.LiveIntegrationTests.Jobs

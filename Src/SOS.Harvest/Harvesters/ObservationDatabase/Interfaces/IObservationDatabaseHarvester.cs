@@ -7,6 +7,6 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase.Interfaces
     /// </summary>
     public interface IObservationDatabaseHarvester : IObservationHarvester
     {
-      
+
     }
 }

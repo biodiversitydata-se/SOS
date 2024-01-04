@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using NetTopologySuite.Algorithm.Match;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers
 {
@@ -45,11 +44,11 @@ namespace SOS.Lib.Managers
         /// <param name="applicationIdentifier"></param>
         /// <returns></returns>
         public async Task<UserInformation> GetUserInformationAsync(string applicationIdentifier, string cultureCode)
-        {            
-            var user = await UserService.GetUserAsync();            
+        {
+            var user = await UserService.GetUserAsync();
             if (user == null) throw new AuthenticationRequiredException("User is null, probably due to missing authentication header.");
-            var userRoles = await UserService.GetUserRolesAsync(user.Id, applicationIdentifier, cultureCode);            
-            
+            var userRoles = await UserService.GetUserRolesAsync(user.Id, applicationIdentifier, cultureCode);
+
             var userInformation = new UserInformation
             {
                 UserName = user.UserName,
@@ -62,8 +61,8 @@ namespace SOS.Lib.Managers
                 var person = await UserService.GetPersonAsync(user.PersonId.Value, cultureCode);
                 userInformation.FirstName = person.FirstName;
                 userInformation.LastName = person.LastName;
-            }            
-            
+            }
+
             userInformation.Roles = new List<UserRole>();
             foreach (var role in userRoles)
             {
@@ -101,7 +100,7 @@ namespace SOS.Lib.Managers
             if (authorityModels == null || !authorityModels.Any()) return null;
 
             List<UserAuthority> userAuthorities = new List<UserAuthority>();
-            foreach(var authorityModel in authorityModels)
+            foreach (var authorityModel in authorityModels)
             {
                 var userAuthority = await GetUserAuthorityAsync(authorityModel);
                 userAuthorities.Add(userAuthority);
@@ -121,12 +120,12 @@ namespace SOS.Lib.Managers
             return userAuthority;
         }
 
-        private async Task <List<UserArea>> GetUserAreasAsync(IEnumerable<AreaModel> areaModels)
+        private async Task<List<UserArea>> GetUserAreasAsync(IEnumerable<AreaModel> areaModels)
         {
             if (areaModels == null || !areaModels.Any()) return null;
 
             List<UserArea> userAreas = new List<UserArea>();
-            foreach(var areaModel in areaModels)
+            foreach (var areaModel in areaModels)
             {
                 var userArea = await GetUserAreaAsync(areaModel);
                 userAreas.Add(userArea);
@@ -143,7 +142,7 @@ namespace SOS.Lib.Managers
                 AreaType = areaType,
                 FeatureId = areaModel.FeatureId,
                 Name = areaInfo.Name
-            };            
+            };
         }
     }
 }

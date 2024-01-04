@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Search.Filters;
 //using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -42,7 +41,7 @@ namespace SOS.Lib.Repositories.Processed
                     .AutoMap<Dataset>()
                     .Properties(ps => ps
                         .KeyWordLowerCase(kwlc => kwlc.Id, false)
-                        .KeyWordLowerCase(kwlc => kwlc.Identifier)                        
+                        .KeyWordLowerCase(kwlc => kwlc.Identifier)
                         .KeyWordLowerCase(kwlc => kwlc.DataStewardship)
                         .KeyWordLowerCase(kwlc => kwlc.Title, false)
                         .KeyWordLowerCase(kwlc => kwlc.ProgrammeArea, false)
@@ -94,7 +93,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
             );
-            
+
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create Dataset index. Error: {createIndexResponse.DebugInformation}");
         }
 
@@ -185,7 +184,7 @@ namespace SOS.Lib.Repositories.Processed
                     // number of items per bulk request
                     .Size(WriteBatchSize)
                     .DroppedDocumentCallback((r, o) =>
-                    {                        
+                    {
                         Logger.LogError($"Dataset identifier: {o?.Identifier}, Error: {r?.Error?.Reason}");
                     })
                 )
@@ -213,7 +212,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<int> AddManyAsync(IEnumerable<Dataset> items)
         {
-            return await Task.Run(() => {
+            return await Task.Run(() =>
+            {
                 // Save valid processed data
                 Logger.LogDebug($"Start indexing Dataset batch for searching with {items.Count()} items");
                 var indexResult = WriteToElastic(items);

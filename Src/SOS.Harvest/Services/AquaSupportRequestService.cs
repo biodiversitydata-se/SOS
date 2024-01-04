@@ -1,7 +1,7 @@
-﻿using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Services
 {
@@ -10,7 +10,7 @@ namespace SOS.Harvest.Services
         private readonly IHttpClientService _httpClientService;
         private readonly ILogger<AquaSupportRequestService> _logger;
         private readonly SemaphoreSlim _semaphore;
-        private DateTime? _lastRequestTime;        
+        private DateTime? _lastRequestTime;
         private const int TimeBetweenCalls = 2000;
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace SOS.Harvest.Services
             ILogger<AquaSupportRequestService> logger)
         {
             _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _semaphore = new SemaphoreSlim(1, 1);
         }
 
@@ -33,11 +33,11 @@ namespace SOS.Harvest.Services
             try
             {
                 await _semaphore.WaitAsync();
-                return await GetDocumentAsync(baseUrl, startDate, endDate, changeId, maxReturnedChanges);                
+                return await GetDocumentAsync(baseUrl, startDate, endDate, changeId, maxReturnedChanges);
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get data from AquaSupport data", e);
+                _logger.LogError(e, "Failed to get data from AquaSupport data");
                 throw;
             }
             finally
@@ -79,7 +79,7 @@ namespace SOS.Harvest.Services
 
             // If get stream failed, try to decrease max returned observations and try again
             if (xmlStream == null)
-            {                
+            {
                 return await GetDocumentAsync(baseUrl, startDate, endDate, changeId, maxReturnedChanges - 2000);
             }
 

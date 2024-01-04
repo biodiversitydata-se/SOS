@@ -12,7 +12,7 @@ namespace SOS.Lib.Configuration.Export
         /// DOI meta data
         /// </summary>
         public DOIConfiguration DOIConfiguration { get; set; }
-     
+
         /// <summary>
         ///     Destination file settings
         /// </summary>
@@ -31,6 +31,6 @@ namespace SOS.Lib.Configuration.Export
         /// <summary>
         /// Vocabulary Configuration
         /// </summary>
-        public VocabularyConfiguration VocabularyConfiguration { get; set; }        
+        public VocabularyConfiguration VocabularyConfiguration { get; set; }
     }
 }

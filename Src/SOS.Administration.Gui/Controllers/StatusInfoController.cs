@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -8,15 +6,17 @@ using MongoDB.Driver;
 using Nest;
 using SOS.Administration.Gui.Models;
 using SOS.Lib.Configuration.Shared;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Administration.Gui.Controllers
 {
-   
-   
+
+
     [ApiController]
     [Route("[controller]")]
     public class StatusInfoController : ControllerBase
-    {       
+    {
         private readonly ILogger<StatusInfoController> _logger;
         private MongoClient _mongoClient;
         private IElasticClient _elasticClient;
@@ -39,11 +39,11 @@ namespace SOS.Administration.Gui.Controllers
         [Route("harvest")]
         public IEnumerable<HarvestInfoDto> GetHarvestInfo()
         {
-            var database = _mongoClient.GetDatabase("sos-harvest" + _mongoSuffix);            
+            var database = _mongoClient.GetDatabase("sos-harvest" + _mongoSuffix);
             var collection = database.GetCollection<HarvestInfoDto>("HarvestInfo");
             var providers = collection.Find(new BsonDocument());
-            return providers.ToList();          
-       }
+            return providers.ToList();
+        }
         [HttpGet]
         [Route("process")]
         public IEnumerable<ProcessInfoDto> GetProcessInfo()
@@ -85,7 +85,7 @@ namespace SOS.Administration.Gui.Controllers
             if (allocation.IsValid)
             {
                 var allocations = new List<SearchIndexInfoDto.AllocationInfo>();
-                foreach(var record in allocation.Records)
+                foreach (var record in allocation.Records)
                 {
                     if (int.TryParse(record.DiskPercent, out int percentage))
                     {

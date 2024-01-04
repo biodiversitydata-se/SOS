@@ -1,7 +1,7 @@
-﻿using FizzWare.NBuilder.Implementation;
-using FizzWare.NBuilder;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
+﻿using FizzWare.NBuilder;
+using FizzWare.NBuilder.Implementation;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Observations.Api.IntegrationTests.Helpers;
 
 namespace SOS.Observations.Api.IntegrationTests.TestData.Factories;

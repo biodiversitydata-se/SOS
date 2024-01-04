@@ -1,10 +1,10 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.XPath;
-using DwC_A;
+﻿using DwC_A;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Harvest.DarwinCore;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.XPath;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.DarwinCore

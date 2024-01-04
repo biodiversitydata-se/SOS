@@ -1,16 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOS.Harvest.Jobs;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
-using SOS.Harvest.Jobs;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.DwcArchive.Interfaces;
+using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -21,11 +22,10 @@ using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Artportalen.Interfaces;
-using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
-using SOS.Lib.Jobs.Import;
 
 namespace SOS.Process.UnitTests.Jobs
 {
@@ -49,7 +49,7 @@ namespace SOS.Process.UnitTests.Jobs
             _instanceManager = new Mock<IInstanceManager>();
             _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _validationManager = new Mock<IValidationManager>();
-            _taxonCache =new Mock<ICache<int, Taxon>>();
+            _taxonCache = new Mock<ICache<int, Taxon>>();
             _processTaxaJob = new Mock<IProcessTaxaJob>();
             _observationProcessorManagerMock = new Mock<IObservationProcessorManager>();
             _areaHelper = new Mock<IAreaHelper>();
@@ -171,8 +171,8 @@ namespace SOS.Process.UnitTests.Jobs
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
 
-            _dataProviderCache.Setup(dpm => dpm.GetAllAsync()).ReturnsAsync(new List<DataProvider> {new DataProvider{ Id = 1, Names = new []{ new VocabularyValueTranslation{ CultureCode = "en-GB", Value = "Artportalen" } }, Identifier = "Artportalen", Type = DataProviderType.ArtportalenObservations} });
-            
+            _dataProviderCache.Setup(dpm => dpm.GetAllAsync()).ReturnsAsync(new List<DataProvider> { new DataProvider { Id = 1, Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } }, Identifier = "Artportalen", Type = DataProviderType.ArtportalenObservations } });
+
             _processTaxaJob.Setup(r => r.RunAsync())
                 .ReturnsAsync(true);
 
@@ -187,7 +187,7 @@ namespace SOS.Process.UnitTests.Jobs
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenObservationVerbatim)))
                 .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now));
-            
+
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(KulObservationVerbatim)))
                 .ReturnsAsync(new HarvestInfo("Identifier",
                     DateTime.Now));

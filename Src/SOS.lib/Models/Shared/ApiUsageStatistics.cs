@@ -1,6 +1,6 @@
-﻿using System;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using SOS.Lib.Models.Interfaces;
+using System;
 
 namespace SOS.Lib.Models.Shared
 {

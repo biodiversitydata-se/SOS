@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.TestHelpers.Gis;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace SOS.Process.LiveIntegrationTests.Helpers

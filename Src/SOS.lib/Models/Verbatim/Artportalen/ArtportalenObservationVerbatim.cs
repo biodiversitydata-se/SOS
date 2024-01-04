@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
+using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
 {
@@ -79,7 +79,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// Field diary group id
         /// </summary>
         public int? FieldDiaryGroupId { get; set; }
-    
+
         /// <summary>
         ///     Taxon gender id
         /// </summary>

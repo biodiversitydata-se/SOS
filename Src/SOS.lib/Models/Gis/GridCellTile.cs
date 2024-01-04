@@ -17,13 +17,13 @@ namespace SOS.Lib.Models.Gis
             var zoomAndCoordinates = GeoTileHelper.GetZoomAndCoordinatesFromKey(key);
             GridCellTile gridCellTile = new GridCellTile
             {
-                Zoom = zoomAndCoordinates.zoom, 
-                X = zoomAndCoordinates.x, 
+                Zoom = zoomAndCoordinates.zoom,
+                X = zoomAndCoordinates.x,
                 Y = zoomAndCoordinates.y,
                 BoundingBox = new LatLonBoundingBox
                 {
                     TopLeft = GeoTileHelper.GetCoordinateFromTile(zoomAndCoordinates.x, zoomAndCoordinates.y, zoomAndCoordinates.zoom),
-                    BottomRight = GeoTileHelper.GetCoordinateFromTile(zoomAndCoordinates.x+1, zoomAndCoordinates.y+1, zoomAndCoordinates.zoom),
+                    BottomRight = GeoTileHelper.GetCoordinateFromTile(zoomAndCoordinates.x + 1, zoomAndCoordinates.y + 1, zoomAndCoordinates.zoom),
                 },
                 ObservationsCount = observationsCount,
                 TaxaCount = taxaCount,

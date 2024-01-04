@@ -16,7 +16,7 @@ namespace SOS.Import.UnitTests.Services
         {
             _speciesObservationChangeServiceMock = new Mock<ISpeciesObservationChangeService>();
             _mvmServiceConfiguration = new MvmServiceConfiguration
-                {MaxNumberOfSightingsHarvested = 10, MaxReturnedChangesInOnePage = 10};
+            { MaxNumberOfSightingsHarvested = 10, MaxReturnedChangesInOnePage = 10 };
             _loggerMock = new Mock<ILogger<MvmObservationService>>();
         }
 

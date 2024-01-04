@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SOS.Lib.Models.UserService
 {
-   
+
     public class AuthorityModel
     {
         public int Id { get; set; }

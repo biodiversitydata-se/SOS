@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SOS.Observations.Api.Dtos
+﻿namespace SOS.Observations.Api.Dtos
 {
     /// <summary>
     /// Taxon observation count.
@@ -10,7 +8,7 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         /// The Taxon Id.
         /// </summary>
-        public int TaxonId { get; set; }        
+        public int TaxonId { get; set; }
 
         /// <summary>
         /// Observation count.

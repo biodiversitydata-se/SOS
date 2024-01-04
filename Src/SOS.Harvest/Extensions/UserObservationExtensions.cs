@@ -23,7 +23,7 @@ namespace SOS.Harvest.Extensions
                 userObservation.SightingId = observation.ArtportalenInternal.SightingId;
                 userObservation.TaxonId = observation.Taxon.Id;
                 userObservation.TaxonSpeciesGroupId = (int)observation.Taxon.Attributes.SpeciesGroup; // todo Check if correct
-                userObservation.ProvinceFeatureId = observation.Location?.Province?.FeatureId; 
+                userObservation.ProvinceFeatureId = observation.Location?.Province?.FeatureId;
                 userObservation.MunicipalityFeatureId = observation.Location?.Municipality?.FeatureId;
                 userObservation.CountryRegionFeatureId = observation.Location?.CountryRegion?.FeatureId;                                                                                  //userObservation.CountryRegionFeatureId = // todo
                 userObservation.IsBirdsite = observation.Taxon?.Attributes?.SpeciesGroup.Equals(SpeciesGroup.Birds) ?? false;
@@ -42,7 +42,7 @@ namespace SOS.Harvest.Extensions
                     userObservation.ObservationYear = userObservation.StartDate.Year;
                     userObservation.ObservationMonth = userObservation.StartDate.Month;
                 }
-               
+
                 if (observation.Projects?.Any() ?? false)
                 {
                     userObservation.ProjectIds = observation.Projects.Select(m => m.Id).ToList();
@@ -101,6 +101,6 @@ namespace SOS.Harvest.Extensions
                 ToUserObservation(observation, m));
         }
 
-        
+
     }
 }

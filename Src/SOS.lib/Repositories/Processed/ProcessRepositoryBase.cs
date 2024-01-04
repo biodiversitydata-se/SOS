@@ -1,17 +1,17 @@
 ﻿using Microsoft.Extensions.Logging;
 using Nest;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
 using System.Collections.Generic;
-using SOS.Lib.Extensions;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -137,7 +137,7 @@ namespace SOS.Lib.Repositories.Processed
             ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
         )
         {
-            _toggleable = toggleable;            
+            _toggleable = toggleable;
             _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
             _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
@@ -150,7 +150,7 @@ namespace SOS.Lib.Repositories.Processed
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             // Default use non live instance
             LiveMode = false;
-        }        
+        }
 
         /// <summary>
         ///     Dispose

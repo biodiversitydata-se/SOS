@@ -32,10 +32,11 @@ namespace SOS.Lib.Swagger
         /// <param name="description"></param>
         public UseSchema(SchemaDataType schema, string description = null)
         {
-            Schema = schema switch {
+            Schema = schema switch
+            {
                 SchemaDataType.Date => new OpenApiSchema { Type = "string", Format = "date", Description = description },
                 SchemaDataType.DateTime => new OpenApiSchema { Type = "string", Format = "date-time", Description = description },
-                SchemaDataType.Integer => new OpenApiSchema { Type = "integer", Format = "int32", Description=description },
+                SchemaDataType.Integer => new OpenApiSchema { Type = "integer", Format = "int32", Description = description },
                 _ => new OpenApiSchema { Type = "string", Format = "string", Description = description }
             };
         }

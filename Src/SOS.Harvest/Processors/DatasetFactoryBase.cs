@@ -16,7 +16,7 @@ namespace SOS.Harvest.Processors
         /// <exception cref="ArgumentNullException"></exception>
         protected DatasetFactoryBase(DataProvider dataProvider, IProcessTimeManager processTimeManager, ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
         {
-           
+
         }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using NetTopologySuite.Geometries;
@@ -15,6 +9,12 @@ using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Resource
 {
@@ -96,7 +96,7 @@ namespace SOS.Lib.Repositories.Resource
         /// <inheritdoc />
         public async Task<Area> GetAsync(AreaType areaType, string feature)
         {
-            var filters = new [] {
+            var filters = new[] {
                 Builders<Area>.Filter.Eq(a => a.AreaType, areaType),
                 Builders<Area>.Filter.Eq(a => a.FeatureId, feature)
             };
@@ -105,7 +105,7 @@ namespace SOS.Lib.Repositories.Resource
             return res;
         }
 
-       
+
         /// <inheritdoc />
         public async Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString,
             int skip, int take)
@@ -119,7 +119,7 @@ namespace SOS.Lib.Repositories.Resource
             else
             {
                 // Make sure economic zone of sweden is NOT matched
-                filters.Add(Builders<Area>.Filter.In(a => a.AreaType, ((AreaType[])Enum.GetValues(typeof(AreaType))).Where(at => at != AreaType.EconomicZoneOfSweden))); 
+                filters.Add(Builders<Area>.Filter.In(a => a.AreaType, ((AreaType[])Enum.GetValues(typeof(AreaType))).Where(at => at != AreaType.EconomicZoneOfSweden)));
             }
 
             if (!string.IsNullOrEmpty(searchString))

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using SOS.Harvest.Factories.Validation.Interfaces;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
@@ -15,10 +13,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
-using SOS.Lib.Configuration.Process;
-using SOS.Harvest.Managers;
 
 namespace SOS.Harvest.Factories.Validation
 {

@@ -139,7 +139,7 @@ namespace SOS.Harvest.Harvesters.Mvm
                         break;
                 }
             }
-            
+
             return observation;
         }
     }

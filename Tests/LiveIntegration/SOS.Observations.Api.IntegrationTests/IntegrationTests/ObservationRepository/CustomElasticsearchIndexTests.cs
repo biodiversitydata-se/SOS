@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using SOS.Lib.Models.Processed.Observation;
+﻿using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationRepository

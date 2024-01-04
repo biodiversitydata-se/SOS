@@ -1,11 +1,11 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.DOI.Controllers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.DOI.Controllers
 {
@@ -34,9 +34,9 @@ namespace SOS.DOI.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetBatchAsync([FromQuery]int take = 10, [FromQuery]int page = 1, [FromQuery]string orderBy = "created", [FromQuery]SearchSortOrder sortOrder = SearchSortOrder.Desc)
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetBatchAsync([FromQuery] int take = 10, [FromQuery] int page = 1, [FromQuery] string orderBy = "created", [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Desc)
         {
             try
             {
@@ -72,9 +72,9 @@ namespace SOS.DOI.Controllers
 
         /// <inheritdoc />
         [HttpGet("{prefix}/{suffix}")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetMetadata([FromRoute] string prefix, [FromRoute] string suffix)
         {
             try

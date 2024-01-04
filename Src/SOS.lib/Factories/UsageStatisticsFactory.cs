@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AgileObjects.AgileMapper.Extensions;
+﻿using AgileObjects.AgileMapper.Extensions;
 using SOS.Lib.Models.ApiManagement;
 using SOS.Lib.Models.ApplicationInsights;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Factories
 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;

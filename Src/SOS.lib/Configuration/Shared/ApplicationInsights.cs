@@ -3,7 +3,7 @@
     /// <summary>
     /// Configuration for application insights
     /// </summary>
-    public class ApplicationInsights 
+    public class ApplicationInsights
     {
         /// <summary>
         /// Connection string

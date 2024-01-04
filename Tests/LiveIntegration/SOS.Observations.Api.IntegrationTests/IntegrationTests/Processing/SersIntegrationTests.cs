@@ -1,10 +1,7 @@
 ﻿using FluentAssertions;
-using Xunit;
-using SOS.Lib.Helpers;
-using System.Collections.Generic;
-using SOS.Lib.Factories;
-using System.Threading.Tasks;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Processing
 {

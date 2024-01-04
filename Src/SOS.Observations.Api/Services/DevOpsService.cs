@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Models.DevOps;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Services.Interfaces
 {
@@ -53,7 +53,7 @@ namespace SOS.Observations.Api.Services.Interfaces
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get releases from dev ops", e);
+                _logger.LogError(e, "Failed to get releases from dev ops");
             }
 
             return null;
@@ -75,7 +75,7 @@ namespace SOS.Observations.Api.Services.Interfaces
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get release from dev ops", e);
+                _logger.LogError(e, "Failed to get release from dev ops");
             }
 
             return null;

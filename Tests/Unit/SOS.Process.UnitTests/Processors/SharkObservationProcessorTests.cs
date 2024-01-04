@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Moq;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Shark;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -17,8 +15,10 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Shark;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors
@@ -60,7 +60,7 @@ namespace SOS.Process.UnitTests.Processors
             _sharkObservationVerbatimRepositoryMock.Object,
             _areaHelper.Object,
             _processedObservationRepository.Object,
-            _vocabularyResolverMock.Object, 
+            _vocabularyResolverMock.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processManagerMock.Object,
             _validationManagerMock.Object,
@@ -154,11 +154,11 @@ namespace SOS.Process.UnitTests.Processors
 
             _processedObservationRepository.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>()))
                 .ReturnsAsync(true);
-            
+
             _processedObservationRepository
                 .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .ReturnsAsync(1);
-           
+
             var taxa = new Dictionary<int, Taxon>
             {
                 {0, new Taxon {Id = 0, TaxonId = "taxon:0", ScientificName = "Biota"}}

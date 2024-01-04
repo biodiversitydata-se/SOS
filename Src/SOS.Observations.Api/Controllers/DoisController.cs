@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +11,10 @@ using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -63,10 +63,10 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="filter"></param>
         /// <returns>Object with these properties: fileName, jobId</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(object), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CreateDOI([FromBody] ExportFilterDto filter)
         {
             try
@@ -79,7 +79,7 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return BadRequest(validationResults.Error);
                 }
-                
+
                 var creatorEmail = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
                 var exportFilter = filter.ToSearchFilter(UserId, Dtos.Enum.ProtectionFilterDto.Public, "en-GB");
                 var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter);
@@ -102,7 +102,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Running DOI failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 

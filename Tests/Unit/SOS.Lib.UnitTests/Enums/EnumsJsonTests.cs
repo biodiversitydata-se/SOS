@@ -1,14 +1,14 @@
-﻿using System;
+﻿using FluentAssertions;
+using SOS.Lib.Enums;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using FluentAssertions;
-using SOS.Lib.Enums;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.TaxonTree
 {
     public class EnumsJsonTests
-    {       
+    {
         string jsonWithEnumValue = """
         {
             "LocationType": 2 
@@ -28,7 +28,7 @@ namespace SOS.Lib.UnitTests.Models.TaxonTree
 
         [Fact]
         public void ParseJson_Succeeds_GivenJsonWithEnumValue()
-        {            
+        {
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ namespace SOS.Lib.UnitTests.Models.TaxonTree
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            act.Should().Throw<JsonException>();                
+            act.Should().Throw<JsonException>();
         }
 
         [Fact]

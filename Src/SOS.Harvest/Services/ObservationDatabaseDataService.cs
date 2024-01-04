@@ -1,8 +1,8 @@
-﻿using System.Data;
+﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using Dapper;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
+using System.Data;
 
 namespace SOS.Harvest.Services
 {
@@ -35,7 +35,7 @@ namespace SOS.Harvest.Services
         {
             using var conn = Connection;
             conn.Open();
-         
+
             var transaction = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
 
             IEnumerable<T> result = null!;
@@ -54,7 +54,7 @@ namespace SOS.Harvest.Services
 
                 transaction.Commit();
             }
-            catch 
+            catch
             {
                 transaction.Rollback();
             }

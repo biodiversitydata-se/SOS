@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -40,8 +40,8 @@ namespace SOS.Administration.Api.Controllers
         /// <param name="nrOfDays">Delete reports and files older than this number of days.</param>
         /// <returns></returns>
         [HttpDelete("DeleteOld")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> DeleteOldReportsAndFilesAsync([FromQuery] int nrOfDays = 30)
         {
             try
@@ -55,7 +55,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 

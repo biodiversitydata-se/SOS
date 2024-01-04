@@ -5,7 +5,7 @@
         /// <summary>
         /// Average size of observation, used to calculate number of observations returned
         /// </summary>
-        public int AverageObservationSize { get; set;}
+        public int AverageObservationSize { get; set; }
 
         /// <summary>
         /// Log the request.

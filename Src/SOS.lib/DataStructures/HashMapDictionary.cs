@@ -51,12 +51,12 @@ namespace SOS.Lib.DataStructures
             lock (this)
             {
                 if (!_keyValue.TryGetValue(key, out var result))
-                    _keyValue.TryAdd(key, new List<TValue> {value});
+                    _keyValue.TryAdd(key, new List<TValue> { value });
                 else if (!result.Contains(value))
                     result.Add(value);
 
                 if (!_valueKey.TryGetValue(value, out var result2))
-                    _valueKey.TryAdd(value, new List<TKey> {key});
+                    _valueKey.TryAdd(value, new List<TKey> { key });
                 else if (!result2.Contains(key))
                     result2.Add(key);
             }

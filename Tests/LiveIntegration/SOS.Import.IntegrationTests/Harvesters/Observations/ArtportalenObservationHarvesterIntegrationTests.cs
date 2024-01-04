@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -11,16 +9,15 @@ using SOS.Harvest.Harvesters.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services;
-using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
-using ITaxonRepository = SOS.Harvest.Repositories.Source.Artportalen.Interfaces.ITaxonRepository;
-using TaxonRepository = SOS.Harvest.Repositories.Source.Artportalen.TaxonRepository;
 
 namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
 {

@@ -31,7 +31,7 @@ namespace SOS.Harvest.Jobs
                 harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        
+
         /// <inheritdoc />
         public async Task<bool> RunHarvestTaxonListsAsync()
         {

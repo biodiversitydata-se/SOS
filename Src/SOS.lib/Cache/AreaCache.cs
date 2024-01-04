@@ -1,14 +1,14 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Nest;
+﻿using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Cache
 {
@@ -65,7 +65,7 @@ namespace SOS.Lib.Cache
                 if (areas != null)
                 {
                     foreach (var area in areas)
-                    {                        
+                    {
                         Cache.TryAdd(area.Id, area);
                     }
                 }
@@ -99,7 +99,7 @@ namespace SOS.Lib.Cache
                 {
                     // Remove geoemtry being cached the longest time
                     _geometryCache.Remove(_geometryCache.Keys.First(), out var removedGeometry);
-                   // _geometryCache.Clear();
+                    // _geometryCache.Clear();
                 }
                 _geometryCache.TryAdd((areaType, featureId), geometry);
             }

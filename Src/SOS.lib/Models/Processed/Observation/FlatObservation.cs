@@ -218,7 +218,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? OccurrenceEstablishmentMeansId => _observation?.Occurrence?.EstablishmentMeans?.Id;
         public string OccurrenceEstablishmentMeansValue => _observation?.Occurrence?.EstablishmentMeans?.Value;
         public string OccurrenceIndividualCount => _observation?.Occurrence?.IndividualCount;
-      //  public string OccurrenceIndividualId => _observation?.Occurrence?.IndividualId;
+        //  public string OccurrenceIndividualId => _observation?.Occurrence?.IndividualId;
         public bool? OccurrenceIsNaturalOccurrence => _observation?.Occurrence?.IsNaturalOccurrence;
         public bool? OccurrenceIsNeverFoundObservation => _observation?.Occurrence?.IsNeverFoundObservation;
         public bool? OccurrenceIsNotRediscoveredObservation => _observation?.Occurrence?.IsNotRediscoveredObservation;
@@ -239,10 +239,10 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? OccurrenceOrganismQuantityUnitId => _observation?.Occurrence?.OrganismQuantityUnit?.Id;
         public string OccurrenceOrganismQuantityUnitValue => _observation?.Occurrence?.OrganismQuantityUnit?.Value;
         public string OccurrencePreparations => _observation?.Occurrence?.Preparations;
-       
+
         //[Obsolete]
         //public int? OccurrenceProtectionLevel => OccurrenceSensitivityCategory;
-       
+
         public int? OccurrenceSensitivityCategory => _observation?.Occurrence?.SensitivityCategory;
         public string OccurrenceRecordedBy => _observation?.Occurrence?.RecordedBy;
         public string OccurrenceRecordNumber => _observation?.Occurrence?.RecordNumber;
@@ -300,14 +300,14 @@ namespace SOS.Lib.Models.Processed.Observation
         public string TaxonAttributesOrganismGroup => _observation?.Taxon?.Attributes?.OrganismGroup;
         public int? TaxonAttributesParentDyntaxaTaxonId => _observation?.Taxon?.Attributes?.ParentDyntaxaTaxonId;
         public bool? TaxonAttributesProtectedByLaw => _observation?.Taxon?.Attributes?.ProtectedByLaw;
-       
-       /* [Obsolete]
-        public string TaxonAttributesProtectionLevel => TaxonAttributesSensitivityCategory;
-        [Obsolete]
-        public int? TaxonAttributesProtectionLevelId => TaxonAttributesSensitivityCategoryId;
-        [Obsolete]
-        public string TaxonAttributesProtectionLevelValue => TaxonAttributesSensitivityCategoryValue;
-        */
+
+        /* [Obsolete]
+         public string TaxonAttributesProtectionLevel => TaxonAttributesSensitivityCategory;
+         [Obsolete]
+         public int? TaxonAttributesProtectionLevelId => TaxonAttributesSensitivityCategoryId;
+         [Obsolete]
+         public string TaxonAttributesProtectionLevelValue => TaxonAttributesSensitivityCategoryValue;
+         */
         public string TaxonAttributesSensitivityCategory => _observation?.Taxon?.Attributes?.SensitivityCategory?.ToString();
         public int? TaxonAttributesSensitivityCategoryId => _observation?.Taxon?.Attributes?.SensitivityCategory?.Id;
         public string TaxonAttributesSensitivityCategoryValue => _observation?.Taxon?.Attributes?.SensitivityCategory?.Value;
@@ -402,8 +402,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OwnerInstitutionCode => _observation?.OwnerInstitutionCode;
         public string PrivateCollection => _observation?.PrivateCollection;
 
-      //  [Obsolete]
-      //  public bool? Protected => Sensitive;
+        //  [Obsolete]
+        //  public bool? Protected => Sensitive;
 
         public bool? Sensitive => _observation?.Sensitive;
         public string PublicCollection => _observation?.PublicCollection;
@@ -434,7 +434,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public object GetValue(PropertyFieldDescription propertyField)
         {
             return propertyField.PropertyPath.ToLower() switch
-            {    
+            {
                 "occurrence.occurrenceid" => OccurrenceOccurrenceId,
                 "dataproviderid" => DataProviderId,
                 "datasetname" => DatasetName,
@@ -601,7 +601,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "occurrence.reproductivecondition" => OccurrenceReproductiveCondition,
                 "occurrence.reproductivecondition.id" => OccurrenceReproductiveConditionId,
                 "occurrence.reproductivecondition.value" => OccurrenceReproductiveConditionValue,
-                "occurrence.sex" => OccurrenceSex, 
+                "occurrence.sex" => OccurrenceSex,
                 "occurrence.sex.id" => OccurrenceSexId,
                 "occurrence.sex.value" => OccurrenceSexValue,
                 "occurrence.url" => OccurrenceUrl,
@@ -758,7 +758,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "organism.associatedorganisms" => OrganismAssociatedOrganisms,
                 "organism.previousidentifications" => OrganismPreviousIdentifications,
                 "organism.organismremarks" => OrganismOrganismRemarks,
-                "location.pointradiusspatialfit" => _observation?.Location?.PointRadiusSpatialFit,                
+                "location.pointradiusspatialfit" => _observation?.Location?.PointRadiusSpatialFit,
                 _ => throw new ArgumentException($"Field is not mapped: \"{propertyField.PropertyPath}\"")
             };
         }

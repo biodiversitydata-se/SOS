@@ -36,7 +36,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                                                       nameof(virtualHerbariumObservationService));
             _virtualHerbariumServiceConfiguration = virtualHerbariumServiceConfiguration ??
                                                     throw new ArgumentNullException(
-                                                        nameof(virtualHerbariumServiceConfiguration));           
+                                                        nameof(virtualHerbariumServiceConfiguration));
         }
 
         /// inheritdoc />
@@ -57,7 +57,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                 var verbatimFactory = new VirtualHerbariumHarvestFactory(localitiesXml!);
                 var pageIndex = 1;
                 var fromDate = new DateTime(1628, 1, 1);
-                
+
                 while (true)
                 {
                     Logger.LogDebug($"Start getting Virtual Herbarium observations page: {pageIndex}");
@@ -103,7 +103,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                     }
 
                     pageIndex++;
-                } 
+                }
             }
             catch (JobAbortedException)
             {

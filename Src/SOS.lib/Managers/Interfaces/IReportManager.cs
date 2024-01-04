@@ -1,11 +1,8 @@
-﻿using System;
+﻿using CSharpFunctionalExtensions;
+using SOS.Lib.Models.Shared;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using SOS.Lib.Models.DataValidation;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.TaxonTree;
 
 namespace SOS.Lib.Managers.Interfaces
 {

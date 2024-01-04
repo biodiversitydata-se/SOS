@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Search.Filters;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {

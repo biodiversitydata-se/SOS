@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using SOS.Lib.Enums;
 using SOS.Harvest.Managers;
+using SOS.Lib.Enums;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Managers

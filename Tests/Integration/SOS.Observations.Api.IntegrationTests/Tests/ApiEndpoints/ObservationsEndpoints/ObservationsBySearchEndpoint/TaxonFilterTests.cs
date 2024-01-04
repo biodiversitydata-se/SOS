@@ -36,11 +36,13 @@ public class TaxonFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
-            Taxon = new TaxonFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Taxon = new TaxonFilterDto
+            {
                 RedListCategories = new string[] { "CR", "EN", "VU" }
             }
-        };        
+        };
 
         // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
@@ -66,11 +68,13 @@ public class TaxonFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
-            Taxon = new TaxonFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Taxon = new TaxonFilterDto
+            {
                 Ids = new int[] { TaxonIds.Silvergran, TaxonIds.Talgoxe, TaxonIds.Blåmes }
             }
-        };        
+        };
 
         // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
@@ -96,12 +100,14 @@ public class TaxonFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
-            Taxon = new TaxonFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Taxon = new TaxonFilterDto
+            {
                 Ids = new int[] { TaxonIds.Mesar },
                 IncludeUnderlyingTaxa = true
             }
-        };        
+        };
 
         // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
@@ -126,7 +132,7 @@ public class TaxonFilterTests : TestBase
              .TheNext(20).With(o => o.TaxonId = TaxonIds.Jätteloka)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClient = TestFixture.CreateApiClient();        
+        var apiClient = TestFixture.CreateApiClient();
         var searchFilter = SearchFilterDtoFactory.CreateWithTaxonListId(
             (int)TaxonListId.ProtectedByLaw, TaxonListOperatorDto.Merge, TaxonIds.Jättebalsamin);
 
@@ -220,7 +226,7 @@ public class TaxonFilterTests : TestBase
         {
             Taxon = new TaxonFilterDto
             {
-                TaxonListIds = new[] { (int)TaxonListId.ProtectedByLaw },                
+                TaxonListIds = new[] { (int)TaxonListId.ProtectedByLaw },
                 TaxonListOperator = TaxonListOperatorDto.Filter
             }
         };
@@ -250,8 +256,10 @@ public class TaxonFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto {
-            Taxon = new TaxonFilterDto {
+        var searchFilter = new SearchFilterDto
+        {
+            Taxon = new TaxonFilterDto
+            {
                 TaxonCategories = new int[] { 17, 18 }
             }
         };

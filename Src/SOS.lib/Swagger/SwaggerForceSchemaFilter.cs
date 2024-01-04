@@ -23,7 +23,7 @@ namespace SOS.Lib.Swagger
 
             if (propertyInfos != null)
             {
-                foreach(var propertyInfo in propertyInfos)
+                foreach (var propertyInfo in propertyInfos)
                 {
                     var propertyName = propertyInfo.Name.ToCamelCase();
                     if (schema.Properties.ContainsKey(propertyName))

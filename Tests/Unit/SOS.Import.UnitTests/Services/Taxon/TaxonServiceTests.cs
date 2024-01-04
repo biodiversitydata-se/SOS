@@ -11,7 +11,7 @@ using Xunit;
 namespace SOS.Import.UnitTests.Services.Taxon
 {
     public class TaxonServiceTests
-    {                
+    {
         [Fact(Skip = "Intended to run on demand")]
         public void GetTaxonTreeFromDwcaFile()
         {

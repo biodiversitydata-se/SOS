@@ -1,19 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using FluentAssertions;
+using SOS.Lib.Helpers;
+using SOS.Lib.Models.Search.Result;
+using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Enum;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 using System.Threading.Tasks;
-using FluentAssertions;
-using NLog.Targets;
-using SOS.Lib.Helpers;
-using SOS.Lib.Models.Search.Result;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Dtos.Location;
-using SOS.Observations.Api.LiveIntegrationTests.Extensions;
-using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.AreasController

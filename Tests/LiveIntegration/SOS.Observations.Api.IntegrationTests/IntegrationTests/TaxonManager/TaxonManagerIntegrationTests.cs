@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
-using Xunit;
-using SOS.Lib.Helpers;
-using System.Collections.Generic;
 using SOS.Lib.Factories;
+using SOS.Lib.Helpers;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using System.Collections.Generic;
+using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.TaxonManager
 {

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Hangfire;
+using SOS.Lib.HangfireAttributes;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Hangfire;
-using SOS.Lib.HangfireAttributes;
 
 namespace SOS.Lib.Jobs.Import
 {

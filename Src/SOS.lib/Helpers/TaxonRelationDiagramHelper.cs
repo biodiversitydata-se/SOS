@@ -1,9 +1,6 @@
 ﻿using SOS.Lib.Models.TaxonTree;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Helpers
 {
@@ -53,7 +50,7 @@ namespace SOS.Lib.Helpers
                 taxonTreeNodes,
                 treeIterationMode,
                 includeSecondaryRelations);
-            
+
             string str = CreateGraphvizFormatRepresentation(edges);
             return str;
         }
@@ -109,7 +106,7 @@ namespace SOS.Lib.Helpers
                 //    node.ScientificName.Replace("/", ""),
                 //    node.TaxonId,
                 //    node.Category.Name);
-                
+
                 sb.AppendLine(string.Format(
                     "node_{0} [label=\"{1}\", shape=box, style=rounded, color=black, peripheries=1, penwidth=1];",
                     node.TaxonId,
@@ -117,7 +114,7 @@ namespace SOS.Lib.Helpers
             }
 
             foreach (var edge in edges)
-            {                
+            {
                 sb.AppendLine(string.Format(
                     "node_{0} -> node_{1} [style={2}, color=black];",
                     edge.Parent.TaxonId,
@@ -126,7 +123,7 @@ namespace SOS.Lib.Helpers
             }
 
             sb.AppendLine("}");
-            return sb.ToString();            
+            return sb.ToString();
         }
 
         private static string CreateMermaidFormatRepresentation<T>(ICollection<TaxonTreeEdge<T>> edges)
@@ -158,14 +155,14 @@ namespace SOS.Lib.Helpers
                     edge.Child.TaxonId,
                     edge.IsMainRelation ? "-->" : "-.->"));
             }
-            
+
             return sb.ToString();
         }
 
         private static HashSet<TaxonTreeEdge<T>> GetAllEdges<T>(
             ICollection<TaxonTreeNode<T>> treeNodes,
-            TaxonRelationsTreeIterationMode treeIterationMode,            
-            bool includeSecondaryRelations = true)            
+            TaxonRelationsTreeIterationMode treeIterationMode,
+            bool includeSecondaryRelations = true)
         {
             var edgesSet = new HashSet<TaxonTreeEdge<T>>();
 
@@ -200,7 +197,7 @@ namespace SOS.Lib.Helpers
             {
                 HashSet<TaxonTreeEdge<T>> parentEdges = node.GetParentsEdges(includeSecondaryRelations);
                 edgeSet.UnionWith(parentEdges);
-            }            
+            }
 
             return edgeSet;
         }

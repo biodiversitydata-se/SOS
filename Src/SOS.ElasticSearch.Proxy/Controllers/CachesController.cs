@@ -1,9 +1,9 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using SOS.ElasticSearch.Proxy.Controllers.Interfaces;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.ElasticSearch.Proxy.Controllers.Interfaces;
+using System.Net;
 
 namespace SOS.ElasticSearch.Proxy.Controllers
 {
@@ -27,16 +27,16 @@ namespace SOS.ElasticSearch.Proxy.Controllers
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ILogger<CachesController> logger)
         {
-         
+
             _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
-           
+
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
         [HttpDelete("{cache}")]
-        [ProducesResponseType(typeof(bool), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult DeleteCache([FromRoute] Cache cache)
         {
             try
@@ -56,7 +56,7 @@ namespace SOS.ElasticSearch.Proxy.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"Error clearing the {cache} cache");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }

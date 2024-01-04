@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Configuration.Shared;
@@ -25,6 +19,12 @@ using SOS.Observations.Api.Dtos.Observation;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Helpers;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers
@@ -79,13 +79,13 @@ namespace SOS.Observations.Api.Controllers
             );
         }
 
-       /// <summary>
-       /// Validate tiles limit
-       /// </summary>
-       /// <param name="tilesLimit"></param>
-       /// <param name="maxTilesTot"></param>
-       /// <param name="countTask"></param>
-       /// <returns></returns>
+        /// <summary>
+        /// Validate tiles limit
+        /// </summary>
+        /// <param name="tilesLimit"></param>
+        /// <param name="maxTilesTot"></param>
+        /// <param name="countTask"></param>
+        /// <returns></returns>
         private async Task<Result> TryValidateTilesLimitAsync(int tilesLimit,
             double maxTilesTot,
             Task<long> countTask)
@@ -173,7 +173,7 @@ namespace SOS.Observations.Api.Controllers
             ElasticSearchConfiguration elasticConfiguration,
             ILogger<ObservationsController> logger) : base(observationManager, areaManager, taxonManager, observationApiConfiguration)
         {
-           
+
             _taxonSearchManager = taxonSearchManager ?? throw new ArgumentNullException(nameof(taxonSearchManager));
             _tilesLimitInternal = observationApiConfiguration?.TilesLimitInternal ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _tilesLimitPublic = observationApiConfiguration.TilesLimitPublic;
@@ -282,12 +282,12 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     ValidateGeometries(filter?.Geographics?.Geometries));
-                
+
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, "sv-SE");
                 var matchCount = await ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
-                
+
                 LogObservationCount(matchCount);
                 return new OkObjectResult(matchCount);
             }
@@ -469,7 +469,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                
+
                 var result = await ObservationManager.GetMetricGridAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters, MetricCoordinateSys.SWEREF99_TM);
@@ -575,7 +575,7 @@ namespace SOS.Observations.Api.Controllers
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-            catch(TimeoutException)
+            catch (TimeoutException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
@@ -643,18 +643,20 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = new SearchFilterInternal(UserId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public)
                 {
                     FieldTranslationCultureCode = translationCultureCode,
-                    Output = string.IsNullOrEmpty(sortBy) ? new OutputFilter() : new OutputFilter { 
-                        SortOrders = new[] { 
-                            new SortOrderFilter { 
-                                SortBy = DwAMappingHelper.MapToObservationField(sortBy), SortOrder = sortOrder 
-                            } 
-                        } 
+                    Output = string.IsNullOrEmpty(sortBy) ? new OutputFilter() : new OutputFilter
+                    {
+                        SortOrders = new[] {
+                            new SortOrderFilter {
+                                SortBy = DwAMappingHelper.MapToObservationField(sortBy), SortOrder = sortOrder
+                            }
+                        }
                     }
                 };
 
                 if (!string.IsNullOrEmpty(kingdom))
                 {
-                    searchFilter.Taxa = new TaxonFilter { 
+                    searchFilter.Taxa = new TaxonFilter
+                    {
                         Kingdoms = kingdom.Split(",", StringSplitOptions.TrimEntries).Select(s => s.ToUpperFirst())
                     };
                 }
@@ -663,7 +665,7 @@ namespace SOS.Observations.Api.Controllers
                 {
                     (searchFilter.Taxa ??= new TaxonFilter()).ScientificNames = scientificName.Split(",", StringSplitOptions.TrimEntries).Select(s => s.ToUpperFirst());
                 }
-                
+
                 if (!string.IsNullOrEmpty(identificationVerificationStatus))
                 {
                     var identificationVerificationStatuses = identificationVerificationStatus.ToLower().Split(",", StringSplitOptions.TrimEntries).ToArray();
@@ -848,7 +850,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                
+
                 var result = await _taxonSearchManager.GetTaxonAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier,
@@ -1151,7 +1153,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
-              
+
                 GeoGridResultDto dto = result.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
                 return new OkObjectResult(dto);
             }
@@ -1230,7 +1232,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-               
+
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
 
                 string strJson = result.GetFeatureCollectionGeoJson();
@@ -1343,7 +1345,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                
+
                 var result = await _taxonSearchManager.GetPageGeoTileTaxaAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom, geoTilePage, taxonIdPage);
                 if (result.IsFailure)
                 {
@@ -1417,11 +1419,11 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                
+
                 var result = await ObservationManager.GetMetricGridAggregationAsync(
                     roleId,
-                    authorizationApplicationIdentifier, 
-                    searchFilter, 
+                    authorizationApplicationIdentifier,
+                    searchFilter,
                     gridCellSizeInMeters,
                     metricCoordinateSys);
 
@@ -1556,14 +1558,14 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogInformation($"User.UserId={UserId}");
                 _logger.LogInformation($"User.Email={UserEmail?.ToString() ?? "[null]"}");
                 if (User?.Claims != null)
-                {                    
+                {
                     foreach (var claim in User.Claims)
                     {
                         _logger.LogInformation($"User.Claim.{claim.Type}={claim.Value.ToString() ?? "[null]"}");
                     }
-                }                
+                }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _logger.LogError(e, "LogUserInformation error");
             }
@@ -1891,7 +1893,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-               
+
                 var result = await _taxonSearchManager.GetTaxonAggregationAsync(roleId,
                     authorizationApplicationIdentifier,
                     searchFilter,
@@ -1972,7 +1974,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
-                _logger.LogInformation(e, e.Message);                
+                _logger.LogInformation(e, e.Message);
                 LogUserInformation();
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }

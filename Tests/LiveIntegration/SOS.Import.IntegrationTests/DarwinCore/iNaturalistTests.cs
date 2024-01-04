@@ -1,4 +1,9 @@
-﻿using System;
+﻿using DwC_A;
+using FluentAssertions;
+using SOS.Harvest.DarwinCore;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.DarwinCore;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -6,12 +11,6 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using DwC_A;
-using FluentAssertions;
-using Microsoft.Extensions.Logging.Abstractions;
-using SOS.Harvest.DarwinCore;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.DarwinCore;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.DarwinCore

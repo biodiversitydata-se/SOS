@@ -11,7 +11,7 @@ namespace SOS.Lib.Models.TaxonAttributeService
         ///     Attributes property
         /// </summary>
         public IEnumerable<TaxonAttributeValue> Values { get; set; }
-        
+
         /// <summary>
         ///     Factor id
         /// </summary>

@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Moq;
+﻿using Moq;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Process.UnitTests.TestHelpers.Factories
 {
@@ -28,11 +28,11 @@ namespace SOS.Process.UnitTests.TestHelpers.Factories
                 .Setup(avm => avm.GetGeometryAsync(It.IsAny<AreaType>(), It.IsAny<string>()))
                 .ReturnsAsync((AreaType type, string featureId) =>
                 {
-                  if (areaById.TryGetValue(type.ToAreaId(featureId), out AreaWithGeometry area))
+                    if (areaById.TryGetValue(type.ToAreaId(featureId), out AreaWithGeometry area))
                     {
                         return area.Geometry;
                     }
-                 
+
                     return null;
                 });
 

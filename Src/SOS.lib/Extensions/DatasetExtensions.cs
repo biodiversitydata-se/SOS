@@ -47,7 +47,7 @@ namespace SOS.Lib.Extensions
         public static Methodology ToMethodology(this ArtportalenDatasetMetadata.Methodology apMethodology)
         {
             return new Methodology
-            {                
+            {
                 MethodologyName = apMethodology.Name,
                 MethodologyDescription = apMethodology.Description?.Clean(),
                 MethodologyLink = apMethodology.Link,
@@ -76,7 +76,7 @@ namespace SOS.Lib.Extensions
 
         public static Models.Processed.DataStewardship.Enums.ProgrammeArea ToProgrammeArea(this ArtportalenDatasetMetadata.ProgrammeArea programmeArea)
         {
-            return programmeArea.Id.ToEnum<Models.Processed.DataStewardship.Enums.ProgrammeArea>();            
+            return programmeArea.Id.ToEnum<Models.Processed.DataStewardship.Enums.ProgrammeArea>();
         }
 
         public static Models.Processed.DataStewardship.Enums.ProjectType ToProjectType(this ArtportalenDatasetMetadata.ProjectType projectType)

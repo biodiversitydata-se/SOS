@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using SOS.Administration.Gui.Dtos.Enum;
+﻿using SOS.Administration.Gui.Dtos.Enum;
+using System.Collections.Generic;
 
 namespace SOS.Administration.Gui.Dtos
 {
     /// <summary>
     /// Search filter.
     /// </summary>
-public class SearchFilterBaseDto
+    public class SearchFilterBaseDto
     {
         public enum SightingDeterminationFilterDto
         {

@@ -1,10 +1,10 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Services.Interfaces;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Services
 {
@@ -40,8 +40,8 @@ namespace SOS.Harvest.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get data from Virtual Herbarium", e);
-               throw;
+                _logger.LogError(e, "Failed to get data from Virtual Herbarium");
+                throw;
             }
         }
 
@@ -54,7 +54,7 @@ namespace SOS.Harvest.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get localities from Virtual Herbarium", e);
+                _logger.LogError(e, "Failed to get localities from Virtual Herbarium");
                 throw;
             }
         }
@@ -68,7 +68,7 @@ namespace SOS.Harvest.Services
         {
             await using var fileStream = await _httpClientService.GetFileStreamAsync(new Uri(
                     $"{_virtualHerbariumServiceConfiguration.BaseAddress}/{path}"),
-                new Dictionary<string, string> {{"Accept", "application/xml"}});
+                new Dictionary<string, string> { { "Accept", "application/xml" } });
 
             if (!fileStream?.CanRead ?? true)
             {
@@ -95,11 +95,11 @@ namespace SOS.Harvest.Services
         private string CleanXml(string xmlString, Encoding encoding)
         {
             // Dropping the BOM
-          /*  var _byteOrderMarkUtf8 = encoding.GetString(encoding.GetPreamble());
-            if (xmlString.StartsWith(_byteOrderMarkUtf8))
-            {
-                xmlString = xmlString.Remove(0, _byteOrderMarkUtf8.Length).Replace("&gt50", "").Replace("&", "");
-            }*/
+            /*  var _byteOrderMarkUtf8 = encoding.GetString(encoding.GetPreamble());
+              if (xmlString.StartsWith(_byteOrderMarkUtf8))
+              {
+                  xmlString = xmlString.Remove(0, _byteOrderMarkUtf8.Length).Replace("&gt50", "").Replace("&", "");
+              }*/
 
             // Replace bad data
             //  xmlString = xmlString.Replace("1920-0&-21", "1920-06-21");

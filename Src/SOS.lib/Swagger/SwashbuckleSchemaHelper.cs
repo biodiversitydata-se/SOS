@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Swagger;
 public class SwashbuckleSchemaHelper
@@ -32,7 +30,7 @@ public class SwashbuckleSchemaHelper
         }
         else
         {
-            _duplicates.Add(id);            
+            _duplicates.Add(id);
         }
 
         int count = _schemaNameRepetition[id] + 1;

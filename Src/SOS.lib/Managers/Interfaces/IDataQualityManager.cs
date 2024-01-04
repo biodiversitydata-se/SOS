@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using SOS.Lib.Models.DataQuality;
+﻿using SOS.Lib.Models.DataQuality;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers.Interfaces
 {

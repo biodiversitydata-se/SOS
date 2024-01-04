@@ -17,7 +17,7 @@ namespace SOS.Harvest.Repositories.Source.ObservationsDatabase
         /// </summary>
         private readonly IObservationDatabaseDataService _observationDatabaseDataService;
 
-        
+
         private async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic? parameters = null)
         {
             return await _observationDatabaseDataService.QueryAsync<E>(query, parameters);
@@ -87,8 +87,8 @@ namespace SOS.Harvest.Repositories.Source.ObservationsDatabase
                 WHERE
 	                h.ArtDataIDNR BETWEEN @StartId AND @EndId
 	                AND h.Forekomststatus IN('A', 'R', 'U', 'X1', 'X2')";
-                
-                return await QueryAsync<ObservationEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1});
+
+                return await QueryAsync<ObservationEntity>(query, new { StartId = startId, EndId = startId + maxRows - 1 });
             }
             catch (Exception e)
             {

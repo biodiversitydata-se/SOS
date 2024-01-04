@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Harvest.Harvesters.Shark;
@@ -8,6 +6,8 @@ using SOS.Harvest.Services;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations

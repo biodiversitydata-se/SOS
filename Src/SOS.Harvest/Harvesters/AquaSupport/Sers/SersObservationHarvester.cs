@@ -1,6 +1,4 @@
-﻿using System.Text;
-using System.Xml.Linq;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Harvesters.AquaSupport.Sers.Interfaces;
@@ -12,6 +10,8 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Text;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Harvesters.AquaSupport.Sers
 {
@@ -50,7 +50,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
             _sersObservationService =
                 sersObservationService ?? throw new ArgumentNullException(nameof(sersObservationService));
             _sersServiceConfiguration = sersServiceConfiguration ??
-                                        throw new ArgumentNullException(nameof(sersServiceConfiguration));  
+                                        throw new ArgumentNullException(nameof(sersServiceConfiguration));
         }
 
         /// inheritdoc />
@@ -64,7 +64,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
                 initValues.preHarvestCount = await InitializeHarvestAsync(true);
                 Logger.LogInformation(GetSersHarvestSettingsInfoString());
 
-                var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
                 var verbatimFactory = new AquaSupportHarvestFactory<SersObservationVerbatim>();
                 var startDate = new DateTime(_sersServiceConfiguration.StartHarvestYear, 1, 1);
                 var endDate = DateTime.Now;
@@ -111,7 +111,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
                             break;
                         }
                     }
-            
+
                     var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
                     if (timeSinceLastCall < 2000)
                     {

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
@@ -12,9 +10,10 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
-using SOS.Harvest.Managers;
-using SOS.Harvest.Processors.DarwinCoreArchive;
-using SOS.Process.LiveIntegrationTests;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Process.LiveIntegrationTests.TestHelpers
 {

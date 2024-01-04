@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Observations.Api.Dtos;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {

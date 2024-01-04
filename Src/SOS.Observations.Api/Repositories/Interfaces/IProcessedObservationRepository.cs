@@ -40,7 +40,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="filter"></param>
         /// <param name="zoom"></param>
         /// <returns></returns>
-        Task<GeoGridTileResult> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom);        
+        Task<GeoGridTileResult> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom);
 
         /// <summary>
         /// Get number of provinces matching the provided filter.
@@ -87,6 +87,6 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <returns></returns>
         Task<bool> SignalSearchInternalAsync(
             SearchFilter filter,
-            bool onlyAboveMyClearance);        
+            bool onlyAboveMyClearance);
     }
 }

@@ -1,6 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Hangfire;
 using System.Threading.Tasks;
-using Hangfire;
 
 namespace SOS.Lib.Jobs.Import
 {

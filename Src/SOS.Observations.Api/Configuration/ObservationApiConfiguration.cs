@@ -21,7 +21,7 @@ namespace SOS.Observations.Api.Configuration
         /// <summary>
         /// Max number of observations allowed for file download
         /// </summary>
-        public int  DownloadExportObservationsLimit { get; set; }
+        public int DownloadExportObservationsLimit { get; set; }
 
         /// <summary>
         /// If true, make response compression enabled.

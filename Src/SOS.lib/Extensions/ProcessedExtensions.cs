@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SOS.Lib.Helpers;
+﻿using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
-using static SOS.Lib.Models.Processed.DataStewardship.Dataset.Dataset;
-using static SOS.Lib.Models.Processed.DataStewardship.Event.Event;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Lib.Extensions
 {

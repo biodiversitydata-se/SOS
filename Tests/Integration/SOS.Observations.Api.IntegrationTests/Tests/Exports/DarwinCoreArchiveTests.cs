@@ -44,8 +44,8 @@ public class DarwinCoreArchiveTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        parsedDwcaFile.Occurrences.Count().Should().Be(15, because: "the DwC-A file contains 15 occurrences");
-        parsedDwcaFile.Events.Count().Should().Be(7, because: "the DwC-A file contains 7 events");
+        parsedDwcaFile?.Occurrences?.Count().Should().Be(15, because: "the DwC-A file contains 15 occurrences");
+        parsedDwcaFile?.Events?.Count().Should().Be(7, because: "the DwC-A file contains 7 events");
     }
 
     [Fact]

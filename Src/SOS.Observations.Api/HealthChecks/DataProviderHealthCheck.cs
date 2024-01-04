@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SOS.Observations.Api.Managers.Interfaces;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -37,7 +37,7 @@ namespace SOS.Observations.Api.HealthChecks
             try
             {
                 var dataProviders = await _dataProviderManager.GetDataProvidersAsync(false, "en-GB");
-                
+
                 var providerCount = 0;
                 var emlCount = 0;
                 foreach (var dataProvider in dataProviders)

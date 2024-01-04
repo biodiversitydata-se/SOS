@@ -1,5 +1,5 @@
-﻿using System;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
+using System;
 
 namespace SOS.Lib.Models.Verbatim.Mvm
 {
@@ -26,7 +26,7 @@ namespace SOS.Lib.Models.Verbatim.Mvm
         public bool IsPositiveObservation { get; set; }
 
         public bool IsPublic { get; set; }
-        
+
         public string Locality { get; set; }
 
         public string LocationId { get; set; }
@@ -45,7 +45,7 @@ namespace SOS.Lib.Models.Verbatim.Mvm
 
         public int ProjectID { get; set; }
         public string ProjectName { get; set; }
-        
+
         public string Quantity { get; set; }
         public string QuantityUnit { get; set; }
 

@@ -17,7 +17,7 @@
         /// Name.
         /// </summary>
         public string Name { get; set; }
-        
+
         /// <summary>
         /// Author.
         /// </summary>

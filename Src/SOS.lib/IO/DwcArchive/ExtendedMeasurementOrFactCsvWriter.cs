@@ -1,18 +1,16 @@
-﻿using System;
+﻿using Hangfire;
+using Hangfire.Server;
+using Microsoft.Extensions.Logging;
+using SOS.Lib.Helpers;
+using SOS.Lib.IO.DwcArchive.Interfaces;
+using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Hangfire;
-using Hangfire.Server;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.IO.DwcArchive.Interfaces;
-using SOS.Export.Models;
-using SOS.Lib.Helpers;
-using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Enums;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -98,7 +96,8 @@ namespace SOS.Lib.IO.DwcArchive
                     return;
                 }
 
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     using var csvFileHelper = new CsvFileHelper();
                     csvFileHelper.InitializeWrite(streamWriter, "\t");
 
@@ -111,7 +110,7 @@ namespace SOS.Lib.IO.DwcArchive
                     csvFileHelper.FinishWrite();
                 });
 
-                
+
                 //_logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
             }
             catch (Exception e)

@@ -1,6 +1,4 @@
-﻿using System.Text;
-using System.Xml.Linq;
-using DnsClient.Internal;
+﻿using DnsClient.Internal;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
@@ -13,6 +11,8 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Nors;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Text;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Harvesters.AquaSupport.Nors
 {
@@ -65,7 +65,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
                 initValues.preHarvestCount = await InitializeHarvestAsync(true);
                 Logger.LogInformation(GetNorsHarvestSettingsInfoString());
 
-                var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
                 var verbatimFactory = new AquaSupportHarvestFactory<NorsObservationVerbatim>();
                 var startDate = new DateTime(_norsServiceConfiguration.StartHarvestYear, 1, 1);
                 var endDate = startDate.AddYears(1).AddDays(-1);

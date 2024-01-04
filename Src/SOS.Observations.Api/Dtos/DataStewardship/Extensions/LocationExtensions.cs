@@ -22,7 +22,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
                 LocationID = location?.LocationId,
                 LocationRemarks = location.LocationRemarks,
                 //LocationType = // ? todo - add location type to models.
-                Emplacement = location?.Point.ConvertCoordinateSystem(responseCoordinateSystem)         
+                Emplacement = location?.Point.ConvertCoordinateSystem(responseCoordinateSystem)
             };
         }
     }

@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Moq;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.Artportalen;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Harvest.Managers;
-using SOS.Harvest.Processors.Artportalen;
-using SOS.Process.UnitTests.TestHelpers.Factories;
-using Xunit;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using Moq;
+using SOS.Process.UnitTests.TestHelpers.Factories;
+using System;
+using System.Collections.Generic;
+using Xunit;
 
 namespace SOS.Process.UnitTests.TestHelpers
 {
@@ -40,7 +40,7 @@ namespace SOS.Process.UnitTests.TestHelpers
             var processConfiguration = new ProcessConfiguration();
             var factory = ArtportalenObservationFactory.CreateAsync(
                 dataProviderDummy,
-                new Dictionary<int, Taxon>(), 
+                new Dictionary<int, Taxon>(),
                 vocabularyRepository.Object,
                 datasetRepositoryMock.Object,
                 false,

@@ -1,5 +1,8 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
@@ -12,9 +15,6 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
-using SOS.Lib.Configuration.Import;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -91,7 +91,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 dataProvider,
                 mode,
                 observationFactory,
-                dwcCollectionRepository.OccurrenceRepository,                
+                dwcCollectionRepository.OccurrenceRepository,
                 cancellationToken);
         }
 

@@ -1,9 +1,5 @@
 ﻿using FizzWare.NBuilder;
-using FluentAssertions;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using System.Linq;
-using Xunit;
 
 namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder.Tests
 {

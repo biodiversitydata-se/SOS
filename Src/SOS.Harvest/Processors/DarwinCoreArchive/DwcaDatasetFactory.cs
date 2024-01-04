@@ -1,9 +1,9 @@
-﻿using SOS.Lib.Models.Shared;
-using SOS.Harvest.Managers.Interfaces;
+﻿using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -11,17 +11,17 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     ///     DwC-A dataset factory.
     /// </summary>
     public class DwcaDatasetFactory : DatasetFactoryBase, IDatasetFactory<DwcVerbatimDataset>
-    {        
+    {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="dataProvider"></param>        
         public DwcaDatasetFactory(
-            DataProvider dataProvider,            
+            DataProvider dataProvider,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
         {
-            
+
         }
 
         public Dataset? CreateProcessedDataset(DwcVerbatimDataset verbatimDataset)
@@ -32,23 +32,23 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 {
                     return null;
                 }
-                
+
                 var observationDataset = new Dataset
-                {                    
+                {
                     AccessRights = verbatimDataset.AccessRights,
                     Assigner = verbatimDataset.Assigner,
                     Creator = verbatimDataset.Creator,
                     DataStewardship = verbatimDataset.DataStewardship?.Clean(),
                     Description = verbatimDataset.Description?.Clean(),
                     EndDate = verbatimDataset.EndDate.HasValue ? verbatimDataset.EndDate.Value.ToUniversalTime() : null,
-                    EventIds = verbatimDataset.EventIds,                    
+                    EventIds = verbatimDataset.EventIds,
                     Identifier = verbatimDataset.Identifier,
                     //Identifier = $"urn:lsid:{DataProvider.Identifier}:Dataset:{verbatimDataset.Identifier}",
                     Language = verbatimDataset.Language?.Clean(),
                     Metadatalanguage = verbatimDataset.Metadatalanguage?.Clean(),
                     Methodology = verbatimDataset.Methodology,
                     OwnerinstitutionCode = verbatimDataset.OwnerinstitutionCode,
-                    Project = verbatimDataset.Project,                    
+                    Project = verbatimDataset.Project,
                     Publisher = verbatimDataset.Publisher,
                     Purpose = verbatimDataset.Purpose,
                     Spatial = verbatimDataset.Spatial?.Clean(),

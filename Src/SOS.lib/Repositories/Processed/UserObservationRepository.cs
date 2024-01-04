@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -40,7 +37,7 @@ namespace SOS.Lib.Repositories.Processed
                     .AutoMap<UserObservation>()
                     .Properties(p => p
                         .Keyword(kw => kw
-                            .Name(nm => nm.ProvinceFeatureId)    
+                            .Name(nm => nm.ProvinceFeatureId)
                         )
                         .Keyword(kw => kw
                             .Name(nm => nm.MunicipalityFeatureId)
@@ -51,7 +48,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
             );
-            
+
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create user observation index. Error: {createIndexResponse.DebugInformation}");
         }
 
@@ -137,7 +134,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<int> AddManyAsync(IEnumerable<UserObservation> items)
         {
-            return await Task.Run(() => {
+            return await Task.Run(() =>
+            {
                 // Save valid processed data
                 Logger.LogDebug($"Start indexing UserObservation batch for searching with {items.Count()} items");
                 var indexResult = WriteToElastic(items);

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,11 +16,16 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
+using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Export;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -119,7 +119,7 @@ namespace SOS.Observations.Api.Controllers
         private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(
             SearchFilterBaseDto filter,
             bool validateSearchFilter,
-            string email, 
+            string email,
             UserExport userExport,
             ProtectionFilterDto? protectionFilter,
             bool sendMailFromZendTo,
@@ -154,7 +154,7 @@ namespace SOS.Observations.Api.Controllers
                 return (Result: BadRequest($"Query exceeds limit of {_orderExportObservationsLimit} observations."), Count: matchCount);
             }
             LogObservationCount(matchCount);
-            return (Result: new OkObjectResult(exportFilter), Count: matchCount);            
+            return (Result: new OkObjectResult(exportFilter), Count: matchCount);
         }
 
         /// <summary>
@@ -167,8 +167,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="applicationIdentifier"></param>
         /// <returns></returns>
         private async Task<IActionResult> DownloadValidateAsync(
-            SearchFilterBaseDto filter, 
-            bool validateSearchFilter, 
+            SearchFilterBaseDto filter,
+            bool validateSearchFilter,
             ProtectionFilterDto? protectionFilter,
             int? roleId,
             string applicationIdentifier)
@@ -177,13 +177,13 @@ namespace SOS.Observations.Api.Controllers
                 validateSearchFilter ? ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
                 ValidateBoundingBox(filter?.Geographics?.BoundingBox, false)
             );
-           
+
             if (validationResults.IsFailure)
             {
                 return BadRequest(validationResults);
             }
 
-            var exportFilter = filter.ToSearchFilter(UserId, protectionFilter ?? ProtectionFilterDto.Public, "en-GB");            
+            var exportFilter = filter.ToSearchFilter(UserId, protectionFilter ?? ProtectionFilterDto.Public, "en-GB");
             var matchCount = await ObservationManager.GetMatchCountAsync(roleId, applicationIdentifier, exportFilter);
 
             if (matchCount == 0)
@@ -272,8 +272,8 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("Datasets")]
-        [ProducesResponseType(typeof(IEnumerable<Lib.Models.Misc.File>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(IEnumerable<Lib.Models.Misc.File>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetDatasetsListAsync()
@@ -394,7 +394,7 @@ namespace SOS.Observations.Api.Controllers
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-               
+
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult is not OkObjectResult okResult)
@@ -403,7 +403,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-               
+
                 fileExportResult =
                     await _exportManager.CreateExportFileAsync(
                         roleId,
@@ -481,8 +481,8 @@ namespace SOS.Observations.Api.Controllers
                         authorizationApplicationIdentifier,
                         exportFilter,
                         eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
-                        _exportPath, 
-                        Cultures.en_GB, 
+                        _exportPath,
+                        Cultures.en_GB,
                         false,
                         PropertyLabelType.PropertyPath,
                         false,
@@ -503,7 +503,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error exporting DwC file");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
             finally
             {
@@ -534,7 +534,7 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SearchFilterDto filter,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
@@ -549,7 +549,7 @@ namespace SOS.Observations.Api.Controllers
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                
+
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult is not OkObjectResult okResult)
@@ -563,8 +563,8 @@ namespace SOS.Observations.Api.Controllers
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
-                        ExportFormat.Excel, 
-                        _exportPath, 
+                        ExportFormat.Excel,
+                        _exportPath,
                         cultureCode,
                         false,
                         propertyLabelType,
@@ -634,7 +634,7 @@ namespace SOS.Observations.Api.Controllers
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                
+
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -647,19 +647,19 @@ namespace SOS.Observations.Api.Controllers
                     await _exportManager.CreateExportFileAsync(
                         roleId,
                         authorizationApplicationIdentifier,
-                        exportFilter, 
-                        ExportFormat.GeoJson, 
-                        _exportPath, 
-                        cultureCode, 
+                        exportFilter,
+                        ExportFormat.GeoJson,
+                        _exportPath,
+                        cultureCode,
                         flat,
                         propertyLabelType,
                         excludeNullValues,
                         gzip,
                         JobCancellationToken.Null);
 
-                if (gzip)                
+                if (gzip)
                     return GetFile(fileExportResult.FilePath, "Observations_GeoJson.zip", "application/zip");
-                else                
+                else
                     return GetFile(fileExportResult.FilePath, "Observations.geojson", "application/geo+json");
             }
             catch (AuthenticationRequiredException)
@@ -785,16 +785,16 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpPost("Order/DwC")]
         [Authorize/*(Roles = "Privat")*/]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [AzureApi, AzureInternalApi]
         public async Task<IActionResult> OrderDwCAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromBody] SearchFilterDto filter, 
+            [FromBody] SearchFilterDto filter,
             [FromQuery] string description,
             [FromQuery] bool eventBased = false,
             [FromQuery] bool validateSearchFilter = false,
@@ -846,7 +846,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Running export failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
@@ -880,7 +880,7 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> OrderExcelAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromBody] SearchFilterDto filter, 
+            [FromBody] SearchFilterDto filter,
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] bool validateSearchFilter = false,
@@ -922,7 +922,7 @@ namespace SOS.Observations.Api.Controllers
                     NumberOfObservations = Convert.ToInt32(validateResult.Count),
                     Format = ExportFormat.Excel,
                     Description = description,
-                    OutputFieldSet = filter?.Output?.FieldSet                    
+                    OutputFieldSet = filter?.Output?.FieldSet
                 };
 
                 userExports.Jobs.Add(exportJobInfo);
@@ -973,7 +973,7 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> OrderGeoJsonAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromBody] SearchFilterDto filter, 
+            [FromBody] SearchFilterDto filter,
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] bool validateSearchFilter = false,

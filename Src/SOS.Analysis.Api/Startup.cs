@@ -1,15 +1,20 @@
-﻿using System.Reflection;
-using System.Text.Json.Serialization;
+﻿using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using SOS.Analysis.Api.ApplicationInsights;
 using SOS.Analysis.Api.Configuration;
+using SOS.Analysis.Api.Managers;
+using SOS.Analysis.Api.Managers.Interfaces;
+using SOS.Analysis.Api.Middleware;
 using SOS.Analysis.Api.Repositories;
 using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.ActionFilters;
@@ -22,28 +27,23 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Middleware;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.TaxonTree;
+using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
+using SOS.Lib.Services;
+using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using SOS.Analysis.Api.Managers;
-using SOS.Analysis.Api.Managers.Interfaces;
-using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Lib.Repositories.Resource;
-using SOS.Lib.Services;
-using SOS.Lib.Services.Interfaces;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.Models.TaxonListService;
-using SOS.Analysis.Api.ApplicationInsights;
-using SOS.Lib.Middleware;
-using SOS.Analysis.Api.Middleware;
-using Microsoft.Extensions.Options;
 using System.Globalization;
-using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace SOS.Analysis.Api
 {
@@ -324,7 +324,7 @@ namespace SOS.Analysis.Api
             services.AddScoped<IAnalysisManager, AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
             services.AddSingleton<ITaxonManager, TaxonManager>();
-           
+
             // Add repositories
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
@@ -343,24 +343,23 @@ namespace SOS.Analysis.Api
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="env"></param>
         /// <param name="apiVersionDescriptionProvider"></param>
         /// <param name="telemetryConfiguration"></param>
         /// <param name="applicationInsightsConfiguration"></param>
         /// <param name="statisticsConfiguration"></param>
         public void Configure(
-            IApplicationBuilder app, 
-            TelemetryConfiguration telemetryConfiguration, 
+            IApplicationBuilder app,
+            TelemetryConfiguration telemetryConfiguration,
             IApiVersionDescriptionProvider apiVersionDescriptionProvider,
-            Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration, 
+            Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration,
             AnalysisConfiguration statisticsConfiguration)
         {
-            
+
             if (statisticsConfiguration.EnableResponseCompression)
             {
                 app.UseResponseCompression();
             }
-            
+
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
@@ -398,11 +397,11 @@ namespace SOS.Analysis.Api
                         $"/swagger/{PublicApiName}{description.GroupName}/swagger.json",
                         $"SOS Analysis API (Public) {description.GroupName.ToUpperInvariant()}");
 
-                    options.DisplayOperationId();                    
+                    options.DisplayOperationId();
                     options.DocExpansion(DocExpansion.None);
                 }
             });
-         
+
             app.UseHttpsRedirection();
             app.UseRouting();
 
@@ -414,7 +413,7 @@ namespace SOS.Analysis.Api
                 endpoints.MapControllers();
             });
         }
-        
+
         private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
         {
             var apiVersionMetadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();

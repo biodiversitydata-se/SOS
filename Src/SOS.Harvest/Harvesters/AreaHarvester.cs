@@ -51,7 +51,7 @@ namespace SOS.Harvest.Harvesters
             _geoRegionApiService = geoRegionApiService ?? throw new ArgumentNullException(nameof(geoRegionApiService));
             _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }        
+        }
 
         /// <inheritdoc />
         public async Task<HarvestInfo> HarvestAreasAsync()
@@ -62,7 +62,7 @@ namespace SOS.Harvest.Harvesters
                 _logger.LogDebug("Start getting areas");
                 var featureCollection = await _geoRegionApiService.GetFeatureCollectionFromZipAsync(Enum.GetValues(typeof(AreaType)).Cast<int>(), 4326);
                 _logger.LogDebug("Finish getting areas");
-                
+
                 if (!featureCollection?.Any() ?? true)
                 {
                     throw new Exception("Failed to load areas from zip");

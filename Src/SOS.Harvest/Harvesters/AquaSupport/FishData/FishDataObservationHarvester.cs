@@ -1,6 +1,4 @@
-﻿using System.Text;
-using System.Xml.Linq;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Harvesters.AquaSupport.FishData.Interfaces;
@@ -12,6 +10,8 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.FishData;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Text;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Harvesters.AquaSupport.FishData
 {
@@ -48,7 +48,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
         {
             _fishDataObservationService =
                 fishDataObservationService ?? throw new ArgumentNullException(nameof(fishDataObservationService));
-            
+
             _fishDataServiceConfiguration = fishDataServiceConfiguration ??
                                        throw new ArgumentNullException(nameof(fishDataServiceConfiguration));
         }
@@ -64,7 +64,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
                 initValues.preHarvestCount = await InitializeHarvestAsync(true);
                 Logger.LogInformation(GetFishDataHarvestSettingsInfoString());
 
-                var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
                 var verbatimFactory = new AquaSupportHarvestFactory<FishDataObservationVerbatim>();
                 var startDate = new DateTime(_fishDataServiceConfiguration.StartHarvestYear, 1, 1);
                 var endDate = DateTime.Now;
@@ -78,7 +78,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
                 while (changeId != 0)
                 {
                     var lastRequesetTime = DateTime.Now;
-                    
+
                     Logger.LogDebug(
                         $"Fetching Fish data observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
 
@@ -110,7 +110,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
                             break;
                         }
                     }
-                    
+
                     var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
                     if (timeSinceLastCall < 2000)
                     {

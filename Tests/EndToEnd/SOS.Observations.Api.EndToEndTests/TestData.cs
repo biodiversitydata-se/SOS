@@ -18,7 +18,7 @@ namespace SOS.Observations.Api.EndToEndTests
             /// Tranås municipality.
             /// </summary>
             public static AreaFilterDto TranasMunicipality => new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "687" };
-            
+
             /// <summary>
             /// Jönköping county.
             /// </summary>
@@ -26,5 +26,5 @@ namespace SOS.Observations.Api.EndToEndTests
         }
     }
 
-    
+
 }

@@ -1,11 +1,9 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
-using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using SOS.Export.LiveIntegrationTests.TestHelpers.Factories;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
@@ -14,13 +12,13 @@ using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Services;
+using System.IO;
+using System.Threading.Tasks;
 using Xunit;
-using SOS.Export.LiveIntegrationTests;
-using SOS.Export.LiveIntegrationTests.TestHelpers.Factories;
 
 namespace SOS.Export.LiveIntegrationTests.IO.DwcArchive
 {

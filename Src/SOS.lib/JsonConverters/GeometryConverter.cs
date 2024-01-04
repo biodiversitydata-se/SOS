@@ -1,11 +1,11 @@
-﻿using System;
+﻿using NetTopologySuite.Geometries;
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using NetTopologySuite.Geometries;
 
 namespace SOS.Lib.JsonConverters
 {
@@ -187,20 +187,20 @@ namespace SOS.Lib.JsonConverters
             switch (type?.ToLower())
             {
                 case "point":
-                    var point = (Point) value;
+                    var point = (Point)value;
                     WritePoint(writer, point.Coordinate);
                     break;
                 case "polygon":
-                    var polygon = (Polygon) value;
+                    var polygon = (Polygon)value;
 
                     WritePolygon(writer, polygon);
                     break;
                 case "multipolygon":
-                    var muliPolygon = (MultiPolygon) value;
+                    var muliPolygon = (MultiPolygon)value;
                     writer.WriteStartArray();
                     foreach (var poly in muliPolygon.Geometries)
                     {
-                        WritePolygon(writer, (Polygon) poly);
+                        WritePolygon(writer, (Polygon)poly);
                     }
 
                     writer.WriteEndArray();

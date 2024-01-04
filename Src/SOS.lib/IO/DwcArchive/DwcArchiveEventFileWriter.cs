@@ -1,4 +1,21 @@
-﻿using System;
+﻿using Hangfire;
+using Hangfire.Server;
+using Microsoft.Extensions.Logging;
+using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
+using SOS.Lib.Factories;
+using SOS.Lib.Helpers;
+using SOS.Lib.IO.DwcArchive.Interfaces;
+using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -6,23 +23,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Enums;
-using SOS.Lib.IO.DwcArchive.Interfaces;
-using SOS.Lib.Extensions;
-using SOS.Lib.Factories;
-using SOS.Lib.Helpers;
-using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Lib.Models.Export;
-using Hangfire.Server;
-using Hangfire;
-using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -105,7 +105,7 @@ namespace SOS.Lib.IO.DwcArchive
             {
                 return;
             }
-            
+
             using var archive = ZipFile.Open(tempFilePath, ZipArchiveMode.Create);
             var dwcExtensions = new List<DwcaEventFilePart>();
 
@@ -431,7 +431,7 @@ namespace SOS.Lib.IO.DwcArchive
                         filter,
                         fileStream,
                         processedObservationRepository,
-                        cancellationToken, 
+                        cancellationToken,
                         true);
                 }
 
@@ -449,15 +449,15 @@ namespace SOS.Lib.IO.DwcArchive
                 // Delete extension files if not used.
                 if (!emofFileCreated && File.Exists(emofCsvFilePath)) File.Delete(emofCsvFilePath);
                 if (!multimediaFileCreated && File.Exists(multimediaCsvFilePath)) File.Delete(multimediaCsvFilePath);
-                
+
                 // Create meta.xml
                 using (var fileStream = File.Create(metaXmlFilePath))
                 {
                     var dwcExtensions = new List<DwcaEventFilePart>();
                     dwcExtensions.Add(DwcaEventFilePart.Occurrence);
                     if (emofFileCreated) dwcExtensions.Add(DwcaEventFilePart.Emof);
-                    if (multimediaFileCreated) dwcExtensions.Add(DwcaEventFilePart.Multimedia);                    
-                    DwcArchiveMetaFileWriter.CreateEventMetaXmlFile(fileStream, eventFieldDescriptions, dwcExtensions, occurrenceFieldDescriptions);                    
+                    if (multimediaFileCreated) dwcExtensions.Add(DwcaEventFilePart.Multimedia);
+                    DwcArchiveMetaFileWriter.CreateEventMetaXmlFile(fileStream, eventFieldDescriptions, dwcExtensions, occurrenceFieldDescriptions);
                 }
 
                 var emlFile = await _dataProviderRepository.GetEmlAsync(dataProvider.Id);

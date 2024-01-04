@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers
 {

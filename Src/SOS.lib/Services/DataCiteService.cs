@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DataCite;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Services
 {
@@ -58,7 +58,7 @@ namespace SOS.Lib.Services
             }
 
             // Create a DOI 
-            data.Attributes.DOI = $"{_dataCiteServiceConfiguration.DoiPrefix}/{ (string.IsNullOrEmpty(data.Attributes.Suffix) ? Guid.NewGuid().ToString() : data.Attributes.Suffix) }";
+            data.Attributes.DOI = $"{_dataCiteServiceConfiguration.DoiPrefix}/{(string.IsNullOrEmpty(data.Attributes.Suffix) ? Guid.NewGuid().ToString() : data.Attributes.Suffix)}";
 
             var doiRequest = new DOI<DOIMetadata>
             {
@@ -78,13 +78,13 @@ namespace SOS.Lib.Services
             try
             {
                 var response = await _httpClientService.GetDataAsync<DOI<IEnumerable<DOIMetadata>>>(
-                    new Uri($"{ _dataCiteServiceConfiguration.BaseAddress }/dois?client-id={_dataCiteServiceConfiguration.ClientId.ToLower()}&page[size]={take}&page[number]={page}&sort={orderBy}:{(sortOrder == SearchSortOrder.Asc ? "asc" : "desc")}"));
+                    new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois?client-id={_dataCiteServiceConfiguration.ClientId.ToLower()}&page[size]={take}&page[number]={page}&sort={orderBy}:{(sortOrder == SearchSortOrder.Asc ? "asc" : "desc")}"));
 
                 return response;
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get DOI batch", e);
+                _logger.LogError(e, "Failed to get DOI batch");
             }
 
             return null;
@@ -96,11 +96,11 @@ namespace SOS.Lib.Services
             try
             {
                 return (await _httpClientService.GetDataAsync<DOI<DOIMetadata>>(
-                    new Uri($"{ _dataCiteServiceConfiguration.BaseAddress }/dois/{ prefix }/{ suffix }"))).Data;
+                    new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois/{prefix}/{suffix}"))).Data;
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get metadata", e);
+                _logger.LogError(e, "Failed to get metadata");
             }
 
             return null;
@@ -118,14 +118,14 @@ namespace SOS.Lib.Services
                     Data = data
                 };
 
-               await _httpClientService.PutDataAsync<DOI<DOIMetadata>>(
-                    new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois/{data.Id}"), doiRequest, GetBasciAuthenticationHeader(), "application/vnd.api+json");
+                await _httpClientService.PutDataAsync<DOI<DOIMetadata>>(
+                     new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois/{data.Id}"), doiRequest, GetBasciAuthenticationHeader(), "application/vnd.api+json");
 
                 return true;
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to publish DOI", e);
+                _logger.LogError(e, "Failed to publish DOI");
             }
 
             return false;
@@ -136,14 +136,14 @@ namespace SOS.Lib.Services
         {
             try
             {
-               var response = await _httpClientService.GetDataAsync<DOI<IEnumerable<DOIMetadata>>>(
-                    new Uri($"{ _dataCiteServiceConfiguration.BaseAddress }/dois?client-id={_dataCiteServiceConfiguration.ClientId.ToLower()}&query=+{searchFor.Replace(" ", "+")}&sort=created:desc"));
+                var response = await _httpClientService.GetDataAsync<DOI<IEnumerable<DOIMetadata>>>(
+                     new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois?client-id={_dataCiteServiceConfiguration.ClientId.ToLower()}&query=+{searchFor.Replace(" ", "+")}&sort=created:desc"));
 
-               return response;
+                return response;
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to search DOI's", e);
+                _logger.LogError(e, "Failed to search DOI's");
             }
 
             return null;

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Reflection;
-using Microsoft.Extensions.Configuration;
-using SOS.Observations.Api.LiveIntegrationTests;
+﻿using Microsoft.Extensions.Configuration;
 using SOS.TestHelpers;
+using System;
+using System.Reflection;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
 {

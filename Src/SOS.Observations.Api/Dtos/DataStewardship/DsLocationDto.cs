@@ -1,7 +1,7 @@
 ﻿using Nest;
 using SOS.Observations.Api.Dtos.DataStewardship.Enums;
-using System.ComponentModel.DataAnnotations;
 using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace SOS.Observations.Api.Dtos.DataStewardship
 {

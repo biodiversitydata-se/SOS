@@ -42,12 +42,13 @@ namespace SOS.Export.IoC.Modules
         /// <summary>
         ///     Module configuration
         /// </summary>
-        public (ExportConfiguration ExportConfiguration, 
-            MongoDbConfiguration ProcessDbConfiguration, 
+        public (ExportConfiguration ExportConfiguration,
+            MongoDbConfiguration ProcessDbConfiguration,
             BlobStorageConfiguration BlobStorageConfiguration,
             CryptoConfiguration CryptoConfiguration,
             DataCiteServiceConfiguration DataCiteServiceConfiguration,
-            UserServiceConfiguration UserServiceConfiguration) Configurations { get; set; }
+            UserServiceConfiguration UserServiceConfiguration) Configurations
+        { get; set; }
 
         /// <summary>
         ///     Load event
@@ -67,7 +68,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterInstance(Configurations.ExportConfiguration.DwcaFilesCreationConfiguration).As<DwcaFilesCreationConfiguration>().SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.FileDestination).As<FileDestination>().SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.ZendToConfiguration).As<ZendToConfiguration>().SingleInstance();
-            builder.RegisterInstance(Configurations.ExportConfiguration.VocabularyConfiguration).As<VocabularyConfiguration>().SingleInstance();            
+            builder.RegisterInstance(Configurations.ExportConfiguration.VocabularyConfiguration).As<VocabularyConfiguration>().SingleInstance();
             builder.RegisterInstance(Configurations.UserServiceConfiguration).As<UserServiceConfiguration>().SingleInstance();
 
             // Processed Mongo Db
@@ -79,7 +80,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<CurrentUserAuthorization>().As<IAuthorizationProvider>().InstancePerLifetimeScope();
 
             // Add cache
-            builder.RegisterType<AreaCache>().As<IAreaCache>().SingleInstance();            
+            builder.RegisterType<AreaCache>().As<IAreaCache>().SingleInstance();
             builder.RegisterType<ProcessedConfigurationCache>().As<ICache<string, ProcessedConfiguration>>().SingleInstance();
 
             // Add managers

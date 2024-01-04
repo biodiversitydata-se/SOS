@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Lib.Extensions
 {

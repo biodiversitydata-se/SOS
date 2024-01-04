@@ -1,8 +1,8 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
+using System;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFactory
@@ -89,8 +89,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-           /* result.Identification.ValidationStatus.Id.Should().Be((int)expectedValidationStatusId);
-            result.Identification.Validated.Should().Be(expectedValidatedValue);*/
+            /* result.Identification.ValidationStatus.Id.Should().Be((int)expectedValidationStatusId);
+             result.Identification.Validated.Should().Be(expectedValidatedValue);*/
             result.Identification.VerificationStatus.Id.Should().Be((int)expectedValidationStatusId);
             result.Identification.Verified.Should().Be(expectedValidatedValue);
         }

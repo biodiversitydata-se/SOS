@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using SOS.Lib.Configuration.Export;
+﻿using SOS.Lib.Configuration.Export;
 
 namespace SOS.Export.UnitTests
 {

@@ -1,8 +1,8 @@
-﻿using System;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using System;
 
 namespace SOS.Lib.Models.Processed.ProcessInfo
 {

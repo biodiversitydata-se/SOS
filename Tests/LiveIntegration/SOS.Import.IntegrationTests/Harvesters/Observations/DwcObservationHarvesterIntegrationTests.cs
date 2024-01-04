@@ -1,11 +1,6 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using DwC_A;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
-using SOS.Harvest.DarwinCore;
-using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Harvesters.DwC;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
@@ -13,6 +8,8 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
+using System.IO;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations

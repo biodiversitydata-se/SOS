@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SOS.Lib.Models.ApplicationInsights;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Lib.Models.ApplicationInsights;
 
 namespace SOS.Lib.Services.Interfaces
 {

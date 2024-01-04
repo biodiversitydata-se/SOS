@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.Models.TaxonListService;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Lib.Models.TaxonListService;
 
 namespace SOS.Lib.Services.Interfaces
 {

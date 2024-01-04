@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.Enums;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
-using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models
 {
@@ -32,7 +32,7 @@ namespace SOS.Lib.Models
             {
                 if (string.IsNullOrEmpty(JsonFormatDependsOn))
                 {
-                    _jsonFormatDependsOn = new []{ DependsOn } ;
+                    _jsonFormatDependsOn = new[] { DependsOn };
                 }
                 else
                 {

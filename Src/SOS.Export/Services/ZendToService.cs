@@ -1,4 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using SOS.Export.Models.ZendTo;
+using SOS.Export.Services.Interfaces;
+using SOS.Lib.Configuration.Export;
+using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -8,12 +13,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using SOS.Export.Models.ZendTo;
-using SOS.Export.Services.Interfaces;
-using SOS.Lib.Configuration.Export;
-using SOS.Lib.Enums;
-using SOS.Lib.Helpers;
-using Microsoft.IdentityModel.Tokens;
 
 namespace SOS.Export.Services
 {
@@ -34,7 +33,7 @@ namespace SOS.Export.Services
         public async Task<ZendToResponse> SendFile(string emailAddress, string description, string filePath, ExportFormat exportFormat,
             bool informRecipients = true, bool informPasscode = true, bool encryptFile = false, string encryptPassword = null)
         {
-           
+
             using var form = new MultipartFormDataContent();
             //    form.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data"); //new MediaTypeHeaderValue("application/x-www-form-urlencoded");
             DateTime fileCreationDate = File.GetCreationTime(filePath);
@@ -81,8 +80,8 @@ namespace SOS.Export.Services
             using var client = new HttpClient();
             using var response = await client.PostAsync("https://zendto.slu.se/dropoff.php", form);
             response.Headers.TryGetValues("X-ZendTo-Response", out var responseStrings);
-            
-            if (response.IsSuccessStatusCode && responseStrings!= null)
+
+            if (response.IsSuccessStatusCode && responseStrings != null)
             {
                 foreach (var responseString in responseStrings)
                 {
@@ -90,7 +89,7 @@ namespace SOS.Export.Services
                     {
                         var zendToResponse = JsonSerializer.Deserialize<ZendToResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                            if (!zendToResponse.Success)
+                        if (!zendToResponse.Success)
                         {
                             _logger.LogError($"Failed to send file with ZendTo. Response: {responseString}");
                         }
@@ -113,7 +112,7 @@ namespace SOS.Export.Services
             string str = template
                 .Replace("{swedishDate}", fileCreationDate.ToString("g", new CultureInfo("sv")))
                 .Replace("{englishDate}", fileCreationDate.ToString("g", new CultureInfo("en")));
-            
+
             return str;
         }
 

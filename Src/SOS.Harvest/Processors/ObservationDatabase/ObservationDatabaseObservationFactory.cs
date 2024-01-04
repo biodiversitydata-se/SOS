@@ -1,4 +1,7 @@
-﻿using SOS.Lib.Constants;
+﻿using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
@@ -7,9 +10,6 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ObservationDatabase;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
-using SOS.Lib.Configuration.Process;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Harvest.Processors.ObservationDatabase
@@ -30,11 +30,11 @@ namespace SOS.Harvest.Processors.ObservationDatabase
         /// <param name="areaHelper"></param>
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public ObservationDatabaseObservationFactory(DataProvider dataProvider, 
+        public ObservationDatabaseObservationFactory(DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager, 
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
         {
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
@@ -108,7 +108,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                 {
                     LifeStage = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.LifeStage]),
                     Sex = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.Sex]),
-                    Behavior = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.Behavior]),                    
+                    Behavior = GetSosId(verbatim.Stadium, _vocabularyById[VocabularyId.Behavior]),
                     CatalogId = verbatim.Id,
                     CatalogNumber = verbatim.Id.ToString(),
                     IndividualCount = verbatim.IndividualCount?.Clean(),
@@ -128,14 +128,14 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                 RightsHolder = verbatim.SCI_name?.Clean(),
                 Taxon = taxon
             };
-                        
+
             obs.Occurrence.OrganismQuantity = obs.Occurrence.IndividualCount;
             if (int.TryParse(obs.Occurrence.OrganismQuantity, out var quantity))
             {
                 obs.Occurrence.OrganismQuantityAggregation = quantity;
                 obs.Occurrence.OrganismQuantityInt = quantity;
             }
-            AddPositionData(obs.Location, verbatim.CoordinateX, verbatim.CoordinateY, CoordinateSys.Rt90_25_gon_v, 
+            AddPositionData(obs.Location, verbatim.CoordinateX, verbatim.CoordinateY, CoordinateSys.Rt90_25_gon_v,
                 verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
 
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
@@ -203,7 +203,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
         {
             UseSourceValue,
             UseDefaultValue
-        }        
+        }
 
         /// <summary>
         ///     Get vocabulary mappings.

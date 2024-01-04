@@ -7,7 +7,7 @@ namespace SOS.Lib.Models.Search.Filters
     ///     Base filter class
     /// </summary>
     public class EventSearchFilter
-    {       
+    {
         public List<string> DatasetIds { get; set; }
         public bool? IsPartOfDataStewardshipDataset { get; set; }
         public List<string> EventIds { get; set; }

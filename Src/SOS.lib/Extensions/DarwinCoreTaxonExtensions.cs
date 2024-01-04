@@ -1,9 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.Observation;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Extensions
 {
@@ -65,7 +65,7 @@ namespace SOS.Lib.Extensions
             var taxa = sourceTaxa?.Select(t => t.ToProcessedTaxon());
             return PopulateDeriviedRedListCategory(taxa?.ToDictionary(t => t.Id, t => t));
         }
-        
+
         public static Taxon ToProcessedTaxon(this DarwinCoreTaxon sourceTaxon)
         {
             var taxon = new Taxon();
@@ -114,7 +114,7 @@ namespace SOS.Lib.Extensions
             taxon.Attributes.ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw ?? false;
             taxon.Attributes.IsInvasiveAccordingToEuRegulation = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false;
             taxon.Attributes.IsInvasiveInSweden = _isInvasiveInSwedenCategories.Contains(sourceTaxon.DynamicProperties?.SwedishHistoryId ?? string.Empty);
-            taxon.Attributes.InvasiveRiskAssessmentCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2);            
+            taxon.Attributes.InvasiveRiskAssessmentCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2);
             taxon.Attributes.RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory?.Substring(0, 2);
             taxon.Attributes.SortOrder = sourceTaxon.SortOrder;
             taxon.Attributes.SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory;

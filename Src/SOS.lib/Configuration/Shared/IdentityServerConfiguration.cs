@@ -3,7 +3,7 @@
     /// <summary>
     /// Configuration parameters for Identity Server.
     /// </summary>
-    public class IdentityServerConfiguration 
+    public class IdentityServerConfiguration
     {
         /// <summary>
         /// Authority

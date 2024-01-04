@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Managers

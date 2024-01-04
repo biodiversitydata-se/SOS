@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Helpers;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Helpers
@@ -295,12 +295,12 @@ namespace SOS.Lib.UnitTests.Helpers
 
         [Fact]
         public void Test_parse_virtual_herbarium_dates()
-        {            
+        {
             DwcParser.ParseDate("1907-8-14").Should().Be(new DateTime(1907, 8, 14));
             DwcParser.ParseDate("2020-7-3").Should().Be(new DateTime(2020, 7, 3));
             DwcParser.ParseDate("2020-10-3").Should().Be(new DateTime(2020, 10, 3));
-            DwcParser.ParseDate("1889-8").Should().Be(new DateTime(1889,08,1));
-            DwcParser.ParseDate("18-9").Should().BeNull();            
+            DwcParser.ParseDate("1889-8").Should().Be(new DateTime(1889, 08, 1));
+            DwcParser.ParseDate("18-9").Should().BeNull();
         }
     }
 }

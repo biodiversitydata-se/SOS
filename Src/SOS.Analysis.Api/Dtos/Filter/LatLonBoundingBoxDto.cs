@@ -24,7 +24,7 @@ namespace SOS.Analysis.Api.Dtos.Filter
         public Envelope ToEnvelope()
         {
             return new Envelope(
-                new Coordinate(TopLeft?.Longitude ?? 0, TopLeft?.Latitude ?? 0), 
+                new Coordinate(TopLeft?.Longitude ?? 0, TopLeft?.Latitude ?? 0),
                 new Coordinate(BottomRight?.Longitude ?? 0, BottomRight?.Latitude ?? 0)
             );
         }

@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Swagger;
+using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -55,7 +55,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     action that occurs at a place and during a period of time).
         /// </summary>
         public Event Event { get; set; }
-                
+
         /// <summary>
         /// Data stewardship.
         /// </summary>
@@ -157,7 +157,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     (http://www.biodiversitycollectionsindex.org/).
         /// </summary>
         public string CollectionId { get; set; }
-       
+
         /// <summary>
         ///     Actions taken to make the shared data less specific or
         ///     complete than in its original form.

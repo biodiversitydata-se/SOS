@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
+﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
+using SOS.Lib.Models.Processed.Observation;
+using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Processed.DataStewardship.Event
 {
@@ -50,7 +50,7 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Event
         /// Date and Time for when the survey started (local time).
         /// </summary>
         /// <value>Date and Time for when the survey started (local time).</value>        
-        public DateTime? StartDate { get; set; }        
+        public DateTime? StartDate { get; set; }
 
         /// <summary>
         /// Date and Time for when the survey ended (local time).

@@ -63,7 +63,7 @@
         /// <summary>
         /// Scientific Name
         /// </summary>
-        public string ScientificName { get; set; }        
+        public string ScientificName { get; set; }
 
         /// <summary>
         /// Taxon attributes.

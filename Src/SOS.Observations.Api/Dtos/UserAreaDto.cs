@@ -11,12 +11,12 @@ namespace SOS.Observations.Api.Dtos
         /// Area type.
         /// </summary>
         public AreaTypeDto AreaType { get; set; }
-        
+
         /// <summary>
         /// Area FeatureId.
         /// </summary>
         public string FeatureId { get; set; }
-        
+
         /// <summary>
         /// Area name.
         /// </summary>

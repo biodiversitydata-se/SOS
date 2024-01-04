@@ -1,18 +1,18 @@
-﻿using System;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using SOS.Lib.Enums;
+using SOS.Lib.Factories;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Enums;
-using SOS.Lib.Factories;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Lib.Managers
 {
@@ -82,7 +82,7 @@ namespace SOS.Lib.Managers
                     : "DataProvider collection was created and initialized with default data providers.";
                 return Result.Success(returnDescription);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Result.Failure<string>(e.Message);
             }

@@ -43,8 +43,8 @@ namespace SOS.Harvest.Jobs
                     }
                 }
             }
-            
-            foreach(var queue in monitoringApi.Queues())
+
+            foreach (var queue in monitoringApi.Queues())
             {
                 var enqueuedJobs = monitoringApi.EnqueuedJobs(queue.Name, 0, (int)monitoringApi.EnqueuedCount(queue.Name));
                 if (enqueuedJobs?.Any() ?? false)

@@ -1,11 +1,11 @@
-﻿using System.Buffers;
-using System.Text;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Services.Interfaces;
+using System.Buffers;
+using System.Text;
+using System.Text.Json;
 
 namespace SOS.Harvest.Services
 {
@@ -25,7 +25,7 @@ namespace SOS.Harvest.Services
             if (reader.TokenType == JsonTokenType.Number)
             {
                 var utf8Bytes = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
-                var stringified =  Encoding.UTF8.GetString(utf8Bytes);
+                var stringified = Encoding.UTF8.GetString(utf8Bytes);
                 return stringified;
             }
             else if (reader.TokenType == JsonTokenType.String)
@@ -63,7 +63,7 @@ namespace SOS.Harvest.Services
                         new Uri($"{_iNaturalistServiceConfiguration.BaseAddress}/v1/occurrence/search?" +
                                 $"country=SE" +
                                 $"&datasetKey={_iNaturalistServiceConfiguration.DatasetKey}" +
-                                $"&eventDate={ fromDate.ToString("yyyy-MM-dd") },{ toDate.ToString("yyyy-MM-dd") }" +
+                                $"&eventDate={fromDate.ToString("yyyy-MM-dd")},{toDate.ToString("yyyy-MM-dd")}" +
                                 $"&offset=" + currentOffset +
                                 $"&limit=" + chunkSize),
                         new Dictionary<string, string>(new[]

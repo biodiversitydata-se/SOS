@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Kul;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -10,10 +11,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Kul;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
-using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Factories.Validation
 {
@@ -33,7 +31,7 @@ namespace SOS.Harvest.Factories.Validation
             ITaxonRepository processedTaxonRepository,
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration) 
+            ProcessConfiguration processConfiguration)
             : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager, processConfiguration)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository;
@@ -92,7 +90,7 @@ namespace SOS.Harvest.Factories.Validation
             {
                 _kulObservationFactory = new KulObservationFactory(
                     dataProvider,
-                    _taxonById, 
+                    _taxonById,
                     _areaHelper,
                     _processTimeManager,
                     ProcessConfiguration);

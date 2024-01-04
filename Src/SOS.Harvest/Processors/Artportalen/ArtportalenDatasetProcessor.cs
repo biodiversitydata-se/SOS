@@ -1,18 +1,18 @@
-﻿using Hangfire;
+﻿using DnsClient.Internal;
+using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Lib.Configuration.Process;
-using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using SOS.Harvest.Processors.Artportalen.Interfaces;
-using SOS.Lib.Models.Search.Filters;
-using System.Data;
-using DnsClient.Internal;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Lib.Extensions;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Data;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -21,7 +21,7 @@ namespace SOS.Harvest.Processors.Artportalen
     /// </summary>
     public class ArtportalenDatasetProcessor : DatasetProcessorBase<ArtportalenDatasetProcessor, DwcVerbatimDataset, IVerbatimRepositoryBase<DwcVerbatimDataset, int>>,
         IArtportalenDatasetProcessor
-    {        
+    {
         private readonly IArtportalenDatasetMetadataRepository _datasetRepository;
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         public override DataProviderType Type => DataProviderType.ArtportalenObservations;
@@ -35,8 +35,8 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="processTimeManager"></param>        
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public ArtportalenDatasetProcessor(            
-            IProcessedObservationCoreRepository processedObservationRepository,            
+        public ArtportalenDatasetProcessor(
+            IProcessedObservationCoreRepository processedObservationRepository,
             IDatasetRepository processedDatasetsRepository,
             IArtportalenDatasetMetadataRepository datasetRepository,
             IProcessManager processManager,
@@ -62,15 +62,15 @@ namespace SOS.Harvest.Processors.Artportalen
         private async Task<int> AddDatasetsAsync(DataProvider dataProvider, List<Lib.Models.Processed.Observation.ArtportalenDatasetMetadata> verbatimDatasets)
         {
             try
-            {                
+            {
                 Logger.LogInformation("Start AddDatasetsAsync()");
                 var datasets = verbatimDatasets.Select(m => m.ToDataset()).ToList();
                 foreach (var dataset in datasets)
                 {
                     dataset.EventIds = await GetEventIdsAsync(dataset.Identifier);
                 }
-                
-                int datasetCount = await ValidateAndStoreDatasets(dataProvider, datasets, "");                
+
+                int datasetCount = await ValidateAndStoreDatasets(dataProvider, datasets, "");
                 Logger.LogInformation("End AddDatasetsAsync()");
                 return datasetCount;
             }

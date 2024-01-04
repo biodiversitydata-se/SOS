@@ -1,10 +1,10 @@
-﻿using System;
+﻿using FluentAssertions;
+using SOS.Observations.Api.Dtos.Filter;
+using SOS.Observations.Api.EndToEndTests.Fixtures;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.EndToEndTests.Fixtures;
 using Xunit;
 
 namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto { Ids = new List<int> {TestData.TaxonIds.Otter}, IncludeUnderlyingTaxa = true},
+                Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
                 Date = new DateFilterDto
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),

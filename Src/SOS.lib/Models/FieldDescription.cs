@@ -25,7 +25,7 @@ namespace SOS.Export.Models
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((FieldDescription) obj);
+            return Equals((FieldDescription)obj);
         }
 
         public override int GetHashCode()

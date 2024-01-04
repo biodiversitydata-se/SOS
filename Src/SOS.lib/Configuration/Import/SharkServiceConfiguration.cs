@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Configuration.Shared;
+﻿using SOS.Lib.Configuration.Shared;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Configuration.Import
 {

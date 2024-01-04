@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
@@ -13,6 +8,11 @@ using SOS.Observations.Api.Dtos.Checklist;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -63,7 +63,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("CalculateTrend")]
         [ProducesResponseType(typeof(TaxonTrendResult), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CalculateTrendAsync([FromBody] CalculateTrendFilterDto filter)
         {
             try
@@ -93,7 +93,7 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(ChecklistDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetChecklistByIdAsync([FromQuery] string id)
         {
             try

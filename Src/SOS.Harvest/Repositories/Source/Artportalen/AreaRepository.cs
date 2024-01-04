@@ -28,7 +28,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         {
             try
             {
-                var areaTypes = ((int[]) Enum.GetValues(typeof(AreaType))).Where(at => at != 25);
+                var areaTypes = ((int[])Enum.GetValues(typeof(AreaType))).Where(at => at != 25);
 
                 var query = @"
                 SELECT -- Break out feature 100 (Sweden) from AreaDataSetId = 18

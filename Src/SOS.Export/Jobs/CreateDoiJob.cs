@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
@@ -16,6 +11,11 @@ using SOS.Lib.Models.DataCite;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace SOS.Export.Jobs
 {
@@ -40,7 +40,7 @@ namespace SOS.Export.Jobs
         /// <param name="configuration"></param>
         /// <param name="doiConfiguration"></param>
         /// <param name="logger"></param>
-        public CreateDoiJob(IObservationManager observationManager, 
+        public CreateDoiJob(IObservationManager observationManager,
             IDataCiteService dataCiteService,
             IDataProviderRepository dataProviderRepository,
             BlobStorageConfiguration configuration,
@@ -49,7 +49,7 @@ namespace SOS.Export.Jobs
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _dataCiteService = dataCiteService ?? throw new ArgumentNullException(nameof(dataCiteService));
-            _dataProviderRepository = dataProviderRepository ?? throw  new ArgumentNullException(nameof(dataProviderRepository));
+            _dataProviderRepository = dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
             _doiContainer = configuration?.Containers["doi"] ?? throw new ArgumentNullException(nameof(configuration));
             _doiConfiguration = doiConfiguration ?? throw new ArgumentNullException(nameof(doiConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -140,7 +140,7 @@ namespace SOS.Export.Jobs
             }
             catch (Exception e)
             {
-                _logger.LogInformation("Failed to create DOI.", e);
+                _logger.LogInformation(e, "Failed to create DOI.");
                 throw;
             }
 

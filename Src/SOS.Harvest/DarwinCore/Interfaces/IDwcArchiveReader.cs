@@ -48,21 +48,21 @@ namespace SOS.Harvest.DarwinCore.Interfaces
         /// <param name="archiveReader"></param>
         /// <returns></returns>
         Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext);
-        
+
         /// <summary>
         /// Read occurrences.
         /// </summary>
         /// <param name="archiveReaderContext"></param>
         /// <returns></returns>
         Task<IEnumerable<DwcObservationVerbatim>?> ReadOccurrencesAsync(ArchiveReaderContext archiveReaderContext);
-        
+
         /// <summary>
         /// Read occurrences in batches.
         /// </summary>
         /// <param name="archiveReaderContext"></param>
         /// <returns></returns>
         IAsyncEnumerable<IEnumerable<DwcObservationVerbatim>?> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext);
-        
+
         /// <summary>
         /// Read events.
         /// </summary>

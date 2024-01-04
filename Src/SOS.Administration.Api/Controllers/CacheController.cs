@@ -1,14 +1,13 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Jobs.Process;
 using SOS.Lib.Jobs.Shared;
 using SOS.Lib.Managers.Interfaces;
+using System;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -35,19 +34,19 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpDelete("{cache}")]
-        [ProducesResponseType(typeof(bool), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> ClearAsync([FromRoute]Cache cache)
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ClearAsync([FromRoute] Cache cache)
         {
             try
             {
-                BackgroundJob.Enqueue<IClearCacheJob>(job => job.RunAsync(new[] {cache}));
+                BackgroundJob.Enqueue<IClearCacheJob>(job => job.RunAsync(new[] { cache }));
                 return new OkObjectResult(await _cacheManager.ClearAsync(cache));
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"Failed to clear {cache} cache");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }

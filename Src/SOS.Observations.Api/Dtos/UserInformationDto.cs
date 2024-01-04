@@ -45,6 +45,6 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         /// User roles.
         /// </summary>
-        public ICollection<UserRoleDto> Roles { get; set; }           
+        public ICollection<UserRoleDto> Roles { get; set; }
     }
 }

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Lib.Models.Shared
 {

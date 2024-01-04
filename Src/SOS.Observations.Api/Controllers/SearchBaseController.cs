@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
-using SOS.Lib.Extensions;
 using SOS.Lib.Exceptions;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
-using Microsoft.ApplicationInsights.DataContracts;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -41,7 +40,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="protectionFilter"></param>
         protected void CheckAuthorization(ProtectionFilterDto? protectionFilter)
         {
-            if((protectionFilter ?? ProtectionFilterDto.Public) != ProtectionFilterDto.Public && (!User?.HasAccessToScope(_observationApiConfiguration.ProtectedScope) ?? true))
+            if ((protectionFilter ?? ProtectionFilterDto.Public) != ProtectionFilterDto.Public && (!User?.HasAccessToScope(_observationApiConfiguration.ProtectedScope) ?? true))
             {
                 throw new AuthenticationRequiredException("Not authorized");
             }
@@ -50,7 +49,7 @@ namespace SOS.Observations.Api.Controllers
         protected void LogObservationCount(long observationCount)
         {
             if (HttpContext == null) return;
-            
+
             HttpContext.Items.TryAdd("Observation-count", observationCount);
         }
 
@@ -62,7 +61,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Get id of current user
         /// </summary>
-        protected int UserId => int.Parse(User?.Claims?.FirstOrDefault(c => c.Type.Contains("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", StringComparison.CurrentCultureIgnoreCase) || c.Type.Contains("client_uaid", StringComparison.CurrentCultureIgnoreCase))?.Value ?? "0");        
+        protected int UserId => int.Parse(User?.Claims?.FirstOrDefault(c => c.Type.Contains("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", StringComparison.CurrentCultureIgnoreCase) || c.Type.Contains("client_uaid", StringComparison.CurrentCultureIgnoreCase))?.Value ?? "0");
 
         /// <summary>
         /// Check if passed areas exists
@@ -75,13 +74,13 @@ namespace SOS.Observations.Api.Controllers
             {
                 return Result.Success();
             }
-            
+
             var existingAreaIds = (await AreaManager.GetAreasAsync(areaIds.Select(a => (a.AreaType, a.FeatureId))))
                 .Select(a => new AreaFilterDto { AreaType = a.AreaType, FeatureId = a.FeatureId });
 
             var missingAreas = areaIds?
                 .Where(aid => !existingAreaIds.Any(a => a.AreaType.Equals(aid.AreaType) && a.FeatureId.Equals(aid.FeatureId, StringComparison.CurrentCultureIgnoreCase)))
-                .Select(aid => $"Area doesn't exist (AreaType: { aid.AreaType }, FeatureId: {aid.FeatureId})");
+                .Select(aid => $"Area doesn't exist (AreaType: {aid.AreaType}, FeatureId: {aid.FeatureId})");
 
             return missingAreas?.Any() ?? false ?
                 Result.Failure(string.Join(". ", missingAreas))
@@ -137,7 +136,7 @@ namespace SOS.Observations.Api.Controllers
 
             try
             {
-                foreach(var geoemtry in geometries)
+                foreach (var geoemtry in geometries)
                 {
                     var geom = geoemtry.ToGeometry();
 
@@ -228,7 +227,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 errors.Add("Confirmed password is not equal to password");
             }
-            
+
             if (errors.Any())
             {
                 return Result.Failure(string.Join(". ", errors));
@@ -241,7 +240,7 @@ namespace SOS.Observations.Api.Controllers
         {
             if (string.IsNullOrEmpty(property))
             {
-                return mandatory ? Result.Failure($"You must state { name }") : Result.Success();
+                return mandatory ? Result.Failure($"You must state {name}") : Result.Success();
             }
 
             if (typeof(Observation).HasProperty(property))
@@ -249,7 +248,7 @@ namespace SOS.Observations.Api.Controllers
                 return Result.Success();
             }
 
-            return Result.Failure($"Missing property ({ property }) used for { name }");
+            return Result.Failure($"Missing property ({property}) used for {name}");
         }
 
         protected virtual Result ValidateSearchFilter(SearchFilterBaseDto filter, bool allowObjectInOutputFields = true)
@@ -268,7 +267,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 errors.Add("Modified from date can't be greater tha to date");
             }
-            
+
             if (searchFilter?.Output?.Fields?.Any() ?? false)
             {
                 errors.AddRange(searchFilter.Output.Fields
@@ -323,7 +322,7 @@ namespace SOS.Observations.Api.Controllers
 
             if (skip + take > ElasticSearchMaxRecords)
             {
-                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
+                errors.Add($"Skip + take can't be greater than {ElasticSearchMaxRecords}");
             }
 
             if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
@@ -336,7 +335,7 @@ namespace SOS.Observations.Api.Controllers
 
             if (skip + take > ElasticSearchMaxRecordsInternal)
             {
-                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecordsInternal }");
+                errors.Add($"Skip + take can't be greater than {ElasticSearchMaxRecordsInternal}");
             }
 
             if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
@@ -351,8 +350,8 @@ namespace SOS.Observations.Api.Controllers
         protected Result ValidateTaxonExists(SearchFilterBaseDto filter)
         {
             var taxonCount = filter?.Taxon?.Ids?.Count() ?? 0;
-            return taxonCount == 0 
-                ? Result.Failure("You must provide taxon id's") 
+            return taxonCount == 0
+                ? Result.Failure("You must provide taxon id's")
                 : Result.Success();
         }
 

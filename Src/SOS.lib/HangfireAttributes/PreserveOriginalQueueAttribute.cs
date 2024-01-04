@@ -11,7 +11,8 @@ namespace SOS.Lib.HangfireAttributes
             try
             {
                 // Activating only when enqueueing a background job
-                if (context.NewState is not EnqueuedState enqueuedState) {
+                if (context.NewState is not EnqueuedState enqueuedState)
+                {
                     return;
                 };
 

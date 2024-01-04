@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
 using SOS.TestHelpers.Helpers;
+using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.UnitTests.TestHelpers.Fixtures
 {

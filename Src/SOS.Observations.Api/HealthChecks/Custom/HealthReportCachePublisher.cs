@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.HealthChecks.Custom
 {
@@ -44,7 +44,7 @@ namespace SOS.Observations.Api.HealthChecks.Custom
             if (noWfsEntries?.Any() ?? false)
             {
                 var dictionaryEntries = new Dictionary<string, HealthReportEntry>(noWfsEntries);
-                LatestNoWfs = new HealthReport(new ReadOnlyDictionary<string, HealthReportEntry>(dictionaryEntries), new System.TimeSpan(dictionaryEntries.Sum(e => e.Value.Duration.Ticks)) );
+                LatestNoWfs = new HealthReport(new ReadOnlyDictionary<string, HealthReportEntry>(dictionaryEntries), new System.TimeSpan(dictionaryEntries.Sum(e => e.Value.Duration.Ticks)));
             }
 
             var wfsEntries = report?.Entries?.Where(e => e.Key.Equals("WFS"));

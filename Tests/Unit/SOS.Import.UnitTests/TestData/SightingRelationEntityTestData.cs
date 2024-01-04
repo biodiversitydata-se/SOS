@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using SOS.Harvest.Entities.Artportalen;
+﻿using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Enums;
+using System.Collections.Generic;
 
 namespace SOS.Import.UnitTests.TestData
 {

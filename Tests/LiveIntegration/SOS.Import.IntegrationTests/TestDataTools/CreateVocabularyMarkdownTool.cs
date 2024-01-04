@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using SOS.Import.LiveIntegrationTests;
-using SOS.Lib.Models.Shared;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.TestDataTools

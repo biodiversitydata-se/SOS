@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel;
 
 namespace SOS.Administration.Api.Models
 {

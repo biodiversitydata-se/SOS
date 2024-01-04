@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Nest;
-using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Search.Filters;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.Search

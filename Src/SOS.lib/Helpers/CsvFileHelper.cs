@@ -1,10 +1,10 @@
-﻿using System;
+﻿using NReco.Csv;
+using RecordParser.Builders.Reader;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using NReco.Csv;
-using RecordParser.Builders.Reader;
 
 namespace SOS.Lib.Helpers
 {
@@ -79,7 +79,7 @@ namespace SOS.Lib.Helpers
         /// <returns></returns>
         public string GetField(int fieldIndex)
         {
-            return fieldIndex > _csvReader.FieldsCount ? null :_csvReader[fieldIndex];
+            return fieldIndex > _csvReader.FieldsCount ? null : _csvReader[fieldIndex];
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace SOS.Lib.Helpers
         /// <param name="delimiter"></param>
         public void InitializeRead(Stream stream, string delimiter)
         {
-           // _stream = stream ?? throw new ArgumentNullException(nameof(stream));
+            // _stream = stream ?? throw new ArgumentNullException(nameof(stream));
             _streamReader = new StreamReader(stream, Encoding.UTF8);
             _csvReader = new CsvReader(_streamReader, delimiter);
         }

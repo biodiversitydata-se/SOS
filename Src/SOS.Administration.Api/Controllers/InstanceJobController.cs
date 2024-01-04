@@ -1,12 +1,11 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
+using System;
+using System.Net;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -35,9 +34,9 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("Activate")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult RunSetActivateInstanceJob([FromQuery] byte instance)
         {
             try
@@ -45,7 +44,7 @@ namespace SOS.Administration.Api.Controllers
                 if (instance < 0 || instance > 1)
                 {
                     _logger.LogError("Instance must be 0 or 1");
-                    return new StatusCodeResult((int) HttpStatusCode.BadRequest);
+                    return new StatusCodeResult((int)HttpStatusCode.BadRequest);
                 }
 
                 BackgroundJob.Enqueue<IActivateInstanceJob>(job => job.RunAsync(instance));
@@ -54,7 +53,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing Activate instance failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }

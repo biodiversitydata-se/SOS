@@ -1,11 +1,8 @@
-﻿using System.Xml.Linq;
-using DwC_A;
+﻿using DwC_A;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using SOS.Harvest.DarwinCore;
-using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
@@ -16,6 +13,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services.Interfaces;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Harvesters.DwC
 {

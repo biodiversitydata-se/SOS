@@ -1,19 +1,17 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SOS.Administration.Gui.Services;
-using SOS.Lib.Configuration.Shared;
-using System.Text;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 using SOS.Administration.Gui.Managers;
 using SOS.Administration.Gui.Managers.Interfaces;
+using SOS.Administration.Gui.Services;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Managers;
@@ -24,6 +22,8 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using System.Globalization;
+using System.Text;
+using System.Text.Json.Serialization;
 
 namespace SOS.Administration.Gui
 {
@@ -44,7 +44,7 @@ namespace SOS.Administration.Gui
                 .AddJsonFile("appsettings.json", true, true)
                 .AddJsonFile($"appsettings.{environment}.json", true)
                 .AddEnvironmentVariables();
-            _isDevelopment =  environment.Equals("local");
+            _isDevelopment = environment.Equals("local");
             if (_isDevelopment)
             {
                 // If Development mode, add secrets stored on developer machine 
@@ -76,9 +76,10 @@ namespace SOS.Administration.Gui
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
-         
+
             var authConfig = Configuration.GetSection(nameof(AuthenticationConfiguration)).Get<AuthenticationConfiguration>();
-            services.AddAuthentication(opt => {
+            services.AddAuthentication(opt =>
+            {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
@@ -112,7 +113,7 @@ namespace SOS.Administration.Gui
             services.AddSingleton(authConfig);
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(testElasticSearchConfiguration);
-            
+
             // Add cache
             services.AddSingleton<IClassCache<ProcessedConfiguration>, ClassCache<ProcessedConfiguration>>();
 

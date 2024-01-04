@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Harvest.Harvesters.Interfaces;
@@ -14,8 +8,11 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
-using SOS.Lib.Models.Interfaces;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -58,8 +55,8 @@ namespace SOS.Administration.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("VocabularyDiffAsZipFile")]
-        [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetVocabulariesDiffAsZipFile()
         {
             try
@@ -73,7 +70,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
@@ -95,7 +92,7 @@ namespace SOS.Administration.Api.Controllers
                 var dwcTaxonById = dwcTaxa.ToDictionary(m => m.Id, m => m);
                 var taxonCategories = TaxonCategoryHelper.GetTaxonCategories(dwcTaxonById);
                 var edges = TaxonCategoryHelper.GetTaxonCategoryEdges(taxonCategories);
-                string strGraphviz = null; 
+                string strGraphviz = null;
                 if (diagramFormat == DiagramFormat.GraphViz)
                 {
                     strGraphviz = TaxonCategoryHelper.CreateGraphVizDiagram(edges, includeSecondaryRelations);
@@ -104,7 +101,7 @@ namespace SOS.Administration.Api.Controllers
                 {
                     strGraphviz = TaxonCategoryHelper.CreateMermaidDiagram(edges, includeSecondaryRelations);
                 }
-                
+
                 return Ok(strGraphviz);
                 //return File(System.Text.Encoding.UTF8.GetBytes(strGraphviz),"text/plain", "TaxonCategory Diagram.gv");
             }
@@ -126,7 +123,7 @@ namespace SOS.Administration.Api.Controllers
         public async Task<IActionResult> GetTaxonRelationsDiagram(
             [FromQuery] int[] taxonIds,
             [FromQuery] TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
-            [FromQuery] bool includeSecondaryRelations = false,            
+            [FromQuery] bool includeSecondaryRelations = false,
             [FromQuery] DiagramFormat diagramFormat = DiagramFormat.Mermaid)
         {
             try

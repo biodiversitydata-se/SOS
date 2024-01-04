@@ -1,12 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen;
 using SOS.Harvest.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
@@ -116,7 +116,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetIdSpanAsyncSuccess()
         {
-            (int minId, int maxId)[] span = new [] { (1, 2) };
+            (int minId, int maxId)[] span = new[] { (1, 2) };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<(int minId, int maxId)>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(span);

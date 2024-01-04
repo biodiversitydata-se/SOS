@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Nest;
+﻿using Nest;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Filters;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Lib
 {

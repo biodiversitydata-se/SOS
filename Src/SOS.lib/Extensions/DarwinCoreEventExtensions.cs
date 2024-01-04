@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SOS.Lib.Models.DarwinCore;
+using System;
 using System.Globalization;
-using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Lib.Extensions
 {

@@ -11,12 +11,12 @@ namespace SOS.Observations.Api.Dtos
         /// Authority id.
         /// </summary>
         public int Id { get; set; }
-        
+
         /// <summary>
         /// Authority name.
         /// </summary>
         public string Name { get; set; }
-        
+
         /// <summary>
         /// Authority areas.
         /// </summary>

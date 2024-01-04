@@ -1,5 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Mvm.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -9,8 +11,6 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Mvm;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Mvm.Interfaces;
 
 namespace SOS.Harvest.Processors.Mvm
 {
@@ -26,7 +26,7 @@ namespace SOS.Harvest.Processors.Mvm
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            JobRunModes mode,            
+            JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             var observationFactory = new MvmObservationFactory(dataProvider, taxa, _areaHelper, TimeManager, ProcessConfiguration);

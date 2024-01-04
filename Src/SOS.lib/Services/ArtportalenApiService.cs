@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.ArtportalenApiService;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Services
 {
@@ -37,11 +37,11 @@ namespace SOS.Lib.Services
         public async Task<SightingOutput> GetSightingByIdAsync(int sightingId)
         {
             try
-            {                
+            {
                 var sighting = await _httpClientService.GetDataAsync<SightingOutput>(
-                    new Uri($"{ _artportalenApiServiceConfiguration.BaseAddress }/sightings/{sightingId}"));
+                    new Uri($"{_artportalenApiServiceConfiguration.BaseAddress}/sightings/{sightingId}"));
 
-                return sighting;                
+                return sighting;
             }
             catch (Exception e)
             {
@@ -56,7 +56,7 @@ namespace SOS.Lib.Services
             try
             {
                 var media = await _httpClientService.GetDataAsync<List<MediaFile>>(
-                    new Uri($"{ _artportalenApiServiceConfiguration.BaseAddress }/sightings/{sightingId}/media"));
+                    new Uri($"{_artportalenApiServiceConfiguration.BaseAddress}/sightings/{sightingId}/media"));
 
                 return media;
             }
@@ -66,6 +66,6 @@ namespace SOS.Lib.Services
             }
 
             return null;
-        }        
+        }
     }
 }

@@ -1,14 +1,14 @@
 ﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.Import;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Harvest.Entities.ObservationsDatabase;
 using SOS.Harvest.Harvesters.ObservationDatabase.Interfaces;
 using SOS.Harvest.Repositories.Source.ObservationsDatabase.Interfaces;
+using SOS.Lib.Configuration.Import;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ObservationDatabase;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Harvesters.ObservationDatabase
@@ -52,7 +52,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
                 Logger.LogDebug($"Start casting entities to verbatim ({batchIndex})");
 
                 // Cast sightings to verbatim observations
-                var verbatimObservations = observations!.Select(e => CastEntityToVerbatim(e))?.ToArray(); 
+                var verbatimObservations = observations!.Select(e => CastEntityToVerbatim(e))?.ToArray();
                 observations = null;
                 Logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
 
@@ -143,7 +143,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
             _observationDatabaseRepository = observationDatabaseRepository ?? throw new ArgumentNullException(nameof(observationDatabaseRepository));
             _observationDatabaseConfiguration = observationDatabaseConfiguration ??
                                                 throw new ArgumentNullException(nameof(observationDatabaseConfiguration));
-            _semaphore = new SemaphoreSlim(_observationDatabaseConfiguration.NoOfThreads, _observationDatabaseConfiguration.NoOfThreads);            
+            _semaphore = new SemaphoreSlim(_observationDatabaseConfiguration.NoOfThreads, _observationDatabaseConfiguration.NoOfThreads);
         }
 
         /// inheritdoc />

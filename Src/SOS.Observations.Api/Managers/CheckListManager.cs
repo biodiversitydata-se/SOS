@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Statistics;
@@ -10,6 +7,9 @@ using SOS.Observations.Api.Dtos.Checklist;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -55,7 +55,7 @@ namespace SOS.Observations.Api.Managers
             await _filterManager.PrepareFilterAsync(checklistSearchFilter);
             var taxonTrendResult = new TaxonTrendResult();
             taxonTrendResult.NrPresentObservations = await _processedChecklistRepository.GetPresentCountAsync(checklistSearchFilter);
-            taxonTrendResult.NrAbsentObservations = await _processedChecklistRepository.GetAbsentCountAsync(checklistSearchFilter);            
+            taxonTrendResult.NrAbsentObservations = await _processedChecklistRepository.GetAbsentCountAsync(checklistSearchFilter);
             taxonTrendResult.NrChecklists = await _processedChecklistRepository.GetChecklistCountAsync(checklistSearchFilter);
             taxonTrendResult.Quotient = taxonTrendResult.NrPresentObservations / (double)taxonTrendResult.NrChecklists;
             taxonTrendResult.TaxonId = checklistSearchFilter.Taxa.Ids.First();

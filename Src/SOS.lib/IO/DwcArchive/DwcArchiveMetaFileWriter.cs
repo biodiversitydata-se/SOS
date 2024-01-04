@@ -1,10 +1,10 @@
-﻿using System;
+﻿using SOS.Export.Models;
+using SOS.Lib.Enums;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using SOS.Export.Models;
-using SOS.Lib.Enums;
 
 namespace SOS.Lib.IO.DwcArchive
 {

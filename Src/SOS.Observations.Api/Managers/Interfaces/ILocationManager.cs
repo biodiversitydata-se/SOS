@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Lib.Models.Search.Filters;
+﻿using SOS.Lib.Models.Search.Filters;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Location;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {
@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<LocationSearchResultDto>> SearchAsync(int? roleId, string authorizationApplicationIdentifier, 
+        Task<IEnumerable<LocationSearchResultDto>> SearchAsync(int? roleId, string authorizationApplicationIdentifier,
             SearchFilter filter, int skip, int take);
     }
 }

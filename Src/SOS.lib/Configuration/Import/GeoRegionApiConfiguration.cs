@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SOS.Lib.Configuration.Import
+﻿namespace SOS.Lib.Configuration.Import
 {
     public class GeoRegionApiConfiguration
     {

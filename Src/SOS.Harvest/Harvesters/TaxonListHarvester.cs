@@ -1,16 +1,15 @@
-﻿using System.Linq;
-using System.Reflection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using System.Reflection;
 
 namespace SOS.Harvest.Harvesters
 {
@@ -76,10 +75,10 @@ namespace SOS.Harvest.Harvesters
                 }
 
                 // Check that data seems to be correct
-                var dataIsOk = conservationLists.Count != 0;                
+                var dataIsOk = conservationLists.Count != 0;
                 var listsWithNoTaxa = new List<TaxonList>();
                 if (dataIsOk)
-                {                    
+                {
                     foreach (var taxonList in taxonLists!)
                     {
                         if (!taxonList.AllowNotaxa && !(taxonList.Taxa?.Any() ?? false))

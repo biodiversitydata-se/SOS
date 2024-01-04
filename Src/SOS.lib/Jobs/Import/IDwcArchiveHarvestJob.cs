@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using SOS.Lib.Enums;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Jobs.Import
 {

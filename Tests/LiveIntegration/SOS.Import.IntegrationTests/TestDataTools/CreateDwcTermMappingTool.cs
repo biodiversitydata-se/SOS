@@ -1,9 +1,9 @@
-﻿using System;
+﻿using DwC_A.Terms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using DwC_A.Terms;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.TestDataTools

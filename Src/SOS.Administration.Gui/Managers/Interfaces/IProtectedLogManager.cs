@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SOS.Administration.Gui.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Administration.Gui.Models;
 
 namespace SOS.Administration.Gui.Managers.Interfaces
 {

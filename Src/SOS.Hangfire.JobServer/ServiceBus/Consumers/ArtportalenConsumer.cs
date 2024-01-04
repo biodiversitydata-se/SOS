@@ -74,11 +74,11 @@ namespace SOS.Hangfire.JobServer.ServiceBus.Consumers
                 }
                 await _artportalenObservationProcessor.ProcessObservationsAsync(provider, new Dictionary<int, Taxon> { { taxon.Id, taxon } }, verbatims);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _logger.LogError(e, $"Failed to update Sighting id: {message.SightingId}");
             }
-            
+
         }
     }
 }

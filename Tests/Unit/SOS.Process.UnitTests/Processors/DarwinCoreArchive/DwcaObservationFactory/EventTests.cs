@@ -1,7 +1,7 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
+using System;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFactory

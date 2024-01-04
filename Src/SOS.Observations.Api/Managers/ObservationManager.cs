@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -26,6 +20,12 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -61,10 +61,10 @@ namespace SOS.Observations.Api.Managers
                 var occurenceIds = new HashSet<string>();
                 var observations = processedObservations.Cast<IDictionary<string, object>>().ToList();
                 LocalDateTimeConverterHelper.ConvertToLocalTime(observations);
-                
+
                 // Resolve vocabulary values.
                 _vocabularyValueResolver.ResolveVocabularyMappedValues(observations, cultureCode);
-               
+
                 foreach (var obs in observations)
                 {
                     if (!protectionFilter.Equals(ProtectionFilter.Public) &&
@@ -82,7 +82,7 @@ namespace SOS.Observations.Api.Managers
                 // Log protected observations
                 if (!protectionFilter.Equals(ProtectionFilter.Public))
                 {
-                    var user =  _httpContextAccessor.HttpContext?.User;
+                    var user = _httpContextAccessor.HttpContext?.User;
 
                     var protectedLog = new ProtectedLog
                     {
@@ -137,7 +137,7 @@ namespace SOS.Observations.Api.Managers
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));            
+            _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
             _taxonSumAggregationCache = taxonSumAggregationCache ?? throw new ArgumentNullException(nameof(taxonSumAggregationCache));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -153,8 +153,8 @@ namespace SOS.Observations.Api.Managers
         public async Task<PagedResult<dynamic>> GetChunkAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
-            SearchFilter filter, 
-            int skip, 
+            SearchFilter filter,
+            int skip,
             int take)
         {
             try
@@ -170,7 +170,7 @@ namespace SOS.Observations.Api.Managers
             {
                 throw;
             }
-            catch(TimeoutException e)
+            catch (TimeoutException e)
             {
                 _logger.LogError(e, "Get chunk of observations timeout");
                 throw;
@@ -187,7 +187,7 @@ namespace SOS.Observations.Api.Managers
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
-            int take, 
+            int take,
             string scrollId)
         {
             try
@@ -224,10 +224,10 @@ namespace SOS.Observations.Api.Managers
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
 
-                if(aggregationType.IsDateHistogram())
+                if (aggregationType.IsDateHistogram())
                     return await _processedObservationRepository.GetAggregatedHistogramChunkAsync(filter, aggregationType);
 
-                if(aggregationType.IsSpeciesSightingsList())
+                if (aggregationType.IsSpeciesSightingsList())
                     return await _processedObservationRepository.GetAggregatedChunkAsync(filter, aggregationType, skip, take);
 
                 if (aggregationType == AggregationType.SightingsPerWeek48)
@@ -340,7 +340,7 @@ namespace SOS.Observations.Api.Managers
                 foreach (var notCachedTaxonId in notCachedTaxonIds)
                 {
                     filter.Taxa.Ids = new[] { notCachedTaxonId };
-                    int observationCount = Convert.ToInt32(await GetMatchCountAsync(null, null, filter));                    
+                    int observationCount = Convert.ToInt32(await GetMatchCountAsync(null, null, filter));
                     int provinceCount = Convert.ToInt32(await GetProvinceCountAsync(null, null, filter));
                     var taxonCount = new TaxonCount { ObservationCount = observationCount, ProvinceCount = provinceCount };
                     var cacheKey = TaxonObservationCountCacheKey.Create(taxonObservationCountSearch, notCachedTaxonId);
@@ -376,7 +376,7 @@ namespace SOS.Observations.Api.Managers
                 {
                     throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                 }
-                
+
                 var result = await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
                 return result;
             }
@@ -401,7 +401,7 @@ namespace SOS.Observations.Api.Managers
         /// <inheritdoc />
         public async Task<dynamic> GetObservationAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet,
             string translationCultureCode, bool protectedObservations, bool includeInternalFields, bool ensureArtportalenUpdated = false)
-        {            
+        {
             if (ensureArtportalenUpdated && (occurrenceId?.Contains("artportalen", StringComparison.CurrentCultureIgnoreCase) ?? false))
             {
                 var regex = new Regex(@"\d+$");
@@ -425,12 +425,12 @@ namespace SOS.Observations.Api.Managers
             }
 
             var protectionFilter = protectedObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public;
-            var filter = includeInternalFields ? 
-                new SearchFilterInternal(userId ?? 0, protectionFilter) { NotPresentFilter = SightingNotPresentFilter.IncludeNotPresent } : 
+            var filter = includeInternalFields ?
+                new SearchFilterInternal(userId ?? 0, protectionFilter) { NotPresentFilter = SightingNotPresentFilter.IncludeNotPresent } :
                 new SearchFilter(userId ?? 0, protectionFilter);
             filter.Output = new OutputFilter();
             filter.Output.PopulateFields(outputFieldSet);
-            
+
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "Sighting", null, null, null, false);
 
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
@@ -517,7 +517,7 @@ namespace SOS.Observations.Api.Managers
                 {
                     throw new AuthenticationRequiredException("You have to login in order to use this end point");
                 }
-              
+
                 var result = await _processedObservationRepository.GetUserYearMonthDayCountAsync(filter, skip, take);
                 return result?.ToDtos();
             }

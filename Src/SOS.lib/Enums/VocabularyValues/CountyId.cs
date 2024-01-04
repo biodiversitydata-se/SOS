@@ -23,7 +23,7 @@
         public const string Västerbotten = "24";
         public const string Västernorrland = "22";
         public const string Västmanland = "19";
-        public const string VästraGötaland	 = "14";
+        public const string VästraGötaland = "14";
         public const string Örebro = "18";
         public const string Östergötland = "5";
     }

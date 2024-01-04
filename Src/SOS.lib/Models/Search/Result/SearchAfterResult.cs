@@ -8,7 +8,7 @@ namespace SOS.Lib.Models.Search.Result
         /// Point in time id
         /// </summary>
         public string PointInTimeId { get; set; }
-    
+
         /// <summary>
         /// Returned records
         /// </summary>

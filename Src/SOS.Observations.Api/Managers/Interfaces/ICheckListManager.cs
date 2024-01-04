@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using SOS.Lib.Models.Search.Filters;
+﻿using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Statistics;
 using SOS.Observations.Api.Dtos.Checklist;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
@@ -13,10 +8,15 @@ using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Location;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers
-{ 
+{
     /// <summary>
     ///     Observation controller
     /// </summary>
@@ -56,7 +56,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [AzureInternalApi]
-        public async Task<IActionResult> GetLocationsByIds([FromBody]IEnumerable<string> locationIds)
+        public async Task<IActionResult> GetLocationsByIds([FromBody] IEnumerable<string> locationIds)
         {
             try
             {

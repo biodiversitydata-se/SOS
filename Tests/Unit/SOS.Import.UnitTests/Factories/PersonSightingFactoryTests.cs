@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Moq;
+﻿using FluentAssertions;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Factories;
 using SOS.Harvest.Repositories.Source.Artportalen.Enums;
-using SOS.Lib.Managers;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Managers
 {
     public class PersonSightingFactoryTests
-    {                
+    {
         [Fact]
         public async Task observation_wihout_observers_returns_personSighting_with_via_prefix()
         {
@@ -38,10 +33,10 @@ namespace SOS.Import.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var personSightingBySightingId = PersonSightingFactory.CreatePersonSightingDictionary(sightingIds, 
-                personByUserId, 
-                organizations, 
-                speciesCollectionItemsBySightingId, 
+            var personSightingBySightingId = PersonSightingFactory.CreatePersonSightingDictionary(sightingIds,
+                personByUserId,
+                organizations,
+                speciesCollectionItemsBySightingId,
                 sightingRelations);
 
             //-----------------------------------------------------------------------------------------------------------

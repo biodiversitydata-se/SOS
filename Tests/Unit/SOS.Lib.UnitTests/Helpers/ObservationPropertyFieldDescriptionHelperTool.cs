@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using MongoDB.Driver;
-using SharpCompress.Common;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models;
 using System.Collections.Generic;
@@ -15,7 +14,7 @@ using Xunit;
 namespace SOS.Lib.UnitTests.Helpers
 {
     public class ObservationPropertyFieldDescriptionHelperTool
-    {       
+    {
         [Fact(Skip = "Intended to run on demand")]
         [Trait("Category", "Tool")]
         public void ReOrderProperties()
@@ -40,7 +39,7 @@ namespace SOS.Lib.UnitTests.Helpers
             File.WriteAllText("c:/temp/2023-09-10/newsortorder2.json", strJsonOutput);
 
             // Assert
-            strJsonOutput.Should().NotBeNull();            
+            strJsonOutput.Should().NotBeNull();
         }
 
         private class FieldSortOrder

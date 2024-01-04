@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Shared
 {

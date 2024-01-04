@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
-using JsonDiffPatchDotNet;
+﻿using JsonDiffPatchDotNet;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SOS.Harvest.Helpers.Interfaces;
@@ -8,6 +6,8 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Reflection;
+using System.Text;
 
 namespace SOS.Harvest.Helpers
 {
@@ -37,7 +37,7 @@ namespace SOS.Harvest.Helpers
             var generatedVocabulariesJtoken = JToken.FromObject(generatedVocabularies);
             var jsonFilesVocabulariesJtoken = JToken.FromObject(jsonFilesVocabularies);
             var processedVocabulariesJtoken = JToken.FromObject(processedVocabularies);
-            var serializerSettings = new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore};
+            var serializerSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
             var generatedVocabulariesJson =
                 JsonConvert.SerializeObject(generatedVocabularies, Formatting.Indented, serializerSettings);
             var jsonFilesVocabulariesJson =

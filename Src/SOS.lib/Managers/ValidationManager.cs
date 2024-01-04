@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
@@ -10,6 +6,10 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers
 {
@@ -107,7 +107,7 @@ namespace SOS.Lib.Managers
                     ObservationDefect.ObservationDefectType.TaxonNotFound,
                     $"Taxon not found ({observation.Taxon?.VerbatimId})")
                 );
-            }            
+            }
 
             if (observation.Location == null || !observation.Location.DecimalLatitude.HasValue ||
                 !observation.Location.DecimalLongitude.HasValue)
@@ -148,7 +148,7 @@ namespace SOS.Lib.Managers
                     "Location point with buffer is missing")
                 );
             }
-         
+
             if (string.IsNullOrEmpty(observation?.Occurrence.CatalogNumber))
             {
                 observationValidation.Defects.Add(new ObservationDefect(

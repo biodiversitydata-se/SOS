@@ -11,7 +11,7 @@ namespace SOS.Analysis.Api.Dtos.Filter
         ///     Type of area
         /// </summary>
         public AreaTypeDto AreaType { get; set; }
-       
+
         /// <summary>
         ///    Feature
         /// </summary>

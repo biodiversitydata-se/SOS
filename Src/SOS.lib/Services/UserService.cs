@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Services
 {
@@ -52,10 +52,10 @@ namespace SOS.Lib.Services
                 if (string.IsNullOrEmpty(authorizationHeader))
                 {
                     return null;
-                } 
-               
+                }
+
                 var response = await _httpClientService.GetDataAsync<ResponseModel<UserModel>>(
-                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/Current"),
+                    new Uri($"{_userServiceConfiguration.BaseAddress}/User/Current"),
                    new Dictionary<string, string> { { "Authorization", authorizationHeader } });
 
                 return response?.Success ?? false
@@ -64,7 +64,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get user", e);
+                _logger.LogError(e, "Failed to get user");
             }
 
             return null;
@@ -80,15 +80,15 @@ namespace SOS.Lib.Services
             try
             {
                 var response = await _httpClientService.GetDataAsync<ResponseModel<UserModel>>(
-                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{userId}"));
-                
+                    new Uri($"{_userServiceConfiguration.BaseAddress}/User/{userId}"));
+
                 return response.Success
                     ? response.Result
                     : throw new Exception(string.Concat(response.Messages?.Select(m => m.Text)));
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get user", e);
+                _logger.LogError(e, "Failed to get user");
             }
 
             return null;
@@ -100,7 +100,7 @@ namespace SOS.Lib.Services
             try
             {
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<AuthorityModel>>>(
-                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{ userId }/authorities?applicationIdentifier={ authorizationApplicationIdentifier ?? "artportalen" }&lang={cultureCode}"));
+                    new Uri($"{_userServiceConfiguration.BaseAddress}/User/{userId}/authorities?applicationIdentifier={authorizationApplicationIdentifier ?? "artportalen"}&lang={cultureCode}"));
 
                 return response.Success
                     ? response.Result
@@ -108,7 +108,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get user authorities", e);
+                _logger.LogError(e, "Failed to get user authorities");
             }
 
             return null;
@@ -121,7 +121,7 @@ namespace SOS.Lib.Services
             {
                 var cultureId = CultureCodeHelper.GetCultureId(cultureCode);
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<RoleModel>>>(
-                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{ userId }/roles?applicationIdentifier={ authorizationApplicationIdentifier ?? "artportalen" }&localeId={cultureId}"));
+                    new Uri($"{_userServiceConfiguration.BaseAddress}/User/{userId}/roles?applicationIdentifier={authorizationApplicationIdentifier ?? "artportalen"}&localeId={cultureId}"));
 
                 return response?.Success ?? false
                     ? response.Result
@@ -129,7 +129,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get user roles", e);
+                _logger.LogError(e, "Failed to get user roles");
             }
 
             return null;
@@ -139,9 +139,9 @@ namespace SOS.Lib.Services
         public async Task<PersonModel> GetPersonAsync(int personId, string cultureCode = "sv-SE")
         {
             try
-            {                
+            {
                 var response = await _httpClientService.GetDataAsync<ResponseModel<PersonModel>>(
-                    new Uri($"{ _userServiceConfiguration.BaseAddress }/Person/{personId}?lang={cultureCode}"));
+                    new Uri($"{_userServiceConfiguration.BaseAddress}/Person/{personId}?lang={cultureCode}"));
 
                 return response?.Success ?? false
                     ? response.Result
@@ -149,7 +149,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get person information", e);
+                _logger.LogError(e, "Failed to get person information");
             }
 
             return null;

@@ -12,7 +12,7 @@ namespace SOS.Observations.Api.Dtos.DataStewardship.Extensions
             if (point == null) return null;
 
             var pointToTransform = new Point(point.Coordinates.Longitude, point.Coordinates.Latitude);
-          
+
             var transformedPoint = pointToTransform.Transform(CoordinateSys.WGS84, responseCoordinateSystem);
             return transformedPoint.ToGeoShape();
         }

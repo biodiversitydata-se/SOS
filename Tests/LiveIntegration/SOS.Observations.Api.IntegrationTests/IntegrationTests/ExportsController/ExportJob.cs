@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -15,6 +10,11 @@ using SOS.Lib.JsonConverters;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsController

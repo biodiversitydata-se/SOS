@@ -1,24 +1,24 @@
-﻿using System.Collections.Concurrent;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
+using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Collections.Concurrent;
 
 namespace SOS.Harvest.Processors
 {
     public abstract class EventProcessorBase<TClass, TVerbatim, TVerbatimRepository> : ProcessorBase<TClass>
         where TVerbatim : IEntity<int>
-        where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int> 
+        where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int>
     {
         protected readonly IEventRepository ObservationEventRepository;
         protected readonly IValidationManager ValidationManager;
@@ -72,7 +72,7 @@ namespace SOS.Harvest.Processors
                 Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} events");
                 var processCount = await ProcessEventsAsync(dataProvider, cancellationToken);
                 Logger.LogInformation($"Event - Finish processing {dataProvider.Identifier} events. publicCount={processCount.publicCount}, protectedCount={processCount.protectedCount}, failedCount={processCount.failedCount}");
-                
+
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount, processCount.failedCount);
             }
             catch (JobAbortedException)
@@ -111,7 +111,7 @@ namespace SOS.Harvest.Processors
                 Logger.LogDebug($"Event - Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
                 var verbatimEventsBatch = await eventVerbatimRepository.GetBatchAsync(startId, endId);
                 Logger.LogDebug($"Event - Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
-                if (!verbatimEventsBatch?.Any() ?? true) return (0, 0, 0);                
+                if (!verbatimEventsBatch?.Any() ?? true) return (0, 0, 0);
 
                 Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
                 var processedEvents = new ConcurrentDictionary<string, Event>();
@@ -240,10 +240,10 @@ namespace SOS.Harvest.Processors
             string batchId)
         {
             Logger.LogDebug($"Start events validation {dataProvider.Identifier} batch: {batchId}");
-            
-            var invalidEvents = ValidationManager.ValidateEvents(ref events, dataProvider);            
+
+            var invalidEvents = ValidationManager.ValidateEvents(ref events, dataProvider);
             await ValidationManager.AddInvalidEventsToDb(invalidEvents);
-            
+
             Logger.LogDebug($"End events validation {dataProvider.Identifier} batch: {batchId}");
 
             return events;

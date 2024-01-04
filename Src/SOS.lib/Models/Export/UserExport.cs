@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Export
 {
@@ -30,5 +30,5 @@ namespace SOS.Lib.Models.Export
         /// Jobs information
         /// </summary>
         public ICollection<ExportJobInfo> Jobs { get; set; }
-    }   
+    }
 }

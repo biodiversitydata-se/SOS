@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Export.Models;
+using SOS.Lib.Enums;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using SOS.Export.Models;
-using SOS.Lib.Enums;
 
 namespace SOS.Lib.Helpers
 {
@@ -52,7 +52,7 @@ namespace SOS.Lib.Helpers
             var fieldIds = GetDefaultDwcExportFieldDescriptionIds();
             var fieldDescriptions = GetFieldDescriptions(fieldIds);
             return fieldDescriptions.OrderBy(m => m.Id);
-        }    
+        }
 
         public static IEnumerable<FieldDescriptionId> GetDefaultDwcExportFieldDescriptionIds()
         {
@@ -171,7 +171,7 @@ namespace SOS.Lib.Helpers
         public static IEnumerable<FieldDescription> GetAllDwcOccurrenceCoreFieldDescriptions()
         {
             var fieldDescriptions = GetFieldDescriptions(AllDwcOccurrenceCoreFieldDescriptions);
-            return fieldDescriptions.OrderBy(m => m.Id);            
+            return fieldDescriptions.OrderBy(m => m.Id);
         }
 
         public static IEnumerable<FieldDescription> GetAllEventDwcOccurrenceCoreFieldDescriptions()
@@ -604,9 +604,9 @@ namespace SOS.Lib.Helpers
             switch (field.ToLowerInvariant())
             {
                 case "occurrence.occurrencestatus":
-                    return new[] {"Occurrence.OccurrenceStatus.Id", "Occurrence.OccurrenceStatus.Value"};
+                    return new[] { "Occurrence.OccurrenceStatus.Id", "Occurrence.OccurrenceStatus.Value" };
                 default:
-                    return new[] {field};
+                    return new[] { field };
             }
         }
     }

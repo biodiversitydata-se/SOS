@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -35,6 +35,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public string ScientificName { get; set; }
 
-       
+
     }
 }

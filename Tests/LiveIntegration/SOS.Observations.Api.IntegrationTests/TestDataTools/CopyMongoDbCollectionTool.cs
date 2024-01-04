@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
@@ -7,6 +6,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using SOS.Observations.Api.LiveIntegrationTests.Utils;
 using SOS.TestHelpers;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.TestDataTools

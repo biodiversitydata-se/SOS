@@ -1,10 +1,10 @@
-﻿using System;
-using System.Net;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Jobs.Shared;
+using System;
+using System.Net;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -28,8 +28,8 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpGet]
-        [ProducesResponseType(typeof(bool), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult ScheduleCleanUpJob(byte runIntervalInMinutes)
         {
             try

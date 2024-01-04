@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
@@ -16,6 +13,9 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -45,9 +45,9 @@ namespace SOS.Observations.Api.Managers
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<FileExportResult> CreateCsvExportAsync(SearchFilter filter, 
+        private async Task<FileExportResult> CreateCsvExportAsync(SearchFilter filter,
             string exportPath,
-            string fileName, 
+            string fileName,
             string culture,
             PropertyLabelType propertyLabelType,
             bool gzip,
@@ -108,7 +108,7 @@ namespace SOS.Observations.Api.Managers
                        cancellationToken);
                 }
                 var propertyFields =
-                   ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter?.Output?.Fields, true);
+                   ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter?.Output?.Fields);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().
                    Where(fd => propertyFields.Select(pf => pf.DwcIdentifier.ToLower()).Contains(fd.DwcIdentifier.ToLower()));
 
@@ -145,9 +145,9 @@ namespace SOS.Observations.Api.Managers
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<FileExportResult> CreateExcelExportAsync(SearchFilter filter, 
-            string exportPath, 
-            string fileName, 
+        private async Task<FileExportResult> CreateExcelExportAsync(SearchFilter filter,
+            string exportPath,
+            string fileName,
             string culture,
             PropertyLabelType propertyLabelType,
             bool gzip,
@@ -156,7 +156,7 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 var fileExportResult = await _excelWriter.CreateFileAync(
-                    filter, 
+                    filter,
                     exportPath,
                     fileName,
                     culture,
@@ -191,15 +191,15 @@ namespace SOS.Observations.Api.Managers
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<FileExportResult> CreateGeoJsonExportAsync(SearchFilter filter, 
-            string exportPath, 
-            string fileName, 
-            string culture, 
+        private async Task<FileExportResult> CreateGeoJsonExportAsync(SearchFilter filter,
+            string exportPath,
+            string fileName,
+            string culture,
             bool flatOut,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
             bool gzip,
-            IJobCancellationToken cancellationToken) 
+            IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -209,7 +209,7 @@ namespace SOS.Observations.Api.Managers
                    fileName,
                    culture,
                    flatOut,
-                   propertyLabelType, 
+                   propertyLabelType,
                    excludeNullValues,
                    gzip,
                    cancellationToken);
@@ -297,7 +297,7 @@ namespace SOS.Observations.Api.Managers
                     ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, gzip, cancellationToken),
                     _ => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken)
                 };
-                
+
                 return fileExportResult;
             }
             catch (Exception e)

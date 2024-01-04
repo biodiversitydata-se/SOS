@@ -80,7 +80,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="includeEmptyCells">Include grid cells with no observations</param>
         /// <param name="onlyUseTilesInRange">If edge length ratio NOT is used and onlyUseTilesInRange = true. Only tiles with shorter or equal distance (alpha value) to another tile will be used in calculation.</param>
         /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
-        /// <param name="coordinateSystem">Gemometry coordinate system</param>
+        /// <param name="coordinateSystem">Gemometry coordinate system
         /// Computes the concave hull of the vertices in a geometry using the target criterion of maximum alpha ratio. 
         /// The alpha factor is a fraction of the length difference between the longest and shortest edges in the Delaunay Triangulation of the input points.
         /// When false: 
@@ -93,7 +93,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             double[] alphaValues,
             int? gridCellSizeInMeters = 2000,
             bool? useCenterPoint = true,
-            bool? useEdgeLengthRatio = true, 
+            bool? useEdgeLengthRatio = true,
             bool? allowHoles = false,
             bool? returnGridCells = false,
             bool? includeEmptyCells = false,

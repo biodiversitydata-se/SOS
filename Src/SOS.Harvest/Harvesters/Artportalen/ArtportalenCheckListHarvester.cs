@@ -6,10 +6,10 @@ using SOS.Harvest.Harvesters.Artportalen.Interfaces;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Harvesters.Artportalen
@@ -82,7 +82,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             // Sum each batch harvested
             var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
-            _logger.LogDebug($"Finish getting Artportalen checklists ({ nrSightingsHarvested })");
+            _logger.LogDebug($"Finish getting Artportalen checklists ({nrSightingsHarvested})");
 
             return nrSightingsHarvested;
 
@@ -223,7 +223,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _logger.LogDebug("Finish empty artportalen checklist verbatim collection");
 
                 var nrChecklistsHarvested = await HarvestAllAsync(harvestFactory, cancellationToken);
-               
+
                 // Update harvest info
                 harvestInfo.Status = nrChecklistsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;
 
@@ -248,7 +248,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
         public async Task<HarvestInfo> HarvestChecklistsAsync(DataProvider provider,
             IJobCancellationToken cancellationToken)
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 throw new NotImplementedException("Not implemented for this provider");
             });
             return null!;

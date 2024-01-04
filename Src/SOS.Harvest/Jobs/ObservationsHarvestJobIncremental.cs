@@ -77,14 +77,14 @@ namespace SOS.Harvest.Jobs
 
         /// <inheritdoc />        
         public async Task<bool> RunIncrementalInactiveAsync(IJobCancellationToken cancellationToken)
-        {            
+        {
             await incrementalHarvestSemaphore.WaitAsync();
             try
             {
                 return await HarvestAsync(JobRunModes.IncrementalInactiveInstance, null, cancellationToken);
             }
             finally
-            {                
+            {
                 incrementalHarvestSemaphore.Release();
             }
         }

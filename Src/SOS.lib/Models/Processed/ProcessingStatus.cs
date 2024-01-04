@@ -1,7 +1,7 @@
-﻿using System;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Enums;
+using System;
 
 namespace SOS.Lib.Models.Processed
 {

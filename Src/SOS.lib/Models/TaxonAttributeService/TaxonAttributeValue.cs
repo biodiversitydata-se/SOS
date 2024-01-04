@@ -9,7 +9,7 @@
         ///     Attribute property
         /// </summary>
         public Attribute AttributeInfo { get; set; }
-       
+
         /// <summary>
         ///    Value
         /// </summary>

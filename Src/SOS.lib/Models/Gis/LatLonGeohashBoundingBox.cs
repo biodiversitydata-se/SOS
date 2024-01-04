@@ -1,6 +1,6 @@
-﻿using System;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using NGeoHash;
+using System;
 
 namespace SOS.Lib.Models.Gis
 {

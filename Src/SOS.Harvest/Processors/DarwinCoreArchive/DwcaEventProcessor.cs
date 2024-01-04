@@ -1,24 +1,24 @@
 ﻿using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Lib.Configuration.Process;
-using SOS.Harvest.Processors.Artportalen.Interfaces;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
-using SOS.Lib.Models.Search.Filters;
-using Hangfire.Server;
-using SOS.Harvest.Processors.Interfaces;
 using System.Collections.Concurrent;
-using MongoDB.Driver;
-using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
@@ -28,7 +28,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     public class DwcaEventProcessor : EventProcessorBase<DwcaEventProcessor, DwcEventOccurrenceVerbatim, IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int>>,
         IDwcaEventProcessor
     {
-        private readonly IVerbatimClient _verbatimClient;        
+        private readonly IVerbatimClient _verbatimClient;
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly IVocabularyRepository _vocabularyRepository;
@@ -145,7 +145,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             List<Lib.Models.Search.Result.EventOccurrenceAggregationItem> eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
             Dictionary<string, List<string>> occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId.ToLower(), m => m.OccurrenceIds);
             foreach (var eventPair in processedEvents)
-            {                
+            {
                 if (occurrenceIdsByEventId.TryGetValue(eventPair.Key.ToLower(), out var occurrenceIds))
                 {
                     if (occurrenceIds != null && eventPair.Value.OccurrenceIds != null && occurrenceIds.Count != eventPair.Value.OccurrenceIds.Count)

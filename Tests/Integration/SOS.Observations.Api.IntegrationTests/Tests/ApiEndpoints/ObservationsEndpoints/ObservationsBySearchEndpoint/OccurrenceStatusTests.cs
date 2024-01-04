@@ -1,11 +1,10 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Observations.Api.IntegrationTests.Helpers;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
@@ -24,7 +23,7 @@ public class OccurrenceStatusTests : TestBase
             .All().HaveValuesFromPredefinedObservations()
              .TheFirst(60).With(o => o.NotPresent = false)
                           .With(o => o.NotRecovered = false)
-             .TheNext(40).With(o => o.NotPresent = true)             
+             .TheNext(40).With(o => o.NotPresent = true)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();

@@ -1,32 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Verbatim
-{    
+{
     /// <summary>
     ///     Darwin core event verbatim repository
     /// </summary>
-    public class DwcCollectionRepository : IDisposable    
-    {        
+    public class DwcCollectionRepository : IDisposable
+    {
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
         private readonly DataProvider _dataProvider;
         private readonly EventVerbatimRepository _eventRepository;
         private readonly OccurrenceVerbatimRepository _occurrenceRepository;
         private readonly DatasetVerbatimRepository _datasetRepository;
-        
+
         public DatasetVerbatimRepository DatasetRepository => _datasetRepository;
         public EventVerbatimRepository EventRepository => _eventRepository;
-        public OccurrenceVerbatimRepository OccurrenceRepository => _occurrenceRepository;        
+        public OccurrenceVerbatimRepository OccurrenceRepository => _occurrenceRepository;
         public void BeginTempMode()
         {
             DatasetRepository.TempMode = true;
@@ -40,7 +40,7 @@ namespace SOS.Lib.Repositories.Verbatim
             EventRepository.TempMode = false;
             OccurrenceRepository.TempMode = false;
         }
-        
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -53,7 +53,7 @@ namespace SOS.Lib.Repositories.Verbatim
             Microsoft.Extensions.Logging.ILogger logger) //: base(importClient, logger)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            _logger = logger?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _eventRepository = new EventVerbatimRepository(
                     dataProvider,
                     importClient,
@@ -68,7 +68,7 @@ namespace SOS.Lib.Repositories.Verbatim
                     dataProvider,
                     importClient,
                     logger);
-            
+
         }
 
         public async Task<bool> DeleteCollectionsAsync(bool? tempMode = true)
@@ -94,7 +94,7 @@ namespace SOS.Lib.Repositories.Verbatim
         }
 
         public async Task<bool> PermanentizeCollectionsAsync()
-        {            
+        {
             bool[] results = await Task.WhenAll(
                 OccurrenceRepository.PermanentizeCollectionAsync(),
                 EventRepository.PermanentizeCollectionAsync(),
@@ -106,7 +106,7 @@ namespace SOS.Lib.Repositories.Verbatim
 
         public void Dispose()
         {
-            
+
         }
     }
 
@@ -151,7 +151,7 @@ namespace SOS.Lib.Repositories.Verbatim
 
         /// <inheritdoc />
         public override async Task<bool> AddCollectionAsync()
-        {            
+        {
             var added = await base.AddCollectionAsync();
             if (!added) return false;
 
@@ -181,14 +181,14 @@ namespace SOS.Lib.Repositories.Verbatim
         {
             var result = await base.DeleteCollectionAsync();
             return result;
-        }        
+        }
 
         /// <inheritdoc />
         public override async Task<bool> PermanentizeCollectionAsync()
         {
             var result = await base.PermanentizeCollectionAsync();
             return result;
-        }       
+        }
     }
 
     /// <summary>
@@ -203,7 +203,7 @@ namespace SOS.Lib.Repositories.Verbatim
         /// Mongodb collection name
         /// </summary>
         protected override string CollectionName => GetCollectionName(TempMode);
-        
+
         protected override string GetCollectionName(bool? tempMode)
         {
             if (tempMode.HasValue)
@@ -255,7 +255,7 @@ namespace SOS.Lib.Repositories.Verbatim
             {
                 new CreateIndexModel<DwcEventOccurrenceVerbatim>(
                     Builders<DwcEventOccurrenceVerbatim>.IndexKeys.Ascending(io => io.EventID))
-            };            
+            };
             await AddIndexes(indexModels);
 
             return true;
@@ -278,7 +278,7 @@ namespace SOS.Lib.Repositories.Verbatim
             {
                 return true;
             }
-           
+
             var mongoCollection = GetMongoCollection(tempMode);
             return await AddManyAsync(eventRecords, mongoCollection);
         }
@@ -294,7 +294,7 @@ namespace SOS.Lib.Repositories.Verbatim
         {
             string collectionName = GetCollectionName(tempMode);
             var result = await DeleteCollectionAsync(collectionName);
-            return result;            
+            return result;
         }
 
         /// <inheritdoc />
@@ -306,14 +306,14 @@ namespace SOS.Lib.Repositories.Verbatim
             {
                 return null;
             }
-           
+
             return events;
         }
     }
 
-    public class OccurrenceVerbatimRepository : VerbatimRepositoryBase<DwcObservationVerbatim, int>, IDarwinCoreArchiveVerbatimRepository        
+    public class OccurrenceVerbatimRepository : VerbatimRepositoryBase<DwcObservationVerbatim, int>, IDarwinCoreArchiveVerbatimRepository
     {
-        private readonly DataProvider _dataProvider;        
+        private readonly DataProvider _dataProvider;
 
         /// <summary>
         /// Mongodb collection name
@@ -361,8 +361,8 @@ namespace SOS.Lib.Repositories.Verbatim
         /// <inheritdoc />
         public override async Task<bool> AddCollectionAsync()
         {
-            var added = await base.AddCollectionAsync();            
-            if (!added) return false;            
+            var added = await base.AddCollectionAsync();
+            if (!added) return false;
 
             var indexModels = new[]
             {
@@ -382,7 +382,7 @@ namespace SOS.Lib.Repositories.Verbatim
             if (!occurrenceRecords?.Any() ?? true)
             {
                 return true;
-            }            
+            }
 
             return await AddManyAsync(occurrenceRecords, MongoCollection);
         }
@@ -403,7 +403,7 @@ namespace SOS.Lib.Repositories.Verbatim
             {
                 return null;
             }
-          
+
             return occurrences;
         }
     }

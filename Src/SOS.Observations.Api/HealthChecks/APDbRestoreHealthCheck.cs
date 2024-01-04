@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Observations.Api.Configuration;
+using SOS.Observations.Api.Repositories.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -53,7 +53,7 @@ namespace SOS.Observations.Api.HealthChecks
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.UniquePublicIndexName);
                 if (processInfo == null) return new HealthCheckResult(HealthStatus.Unhealthy, "Artportalen database backup restore health check failed. processInfo=null.");
 
-                var apInfo = processInfo.ProvidersInfo.FirstOrDefault(pi => pi.DataProviderId.Equals(1));                
+                var apInfo = processInfo.ProvidersInfo.FirstOrDefault(pi => pi.DataProviderId.Equals(1));
 
                 var regex = new Regex(@"\d\d\d\d-\d\d-\d\d\s\d\d:\d\d:\d\d");
                 var match = regex.Match(apInfo?.HarvestNotes ?? string.Empty);

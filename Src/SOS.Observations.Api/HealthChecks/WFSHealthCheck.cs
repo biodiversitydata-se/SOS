@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -51,7 +51,7 @@ namespace SOS.Observations.Api.HealthChecks
                 }
 
                 response = await _httpClientService.GetDataAsync<dynamic>(new Uri("https://sosgeo.artdata.slu.se/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&typeName=SOS:SpeciesObservations&outputFormat=application/json&count=10&CQL_Filter=organismGroup='Kärlväxter'"));
-                if(response.GetProperty("numberReturned").GetInt16() != 10)
+                if (response.GetProperty("numberReturned").GetInt16() != 10)
                 {
                     return new HealthCheckResult(HealthStatus.Unhealthy, "Failed to get observations of a specific organism group by using CQL filter");
                 }

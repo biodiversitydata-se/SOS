@@ -1,6 +1,5 @@
-﻿using System;
+﻿using SOS.Lib.Constants;
 using System.Globalization;
-using SOS.Lib.Constants;
 
 namespace SOS.Harvest.Extensions
 {

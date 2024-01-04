@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SOS.Lib.Cache;
-using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Result;
+using System;
 
 namespace SOS.Lib.Models.Cache
 {
@@ -17,7 +13,7 @@ namespace SOS.Lib.Models.Cache
         public bool IncludeUnderlyingTaxa { get; set; }
         public int? FromYear { get; set; }
         public int? ToYear { get; set; }
-        public AreaType? AreaType  { get; set; }
+        public AreaType? AreaType { get; set; }
         public string FeatureId { get; set; }
         public int? DataProviderId { get; set; }
         //public string DataProviderIds { get; set; }

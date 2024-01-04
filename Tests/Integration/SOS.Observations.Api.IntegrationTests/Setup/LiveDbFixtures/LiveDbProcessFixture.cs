@@ -1,44 +1,43 @@
 ﻿using DwC_A;
 using Microsoft.ApplicationInsights;
-using SOS.Harvest.DarwinCore.Interfaces;
+using Microsoft.Extensions.Configuration;
 using SOS.Harvest.DarwinCore;
+using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Extensions;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Observations.Api.Repositories;
-using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.Lib.Managers;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.Models.TaxonListService;
-using SOS.Lib.Models.Processed.Checklist;
-using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Lib.Database;
-using Microsoft.Extensions.Configuration;
-using System.IO.Compression;
-using SOS.Observations.Api.IntegrationTests.TestData;
-using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Helpers;
+using SOS.Observations.Api.IntegrationTests.TestData;
+using SOS.Observations.Api.Repositories;
+using SOS.Observations.Api.Repositories.Interfaces;
+using System.IO.Compression;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup.LiveDbFixtures;
 public class LiveDbProcessFixture : IProcessFixture
@@ -141,9 +140,9 @@ public class LiveDbProcessFixture : IProcessFixture
         serviceCollection.AddSingleton(vocabularyConfiguration);
 
         var mongoDbConfiguration = GetMongoDbConfiguration();
-        var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
-        var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
-        mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
+        var processedSettings = mongoDbConfiguration?.GetMongoDbSettings();
+        var processClient = new ProcessClient(processedSettings, mongoDbConfiguration?.DatabaseName,
+        mongoDbConfiguration?.ReadBatchSize ?? 1000, mongoDbConfiguration?.WriteBatchSize ?? 1000);
         serviceCollection.AddSingleton<IProcessClient>(processClient);
 
         var elasticConfiguration = GetSearchDbConfiguration();
@@ -185,7 +184,7 @@ public class LiveDbProcessFixture : IProcessFixture
         };
     }
 
-    private static MongoDbConfiguration GetMongoDbConfiguration()
+    private static MongoDbConfiguration? GetMongoDbConfiguration()
     {
         var config = GetAppSettings();
         var mongoDbConfiguration = config.GetSection($"ProcessDbConfiguration").Get<MongoDbConfiguration>();
@@ -223,10 +222,10 @@ public class LiveDbProcessFixture : IProcessFixture
             _taxa = await _taxonRepository.GetAllAsync();
         }
 
-        _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
+        _taxaById = _taxa?.ToDictionary(m => m.Id, m => m);
         _artportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
             new DataProvider { Id = 1 },
-            _taxaById,
+            _taxaById!,
             _vocabularyRepository,
             _artportalenDatasetMetadataRepository,
             false,
@@ -603,7 +602,7 @@ public class LiveDbProcessFixture : IProcessFixture
         return factory;
     }
 
-    private List<Taxon> GetTaxaFromZipFile()
+    private List<Taxon>? GetTaxaFromZipFile()
     {
         //var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         //var filePath = Path.Combine(assemblyPath, @"Resources/TaxonCollection.zip");
@@ -614,7 +613,7 @@ public class LiveDbProcessFixture : IProcessFixture
             var taxonFile = archive.Entries.FirstOrDefault(f =>
                 f.Name.Equals("TaxonCollection.json", StringComparison.CurrentCultureIgnoreCase));
 
-            var taxonFileStream = taxonFile.Open();
+            var taxonFileStream = taxonFile!.Open();
             using var sr = new StreamReader(taxonFileStream, Encoding.UTF8);
             string strJson = sr.ReadToEnd();
             var jsonSerializerOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };

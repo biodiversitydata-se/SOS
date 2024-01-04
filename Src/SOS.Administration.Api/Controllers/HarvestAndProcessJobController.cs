@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -35,28 +35,28 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("Observations/Schedule/Daily")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult AddDailyObservationHarvestAndProcessJob([FromQuery] int hour, [FromQuery] int minute)
         {
             try
             {
                 RecurringJob.AddOrUpdate<IObservationsHarvestJobFull>($"{nameof(IObservationsHarvestJobFull)}",
                     job => job.RunFullAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
-                
+
                 return new OkObjectResult("Observations harvest and process job added");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Adding observations harvest and process job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("Observations/Run")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult RunObservationHarvestAndProcessJob()
         {
             try
@@ -67,7 +67,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing observations harvest and process job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
@@ -117,7 +117,7 @@ namespace SOS.Administration.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public IActionResult ScheduleIncrementalObservationHarvestAndProcessJob([FromQuery]byte runIntervalInMinutes)
+        public IActionResult ScheduleIncrementalObservationHarvestAndProcessJob([FromQuery] byte runIntervalInMinutes)
         {
             try
             {

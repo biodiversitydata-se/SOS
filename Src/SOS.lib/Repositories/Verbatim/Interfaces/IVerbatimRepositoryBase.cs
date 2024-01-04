@@ -1,7 +1,7 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Interfaces;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Verbatim.Interfaces
 {

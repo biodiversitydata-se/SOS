@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Models.ApplicationInsights;
+using SOS.Lib.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Models.ApplicationInsights;
-using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.Services
 {
@@ -33,7 +33,7 @@ namespace SOS.Lib.Services
             headerData.Add("x-api-key", _applicationInsightsConfiguration.ApiKey);
 
             var result = await _httpClientService.PostDataAsync<T>(
-                new Uri($"{_applicationInsightsConfiguration.BaseAddress}/apps/{_applicationInsightsConfiguration.ApplicationId }/query"), new
+                new Uri($"{_applicationInsightsConfiguration.BaseAddress}/apps/{_applicationInsightsConfiguration.ApplicationId}/query"), new
                 {
                     query = query?
                     .Replace("\n", "")
@@ -100,7 +100,7 @@ namespace SOS.Lib.Services
                     Endpoint = ((JsonElement)r[1]).GetString(),
                     AccountId = ((JsonElement)r[2]).GetString(),
                     UserId = ((JsonElement)r[3]).GetString(),
-                    RequestingSystem = ((JsonElement)r[4]).GetString(),                    
+                    RequestingSystem = ((JsonElement)r[4]).GetString(),
                     RequestCount = ((JsonElement)r[5]).GetInt64(),
                     FailureCount = ((JsonElement)r[6]).GetInt64(),
                     AverageDuration = ((JsonElement)r[7]).GetInt64(),

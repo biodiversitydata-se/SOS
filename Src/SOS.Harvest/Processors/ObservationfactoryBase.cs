@@ -1,14 +1,14 @@
-﻿using SOS.Lib.Extensions;
+﻿using SOS.Harvest.Managers.Interfaces;
+using SOS.Lib.Configuration.Process;
+using SOS.Lib.Constants;
+using SOS.Lib.DataStructures;
+using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Lib.Configuration.Process;
-using SOS.Lib.Enums;
-using SOS.Lib.Helpers;
 using System.Reflection;
 using System.Text.Json;
-using SOS.Lib.DataStructures;
-using SOS.Lib.Constants;
 
 namespace SOS.Harvest.Processors
 {
@@ -106,8 +106,8 @@ namespace SOS.Harvest.Processors
             }
         }
 
-        protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }        
-        
+        protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -115,9 +115,9 @@ namespace SOS.Harvest.Processors
         /// <param name="taxa"></param>
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        protected ObservationFactoryBase(DataProvider dataProvider, 
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa, 
-            IProcessTimeManager processTimeManager, 
+        protected ObservationFactoryBase(DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
         {
             Taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -167,7 +167,7 @@ namespace SOS.Harvest.Processors
                 {
                     taxon = GetTaxonByName(name, ignoreDuplicates);
                     if (taxon != null)
-                    { 
+                    {
                         break;
                     }
                 }
@@ -182,8 +182,9 @@ namespace SOS.Harvest.Processors
                 return taxon;
             }
 
-            return new Lib.Models.Processed.Observation.Taxon { 
-                Id = -1, 
+            return new Lib.Models.Processed.Observation.Taxon
+            {
+                Id = -1,
                 VerbatimId = verbatimId ?? taxonId.ToString(),
                 VerbatimName = verbatimName ?? names?.FirstOrDefault(n => !string.IsNullOrEmpty(n))
             };

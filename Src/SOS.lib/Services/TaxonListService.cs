@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Services
 {
@@ -39,13 +39,13 @@ namespace SOS.Lib.Services
             try
             {
                 var response = await _httpClientService.GetDataAsync<ConservationListsResult>(
-                    new Uri($"{ _taxonListServiceConfiguration.BaseAddress }/definitions"));
+                    new Uri($"{_taxonListServiceConfiguration.BaseAddress}/definitions"));
 
                 return response.ConservationLists;
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get conservation lists definition", e);
+                _logger.LogError(e, "Failed to get conservation lists definition");
             }
 
             return null;
@@ -56,14 +56,14 @@ namespace SOS.Lib.Services
             try
             {
                 var response = await _httpClientService.PostDataAsync<NatureConservationListTaxaResult>(
-                    new Uri($"{ _taxonListServiceConfiguration.BaseAddress }/taxa"),
+                    new Uri($"{_taxonListServiceConfiguration.BaseAddress}/taxa"),
                         new { conservationListIds = conservationListIds, outputFields = new[] { "id", "scientificname", "swedishname" } });
 
                 return response.NatureConservationListTaxa;
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get conservation lists taxa", e);
+                _logger.LogError(e, "Failed to get conservation lists taxa");
             }
 
             return null;

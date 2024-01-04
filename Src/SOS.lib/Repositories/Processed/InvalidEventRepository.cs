@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -29,7 +29,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task CreateIndexAsync()
         {
-            var indexModels = new []
+            var indexModels = new[]
             {
                 new CreateIndexModel<InvalidEvent>(
                     Builders<InvalidEvent>.IndexKeys.Ascending(io => io.DatasetName)),

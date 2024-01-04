@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.JsonConverters;
+using SOS.Lib.Models.DarwinCore;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using SOS.Lib.JsonConverters;
-using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Import.LiveIntegrationTests.TestHelpers.Factories
 {

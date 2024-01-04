@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Models.DarwinCore;
+﻿using SOS.Lib.Models.DarwinCore;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.DataValidation
 {

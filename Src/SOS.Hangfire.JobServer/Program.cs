@@ -1,14 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autofac;
+﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,6 +15,7 @@ using Newtonsoft.Json.Converters;
 using NLog.Web;
 using SOS.Export.IoC.Modules;
 using SOS.Hangfire.JobServer.Configuration;
+using SOS.Hangfire.JobServer.ServiceBus.Consumers;
 using SOS.Harvest.IoC.Modules;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
@@ -26,16 +23,19 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Context;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
-using MassTransit;
-using SOS.Hangfire.JobServer.ServiceBus.Consumers;
-using SOS.Lib.Context;
+using System;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SOS.Hangfire.JobServer
 {
@@ -66,13 +66,13 @@ namespace SOS.Hangfire.JobServer
         /// <param name="args"></param>
         /// <returns></returns>
         public static async Task Main(string[] args)
-        {            
+        {
             _env = args?.Any() ?? false
                 ? args[0].ToLower()
                 : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
 
-            Console.WriteLine("Starting up in environment:"  + _env);
-           
+            Console.WriteLine("Starting up in environment:" + _env);
+
 
             if (new[] { "local", "dev", "st", "prod", "at" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
             {
@@ -137,7 +137,7 @@ namespace SOS.Hangfire.JobServer
                                 _hangfireDbConfiguration.DatabaseName,
                                 new MongoStorageOptions
                                 {
-                                    
+
                                     CheckConnection = true,
                                     CheckQueuedJobsStrategy = CheckQueuedJobsStrategy.Watch,
                                     CountersAggregateInterval = TimeSpan.FromMinutes(10), // Default 5
@@ -145,7 +145,7 @@ namespace SOS.Hangfire.JobServer
                                     //  DistributedLockLifetime = TimeSpan.FromSeconds(30),
                                     JobExpirationCheckInterval = TimeSpan.FromMinutes(10),
                                     InvisibilityTimeout = null,
-                                   // MigrationLockTimeout = TimeSpan.FromMinutes(1),
+                                    // MigrationLockTimeout = TimeSpan.FromMinutes(1),
                                     MigrationOptions = new MongoMigrationOptions
                                     {
                                         MigrationStrategy = new MigrateMongoMigrationStrategy(),
@@ -170,14 +170,14 @@ namespace SOS.Hangfire.JobServer
                         "MongoDB Solution Conventions",
                         new ConventionPack
                         {
-                            new IgnoreExtraElementsConvention(true), 
+                            new IgnoreExtraElementsConvention(true),
                             new IgnoreIfNullConvention(true)
-                        }, 
+                        },
                         t => true);
 
                     // Get configuration
                     _apiManagementServiceConfiguration = hostContext.Configuration.GetSection("ApiManagementServiceConfiguration").Get<ApiManagementServiceConfiguration>();
-                    _cryptoConfiguration = hostContext.Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>(); 
+                    _cryptoConfiguration = hostContext.Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
                     _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
                     _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
                     _searchDbConfiguration = hostContext.Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
@@ -201,7 +201,7 @@ namespace SOS.Hangfire.JobServer
                     services.AddSingleton(_searchDbConfiguration);
                     services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(_searchDbConfiguration));
 
-                    var jobServerConfiguration = hostContext.Configuration.GetSection("JobServerConfiguration").Get<JobServerConfiguration>(); 
+                    var jobServerConfiguration = hostContext.Configuration.GetSection("JobServerConfiguration").Get<JobServerConfiguration>();
                     if (jobServerConfiguration.EnableBusHarvest)
                     {
                         services.AddMassTransit(cfg =>
@@ -225,11 +225,11 @@ namespace SOS.Hangfire.JobServer
                         return new AutofacServiceProviderFactory(builder =>
                             builder
                                 .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
-                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration,  _processDbConfiguration, _blobStorageConfiguration, _cryptoConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration) })
+                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _cryptoConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration) })
                         );
                     }
                 )
-                .UseNLog();            
+                .UseNLog();
         }
 
         private static void LogStartupSettings(ILogger<Program> logger)
@@ -274,7 +274,7 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine("");
 
             sb.AppendLine($"[MvmServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.MvmServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            sb.AppendLine($"[MvmServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.MvmServiceConfiguration.MaxReturnedChangesInOnePage}"); 
+            sb.AppendLine($"[MvmServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.MvmServiceConfiguration.MaxReturnedChangesInOnePage}");
             sb.AppendLine("");
 
             sb.AppendLine($"[NorsServiceConfiguration].[BaseAddress]: {_importConfiguration.NorsServiceConfiguration.BaseAddress}");

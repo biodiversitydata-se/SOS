@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using Xunit;
@@ -73,7 +72,7 @@ namespace SOS.Lib.UnitTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            fieldDescriptions.Should().Contain(x => x.Id == (int) FieldDescriptionId.CatalogNumber);
+            fieldDescriptions.Should().Contain(x => x.Id == (int)FieldDescriptionId.CatalogNumber);
         }
     }
 }

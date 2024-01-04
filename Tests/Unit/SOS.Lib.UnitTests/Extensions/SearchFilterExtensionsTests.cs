@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Filters;
+using System.Collections.Generic;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Extensions
@@ -30,7 +30,7 @@ namespace SOS.Lib.UnitTests.Extensions
             //-----------------------------------------------------------------------------------------------------------
             searchFilter.Output.Fields.Should().BeEquivalentTo(
                 "Occurrence.OccurrenceId",
-                "Event.StartDate", 
+                "Event.StartDate",
                 "Event.EndDate",
                 "DatasetName",
                 "Identification.Verified",
@@ -105,7 +105,7 @@ namespace SOS.Lib.UnitTests.Extensions
             // Act
             //-----------------------------------------------------------------------------------------------------------
             searchFilter.Output.PopulateFields(OutputFieldSet.Minimum);
-           
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ namespace SOS.Lib.UnitTests.Extensions
             // Act
             //-----------------------------------------------------------------------------------------------------------
             searchFilter.Output.PopulateFields(OutputFieldSet.Extended);
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -267,7 +267,7 @@ namespace SOS.Lib.UnitTests.Extensions
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-           
+
             searchFilter.Output.PopulateFields(OutputFieldSet.AllWithValues);
             //-----------------------------------------------------------------------------------------------------------
             // Assert

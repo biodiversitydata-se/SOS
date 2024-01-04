@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SOS.Observations.Api.Configuration;
+using SOS.Observations.Api.Managers.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -57,10 +57,10 @@ namespace SOS.Observations.Api.HealthChecks
                 // All providers successful
                 if (publicIndexCount > _healthCheckConfiguration.PublicObservationCount)
                 {
-                    if (protectedIndexCount >_healthCheckConfiguration.ProtectedObservationCount)
+                    if (protectedIndexCount > _healthCheckConfiguration.ProtectedObservationCount)
                     {
                         return new HealthCheckResult(
-                            HealthStatus.Healthy, 
+                            HealthStatus.Healthy,
                             "There is a reasonable amount of observations processed",
                             data: data
                       );

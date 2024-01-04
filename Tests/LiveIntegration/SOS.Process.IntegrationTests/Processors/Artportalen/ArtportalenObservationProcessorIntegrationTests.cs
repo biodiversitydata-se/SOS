@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Services;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
@@ -22,14 +22,13 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services;
-using SOS.Harvest.Managers;
-using SOS.Harvest.Processors.Artportalen;
-using SOS.Harvest.Repositories.Source.Artportalen;
-using SOS.Harvest.Services;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
 using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
-using SOS.Process.LiveIntegrationTests;
 
 namespace SOS.Process.LiveIntegrationTests.Processors.Artportalen
 {

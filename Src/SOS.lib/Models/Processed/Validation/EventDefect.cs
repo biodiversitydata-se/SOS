@@ -19,7 +19,7 @@
             /// <summary>
             /// Unknown defect
             /// </summary>
-            Unknown = 0,            
+            Unknown = 0,
             /// <summary>
             /// Event is not in Sweden
             /// </summary>

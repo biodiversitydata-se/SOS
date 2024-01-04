@@ -1,11 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
-using SOS.Lib.Extensions;
-using SOS.Lib.Models.Processed.Observation;
-using Xunit;
-
-namespace SOS.Export.UnitTests.Extensions
+﻿namespace SOS.Export.UnitTests.Extensions
 {
     public class DarwinCoreExtensionsTests
     {

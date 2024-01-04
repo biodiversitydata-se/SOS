@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using SOS.Lib.Helpers;
+﻿using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Lib.Extensions
 {

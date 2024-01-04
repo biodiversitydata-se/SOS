@@ -59,7 +59,7 @@ namespace SOS.Harvest.Managers
             ProcessConfiguration processConfiguration,
             ILogger<DwcaDataValidationReportManager> logger)
         {
-            _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));            
+            _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             _processedVocabularyRepository = processedVocabularyRepository ?? throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -280,7 +280,7 @@ namespace SOS.Harvest.Managers
             UpdateTermDictionaryValue(VocabularyId.Sex, verbatimObservation.Sex, processedObservation.Occurrence.Sex, processedFieldValues, verbatimFieldValues);
             UpdateTermDictionaryValue(VocabularyId.ReproductiveCondition, verbatimObservation.ReproductiveCondition, processedObservation.Occurrence.ReproductiveCondition, processedFieldValues, verbatimFieldValues);
             UpdateTermDictionaryValue(VocabularyId.Behavior, verbatimObservation.Behavior, processedObservation.Occurrence.Behavior, processedFieldValues, verbatimFieldValues);
-           // UpdateTermDictionaryValue(VocabularyId.VerificationStatus, verbatimObservation.IdentificationVerificationStatus, processedObservation.Identification.ValidationStatus, processedFieldValues, verbatimFieldValues);
+            // UpdateTermDictionaryValue(VocabularyId.VerificationStatus, verbatimObservation.IdentificationVerificationStatus, processedObservation.Identification.ValidationStatus, processedFieldValues, verbatimFieldValues);
             UpdateTermDictionaryValue(VocabularyId.VerificationStatus, verbatimObservation.IdentificationVerificationStatus, processedObservation.Identification.VerificationStatus, processedFieldValues, verbatimFieldValues);
             UpdateTermDictionaryValue(VocabularyId.Institution, verbatimObservation.InstitutionCode, processedObservation.InstitutionCode, processedFieldValues, verbatimFieldValues);
             UpdateTermDictionaryValue(VocabularyId.Unit, verbatimObservation.OrganismQuantityType, processedObservation.Occurrence.OrganismQuantityUnit, processedFieldValues, verbatimFieldValues);
@@ -353,7 +353,7 @@ namespace SOS.Harvest.Managers
         private void UpdateTaxaStatistics(TaxaStatistics taxaStatistics, Observation processedObservation)
         {
             if (processedObservation.Taxon == null || _taxonById == null || !_taxonById.TryGetValue(processedObservation.Taxon.Id, out var taxon)) return;
-            
+
             taxaStatistics.TaxaSet.Add(taxon.Id);
 
             if (taxon.Attributes.ProtectedByLaw)

@@ -1,17 +1,16 @@
-﻿using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Harvest.Harvesters.AquaSupport.Kul;
 using SOS.Harvest.Services;
-using SOS.Import.LiveIntegrationTests;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations

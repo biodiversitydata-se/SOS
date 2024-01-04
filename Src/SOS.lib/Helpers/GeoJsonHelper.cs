@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text.Json;
-using Nest;
+﻿using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text.Json;
 
 namespace SOS.Lib.Helpers
 {
@@ -33,14 +33,14 @@ namespace SOS.Lib.Helpers
         public static void FillInBlanks(
             IDictionary<string, IFeature> metricGridCellFeatures,
             IDictionary<double, Geometry> metricEooGeometries,
-            int gridCellsInMeters, 
+            int gridCellsInMeters,
             IEnumerable<KeyValuePair<string, object>> attributes,
             bool useCenterPoint)
         {
             var emptyGridCellFeaturesSweRef99 = new Dictionary<string, IFeature>();
 
             // Start at top left gridcell bottom left corner
-           
+
             var minX = metricGridCellFeatures.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.X));
             var maxX = metricGridCellFeatures.Max(gc => gc.Value.Geometry.Coordinates.Max(c => c.X));
             var minY = metricGridCellFeatures.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.Y));
@@ -109,7 +109,7 @@ namespace SOS.Lib.Helpers
                                     emptyCellAdded = true;
                                 }
                             }
-                        } 
+                        }
                     }
 
                     x += gridCellsInMeters;
@@ -120,7 +120,7 @@ namespace SOS.Lib.Helpers
             }
 
             // Add empty grid cells to result set
-            foreach(var emptyGridCellFeature in emptyGridCellFeaturesSweRef99)
+            foreach (var emptyGridCellFeature in emptyGridCellFeaturesSweRef99)
             {
                 metricGridCellFeatures.Add(emptyGridCellFeature);
             }
@@ -238,19 +238,19 @@ namespace SOS.Lib.Helpers
         }
 
         public static string GetGridCellId(int gridCellSizeInMeters, int left, int bottom)
-        {            
+        {
             var gridSizeInKm = gridCellSizeInMeters / 1000.0;
             var gridSizesInM = gridCellSizeInMeters.ToString();
             var noOfZeros = gridSizesInM.Length - gridSizesInM.TrimEnd('0').Length;
             string lowLeftX = left.ToString();
             string lowLeftY = bottom.ToString();
             var strLowerLeftY = lowLeftY.Remove(lowLeftY.ToString().Length - noOfZeros, noOfZeros);
-            var strLowerLeftX = lowLeftX.Remove(lowLeftX.ToString().Length - noOfZeros, noOfZeros); 
+            var strLowerLeftX = lowLeftX.Remove(lowLeftX.ToString().Length - noOfZeros, noOfZeros);
             string id;
             if (gridCellSizeInMeters < 1000)
                 id = $"{gridCellSizeInMeters}mN{strLowerLeftY}E{strLowerLeftX}";
             else
-                id = $"{gridSizeInKm.ToString(CultureInfo.InvariantCulture)}kmN{strLowerLeftY}E{strLowerLeftX}";            
+                id = $"{gridSizeInKm.ToString(CultureInfo.InvariantCulture)}kmN{strLowerLeftY}E{strLowerLeftX}";
             return id;
         }
     }

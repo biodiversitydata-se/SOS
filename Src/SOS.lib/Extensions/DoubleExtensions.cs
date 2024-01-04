@@ -16,7 +16,7 @@ namespace SOS.Lib.Extensions
             {
                 return 0;
             }
-   
+
             var scale = Math.Pow(10, Math.Floor(Math.Log10(Math.Abs(value))) + 1);
             return scale * Math.Round(value / scale, digits);
         }

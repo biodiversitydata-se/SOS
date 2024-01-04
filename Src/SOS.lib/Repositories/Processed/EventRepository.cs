@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -19,6 +13,12 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Event = SOS.Lib.Models.Processed.DataStewardship.Event.Event;
 
 namespace SOS.Lib.Repositories.Processed
@@ -58,7 +58,7 @@ namespace SOS.Lib.Repositories.Processed
                         .KeyWordLowerCase(kwlc => kwlc.PlainStartDate)
                         .KeyWordLowerCase(kwlc => kwlc.PlainStartTime, false)
                         .KeyWordLowerCase(kwlc => kwlc.PlainEndDate)
-                        .KeyWordLowerCase(kwlc => kwlc.PlainEndTime, false)                        
+                        .KeyWordLowerCase(kwlc => kwlc.PlainEndTime, false)
                         .KeyWordLowerCase(kwlc => kwlc.Habitat, false)
                         .Date(d => d
                             .Name(nm => nm.EndDate)
@@ -144,11 +144,11 @@ namespace SOS.Lib.Repositories.Processed
                         .Object<WeatherVariable>(t => t
                             .AutoMap()
                             .Name(nm => nm.Weather)
-                        )                        
+                        )
                     )
                 )
             );
-            
+
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationEvent index. Error: {createIndexResponse.DebugInformation}");
         }
 
@@ -259,7 +259,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<int> AddManyAsync(IEnumerable<Event> items)
         {
-            return await Task.Run(() => {
+            return await Task.Run(() =>
+            {
                 // Save valid processed data
                 Logger.LogDebug($"Start indexing ObservationEvent batch for searching with {items.Count()} items");
                 var indexResult = WriteToElastic(items);
@@ -334,7 +335,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexName = IndexName;
             var (query, excludeQuery) = GetCoreQueries(filter);
             var aggregationDictionary = new Dictionary<TKey, List<TValue>>();
-            CompositeKey nextPageKey = null;            
+            CompositeKey nextPageKey = null;
             do
             {
                 var searchResponse = await PageAggregationItemListAsync(indexName, aggregationFieldKey, aggregationFieldList, query, excludeQuery, nextPageKey, MaxNrElasticSearchAggregationBuckets);
@@ -462,10 +463,10 @@ namespace SOS.Lib.Repositories.Processed
 
             return searchResponse;
         }
-                
+
         public async Task<PagedResult<dynamic>> GetChunkAsync(EventSearchFilter filter, int skip, int take, bool getAllFields = false)
         {
-            string indexName = IndexName;            
+            string indexName = IndexName;
             var (query, excludeQuery) = GetCoreQueries(filter);
             var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(indexName, filter.SortOrders);
 
@@ -485,7 +486,7 @@ namespace SOS.Lib.Repositories.Processed
 
             searchResponse.ThrowIfInvalid();
             var totalCount = searchResponse.HitsMetadata.Total.Value;
-            var includeRealCount = totalCount >= ElasticSearchMaxRecords;            
+            var includeRealCount = totalCount >= ElasticSearchMaxRecords;
 
             if (includeRealCount)
             {
@@ -506,16 +507,16 @@ namespace SOS.Lib.Repositories.Processed
 
             return new PagedResult<dynamic>
             {
-                Records = searchResponse.Documents,                
+                Records = searchResponse.Documents,
                 Skip = skip,
                 Take = take,
                 TotalCount = totalCount
             };
-        }        
+        }
 
         protected (ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>)
             GetCoreQueries(EventSearchFilter filter)
-        {            
+        {
             var query = filter.ToQuery<dynamic>();
             var excludeQuery = filter.ToExcludeQuery();
 
@@ -529,7 +530,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         public static List<Event> CastDynamicsToEvents(IEnumerable<dynamic> dynamicObjects)
         {
-            if (dynamicObjects == null) return null;            
+            if (dynamicObjects == null) return null;
 
             return JsonSerializer.Deserialize<List<Event>>(
                 JsonSerializer.Serialize(dynamicObjects, jsonSerializerOptions), jsonSerializerOptions);

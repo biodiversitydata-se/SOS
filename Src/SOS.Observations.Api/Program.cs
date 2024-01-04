@@ -1,10 +1,10 @@
-﻿using System;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Web;
+using System;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace SOS.Observations.Api
@@ -37,10 +37,10 @@ namespace SOS.Observations.Api
             finally
             {
                 // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-               LogManager.Shutdown();
+                LogManager.Shutdown();
             }
         }
-        
+
         /// <summary>
         ///     Create a host builder
         /// </summary>

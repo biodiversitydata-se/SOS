@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using SOS.Lib.Swagger;
+using SOS.Observations.Api.Dtos;
+using System;
 using System.Globalization;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using SOS.Observations.Api.Dtos;
-using SOS.Lib.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -46,8 +46,8 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(EnvironmentInformationDto), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(EnvironmentInformationDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [AzureApi, AzureInternalApi]
         public IActionResult Get()
         {
@@ -70,7 +70,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Retrieving environment information failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }

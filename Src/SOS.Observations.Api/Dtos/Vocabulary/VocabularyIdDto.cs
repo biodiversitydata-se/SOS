@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SOS.Observations.Api.Dtos.Vocabulary
+﻿namespace SOS.Observations.Api.Dtos.Vocabulary
 {
     public enum VocabularyIdDto
     {
@@ -29,7 +27,7 @@ namespace SOS.Observations.Api.Dtos.Vocabulary
         /*[Obsolete]
         ValidationStatus = 26,
         [Obsolete]
-        TaxonProtectionLevel = 27,   */     
+        TaxonProtectionLevel = 27,   */
         TaxonCategory = 28
     }
 }

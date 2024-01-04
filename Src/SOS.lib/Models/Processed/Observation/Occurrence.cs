@@ -23,7 +23,8 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This field uses a controlled vocabulary.
         /// </remarks>
         public VocabularyValue
-            Activity { get; set; }
+            Activity
+        { get; set; }
 
         /// <summary>
         ///     A list (concatenated and separated) of identifiers
@@ -252,7 +253,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     (recordNumber), should be listed first.
         /// </summary>
         public string RecordedBy { get; set; }
-        
+
         /// <summary>
         ///     An identifier given to the Occurrence at the time it was
         ///     recorded. Often serves as a link between field notes and

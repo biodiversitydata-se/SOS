@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Harvesters.iNaturalist.Interfaces;
@@ -9,6 +8,7 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim;
+using System.Text;
 
 namespace SOS.Harvest.Harvesters.iNaturalist
 {
@@ -58,7 +58,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
             // Get current document count from permanent index
             var currentDocCount = await dwcCollectionRepository.OccurrenceRepository.CountAllDocumentsAsync();
-            dwcCollectionRepository.BeginTempMode();            
+            dwcCollectionRepository.BeginTempMode();
 
             try
             {
@@ -71,7 +71,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 _logger.LogInformation("Finish empty collection for iNaturalist verbatim collection");
 
                 var nrSightingsHarvested = 0;
-       
+
                 var startDate = new DateTime(_iNaturalistServiceConfiguration.StartHarvestYear, 1, 1);
                 var endDate = startDate.AddMonths(1).AddDays(-1);
                 var gBIFResult = await _iNaturalistObservationService.GetAsync(startDate, endDate);
@@ -120,14 +120,14 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                     harvestInfo.Status = RunStatus.Success;
                     _logger.LogInformation("Start permanentize temp collection for iNaturalist verbatim");
                     await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync();
-                    _logger.LogInformation("Finish permanentize temp collection for iNaturalist verbatim");                    
+                    _logger.LogInformation("Finish permanentize temp collection for iNaturalist verbatim");
                 }
                 else
                 {
                     harvestInfo.Status = RunStatus.Failed;
                     _logger.LogError($"iNaturalist: Previous harvested observation count is: {currentDocCount}. Now only {nrSightingsHarvested} observations where harvested.");
                 }
-                
+
             }
             catch (JobAbortedException)
             {
@@ -139,7 +139,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 _logger.LogError(e, "Failed to harvest iNaturalist");
                 harvestInfo.Status = RunStatus.Failed;
             }
-            
+
             _logger.LogInformation($"Finish harvesting sightings for iNaturalist data provider. Status={harvestInfo.Status}");
             return harvestInfo;
         }

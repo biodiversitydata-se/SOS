@@ -5,6 +5,6 @@
     /// </summary>
     public class SearchFilterAggregationInternalDto : SearchFilterInternalBaseDto
     {
-        
+
     }
 }

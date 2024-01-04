@@ -1,11 +1,11 @@
-﻿using System;
+﻿using MongoDB.Driver.GeoJsonObjectModel;
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using MongoDB.Driver.GeoJsonObjectModel;
 
 namespace SOS.Lib.JsonConverters
 {
@@ -20,7 +20,7 @@ namespace SOS.Lib.JsonConverters
             this._useCapitalLetter = useCapitalLetter;
         }
         public GeoJsonConverter()
-        {            
+        {
         }
 
         private string ReadCoordinateData(ref Utf8JsonReader reader)
@@ -206,16 +206,16 @@ namespace SOS.Lib.JsonConverters
             switch (value.Type)
             {
                 case GeoJsonObjectType.Point:
-                    var point = (GeoJsonPoint<GeoJson2DCoordinates>) value;
+                    var point = (GeoJsonPoint<GeoJson2DCoordinates>)value;
                     WritePoint(writer, point.Coordinates);
                     break;
                 case GeoJsonObjectType.Polygon:
-                    var polygon = (GeoJsonPolygon<GeoJson2DCoordinates>) value;
+                    var polygon = (GeoJsonPolygon<GeoJson2DCoordinates>)value;
 
                     WritePolygon(writer, polygon.Coordinates);
                     break;
                 case GeoJsonObjectType.MultiPolygon:
-                    var muliPolygon = (GeoJsonMultiPolygon<GeoJson2DCoordinates>) value;
+                    var muliPolygon = (GeoJsonMultiPolygon<GeoJson2DCoordinates>)value;
                     writer.WriteStartArray();
                     foreach (var poly in muliPolygon.Coordinates.Polygons)
                     {

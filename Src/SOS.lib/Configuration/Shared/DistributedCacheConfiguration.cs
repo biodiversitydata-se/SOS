@@ -3,7 +3,7 @@
     /// <summary>
     ///     Configuration for distributed cache
     /// </summary>
-    public class DistributedCacheConfiguration 
+    public class DistributedCacheConfiguration
     {
         /// <summary>
         /// Channel prefix

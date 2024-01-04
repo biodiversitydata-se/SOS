@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.ApplicationInsights.AspNetCore;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Managers.Interfaces;
 using SOS.Administration.Api.Models.Ipt;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -36,8 +35,8 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpGet("Resources")]
-        [ProducesResponseType(typeof(IEnumerable<IptResource>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(IEnumerable<IptResource>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetResourcesAsync()
         {
             try
@@ -49,7 +48,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting IPT resources");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -12,6 +8,10 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Harvesters.Observations
@@ -25,7 +25,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         {
             _kulObservationVerbatimRepositoryMock = new Mock<IKulObservationVerbatimRepository>();
             _kulObservationServiceMock = new Mock<IKulObservationService>();
-            _kulServiceConfiguration = new KulServiceConfiguration {StartHarvestYear = DateTime.Now.Year};
+            _kulServiceConfiguration = new KulServiceConfiguration { StartHarvestYear = DateTime.Now.Year };
             _loggerMock = new Mock<ILogger<KulObservationHarvester>>();
         }
 

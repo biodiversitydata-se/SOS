@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Models.Shared;
+﻿using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
 {

@@ -1,4 +1,9 @@
-﻿using SOS.Lib.Models.Shared;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using SOS.Administration.Gui.Dtos;
+using SOS.Administration.Gui.Dtos.Enum;
+using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Models.Shared;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,11 +11,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using Newtonsoft.Json;
-using Microsoft.Extensions.Options;
-using SOS.Administration.Gui.Dtos;
-using SOS.Administration.Gui.Dtos.Enum;
-using SOS.Lib.Models.Search.Result;
 
 namespace SOS.Administration.Gui.Services
 {
@@ -20,7 +20,7 @@ namespace SOS.Administration.Gui.Services
         public int Id { get; set; }
         public string Description { get; set; }
         public string Group { get; set; }
-        public string Route { get; set; }        
+        public string Route { get; set; }
 
         public delegate Task<TestResults> RunTestFunction();
         [System.Text.Json.Serialization.JsonIgnore]
@@ -213,7 +213,7 @@ namespace SOS.Administration.Gui.Services
                 Ids = new List<int>() { 100077 },
                 IncludeUnderlyingTaxa = true
             };
-            searchFilter.Geographics = new GeographicsFilterDto{Areas = new[] { new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "687" } } };
+            searchFilter.Geographics = new GeographicsFilterDto { Areas = new[] { new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "687" } } };
             searchFilter.Date = new DateFilterDto()
             {
                 StartDate = new DateTime(1990, 1, 31, 07, 59, 46),

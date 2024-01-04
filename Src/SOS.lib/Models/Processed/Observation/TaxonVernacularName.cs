@@ -1,6 +1,4 @@
-﻿using Org.BouncyCastle.Utilities.Collections;
-
-namespace SOS.Lib.Models.Processed.Observation
+﻿namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// Taxon vernacular name.
@@ -59,7 +57,7 @@ namespace SOS.Lib.Models.Processed.Observation
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((TaxonVernacularName) obj);
+            return Equals((TaxonVernacularName)obj);
         }
 
         public override int GetHashCode()

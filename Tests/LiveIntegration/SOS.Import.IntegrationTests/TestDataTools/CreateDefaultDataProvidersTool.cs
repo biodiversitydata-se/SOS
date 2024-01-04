@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
-using SOS.Import.LiveIntegrationTests;
+﻿using Newtonsoft.Json;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.TestDataTools
@@ -458,7 +457,7 @@ namespace SOS.Import.LiveIntegrationTests.TestDataTools
                         "http://www.nrm.se/forskningochsamlingar/miljoforskningochovervakning/ringmarkningscentralen.214.html",
                     Datasets = new[]
                     {
-                        new DataProviderDataset{  
+                        new DataProviderDataset{
                             DataUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
                             Identifier = "nrm-ringedbirds",
                             IsActive = true,

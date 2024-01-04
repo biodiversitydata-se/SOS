@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.Linq;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -50,8 +50,8 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet()]
-        [ProducesResponseType(typeof(object), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> HealthCheck()
         {
@@ -60,7 +60,7 @@ namespace SOS.Observations.Api.Controllers
                 var start = DateTime.Now;
                 var healthCheck = await _healthCheckService.CheckHealthAsync(new System.Threading.CancellationToken());
                 var entries = new Dictionary<string, HealthReportEntry>();
-              
+
                 var azureApiCheck = healthCheck.Entries?.Where(e => e.Key.Equals("Azure search API health check"))?.Select(d => d.Value)?.FirstOrDefault();
                 var azureStatus = azureApiCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Not running" : "Running";
                 entries.Add("SOS API", new HealthReportEntry(
@@ -147,7 +147,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error making health check");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }

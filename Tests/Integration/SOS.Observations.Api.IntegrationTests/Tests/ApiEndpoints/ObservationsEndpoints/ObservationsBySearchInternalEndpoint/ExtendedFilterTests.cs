@@ -1,11 +1,11 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Filter;
+using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Observations.Api.IntegrationTests.Helpers;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchInternalEndpoint;
 
@@ -705,7 +705,7 @@ public class ExtendedFilterTests : TestBase
         foreach (var item in testResultItems)
         {
             item.VerbatimValue = $"StartDate={item.VerbatimObservation!.StartDate!.Value.ToShortDateString()}, EndDate={item.VerbatimObservation.EndDate!.Value.ToShortDateString()}";
-            item.ProcessedValue = $"StartMonth={item.ProcessedObservation!.Event.StartMonth}, EndMonth={item.ProcessedObservation.Event.EndMonth}, StartDate={item.ProcessedObservation.Event.StartDate.Value.ToShortDateString()}, EndDate={item.ProcessedObservation.Event.EndDate!.Value.ToShortDateString()}";
+            item.ProcessedValue = $"StartMonth={item.ProcessedObservation!.Event.StartMonth}, EndMonth={item.ProcessedObservation.Event.EndMonth}, StartDate={item.ProcessedObservation.Event.StartDate!.Value.ToShortDateString()}, EndDate={item.ProcessedObservation.Event.EndDate!.Value.ToShortDateString()}";
         }
         testResultItems = testResultItems
             .OrderBy(m => m.ProcessedObservation!.Event.EndDate!.Value)

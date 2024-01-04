@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Helpers;
+using SOS.Lib.Models.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -18,7 +18,7 @@ namespace SOS.Lib.Repositories.Processed
     {
         protected readonly IProcessClient _client;
         protected ILogger<MongoDbProcessedRepositoryBase<TEntity, TKey>> Logger;
-        
+
         /// <summary>
         ///     Mongo db
         /// </summary>
@@ -76,12 +76,12 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-       /// <summary>
-       /// Add batch of items
-       /// </summary>
-       /// <param name="batch"></param>
-       /// <param name="attempt"></param>
-       /// <returns></returns>
+        /// <summary>
+        /// Add batch of items
+        /// </summary>
+        /// <param name="batch"></param>
+        /// <param name="attempt"></param>
+        /// <returns></returns>
         private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch, byte attempt)
         {
             if (!batch?.Any() ?? true)
@@ -148,7 +148,7 @@ namespace SOS.Lib.Repositories.Processed
         protected async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
         {
             return await AddBatchAsync(batch, 1);
-        }        
+        }
 
         /// <inheritdoc />
         public async Task<bool> UpdateAsync(TKey id, TEntity entity)
@@ -164,7 +164,7 @@ namespace SOS.Lib.Repositories.Processed
                 var updateResult = await mongoCollection.ReplaceOneAsync(
                     x => x.Id.Equals(id),
                     entity,
-                    new ReplaceOptions {IsUpsert = true});
+                    new ReplaceOptions { IsUpsert = true });
                 return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
             }
             catch (Exception e)
@@ -300,7 +300,7 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-     
+
         /// <inheritdoc />
         public virtual async Task<bool> VerifyCollectionAsync()
         {

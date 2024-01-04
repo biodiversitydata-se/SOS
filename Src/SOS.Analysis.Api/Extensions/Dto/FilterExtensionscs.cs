@@ -41,7 +41,7 @@ namespace SOS.Analysis.Api.Extensions.Dto
             {
                 isOnlyNotPresentOrRecoveredFilterSet = true;
             }
-            
+
             filter.DiffusionStatuses = searchFilterDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus)dsd)?.ToList();
             filter.DeterminationFilter = (SightingDeterminationFilter)searchFilterDto.DeterminationFilter;
 

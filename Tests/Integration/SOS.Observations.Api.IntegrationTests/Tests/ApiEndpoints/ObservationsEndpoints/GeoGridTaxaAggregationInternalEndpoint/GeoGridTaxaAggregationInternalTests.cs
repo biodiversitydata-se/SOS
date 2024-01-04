@@ -1,8 +1,8 @@
 ﻿using FizzWare.NBuilder;
+using MongoDB.Driver.GeoJsonObjectModel;
+using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Lib.Models.Verbatim.Artportalen;
-using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 

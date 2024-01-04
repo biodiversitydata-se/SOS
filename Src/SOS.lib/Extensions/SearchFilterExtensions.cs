@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search.Filters;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Lib.Extensions
 {
@@ -37,7 +37,7 @@ namespace SOS.Lib.Extensions
             {
                 outputFields.AddRange(filter.Fields.Where(of => !outputFields.Contains(of, StringComparer.CurrentCultureIgnoreCase)));
             }
-           
+
             filter.Fields = outputFields;
         }
     }

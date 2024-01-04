@@ -1,5 +1,4 @@
 ﻿using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +26,7 @@ namespace SOS.Lib.Helpers
                 int taxonCategoryId = taxon.DynamicProperties.TaxonCategoryId.GetValueOrDefault();
                 var taxonCategory = taxonCategoryById[taxonCategoryId];
                 if (darwinCoreTaxonById.TryGetValue(taxon.DynamicProperties.ParentDyntaxaTaxonId.GetValueOrDefault(-1), out var parentTaxon))
-                {                    
+                {
                     var parentTaxonCategory = taxonCategoryById[parentTaxon.DynamicProperties.TaxonCategoryId.GetValueOrDefault()];
                     taxonCategory.Parents.Add(parentTaxonCategory);
                     taxonCategory.MainParents.Add(parentTaxonCategory);
@@ -40,13 +39,13 @@ namespace SOS.Lib.Helpers
                     foreach (var secondaryParentId in taxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds)
                     {
                         if (darwinCoreTaxonById.TryGetValue(secondaryParentId, out var secondaryParentTaxon))
-                        {                            
-                            var secondaryParentTaxonCategory = taxonCategoryById[secondaryParentTaxon.DynamicProperties.TaxonCategoryId.GetValueOrDefault()];                            
+                        {
+                            var secondaryParentTaxonCategory = taxonCategoryById[secondaryParentTaxon.DynamicProperties.TaxonCategoryId.GetValueOrDefault()];
                             taxonCategory.Parents.Add(secondaryParentTaxonCategory);
                             taxonCategory.SecondaryParents.Add(secondaryParentTaxonCategory);
                             secondaryParentTaxonCategory.Children.Add(taxonCategory);
                             secondaryParentTaxonCategory.SecondaryChildren.Add(taxonCategory);
-                        }                        
+                        }
                     }
                 }
             }

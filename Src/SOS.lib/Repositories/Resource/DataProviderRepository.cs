@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SOS.Lib.Repositories.Resource
 {
@@ -41,7 +41,7 @@ namespace SOS.Lib.Repositories.Resource
         /// <inheritdoc />
         public override async Task<List<DataProvider>> GetAllAsync()
         {
-            var allDataProviders = await base.GetAllAsync();            
+            var allDataProviders = await base.GetAllAsync();
             return allDataProviders.OrderBy(provider => provider.Id).ToList();
         }
 
@@ -54,7 +54,7 @@ namespace SOS.Lib.Repositories.Resource
 
                 return true;
             }
-            catch 
+            catch
             {
                 return false;
             }
@@ -72,7 +72,7 @@ namespace SOS.Lib.Repositories.Resource
                 {
                     _gridFSBucket.DeleteAsync(c.Id, CancellationToken.None);
                 });
-                
+
                 return true;
             }
             catch

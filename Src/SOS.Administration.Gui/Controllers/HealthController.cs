@@ -1,16 +1,16 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Administration.Gui.Services;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Gui.Controllers
 {
-   
+
     [Route("[controller]")]
     [ApiController]
     public class HealthController : ControllerBase
-    {        
+    {
         private readonly ISearchService _service;
-       
+
         public HealthController(ISearchService searchService)
         {
             _service = searchService;
@@ -28,7 +28,7 @@ namespace SOS.Administration.Gui.Controllers
             catch
             {
                 return null;
-            } ;
+            };
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Extensions;
+﻿using SOS.Lib.Extensions;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.DataValidation
 {

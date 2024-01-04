@@ -1,15 +1,14 @@
-﻿using System;
-using System.Linq;
-using Moq;
+﻿using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Harvest.Managers;
-using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Process.UnitTests.TestHelpers.Factories;
 using SOS.TestHelpers.Helpers;
+using System;
+using System.Linq;
 using Xunit;
 
 namespace SOS.Process.UnitTests.TestHelpers

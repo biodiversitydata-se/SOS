@@ -1,4 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using SOS.Administration.Api.Models;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Shared;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -8,12 +14,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using SOS.Administration.Api.Models;
-using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -49,9 +49,9 @@ namespace SOS.Administration.Api.Controllers
         /// </param>
         /// <returns></returns>
         [HttpPost("ImportDefaultDataProviders")]
-        [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> ImportDefaultDataprovidersAsync(
             [FromQuery] bool forceOverwriteIfCollectionExist = false)
         {
@@ -64,7 +64,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
@@ -158,7 +158,7 @@ namespace SOS.Administration.Api.Controllers
 
                     providerId = dataProvider.Id;
                 }
-               
+
 
                 if (model.File == null || model.File.Length == 0)
                 {
@@ -235,8 +235,8 @@ namespace SOS.Administration.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<DataProvider>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(IEnumerable<DataProvider>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetDataProvidersAsync()
         {
             try
@@ -249,7 +249,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting data providers");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
@@ -258,8 +258,8 @@ namespace SOS.Administration.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("HarvestAndProcessSettings")]
-        [ProducesResponseType(typeof(DataProviderHarvestAndProcessSettingsDto), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(DataProviderHarvestAndProcessSettingsDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> DataProviderHarvestSettings()
         {
             try
@@ -286,7 +286,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }

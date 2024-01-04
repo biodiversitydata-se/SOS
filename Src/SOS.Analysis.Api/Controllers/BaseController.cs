@@ -14,7 +14,7 @@ using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Analysis.Api.Controllers
 {
-    
+
     public class BaseController : ControllerBase
     {
         private readonly IAreaCache _areaCache;
@@ -115,7 +115,7 @@ namespace SOS.Analysis.Api.Controllers
             {
                 return Result.Success();
             }
-           
+
             var existingAreaIds = (await _areaCache.GetAreasAsync(areaKeys!.Select(a => ((AreaType)a.AreaType, a.FeatureId))))
                 .Select(a => new AreaFilterDto { AreaType = (AreaTypeDto)a.AreaType, FeatureId = a.FeatureId });
 
@@ -169,14 +169,14 @@ namespace SOS.Analysis.Api.Controllers
             if (fields?.Any() ?? false)
             {
                 errors.AddRange(fields
-                   // .Where(f => !ObservationPropertyFieldDescriptionHelper.FieldByPropertyPath.ContainsKey(f.ToLower()))
+                    // .Where(f => !ObservationPropertyFieldDescriptionHelper.FieldByPropertyPath.ContainsKey(f.ToLower()))
                     .Where(f => !typeof(Observation).HasProperty(f))
                     .Select(f => $"Field doesn't exist ({f})"));
             }
 
             return errors.Any() ? Result.Failure(string.Join(". ", errors)) : Result.Success();
         }
-       
+
 
         protected Result ValidateInt(int value, int minLimit, int maxLimit, string paramName)
         {
@@ -299,7 +299,7 @@ namespace SOS.Analysis.Api.Controllers
             _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
             _protectedScope = protectedScope ?? throw new ArgumentNullException(nameof(protectedScope));
             _tilesLimit = !tilesLimit.Equals(0) ? tilesLimit : throw new ArgumentNullException(nameof(tilesLimit));
-            _countFactor = !countFactor.Equals(0) ? countFactor : throw new ArgumentNullException(nameof(countFactor)); 
+            _countFactor = !countFactor.Equals(0) ? countFactor : throw new ArgumentNullException(nameof(countFactor));
         }
     }
 }

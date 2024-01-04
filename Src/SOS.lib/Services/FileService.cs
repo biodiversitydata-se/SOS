@@ -1,6 +1,6 @@
-﻿using System.IO;
+﻿using SOS.Lib.Services.Interfaces;
+using System.IO;
 using System.IO.Compression;
-using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.Services
 {

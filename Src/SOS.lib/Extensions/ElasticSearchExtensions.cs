@@ -20,7 +20,7 @@ namespace SOS.Lib.Extensions
             throw new InvalidOperationException(debugInformation);
         }
 
-        public static void ThrowIfInvalid(this CountResponse response) 
+        public static void ThrowIfInvalid(this CountResponse response)
         {
             if (!response.IsValid)
             {

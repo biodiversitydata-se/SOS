@@ -1,8 +1,8 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -20,7 +20,7 @@ public class ExcludeFilterTests : TestBase
     {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()            
+            .All().HaveValuesFromPredefinedObservations()
             .Build();
         var excludeOccurrenceIds = verbatimObservations.Take(40).Select(m => $"urn:lsid:artportalen.se:sighting:{m.SightingId}").ToList();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -30,7 +30,7 @@ public class ExcludeFilterTests : TestBase
             ExcludeFilter = new ExcludeFilterDto
             {
                 OccurrenceIds = excludeOccurrenceIds
-            }            
+            }
         };
 
         // Act

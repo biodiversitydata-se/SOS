@@ -1,7 +1,7 @@
-﻿using System.Collections;
+﻿using DwC_A.Exceptions;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DwC_A.Exceptions;
 
 namespace DwC_A.Meta
 {
@@ -18,7 +18,7 @@ namespace DwC_A.Meta
             if (idFieldType != null && idFieldType.IndexSpecified
                                     && fieldTypes.All(n => n.Index != idFieldType.Index))
             {
-                this.fieldTypes = fieldTypes.Append(new FieldType {Index = idFieldType.Index, Term = idFieldName})
+                this.fieldTypes = fieldTypes.Append(new FieldType { Index = idFieldType.Index, Term = idFieldName })
                     .OrderBy(n => n.Index);
             }
             else

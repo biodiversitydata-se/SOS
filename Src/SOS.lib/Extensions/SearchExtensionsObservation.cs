@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Nest;
+﻿using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.Artportalen;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Filters;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using static SOS.Lib.Extensions.SearchExtensionsGeneric;
 
 namespace SOS.Lib
@@ -30,7 +30,7 @@ namespace SOS.Lib
 
             if (filter.ObservedByMe)
             {
-                query.TryAddNestedTermAndCriteria("artportalenInternal.occurrenceRecordedByInternal", new Dictionary<string, object> { 
+                query.TryAddNestedTermAndCriteria("artportalenInternal.occurrenceRecordedByInternal", new Dictionary<string, object> {
                     { "userServiceUserId", filter.UserId },
                     { "viewAccess", true }
                 });
@@ -109,7 +109,7 @@ namespace SOS.Lib
                 .Bool(b => b
                     .Should(authorizeQuerys)
                 )
-            );  
+            );
         }
 
 
@@ -191,17 +191,17 @@ namespace SOS.Lib
 
             query.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleFrequencyId", internalFilter.TriggeredObservationRuleFrequencyIds);
             query.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleReproductionId", internalFilter.TriggeredObservationRuleReproductionIds);
-          
+
             query.TryAddTermsCriteria("event.discoveryMethod.id", internalFilter.DiscoveryMethodIds);
 
             query.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.VerificationStatusIds);
             query.TryAddTermCriteria("institutionId", internalFilter.InstitutionId);
 
             query.TryAddTermsCriteria("location.attributes.projectId", internalFilter.SiteProjectIds);
-            
+
 
             query.TryAddTermsCriteria("occurrence.activity.id", internalFilter.ActivityIds);
-            
+
             if (internalFilter.OnlyWithMedia)
             {
                 query.AddMustExistsCriteria("occurrence.associatedMedia");
@@ -243,7 +243,7 @@ namespace SOS.Lib
 
             query.TryAddTermCriteria("occurrence.substrate.id", internalFilter.SubstrateId);
             query.TryAddTermCriteria("occurrence.substrate.speciesId", internalFilter.SubstrateSpeciesId);
-            
+
             if (internalFilter.Weight.HasValue && !string.IsNullOrWhiteSpace(internalFilter.WeightOperator))
             {
                 query.AddNumericFilterWithRelationalOperator("occurrence.weight", internalFilter.Weight.Value, internalFilter.WeightOperator);
@@ -359,7 +359,7 @@ namespace SOS.Lib
             excludeQuery.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.ExcludeVerificationStatusIds);
         }
 
-        public static void AddSightingTypeFilters<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, 
+        public static void AddSightingTypeFilters<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query,
             SearchFilterBase.SightingTypeFilter sightingTypeFilter,
             IEnumerable<int> sightingTypeSearchGroupIds) where TQueryContainer : class
         {
@@ -401,7 +401,7 @@ namespace SOS.Lib
             sightingTypeQuery.TryAddTermsCriteria("artportalenInternal.sightingTypeSearchGroupId", sightingTypeSearchGroupFilter);
 
             // If not only Assessment is selected
-            if (!(sightingTypeSearchGroupFilter.Count().Equals(1) && sightingTypeSearchGroupFilter.First().Equals(2))) 
+            if (!(sightingTypeSearchGroupFilter.Count().Equals(1) && sightingTypeSearchGroupFilter.First().Equals(2)))
             {
                 // Get observations from other than Artportalen too
                 sightingTypeQuery.AddNotExistsCriteria("artportalenInternal.sightingTypeSearchGroupId");
@@ -415,7 +415,7 @@ namespace SOS.Lib
         }
 
         private static void TryAddDataStewardshipFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, DataStewardshipFilter filter)
-        { 
+        {
             if (filter == null)
             {
                 return;
@@ -451,7 +451,7 @@ namespace SOS.Lib
 
             query.TryAddTermsCriteria("event.eventId", filter.Ids);
         }
-       
+
 
         /// <summary>
         /// Add geometry filter to query
@@ -605,7 +605,7 @@ namespace SOS.Lib
                 case SightingNotRecoveredFilter.OnlyNotRecovered:
                     query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", true);
                     break;
-            }            
+            }
         }
 
         /// <summary>
@@ -766,7 +766,7 @@ namespace SOS.Lib
                 query.AddAuthorizationFilters(filter.ExtendedAuthorization);
             }
 
-            query.TryAddTermsCriteria("occurrence.sensitivityCategory", filter.SensitivityCategories);    
+            query.TryAddTermsCriteria("occurrence.sensitivityCategory", filter.SensitivityCategories);
 
             // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
             if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
@@ -788,12 +788,12 @@ namespace SOS.Lib
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DataStewardshipDatasetIds);
             if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
-            {                
+            {
                 query.AddExistsCriteria("dataStewardship");
             }
-            
-            query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);                        
-            query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds); 
+
+            query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);
+            query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds);
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
 
             // Cos4Cloud specific
@@ -806,7 +806,7 @@ namespace SOS.Lib
             {
                 sightingTypeSearchGroupIds = query.AddInternalFilters(filter);
             }
-           
+
             if (!skipSightingTypeFilters || (sightingTypeSearchGroupIds?.Any() ?? false))
             {
                 query.AddSightingTypeFilters(filter.TypeFilter, sightingTypeSearchGroupIds);
@@ -847,7 +847,7 @@ namespace SOS.Lib
                     }
                 }
             }
-            
+
             query.TryAddTermsCriteria("occurrence.occurrenceId", filter.ExcludeFilter?.OccurrenceIds);
 
             if (filter is SearchFilterInternal)
@@ -888,7 +888,7 @@ namespace SOS.Lib
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")
                     .Field("location.pointWithDisturbanceBuffer")
-                    .Field("location.isInEconomicZoneOfSweden")); 
+                    .Field("location.isInEconomicZoneOfSweden"));
             }
             else
             {

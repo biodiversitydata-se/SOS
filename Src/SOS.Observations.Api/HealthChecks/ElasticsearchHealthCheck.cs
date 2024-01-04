@@ -1,19 +1,19 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using Elasticsearch.Net;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+using Nest;
+using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Observations.Api.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Models.Processed.Configuration;
-using Nest;
-using System.Text;
-using Elasticsearch.Net;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Configuration;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -61,7 +61,7 @@ namespace SOS.Observations.Api.HealthChecks
                 var processedConfig = _processedConfigurationCache.GetAsync(_processedConfigurationId)?.Result;
                 return processedConfig ?? new ProcessedConfiguration { Id = _processedConfigurationId };
             }
-            catch 
+            catch
             {
                 return default;
             }
@@ -133,11 +133,11 @@ namespace SOS.Observations.Api.HealthChecks
                     }
 
                     if (health.Status > status) status = health.Status;
-                    if (isActive) 
+                    if (isActive)
                         sb.Append($"{health.ClusterName} (active): {health.Status}");
-                    else 
+                    else
                         sb.Append($"{health.ClusterName}: {health.Status}");
-                    
+
                     var catNodes = await client.Cat.NodesAsync();
                     if (catNodes.IsValid)
                     {

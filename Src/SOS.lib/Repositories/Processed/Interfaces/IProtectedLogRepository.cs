@@ -1,8 +1,8 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using SOS.Lib.Models.Log;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MongoDB.Bson;
-using SOS.Lib.Models.Log;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
@@ -14,6 +8,11 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
+using System;
+using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -56,9 +55,9 @@ namespace SOS.Administration.Api.Controllers
         /// <returns></returns>
         [HttpPost("CreateDataValidationReport/Run")]
         [DisableRequestSizeLimit]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> RunDataValidationJob(
             [FromQuery] string dataProviderIdOrIdentifier,
             [FromQuery] string createdBy,
@@ -84,8 +83,8 @@ namespace SOS.Administration.Api.Controllers
                 // Enqueue job to Hangfire.
                 BackgroundJob.Enqueue<IDataValidationReportJob>(job =>
                     job.RunAsync(
-                        reportId, 
-                        createdBy, 
+                        reportId,
+                        createdBy,
                         dataProvider.Identifier,
                         maxNrObservationsToRead,
                         nrValidObservationsInReport,
@@ -133,8 +132,8 @@ namespace SOS.Administration.Api.Controllers
                 // Enqueue job to Hangfire.
                 BackgroundJob.Enqueue<ICreateDwcaDataValidationReportJob>(job =>
                     job.RunAsync(
-                        reportId, 
-                        model.CreatedBy, 
+                        reportId,
+                        model.CreatedBy,
                         filePath,
                         model.MaxNrObservationsToRead,
                         model.NrValidObservationsInReport,
@@ -171,7 +170,7 @@ namespace SOS.Administration.Api.Controllers
                 }
 
                 var reportId = Report.CreateReportId();
-                
+
 
                 BackgroundJob.Enqueue<IInvalidObservationsReportsJob>(job => job.RunCreateExcelFileReportAsync(reportId, dataProvider.Id, createdBy));
                 return new OkObjectResult($"Create Invalid Observations Excel report job with Id \"{reportId}\" was enqueued to Hangfire.");

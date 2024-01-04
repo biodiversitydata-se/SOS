@@ -1,5 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Sers.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -9,8 +11,6 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Sers.Interfaces;
 
 namespace SOS.Harvest.Processors.Sers
 {

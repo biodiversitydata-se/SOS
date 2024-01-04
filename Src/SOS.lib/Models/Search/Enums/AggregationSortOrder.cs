@@ -3,8 +3,8 @@
     public enum AggregationSortOrder
     {
         CountDescending,
-        CountAscending,        
+        CountAscending,
         KeyAscending,
-        KeyDescending        
+        KeyDescending
     }
 }

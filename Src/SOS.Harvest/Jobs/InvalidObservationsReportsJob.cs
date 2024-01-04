@@ -23,7 +23,7 @@ namespace SOS.Harvest.Jobs
         {
             _invalidObservationsManager = invalidObservationsManager ?? throw new ArgumentNullException(nameof(invalidObservationsManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }        
+        }
 
         /// <inheritdoc />
         public async Task<bool> RunCreateExcelFileReportAsync(string reportId, int dataProviderId, string createdBy)

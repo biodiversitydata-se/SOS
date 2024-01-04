@@ -1,13 +1,13 @@
-﻿using DotNet.Testcontainers.Containers;
+﻿using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
 using Elasticsearch.Net;
 using MongoDB.Driver;
 using Nest;
-using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Database;
+using SOS.Lib.Database.Interfaces;
+using SOS.Observations.Api.IntegrationTests.Extensions;
 using Testcontainers.Elasticsearch;
 using Testcontainers.MongoDb;
-using SOS.Observations.Api.IntegrationTests.Extensions;
-using DotNet.Testcontainers.Builders;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
 public class TestContainersFixture : IAsyncLifetime
@@ -20,12 +20,12 @@ public class TestContainersFixture : IAsyncLifetime
     private const string MONGODB_PASSWORD = "admin";
     private const string MONGODB_IMAGE_NAME = "mongo:6.0.5";
 
-    private ElasticsearchContainer _elasticsearchContainer { get; set; }
-    private MongoDbContainer _mongoDbContainer { get; set; }
-    private MongoDbContainer _mongoDbHarvestDbContainer { get; set; }    
-    private IProcessClient _processClient { get; set; }
-    private IVerbatimClient _verbatimClient { get; set; }
-    private IElasticClient _elasticClient { get; set; }
+    private ElasticsearchContainer? _elasticsearchContainer { get; set; }
+    private MongoDbContainer? _mongoDbContainer { get; set; }
+    private MongoDbContainer? _mongoDbHarvestDbContainer { get; set; }
+    private IProcessClient? _processClient { get; set; }
+    private IVerbatimClient? _verbatimClient { get; set; }
+    private IElasticClient? _elasticClient { get; set; }
 
     public TestContainersFixture()
     {
@@ -41,23 +41,23 @@ public class TestContainersFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _elasticsearchContainer.DisposeAsync();
-        await _mongoDbContainer.DisposeAsync();
-        await _mongoDbHarvestDbContainer.DisposeAsync();
+        await _elasticsearchContainer!.DisposeAsync();
+        await _mongoDbContainer!.DisposeAsync();
+        await _mongoDbHarvestDbContainer!.DisposeAsync();
     }
 
     public ServiceCollection GetServiceCollection()
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddSingleton(_processClient!);
-        serviceCollection.AddSingleton(_verbatimClient);
-        serviceCollection.AddSingleton(_elasticClient!);        
+        serviceCollection.AddSingleton(_verbatimClient!);
+        serviceCollection.AddSingleton(_elasticClient!);
 
         return serviceCollection;
     }
 
     private async Task<ElasticClient> InitializeElasticsearchAsync()
-    {   
+    {
         if (UseKibanaDebug)
         {
             return await InitializeElasticsearchWithKibanaAsync();
@@ -66,9 +66,9 @@ public class TestContainersFixture : IAsyncLifetime
         _elasticsearchContainer = new ElasticsearchBuilder()
             .WithImage(ELASTIC_IMAGE_NAME)
             .WithCleanUp(true)
-            .WithPassword(ELASTIC_PASSWORD)                        
+            .WithPassword(ELASTIC_PASSWORD)
         .Build();
-        await _elasticsearchContainer.StartAsync().ConfigureAwait(false);               
+        await _elasticsearchContainer.StartAsync().ConfigureAwait(false);
         var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(_elasticsearchContainer.GetConnectionString()))
             .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
             .EnableApiVersioningHeader()
@@ -85,11 +85,11 @@ public class TestContainersFixture : IAsyncLifetime
 
         _elasticsearchContainer = new ElasticsearchBuilder()
             .WithImage(ELASTIC_IMAGE_NAME)
-            .WithCleanUp(true)            
+            .WithCleanUp(true)
             .WithPortBinding(9200, 9200)
             .WithNetwork(network)
-            .WithNetworkAliases("elastic-test-network")            
-            .WithEnvironment("xpack.security.enabled", "false")        
+            .WithNetworkAliases("elastic-test-network")
+            .WithEnvironment("xpack.security.enabled", "false")
         .Build();
 
         var kibanaContainer = new ContainerBuilder()
@@ -97,13 +97,13 @@ public class TestContainersFixture : IAsyncLifetime
           .WithImage("docker.elastic.co/kibana/kibana:8.7.1")
           .WithPortBinding(5601, 5601)
           .WithNetwork(network)
-          .WithEnvironment("ELASTICSEARCH_HOSTS", $"http://elastic-test-network:9200")        
+          .WithEnvironment("ELASTICSEARCH_HOSTS", $"http://elastic-test-network:9200")
         .Build();
 
         await network.CreateAsync().ConfigureAwait(false);
         await _elasticsearchContainer.StartAsync().ConfigureAwait(false);
         await kibanaContainer.StartAsync().ConfigureAwait(false);
-        
+
         var elasticUri = new UriBuilder(Uri.UriSchemeHttp, _elasticsearchContainer.Hostname, _elasticsearchContainer.GetMappedPublicPort(9200)).ToString();
         var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(elasticUri))
             .ServerCertificateValidationCallback(CertificateValidations.AllowAll)

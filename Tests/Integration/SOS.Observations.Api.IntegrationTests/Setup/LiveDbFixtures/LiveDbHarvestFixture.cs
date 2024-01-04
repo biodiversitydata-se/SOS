@@ -1,10 +1,10 @@
-﻿using SOS.Lib.Configuration.Shared;
+﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Lib.Database;
-using SOS.Lib.Models.Shared;
-using Microsoft.Extensions.Logging;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup.LiveDbFixtures;
 public class LiveDbHarvestFixture : IHarvestFixture

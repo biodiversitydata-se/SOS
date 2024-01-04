@@ -1,17 +1,17 @@
 ﻿using Nest;
+using Newtonsoft.Json;
 using SOS.Observations.Api.Dtos.DataStewardship.Enums;
+using Swashbuckle.AspNetCore.Annotations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace SOS.Observations.Api.Dtos.DataStewardship
 {
     /// <summary>
     /// A specific observation of an organism or a uniform group of organisms made at an event.
     /// </summary>
-    
+
     [SwaggerSchema("Metadata about a occurrence.", Required = new[] { "Identifier" })]
     public class DsOccurrenceDto
     {

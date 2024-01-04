@@ -26,12 +26,12 @@ namespace SOS.Harvest.Jobs
             IHarvestInfoRepository harvestInfoRepository,
             ILogger<ArtportalenDatasetMetadataHarvestJob> logger)
         {
-            _artportalenDatasetMetadataHarvester = artportalenDatasetMetadataHarvester ?? throw new ArgumentNullException(nameof(artportalenDatasetMetadataHarvester));            
+            _artportalenDatasetMetadataHarvester = artportalenDatasetMetadataHarvester ?? throw new ArgumentNullException(nameof(artportalenDatasetMetadataHarvester));
             _harvestInfoRepository =
                 harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        
+
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {

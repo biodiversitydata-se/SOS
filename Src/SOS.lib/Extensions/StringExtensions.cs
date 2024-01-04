@@ -106,7 +106,7 @@ namespace SOS.Lib.Extensions
         /// <returns>The Double value.</returns>
         public static double? ParseDouble(this string value, bool trim = true)
         {
-            return TryParseDouble(value, out var result, trim) ? (double?) result : null;
+            return TryParseDouble(value, out var result, trim) ? (double?)result : null;
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace SOS.Lib.Extensions
         /// <returns>The Boolean value.</returns>
         public static bool? ParseBoolean(this string value, bool trim = true)
         {
-            return TryParseBoolean(value, out var result, trim) ? (bool?) result : null;
+            return TryParseBoolean(value, out var result, trim) ? (bool?)result : null;
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace SOS.Lib.Extensions
         /// <returns>The DateTime value.</returns>
         public static DateTime? ParseDateTime(this string value, bool trim = true)
         {
-            return TryParseDateTime(value, out var result, trim) ? (DateTime?) result : null;
+            return TryParseDateTime(value, out var result, trim) ? (DateTime?)result : null;
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace SOS.Lib.Extensions
         /// <returns>The Int32 value.</returns>
         public static int? ParseInt(this string value, bool trim = true)
         {
-            return TryParseInt(value, out var result, trim) ? (int?) result : null;
+            return TryParseInt(value, out var result, trim) ? (int?)result : null;
         }
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace SOS.Lib.Extensions
         /// <returns>The Int64 value.</returns>
         public static long? ParseLong(this string value, bool trim = true)
         {
-            return TryParseLong(value, out var result, trim) ? (long?) result : null;
+            return TryParseLong(value, out var result, trim) ? (long?)result : null;
         }
 
         /// <summary>

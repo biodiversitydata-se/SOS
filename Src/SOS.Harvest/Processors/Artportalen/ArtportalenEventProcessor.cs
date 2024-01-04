@@ -1,19 +1,19 @@
-﻿using Hangfire;
+﻿using DnsClient.Internal;
+using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.DataStewardship.Event;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Artportalen.Interfaces;
-using SOS.Lib.Configuration.Process;
-using DnsClient.Internal;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
-using SOS.Lib.Extensions;
 using System.Text.Json;
-using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -36,7 +36,7 @@ namespace SOS.Harvest.Processors.Artportalen
         public ArtportalenEventProcessor(
             //IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int> artportalenVerbatimRepository,
             //IArtportalenVerbatimRepository artportalenVerbatimRepository // observation verbatim repository
-            IProcessedObservationCoreRepository processedObservationRepository,            
+            IProcessedObservationCoreRepository processedObservationRepository,
             IEventRepository observationEventRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
@@ -45,11 +45,11 @@ namespace SOS.Harvest.Processors.Artportalen
             ILogger<ArtportalenEventProcessor> logger) :
                 base(observationEventRepository, processManager, processTimeManager, validationManager, processConfiguration, logger)
         {
-            _processedObservationRepository = processedObservationRepository;            
+            _processedObservationRepository = processedObservationRepository;
         }
 
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessEventsAsync(DataProvider dataProvider, IJobCancellationToken cancellationToken)
-        {            
+        {
             var processCount = await AddObservationEventsAsync(dataProvider);
             return processCount;
         }
@@ -58,7 +58,7 @@ namespace SOS.Harvest.Processors.Artportalen
         {
             try
             {
-                Logger.LogInformation("Start AddObservationEventsAsync()");                
+                Logger.LogInformation("Start AddObservationEventsAsync()");
                 int batchSize = 5000;
                 var filter = new SearchFilter(0);
                 filter.IsPartOfDataStewardshipDataset = true;
@@ -102,7 +102,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     }
 
                     // write to ES
-                    var eventCount = await ValidateAndStoreEvents(dataProvider, events, "");                    
+                    var eventCount = await ValidateAndStoreEvents(dataProvider, events, "");
                     eventCountSum.publicCount += eventCount.publicCount;
                     eventCountSum.protectedCount += eventCount.protectedCount;
                     eventCountSum.failedCount += eventCount.failedCount;

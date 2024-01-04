@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Harvest.Factories.Vocabularies;
 using SOS.Harvest.Factories.Vocabularies.Interfaces;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Reflection;
+using System.Text;
 
 namespace SOS.Harvest.Harvesters
 {
@@ -250,7 +245,7 @@ namespace SOS.Harvest.Harvesters
         private (string Filename, byte[] Bytes) CreateVocabularyFileResult(Vocabulary vocabulary, string fileName)
         {
             var bytes = SerializeToJsonArray(vocabulary,
-                new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore}, Formatting.Indented);
+                new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }, Formatting.Indented);
             return (Filename: fileName, Bytes: bytes);
         }
 

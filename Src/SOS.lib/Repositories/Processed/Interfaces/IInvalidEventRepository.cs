@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using SOS.Lib.Models.Processed.Validation;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
@@ -16,6 +10,12 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Repositories.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using ITaxonSearchManager = SOS.Observations.Api.Managers.Interfaces.ITaxonSearchManager;
 
 namespace SOS.Observations.Api.Managers
@@ -146,7 +146,7 @@ namespace SOS.Observations.Api.Managers
         {
             _processedTaxonRepository = processedTaxonRepository ??
                                               throw new ArgumentNullException(nameof(processedTaxonRepository));
-            _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));     
+            _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _taxonSumAggregationCache = taxonSumAggregationCache ?? throw new ArgumentNullException(nameof(taxonSumAggregationCache));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -159,7 +159,7 @@ namespace SOS.Observations.Api.Managers
         public async Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
-            SearchFilter filter, 
+            SearchFilter filter,
             int zoom)
         {
             try
@@ -244,7 +244,7 @@ namespace SOS.Observations.Api.Managers
                         .Where(m => taxonIds.Contains(m.Key))
                         .ToDictionary(m => m.Key, m => m.Value);
                 }
-                
+
                 // Update skip and take
                 if (skip == null)
                 {
@@ -304,10 +304,10 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);                
-                return await _processedTaxonRepository.GetTaxonAggregationAsync(filter, 
-                    skip, 
-                    take, 
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+                return await _processedTaxonRepository.GetTaxonAggregationAsync(filter,
+                    skip,
+                    take,
                     sumUnderlyingTaxa);
             }
             catch (TimeoutException e)

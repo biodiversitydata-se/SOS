@@ -1,6 +1,6 @@
 ﻿namespace SOS.Analysis.Api.Dtos.Area.Enum
 {
-   
+
     /// <summary>
     /// Area type dto
     /// </summary>
@@ -17,7 +17,7 @@
         Parish = 19,
         Spa = 20,
         County = 21,
-        ProtectedNature = 22,        
+        ProtectedNature = 22,
         SwedishForestAgencyDistricts = 24,
         Sci = 26,
         WaterArea = 27,

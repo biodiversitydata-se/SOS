@@ -1,6 +1,8 @@
-﻿using System.Text.Json.Serialization;
+﻿using Microsoft.ApplicationInsights.Extensibility;
 using SOS.ElasticSearch.Proxy.ApplicationInsights;
+using SOS.ElasticSearch.Proxy.Configuration;
 using SOS.ElasticSearch.Proxy.Middleware;
+using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -16,10 +18,8 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.ElasticSearch.Proxy.Configuration;
-using Microsoft.ApplicationInsights.Extensibility;
-using SOS.Lib.ApplicationInsights;
 using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace SOS.ElasticSearch.Proxy
 {

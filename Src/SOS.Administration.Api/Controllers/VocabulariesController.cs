@@ -1,15 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
+using System;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -40,8 +40,8 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("All/Create")]
-        [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CreateAllVocabulariesFilesAsync()
         {
             try
@@ -53,14 +53,14 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("Single/Create")]
-        [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CreateSingleVocabularyFileAsync(VocabularyId vocabularyId)
         {
             try
@@ -72,7 +72,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 

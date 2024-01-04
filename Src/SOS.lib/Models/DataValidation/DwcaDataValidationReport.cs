@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Models.Processed.Observation;
+﻿using SOS.Lib.Models.Processed.Observation;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.DataValidation
 {

@@ -1,11 +1,11 @@
 ﻿using FizzWare.NBuilder;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Dtos;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Extensions;
 using Nest;
+using SOS.Lib.Extensions;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -540,8 +540,8 @@ public class ObservationPropertiesTest : TestBase
         // Assert
         //-----------------------------------------------------------------------------------------------------------            
         result.Should().NotBeNull();
-        result.TotalCount.Should().Be(1);
-        var obs = result.Records.First();
+        result?.TotalCount.Should().Be(1);
+        var obs = result?.Records.First()!;
         obs.AccessRights.Should().Be(observation.AccessRights);
         obs.ArtportalenInternal.ActivityCategoryId.Should().Be(observation.ArtportalenInternal.ActivityCategoryId);
         obs.ArtportalenInternal.BirdValidationAreaIds.First().Should().Be(observation.ArtportalenInternal.BirdValidationAreaIds.First());

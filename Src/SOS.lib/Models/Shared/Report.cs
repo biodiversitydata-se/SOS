@@ -1,7 +1,7 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
+using System;
+using System.Text.RegularExpressions;
 
 namespace SOS.Lib.Models.Shared
 {
@@ -15,7 +15,7 @@ namespace SOS.Lib.Models.Shared
             Id = id;
             CreatedDate = DateTime.UtcNow;
         }
-        
+
         public string Id { get; set; }
         public string Name { get; set; }
         public string CreatedBy { get; set; }

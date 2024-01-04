@@ -10,7 +10,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         /// Artportalen specific search properties
         /// </summary>
-        public ExtendedFilterDto ExtendedFilter{ get; set; }
+        public ExtendedFilterDto ExtendedFilter { get; set; }
 
         /// <summary>
         /// Observation protection filter

@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 
 namespace SOS.Lib.Helpers
-{    
+{
     public enum HashingClassAlgorithms
     {
         MD5 = 0,

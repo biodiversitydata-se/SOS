@@ -21,7 +21,7 @@ namespace SOS.Observations.Api.HealthChecks
             private readonly HttpClient _client;
             private readonly string _apiUrl;
             private readonly string _subscriptionKey;
-            
+
             /// <summary>
             /// Constructor.
             /// </summary>
@@ -45,7 +45,7 @@ namespace SOS.Observations.Api.HealthChecks
             /// <returns></returns>
             /// <exception cref="Exception"></exception>
             public async Task<PagedResultDto<Observation>> SearchObservations(SearchFilterDto searchFilter, string cultureCode, int skip, int take)
-            {                
+            {
                 var response = await _client.PostAsync($"{_apiUrl}Observations/Search?skip={skip}&take={take}&translationCultureCode={cultureCode}", new StringContent(JsonSerializer.Serialize(searchFilter), Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {

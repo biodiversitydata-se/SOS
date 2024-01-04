@@ -21,7 +21,7 @@ namespace SOS.Observations.Api.HealthChecks
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
         }
-       
+
         private async Task<(TimeSpan Duration, long TotalCount)> SearchPicaPicaAsync()
         {
             var searchFilter = new SearchFilter(0)

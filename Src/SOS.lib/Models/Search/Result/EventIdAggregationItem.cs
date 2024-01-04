@@ -29,12 +29,12 @@ namespace SOS.Lib.Models.Search.Result
     public class AggregationItemList<TKey, TValue>
     {
         public TKey AggregationKey { get; set; }
-        public List<TValue> Items { get; set; }        
+        public List<TValue> Items { get; set; }
     }
 
     public class EventOccurrenceAggregationItem
     {
         public string EventId { get; set; }
-        public List<string> OccurrenceIds { get; set; }        
+        public List<string> OccurrenceIds { get; set; }
     }
 }

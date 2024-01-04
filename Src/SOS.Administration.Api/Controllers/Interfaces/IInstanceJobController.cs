@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace SOS.Administration.Api.Controllers.Interfaces
 {
@@ -7,7 +6,7 @@ namespace SOS.Administration.Api.Controllers.Interfaces
     ///     System job controller
     /// </summary>
     public interface IInstanceJobController
-    {        
+    {
         /// <summary>
         ///     Activate instance
         /// </summary>

@@ -1,8 +1,8 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -10,7 +10,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
 
 [Collection(TestCollection.Name)]
 public class OccurrenceStatusTests : TestBase
-{    
+{
     public OccurrenceStatusTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
     }
@@ -27,17 +27,19 @@ public class OccurrenceStatusTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        
+
         // Scenario 1 - Get only present observations (Noterade)
-        var onlyPresentSearchFilter = new SearchFilterInternalDto {
+        var onlyPresentSearchFilter = new SearchFilterInternalDto
+        {
             OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
             NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.NoFilter,
-            ExtendedFilter = new ExtendedFilterDto {
+            ExtendedFilter = new ExtendedFilterDto
+            {
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.DontIncludeNotPresent
             }
         };
         var onlyPresentResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(onlyPresentSearchFilter));
-        var onlyPresentResult = await onlyPresentResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();        
+        var onlyPresentResult = await onlyPresentResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
         onlyPresentResult!.TotalCount.Should().Be(70);
 
         // Scenario 2 - Get only not present observations (Ej noterade (inkl. ej återfunna))

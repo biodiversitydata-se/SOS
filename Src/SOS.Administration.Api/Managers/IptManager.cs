@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Managers.Interfaces;
 using SOS.Administration.Api.Models.Ipt;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Managers
 {
@@ -26,7 +26,7 @@ namespace SOS.Administration.Api.Managers
         /// <returns></returns>
         private int GetIndex(string text, int searchFrom, string searchFor)
         {
-           return text?.IndexOf(searchFor, searchFrom) ?? -1;
+            return text?.IndexOf(searchFor, searchFrom) ?? -1;
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace SOS.Administration.Api.Managers
 
                     arrayItem = GetValue(arrayText.Value, arrayItem.CurrentIndex, "[", "]");
                 }
-                
+
                 return resources;
             }
             catch (Exception e)

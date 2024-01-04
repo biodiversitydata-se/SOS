@@ -1,7 +1,9 @@
-﻿using System.Collections.Concurrent;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed;
@@ -9,15 +11,13 @@ using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
-using SOS.Lib.Configuration.Process;
+using System.Collections.Concurrent;
 
 namespace SOS.Harvest.Processors
 {
     public abstract class ChecklistProcessorBase<TClass, TVerbatim, TVerbatimRepository> : ProcessorBase<TClass>
         where TVerbatim : IEntity<int>
-        where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int> 
+        where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int>
     {
         /// <summary>
         /// Commit batch
@@ -105,7 +105,7 @@ namespace SOS.Harvest.Processors
                     // Add checklist
                     checklists.TryAdd(checklist.Id, checklist);
                 }
-               
+
                 Logger.LogDebug($"Checklist - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
 
                 return await ValidateAndStoreChecklists(dataProvider, checklists.Values, $"{startId}-{endId}");

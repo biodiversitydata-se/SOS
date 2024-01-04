@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SOS.Observations.Api.Managers.Interfaces;
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -53,13 +53,13 @@ namespace SOS.Observations.Api.HealthChecks
                 var errors = new StringBuilder();
                 if (activePublicIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append($"Duplicates found in active public index: { string.Join(", ", activePublicIndexDuplicates) }...");
+                    errors.Append($"Duplicates found in active public index: {string.Join(", ", activePublicIndexDuplicates)}...");
                     unhealthy = true;
                 }
 
                 if (activePublicprotectedIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append($"Duplicates found in active protected index: { string.Join(", ", activePublicprotectedIndexDuplicates) }...");
+                    errors.Append($"Duplicates found in active protected index: {string.Join(", ", activePublicprotectedIndexDuplicates)}...");
                     unhealthy = true;
                 }
 

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Harvesters.Artportalen.Interfaces;
@@ -13,6 +12,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.ComponentModel;
 
 namespace SOS.Harvest.Jobs
 {
@@ -89,7 +89,7 @@ namespace SOS.Harvest.Jobs
 
                 var success = harvestTaskByDataProvider.All(r => r.Value.Result.Status == RunStatus.Success || r.Value.Result.Status == RunStatus.CanceledSuccess);
 
-                _logger.LogInformation($"Finish checklist harvest jobs. Success: { success }");
+                _logger.LogInformation($"Finish checklist harvest jobs. Success: {success}");
 
                 return success;
             }
@@ -164,7 +164,7 @@ namespace SOS.Harvest.Jobs
             }
 
             _logger.LogInformation("Finish checklist harvest job");
-            
+
             return await _processChecklistsJob.RunAsync(
                 dataProviders!.Select(dataProvider => dataProvider.Identifier).ToArray(),
                 cancellationToken);

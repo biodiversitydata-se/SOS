@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Models.Gis;
+﻿using SOS.Lib.Models.Gis;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Search.Result
 {

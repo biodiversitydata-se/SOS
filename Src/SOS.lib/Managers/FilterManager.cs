@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SOS.Lib.Cache.Interfaces;
+﻿using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Services.Interfaces;
-using SOS.Lib.Models.Search.Filters;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers
 {
@@ -18,7 +18,7 @@ namespace SOS.Lib.Managers
     public class FilterManager : IFilterManager
     {
         private const int BiotaTaxonId = 0;
-        
+
         private readonly ITaxonManager _taxonManager;
         private IUserService _userService;
         private readonly IAreaCache _areaCache;
@@ -41,7 +41,7 @@ namespace SOS.Lib.Managers
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task<List<ExtendedAuthorizationAreaFilter>> GetExtendedAuthorizationAreas(int userId, int roleId, string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<List<ExtendedAuthorizationAreaFilter>> GetExtendedAuthorizationAreas(int userId, int roleId, string authorizationApplicationIdentifier, string authorityIdentity, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
             if (userId == 0)
             {
@@ -53,7 +53,7 @@ namespace SOS.Lib.Managers
             if (roleId != 0)
             {
                 var userRoles = await _userService.GetUserRolesAsync(userId, authorizationApplicationIdentifier);
-                
+
                 var role = userRoles?.Where(r => r.Id.Equals(roleId))?.FirstOrDefault();
                 authorities = role?.Authorities;
             }
@@ -62,12 +62,12 @@ namespace SOS.Lib.Managers
                 // Get user authorities
                 authorities = (await _userService.GetUserAuthoritiesAsync(userId, authorizationApplicationIdentifier))?.Where(a => a.AuthorityIdentity.Equals(authorityIdentity));
             }
-            
+
             if (authorities == null)
             {
                 return null;
             }
-            
+
             var extendedAuthorizationAreaFilters = new List<ExtendedAuthorizationAreaFilter>();
 
             foreach (var authority in authorities)
@@ -87,7 +87,7 @@ namespace SOS.Lib.Managers
                 if (authority.Areas?.Any() ?? false)
                 {
                     var areaFilters = new List<AreaFilter>();
-                    
+
                     foreach (var area in authority.Areas)
                     {
                         // 100 = sweden, no meaning to add since all processed observations are in sweden
@@ -133,20 +133,20 @@ namespace SOS.Lib.Managers
                 return;
             }
 
-            filter.Ids = GetTaxonIds(filter.Ids, 
-                filter.IncludeUnderlyingTaxa, 
+            filter.Ids = GetTaxonIds(filter.Ids,
+                filter.IncludeUnderlyingTaxa,
                 filter.ListIds,
-                filter.TaxonListOperator, 
+                filter.TaxonListOperator,
                 filter.TaxonCategories);
         }
 
-        private List<int> GetTaxonIds(IEnumerable<int> taxonIds, 
-            bool includeUnderlyingTaxa, 
-            IEnumerable<int> listIds, 
+        private List<int> GetTaxonIds(IEnumerable<int> taxonIds,
+            bool includeUnderlyingTaxa,
+            IEnumerable<int> listIds,
             TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge,
             IEnumerable<int> taxonCategories = null,
             bool returnBiotaResultAsNull = true)
-        {            
+        {
             var taxaIds = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa, returnBiotaResultAsNull);
             if (listIds != null && listIds.Count() > 0)
             {
@@ -172,8 +172,8 @@ namespace SOS.Lib.Managers
             return taxaIds?.Distinct().ToList();
         }
 
-        private List<int> FilterTaxonByTaxonLists(IEnumerable<int> taxaIds, 
-            IEnumerable<int> listIds, 
+        private List<int> FilterTaxonByTaxonLists(IEnumerable<int> taxaIds,
+            IEnumerable<int> listIds,
             TaxonFilter.TaxonListOp listOperator,
             bool includeUnderlyingTaxa)
         {
@@ -192,7 +192,7 @@ namespace SOS.Lib.Managers
                     }
                 }
             }
-            
+
             if (taxonListIdsSet.Count == 0)
             {
                 return taxaIds?.ToList();
@@ -212,13 +212,6 @@ namespace SOS.Lib.Managers
             var taxaSet = new HashSet<int>();
             taxaSet.UnionWith(taxaIds);
             taxaSet.IntersectWith(taxonListIdsSet);
-
-            // When TaxonListOp.Filter is used and there are no taxa in the result, this should result in no observations result.
-            if (listOperator == TaxonFilter.TaxonListOp.Filter && taxaSet.Count == 0)
-            {
-                return new List<int> { -1 };
-            }
-
             return taxaSet.ToList();
         }
 
@@ -234,12 +227,12 @@ namespace SOS.Lib.Managers
             bool includeUnderlyingTaxa,
             bool returnBiotaResultAsNull = true
         )
-        {                        
+        {
             if ((!taxonIds?.Any() ?? true) || !includeUnderlyingTaxa)
             {
                 if (!returnBiotaResultAsNull && includeUnderlyingTaxa)
                 {
-                    return _taxonManager.TaxonTree.GetUnderlyingTaxonIds(new int[] {0}, true);
+                    return _taxonManager.TaxonTree.GetUnderlyingTaxonIds(new int[] { 0 }, true);
                 }
                 else
                 {
@@ -449,7 +442,7 @@ namespace SOS.Lib.Managers
             if (filter == null)
             {
                 filter = new TaxonFilter() { IncludeUnderlyingTaxa = true };
-            }          
+            }
 
             // todo - add support for red list categories.
             var taxonIds = GetTaxonIds(filter.Ids,
@@ -458,7 +451,7 @@ namespace SOS.Lib.Managers
                 filter.TaxonListOperator,
                 filter.TaxonCategories,
                 true);
-            
+
             if (taxonIds == null && !filter.IncludeUnderlyingTaxa)
             {
                 taxonIds = new List<int> { 0 }; // Return only Biota if includeUnderlyingTaxa=false

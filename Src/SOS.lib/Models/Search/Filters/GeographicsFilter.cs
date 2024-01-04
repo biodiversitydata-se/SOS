@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Nest;
+using SOS.Lib.Models.Gis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Nest;
-using SOS.Lib.Models.Gis;
 
 namespace SOS.Lib.Models.Search.Filters
 {

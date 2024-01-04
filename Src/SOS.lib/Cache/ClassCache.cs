@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
-using Microsoft.Extensions.Caching.Memory;
 using SOS.Lib.Cache.Interfaces;
+using System;
+using System.Threading;
 
 namespace SOS.Lib.Cache
 {
@@ -49,7 +49,7 @@ namespace SOS.Lib.Cache
             _memoryCache.TryGetValue(_cacheKey, out var entity);
             return (TClass)entity;
         }
-       
+
         /// <inheritdoc />
         public void Set(TClass entity)
         {
@@ -61,7 +61,7 @@ namespace SOS.Lib.Cache
                     .SetPriority(CacheItemPriority.NeverRemove)
                     .AddExpirationToken(expirationToken)
                     .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);
-    ;
+                ;
                 _memoryCache.Set(_cacheKey, entity, cacheEntryOptions);
             }
         }

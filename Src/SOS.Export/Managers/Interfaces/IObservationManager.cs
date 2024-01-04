@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using SOS.Export.Models.ZendTo;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
+using System.Threading.Tasks;
 
 namespace SOS.Export.Managers.Interfaces
 {
@@ -32,7 +32,7 @@ namespace SOS.Export.Managers.Interfaces
         Task<ZendToResponse> ExportAndSendAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
-            SearchFilter filter, 
+            SearchFilter filter,
             string emailAddress,
             string description,
             ExportFormat exportFormat,

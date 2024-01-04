@@ -1,13 +1,13 @@
-﻿using SOS.Analysis.Api.Repositories.Interfaces;
+﻿using Nest;
+using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Repositories.Processed;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Filters;
-using Nest;
 using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Repositories.Processed;
 
 namespace SOS.Analysis.Api.Repositories
 {
@@ -27,7 +27,7 @@ namespace SOS.Analysis.Api.Repositories
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
-           
+
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
@@ -10,6 +6,10 @@ using SOS.Lib.Swagger;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -45,8 +45,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="take">Number of areas to return</param>
         /// <returns>List of areas</returns>
         [HttpGet()]
-        [ProducesResponseType(typeof(PagedResult<AreaBaseDto>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(PagedResult<AreaBaseDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetAreas([FromQuery] IEnumerable<AreaTypeDto> areaTypes = null,
             [FromQuery] string searchString = null, [FromQuery] int skip = 0, [FromQuery] int take = 100)
@@ -58,7 +58,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting areas");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
@@ -98,13 +98,13 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetExport(
-            [FromRoute] AreaTypeDto areaType, 
-            [FromRoute] string featureId, 
+            [FromRoute] AreaTypeDto areaType,
+            [FromRoute] string featureId,
             [FromQuery] AreaExportFormatDto format = AreaExportFormatDto.Json)
         {
             try
             {
-                var zipBytes = await _areaManager.GetZippedAreaAsync(areaType, featureId,(AreaExportFormat) format);
+                var zipBytes = await _areaManager.GetZippedAreaAsync(areaType, featureId, (AreaExportFormat)format);
 
                 if (zipBytes == null)
                 {

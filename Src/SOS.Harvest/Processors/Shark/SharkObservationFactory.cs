@@ -1,4 +1,8 @@
-﻿using SOS.Lib.Constants;
+﻿using SOS.Harvest.Constants;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
@@ -6,10 +10,6 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shark;
-using SOS.Harvest.Constants;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
-using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.Shark
 {
@@ -25,8 +25,8 @@ namespace SOS.Harvest.Processors.Shark
         /// <param name="areaHelper"></param>
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SharkObservationFactory(DataProvider dataProvider, 
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
+        public SharkObservationFactory(DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
@@ -42,13 +42,13 @@ namespace SOS.Harvest.Processors.Shark
         /// <returns></returns>
         public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim, bool diffuseIfSupported)
         {
-            var taxon = GetTaxon(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, new[] {verbatim.ScientificName, verbatim.ReportedScientificName}.Distinct());
+            var taxon = GetTaxon(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, new[] { verbatim.ScientificName, verbatim.ReportedScientificName }.Distinct());
             var sharkSampleId = $"{(string.IsNullOrEmpty(verbatim.Sharksampleidmd5) ? verbatim.SharkSampleId : verbatim.Sharksampleidmd5)}-{taxon.Id}".RemoveWhiteSpace();
 
             var obs = new Observation
-            {                
+            {
                 DataProviderId = DataProvider.Id,
-                BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
+                BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.SHARK}",
                 DatasetName = verbatim.DatasetName,
                 DiffusionStatus = DiffusionStatus.NotDiffused,
@@ -91,7 +91,7 @@ namespace SOS.Harvest.Processors.Shark
             };
 
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
-            AddPositionData(obs.Location, verbatim.SampleLongitudeDd, verbatim.SampleLatitudeDd, 
+            AddPositionData(obs.Location, verbatim.SampleLongitudeDd, verbatim.SampleLatitudeDd,
                 CoordinateSys.WGS84, ProcessConstants.DefaultAccuracyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
 
@@ -118,10 +118,10 @@ namespace SOS.Harvest.Processors.Shark
         {
             if (dyntaxaTaxonId == 0)
             {
-                return new VocabularyValue {Id = (int) OccurrenceStatusId.Absent};
+                return new VocabularyValue { Id = (int)OccurrenceStatusId.Absent };
             }
 
-            return new VocabularyValue {Id = (int) OccurrenceStatusId.Present};
+            return new VocabularyValue { Id = (int)OccurrenceStatusId.Present };
         }
 
         /// <summary>

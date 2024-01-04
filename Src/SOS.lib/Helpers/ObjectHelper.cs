@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SOS.Lib.Extensions;
+using SOS.Lib.Helpers.Interfaces;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -6,8 +8,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using SOS.Lib.Extensions;
-using SOS.Lib.Helpers.Interfaces;
 
 namespace SOS.Lib.Helpers
 {
@@ -98,7 +98,7 @@ namespace SOS.Lib.Helpers
             {
                 CacheProperties(type);
             }
-            
+
             return CachedProperties[type];
         }
 
@@ -165,7 +165,7 @@ namespace SOS.Lib.Helpers
             return ExecuteInternal(@object, prefix: prefix, valuesAsString: valuesAsString);
         }
 
-        public IEnumerable<string> GetPropertiesWithGarbageChars<T>( T @object)
+        public IEnumerable<string> GetPropertiesWithGarbageChars<T>(T @object)
         {
             var garbageProperties = new HashSet<string>();
 

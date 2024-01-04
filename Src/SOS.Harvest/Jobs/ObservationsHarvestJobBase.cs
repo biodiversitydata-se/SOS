@@ -18,7 +18,7 @@ namespace SOS.Harvest.Jobs
     /// <summary>
     ///     Observation harvest job.
     /// </summary>
-    public class ObservationsHarvestJobBase 
+    public class ObservationsHarvestJobBase
     {
         private readonly IProjectHarvester _projectHarvester;
         private readonly IArtportalenDatasetMetadataHarvester _artportalenDatasetMetadataHarvester;
@@ -174,8 +174,8 @@ namespace SOS.Harvest.Jobs
             }
         }
 
-        
-       
+
+
         protected virtual async Task PostHarvestAsync(IDictionary<DataProvider, Task<HarvestInfo>> harvestTaskByDataProvider)
         {
         }

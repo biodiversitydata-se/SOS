@@ -61,7 +61,7 @@ namespace SOS.Harvest.Harvesters
         /// <param name="dataLastModified"></param>
         /// <param name="notes"></param>
         /// <returns></returns>
-        protected async Task<HarvestInfo> FinishHarvestAsync((DateTime startDate, long preHarvestCount) initValues,  RunStatus runStatus, int harvestCount, DateTime? dataLastModified = null, string? notes = null)
+        protected async Task<HarvestInfo> FinishHarvestAsync((DateTime startDate, long preHarvestCount) initValues, RunStatus runStatus, int harvestCount, DateTime? dataLastModified = null, string? notes = null)
         {
             // Update harvest info
             var harvestInfo = new HarvestInfo(_provider, initValues.startDate);

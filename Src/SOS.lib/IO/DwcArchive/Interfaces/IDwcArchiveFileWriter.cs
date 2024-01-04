@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using SOS.Export.Models;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
@@ -9,6 +7,8 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.DwcArchive.Interfaces
 {
@@ -28,7 +28,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
         Task<FileExportResult> CreateDwcArchiveFileAsync(
-            DataProvider dataProvider, 
+            DataProvider dataProvider,
             SearchFilter filter,
             string fileName,
             IProcessedObservationCoreRepository processedObservationRepository,
@@ -51,7 +51,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
         Task<FileExportResult> CreateDwcArchiveFileAsync(
-            DataProvider dataProvider, 
+            DataProvider dataProvider,
             SearchFilter filter,
             string fileName,
             IProcessedObservationCoreRepository processedObservationRepository,

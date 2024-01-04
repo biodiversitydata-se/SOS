@@ -1,20 +1,17 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Nest;
-using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Harvesters;
 using SOS.Harvest.Services.Interfaces;
-using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Harvesters
@@ -43,7 +40,7 @@ namespace SOS.Import.UnitTests.Harvesters
         private readonly Mock<IGeoRegionApiService> _geoRegionApiServiceMock;
         private readonly Mock<ILogger<AreaHarvester>> _loggerMock;
         private readonly Mock<ICacheManager> _cacheManagerMock;
-        
+
         private AreaHarvester TestObject => new AreaHarvester(
             _areaRepositoryMock.Object,
             _areaProcessedRepository.Object,
@@ -85,7 +82,7 @@ namespace SOS.Import.UnitTests.Harvesters
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _areaRepositoryMock.Setup(mdr => mdr.GetAsync())
-                .ReturnsAsync(new[] {new AreaEntity {FeatureId = "1", Name = "Sverige", PolygonWKT = "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))" } });
+                .ReturnsAsync(new[] { new AreaEntity { FeatureId = "1", Name = "Sverige", PolygonWKT = "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))" } });
             _areaProcessedRepository.Setup(tr => tr.DeleteCollectionAsync())
                 .ReturnsAsync(true);
             _areaProcessedRepository.Setup(tr => tr.AddCollectionAsync())

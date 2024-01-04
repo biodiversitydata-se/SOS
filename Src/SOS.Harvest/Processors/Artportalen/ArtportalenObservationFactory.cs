@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Razor.TagHelpers;
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
@@ -25,7 +24,7 @@ using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
 namespace SOS.Harvest.Processors.Artportalen
 {
     public class ArtportalenObservationFactory : ObservationFactoryBase, IObservationFactory<ArtportalenObservationVerbatim>
-    { 
+    {
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly IDictionary<int, DatasetMapping> _datasetByProjectId;
         private readonly bool _incrementalMode;
@@ -195,9 +194,9 @@ namespace SOS.Harvest.Processors.Artportalen
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             IDictionary<int, DatasetMapping> datasetByProjectId,
             bool incrementalMode,
-            string artPortalenUrl, 
+            string artPortalenUrl,
             IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration) 
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
         {
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _incrementalMode = incrementalMode;
@@ -284,7 +283,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     verbatimObservation.StartTime,
                     verbatimObservation.EndDate,
                     verbatimObservation.EndTime,
-                    out startDate, 
+                    out startDate,
                     out endDate);
 
                 var taxonId = verbatimObservation.TaxonId ?? -1;
@@ -572,11 +571,11 @@ namespace SOS.Harvest.Processors.Artportalen
         }
 
         public static void GetStartEndDate(
-            DateTime? startDate, 
-            TimeSpan? startTime, 
-            DateTime? endDate, 
-            TimeSpan? endTime, 
-            out DateTime? startDateResult, 
+            DateTime? startDate,
+            TimeSpan? startTime,
+            DateTime? endDate,
+            TimeSpan? endTime,
+            out DateTime? startDateResult,
             out DateTime? endDateResult)
         {
             // Add time to start date if it exists
@@ -605,7 +604,7 @@ namespace SOS.Harvest.Processors.Artportalen
             else
             {
                 endDateResult = null;
-            }            
+            }
 
             if (startDateResult.HasValue && startDateResult.Value.Kind == DateTimeKind.Unspecified)
             {
@@ -766,7 +765,7 @@ namespace SOS.Harvest.Processors.Artportalen
             if (metadataValue != null)
             {
                 return new VocabularyValue
-                    { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = metadataValue };
+                { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = metadataValue };
             }
 
             if (defaultId.HasValue)
@@ -775,7 +774,7 @@ namespace SOS.Harvest.Processors.Artportalen
             }
 
             return new VocabularyValue
-                { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
+            { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
         }
 
 
@@ -785,7 +784,7 @@ namespace SOS.Harvest.Processors.Artportalen
             {
                 return verbatimObservation.DiscoveryMethod.Translate(Cultures.en_GB, Cultures.sv_SE);
             }
-            
+
             if (!verbatimObservation.Projects?.Any() ?? true) return null!;
 
             var project = verbatimObservation.Projects!.First();
@@ -964,7 +963,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
 
         protected DatasetMapping? GetDataStewardshipDatasetMapping(Observation observation)
-        {            
+        {
             if (observation.Projects == null || observation.Projects.Count() == 0) return null;
 
             DatasetMapping? datasetMapping = null;
@@ -975,9 +974,9 @@ namespace SOS.Harvest.Processors.Artportalen
                     break;
                 }
             }
-            
-            return datasetMapping;            
-        }        
+
+            return datasetMapping;
+        }
 
         public class DatasetMapping
         {

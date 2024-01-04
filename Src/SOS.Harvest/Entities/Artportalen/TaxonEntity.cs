@@ -4,7 +4,7 @@
     ///     Taxon object
     /// </summary>
     public class TaxonEntity
-    {        
+    {
         /// <summary>
         ///     Id of taxon
         /// </summary>
@@ -13,6 +13,6 @@
         /// <summary>
         /// Species group id
         /// </summary>
-        public int? SpeciesGroupId { get; set; }      
+        public int? SpeciesGroupId { get; set; }
     }
 }

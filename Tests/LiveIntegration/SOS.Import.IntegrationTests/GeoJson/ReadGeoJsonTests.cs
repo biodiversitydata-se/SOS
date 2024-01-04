@@ -1,4 +1,5 @@
-﻿using DwC_A;
+﻿using FluentAssertions;
+using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
 using System;
@@ -7,10 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FluentAssertions;
-using NetTopologySuite.Features;
 using Xunit;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.LiveIntegrationTests.GeoJson
 {

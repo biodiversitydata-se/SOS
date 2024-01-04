@@ -1,14 +1,6 @@
-﻿using System;
+﻿using SOS.Lib.Models.Processed.Observation;
+using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using SOS.Lib.Configuration.Process;
-using SOS.Lib.Constants;
-using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Lib.Helpers
 {
@@ -18,7 +10,7 @@ namespace SOS.Lib.Helpers
     public static class LocalDateTimeConverterHelper
     {
         private static TimeZoneInfo swedenTimeZone = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
-        
+
         public static void ConvertToLocalTime(IEnumerable<Observation> processedObservations)
         {
             if (processedObservations == null) return;
@@ -32,7 +24,7 @@ namespace SOS.Lib.Helpers
         public static void ConvertToLocalTime(IEnumerable<IDictionary<string, object>> processedRecords)
         {
             if (processedRecords == null) return;
-            
+
             foreach (var record in processedRecords)
             {
                 ConvertToLocalTime(record);

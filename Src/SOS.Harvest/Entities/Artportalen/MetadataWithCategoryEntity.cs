@@ -8,7 +8,7 @@
         /// <summary>
         /// Constructor
         /// </summary>
-        public MetadataWithCategoryEntity(): base(default!)
+        public MetadataWithCategoryEntity() : base(default!)
         {
         }
 
@@ -17,7 +17,7 @@
         /// </summary>
         public MetadataWithCategoryEntity(T id) : base(id)
         {
-        } 
+        }
 
         /// <summary>
         ///     Id of category

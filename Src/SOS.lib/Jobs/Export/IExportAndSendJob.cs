@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using SOS.Lib.Enums;
 using SOS.Lib.HangfireAttributes;
 using SOS.Lib.Models.Search.Filters;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Jobs.Export
 {

@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using MessagePack;
+using MessagePack.Resolvers;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using MessagePack;
-using MessagePack.Resolvers;
 
 namespace SOS.TestHelpers.Helpers
 {

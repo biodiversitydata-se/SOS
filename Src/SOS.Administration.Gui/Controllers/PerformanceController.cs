@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Nest;
+using Newtonsoft.Json;
+using SOS.Lib.Configuration.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Nest;
-using Newtonsoft.Json;
-using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Administration.Gui.Controllers
 {
@@ -94,7 +94,7 @@ namespace SOS.Administration.Gui.Controllers
         public LoadTestMetrics Metrics { get; set; }
         public DateTime Timestamp { get; set; }
     }
-    
+
     [Route("[controller]")]
     [ApiController]
     public class PerformanceController : ControllerBase
@@ -106,12 +106,12 @@ namespace SOS.Administration.Gui.Controllers
         private ApplicationInsightsConfiguration _aiConfig;
 
 
-        public PerformanceController( IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, TestElasticSearchConfiguration testElasticConfiguration)
-        {          
+        public PerformanceController(IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, TestElasticSearchConfiguration testElasticConfiguration)
+        {
             _testElasticClient = testElasticConfiguration.GetClients().FirstOrDefault();
             _aiConfig = aiConfig.CurrentValue;
         }
-     
+
         public static string GetTelemetry(string appid, string apikey,
                 string queryType, string parameterString)
         {
@@ -138,7 +138,7 @@ namespace SOS.Administration.Gui.Controllers
                             | where success == false and resultCode != 404
                             | summarize failedCount = sum(itemCount) by name
                             | top 10 by failedCount desc";
-            var json = GetTelemetry(_aiConfig.ApplicationId, _aiConfig.ApiKey, "query", "timespan=P1D&query=" + query );
+            var json = GetTelemetry(_aiConfig.ApplicationId, _aiConfig.ApiKey, "query", "timespan=P1D&query=" + query);
 
             var failedRequests = new List<FailedData>();
 
@@ -156,7 +156,7 @@ namespace SOS.Administration.Gui.Controllers
                     failedRequests.Add(failedRequest);
                 }
             }
-           
+
             return failedRequests;
         }
 
@@ -168,10 +168,10 @@ namespace SOS.Administration.Gui.Controllers
                 .Index("sos-st-loadtests-summaries")
                 .Size(5)
                 .Sort(f => f
-                    .Descending(d=>d.Timestamp))
+                    .Descending(d => d.Timestamp))
                 );
-            if (result.IsValid) 
-            { 
+            if (result.IsValid)
+            {
                 return result.Documents;
             }
             else
@@ -232,7 +232,7 @@ namespace SOS.Administration.Gui.Controllers
             {
                 return null;
             }
-            
+
         }
     }
 }

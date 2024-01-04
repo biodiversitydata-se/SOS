@@ -1,5 +1,8 @@
 ﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
@@ -8,11 +11,8 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
-using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
-using SOS.Lib.Configuration.Process;
+using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Harvest.Processors.VirtualHerbarium
 {
@@ -73,7 +73,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
 
             try
             {
-               
+
                 int month;
                 int day;
                 if (int.TryParse(dateArray[0], out var year) && year > firstPossibleYear && year <= DateTime.Today.Year)
@@ -85,10 +85,10 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                         _ => (new DateTime(year, 1, 1), new DateTime(year, 12, 31))
                     };
                 }
-                
+
             }
             catch (Exception)
-            {}
+            { }
 
             return (null, null);
         }
@@ -102,13 +102,13 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         /// <param name="processTimeManager"></param>
         /// <param name="processConfiguration"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public VirtualHerbariumObservationFactory(DataProvider dataProvider, 
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa, 
+        public VirtualHerbariumObservationFactory(DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
         {
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));            
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         public async Task InitializeAsync()
@@ -239,15 +239,15 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 {
                     maxDistanceInM = (int)centroid.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM).Distance(maxPoint.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM));
                 }
-                
+
                 string key = area.Name.Trim().ToLower();
                 if (!dic.TryAdd(key, (centroid.X, centroid.Y, maxDistanceInM)))
                 {
                     duplicates.Add(key);
-                }                    
+                }
             }
 
-            foreach(var key in duplicates)
+            foreach (var key in duplicates)
             {
                 dic.Remove(key);
             }
@@ -278,9 +278,9 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             }
 
             var obs = new Observation
-            {                
+            {
                 DataProviderId = DataProvider.Id,
-                BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
+                BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.VirtualHerbarium}",
                 DatasetName = "Virtual Herbarium",
                 Defects = defects.Count == 0 ? null : defects,
@@ -301,7 +301,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 {
                     BirdNestActivityId = taxon?.IsBird() ?? false ? 1000000 : 0,
                     CatalogNumber = $"{verbatim.InstitutionCode}-{verbatim.AccessionNo}-{taxon?.Id ?? verbatim.DyntaxaId}",
-                    OccurrenceId =  $"urn:lsid:herbarium.emg.umu.se:observation:{verbatim.InstitutionCode}*{verbatim.AccessionNo}*{taxon?.Id ?? verbatim.DyntaxaId}",
+                    OccurrenceId = $"urn:lsid:herbarium.emg.umu.se:observation:{verbatim.InstitutionCode}*{verbatim.AccessionNo}*{taxon?.Id ?? verbatim.DyntaxaId}",
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,
@@ -351,10 +351,10 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         {
             if (dyntaxaTaxonId == 0)
             {
-                return new VocabularyValue {Id = (int) OccurrenceStatusId.Absent};
+                return new VocabularyValue { Id = (int)OccurrenceStatusId.Absent };
             }
 
-            return new VocabularyValue {Id = (int) OccurrenceStatusId.Present};
+            return new VocabularyValue { Id = (int)OccurrenceStatusId.Present };
         }
 
         /// <summary>

@@ -59,7 +59,7 @@ namespace SOS.Lib.Models.TaxonTree
         /// <param name="taxonId">Taxon id.</param>
         /// <returns></returns>
         public TaxonTreeNode<T> GetTreeNode(int taxonId)
-        {            
+        {
             if (TreeNodeById.TryGetValue(taxonId, out var treeNode))
             {
                 return treeNode;
@@ -82,7 +82,7 @@ namespace SOS.Lib.Models.TaxonTree
                 return underlyingTaxonIds;
             }
             var treeNodes = taxonIds.Where(t => TreeNodeById.ContainsKey(t)).Select(t => TreeNodeById[t]);
-            
+
             foreach (var treeNode in treeNodes.AsDepthFirstNodeIterator(returnSelfs))
             {
                 underlyingTaxonIds.Add(treeNode.TaxonId);

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -12,6 +8,10 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Harvesters.Observations
@@ -26,7 +26,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _sersObservationVerbatimRepositoryMock = new Mock<ISersObservationVerbatimRepository>();
             _sersObservationServiceMock = new Mock<ISersObservationService>();
             _sersServiceConfiguration = new SersServiceConfiguration
-                { MaxNumberOfSightingsHarvested = 1};
+            { MaxNumberOfSightingsHarvested = 1 };
             _loggerMock = new Mock<ILogger<SersObservationHarvester>>();
         }
 

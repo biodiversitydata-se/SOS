@@ -9,10 +9,10 @@
     public enum DescriptionType
     {
         Other,
-        Abstract, 
-        Methods, 
-        SeriesInformation, 
-        TableOfContents, 
+        Abstract,
+        Methods,
+        SeriesInformation,
+        TableOfContents,
         TechnicalInfo
     }
 

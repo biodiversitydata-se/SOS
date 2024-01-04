@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Nest;
+﻿using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Cache.Interfaces
 {

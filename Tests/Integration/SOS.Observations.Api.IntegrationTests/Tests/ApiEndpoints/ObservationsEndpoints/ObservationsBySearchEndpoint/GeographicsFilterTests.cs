@@ -1,10 +1,10 @@
 ﻿using FizzWare.NBuilder;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.Factories;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -216,7 +216,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                  .TheNext(20).HaveCoordinatesInSpan(14.50100, 16.50900, 56.00001, 56.00009, 10)
                              .With(o => o.TaxonId = 100009) // Disturbance radius: 1000m
                 .Build();
-           
+
             await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var searchFilter = new SearchFilterDto
             {

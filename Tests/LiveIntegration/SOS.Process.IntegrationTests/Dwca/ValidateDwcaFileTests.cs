@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using Xunit;
 using SOS.Lib.IO.DwcArchive;
+using Xunit;
 
 namespace SOS.Process.LiveIntegrationTests.Dwca
 {

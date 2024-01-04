@@ -24,12 +24,12 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         {
             var datasetEntities = new DatasetEntities();
             datasetEntities.Datasets = await GetDatasetsAsync();
-            datasetEntities.AccessRights= await GetAccessRightsAsync();
-            datasetEntities.Organisations= await GetOrganisationsAsync();
-            datasetEntities.Methodologies= await GetMethodologiesAsync();
-            datasetEntities.ProgrammeAreas= await GetProgrammeAreasAsync();
-            datasetEntities.Projects= await GetProjectsAsync();
-            datasetEntities.ProjectTypes= await GetProjectTypesAsync();
+            datasetEntities.AccessRights = await GetAccessRightsAsync();
+            datasetEntities.Organisations = await GetOrganisationsAsync();
+            datasetEntities.Methodologies = await GetMethodologiesAsync();
+            datasetEntities.ProgrammeAreas = await GetProgrammeAreasAsync();
+            datasetEntities.Projects = await GetProjectsAsync();
+            datasetEntities.ProjectTypes = await GetProjectTypesAsync();
             datasetEntities.Purposes = await GetPurposesAsync();
             datasetEntities.DatasetCreatorRelations = await GetDatasetCreatorAsync();
             datasetEntities.DatasetMethodologyRelations = await GetDatasetMethodologyAsync();

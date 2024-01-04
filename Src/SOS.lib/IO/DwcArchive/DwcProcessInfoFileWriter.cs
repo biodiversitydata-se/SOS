@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.Models.Processed.ProcessInfo;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using SOS.Lib.Models.Processed.ProcessInfo;
 
 namespace SOS.Lib.IO.DwcArchive
 {

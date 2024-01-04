@@ -1,9 +1,9 @@
-﻿using System.IO;
+﻿using SOS.Lib.JsonConverters;
+using SOS.Lib.Models.Processed.Observation;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using SOS.Lib.JsonConverters;
-using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Export.UnitTests.TestHelpers.Factories
 {

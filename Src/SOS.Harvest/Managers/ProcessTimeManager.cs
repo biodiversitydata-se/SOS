@@ -1,6 +1,6 @@
-﻿using System.Collections.Concurrent;
-using SOS.Harvest.Managers.Interfaces;
+﻿using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Configuration.Process;
+using System.Collections.Concurrent;
 
 namespace SOS.Harvest.Managers
 {
@@ -45,7 +45,7 @@ namespace SOS.Harvest.Managers
                 return id;
             }
 
-            public TimeSpan AverageDuration => TimeSpan.FromMilliseconds(_sessionCount == 0 ? 0 :_totalDuration / _sessionCount);
+            public TimeSpan AverageDuration => TimeSpan.FromMilliseconds(_sessionCount == 0 ? 0 : _totalDuration / _sessionCount);
 
             public long SessionCount => _sessionCount;
 

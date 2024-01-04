@@ -9,12 +9,12 @@
         /// Id.
         /// </summary>
         public int Id { get; set; }
-        
+
         /// <summary>
         /// Name.
         /// </summary>
         public string Name { get; set; }
-        
+
         /// <summary>
         /// Project description.
         /// </summary>
@@ -29,7 +29,7 @@
         /// Value of the data in string format.
         /// </summary>
         public string Value { get; set; }
-        
+
         /// <summary>
         /// Data type.
         /// </summary>

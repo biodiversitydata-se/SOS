@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SOS.Lib.Managers.Interfaces
 {
@@ -34,7 +34,7 @@ namespace SOS.Lib.Managers.Interfaces
 
 
         Task<List<DataProvider>> GetAllDataProvidersAsync();
-        
+
         /// <summary>
         ///     Get data provider by Id.
         /// </summary>

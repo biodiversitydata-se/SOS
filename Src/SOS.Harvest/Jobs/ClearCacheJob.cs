@@ -48,7 +48,8 @@ namespace SOS.Harvest.Jobs
         /// <inheritdoc />
         public async Task RunAsync(IEnumerable<Cache> caches)
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 if (!caches?.Any() ?? true)
                 {
                     return;

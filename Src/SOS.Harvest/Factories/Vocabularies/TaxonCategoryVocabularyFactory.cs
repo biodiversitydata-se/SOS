@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SOS.Harvest.Factories.Vocabularies;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Taxon.Interfaces;
 using SOS.Lib.Constants;
@@ -19,7 +14,7 @@ namespace SOS.Harvest.Factories.Vocabularies
     /// </summary>
     public class TaxonCategoryVocabularyFactory : ArtportalenVocabularyFactoryBase
     {
-        private readonly IMetadataRepository _artportalenMetadataRepository;        
+        private readonly IMetadataRepository _artportalenMetadataRepository;
         private readonly ITaxonService _taxonService;
         private readonly ILogger<TaxonCategoryVocabularyFactory> _logger;
 
@@ -29,12 +24,12 @@ namespace SOS.Harvest.Factories.Vocabularies
         /// <param name="metadataRepository"></param>
         /// <param name="logger"></param>
         public TaxonCategoryVocabularyFactory(
-            IMetadataRepository metadataRepository,            
+            IMetadataRepository metadataRepository,
             ITaxonService taxonService,
             ILogger<TaxonCategoryVocabularyFactory> logger)
         {
             _artportalenMetadataRepository =
-                metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));            
+                metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _taxonService =
                 taxonService ?? throw new ArgumentNullException(nameof(taxonService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -44,11 +39,11 @@ namespace SOS.Harvest.Factories.Vocabularies
         protected override bool Localized => true;
 
         protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
-        {            
+        {
             var dwcTaxa = await _taxonService.GetTaxaAsync();
             var dwcTaxonById = dwcTaxa.ToDictionary(m => m.Id, m => m);
             var taxonCategories = TaxonCategoryHelper.GetTaxonCategories(dwcTaxonById);
-            var vocabularyValues = GetVocabularyValues(taxonCategories);            
+            var vocabularyValues = GetVocabularyValues(taxonCategories);
             return vocabularyValues;
         }
 
@@ -83,6 +78,6 @@ namespace SOS.Harvest.Factories.Vocabularies
             };
 
             return vocabularyValue;
-        }     
+        }
     }
 }

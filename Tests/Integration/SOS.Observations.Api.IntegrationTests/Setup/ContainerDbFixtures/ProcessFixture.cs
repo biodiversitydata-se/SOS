@@ -1,42 +1,41 @@
 ﻿using DwC_A;
 using Microsoft.ApplicationInsights;
-using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.DarwinCore;
+using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Extensions;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Observations.Api.Repositories;
-using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.Lib.Managers;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.Models.TaxonListService;
-using SOS.Lib.Models.Processed.Checklist;
-using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Observations.Api.IntegrationTests.TestData;
-using SOS.Observations.Api.IntegrationTests.Setup;
-using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Helpers;
+using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
+using SOS.Observations.Api.IntegrationTests.TestData;
+using SOS.Observations.Api.Repositories;
+using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
 public class ProcessFixture : IProcessFixture
@@ -442,10 +441,10 @@ public class ProcessFixture : IProcessFixture
             bool clearExistingObservations = true)
     {
         if (clearExistingObservations)
-        {            
+        {
             await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
-        }        
-        _processedObservationCoreRepository.AddMany(observations, protectedIndex, true);        
+        }
+        _processedObservationCoreRepository.AddMany(observations, protectedIndex, true);
     }
 
     public DwcaObservationFactory GetDwcaObservationFactory(bool initAreaHelper)

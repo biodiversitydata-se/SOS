@@ -18,7 +18,7 @@ namespace SOS.Harvest.Managers
     {
         private readonly Dictionary<DataProviderType, IObservationProcessor> _processorByType;
 
-       
+
         public ObservationProcessorManager(
             IArtportalenObservationProcessor artportalenObservationProcessor,
             IDwcaObservationProcessor dwcaObservationProcessor,

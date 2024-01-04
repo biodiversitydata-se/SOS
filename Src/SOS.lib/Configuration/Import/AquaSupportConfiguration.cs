@@ -1,6 +1,6 @@
 ﻿namespace SOS.Lib.Configuration.Import
 {
-    public class AquaSupportConfiguration 
+    public class AquaSupportConfiguration
     {
         /// <summary>
         ///     Address for the service

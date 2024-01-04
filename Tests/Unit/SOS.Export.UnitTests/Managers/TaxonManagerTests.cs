@@ -1,21 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
-using Hangfire;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Moq;
-using ProjNet.CoordinateSystems;
 using SOS.Lib.Cache;
-using SOS.Lib.Enums;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Collections.Generic;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Managers
@@ -43,10 +38,10 @@ namespace SOS.Export.UnitTests.Managers
         ///     Return object to be tested
         /// </summary>
         private TaxonManager TestObject => new TaxonManager(
-            _processedTaxonRepositoryMock.Object, 
+            _processedTaxonRepositoryMock.Object,
             _taxonListRepositoryMock.Object,
-            new ClassCache<TaxonTree<IBasicTaxon>>(new MemoryCache(new MemoryCacheOptions())), 
-            new ClassCache<TaxonListSetsById>(new MemoryCache(new MemoryCacheOptions())), 
+            new ClassCache<TaxonTree<IBasicTaxon>>(new MemoryCache(new MemoryCacheOptions())),
+            new ClassCache<TaxonListSetsById>(new MemoryCache(new MemoryCacheOptions())),
             _loggerMock.Object);
 
         /// <summary>
@@ -62,7 +57,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             _processedTaxonRepositoryMock.Setup(pir => pir.GetAllAsync(It.IsAny<ProjectionDefinition<Taxon, BasicTaxon>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new List<BasicTaxon>());
-       
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------

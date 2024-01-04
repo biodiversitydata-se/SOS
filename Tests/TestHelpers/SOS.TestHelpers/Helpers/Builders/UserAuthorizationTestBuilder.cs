@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.UserService;
+using System.Collections.Generic;
 
 namespace SOS.TestHelpers.Helpers.Builders
 {
@@ -8,14 +8,14 @@ namespace SOS.TestHelpers.Helpers.Builders
     {
         public UserAuthorizationTestBuilder WithAreaAccess(AreaType areaType, string featureId)
         {
-            return With(entity => entity.Areas.Add(new AreaModel {AreaTypeId = (int)areaType, FeatureId = featureId}));
+            return With(entity => entity.Areas.Add(new AreaModel { AreaTypeId = (int)areaType, FeatureId = featureId }));
         }
 
         public UserAuthorizationTestBuilder WithAreaAccess(AreaModel area)
         {
             return With(entity => entity.Areas.Add(area));
         }
-        
+
         public UserAuthorizationTestBuilder WithAuthorityIdentity(string authorityIdentity)
         {
             return With(entity => entity.AuthorityIdentity = authorityIdentity);

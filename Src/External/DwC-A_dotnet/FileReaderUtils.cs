@@ -7,7 +7,7 @@ namespace DwC_A
     {
         public static void ValidateLineEnds(string linesTerminatedBy)
         {
-            if (new[] {"\n", "r", "\r\n"}.Contains(linesTerminatedBy) == false)
+            if (new[] { "\n", "r", "\r\n" }.Contains(linesTerminatedBy) == false)
             {
                 throw new NotSupportedException("Only files terminated by '\n', '\r' or '\r\n' are supported.");
             }

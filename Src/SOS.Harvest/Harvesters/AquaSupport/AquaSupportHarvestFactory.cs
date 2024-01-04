@@ -1,8 +1,8 @@
-﻿using System.Xml.Linq;
-using SOS.Harvest.Harvesters;
+﻿using SOS.Harvest.Harvesters;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
+using System.Xml.Linq;
 
 namespace SOS.Harvesters.AquaSupport
 {

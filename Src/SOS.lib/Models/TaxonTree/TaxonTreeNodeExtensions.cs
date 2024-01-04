@@ -203,12 +203,12 @@ namespace SOS.Lib.Models.TaxonTree
                 {
                     foreach (var secondaryParent in node.SecondaryParents)
                     {
-                        var secondaryEdge = new TaxonTreeEdge<T> { Parent = secondaryParent, Child = node, IsMainRelation = false };                        
+                        var secondaryEdge = new TaxonTreeEdge<T> { Parent = secondaryParent, Child = node, IsMainRelation = false };
                         edgeSet.Add(secondaryEdge);
                         if (!visitedNodesSet.Contains(secondaryParent))
                         {
                             nodesStack.Push(secondaryParent);
-                        }                        
+                        }
                     }
                 }
 
@@ -241,7 +241,7 @@ namespace SOS.Lib.Models.TaxonTree
                         {
                             nodesStack.Push(child);
                         }
-                    }                     
+                    }
                 }
 
                 if (includeSecondaryChildren && node.SecondaryChildren != null && node.SecondaryChildren.Count > 0)

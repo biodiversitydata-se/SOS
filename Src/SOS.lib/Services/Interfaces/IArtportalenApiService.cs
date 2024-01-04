@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.Models.ArtportalenApiService;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Lib.Models.ArtportalenApiService;
 
 namespace SOS.Lib.Services.Interfaces
 {

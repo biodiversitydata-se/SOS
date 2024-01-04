@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SOS.Lib.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading;
-using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Processed.Observation
 {

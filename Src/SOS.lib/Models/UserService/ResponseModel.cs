@@ -7,7 +7,7 @@ namespace SOS.Lib.Models.UserService
         public bool Success { get; set; }
 
         public T Result { get; set; }
-       
+
         public IEnumerable<MessageModel> Messages { get; set; }
     }
 }

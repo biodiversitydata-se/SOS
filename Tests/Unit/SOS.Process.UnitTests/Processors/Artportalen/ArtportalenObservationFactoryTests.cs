@@ -1,14 +1,14 @@
 ﻿using FluentAssertions;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.Artportalen;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Harvest.Processors.Artportalen;
-using System.Collections.Generic;
-using SOS.Lib.Configuration.Process;
-using SOS.Harvest.Managers;
-using Xunit;
 using System;
+using System.Collections.Generic;
+using Xunit;
 
 namespace SOS.Process.UnitTests.Processors.Artportalen
 {
@@ -60,11 +60,11 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
         {
             // Act
             ArtportalenObservationFactory.GetStartEndDate(
-                startDate, 
-                startTime, 
-                endDate, 
-                endTime, 
-                out DateTime? startDateResult, 
+                startDate,
+                startTime,
+                endDate,
+                endTime,
+                out DateTime? startDateResult,
                 out DateTime? endDateResult);
 
             // Assert
@@ -101,7 +101,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
                     new TimeSpan(12, 0, 0), // endTime
                     DateTime.SpecifyKind(new DateTime(2009, 2, 20), DateTimeKind.Local).Add(new TimeSpan(10, 15, 0)), // expectedStartDate
                     DateTime.SpecifyKind(new DateTime(2009, 2, 20), DateTimeKind.Local).Add(new TimeSpan(12, 0, 0)) // expectedEndDate
-                },                
+                },
                 new object[] // Only startDate with time in the Date
                 {
                     DateTime.SpecifyKind(new DateTime(2009, 2, 20, 12, 10, 0), DateTimeKind.Local), // startDate

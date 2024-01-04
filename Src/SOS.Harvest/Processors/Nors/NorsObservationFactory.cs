@@ -1,14 +1,13 @@
-﻿using SOS.Lib.Constants;
+﻿using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
-using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Nors;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
-using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Processors.Nors
 {
@@ -24,8 +23,8 @@ namespace SOS.Harvest.Processors.Nors
         /// <param name="areaHelper"></param>
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public NorsObservationFactory(DataProvider dataProvider, 
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa, 
+        public NorsObservationFactory(DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
@@ -43,9 +42,9 @@ namespace SOS.Harvest.Processors.Nors
         {
             var taxon = GetTaxon(verbatim.DyntaxaTaxonId);
             var obs = new Observation
-            {                
+            {
                 DataProviderId = DataProvider.Id,
-                BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
+                BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.NORS}",
                 DatasetName = "NORS",
                 DiffusionStatus = DiffusionStatus.NotDiffused,
@@ -116,10 +115,10 @@ namespace SOS.Harvest.Processors.Nors
         {
             if (dyntaxaTaxonId == 0)
             {
-                return new VocabularyValue {Id = (int) OccurrenceStatusId.Absent};
+                return new VocabularyValue { Id = (int)OccurrenceStatusId.Absent };
             }
 
-            return new VocabularyValue {Id = (int) OccurrenceStatusId.Present};
+            return new VocabularyValue { Id = (int)OccurrenceStatusId.Present };
         }
 
         /// <summary>

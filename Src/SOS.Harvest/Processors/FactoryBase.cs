@@ -1,15 +1,15 @@
-﻿using System.Globalization;
+﻿using MongoDB.Driver.GeoJsonObjectModel;
 using Nest;
 using NetTopologySuite.Geometries;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Harvest.Managers;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Lib.Configuration.Process;
-using MongoDB.Driver.GeoJsonObjectModel;
+using System.Globalization;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Harvest.Processors
@@ -75,7 +75,7 @@ namespace SOS.Harvest.Processors
             var sweRef99TmPoint = point.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
             location.Sweref99TmX = sweRef99TmPoint.Coordinate.X;
             location.Sweref99TmY = sweRef99TmPoint.Coordinate.Y;
-           
+
             var etrs89Point = point.Transform(CoordinateSys.WGS84, CoordinateSys.ETRS89_LAEA_Europe);
             location.Etrs89X = etrs89Point.Coordinate.X;
             location.Etrs89Y = etrs89Point.Coordinate.Y;
@@ -89,7 +89,7 @@ namespace SOS.Harvest.Processors
             }
             location.VerbatimLatitude = verbatimLatitude.Value.ToString(CultureInfo.InvariantCulture);
             location.VerbatimLongitude = verbatimLongitude.Value.ToString(CultureInfo.InvariantCulture);
-        }        
+        }
 
         protected FactoryBase(DataProvider dataProvider, IProcessTimeManager processTimeManager, ProcessConfiguration processConfiguration)
         {
@@ -97,7 +97,7 @@ namespace SOS.Harvest.Processors
             TimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
             ProcessConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
         }
-       
+
         /// <summary>
         /// Add position data
         /// </summary>
@@ -110,7 +110,7 @@ namespace SOS.Harvest.Processors
         protected void AddPositionData(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
         {
             const int maxCoordinateUncertaintyInMeters = 500000; // 500 km
-            Point point = null!;            
+            Point point = null!;
             if (verbatimLongitude.HasValue && verbatimLongitude.Value > 0 && verbatimLatitude.HasValue && verbatimLatitude > 0)
             {
                 point = new Point(verbatimLongitude.Value, verbatimLatitude.Value);
@@ -132,7 +132,7 @@ namespace SOS.Harvest.Processors
 
             var pointWithBuffer = point.ToCircle(coordinateUncertaintyInMeters!.Value);
             var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
-            
+
             InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer?.ToGeoShape() as PolygonGeoShape, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);
         }
 
@@ -193,7 +193,7 @@ namespace SOS.Harvest.Processors
         private AccessRightsId GetAccessRightsIdFromSensitivityCategory(int sensitivityCategory)
         {
             if (sensitivityCategory > 1) return AccessRightsId.NotForPublicUsage;
-            return AccessRightsId.FreeUsage;            
+            return AccessRightsId.FreeUsage;
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -11,6 +7,10 @@ using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -63,8 +63,8 @@ namespace SOS.Observations.Api.Controllers
 
             if (autoAdjustBoundingBox)
             {
-                Geometry geometryUnion = null!; 
-                
+                Geometry geometryUnion = null!;
+
                 // If areas passed, adjust bounding box to them
                 if (filter?.Areas?.Any() ?? false)
                 {
@@ -72,7 +72,7 @@ namespace SOS.Observations.Api.Controllers
                     var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
 
                     var areaPolygons = areas?.Select(a => a.BoundingBox.GetPolygon());
- 
+
                     foreach (var areaPolygon in areaPolygons!)
                     {
                         geometryUnion = geometryUnion == null ? areaPolygon : geometryUnion.Union(areaPolygon);
@@ -163,7 +163,7 @@ namespace SOS.Observations.Api.Controllers
             return result;
         }
 
-            protected Result ValidateTaxa(IEnumerable<int> taxonIds)
+        protected Result ValidateTaxa(IEnumerable<int> taxonIds)
         {
             var missingTaxa = taxonIds?
                 .Where(tid => !_taxonManager.TaxonTree.TreeNodeById.ContainsKey(tid))

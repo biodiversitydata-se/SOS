@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers.Interfaces
 {

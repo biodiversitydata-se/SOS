@@ -7,7 +7,7 @@ namespace SOS.Lib.Models.Processed.Observation
     /// <summary>
     /// Taxon attributes.
     /// </summary>
-    public class TaxonAttributes 
+    public class TaxonAttributes
     {
         private static HashSet<string> _redlistCategories = new HashSet<string>() { "cr", "en", "vu", "nt" };
 
@@ -154,7 +154,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Taxon category.
         /// </summary>
-        public VocabularyValue TaxonCategory { get; set; }        
+        public VocabularyValue TaxonCategory { get; set; }
 
         /// <summary>
         ///     Vernacular names.

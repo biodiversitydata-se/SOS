@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Models.Shared;
+﻿using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -112,7 +112,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Id of publishing types.
         /// </summary>
         public IEnumerable<int> SightingPublishTypeIds { get; set; }
-        
+
         /// <summary>
         ///     Internal field used for searches by Artportalen, contains extra user information.
         /// </summary>
@@ -156,7 +156,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [SwaggerExclude]
         public int? ReportedByUserServiceUserId { get; set; }
-        
+
         /// <summary>
         ///     Alias for the reporter, internal use only.
         /// </summary>

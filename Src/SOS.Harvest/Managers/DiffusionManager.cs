@@ -33,7 +33,7 @@ namespace SOS.Harvest.Managers
             if (observation?.ArtportalenInternal != null)
             {
                 observation.ArtportalenInternal.BirdValidationAreaIds = null;
-               // observation.ArtportalenInternal.LocationExternalId = null;
+                // observation.ArtportalenInternal.LocationExternalId = null;
                 observation.ArtportalenInternal.LocationPresentationNameParishRegion = null;
                 observation.ArtportalenInternal.ParentLocality = null;
                 observation.ArtportalenInternal.ParentLocationId = null;
@@ -66,7 +66,7 @@ namespace SOS.Harvest.Managers
 
             var (mod, add) = GetDiffusionValues(observation!.Occurrence?.SensitivityCategory ?? 0);
 
-           
+
             //transform the point into the same format as Artportalen so that we can use the same diffusion as them
             var geompoint = new NetTopologySuite.Geometries.Point(longitude, latitude);
             var transformedPoint = geompoint.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
@@ -80,7 +80,7 @@ namespace SOS.Harvest.Managers
             var coordinateUncertaintyInMeters = location.CoordinateUncertaintyInMeters ?? 0;
             var newCoordinateUncertaintyInMeters = coordinateUncertaintyInMeters > mod ? coordinateUncertaintyInMeters : mod;
             var diffusedPoint =
-                diffusedUntransformedPoint.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);            
+                diffusedUntransformedPoint.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
             var diffusedPointWithBuffer = ((NetTopologySuite.Geometries.Point)diffusedPoint).ToCircle(newCoordinateUncertaintyInMeters);
             PolygonGeoShape diffusedPointWithDisturbanceBuffer = null!;
 
@@ -94,7 +94,7 @@ namespace SOS.Harvest.Managers
             location.DecimalLongitude = diffusedPoint.Coordinate.X;
             location.DecimalLatitude = diffusedPoint.Coordinate.Y;
             location.CoordinateUncertaintyInMeters = newCoordinateUncertaintyInMeters;
-            location.Point = (PointGeoShape) diffusedPoint.ToGeoShape();
+            location.Point = (PointGeoShape)diffusedPoint.ToGeoShape();
             location.PointLocation = location.Point.ToGeoLocation();
             location.PointWithBuffer = (PolygonGeoShape)diffusedPointWithBuffer.ToGeoShape();
             location.PointWithDisturbanceBuffer = diffusedPointWithDisturbanceBuffer;
@@ -143,7 +143,7 @@ namespace SOS.Harvest.Managers
             // Diffused observations is not protected
             observation.Sensitive = false;
             observation.Occurrence.ReportedBy = string.Empty;
-            
+
             if (observation.Modified.HasValue)
             {
                 observation.Modified = new DateTime(observation.Modified.Value.Year, observation.Modified.Value.Month, 1);

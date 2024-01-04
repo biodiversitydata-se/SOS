@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Observations.Api.HealthChecks
 {

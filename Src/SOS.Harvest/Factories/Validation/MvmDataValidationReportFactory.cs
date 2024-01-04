@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Mvm;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -10,10 +11,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Mvm;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Mvm;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
-using SOS.Lib.Configuration.Process;
 
 namespace SOS.Harvest.Factories.Validation
 {
@@ -33,7 +31,7 @@ namespace SOS.Harvest.Factories.Validation
             ITaxonRepository processedTaxonRepository,
             IMvmObservationVerbatimRepository mvmObservationVerbatimRepository,
             IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration) 
+            ProcessConfiguration processConfiguration)
             : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager, processConfiguration)
         {
             _mvmObservationVerbatimRepository = mvmObservationVerbatimRepository;

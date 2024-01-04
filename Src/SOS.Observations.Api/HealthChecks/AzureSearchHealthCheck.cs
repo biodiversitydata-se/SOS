@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Dtos.Filter;
 using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -31,9 +31,9 @@ namespace SOS.Observations.Api.HealthChecks
             {
                 _sosAzureClient = new SosAzureClient(healthCheckConfiguration.AzureApiUrl, healthCheckConfiguration.AzureSubscriptionKey);
                 _initialized = true;
-            }            
+            }
         }
-       
+
         private async Task<(TimeSpan Duration, long TotalCount)> SearchPicaPicaAsync()
         {
             var searchFilter = new SearchFilterDto()
@@ -42,17 +42,17 @@ namespace SOS.Observations.Api.HealthChecks
                 {
                     Ids = new[] { 103032 },
                     IncludeUnderlyingTaxa = true
-                },                
+                },
                 VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
                 Output = new OutputFilterDto
                 {
                     Fields = new[] { "taxon.id" }
-                }                
+                }
             };
 
             // Warm up
-            await _sosAzureClient.SearchObservations(searchFilter, "sv-SE", 0, 1);            
+            await _sosAzureClient.SearchObservations(searchFilter, "sv-SE", 0, 1);
 
             Thread.Sleep(1100);
             var sw = new Stopwatch();

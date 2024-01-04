@@ -30,7 +30,7 @@ namespace SOS.Lib.IO.DwcArchive
             public int Index { get; protected set; }
             public string Term { get; protected set; }
             public string CSVColumnName { get; protected set; }
-            
+
             /// <summary>
             /// Indicates whether this column shouldn't be written to meta.xml.
             /// </summary>

@@ -1,13 +1,9 @@
-﻿using MongoDB.Bson;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace SOS.Administration.Gui.Models
 {
     public class PagedInvalidObservationsDto
-    {        
+    {
         public IEnumerable<InvalidObservationDto> Observations { get; set; }
         // The number of elements in the page
         public int Size { get; set; }

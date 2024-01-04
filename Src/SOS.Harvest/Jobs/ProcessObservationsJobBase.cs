@@ -1,15 +1,14 @@
-﻿using System.Collections.Concurrent;
-using AgileObjects.AgileMapper.Extensions;
+﻿using AgileObjects.AgileMapper.Extensions;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
-using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Factories;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed;
@@ -18,6 +17,7 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Collections.Concurrent;
 using System.Data;
 
 namespace SOS.Harvest.Jobs
@@ -62,7 +62,7 @@ namespace SOS.Harvest.Jobs
                 _logger.LogInformation(
                     $"Finish clear ElasticSearch index: {_processedObservationRepository.ProtectedIndexName}");
 
-               
+
             }
             else
             {
@@ -107,7 +107,7 @@ namespace SOS.Harvest.Jobs
             await _processedObservationRepository.EnableIndexingAsync(true);
             _logger.LogInformation($"Finish enable indexing ({_processedObservationRepository.ProtectedIndexName})");
         }
- 
+
         /// <summary>
         ///  Process verbatim observations
         /// </summary>
@@ -347,10 +347,10 @@ namespace SOS.Harvest.Jobs
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            
+
             _enableTimeManager = processConfiguration.EnableTimeManager;
             _processConfiguration = processConfiguration;
-        }        
+        }
 
         /// <summary>
         /// Get taxonomy
@@ -375,13 +375,13 @@ namespace SOS.Harvest.Jobs
                         _logger.LogError("Failed to process taxa");
                         return null!;
                     }
-                
+
                     _logger.LogInformation("Finish harvest taxa");
 
                     _taxonCache.Clear();
                     _logger.LogInformation("Taxa cache cleared.");
                 }
-                
+
                 //--------------------------------------
                 // Get taxonomy
                 //--------------------------------------
@@ -489,7 +489,7 @@ namespace SOS.Harvest.Jobs
                 // Disable indexing for public and protected index
                 await DisableIndexingAsync();
                 await PreProcessingAsync();
-               
+
                 //------------------------------------------------------------------------
                 // 5. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------                
@@ -505,7 +505,7 @@ namespace SOS.Harvest.Jobs
                 {
                     // Update dynamic provider data
                     await UpdateProvidersMetadataAsync(dataProvidersToProcess);
-                    await PostProcessingAsync(dataProvidersToProcess, taxonById!, result.Sum(s => s.Value.PublicCount), cancellationToken);
+                    await PostProcessingAsync(dataProvidersToProcess, taxonById!, result.Sum(s => s.Value.PublicCount), cancellationToken!);
                 }
 
                 _logger.LogInformation($"Processing done: {success} {mode}");

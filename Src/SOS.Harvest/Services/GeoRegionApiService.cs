@@ -1,10 +1,10 @@
-﻿using System.IO.Compression;
-using System.Text;
-using NetTopologySuite.Features;
+﻿using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Gis;
+using System.IO.Compression;
+using System.Text;
 
 namespace SOS.Harvest.Services
 {
@@ -42,7 +42,7 @@ namespace SOS.Harvest.Services
             using var areasReader = new StreamReader(areasFile.Open(), Encoding.UTF8);
             JsonReader jsonReader = new JsonTextReader(areasReader);
             var serializer = GeoJsonSerializer.CreateDefault();
-           
+
             return serializer.Deserialize<FeatureCollection>(jsonReader);
         }
 

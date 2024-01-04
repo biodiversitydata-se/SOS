@@ -1,13 +1,13 @@
-﻿using System.IO.Compression;
-using System.Xml;
-using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using RecordParser.Builders.Reader;
 using SOS.Harvest.Services.Taxon.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
+using System.IO.Compression;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Services.Taxon
 {
@@ -18,7 +18,7 @@ namespace SOS.Harvest.Services.Taxon
         private readonly string _taxonDwcUrl;
         private readonly ITaxonServiceProxy _taxonServiceProxy;
 
-      
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -68,8 +68,8 @@ namespace SOS.Harvest.Services.Taxon
         public IEnumerable<DarwinCoreTaxon> GetTaxaFromDwcaFileStream(Stream zipFileContentStream)
         {
             try
-            {                
-                if (zipFileContentStream == null) return null!;                
+            {
+                if (zipFileContentStream == null) return null!;
                 using var zipArchive = new ZipArchive(zipFileContentStream, ZipArchiveMode.Read, false);
                 var missingFiles = new[] {
                     "Taxon.csv",
@@ -217,7 +217,7 @@ namespace SOS.Harvest.Services.Taxon
             csvFileHelper.InitializeRead(taxonFile.Open(), csvFieldDelimiter);
 
 
-        // Get all taxa from file
+            // Get all taxa from file
             var alltaxa = csvFileHelper
                 .GetRecords(TaxonMapping);
             csvFileHelper.FinishRead();
@@ -237,7 +237,7 @@ namespace SOS.Harvest.Services.Taxon
                 if (synonymsByTaxonId.TryGetValue(taxon.TaxonID, out var synonyms))
                 {
                     var synonymeNames = new List<DarwinCoreSynonymName>();
-                    
+
                     foreach (var dwcSynonyme in synonyms)
                     {
                         synonymeNames.Add(CreateDarwinCoreSynonymName(dwcSynonyme));
@@ -249,7 +249,7 @@ namespace SOS.Harvest.Services.Taxon
                 taxon.DynamicProperties = new TaxonDynamicProperties();
                 taxon.Id = taxon.DynamicProperties.DyntaxaTaxonId = GetTaxonIdfromDyntaxaGuid(taxon.TaxonID);
             }
-           
+
             _logger.LogDebug("Finish adding taxon core data");
             return taxonByTaxonId;
         }
@@ -348,7 +348,7 @@ namespace SOS.Harvest.Services.Taxon
             // Try to get TaxonProperties.csv
             var taxonPropertiesFile = zipArchive.Entries.FirstOrDefault(f =>
                 f.Name.Equals("TaxonProperties.csv", StringComparison.CurrentCultureIgnoreCase));
-            
+
             if (taxonPropertiesFile == null)
             {
                 _logger.LogError("Failed to open TaxonProperties.csv, sort order will be set to 0");
@@ -369,7 +369,7 @@ namespace SOS.Harvest.Services.Taxon
                     TaxonCategoryEnglishName = m.TaxonCategoryEnglishName,
                     TaxonCategoryDarwinCoreName = m.TaxonCategoryDarwinCoreName,
                     SortOrder = m.SortOrder,
-                    TaxonId = GetTaxonIdfromDyntaxaGuid(m.TaxonId),                    
+                    TaxonId = GetTaxonIdfromDyntaxaGuid(m.TaxonId),
                 });
             csvFileHelper.FinishRead();
             var taxonPropertiesById = allTaxonProperties
@@ -414,7 +414,7 @@ namespace SOS.Harvest.Services.Taxon
             // Read vernacular name data
             using var csvFileHelper = new CsvFileHelper();
             csvFileHelper.InitializeRead(vernacularNameFile.Open(), csvFieldDelimiter);
-           
+
             // Get all vernacular names from file
             var vernacularNames = csvFileHelper
                 .GetRecords(VernacularNameMapping)

@@ -1,9 +1,3 @@
-using System;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text.Json.Serialization;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Hangfire;
@@ -25,6 +19,12 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using System;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace SOS.Administration.Api
 {
@@ -81,7 +81,7 @@ namespace SOS.Administration.Api
 
             services.AddControllers()
                 .AddJsonOptions(x => { x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
-            
+
             services.Configure<FormOptions>(options =>
             {
                 options.ValueLengthLimit = int.MaxValue;
@@ -161,12 +161,12 @@ namespace SOS.Administration.Api
 
             services.AddScoped<ICacheManager, CacheManager>();
 
-     /*       // Add managers
-            services.AddSingleton<IIptManager, IIptManager>();
+            /*       // Add managers
+                   services.AddSingleton<IIptManager, IIptManager>();
 
-            // Add services
-            services.AddSingleton<IFileDownloadService, FileDownloadService>();
-            services.AddSingleton<IHttpClientService, HttpClientService>();*/
+                   // Add services
+                   services.AddSingleton<IFileDownloadService, FileDownloadService>();
+                   services.AddSingleton<IHttpClientService, HttpClientService>();*/
         }
 
         /// <summary>
@@ -198,7 +198,7 @@ namespace SOS.Administration.Api
 
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
-                Authorization = new[] {new AllowAllConnectionsFilter()},
+                Authorization = new[] { new AllowAllConnectionsFilter() },
                 IgnoreAntiforgeryToken = true
             });
 

@@ -1,11 +1,10 @@
-﻿using System.Globalization;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Gis;
 using SOS.TestHelpers.Helpers.Builders;
+using System.Globalization;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFactory

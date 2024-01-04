@@ -1,12 +1,11 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Harvest.Repositories.Source.Artportalen;
 using SOS.Harvest.Services;
-using SOS.Import.LiveIntegrationTests;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.LiveIntegrationTests.Repositories

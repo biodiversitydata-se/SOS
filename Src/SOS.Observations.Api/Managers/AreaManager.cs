@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.IO;
@@ -22,6 +12,16 @@ using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using ArgumentException = System.ArgumentException;
 
 namespace SOS.Observations.Api.Managers
@@ -68,7 +68,7 @@ namespace SOS.Observations.Api.Managers
                     Name = area.Name
                 };
 
-                var serializeOptions = new JsonSerializerOptions {  DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+                var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
                 serializeOptions.Converters.Add(new GeoJsonConverter(true)); // Länsstyrelsen fix. Expects capital letter.
                 serializeOptions.Converters.Add(new JsonStringEnumConverter());
 
@@ -170,7 +170,7 @@ namespace SOS.Observations.Api.Managers
             {
                 var areas = await _areaCache.GetAreasAsync(areaKeys.Select(k => ((AreaType)k.Item1, k.Item2)));
 
-                return areas?.Select(a => new AreaBaseDto{ AreaType = (AreaTypeDto)a.AreaType, FeatureId = a.FeatureId, Name = a.Name, BoundingBox = a.BoundingBox });
+                return areas?.Select(a => new AreaBaseDto { AreaType = (AreaTypeDto)a.AreaType, FeatureId = a.FeatureId, Name = a.Name, BoundingBox = a.BoundingBox });
             }
             catch (Exception e)
             {

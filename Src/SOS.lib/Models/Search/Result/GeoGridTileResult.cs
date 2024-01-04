@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using NetTopologySuite.Features;
+﻿using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Search.Result
 {

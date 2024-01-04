@@ -1,5 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.FishData.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -9,15 +11,13 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.FishData;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.FishData.Interfaces;
 
 namespace SOS.Harvest.Processors.FishData
 {
     /// <summary>
     ///     Process factory class
     /// </summary>
-    public class FishDataObservationProcessor : 
+    public class FishDataObservationProcessor :
         ObservationProcessorBase<FishDataObservationProcessor, FishDataObservationVerbatim, IFishDataObservationVerbatimRepository>, IFishDataObservationProcessor
     {
         private readonly IAreaHelper _areaHelper;

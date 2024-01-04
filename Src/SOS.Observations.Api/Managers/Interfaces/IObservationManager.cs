@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Observations.Api.Dtos;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {
@@ -88,7 +88,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<GeoGridMetricResult> GetMetricGridAggregationAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
-            SearchFilter filter, 
+            SearchFilter filter,
             int gridCellSizeInMeters,
             MetricCoordinateSys metricCoordinateSys);
 
@@ -128,12 +128,12 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<dynamic> GetObservationAsync(
             int? userId,
             int? roleId,
-            string authorizationApplicationIdentifier, 
-            string occurrenceId, 
-            OutputFieldSet outputFieldSet, 
-            string translationCultureCode, 
-            bool protectedObservations, 
-            bool includeInternalFields, 
+            string authorizationApplicationIdentifier,
+            string occurrenceId,
+            OutputFieldSet outputFieldSet,
+            string translationCultureCode,
+            bool protectedObservations,
+            bool includeInternalFields,
             bool ensureArtportalenUpdated);
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<bool> SignalSearchInternalAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
-            SearchFilter filter, 
+            SearchFilter filter,
             int areaBuffer,
             bool onlyAboveMyClearance = true);
 

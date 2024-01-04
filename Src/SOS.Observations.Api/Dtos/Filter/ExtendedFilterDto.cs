@@ -50,7 +50,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// Reported by Artportalen user id.
         /// </summary>
         public int? ReportedByUserId { get; set; }
-        
+
         /// <summary>
         /// Observed by Artportalen user id.
         /// </summary>
@@ -60,7 +60,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// Reported by user service user id.
         /// </summary>
         public int? ReportedByUserServiceUserId { get; set; }
-        
+
         /// <summary>
         /// Observed by user service user id.
         /// </summary>
@@ -91,7 +91,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         public DateTime? ReportedDateFrom { get; set; }
         public DateTime? ReportedDateTo { get; set; }
         public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.DoNotShowMerged;
-        
+
         public bool UsePeriodForAllYears { get; set; }
         public IEnumerable<int> Months { get; set; }
         public DateFilterComparisonDto MonthsComparison { get; set; } = DateFilterComparisonDto.StartDate;

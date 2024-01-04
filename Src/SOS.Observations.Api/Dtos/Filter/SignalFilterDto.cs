@@ -5,7 +5,7 @@ namespace SOS.Observations.Api.Dtos.Filter
     /// <summary>
     /// Search filter for signal search.
     /// </summary>
-    public class SignalFilterDto 
+    public class SignalFilterDto
     {
         /// <summary>
         /// Limit returned observations based on bird nest activity level.

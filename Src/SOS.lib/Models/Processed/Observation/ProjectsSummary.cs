@@ -9,22 +9,22 @@
         /// Project 1 Id.
         /// </summary>
         public int? Project1Id { get; set; }
-        
+
         /// <summary>
         /// Project 1 name.
         /// </summary>
         public string Project1Name { get; set; }
-        
+
         /// <summary>
         /// Project 1 category.
         /// </summary>
         public string Project1Category { get; set; }
-        
+
         /// <summary>
         /// Project 1 URL.
         /// </summary>
         public string Project1Url { get; set; }
-        
+
         /// <summary>
         /// Project 1 values.
         /// </summary>

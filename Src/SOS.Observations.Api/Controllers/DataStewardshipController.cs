@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -16,6 +12,10 @@ using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers
@@ -69,7 +69,7 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> GetDatasetByIdAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromRoute] string id, 
+            [FromRoute] string id,
             [FromQuery] DsExportMode exportMode = DsExportMode.Json
         )
         {
@@ -122,7 +122,7 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SearchFilterBaseDto filter,
             [FromQuery] bool includeEventIds = false,
             [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] int skip = 0, 
+            [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
             [FromQuery] DsExportMode exportMode = DsExportMode.Json
         )
@@ -133,19 +133,19 @@ namespace SOS.Observations.Api.Controllers
                     ValidateSearchPagingArguments(skip, take),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
-                
+
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
-                
+
                 var searchFilter = filter.ToSearchFilter(UserId, ProtectionFilterDto.Public, "sv-SE");
                 if (!includeEventIds)
                 {
                     searchFilter ??= new Lib.Models.Search.Filters.SearchFilter();
                     searchFilter.Output.ExcludeFields.Add("eventIds");
                 }
-                
+
                 var result = await _dataStewardshipManager.GetDatasetsBySearchAsync(searchFilter, skip, take);
 
                 return exportMode.Equals(DsExportMode.Csv) ?
@@ -157,14 +157,14 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogInformation(e, e.Message);
                 _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
                 _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
-                return new StatusCodeResult((int) HttpStatusCode.Unauthorized);
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
-                        catch (TimeoutException)
-                        {
+            catch (TimeoutException)
+            {
                 return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
             }
-                        catch (Exception e)
-                        {
+            catch (Exception e)
+            {
                 _logger.LogError(e, $"Dataset search failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }

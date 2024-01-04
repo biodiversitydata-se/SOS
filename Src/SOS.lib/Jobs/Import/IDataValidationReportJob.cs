@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using SOS.Lib.Models.Shared;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Jobs.Import
 {
@@ -16,8 +16,8 @@ namespace SOS.Lib.Jobs.Import
         [JobDisplayName("Data Validation Report, Id: \"{0}\",  Data provider: \"{2}\"")]
         [Queue("low")]
         Task<Report> RunAsync(
-            string reportId, 
-            string createdBy, 
+            string reportId,
+            string createdBy,
             string dataProviderIdentifier,
             int maxNrObservationsToRead,
             int nrValidObservationsInReport,

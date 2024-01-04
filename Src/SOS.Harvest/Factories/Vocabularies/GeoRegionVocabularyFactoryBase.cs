@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Repositories.Resource.Interfaces;
@@ -41,7 +40,7 @@ namespace SOS.Harvest.Factories.Vocabularies
                 default:
                     throw new ArgumentException($"DarwinCore don't have support for {areaType}");
             }
-        
+
         }
     }
 }

@@ -53,7 +53,7 @@ namespace SOS.Observations.Api.Managers
             {
                 var response = await _devOpsService.GetReleasesAsync(releaseDefinition.Id);
 
-                if (response.Count == 0 )
+                if (response.Count == 0)
                 {
                     continue;
                 }
@@ -67,7 +67,7 @@ namespace SOS.Observations.Api.Managers
                         continue;
                     }
 
-                    var currentEnvironment = releaseDetails.Environments.FirstOrDefault(e => 
+                    var currentEnvironment = releaseDetails.Environments.FirstOrDefault(e =>
                         e.Name.Equals(environment, StringComparison.CurrentCultureIgnoreCase)
                         && e.CreatedOn.HasValue
                     );
@@ -83,7 +83,7 @@ namespace SOS.Observations.Api.Managers
                 }
             }
 
-           
+
             return buildInfo;
         }
     }

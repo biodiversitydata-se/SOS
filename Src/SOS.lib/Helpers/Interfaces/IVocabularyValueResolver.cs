@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Configuration.Process;
+﻿using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Processed.Observation;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Helpers.Interfaces
 {

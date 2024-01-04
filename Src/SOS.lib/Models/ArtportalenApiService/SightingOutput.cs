@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace SOS.Lib.Models.ArtportalenApiService
-{    
+{
     public class SightingOutput
     {
         /// <summary>

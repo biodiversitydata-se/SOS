@@ -21,6 +21,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Media comment cration time
         /// </summary>
         public DateTime? Created { get; set; }
-        
+
     }
 }

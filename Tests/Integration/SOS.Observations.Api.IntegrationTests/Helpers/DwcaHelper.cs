@@ -1,10 +1,10 @@
 ﻿using DwC_A;
-using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.DarwinCore;
+using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Shared;
-using System.IO.Compression;
 using SOS.Observations.Api.IntegrationTests.Extensions;
+using System.IO.Compression;
 
 namespace SOS.Observations.Api.IntegrationTests.Helpers;
 internal static class DwcaHelper
@@ -36,8 +36,8 @@ internal static class DwcaHelper
         var items = new List<Dictionary<string, string>>();
         using var memoryStream = new MemoryStream(zipFileBytes);
         using var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Read);
-        using var csvStream = zipArchive.GetEntry("occurrence.txt").Open();
-        using var streamRdr = new StreamReader(csvStream);
+        using var csvStream = zipArchive.GetEntry("occurrence.txt")?.Open();
+        using var streamRdr = new StreamReader(csvStream!);
         var dwCReader = new NReco.Csv.CsvReader(streamRdr, "\t");
         var columnIdByHeader = new Dictionary<string, int>();
         var headerByColumnId = new Dictionary<int, string>();

@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
-using FluentAssertions;
-using Xunit;
+﻿using FluentAssertions;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using System.Collections.Generic;
 using System.Linq;
-using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationRepository
 {

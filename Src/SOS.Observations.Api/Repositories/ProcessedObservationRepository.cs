@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib;
 using SOS.Lib.Cache.Interfaces;
@@ -13,11 +9,15 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.AggregatedResult;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Repositories.Processed;
 using SOS.Observations.Api.Repositories.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Repositories
 {
@@ -155,7 +155,7 @@ namespace SOS.Observations.Api.Repositories
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
-            
+
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -166,7 +166,7 @@ namespace SOS.Observations.Api.Repositories
                     )
                 )
                 .Aggregations(a => a
-                    
+
                     .DateHistogram("aggregation", dh => dh
                         .Field("event.startDate")
                         .CalendarInterval(aggregationType switch
@@ -192,7 +192,7 @@ namespace SOS.Observations.Api.Repositories
             );
 
             searchResponse.ThrowIfInvalid();
-           
+
             var totalCount = searchResponse.HitsMetadata.Total.Value;
 
             var result = searchResponse
@@ -281,8 +281,8 @@ namespace SOS.Observations.Api.Repositories
                 var currentWeek = yearWeekAggregations.First().Value.Week;
                 var lastYear = yearWeekAggregations.Last().Value.Year;
                 var lastWeek = yearWeekAggregations.Last().Value.Week;
-                
-                while(currentYear < lastYear || (currentYear == lastYear && currentWeek <= lastWeek))
+
+                while (currentYear < lastYear || (currentYear == lastYear && currentWeek <= lastWeek))
                 {
                     if (!yearWeekAggregations.TryGetValue($"{currentYear}-{currentWeek}", out var yearWeekAggregation))
                     {
@@ -393,7 +393,7 @@ namespace SOS.Observations.Api.Repositories
 
             // When operation is disposed, telemetry item is sent.
             return gridResult;
-        }        
+        }
 
         /// <inheritdoc />
         public async Task<int> GetProvinceCountAsync(SearchFilterBase filter)

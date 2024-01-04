@@ -8,7 +8,7 @@ namespace SOS.Harvest.DarwinCore.Factories
     {
         public static DwcObservationVerbatim Create(int id, IRow row, IIdIdentifierTuple? idIdentifierTuple, int idIndex)
         {
-            var verbatimRecord = new DwcObservationVerbatim{ Id = id };
+            var verbatimRecord = new DwcObservationVerbatim { Id = id };
             if (idIdentifierTuple != null)
             {
                 verbatimRecord.DataProviderId = idIdentifierTuple.Id;

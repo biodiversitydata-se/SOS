@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using DwC_A.Factories;
+﻿using DwC_A.Factories;
 using DwC_A.Meta;
+using System.Collections.Generic;
+using System.IO;
 
 namespace DwC_A
 {

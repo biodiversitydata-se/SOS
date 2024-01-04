@@ -41,7 +41,7 @@ namespace SOS.Harvest.DarwinCore.Interfaces
         /// <param name="archiveReaderContext"></param>
         /// <returns></returns>
         IAsyncEnumerable<List<DwcObservationVerbatim>?> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext);
-        
+
         /// <summary>
         /// Read events.
         /// </summary>

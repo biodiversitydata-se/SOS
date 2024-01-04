@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SOS.Lib.Models.Statistics;
+using SOS.Lib.Models.Verbatim.DarwinCore;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using SOS.Lib.Models.Statistics;
-using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Lib.Repositories.Verbatim.Interfaces
 {

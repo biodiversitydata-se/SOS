@@ -1,9 +1,9 @@
-﻿using System;
+﻿using SOS.Lib.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using SOS.Lib.Extensions;
 
 namespace SOS.Lib.Helpers
 {
@@ -37,7 +37,7 @@ namespace SOS.Lib.Helpers
                     "yyyy-MM-dd",
                     "yyyy-MM-d",
                     "yyyy-M-dd",
-                    "yyyy-M-d",                    
+                    "yyyy-M-d",
                     "yyyy-M",
                     "yyyy-0MM-dd", // special case for the TUVA dataset that contains multiple observations in this format.
                     "dddd, dd MMMM yyyy",
@@ -351,7 +351,7 @@ namespace SOS.Lib.Helpers
                     return true;
                 }
 
-                endDate = ParseDate(strEndDate);                
+                endDate = ParseDate(strEndDate);
                 if (!endDate.HasValue)
                 {
                     startDate = null;

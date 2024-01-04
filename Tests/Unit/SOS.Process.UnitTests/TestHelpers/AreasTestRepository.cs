@@ -1,18 +1,14 @@
-﻿using System;
+﻿using NetTopologySuite.Features;
+using NetTopologySuite.IO;
+using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
+using SOS.Lib.Models.Shared;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
-using Nest;
-using NetTopologySuite.Features;
-using NetTopologySuite.Geometries;
-using NetTopologySuite.IO;
-using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
-using SOS.Lib.JsonConverters;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Process.UnitTests.TestHelpers
 {

@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.ElasticSearch.Proxy.Configuration;
 using SOS.ElasticSearch.Proxy.Extensions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Text;
@@ -76,10 +76,10 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                         streamContent.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
                     }
                 }
-                
+
                 requestMessage.Content = streamContent;
             }
-            
+
             return requestMessage;
         }
 
@@ -104,7 +104,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <returns></returns>
         private static HttpMethod GetMethod(string method)
         {
-           return new HttpMethod(method);
+            return new HttpMethod(method);
         }
 
         private string RewriteBody(string body)
@@ -118,7 +118,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             bodyDictionary.UpdateQuery();
             if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
             {
-               bodyDictionary.UpdateExclude(_proxyConfiguration.ExcludeFields!);
+                bodyDictionary.UpdateExclude(_proxyConfiguration.ExcludeFields!);
             }
             bodyDictionary.UpdateSort();
             return JsonConvert.SerializeObject(bodyDictionary);// jsonBody.ToString(); 
@@ -132,7 +132,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <param name="proxyConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public RequestMiddleware(RequestDelegate nextMiddleware, 
+        public RequestMiddleware(RequestDelegate nextMiddleware,
             IProcessedObservationCoreRepository processedObservationRepository,
             ProxyConfiguration proxyConfiguration,
             ILogger<RequestMiddleware> logger)
@@ -183,7 +183,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     using var httpClient = new HttpClient(httpClientHandler);
                     using var responseMessage = await httpClient.SendAsync(targetRequestMessage,
                         HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
-                    
+
                     context.Response.StatusCode = (int)responseMessage.StatusCode;
                     CopyFromTargetResponseHeaders(context, responseMessage);
                     if (_proxyConfiguration.LogResponse)

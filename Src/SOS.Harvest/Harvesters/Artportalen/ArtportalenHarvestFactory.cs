@@ -15,9 +15,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
         private readonly IMediaRepository _mediaRepository;
         private readonly IProjectRepository _projectRepository;
-        private readonly ISightingRepository _sightingRepository;        
+        private readonly ISightingRepository _sightingRepository;
         private readonly ISightingRelationRepository _sightingRelationRepository;
-        private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;        
+        private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly ILogger<IObservationHarvester> _logger;
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     observation.PublicCollection = _artportalenMetadataContainer.TryGetOrganization(speciesCollectionItemEntity.OrganizationId);
                     observation.PrivateCollection = (await _artportalenMetadataContainer.TryGetPersonByUserIdAsync(speciesCollectionItemEntity.CollectorId))?.FullName;
                 }
-                
+
                 if (personSighting != null)
                 {
                     observation.VerifiedBy = personSighting.VerifiedBy;
@@ -302,7 +302,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 for (var i = 0; i < projectParameterEntities.Length; i++)
                 {
                     var projectParameterEntity = projectParameterEntities[i];
-                    
+
                     // Try to get projects by sighting id
                     if (!sightingsProjects.TryGetValue(projectParameterEntity.SightingId, out var sightingProjects))
                     {
@@ -357,12 +357,12 @@ namespace SOS.Harvest.Harvesters.Artportalen
                        SightingRelationTypeId = e.SightingRelationTypeId,
                        Sort = e.Sort,
                        UserId = e.UserId
-                   }; 
+                   };
         }
         #endregion SightingRelations
 
         #region SpeciesCollections
-       
+
 
         /// <summary>
         /// Initialize species collections
@@ -432,7 +432,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             _artportalenMetadataContainer = artportalenMetadataContainer ?? throw new ArgumentNullException(nameof(artportalenMetadataContainer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        
+
         /// <inheritdoc />
         public async Task<IEnumerable<ArtportalenObservationVerbatim>?> CastEntitiesToVerbatimsAsync(SightingEntity[] entities)
         {
@@ -494,7 +494,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
             // Clean up
             sites.Clear();
-           
+
             return verbatims;
         }
     }

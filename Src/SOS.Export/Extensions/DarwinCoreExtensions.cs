@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SOS.Export.Models.DarwinCore;
-using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Observation;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Export.Extensions
 {

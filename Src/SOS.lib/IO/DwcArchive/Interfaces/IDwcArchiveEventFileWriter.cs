@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Hangfire;
-using SOS.Export.Models;
+﻿using Hangfire;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
@@ -9,6 +6,8 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.DwcArchive.Interfaces
 {

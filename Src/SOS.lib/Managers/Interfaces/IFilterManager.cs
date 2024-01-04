@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Lib.Models.Search.Filters;
+﻿using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Services.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers.Interfaces
 {
@@ -29,12 +29,12 @@ namespace SOS.Lib.Managers.Interfaces
         /// <returns></returns>
         Task PrepareFilterAsync(
             int? roleId,
-            string authorizationApplicationIdentifier, 
+            string authorizationApplicationIdentifier,
             SearchFilterBase filter,
             string authorityIdentity = "Sighting",
-            int? areaBuffer = 0, 
-            bool? authorizationUsePointAccuracy = false, 
-            bool? authorizationUseDisturbanceRadius = false, 
+            int? areaBuffer = 0,
+            bool? authorizationUsePointAccuracy = false,
+            bool? authorizationUseDisturbanceRadius = false,
             bool? setDefaultProviders = true);
 
         /// <summary>

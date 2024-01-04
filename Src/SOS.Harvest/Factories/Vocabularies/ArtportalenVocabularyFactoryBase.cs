@@ -185,7 +185,7 @@ namespace SOS.Harvest.Factories.Vocabularies
                     });
                 }
             }
-           
+
             artportalenMapping.Mappings.Add(mappingField);
             return artportalenMapping;
         }

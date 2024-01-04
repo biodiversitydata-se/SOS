@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.Models.Misc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Lib.Models.Misc;
 namespace SOS.Observations.Api.Managers.Interfaces
 {
     /// <summary>

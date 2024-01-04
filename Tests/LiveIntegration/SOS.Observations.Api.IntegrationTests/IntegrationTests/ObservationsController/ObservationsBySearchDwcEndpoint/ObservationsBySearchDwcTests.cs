@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using SOS.Lib.JsonConverters;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.Dtos.Filter;
+﻿using FluentAssertions;
 using SOS.Observations.Api.Dtos.Observation;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.ObservationsBySearchDwcEndpoint
 {

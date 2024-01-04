@@ -1,8 +1,8 @@
 ﻿using SOS.Lib.Enums.VocabularyValues;
-using System.IO.Compression;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
+using System.IO.Compression;
 
 namespace SOS.Observations.Api.IntegrationTests.Helpers.DataUtils;
 

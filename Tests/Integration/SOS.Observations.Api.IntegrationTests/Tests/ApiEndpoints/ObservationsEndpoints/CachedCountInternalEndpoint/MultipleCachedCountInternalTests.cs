@@ -1,6 +1,6 @@
 ﻿using FizzWare.NBuilder;
-using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 

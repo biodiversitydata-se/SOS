@@ -1,6 +1,6 @@
 ﻿namespace SOS.Harvest.Entities.Artportalen
 {
-    public class MediaEntity 
+    public class MediaEntity
     {
         /// <summary>
         /// Media comment

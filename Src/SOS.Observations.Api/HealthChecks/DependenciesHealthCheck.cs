@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SOS.Lib.Configuration.Shared;
+using SOS.Observations.Api.Repositories.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SOS.Lib.Configuration.Shared;
-using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -21,10 +21,10 @@ namespace SOS.Observations.Api.HealthChecks
         /// <summary>
         /// Constructor
         /// </summary>
-        public DependenciesHealthCheck(IConfiguration configuration,             
+        public DependenciesHealthCheck(IConfiguration configuration,
             IProcessedObservationRepository processedObservationRepository)
         {
-            _configuration = configuration;            
+            _configuration = configuration;
             _processedObservationRepository = processedObservationRepository;
         }
 

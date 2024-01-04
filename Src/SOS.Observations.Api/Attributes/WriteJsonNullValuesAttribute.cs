@@ -1,12 +1,12 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using SOS.Lib.JsonConverters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SOS.Observations.Api.Controllers
-{    
+{
     public class WriteJsonNullValuesAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuted(ActionExecutedContext ctx)
@@ -25,8 +25,8 @@ namespace SOS.Observations.Api.Controllers
                         new GeoShapeConverter(),
                         new NetTopologySuite.IO.Converters.GeoJsonConverterFactory() // Is this needed?
                     }
-                }));                        
+                }));
             }
         }
-    }   
+    }
 }

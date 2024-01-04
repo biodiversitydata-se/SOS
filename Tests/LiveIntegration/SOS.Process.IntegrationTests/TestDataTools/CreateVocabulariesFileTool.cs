@@ -1,13 +1,13 @@
-﻿using System.IO;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using MessagePack;
+﻿using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Repositories.Resource;
+using System.IO;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Process.LiveIntegrationTests.TestDataTools

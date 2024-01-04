@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Shared;
 using SOS.Process.UnitTests.TestHelpers;
+using System.Collections.Generic;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors.Artportalen
@@ -13,7 +13,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
     public class ArtportalenVocabularyMappingTests : IClassFixture<ArtportalenObservationFactoryFixture>
     {
         private readonly ArtportalenObservationFactoryFixture _fixture;
-        
+
         public ArtportalenVocabularyMappingTests(ArtportalenObservationFactoryFixture fixture)
         {
             _fixture = fixture;
@@ -71,7 +71,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var activity = new Metadata<int>((int)ActivityId.BroodPatch);
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var activity = new Metadata<int>((int) ActivityId.NestBuilding);
+            var activity = new Metadata<int>((int)ActivityId.NestBuilding);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

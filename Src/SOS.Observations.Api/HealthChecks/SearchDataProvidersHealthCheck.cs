@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Managers.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.HealthChecks
 {
     public class SearchDataProvidersHealthCheck : IHealthCheck
     {
         private readonly IObservationManager _observationManager;
-        private readonly IDataProviderCache _dataProviderCache;      
+        private readonly IDataProviderCache _dataProviderCache;
 
         private async Task<(int NumberOfProviders, int SuccessfulProviders, string Msg, HealthStatus Status)> SearchByProviderAsync()
         {
@@ -27,14 +27,14 @@ namespace SOS.Observations.Api.HealthChecks
             {
                 return (NumberOfProviders: 0, SuccessfulProviders: 0, Msg: "No providers found", Status: HealthStatus.Unhealthy);
             }
-            
+
             var providerSearchTasks = new Dictionary<DataProvider, Task<PagedResult<dynamic>>>();
 
             foreach (var provider in providers)
             {
                 var searchFilter = new SearchFilter(0, ProtectionFilter.Public)
                 {
-                    DataProviderIds = new List<int>{ provider.Id },
+                    DataProviderIds = new List<int> { provider.Id },
                     Output = new OutputFilter
                     {
                         Fields = new List<string> { "taxon.id" }
@@ -47,7 +47,7 @@ namespace SOS.Observations.Api.HealthChecks
 
             var providerCount = providers.Count();
             var successfulProviders = providerSearchTasks.Count(t => (t.Value.Result?.TotalCount ?? 0) > 0);
-            
+
             // More than 75% successful. Allow some data providers to contain zero observations.
             if (successfulProviders > providerCount * 0.75)
             {
@@ -89,12 +89,12 @@ namespace SOS.Observations.Api.HealthChecks
             {
                 var result = await SearchByProviderAsync();
                 return new HealthCheckResult(
-                    result.Status, 
+                    result.Status,
                     result.Msg,
-                    null, 
+                    null,
                     new Dictionary<string, object> {
                         { "SuccessfulProviders", result.SuccessfulProviders },
-                        { "NumberOfProviders", result.NumberOfProviders }                        
+                        { "NumberOfProviders", result.NumberOfProviders }
                     });
             }
             catch (Exception e)

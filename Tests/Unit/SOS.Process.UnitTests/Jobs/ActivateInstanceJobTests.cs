@@ -1,10 +1,10 @@
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Harvest.Jobs;
 using SOS.Harvest.Managers.Interfaces;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Jobs

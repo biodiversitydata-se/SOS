@@ -1,5 +1,8 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -10,9 +13,6 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Artportalen.Interfaces;
-using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -58,7 +58,7 @@ namespace SOS.Harvest.Processors.Artportalen
             ISightingRepository sightingRepository,
             IUserObservationRepository userObservationRepository,
             ProcessConfiguration processConfiguration,
-            ILogger<ArtportalenObservationProcessor> logger) : 
+            ILogger<ArtportalenObservationProcessor> logger) :
                 base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, userObservationRepository, processConfiguration, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
@@ -73,17 +73,17 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <inheritdoc />
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,            
-            JobRunModes mode,            
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             var observationFactory =
-                await ArtportalenObservationFactory.CreateAsync(dataProvider, 
-                    taxa, 
+                await ArtportalenObservationFactory.CreateAsync(dataProvider,
+                    taxa,
                     _processedVocabularyRepository,
                     _artportalenDatasetRepository,
-                    mode != JobRunModes.Full, 
-                    _artPortalenUrl, 
+                    mode != JobRunModes.Full,
+                    _artPortalenUrl,
                     TimeManager,
                     ProcessConfiguration);
             _artportalenVerbatimRepository.Mode = mode;
@@ -96,7 +96,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 var deletedIds = await _sightingRepository.GetDeletedIdsAsync(from);
                 var rejectedIds = await _sightingRepository.GetRejectedIdsAsync(from);
                 var idsToDelete = deletedIds?.Union(rejectedIds ?? Array.Empty<int>()) ?? rejectedIds;
-                
+
                 if (idsToDelete?.Any() ?? false)
                 {
                     Logger.LogDebug($"Start deleting {idsToDelete.Count():N0} Artportalen sightings ({mode})");
@@ -110,7 +110,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     Logger.LogDebug($"Finish deleting {idsToDelete.Count():N0} Artportalen sightings ({mode})");
                 }
             }
-            
+
             return await base.ProcessObservationsAsync(
                 dataProvider,
                 mode,
@@ -122,7 +122,7 @@ namespace SOS.Harvest.Processors.Artportalen
         public override DataProviderType Type => DataProviderType.ArtportalenObservations;
 
         /// <inheritdoc />
-        public async Task<bool> ProcessObservationsAsync(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
+        public async Task<bool> ProcessObservationsAsync(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
         {
             var observationFactory =

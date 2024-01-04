@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace SOS.Observations.Api.Dtos.Filter
 {
@@ -69,7 +68,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         ///// Observation specific filter
         ///// </summary>
         //public TrendObservationFilterDto Observation { get; set; }
-        
+
         /// <summary>
         /// Id of taxon
         /// </summary>

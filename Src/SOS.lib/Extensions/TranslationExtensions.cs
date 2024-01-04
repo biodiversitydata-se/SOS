@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SOS.Lib.Models.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Extensions
 {

@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using DwC_A;
+﻿using DwC_A;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Driver;
 using Moq;
 using SOS.Harvest.DarwinCore;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -26,14 +25,12 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services;
-using SOS.Harvest.Managers;
-using SOS.Harvest.Processors.DarwinCoreArchive;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
-using SOS.Lib.Configuration.Import;
-using SOS.Lib.IO.DwcArchive.Interfaces;
-using SOS.Lib.Services.Interfaces;
-using SOS.Process.LiveIntegrationTests;
 
 namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
 {

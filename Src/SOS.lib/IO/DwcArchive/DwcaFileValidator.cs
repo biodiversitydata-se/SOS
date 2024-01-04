@@ -1,14 +1,14 @@
-﻿using SOS.Lib.Helpers;
+﻿using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
+using SOS.Lib.Models.DarwinCore;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO.Compression;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using SOS.Lib.Extensions;
-using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -41,7 +41,7 @@ namespace SOS.Lib.IO.DwcArchive
             string filePath = CreateDwcaFileFromComponents(dwcaFileComponents, outputFolder, outputFilename);
             return filePath;
         }
-        
+
         private static string CreateDwcaFileFromComponents(DwcaFileComponents dwcaFileComponents, string outputFolder, string filename)
         {
             string folderName = Guid.NewGuid().ToString();
@@ -154,7 +154,7 @@ namespace SOS.Lib.IO.DwcArchive
                     var metaEntry = archive.Entries.Single(m => m.FullName.Equals("meta.xml", StringComparison.InvariantCultureIgnoreCase));
                     dwcaFileComponents.Meta = ReadZipEntryAsString(metaEntry);
                     var emlEntry = archive.Entries.Single(m => m.FullName.Equals("eml.xml", StringComparison.InvariantCultureIgnoreCase));
-                    dwcaFileComponents.Eml = ReadZipEntryAsString(emlEntry);                    
+                    dwcaFileComponents.Eml = ReadZipEntryAsString(emlEntry);
                     var occurrenceEntry = archive.Entries.FirstOrDefault(m => m.FullName.StartsWith("occurrence", StringComparison.InvariantCultureIgnoreCase)
                                                                              || m.FullName.StartsWith("observation", StringComparison.InvariantCultureIgnoreCase));
                     var occurrenceComponent = ReadOccurrenceCsvFile(nrRowsLimit, startRow, occurrenceEntry);
@@ -236,7 +236,7 @@ namespace SOS.Lib.IO.DwcArchive
         private static void CalculateErrors(DwcaOccurrenceComponent dwcaOccurrenceComponent)
         {
             if (!dwcaOccurrenceComponent.ErrorRows.Any()) return;
-            List<string> rows = new List<string> {dwcaOccurrenceComponent.Header};
+            List<string> rows = new List<string> { dwcaOccurrenceComponent.Header };
             rows.AddRange(dwcaOccurrenceComponent.ErrorRows);
             string str = string.Join("\r\n", rows);
             List<Dictionary<string, string>> csvRows = ParseCsv(str);
@@ -310,7 +310,7 @@ namespace SOS.Lib.IO.DwcArchive
                 using (var streamRdr = new StreamReader(readMemoryStream))
                 {
                     var csvReader = new NReco.Csv.CsvReader(streamRdr, "\t");
-                    
+
                     // Read header
                     csvReader.Read();
                     for (int i = 0; i < csvReader.FieldsCount; i++)

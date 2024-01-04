@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
@@ -13,6 +9,10 @@ using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SOS.Export.Jobs
 {
@@ -32,7 +32,7 @@ namespace SOS.Export.Jobs
         /// <param name="userExport"></param>
         private void RemoveExpiredJobs(UserExport userExport)
         {
-            userExport.Jobs = userExport.Jobs.Where(j => 
+            userExport.Jobs = userExport.Jobs.Where(j =>
                 !(
                     (j.Status.Equals(ExportJobStatus.Succeeded) && DateTime.Now.ToUniversalTime() > (j.ProcessEndDate.HasValue ? j.ProcessEndDate.Value.AddDays(j.LifetimeDays) : null)) || // Remove succeded jobs where expire date has passed
                     (j.ProcessStartDate.HasValue && DateTime.Now.ToUniversalTime() > j.ProcessStartDate.Value.AddMonths(1)) // Remove jobs older than one month
@@ -117,10 +117,10 @@ namespace SOS.Export.Jobs
 
         /// <inheritdoc />
         public async Task<bool> RunAsync(
-            SearchFilter filter, 
-            int? roleId, 
+            SearchFilter filter,
+            int? roleId,
             string authorizationApplicationIdentifier,
-            string email, 
+            string email,
             string description,
             ExportFormat exportFormat,
             string culture,
@@ -142,7 +142,7 @@ namespace SOS.Export.Jobs
                 await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
                 var password = await _cryptoService.DecryptAsync(encryptedPassword);
                 var response = await _observationManager.ExportAndSendAsync(roleId, authorizationApplicationIdentifier, filter, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, password, cancellationToken);
-                
+
                 _logger.LogInformation($"End export and send job. Success: {response.Success}");
                 await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);
                 return response.Success ? true : throw new Exception("Export and send job failed");

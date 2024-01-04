@@ -1,23 +1,19 @@
-﻿using System;
+﻿using Hangfire;
+using Microsoft.Extensions.Logging;
+using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.IO.Excel.Interfaces;
+using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Services.Interfaces;
+using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Hangfire;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Enums;
-using SOS.Lib.IO.Excel.Interfaces;
-using SOS.Lib.Helpers;
-using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Models;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Services.Interfaces;
-using SOS.Lib.Models.Export;
-using SOS.Lib.Models.Search.Filters;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 
 namespace SOS.Lib.IO.Excel
 {
@@ -39,7 +35,7 @@ namespace SOS.Lib.IO.Excel
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public CsvFileWriter(IProcessedObservationCoreRepository processedObservationRepository, 
+        public CsvFileWriter(IProcessedObservationCoreRepository processedObservationRepository,
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
             ILogger<CsvFileWriter> logger)
@@ -53,21 +49,21 @@ namespace SOS.Lib.IO.Excel
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<FileExportResult> CreateFileAync(SearchFilter filter, 
+        public async Task<FileExportResult> CreateFileAync(SearchFilter filter,
             string exportPath,
-            string fileName, 
+            string fileName,
             string culture,
             PropertyLabelType propertyLabelType,
             bool gzip,
             IJobCancellationToken cancellationToken)
         {
             string temporaryZipExportFolderPath = null;
-            
+
             try
             {
                 var nrObservations = 0;
                 var propertyFields =
-                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, true);
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
                 {
@@ -75,7 +71,7 @@ namespace SOS.Lib.IO.Excel
                 }
 
                 var observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "Observations.csv");
-                await using var fileStream = File.Create(observationsFilePath);                
+                await using var fileStream = File.Create(observationsFilePath);
                 using var csvFileHelper = new CsvFileHelper();
                 csvFileHelper.InitializeWrite(fileStream, "\t");
                 csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
@@ -88,7 +84,7 @@ namespace SOS.Lib.IO.Excel
                     cancellationToken?.ThrowIfCancellationRequested();
                     // Start fetching next batch of observations.
                     var searchResultTask = _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
-                    
+
                     // Fetch observations from ElasticSearch.
                     var processedObservations = searchResult.Records.ToArray();
 
@@ -108,9 +104,9 @@ namespace SOS.Lib.IO.Excel
                         }
                         csvFileHelper.WriteRow(fields);
                     }
-                 
+
                     nrObservations += processedObservations.Length;
-                    
+
                     // Get next batch of observations.
                     searchResult = await searchResultTask;
                 }

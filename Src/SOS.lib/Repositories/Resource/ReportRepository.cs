@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using GridFSFileInfo = MongoDB.Driver.GridFS.GridFSFileInfo;
 
 namespace SOS.Lib.Repositories.Resource
@@ -47,7 +47,7 @@ namespace SOS.Lib.Repositories.Resource
                 await _gridFsBucket.DeleteAsync(fileInfo.Id);
                 return true;
             }
-            
+
             return false;
         }
 
@@ -59,7 +59,7 @@ namespace SOS.Lib.Repositories.Resource
             {
                 await _gridFsBucket.DeleteAsync(fileInfo.Id);
             }
-            
+
             return true;
         }
 

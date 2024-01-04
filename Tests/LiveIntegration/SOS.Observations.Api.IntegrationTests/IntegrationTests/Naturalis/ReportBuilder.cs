@@ -1,13 +1,13 @@
-﻿using System;
+﻿using SOS.Lib.Helpers;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using SOS.Lib.Helpers;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Naturalis

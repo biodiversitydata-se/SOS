@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Models.ApiManagement;
+using SOS.Lib.Services.Interfaces;
+using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Models.ApiManagement;
-using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.Services
 {
@@ -100,7 +99,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get user from api management", e);
+                _logger.LogError(e, "Failed to get user from api management");
                 return null;
             }
         }

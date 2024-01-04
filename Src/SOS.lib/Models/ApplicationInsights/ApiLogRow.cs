@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SOS.Lib.Models.ApplicationInsights
+﻿namespace SOS.Lib.Models.ApplicationInsights
 {
     /// <summary>
     /// Application insights log row
@@ -55,7 +53,7 @@ namespace SOS.Lib.Models.ApplicationInsights
         /// <summary>
         /// Name of system making the request
         /// </summary>
-        public string RequestingSystem { get; set; }        
+        public string RequestingSystem { get; set; }
 
         /// <summary>
         /// Successful call

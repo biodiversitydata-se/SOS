@@ -77,7 +77,7 @@
         /// Length filter
         /// </summary>
         public int? Length { get; set; }
-        
+
         /// <summary>
         /// Length operator
         /// </summary>
@@ -92,7 +92,7 @@
         /// Months filter
         /// </summary>
         public IEnumerable<int>? Months { get; set; }
-        
+
         /// <summary>
         /// Months comparsion 
         /// </summary>
@@ -146,7 +146,7 @@
         /// Quantity filter
         /// </summary>
         public int? Quantity { get; set; }
-        
+
         /// <summary>
         /// Operator used for quantity filter
         /// </summary>
@@ -226,12 +226,12 @@
         /// Substrate filter
         /// </summary>
         public int? SubstrateId { get; set; }
-        
+
         /// <summary>
         /// Substrate species filter
         /// </summary>
         public int? SubstrateSpeciesId { get; set; }
-       
+
 
         /// <summary>
         /// Triggered observation rule frequency id's
@@ -267,7 +267,7 @@
         /// Weight filter
         /// </summary>
         public int? Weight { get; set; }
-        
+
         /// <summary>
         /// Operator used for weight filter
         /// </summary>

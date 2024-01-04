@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
@@ -11,6 +6,11 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories
 {
@@ -197,12 +197,12 @@ namespace SOS.Lib.Repositories
             }
             catch (MongoWriteException e)
             {
-                Logger.LogError("Failed to add item", e);
+                Logger.LogError(e, "Failed to add item");
                 return true;
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to add item", e);
+                Logger.LogError(e, "Failed to add item");
                 throw;
             }
         }
@@ -226,7 +226,7 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to add collection", e);
+                Logger.LogError(e, "Failed to add collection");
                 throw;
             }
         }
@@ -248,7 +248,7 @@ namespace SOS.Lib.Repositories
             Logger.LogInformation($"Begin waiting for MongoDB data. Collection={MongoCollection}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
             if (timeout == null) timeout = TimeSpan.FromMinutes(10);
             var sleepTime = TimeSpan.FromSeconds(5);
-            int nrIterations = (int)(Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));            
+            int nrIterations = (int)(Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
             long docCount = await CountAllDocumentsAsync();
             var iterations = 0;
 
@@ -358,9 +358,9 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to delete item", e);
+                Logger.LogError(e, "Failed to delete item");
 
-                throw; 
+                throw;
             }
         }
 
@@ -383,7 +383,7 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to delete collection", e);
+                Logger.LogError(e, "Failed to delete collection");
                 throw;
             }
         }
@@ -405,7 +405,7 @@ namespace SOS.Lib.Repositories
             {
                 return 0;
             }
-            
+
         }
 
         /// <inheritdoc />
@@ -434,7 +434,7 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to delete batch", e);
+                Logger.LogError(e, "Failed to delete batch");
 
                 throw;
             }
@@ -457,7 +457,7 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to get item by id", e);
+                Logger.LogError(e, "Failed to get item by id");
                 throw;
             }
         }
@@ -471,7 +471,7 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to get many by id's", e);
+                Logger.LogError(e, "Failed to get many by id's");
 
                 throw;
             }
@@ -499,7 +499,7 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to get batch", e);
+                Logger.LogError(e, "Failed to get batch");
 
                 throw;
             }
@@ -514,7 +514,7 @@ namespace SOS.Lib.Repositories
         /// <inheritdoc />
         public async Task<List<TEntity>> GetAllAsync(IMongoCollection<TEntity> mongoCollection)
         {
-            var res = await mongoCollection.AsQueryable().ToListAsync();            
+            var res = await mongoCollection.AsQueryable().ToListAsync();
 
             return res;
         }
@@ -549,25 +549,25 @@ namespace SOS.Lib.Repositories
             var cursor = await GetAllByCursorAsync(mongoCollection, projectionDefinition, noCursorTimeout);
             while (await cursor.MoveNextAsync())
             {
-                items.AddRange(cursor.Current);                
+                items.AddRange(cursor.Current);
             }
 
             return items;
         }
 
         /// <inheritdoc />
-        public async Task<IAsyncCursor<TProjection>> GetAllByCursorAsync<TProjection>(ProjectionDefinition<TEntity, TProjection> projectionDefinition, 
+        public async Task<IAsyncCursor<TProjection>> GetAllByCursorAsync<TProjection>(ProjectionDefinition<TEntity, TProjection> projectionDefinition,
             bool noCursorTimeout = false)
         {
             return await GetAllByCursorAsync(MongoCollection, projectionDefinition, noCursorTimeout);
         }
 
         /// <inheritdoc />
-        public async Task<IAsyncCursor<TProjection>> GetAllByCursorAsync<TProjection>(IMongoCollection<TEntity> mongoCollection, 
+        public async Task<IAsyncCursor<TProjection>> GetAllByCursorAsync<TProjection>(IMongoCollection<TEntity> mongoCollection,
             ProjectionDefinition<TEntity, TProjection> projectionDefinition,
             bool noCursorTimeout = false)
         {
-            return await GetByCursorAsync(mongoCollection,  
+            return await GetByCursorAsync(mongoCollection,
                 FilterDefinition<TEntity>.Empty,
                 projectionDefinition,
                 noCursorTimeout);
@@ -578,7 +578,7 @@ namespace SOS.Lib.Repositories
             FilterDefinition<TEntity> filterDefinition,
             ProjectionDefinition<TEntity, TProjection> projectionDefinition,
             bool noCursorTimeout = false)
-        {            
+        {
             return await mongoCollection.FindAsync(filterDefinition,
                 new FindOptions<TEntity, TProjection> { NoCursorTimeout = noCursorTimeout, BatchSize = BatchSizeRead, AllowPartialResults = true, CursorType = CursorType.NonTailable, Projection = projectionDefinition });
         }
@@ -609,7 +609,7 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to get batch", e);
+                Logger.LogError(e, "Failed to get batch");
 
                 throw;
             }
@@ -638,7 +638,7 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to get max id", e);
+                Logger.LogError(e, "Failed to get max id");
 
                 throw;
             }
@@ -682,7 +682,7 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to update entity", e);
+                Logger.LogError(e, "Failed to update entity");
                 throw;
             }
         }

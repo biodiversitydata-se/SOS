@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using Cronos;
+﻿using Cronos;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Converters;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Shared
 {
@@ -44,7 +44,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         ///     Descriptions of the data provider 
         /// </summary>
-        public IEnumerable<VocabularyValueTranslation> Descriptions { get; set; }        
+        public IEnumerable<VocabularyValueTranslation> Descriptions { get; set; }
 
         /// <summary>
         /// Indicates that failure in harvest for this provider will stop job from processing
@@ -217,7 +217,7 @@ namespace SOS.Lib.Models.Shared
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((DataProvider) obj);
+            return Equals((DataProvider)obj);
         }
 
         public override int GetHashCode()

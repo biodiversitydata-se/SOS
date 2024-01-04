@@ -1,29 +1,29 @@
-﻿using System.Text.RegularExpressions;
+﻿using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.Interfaces;
-using SOS.Lib.Configuration.Process;
-using SOS.Lib.Models.Processed.DataStewardship.Common;
+using System.Text.RegularExpressions;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
 {
     /// <summary>
     ///     DwC-A event factory.
     /// </summary>
-    public class DwcaEventFactory : EventFactoryBase, IEventFactory<DwcEventOccurrenceVerbatim>    
+    public class DwcaEventFactory : EventFactoryBase, IEventFactory<DwcEventOccurrenceVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
-        private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;        
+        private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
 
         /// <summary>
         /// Constructor
@@ -87,7 +87,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 {
                     coordinateSystem = CoordinateSys.WGS84;
                 }
-                
+
                 AddPositionData(processedEvent.Location, verbatim.DecimalLongitude.ParseDouble(), verbatim.DecimalLatitude.ParseDouble(),
                     coordinateSystem, verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, 0);
                 _areaHelper.AddAreaDataToProcessedLocation(processedEvent.Location);
@@ -104,7 +104,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {
             UseSourceValue,
             UseDefaultValue
-        }        
+        }
 
         private Location CreateLocation(DwcEventOccurrenceVerbatim verbatim)
         {
@@ -263,7 +263,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
             return taxonIds;
         }
-        
+
         public static async Task<DwcaEventFactory> CreateAsync(
             DataProvider dataProvider,
             IVocabularyRepository processedVocabularyRepository,

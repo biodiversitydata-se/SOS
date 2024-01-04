@@ -12,7 +12,7 @@ namespace SOS.Lib.Extensions
         public static Event ToEvent(this Observation observation, IEnumerable<string> occurrenceIds, int dataProviderId)
         {
             if (observation == null) return null;
-            
+
             var ev = new Event();
             ev.EventId = observation.Event.EventId;
             ev.ParentEventId = observation.Event.ParentEventId;
@@ -23,7 +23,7 @@ namespace SOS.Lib.Extensions
             {
                 DatasetIdentifier = observation.DataStewardship?.DatasetIdentifier,
                 DatasetTitle = observation.DataStewardship?.DatasetTitle
-            };            
+            };
             ev.Created = DateTime.Now;
             ev.DataProviderId = dataProviderId;
             ev.StartDate = observation.Event.StartDate;
@@ -38,7 +38,7 @@ namespace SOS.Lib.Extensions
             ev.SampleSizeUnit = observation.Event.SampleSizeUnit;
             ev.DiscoveryMethod = observation.Event.DiscoveryMethod;
             ev.MeasurementOrFacts = observation.Event.MeasurementOrFacts;
-            ev.Habitat = observation.Event.Habitat;            
+            ev.Habitat = observation.Event.Habitat;
             ev.Location = observation.Location;
             //ev.LocationProtected = ?
             //ev.EventType = ?
@@ -61,7 +61,7 @@ namespace SOS.Lib.Extensions
 
             ev.OccurrenceIds = occurrenceIds.ToList();
             ev.NoObservations = !ev.OccurrenceIds.Any();
-            
+
             return ev;
         }
     }

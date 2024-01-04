@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
+using System.IO;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -14,10 +14,10 @@ namespace SOS.Lib.IO.DwcArchive
         public DataProvider DataProvider { get; set; }
         public string ExportFolder { get; set; }
         public Dictionary<string, Dictionary<DwcaFilePart, string>> FilePathByBatchIdAndFilePart { get; set; }
-        public Dictionary<string, Dictionary<DwcaEventFilePart, string>> EventFilePathByBatchIdAndFilePart { get; set; }        
+        public Dictionary<string, Dictionary<DwcaEventFilePart, string>> EventFilePathByBatchIdAndFilePart { get; set; }
         public WrittenEventSets WrittenEventsData { get; set; } = new WrittenEventSets();
         public DwcaWriteResult OccurrenceDwcaWriteSummary { get; set; } = new DwcaWriteResult();
-        public DwcaWriteResult EventDwcaWriteSummary { get; set; } = new DwcaWriteResult();        
+        public DwcaWriteResult EventDwcaWriteSummary { get; set; } = new DwcaWriteResult();
 
         public static DwcaFilePartsInfo Create(DataProvider dataProvider, string exportFolderPath)
         {

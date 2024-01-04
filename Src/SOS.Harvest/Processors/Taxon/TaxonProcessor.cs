@@ -1,16 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
+using SOS.Harvest.Enums;
+using SOS.Harvest.Processors.Taxon.Interfaces;
+using SOS.Harvest.Services.Taxon.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Harvest.Enums;
-using SOS.Harvest.Processors.Taxon.Interfaces;
-using SOS.Harvest.Services.Taxon.Interfaces;
-using SOS.Lib.Extensions;
 
 namespace SOS.Harvest.Processors.Taxon
 {
@@ -48,7 +48,7 @@ namespace SOS.Harvest.Processors.Taxon
 
             // Get taxon attribues to populate enumerations
             var taxonAttributes =
-                       await _taxonAttributeService.GetTaxonAttributesAsync(new [] {0},
+                       await _taxonAttributeService.GetTaxonAttributesAsync(new[] { 0 },
                            allFactors, Array.Empty<int>());
 
             if (!taxonAttributes?.Factors?.Any() ?? true)
@@ -105,9 +105,9 @@ namespace SOS.Harvest.Processors.Taxon
         /// <param name="taxonIds"></param>
         /// <param name="currentRedlistPeriodId"></param>
         /// <returns></returns>
-        private async Task PopulateDynamicProperties(IDictionary<int, DarwinCoreTaxon> taxaDictonary, 
-            IDictionary<int, IDictionary<string, string>> attributeTypes, 
-            IEnumerable<int> taxonIds, 
+        private async Task PopulateDynamicProperties(IDictionary<int, DarwinCoreTaxon> taxaDictonary,
+            IDictionary<int, IDictionary<string, string>> attributeTypes,
+            IEnumerable<int> taxonIds,
             int? currentRedlistPeriodId = null)
         {
             try
@@ -124,19 +124,20 @@ namespace SOS.Harvest.Processors.Taxon
                     factors = (int[])Enum.GetValues(typeof(PeriodizeFactorEnum));
                     periods = new[] { currentRedlistPeriodId ?? 0 };
                 }
-                
+
                 var response =
                         await _taxonAttributeService.GetTaxonAttributesAsync(taxonIds,
                             factors,
-                            currentRedlistPeriodId.HasValue ? new[] { currentRedlistPeriodId ?? 0 } : Array.Empty<int>()); 
+                            currentRedlistPeriodId.HasValue ? new[] { currentRedlistPeriodId ?? 0 } : Array.Empty<int>());
 
                 if (!response?.TaxonAttributes?.Any() ?? true)
                 {
                     return;
                 }
-                
 
-                foreach (var taxonAttribute in response!.TaxonAttributes) {
+
+                foreach (var taxonAttribute in response!.TaxonAttributes)
+                {
                     var mainField = taxonAttribute.Values?.FirstOrDefault(a => a.AttributeInfo?.IsMainField ?? false);
 
                     if (!taxaDictonary.TryGetValue(taxonAttribute.TaxonId, out var taxon) || mainField == null || taxonAttribute?.FactorId == null)
@@ -153,7 +154,7 @@ namespace SOS.Harvest.Processors.Taxon
                             attributeType?.TryGetValue(mainField.Value, out enumValue);
                         }
                     };
-                    
+
                     if (currentRedlistPeriodId.HasValue)
                     {
                         switch ((PeriodizeFactorEnum)taxonAttribute.FactorId)
@@ -214,7 +215,7 @@ namespace SOS.Harvest.Processors.Taxon
                                 taxon.DynamicProperties.SwedishOccurrence = enumValue;
                                 break;
                         }
-                    }  
+                    }
                 }
                 _logger.LogDebug("Finish get taxon attributes batch");
             }
@@ -231,7 +232,7 @@ namespace SOS.Harvest.Processors.Taxon
         /// <param name="taxa"></param>
         private void CalculateHigherClassificationField(IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
             TaxonTree<IBasicTaxon> taxonTree)
-        {          
+        {
             if ((!taxa?.Any() ?? true) || taxonTree == null)
             {
                 return;
@@ -258,12 +259,12 @@ namespace SOS.Harvest.Processors.Taxon
             }
 
             var apTaxa = await _apTaxonRepository.GetAsync();
-          
+
             if (!apTaxa?.Any() ?? true)
             {
                 return;
             }
-          
+
             foreach (var aptaxon in apTaxa!)
             {
                 if (taxa!.TryGetValue(aptaxon.Id, out var taxon))
@@ -296,32 +297,32 @@ namespace SOS.Harvest.Processors.Taxon
                     _logger.LogInformation($"Taxon: {taxon.Id} is missing a scientific name");
                     success = false;
                 }
-             /*   if (string.IsNullOrEmpty(taxon.TaxonRank))
-                {
-                    _logger.LogInformation($"Taxon: {taxon.Id} is missing taxon rank");
-                    success = false;
-                }
-                if (string.IsNullOrEmpty(taxon.TaxonomicStatus))
-                {
-                    _logger.LogInformation($"Taxon: {taxon.Id} is missing taxonomic status");
-                    success = false;
-                }*/
+                /*   if (string.IsNullOrEmpty(taxon.TaxonRank))
+                   {
+                       _logger.LogInformation($"Taxon: {taxon.Id} is missing taxon rank");
+                       success = false;
+                   }
+                   if (string.IsNullOrEmpty(taxon.TaxonomicStatus))
+                   {
+                       _logger.LogInformation($"Taxon: {taxon.Id} is missing taxonomic status");
+                       success = false;
+                   }*/
             }
 
             return success;
         }
 
-       /// <summary>
-       /// Constructor
-       /// </summary>
-       /// <param name="taxonService"></param>
-       /// <param name="taxonAttributeService"></param>
-       /// <param name="processedTaxonRepository"></param>
-       /// <param name="apTaxonRepository"></param>
-       /// <param name="processConfiguration"></param>
-       /// <param name="logger"></param>
-       /// <exception cref="ArgumentNullException"></exception>
-       /// <exception cref="ArgumentException"></exception>
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="taxonService"></param>
+        /// <param name="taxonAttributeService"></param>
+        /// <param name="processedTaxonRepository"></param>
+        /// <param name="apTaxonRepository"></param>
+        /// <param name="processConfiguration"></param>
+        /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         public TaxonProcessor(
             ITaxonService taxonService,
             ITaxonAttributeService taxonAttributeService,
@@ -330,7 +331,7 @@ namespace SOS.Harvest.Processors.Taxon
             ProcessConfiguration processConfiguration,
             ILogger<TaxonProcessor> logger)
         {
-           
+
             _taxonService = taxonService ?? throw new ArgumentNullException(nameof(taxonService));
             _taxonAttributeService =
                 taxonAttributeService ?? throw new ArgumentNullException(nameof(taxonAttributeService));
@@ -358,7 +359,7 @@ namespace SOS.Harvest.Processors.Taxon
                 _logger.LogDebug("Finish adding taxon attributes");
 
                 var taxa = dwcTaxa.ToProcessedTaxa();
-                
+
                 var taxonCount = await _processedTaxonRepository.CountAllDocumentsAsync();
                 var useCurrentCollection = false;
                 if (!taxa?.Any() ?? true)
@@ -380,7 +381,7 @@ namespace SOS.Harvest.Processors.Taxon
                     _logger.LogWarning("There are cycles in the taxa data");
                     useCurrentCollection = true;
                 }
-                
+
                 if (useCurrentCollection)
                 {
                     _logger.LogInformation("Using current taxa collection");

@@ -1,5 +1,4 @@
-﻿using System.Text;
-using DwC_A;
+﻿using DwC_A;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -13,6 +12,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using System.Text;
 
 namespace SOS.Harvest.Jobs
 {
@@ -46,8 +46,8 @@ namespace SOS.Harvest.Jobs
         }
 
         public async Task<Report> RunAsync(
-            string reportId, 
-            string createdBy, 
+            string reportId,
+            string createdBy,
             string archivePath,
             int maxNrObservationsToRead,
             int nrValidObservationsInReport,
@@ -65,7 +65,7 @@ namespace SOS.Harvest.Jobs
                     nrValidObservationsInReport,
                     nrInvalidObservationsInReport,
                     nrTaxaInTaxonStatistics);
-                
+
                 // Serialize and save compact JSON file
                 var compactJsonSettings = CreateCompactJsonSerializerSettings();
                 var compactJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, compactJsonSettings);

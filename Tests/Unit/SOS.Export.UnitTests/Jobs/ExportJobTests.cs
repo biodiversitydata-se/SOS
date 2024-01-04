@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -10,8 +8,9 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Jobs
@@ -60,14 +59,14 @@ namespace SOS.Export.UnitTests.Jobs
             _observationManager
                 .Setup(blss => blss
                     .ExportAndSendAsync(
-                        It.IsAny<int>(), 
-                        It.IsAny<string>(), 
-                        It.IsAny<SearchFilter>(), 
-                        It.IsAny<string>(), 
-                        "", 
-                        ExportFormat.DwC, 
-                        "en-GB", false, 
-                        PropertyLabelType.PropertyName, 
+                        It.IsAny<int>(),
+                        It.IsAny<string>(),
+                        It.IsAny<SearchFilter>(),
+                        It.IsAny<string>(),
+                        "",
+                        ExportFormat.DwC,
+                        "en-GB", false,
+                        PropertyLabelType.PropertyName,
                         false,
                         It.IsAny<bool>(),
                         It.IsAny<bool>(),
@@ -84,7 +83,7 @@ namespace SOS.Export.UnitTests.Jobs
 
             Func<Task> act = async () =>
             {
-                await observationManager.RunAsync(new SearchFilter(0), 0, "", null, "", ExportFormat.DwC, "en-GB", false,  PropertyLabelType.PropertyName, false, false, false, null, null, JobCancellationToken.Null);
+                await observationManager.RunAsync(new SearchFilter(0), 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, null, JobCancellationToken.Null);
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -108,22 +107,22 @@ namespace SOS.Export.UnitTests.Jobs
                 .Setup(blss => blss
                     .ExportAndSendAsync(
                         It.IsAny<int>(),
-                        It.IsAny<string>(), 
-                        It.IsAny<SearchFilter>(), 
-                        It.IsAny<string>(), 
-                        "", 
-                        ExportFormat.DwC, 
-                        "en-GB", 
-                        false, 
+                        It.IsAny<string>(),
+                        It.IsAny<SearchFilter>(),
+                        It.IsAny<string>(),
+                        "",
+                        ExportFormat.DwC,
+                        "en-GB",
+                        false,
                         PropertyLabelType.
-                        PropertyName, 
+                        PropertyName,
                         false,
                         It.IsAny<bool>(),
                         It.IsAny<bool>(),
                         It.IsAny<string>(),
                         JobCancellationToken.Null)
                 )
-                .ReturnsAsync(new Models.ZendTo.ZendToResponse { Status = "OK"} );
+                .ReturnsAsync(new Models.ZendTo.ZendToResponse { Status = "OK" });
 
             _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
             _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
@@ -152,13 +151,13 @@ namespace SOS.Export.UnitTests.Jobs
                     .ExportAndSendAsync(
                         It.IsAny<int>(),
                         It.IsAny<string>(),
-                        It.IsAny<SearchFilter>(), 
-                        It.IsAny<string>(), 
-                        "", 
-                        ExportFormat.DwC, 
-                        "en-GB", 
-                        false,  
-                        PropertyLabelType.PropertyName, 
+                        It.IsAny<SearchFilter>(),
+                        It.IsAny<string>(),
+                        "",
+                        ExportFormat.DwC,
+                        "en-GB",
+                        false,
+                        PropertyLabelType.PropertyName,
                         false,
                         It.IsAny<bool>(),
                         It.IsAny<bool>(),

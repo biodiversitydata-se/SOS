@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
+using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Factories;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.TaxonTree;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Factories;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.TaxonListService;
-using SOS.Lib.Models.Processed.Observation;
-using MongoDB.Driver;
 
 namespace SOS.Lib.Managers
 {
@@ -61,7 +61,7 @@ namespace SOS.Lib.Managers
             IClassCache<TaxonListSetsById> taxonListSetsByIdCache,
             ILogger<TaxonManager> logger)
         {
-            
+
             _processedTaxonRepository = processedTaxonRepository ??
                                         throw new ArgumentNullException(nameof(processedTaxonRepository));
             _taxonListRepository = taxonListRepository ??
@@ -96,7 +96,7 @@ namespace SOS.Lib.Managers
                         _taxonListSetsByIdCache.Set(taxonListSetsById);
                     }
                 }
-                
+
                 return taxonListSetsById;
             }
         }
@@ -112,7 +112,7 @@ namespace SOS.Lib.Managers
                 tuple.WithUnderlyingTaxa = TaxonTree.GetUnderlyingTaxonIds(tuple.Taxa, true).ToHashSet();
                 taxonListSetById.TryAdd(taxonList.Id, tuple);
             }
-            
+
             return taxonListSetById;
         }
 
@@ -148,7 +148,7 @@ namespace SOS.Lib.Managers
                     ScientificName = m.ScientificName,
                     Attributes = m.Attributes
                 });
-                
+
                 var taxa = await _processedTaxonRepository.GetAllAsync(projection);
                 return taxa;
             }

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.Models.UserService;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Lib.Models.UserService;
 
 namespace SOS.Lib.Services.Interfaces
 {

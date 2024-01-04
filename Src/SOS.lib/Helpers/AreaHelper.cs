@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using NetTopologySuite.Features;
+﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
 using SOS.Lib.Enums;
@@ -15,6 +9,12 @@ using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Lib.Helpers
@@ -25,10 +25,10 @@ namespace SOS.Lib.Helpers
             AreaType.Atlas5x5,
             AreaType.Atlas10x10,
             AreaType.CountryRegion,
-            AreaType.County, 
-            AreaType.Province, 
-            AreaType.Municipality, 
-            AreaType.Parish, 
+            AreaType.County,
+            AreaType.Province,
+            AreaType.Municipality,
+            AreaType.Parish,
             AreaType.EconomicZoneOfSweden
         };
 
@@ -240,7 +240,7 @@ namespace SOS.Lib.Helpers
         {
             // If tree already initialized, return
             if (IsInitialized) return;
-                       
+
             try
             {
                 await _initializeSemaphoreSlim.WaitAsync();
@@ -261,7 +261,7 @@ namespace SOS.Lib.Helpers
                         var feature = geometry.ToFeature(attributes);
                         _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
                     }
-                    
+
                     _strTree.Build();
                     IsInitialized = true;
                 }
@@ -278,7 +278,7 @@ namespace SOS.Lib.Helpers
         /// <inheritdoc />
         public async Task<IEnumerable<Models.Shared.Area>> GetAreasAsync(AreaType type)
         {
-            return await _processedAreaRepository.GetAsync(new[] {type});
+            return await _processedAreaRepository.GetAsync(new[] { type });
         }
 
         /// <inheritdoc />
@@ -303,6 +303,6 @@ namespace SOS.Lib.Helpers
             return featuresContainingPoint;
         }
 
-        
+
     }
 }

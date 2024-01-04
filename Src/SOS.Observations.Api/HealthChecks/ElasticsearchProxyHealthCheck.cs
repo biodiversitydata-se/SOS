@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -24,7 +24,7 @@ namespace SOS.Observations.Api.HealthChecks
         /// <param name="httpClientService"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="healthCheckConfiguration"></param>
-        public ElasticsearchProxyHealthCheck(IHttpClientService httpClientService, 
+        public ElasticsearchProxyHealthCheck(IHttpClientService httpClientService,
             ElasticSearchConfiguration elasticConfiguration,
             HealthCheckConfiguration healthCheckConfiguration)
         {
@@ -57,7 +57,7 @@ namespace SOS.Observations.Api.HealthChecks
                         size = 5,
                         query = new
                         {
-                            match_all = new {}
+                            match_all = new { }
                         },
                         from = 0
                     },
@@ -72,7 +72,7 @@ namespace SOS.Observations.Api.HealthChecks
                 {
                     return new HealthCheckResult(HealthStatus.Unhealthy, "Failed to get 5 observations");
                 }
-                
+
                 return new HealthCheckResult(HealthStatus.Healthy, null);
             }
             catch (Exception)

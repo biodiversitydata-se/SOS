@@ -18,7 +18,7 @@ namespace SOS.Lib.JsonConverters
                 return null;
             }
 
-            return new DateTime(date.Value.Year, date.Value.Month, date.Value.Day, 23,59,59);
+            return new DateTime(date.Value.Year, date.Value.Month, date.Value.Day, 23, 59, 59);
         }
 
         /// <summary>

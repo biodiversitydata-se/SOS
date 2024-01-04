@@ -47,7 +47,7 @@ namespace SOS.Analysis.Api.Controllers
             _analysisManager = analysisManager ?? throw new ArgumentNullException(nameof(analysisManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-       
+
         [HttpPost("/internal/aggregation")]
         [ProducesResponseType(typeof(PagedAggregationResultDto<UserAggregationResponseDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -246,7 +246,7 @@ namespace SOS.Analysis.Api.Controllers
                 var edgeLengthValidation = Result.Success();
                 if ((useEdgeLengthRatio ?? false) && (alphaValues?.Any() ?? false))
                 {
-                    foreach(var edgeLength in alphaValues)
+                    foreach (var edgeLength in alphaValues)
                     {
                         edgeLengthValidation = ValidateDouble(edgeLength, 0.0, 1.0, "Alpha value");
                         if (edgeLengthValidation.IsFailure)
@@ -264,7 +264,7 @@ namespace SOS.Analysis.Api.Controllers
                     ValidateSearchFilter(searchFilter!),
                     ValidateInt(gridCellSizeInMeters!.Value, minLimit: 100, maxLimit: 100000, "Grid cell size in meters"),
                     await ValidateMetricTilesLimitAsync(
-                        searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), 
+                        searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                         gridCellSizeInMeters.Value,
                         _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter)
                     ));
@@ -277,11 +277,11 @@ namespace SOS.Analysis.Api.Controllers
                 var result = await _analysisManager.CalculateAooAndEooAsync(
                     roleId,
                     authorizationApplicationIdentifier,
-                    filter, 
-                    gridCellSizeInMeters!.Value, 
+                    filter,
+                    gridCellSizeInMeters!.Value,
                     useCenterPoint!.Value,
-                    alphaValues!, 
-                    useEdgeLengthRatio!.Value, 
+                    alphaValues!,
+                    useEdgeLengthRatio!.Value,
                     allowHoles!.Value,
                     returnGridCells!.Value,
                     includeEmptyCells!.Value,

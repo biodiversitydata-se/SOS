@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using SOS.Lib.Models.ApplicationInsights;
+using SOS.Lib.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.ApplicationInsights;
-using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Administration.Gui.Controllers
-{    
+{
     [ApiController]
     [Route("[controller]")]
     public class ApplicationInsightsController : ControllerBase

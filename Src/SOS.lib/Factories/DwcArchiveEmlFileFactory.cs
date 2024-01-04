@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Nest;
+using SOS.Lib.Extensions;
+using SOS.Lib.Models.Shared;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Nest;
-using SOS.Lib.Extensions;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Factories
 {
@@ -26,7 +26,7 @@ namespace SOS.Lib.Factories
             {
                 return element;
             }
-           
+
             element = new XElement(name);
             dataset.Add(element);
 
@@ -71,22 +71,22 @@ namespace SOS.Lib.Factories
             var geographicCoverage = GetElement(coverage, "geographicCoverage");
             GetElement(geographicCoverage, "geographicDescription").SetValue("All data is collected within Sweden.");
             var boundingCoordinates = GetElement(geographicCoverage, "boundingCoordinates");
-            GetElement(boundingCoordinates,"westBoundingCoordinate").SetValue(geoBounds.TopLeft.Lon ?? 0.0);
+            GetElement(boundingCoordinates, "westBoundingCoordinate").SetValue(geoBounds.TopLeft.Lon ?? 0.0);
             GetElement(boundingCoordinates, "eastBoundingCoordinate").SetValue(geoBounds.BottomRight.Lon ?? 0.0);
-            GetElement(boundingCoordinates,"northBoundingCoordinate").SetValue(geoBounds.TopLeft.Lat ?? 0.0);
-            GetElement(boundingCoordinates,"southBoundingCoordinate").SetValue(geoBounds.BottomRight.Lat ?? 0.0);
+            GetElement(boundingCoordinates, "northBoundingCoordinate").SetValue(geoBounds.TopLeft.Lat ?? 0.0);
+            GetElement(boundingCoordinates, "southBoundingCoordinate").SetValue(geoBounds.BottomRight.Lat ?? 0.0);
         }
-       
+
         private static void SetTemporalCoverage(XElement dataset, DateTime? firstSpotted, DateTime? lastSpotted)
         {
             if (!(firstSpotted.HasValue || lastSpotted.HasValue))
             {
                 return;
             }
-            
+
             var temporalCoverage = GetElement(GetElement(dataset, "coverage"), "temporalCoverage");
             var rangeOfDates = GetElement(temporalCoverage, "rangeOfDates");
-           
+
             if (firstSpotted.HasValue)
             {
                 var beginDate = GetElement(rangeOfDates, "beginDate");
@@ -100,7 +100,7 @@ namespace SOS.Lib.Factories
             }
         }
 
-        
+
         /// <summary>
         ///     Set pubDate to today's date
         /// </summary>

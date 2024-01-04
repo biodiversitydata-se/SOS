@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Models.TaxonTree
 {
@@ -11,17 +8,17 @@ namespace SOS.Lib.Models.TaxonTree
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class TaxonTreeEdge<T>
-    {        
+    {
         /// <summary>
         /// Parent.
         /// </summary>
         public TaxonTreeNode<T> Parent { get; set; }
-        
+
         /// <summary>
         /// Child.
         /// </summary>
         public TaxonTreeNode<T> Child { get; set; }
-        
+
         /// <summary>
         /// Inidicates whether this relation is a main relation or a secondary relation.
         /// </summary>

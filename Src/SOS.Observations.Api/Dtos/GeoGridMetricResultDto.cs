@@ -11,7 +11,7 @@ namespace SOS.Observations.Api.Dtos
         public int GridCellCount { get; set; }
 
         public int GridCellSizeInMeters { get; set; }
-        
+
         public XYBoundingBoxDto Sweref99TmBoundingBox { get; set; }
     }
 }

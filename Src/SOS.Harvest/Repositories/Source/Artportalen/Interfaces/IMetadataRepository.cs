@@ -60,7 +60,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<MetadataEntity<int>>> GetAreaTypesAsync();
-        
+
         /// <summary>
         ///     Gets all discovery methods
         /// </summary>

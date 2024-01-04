@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -12,14 +10,15 @@ using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Excel.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Services.Interfaces;
-using Xunit;
 using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.IO.DwcArchive;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Services.Interfaces;
+using System;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace SOS.Export.UnitTests.Managers
 {
@@ -74,7 +73,7 @@ namespace SOS.Export.UnitTests.Managers
             _fileServiceMock.Object,
             _blobStorageServiceMock.Object,
             _zendToServiceMock.Object,
-            new FileDestination {Path = "test"},
+            new FileDestination { Path = "test" },
             _filterManagerMock.Object,
             _loggerMock.Object);
 
@@ -113,13 +112,13 @@ namespace SOS.Export.UnitTests.Managers
             var result = await TestObject.ExportAndSendAsync(
                 It.IsAny<int>(),
                 It.IsAny<string>(),
-                It.IsAny<SearchFilter>(), 
-                It.IsAny<string>(), 
-                "", 
-                ExportFormat.DwC, 
-                "en-GB", 
-                false, 
-                PropertyLabelType.PropertyPath, 
+                It.IsAny<SearchFilter>(),
+                It.IsAny<string>(),
+                "",
+                ExportFormat.DwC,
+                "en-GB",
+                false,
+                PropertyLabelType.PropertyPath,
                 false,
                 It.IsAny<bool>(),
                 It.IsAny<bool>(),
@@ -152,12 +151,12 @@ namespace SOS.Export.UnitTests.Managers
             var result = await TestObject.ExportAndSendAsync(
                 It.IsAny<int>(),
                 It.IsAny<string>(),
-                It.IsAny<SearchFilter>(), 
-                It.IsAny<string>(), 
-                "", ExportFormat.DwC, 
-                "en-GB", 
+                It.IsAny<SearchFilter>(),
+                It.IsAny<string>(),
+                "", ExportFormat.DwC,
+                "en-GB",
                 false,
-                PropertyLabelType.PropertyPath, 
+                PropertyLabelType.PropertyPath,
                 false,
                 It.IsAny<bool>(),
                 It.IsAny<bool>(),
@@ -204,14 +203,14 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), "", 
+            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), "",
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
             result.Should().BeFalse();
-        }             
+        }
 
         /// <summary>
         ///     Test export all throws
@@ -230,7 +229,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), "", 
+            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), "",
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert

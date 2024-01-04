@@ -1,12 +1,8 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using Microsoft.Extensions.Logging;
-using Nest;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Enums;
-using System.Transactions;
-using System;
 
 namespace SOS.Harvest.Repositories.Source.Artportalen
 {
@@ -283,8 +279,8 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     WHERE 
                         CountryIsoCode = 752 AND Id IN @AreaTypes";
 
-                var areaTypes = (int[]) Enum.GetValues(typeof(AreaType));
-                return await QueryAsync<MetadataEntity<int>>(query, new {AreaTypes = areaTypes});
+                var areaTypes = (int[])Enum.GetValues(typeof(AreaType));
+                return await QueryAsync<MetadataEntity<int>>(query, new { AreaTypes = areaTypes });
             }
             catch (Exception e)
             {
@@ -313,7 +309,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     ORDER BY
 	                    dm.Id,
 	                    gc.CultureCode";
-                
+
                 return await QueryAsync<MetadataEntity<int>>(query);
             }
             catch (Exception e)
@@ -382,7 +378,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             }
         }
 
-        
+
 
         /// <inheritdoc />
         public async Task<DateTime?> GetLastBackupDateAsync()
@@ -396,7 +392,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                    master.sys.databases d
 	                    LEFT JOIN msdb.dbo.[restorehistory] r ON d.[name] = r.destination_database_name
                     WHERE
-	                    d.[name] = '{ DataService.BackUpDatabaseName }'
+	                    d.[name] = '{DataService.BackUpDatabaseName}'
                     GROUP BY         
 	                    r.destination_database_name";
 

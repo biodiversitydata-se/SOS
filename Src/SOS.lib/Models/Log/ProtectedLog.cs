@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using SOS.Lib.Models.Interfaces;
+using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Log
 {

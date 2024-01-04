@@ -1,12 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Harvest.Services;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
+using System;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Services
@@ -20,7 +20,7 @@ namespace SOS.Import.UnitTests.Services
         {
             _aquaSupportRequestServiceMock = new Mock<IAquaSupportRequestService>();
             _norsServiceConfiguration = new NorsServiceConfiguration
-                { MaxNumberOfSightingsHarvested = 10 };
+            { MaxNumberOfSightingsHarvested = 10 };
             _loggerMock = new Mock<ILogger<NorsObservationService>>();
         }
         private readonly Mock<IAquaSupportRequestService> _aquaSupportRequestServiceMock;

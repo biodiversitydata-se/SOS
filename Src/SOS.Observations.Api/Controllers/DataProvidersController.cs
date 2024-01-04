@@ -1,22 +1,22 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
+using SOS.Lib.Swagger;
+using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Repositories.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Observations.Api.Repositories.Interfaces;
-using Newtonsoft.Json;
-using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System.Globalization;
-using SOS.Lib.Enums;
-using SOS.Lib.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -73,7 +73,7 @@ namespace SOS.Observations.Api.Controllers
         [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetDataProvidersAsync(
             [FromQuery] IEnumerable<DataProviderCategory> categories,
-            [FromQuery] string cultureCode = "sv-SE", 
+            [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool includeProvidersWithNoObservations = false)
         {
             try
@@ -194,7 +194,7 @@ namespace SOS.Observations.Api.Controllers
                 var entries = new Dictionary<string, HealthReportEntry>();
 
                 var processInfo = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
-                foreach(var provider in processInfo.ProvidersInfo)
+                foreach (var provider in processInfo.ProvidersInfo)
                 {
                     entries.Add(provider.DataProviderIdentifier, new HealthReportEntry(
                        provider.ProcessStatus.Equals("Success", StringComparison.CurrentCultureIgnoreCase) ? HealthStatus.Healthy : HealthStatus.Unhealthy,

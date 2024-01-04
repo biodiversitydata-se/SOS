@@ -8,7 +8,7 @@
         /// <summary>
         /// Id of data provider
         /// </summary>
-        public string DataProviderId{ get; set; }
+        public string DataProviderId { get; set; }
 
         /// <summary>
         /// Id of observation

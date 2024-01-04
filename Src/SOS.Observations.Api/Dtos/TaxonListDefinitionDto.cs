@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using SOS.Lib.Extensions;
+﻿using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS.Observations.Api.Dtos
 {

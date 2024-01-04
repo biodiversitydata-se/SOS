@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -9,6 +7,8 @@ using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Harvesters.Observations
@@ -22,7 +22,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         {
             _sharkObservationVerbatimRepositoryMock = new Mock<ISharkObservationVerbatimRepository>();
             _sharkObservationServiceMock = new Mock<ISharkObservationService>();
-            _sharkServiceConfiguration = new SharkServiceConfiguration {MaxNumberOfSightingsHarvested = 1};
+            _sharkServiceConfiguration = new SharkServiceConfiguration { MaxNumberOfSightingsHarvested = 1 };
             _loggerMock = new Mock<ILogger<SharkObservationHarvester>>();
         }
 

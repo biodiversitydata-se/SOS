@@ -34,9 +34,9 @@ public class HarvestJobTests : TestBase
         var dwcaData = await ReadDwcaDataAsync(dataProvider);
 
         // Assert
-        dwcaData.Datasets.Count.Should().Be(1, because: "the DwC-A file contains 1 dataset");
-        dwcaData.Events.Count.Should().Be(7, because: "the DwC-A file contains 7 events");
-        dwcaData.Occurrences.Count.Should().Be(15, because: "the DwC-A file contains 15 occurrences");
+        dwcaData?.Datasets?.Count.Should().Be(1, because: "the DwC-A file contains 1 dataset");
+        dwcaData?.Events?.Count.Should().Be(7, because: "the DwC-A file contains 7 events");
+        dwcaData?.Occurrences?.Count.Should().Be(15, because: "the DwC-A file contains 15 occurrences");
     }
 
     [Fact]
@@ -77,8 +77,8 @@ public class HarvestJobTests : TestBase
 
     private class DwcaData
     {
-        public List<DwcVerbatimDataset> Datasets { get; set; }
-        public List<DwcEventOccurrenceVerbatim> Events { get; set; }
-        public List<DwcObservationVerbatim> Occurrences { get; set; }
+        public List<DwcVerbatimDataset>? Datasets { get; set; }
+        public List<DwcEventOccurrenceVerbatim>? Events { get; set; }
+        public List<DwcObservationVerbatim>? Occurrences { get; set; }
     }
 }

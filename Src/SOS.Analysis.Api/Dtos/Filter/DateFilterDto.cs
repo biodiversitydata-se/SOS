@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
-using SOS.Analysis.Api.Dtos.Filter.Enums;
+﻿using SOS.Analysis.Api.Dtos.Filter.Enums;
 using SOS.Lib.JsonConverters;
+using System.Text.Json.Serialization;
 
 namespace SOS.Analysis.Api.Dtos.Filter
 {

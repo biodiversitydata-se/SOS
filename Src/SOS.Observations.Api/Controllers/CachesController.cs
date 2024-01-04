@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
@@ -9,6 +6,9 @@ using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
+using System;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -62,8 +62,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="cache">The cache to clear.</param>
         /// <returns></returns>
         [HttpDelete("{cache}")]
-        [ProducesResponseType(typeof(bool), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public IActionResult DeleteCache([FromRoute] Cache cache)
         {
@@ -97,7 +97,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"Error clearing the {cache} cache");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
@@ -118,7 +118,7 @@ namespace SOS.Observations.Api.Controllers
                 {
                     case Cache.Area:
                         var areas = await _areaCache.GetAllAsync();
-                        return new OkObjectResult(areas);                        
+                        return new OkObjectResult(areas);
                     case Cache.DataProviders:
                         var dataProviders = await _dataProvidersCache.GetAllAsync();
                         return new OkObjectResult(dataProviders);
@@ -137,7 +137,7 @@ namespace SOS.Observations.Api.Controllers
                     default:
                         _logger.LogError($"{cache} is not supported");
                         return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-                }                
+                }
             }
             catch (Exception e)
             {

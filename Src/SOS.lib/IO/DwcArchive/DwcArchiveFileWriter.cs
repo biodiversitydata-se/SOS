@@ -1,4 +1,22 @@
-﻿using System;
+﻿using Hangfire;
+using Hangfire.Server;
+using Microsoft.Extensions.Logging;
+using SOS.Export.Models;
+using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
+using SOS.Lib.Factories;
+using SOS.Lib.Helpers;
+using SOS.Lib.IO.DwcArchive.Interfaces;
+using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -6,24 +24,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Hangfire;
-using Hangfire.Server;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.IO.DwcArchive.Interfaces;
-using SOS.Export.Models;
-using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Lib.Services.Interfaces;
-using SOS.Lib.Factories;
-using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Export;
-using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -51,7 +51,7 @@ namespace SOS.Lib.IO.DwcArchive
             ISimpleMultimediaCsvWriter simpleMultimediaCsvWriter,
             IFileService fileService,
             IDataProviderRepository dataProviderRepository,
-            ILogger<DwcArchiveFileWriter> logger) 
+            ILogger<DwcArchiveFileWriter> logger)
         {
             _dwcArchiveOccurrenceCsvWriter = dwcArchiveOccurrenceCsvWriter ??
                                              throw new ArgumentNullException(nameof(dwcArchiveOccurrenceCsvWriter));
@@ -192,7 +192,7 @@ namespace SOS.Lib.IO.DwcArchive
                 {
                     FilePath = zipFilePath,
                     NrObservations = nrObservations
-                };                
+                };
             }
             catch (JobAbortedException)
             {
@@ -232,7 +232,7 @@ namespace SOS.Lib.IO.DwcArchive
             var dwcObservations = processedObservations.ToDarwinCore(fixSbdiArtportalenInstitutionCode);
             if (checkForIllegalCharacters) ValidateObservations(dwcObservations);
             if (dwcObservations != null && dwcObservations.Any())
-            {                
+            {
                 occurrenceCount = dwcObservations.Count();
                 await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
                 await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
@@ -261,7 +261,7 @@ namespace SOS.Lib.IO.DwcArchive
             {
                 multimediaCount = multimediaRows.Count();
                 await using var multimediaFileStream = File.AppendText(multimediaCsvFilePath);
-               
+
                 _simpleMultimediaCsvWriter.WriteHeaderlessCsvFile(
                     multimediaRows,
                     multimediaFileStream);
@@ -403,7 +403,7 @@ namespace SOS.Lib.IO.DwcArchive
             _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvFileHelper,
                 FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions());
             await csvFileHelper.FlushAsync();
-            
+
             foreach (var filePath in occurrenceFilePaths)
             {
                 await using var readStream = File.OpenRead(filePath);
@@ -467,7 +467,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // Create eml.xml
                 DwCArchiveEmlFileFactory.SetPubDateToCurrentDate(emlFile);
                 await using var enlFileStream = archive.CreateEntry("eml.xml", CompressionLevel.Optimal).Open();
-               
+
                 await emlFile.SaveAsync(enlFileStream, SaveOptions.None, CancellationToken.None);
                 enlFileStream.Close();
             }
@@ -484,7 +484,7 @@ namespace SOS.Lib.IO.DwcArchive
                     dwcaFilePartsInfo.ExportFolder,
                     searchPattern,
                     SearchOption.TopDirectoryOnly));
-                }    
+                }
             }
 
             return filePaths;

@@ -1,8 +1,8 @@
-﻿using System.Xml.Linq;
-using Hangfire;
+﻿using Hangfire;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Harvesters.DwC.Interfaces
 {

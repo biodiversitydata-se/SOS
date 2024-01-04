@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SOS.Lib.Models.Verbatim.Artportalen
+﻿namespace SOS.Lib.Models.Verbatim.Artportalen
 {
     /// <summary>
     ///     Represents a person

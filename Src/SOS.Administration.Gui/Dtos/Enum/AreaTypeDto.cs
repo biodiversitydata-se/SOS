@@ -1,6 +1,6 @@
 ﻿namespace SOS.Administration.Gui.Dtos.Enum
 {
-   
+
     /// <summary>
     /// Area type dto
     /// </summary>

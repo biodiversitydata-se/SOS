@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Administration.Api.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers.Interfaces
 {

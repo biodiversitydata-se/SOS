@@ -1,16 +1,16 @@
-﻿using System.Text;
-using Hangfire;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Lib.Jobs.Import;
+﻿using Hangfire;
 using Newtonsoft.Json;
+using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Jobs.Import;
 using SOS.Lib.Json;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using System.Text;
 
 namespace SOS.Harvest.Jobs
 {
@@ -25,8 +25,8 @@ namespace SOS.Harvest.Jobs
         private readonly DwcaConfiguration _dwcaConfiguration;
 
         public DataValidationReportJob(
-            IDataProviderManager dataProviderManager, 
-            IDataValidationReportManager dataValidationReportManager, 
+            IDataProviderManager dataProviderManager,
+            IDataValidationReportManager dataValidationReportManager,
             IReportManager reportManager,
             DwcaConfiguration dwcaConfiguration)
         {
@@ -59,7 +59,7 @@ namespace SOS.Harvest.Jobs
             var compactJsonSettings = CreateCompactJsonSerializerSettings();
             var compactJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, compactJsonSettings);
             var compactJsonFile = Encoding.UTF8.GetBytes(compactJson);
-            
+
             // Create verbose JSON file
             var verboseJsonSettings = CreateVerboseJsonSerializerSettings();
             var verboseJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, verboseJsonSettings);
