@@ -114,7 +114,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
                     .Occurrences
                     .Select(m => observationFactory.CreateProcessedObservation(m, false))
                     .ToList();
-                await AddObservationsToElasticsearchAsync(processedObservations, false, clearExistingRecords);
+                await AddObservationsToElasticsearchAsync(processedObservations!, false, clearExistingRecords);
                 output.WriteLine($"Processed observations count= {processedObservations.Count}");
 
                 var processedEvents = parsedDwcaFile
@@ -128,7 +128,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
                     .Datasets
                     .Select(m => datasetFactory.CreateProcessedDataset(m))
                     .ToList();
-                await AddDatasetsToElasticsearchAsync(processedDatasets, clearExistingRecords);
+                await AddDatasetsToElasticsearchAsync(processedDatasets!, clearExistingRecords);
                 output.WriteLine($"Processed datasets count= {processedDatasets.Count}");
                 clearExistingRecords = false;
             }

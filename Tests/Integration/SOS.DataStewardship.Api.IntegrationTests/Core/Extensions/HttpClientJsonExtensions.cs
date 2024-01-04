@@ -6,7 +6,7 @@ public static class HttpClientJsonExtensions
         this HttpClient client,
         string requestUri,
         TBody value,
-        JsonSerializerOptions options = null,
+        JsonSerializerOptions options = null!,
         CancellationToken cancellationToken = default)
     {
         var postResponse = await client.PostAsJsonAsync(requestUri, value, options, cancellationToken);
