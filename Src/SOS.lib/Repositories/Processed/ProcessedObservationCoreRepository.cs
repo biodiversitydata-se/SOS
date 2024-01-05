@@ -987,7 +987,7 @@ namespace SOS.Lib.Repositories.Processed
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to get ElasticSearch health", e);
+                Logger.LogError(e, "Failed to get ElasticSearch health");
                 return WaitForStatus.Red;
             }
         }
