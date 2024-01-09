@@ -17,6 +17,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
@@ -95,6 +96,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
                 processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager,
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                    new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationCoreRepository>());
             }
             else

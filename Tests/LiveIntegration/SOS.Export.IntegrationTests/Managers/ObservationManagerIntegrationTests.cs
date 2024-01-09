@@ -73,6 +73,7 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                 elasticClientManager,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(processedConfigurationRepository),
+                new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
 
             var excelWriter = new ExcelFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,

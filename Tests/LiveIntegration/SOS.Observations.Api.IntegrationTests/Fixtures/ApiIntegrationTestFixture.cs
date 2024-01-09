@@ -195,7 +195,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             TaxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
             var taxonManager = CreateTaxonManager(processClient, TaxonRepository, memoryCache);
             var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
-            ProcessedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processedConfigurationCache, processClient, memoryCache);
+            ProcessedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processedConfigurationCache, taxonManager, processClient, memoryCache);
             EventRepository = new EventRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<EventRepository>());
             InvalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var processedTaxonRepository = CreateProcessedTaxonRepository(elasticConfiguration, elasticClientManager, processClient, taxonManager);
@@ -400,6 +400,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             ElasticSearchConfiguration elasticConfiguration,
             IElasticClientManager elasticClientManager,
             ProcessedConfigurationCache processedConfigurationCache,
+            ITaxonManager taxonManager,
             IProcessClient processClient,
             IMemoryCache memoryCache)
         {
@@ -407,6 +408,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 elasticClientManager,
                 processedConfigurationCache,
                 elasticConfiguration,
+                taxonManager,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;
         }

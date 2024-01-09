@@ -1,10 +1,15 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using SOS.Harvest.Jobs;
 using SOS.Harvest.Processors.Taxon;
+using SOS.Harvest.Services.Taxon;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
+using SOS.Lib.Services;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -29,7 +34,21 @@ namespace SOS.Process.LiveIntegrationTests.Jobs
                 processDbConfiguration.WriteBatchSize);
             var elasticConfiguration = GetElasticConfiguration();
 
-            var taxonProcessor = new TaxonProcessor(null, null, null, null, null, null); //Todo
+            var taxonServiceConfiguration = new TaxonServiceConfiguration()
+            {
+                AcceptHeaderContentType = "application/text",
+                BaseAddress = "https://taxonapi.artdata.slu.se/darwincore/download?version=custom"
+            };
+            var taxonService = new TaxonService(new TaxonServiceProxy(), taxonServiceConfiguration, new NullLogger<TaxonService>());
+            var taxonAttributeService = new TaxonAttributeService(new HttpClientService(new NullLogger<HttpClientService>()), new TaxonAttributeServiceConfiguration()
+            {
+                AcceptHeaderContentType = "application/json",
+                BaseAddress = "https://taxonattributeservice.artdata.slu.se/api"
+            }, new NullLogger<TaxonAttributeService>());
+            var processedTaxonRepositoryMock = new Mock<ITaxonRepository>();
+            var apTaxonRepositoryMock = new Mock<Harvest.Repositories.Source.Artportalen.Interfaces.ITaxonRepository>();
+            var processConfiguration = new ProcessConfiguration() { NoOfThreads = 1 };
+            var taxonProcessor = new TaxonProcessor(taxonService, taxonAttributeService, processedTaxonRepositoryMock.Object, apTaxonRepositoryMock.Object,  processConfiguration, new NullLogger<TaxonProcessor>());
 
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());

@@ -558,17 +558,20 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticClientManager"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationCoreRepository(
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
+            ITaxonManager taxonManager,
             ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             if (elasticConfiguration.Clusters != null)
             {
                 CheckNodes(elasticConfiguration.Clusters.First().Hosts?.Count() ?? 0);
             }
+            _taxonManager = taxonManager;
         }
 
         /// <inheritdoc />

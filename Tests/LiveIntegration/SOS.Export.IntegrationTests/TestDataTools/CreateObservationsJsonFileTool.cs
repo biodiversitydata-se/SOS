@@ -6,6 +6,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
@@ -42,6 +43,7 @@ namespace SOS.Export.LiveIntegrationTests.TestDataTools
                 new ElasticClientManager(elasticSearchConfiguration),
                 new ElasticSearchConfiguration(),
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
+                new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

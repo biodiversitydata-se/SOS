@@ -32,6 +32,10 @@ namespace SOS.Lib.Models.Interfaces
         /// </summary>
         string ScientificName { get; set; }
 
+        string ScientificNameAuthorship { get; set; }
+
+        string VernacularName { get; set; }
+
         /// <summary>
         /// Taxon attributes
         /// </summary>
