@@ -137,9 +137,8 @@ namespace SOS.Hangfire.JobServer
                                 _hangfireDbConfiguration.DatabaseName,
                                 new MongoStorageOptions
                                 {
-
                                     CheckConnection = true,
-                                    CheckQueuedJobsStrategy = CheckQueuedJobsStrategy.Watch,
+                                    CheckQueuedJobsStrategy = (_hangfireDbConfiguration?.Hosts?.Length ?? 0) < 2 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
                                     CountersAggregateInterval = TimeSpan.FromMinutes(10), // Default 5
                                     // ConnectionCheckTimeout = TimeSpan.FromSeconds(5),
                                     //  DistributedLockLifetime = TimeSpan.FromSeconds(30),
@@ -154,7 +153,7 @@ namespace SOS.Hangfire.JobServer
                                     Prefix = "hangfire",
                                     QueuePollInterval = TimeSpan.FromSeconds(10) // Deafult 15
                                 })
-                    );
+                    );// ;// ;
                     GlobalJobFilters.Filters.Add(
                         new HangfireJobExpirationTimeAttribute(_hangfireDbConfiguration.JobExpirationDays));
                     GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });

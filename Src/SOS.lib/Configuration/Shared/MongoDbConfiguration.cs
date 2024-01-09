@@ -85,13 +85,10 @@ namespace SOS.Lib.Configuration.Shared
             // Set server/s and connection mode based on number of hosts 
             if (Hosts.Length == 1)
             {
-                //mongoSettings.ConnectionMode = ConnectionMode.Standalone;
                 mongoSettings.DirectConnection = true;
             }
             else
             {
-
-                //mongoSettings.ConnectionMode = ConnectionMode.ReplicaSet;
                 mongoSettings.DirectConnection = false;
                 mongoSettings.ReplicaSetName = ReplicaSetName;
                 mongoSettings.ReadPreference = ReadPreference.SecondaryPreferred;

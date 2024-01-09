@@ -297,48 +297,42 @@ namespace SOS.Lib
 
                 if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate)
                 {
-                    selector = "((startMonth > fromMonth || (startMonth == fromMonth && startDay >= fromDay)) && (endMonth < toMonth || (endMonth == toMonth && endDay <= toDay)))";
+                    selector = "(eventStartDate.isEqual(filterStartDate) || eventStartDate.isAfter(filterStartDate)) && (eventEndDate.isEqual(filterEndDate) || eventEndDate.isBefore(filterEndDate))";
                 }
                 else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OnlyStartDate)
                 {
-                    selector = "((startMonth > fromMonth || (startMonth == fromMonth && startDay >= fromDay)) && (startMonth < toMonth || (startMonth == toMonth && startDay <= toDay)))";
+                    selector = "(eventStartDate.isEqual(filterStartDate) || eventStartDate.isAfter(filterStartDate)) && (eventStartDate.isEqual(filterEndDate) || eventStartDate.isBefore(filterEndDate))";
                 }
                 else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OnlyEndDate)
                 {
-                    selector = "((endMonth > fromMonth || (endMonth == fromMonth && endDay >= fromDay)) && (endMonth < toMonth || (endMonth == toMonth && endDay <= toDay)))";
+                    selector = "(eventEndDate.isEqual(filterStartDate) || eventEndDate.isAfter(filterStartDate)) && (eventEndDate.isEqual(filterEndDate) || eventEndDate.isBefore(filterEndDate))";
                 }
                 else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate)
                 {
-                    selector = "((startMonth > fromMonth || (startMonth == fromMonth && startDay >= fromDay)) && (startMonth < toMonth || (startMonth == toMonth && startDay <= toDay))) || " +
-                               "((endMonth > fromMonth || (endMonth == fromMonth && endDay >= fromDay)) && (endMonth < toMonth || (endMonth == toMonth && endDay <= toDay)))";
+                    selector = "((eventStartDate.isEqual(filterStartDate) || eventStartDate.isAfter(filterStartDate)) && (eventStartDate.isEqual(filterEndDate) || eventStartDate.isBefore(filterEndDate))) || " +
+                               "((eventEndDate.isEqual(filterStartDate) || eventEndDate.isAfter(filterStartDate)) && (eventEndDate.isEqual(filterEndDate) || eventEndDate.isBefore(filterEndDate)))";
                 }
-
+    
                 query.AddScript($@"
                             ZonedDateTime zStartDate = doc['event.startDate'].value;  
-                            ZonedDateTime convertedStartDate = zStartDate.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
-                            int startMonth = convertedStartDate.getMonthValue();
-                            int startDay = convertedStartDate.getDayOfMonth();
-                            
+                            ZonedDateTime eventStartDate = zStartDate.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
                             ZonedDateTime zEndDate = doc['event.endDate'].value;  
-                            ZonedDateTime convertedEndDate = zEndDate.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
-                            int endMonth = convertedEndDate.getMonthValue();
-                            int endDay = convertedEndDate.getDayOfMonth();
+                            ZonedDateTime eventEndDate = zEndDate.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
+                            
+                            // Change filter date in order to match period regardless of year
+                            ZonedDateTime filterStartDate = ZonedDateTime.of(eventStartDate.getYear() - {(internalFilter.Date.StartDate.Value.Year < internalFilter.Date.EndDate.Value.Year ? 1 : 0)}, 
+                                {internalFilter.Date.StartDate.Value.Month}, 
+                                {internalFilter.Date.StartDate.Value.Day}, 
+                                {internalFilter.Date.StartDate.Value.Minute}, 
+                                {internalFilter.Date.StartDate.Value.Second}, 
+                                {internalFilter.Date.StartDate.Value.Millisecond}, 0, ZoneId.of('Europe/Stockholm'));
+                            long diffInNano = Long.parseLong(""{Math.Abs((internalFilter.Date.StartDate.Value - internalFilter.Date.EndDate.Value).TotalNanoseconds)}"");
+                            ZonedDateTime filterEndDate = filterStartDate.plusNanos(diffInNano);
 
-                            int fromMonth = {internalFilter.Date.StartDate.Value.Month};
-                            int fromDay = {internalFilter.Date.StartDate.Value.Day};
-                            int toMonth = {internalFilter.Date.EndDate.Value.Month};
-                            int toDay = {internalFilter.Date.EndDate.Value.Day};
-
-                            if(
-                               {selector}
-                            )
-                            {{ 
+                           if({selector})
                                 return true;
-                            }} 
-                            else 
-                            {{
-                                return false;
-                            }}
+
+                            return false;
                         ");
             }
 
