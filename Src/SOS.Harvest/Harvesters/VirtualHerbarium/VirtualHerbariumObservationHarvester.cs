@@ -10,6 +10,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System.Globalization;
+using System.Xml.Linq;
 
 namespace SOS.Harvest.Harvesters.VirtualHerbarium
 {

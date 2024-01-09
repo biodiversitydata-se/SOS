@@ -14,6 +14,25 @@ namespace SOS.Harvest.Services
         private readonly ILogger<VirtualHerbariumObservationService> _logger;
         private readonly VirtualHerbariumServiceConfiguration _virtualHerbariumServiceConfiguration;
 
+        /// <inheritdoc />
+        private async Task<XDocument?> GetAsync(DateTime from, int pageIndex, int pageSize, byte attempt)
+        {
+            try
+            {
+                return await GetXDocuemnt($"admin/lifewatche.php?datum={from}&page={pageIndex}&pagesize={pageSize}");
+            }
+            catch (Exception e)
+            {
+                if (attempt > 2)
+                {
+                    _logger.LogError(e, "Failed to get data from Virtual Herbarium");
+                    throw;
+                }
+                Thread.Sleep(attempt * 2000);
+                return await GetAsync(from, pageIndex, pageSize, ++attempt);
+            }
+        }
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -34,15 +53,7 @@ namespace SOS.Harvest.Services
         /// <inheritdoc />
         public async Task<XDocument?> GetAsync(DateTime from, int pageIndex, int pageSize)
         {
-            try
-            {
-                return await GetXDocuemnt($"admin/lifewatche.php?datum={from}&page={pageIndex}&pagesize={pageSize}");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get data from Virtual Herbarium");
-                throw;
-            }
+            return await GetAsync(from, pageIndex, pageSize, 1);
         }
 
         /// <inheritdoc />
