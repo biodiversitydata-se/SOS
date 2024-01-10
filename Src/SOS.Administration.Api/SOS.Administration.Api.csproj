@@ -56,7 +56,7 @@
 	    <PackageReference Include="Elastic.CommonSchema.NLog" Version="8.6.1" />
 	    <PackageReference Include="HangFire" Version="1.8.7" />
 	    <PackageReference Include="HangFire.Autofac" Version="2.4.1" />
-	    <PackageReference Include="HangFire.Mongo" Version="1.9.15" />
+	    <PackageReference Include="HangFire.Mongo" Version="1.9.16" />
 	    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
 	    <PackageReference Include="NLog.Targets.ElasticSearch" Version="7.7.0" />
 	    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.8" />
