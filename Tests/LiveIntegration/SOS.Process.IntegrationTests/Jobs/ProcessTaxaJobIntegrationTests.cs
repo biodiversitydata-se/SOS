@@ -45,10 +45,15 @@ namespace SOS.Process.LiveIntegrationTests.Jobs
                 AcceptHeaderContentType = "application/json",
                 BaseAddress = "https://taxonattributeservice.artdata.slu.se/api"
             }, new NullLogger<TaxonAttributeService>());
+            var taxonListService = new TaxonListService(new HttpClientService(new NullLogger<HttpClientService>()), new Lib.Configuration.Import.TaxonListServiceConfiguration()
+            {
+                AcceptHeaderContentType = "application/json",
+                BaseAddress = "https://taxonlistservice.artdata.slu.se"
+            }, new NullLogger<TaxonListService>());
             var processedTaxonRepositoryMock = new Mock<ITaxonRepository>();
             var apTaxonRepositoryMock = new Mock<Harvest.Repositories.Source.Artportalen.Interfaces.ITaxonRepository>();
             var processConfiguration = new ProcessConfiguration() { NoOfThreads = 1 };
-            var taxonProcessor = new TaxonProcessor(taxonService, taxonAttributeService, processedTaxonRepositoryMock.Object, apTaxonRepositoryMock.Object,  processConfiguration, new NullLogger<TaxonProcessor>());
+            var taxonProcessor = new TaxonProcessor(taxonService, taxonAttributeService, taxonListService, processedTaxonRepositoryMock.Object, apTaxonRepositoryMock.Object,  processConfiguration, new NullLogger<TaxonProcessor>());
 
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
