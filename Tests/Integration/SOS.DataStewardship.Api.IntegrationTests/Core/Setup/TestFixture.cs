@@ -13,6 +13,10 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Cache;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Managers;
+using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.TaxonTree;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
@@ -57,12 +61,15 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         public ServiceCollection GetServiceCollection()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddLogging();
+            serviceCollection.AddLogging();            
+            serviceCollection.AddMemoryCache();
             serviceCollection.AddSingleton<IAreaHelper, AreaHelper>();
             serviceCollection.AddSingleton<IAreaRepository, AreaRepository>();
             serviceCollection.AddSingleton<ProcessFixture>();
             serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
             serviceCollection.AddSingleton<ITaxonRepository, TaxonRepository>();
+            serviceCollection.AddSingleton<ITaxonListRepository, TaxonListRepository>();
+            serviceCollection.AddSingleton<ITaxonManager, TaxonManager>();            
             serviceCollection.AddSingleton<IProcessTimeManager, ProcessTimeManager>();
             serviceCollection.AddSingleton<ProcessConfiguration>();
 
@@ -75,6 +82,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             var elasticConfiguration = CreateElasticSearchConfiguration();
             serviceCollection.AddSingleton(elasticConfiguration);
             serviceCollection.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
+            serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
+            serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
 
             return serviceCollection;
