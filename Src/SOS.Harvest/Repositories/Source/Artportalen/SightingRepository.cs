@@ -325,10 +325,11 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
                 var result = await QueryAsync<int>(query, new { modifiedSince = modifiedSince.ToLocalTime() });
 
-                Logger.LogDebug($"GetModifiedIdsAsync({modifiedSince}, {limit}, Live={Live}) returned {result?.Count() ?? 0} sightingIds");
+                Logger.LogInformation($"GetModifiedIdsAsync({modifiedSince.ToLocalTime()}, {limit}, Live={Live}) returned {result?.Count() ?? 0} sightingIds.");
+                Logger.LogDebug(query);
                 if (!result?.Any() ?? true)
                 {
-                    Logger.LogDebug($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}, Query: {query}");
+                    Logger.LogInformation($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}, Query: {query}");
                 }
                 return result!;
             }
