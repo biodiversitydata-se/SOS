@@ -57,7 +57,7 @@ namespace SOS.Lib.Services
             {
                 var response = await _httpClientService.PostDataAsync<NatureConservationListTaxaResult>(
                     new Uri($"{_taxonListServiceConfiguration.BaseAddress}/taxa"),
-                        new { conservationListIds = conservationListIds, outputFields = new[] { "id", "scientificname", "swedishname" } });
+                        new { conservationListIds, outputFields = new[] { "id", "scientificname", "swedishname" } });
 
                 return response.NatureConservationListTaxa;
             }
