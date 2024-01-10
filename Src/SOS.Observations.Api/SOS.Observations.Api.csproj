@@ -41,9 +41,9 @@
 		<PackageReference Include="CSharpFunctionalExtensions" Version="2.40.3" />
 		<PackageReference Include="HangFire" Version="1.8.7" />
 		<PackageReference Include="HangFire.Autofac" Version="2.4.1" />
-		<PackageReference Include="HangFire.Mongo" Version="1.9.15" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="8.0.0" />
+		<PackageReference Include="HangFire.Mongo" Version="1.9.16" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="8.0.1" />
 		<PackageReference Include="Microsoft.OpenApi" Version="1.6.11" />
 		<PackageReference Include="MongoDB.Driver" Version="2.23.1" />
 		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.23.1" />
