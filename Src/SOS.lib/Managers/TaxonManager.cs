@@ -146,6 +146,8 @@ namespace SOS.Lib.Managers
                     Id = m.Id,
                     SecondaryParentDyntaxaTaxonIds = m.SecondaryParentDyntaxaTaxonIds,
                     ScientificName = m.ScientificName,
+                    ScientificNameAuthorship = m.ScientificNameAuthorship,
+                    VernacularName = m.VernacularName,
                     Attributes = m.Attributes
                 });
 

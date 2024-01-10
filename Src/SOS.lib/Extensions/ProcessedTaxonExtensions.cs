@@ -28,7 +28,9 @@ namespace SOS.Lib.Extensions
                 Attributes = sourceTaxon.Attributes,
                 SecondaryParentDyntaxaTaxonIds = sourceTaxon.SecondaryParentDyntaxaTaxonIds,
                 Id = sourceTaxon.Id,
-                ScientificName = sourceTaxon.ScientificName
+                ScientificName = sourceTaxon.ScientificName,
+                ScientificNameAuthorship = sourceTaxon.ScientificNameAuthorship,
+                VernacularName = sourceTaxon.VernacularName
             };
         }
     }

@@ -1,4 +1,5 @@
-﻿using SOS.UserStatistics.Api.Cache.Managers;
+﻿using SOS.Lib.Managers;
+using SOS.UserStatistics.Api.Cache.Managers;
 
 namespace SOS.UserStatistics.Api.IntegrationTests.Fixtures;
 
@@ -116,6 +117,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
             elasticClientManager,
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+            new Mock<ITaxonManager>().Object,
             new NullLogger<ProcessedObservationCoreRepository>());
         return userStatisticsProcessedObservationRepository;
     }

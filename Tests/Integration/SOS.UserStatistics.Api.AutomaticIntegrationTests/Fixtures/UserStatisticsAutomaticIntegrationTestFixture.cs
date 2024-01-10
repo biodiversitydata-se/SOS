@@ -178,6 +178,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
             elasticClientManager,
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+            taxonManager,
             new NullLogger<ProcessedObservationCoreRepository>());
         return userStatisticsProcessedObservationRepository;
     }

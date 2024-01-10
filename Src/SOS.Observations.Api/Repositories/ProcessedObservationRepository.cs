@@ -27,7 +27,8 @@ namespace SOS.Observations.Api.Repositories
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, logger)
+            ITaxonManager taxonManager,
+            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, logger)
         {
         }
 
@@ -37,7 +38,7 @@ namespace SOS.Observations.Api.Repositories
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
-
+            
             // Get number of distinct values
             var searchResponseCount = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -49,7 +50,7 @@ namespace SOS.Observations.Api.Repositories
                 )
                 .Aggregations(a => a
                     .Cardinality("species_count", c => c
-                        .Field("taxon.scientificName")
+                        .Field("taxon.id")
                     )
                 )
                 .Size(0)
@@ -73,12 +74,13 @@ namespace SOS.Observations.Api.Repositories
 
             // Calculate size to fetch. If zero, get all
             var size = skip + take < maxResult ? skip + take : maxResult == 0 ? 1 : maxResult;
+            size = size * 2; // There can be duplicates due to sort order differences between full harvest and incremental harvest observations
             if (skip == 0 && take == -1)
             {
                 size = maxResult == 0 ? 1 : maxResult;
                 take = maxResult;
             }
-
+            
             // Get the real result
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -95,25 +97,10 @@ namespace SOS.Observations.Api.Repositories
                             .Terms("sortOrder", t => t
                                 .Field("taxon.attributes.sortOrder")
                              )
-                            .Terms("scientificName", t => t
-                                .Field("taxon.scientificName")
-                             )
                             .Terms("id", t => t
                                 .Field("taxon.id")
                             )
-                            .Terms("vernacularName", t => t
-                                .Field("taxon.vernacularName")
-                                .MissingBucket(true)
-                            )
-                            .Terms("scientificNameAuthorship", t => t
-                                .Field("taxon.scientificNameAuthorship")
-                                .MissingBucket(true)
-                            )
-                            .Terms("redlistCategory", t => t
-                                .Field("taxon.attributes.redlistCategory")
-                                .MissingBucket(true)
-                            )
-                        )
+                        )                        
                 )
             )
                 .Size(0)
@@ -122,7 +109,7 @@ namespace SOS.Observations.Api.Repositories
             );
 
             searchResponse.ThrowIfInvalid();
-            var result = searchResponse
+            var buckets = searchResponse
                 .Aggregations
                 .Composite("species")
                 .Buckets?
@@ -130,15 +117,39 @@ namespace SOS.Observations.Api.Repositories
                         new AggregatedSpecies
                         {
                             DocCount = b.DocCount,
-                            RedlistCategory = b.Key["redlistCategory"]?.ToString() ?? "",
-                            ScientificNameAuthorship = b.Key["scientificNameAuthorship"]?.ToString() ?? "",
-                            ScientificName = b.Key["scientificName"]?.ToString() ?? "",
-                            TaxonId = int.Parse(b.Key["id"].ToString()),
-                            VernacularName = b.Key["vernacularName"]?.ToString() ?? ""
+                            TaxonId = int.Parse(b.Key["id"].ToString())
                         }
-                    )?
+                    ).ToList();
+
+            Dictionary<int, AggregatedSpecies> dic = new Dictionary<int, AggregatedSpecies>();
+            for (int i = 0; i < buckets.Count; i++)
+            {
+                if (!dic.ContainsKey(buckets[i].TaxonId))
+                {
+                    dic.Add(buckets[i].TaxonId, buckets[i]);
+                }
+                else
+                {
+                    dic[buckets[i].TaxonId].DocCount += buckets[i].DocCount;
+                }
+            }
+
+            var result = dic.Values
                 .Skip(skip)
-                .Take(take);
+                .Take(take)
+                .ToList();            
+            
+            foreach (var item in result)
+            {
+                var treeNode = _taxonManager.TaxonTree.GetTreeNode(item.TaxonId);
+                if (treeNode != null)
+                {
+                    item.RedlistCategory = treeNode.Data.Attributes.RedlistCategory ?? "";
+                    item.ScientificName = treeNode.Data.ScientificName;
+                    item.VernacularName = treeNode.Data.VernacularName ?? "";
+                    item.ScientificNameAuthorship = treeNode.Data.ScientificNameAuthorship ?? "";
+                }
+            }
 
             return new PagedResult<dynamic>
             {
@@ -147,6 +158,13 @@ namespace SOS.Observations.Api.Repositories
                 Take = take,
                 TotalCount = maxResult
             };
+        }
+
+        private class TaxInfo
+        {
+            public int TaxonId { get; set; }
+            public int Index { get; set; }
+            public int DocCount { get; set; }
         }
 
         /// <inheritdoc />
