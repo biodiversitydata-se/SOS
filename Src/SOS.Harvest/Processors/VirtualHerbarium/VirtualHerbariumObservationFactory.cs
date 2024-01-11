@@ -20,7 +20,6 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
     {
         private readonly IAreaHelper _areaHelper;
         private IDictionary<string, (double longitude, double latitude, int precision)>? _communities;
-        private IDictionary<string, (double longitude, double latitude, int precision)>? _parishes;
 
         private string GetLocality(VirtualHerbariumObservationVerbatim verbatim)
         {
@@ -114,7 +113,6 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         public async Task InitializeAsync()
         {
             _communities = await GetCommunitiesAsync();
-            _parishes = await GetAreaCentroidsAsync(AreaType.Parish);
         }
 
         private async Task<IDictionary<string, (double longitude, double latitude, int precision)>?> GetCommunitiesAsync()
@@ -323,12 +321,6 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                     verbatim.DecimalLongitude = parish.longitude;
                     verbatim.DecimalLatitude = parish.latitude;
                     verbatim.CoordinatePrecision = parish.precision;
-                }
-                else if (_parishes?.TryGetValue(verbatim.District.ToLower(), out var par) ?? false)
-                {
-                    verbatim.DecimalLongitude = par.longitude;
-                    verbatim.DecimalLatitude = par.latitude;
-                    verbatim.CoordinatePrecision = par.precision;
                 }
             }
 

@@ -177,7 +177,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(harvestFromDate, _artportalenConfiguration.CatchUpLimit))?.ToArray();
             Logger.LogDebug($"Number of Artportalen Ids to harvest: {idsToHarvest?.Length ?? 0}, lastModifiedQuery={harvestFromDate} ({mode})");
 
-            if (!idsToHarvest?.Any() ?? true)
+            if ((idsToHarvest?.Length ?? 0) == 0)
             {
                 return 0;
             }

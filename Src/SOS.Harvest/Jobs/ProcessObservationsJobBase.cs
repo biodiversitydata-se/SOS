@@ -32,7 +32,7 @@ namespace SOS.Harvest.Jobs
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly bool _enableTimeManager;
-        private static SemaphoreSlim getTaxaSemaphore = new SemaphoreSlim(1, 1);
+        private static SemaphoreSlim _getTaxaSemaphore = new SemaphoreSlim(1, 1);
 
         private async Task InitializeAreaHelperAsync()
         {
@@ -359,7 +359,7 @@ namespace SOS.Harvest.Jobs
         /// <returns></returns>
         protected async Task<IDictionary<int, Taxon>> GetTaxaAsync(JobRunModes mode)
         {
-            await getTaxaSemaphore.WaitAsync();
+            await _getTaxaSemaphore.WaitAsync();
             try
             {
                 // Use current taxa if we are in incremental mode, to speed things up
@@ -403,7 +403,7 @@ namespace SOS.Harvest.Jobs
             }
             finally
             {
-                getTaxaSemaphore.Release();
+                _getTaxaSemaphore.Release();
             }
         }
 
@@ -422,6 +422,7 @@ namespace SOS.Harvest.Jobs
         /// </summary>
         protected virtual async Task PreProcessingAsync()
         {
+            await Task.Yield();
         }
 
         /// <summary>
