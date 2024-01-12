@@ -214,7 +214,6 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="allowHoles">Gets or sets whether holes are allowed in the concave hull polygon.</param>
         /// <param name="returnGridCells">Return grid cells features</param>
         /// <param name="includeEmptyCells">Include grid cells with no observations</param>
-        /// <param name="onlyUseTilesInRange">If edge length ratio NOT is used and onlyUseTilesInRange = true. Only tiles with shorter or equal distance (alpha value) to another tile will be used in calculation.</param>
         /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
         /// <param name="coordinateSystem">Gemometry coordinate system</param>
         /// <returns></returns>
@@ -235,7 +234,6 @@ namespace SOS.Analysis.Api.Controllers
             [FromQuery] bool? allowHoles = false,
             [FromQuery] bool? returnGridCells = false,
             [FromQuery] bool? includeEmptyCells = false,
-            [FromQuery] bool? onlyUseTilesInRange = false,
             [FromQuery] MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
             [FromQuery] CoordinateSys? coordinateSystem = CoordinateSys.WGS84)
         {
@@ -262,7 +260,7 @@ namespace SOS.Analysis.Api.Controllers
                     edgeLengthValidation,
                     alphaValues?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one alpha value"),
                     ValidateSearchFilter(searchFilter!),
-                    ValidateInt(gridCellSizeInMeters!.Value, minLimit: 100, maxLimit: 100000, "Grid cell size in meters"),
+                    ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
                     await ValidateMetricTilesLimitAsync(
                         searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                         gridCellSizeInMeters.Value,
@@ -286,8 +284,7 @@ namespace SOS.Analysis.Api.Controllers
                     returnGridCells!.Value,
                     includeEmptyCells!.Value,
                     metricCoordinateSys!.Value,
-                    coordinateSystem!.Value,
-                    onlyUseTilesInRange!.Value
+                    coordinateSystem!.Value
                 );
                 return new OkObjectResult(result!);
             }
@@ -298,6 +295,77 @@ namespace SOS.Analysis.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "GetAooAndEoo error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Calculate AOO and EOO and get geometry showing coverage 
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="searchFilter"></param>
+        /// <param name="maxDistance">Max distance between occurrence grid cells</param>
+        /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
+        /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
+        /// <param name="coordinateSystem">Gemometry coordinate system</param>
+        /// <returns></returns>
+        [HttpPost("/internal/aoo_eoo/article17")]
+        [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> CalculateAooAndEooArticle17InternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+            [FromBody] SearchFilterInternalDto searchFilter,
+            [FromQuery] int maxDistance,
+            [FromQuery] int? gridCellSizeInMeters = 2000,
+            [FromQuery] MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
+            [FromQuery] CoordinateSys? coordinateSystem = CoordinateSys.WGS84)
+        {
+            try
+            {
+                CheckAuthorization(searchFilter.ProtectionFilter);
+                searchFilter = await InitializeSearchFilterAsync(searchFilter);
+                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
+
+                var validationResult = Result.Combine(
+
+                    maxDistance > 0 ? Result.Success() : Result.Failure("You must state max distance"),
+                    ValidateInt(maxDistance, minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
+                    ValidateSearchFilter(searchFilter!),
+                    ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
+                    await ValidateMetricTilesLimitAsync(
+                        searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
+                        gridCellSizeInMeters.Value,
+                        _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter)
+                    ));
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var result = await _analysisManager.CalculateAooAndEooArticle17Async(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    filter,
+                    gridCellSizeInMeters!.Value,
+                    maxDistance,
+                    metricCoordinateSys!.Value,
+                    coordinateSystem!.Value
+                );
+                return new OkObjectResult(result!);
+            }
+            catch (AuthenticationRequiredException)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "GetAooAndEoo article 17 error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

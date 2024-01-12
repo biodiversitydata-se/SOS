@@ -78,7 +78,6 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="allowHoles">Gets or sets whether holes are allowed in the concave hull polygon.</param>
         /// <param name="returnGridCells">Return grid cells features</param>
         /// <param name="includeEmptyCells">Include grid cells with no observations</param>
-        /// <param name="onlyUseTilesInRange">If edge length ratio NOT is used and onlyUseTilesInRange = true. Only tiles with shorter or equal distance (alpha value) to another tile will be used in calculation.</param>
         /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
         /// <param name="coordinateSystem">Gemometry coordinate system
         /// Computes the concave hull of the vertices in a geometry using the target criterion of maximum alpha ratio. 
@@ -97,7 +96,30 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             bool? allowHoles = false,
             bool? returnGridCells = false,
             bool? includeEmptyCells = false,
-            bool? onlyUseTilesInRange = false,
+            MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
+            CoordinateSys? coordinateSystem = CoordinateSys.WGS84);
+
+        /// <summary>
+        /// Calculate AOO and EOO and get geometry showing coverage 
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="searchFilter"></param>
+        /// <param name="maxDistance">Max distance between occurrence grid cells</param>
+        /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
+        /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
+        /// <param name="coordinateSystem">Gemometry coordinate system
+        /// Computes the concave hull of the vertices in a geometry using the target criterion of maximum alpha ratio. 
+        /// The alpha factor is a fraction of the length difference between the longest and shortest edges in the Delaunay Triangulation of the input points.
+        /// When false: 
+        /// Computes the concave hull of the vertices in a geometry using the target criterion of maximum edge length.</param>
+        /// <returns></returns>
+        Task<IActionResult> CalculateAooAndEooArticle17InternalAsync(
+            int? roleId,
+            string? authorizationApplicationIdentifier,
+            SearchFilterInternalDto searchFilter,
+            int maxDistance,
+            int? gridCellSizeInMeters = 2000,
             MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
             CoordinateSys? coordinateSystem = CoordinateSys.WGS84);
     }

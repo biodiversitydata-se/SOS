@@ -126,6 +126,63 @@ namespace SOS.Lib.Helpers
             }
         }
 
+        /// <summary>
+        /// Add missing grid cells to grid
+        /// </summary>
+        /// <param name="metricGridCellFeatures"></param>
+        /// <param name="gridCellsInMeters"></param>
+        /// <param name="attributes"></param>
+        /// <param name="useCenterPoint"></param>
+        public static void FillInBlanks(
+            IDictionary<string, IFeature> metricGridCellFeatures,
+            int gridCellsInMeters,
+            IEnumerable<KeyValuePair<string, object>> attributes)
+        {
+            // Start at top left gridcell bottom left corner
+            var minX = metricGridCellFeatures.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.X));
+            var maxX = metricGridCellFeatures.Max(gc => gc.Value.Geometry.Coordinates.Max(c => c.X));
+            var minY = metricGridCellFeatures.Min(gc => gc.Value.Geometry.Coordinates.Min(c => c.Y));
+            var x = minX;
+            var y = metricGridCellFeatures.Max(gc => gc.Value.Geometry.Coordinates.Max(c => c.Y)) - gridCellsInMeters;
+            while (y >= minY)
+            {
+                while (x < maxX)
+                {
+                    var id = GetGridCellId(gridCellsInMeters, (int)x, (int)y);
+                    
+                    // Try to get grid cell
+                    if (!metricGridCellFeatures.TryGetValue(id, out var feature))
+                    {
+                        // Grid cell is missing, create a new one
+                        feature = new Feature(
+                            new Polygon(
+                                new LinearRing(
+                                    new[] {
+                                        new Coordinate(x, y), // bottom left
+                                        new Coordinate(x, y + gridCellsInMeters), // top left 
+                                        new Coordinate(x + gridCellsInMeters, y + gridCellsInMeters), // top rigth
+                                        new Coordinate(x + gridCellsInMeters, y), // bottom rigth
+                                        new Coordinate(x, y) // bottom left
+                                    }
+                            )),
+                            new AttributesTable(
+                                new KeyValuePair<string, object>[] {
+                                            new KeyValuePair<string, object>("id", id)
+                                }.Concat(attributes)
+                            )
+                        );
+
+                        metricGridCellFeatures.Add(id, feature);
+                    }
+
+                    x += gridCellsInMeters;
+                }
+
+                x = minX;
+                y -= gridCellsInMeters;
+            }
+        }
+
         public static string GetFeatureCollectionString(IEnumerable<IDictionary<string, object>> records, bool flattenProperties)
         {
             var featureCollection = GetFeatureCollection(records, flattenProperties);

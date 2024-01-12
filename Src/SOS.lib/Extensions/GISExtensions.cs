@@ -245,41 +245,6 @@ namespace SOS.Lib.Extensions
 
             return newRingCoordinates;
         }
-
-        /// <summary>
-        /// Return tiles within passed distance
-        /// </summary>
-        /// <param name="polygons"></param>
-        /// <param name="maxDistance"></param>
-        /// <returns></returns>
-        private static IEnumerable<Polygon> WithinDistance(this Polygon[] polygons, int maxDistance)
-        {
-            var tilesInRange = new HashSet<Polygon>();
-            var tileCount = polygons.Length;
-
-            for (var i = 0; i < tileCount; i++)
-            {
-                var startTile = polygons[i];
-                var startTileAdded = false;
-                for (var j = i + 1; j < tileCount; j++)
-                {
-                    var endTile = polygons[j];
-                    var disance = startTile.Centroid.Distance(endTile.Centroid);
-                    if (disance <= maxDistance)
-                    {
-                        if (!startTileAdded)
-                        {
-                            tilesInRange.Add(startTile);
-                            startTileAdded = true;
-                        }
-
-                        tilesInRange.Add(endTile);
-                    }
-                }
-            }
-
-            return tilesInRange;
-        }
         #endregion Private
 
         #region Public
@@ -359,8 +324,7 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static MultiPolygon CalculateTraiangels(this Polygon[] polygons, bool useCenterPoint = true, int maxDistance = 0)
         {
-            var tilesInRange = polygons.WithinDistance(maxDistance);
-            var points = tilesInRange.CalculationPoints(useCenterPoint);
+            var points = polygons.CalculationPoints(useCenterPoint);
 
             // we need at least tree points to make a traingle
             if ((points?.Count() ?? 0) < 3)
@@ -407,12 +371,10 @@ namespace SOS.Lib.Extensions
         /// <param name="useEdgeLengthRatio">Use edge length ratio instead of edge length. The edge length ratio is a fraction of the length difference between the 
         /// longest and shortest edges in the Delaunay Triangulation of the input points</param>
         /// <param name="allowHoles"></param>
-        /// <param name="onlyUseTilesInRange">If edge length ratio NOT is used and onlyUseTilesInRange = true. Only tiles with shorter or equal distance (alpha value) to another tile will be used in calculation.</param>
         /// <returns></returns>
-        public static Geometry ConcaveHull(this Polygon[] polygons, bool useCenterPoint = true, double alphaValue = 0, bool useEdgeLengthRatio = false, bool allowHoles = false, bool onlyUseTilesInRange = false)
+        public static Geometry ConcaveHull(this Polygon[] polygons, bool useCenterPoint = true, double alphaValue = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
         {
-            var tilesInRange = useEdgeLengthRatio || !onlyUseTilesInRange ? polygons : polygons.WithinDistance((int)alphaValue);
-            var points = tilesInRange.CalculationPoints(useCenterPoint);
+            var points = polygons.CalculationPoints(useCenterPoint);
 
             return points.ToArray().ConcaveHull(alphaValue, useEdgeLengthRatio, allowHoles);
         }

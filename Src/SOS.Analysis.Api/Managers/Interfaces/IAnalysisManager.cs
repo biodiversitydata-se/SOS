@@ -78,7 +78,6 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="includeEmptyCells"></param>
         /// <param name="metricCoordinateSys"></param>
         /// <param name="coordinateSystem"></param>
-        /// <param name="onlyUseTilesInRange"></param>
         /// <returns></returns>
         Task<FeatureCollection> CalculateAooAndEooAsync(
             int? roleId,
@@ -92,9 +91,28 @@ namespace SOS.Analysis.Api.Managers.Interfaces
             bool returnGridCells,
             bool includeEmptyCells,
             MetricCoordinateSys metricCoordinateSys,
-            CoordinateSys coordinateSystem,
-            bool onlyUseTilesInRange);
+            CoordinateSys coordinateSystem);
 
+        /// <summary>
+        /// Calculate AOO EOO for Article 17
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="gridCellsInMeters"></param>
+        /// <param name="maxDistance"></param>
+        /// <param name="metricCoordinateSys"></param>
+        /// <param name="coordinateSystem"></param>
+        /// <returns></returns>
+        Task<FeatureCollection> CalculateAooAndEooArticle17Async(
+           int? roleId,
+           string? authorizationApplicationIdentifier,
+           SearchFilter filter,
+           int gridCellsInMeters,
+           int maxDistance,
+           MetricCoordinateSys metricCoordinateSys,
+           CoordinateSys coordinateSystem);
+        
         /// <summary>
         /// Get count of observations matching search criteria
         /// </summary>

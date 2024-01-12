@@ -2,6 +2,7 @@
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Index.Strtree;
 using SOS.Analysis.Api.Dtos.Enums;
 using SOS.Analysis.Api.Dtos.Search;
 using SOS.Analysis.Api.Managers.Interfaces;
@@ -56,6 +57,34 @@ namespace SOS.Analysis.Api.Managers
             }
 
             return (observationsCount, minX ?? 0.0, maxX ?? 0.0, minY ?? 0.0, maxY ?? 0.0);
+        }
+
+        /// <summary>
+        /// Get grid cells
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="gridCellsInMeters"></param>
+        /// <param name="metricCoordinateSys"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<GridCell>> GetGridCellsAync(int? roleId,
+            string? authorizationApplicationIdentifier,
+            SearchFilter filter,
+            int gridCellsInMeters,
+            MetricCoordinateSys metricCoordinateSys)
+        {
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            var gridCells = new List<GridCell>();
+            const int pageSize = 10000;
+            var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize);
+            while ((result?.GridCellCount ?? 0) > 0)
+            {
+                gridCells.AddRange(result!.GridCells);
+                result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize, result.AfterKey);
+            }
+
+            return gridCells;
         }
 
         /// <summary>
@@ -163,29 +192,21 @@ namespace SOS.Analysis.Api.Managers
             bool returnGridCells,
             bool includeEmptyCells,
             MetricCoordinateSys metricCoordinateSys,
-            CoordinateSys coordinateSystem,
-            bool onlyUseTilesInRange)
+            CoordinateSys coordinateSystem)
         {
             try
             {
-                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-                var gridCells = new List<GridCell>();
-                const int pageSize = 10000;
-                var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize);
-                while ((result?.GridCellCount ?? 0) > 0)
-                {
-                    gridCells.AddRange(result!.GridCells);
-                    result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize, result.AfterKey);
-                }
-                var metaData = CalculateMetadata(gridCells);
+                var gridCells = await GetGridCellsAync(roleId, authorizationApplicationIdentifier, filter, gridCellsInMeters, metricCoordinateSys);
                 if (!gridCells.Any())
                 {
                     return null!;
                 }
 
-                var gridCellCount = gridCells.Count();
-                var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
-                var aoo = Math.Round((double)gridCellCount * gridCellArea, 0);
+                var metaData = CalculateMetadata(gridCells);
+                var futureCollection = new FeatureCollection
+                {
+                    BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)
+                };
 
                 // We need features to return later so we create them now 
                 var gridCellFeaturesMetric = gridCells.Select(gc => gc.MetricBoundingBox
@@ -198,17 +219,13 @@ namespace SOS.Analysis.Api.Managers
                     })
                 ).ToDictionary(f => (string)f.Attributes["id"], f => f);
 
-                var futureCollection = new FeatureCollection
-                {
-                    BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)
-                };
                 var metricEooGeometries = new Dictionary<double, Geometry>();
                 foreach (var alphaValue in alphaValues)
                 {
                     var eooGeometry = gridCellFeaturesMetric
                         .Select(f => f.Value.Geometry as Polygon)
                             .ToArray()
-                                .ConcaveHull(useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles, onlyUseTilesInRange);
+                                .ConcaveHull(useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles);
 
                     if (eooGeometry == null)
                     {
@@ -218,6 +235,10 @@ namespace SOS.Analysis.Api.Managers
                     var area = eooGeometry.Area / 1000000; //Calculate area in km2
                     var eoo = Math.Round(area, 0);
                     var transformedEooGeometry = eooGeometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
+
+                    var gridCellCount = gridCells.Count();
+                    var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
+                    var aoo = Math.Round((double)gridCellCount * gridCellArea, 0);
 
                     futureCollection.Add(new Feature(
                         transformedEooGeometry,
@@ -261,6 +282,174 @@ namespace SOS.Analysis.Api.Managers
                     }
 
                     futureCollection.Add(gridCellFeatureMetric.Value);
+                }
+
+                return futureCollection;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                _logger.LogError(e, "Failed to calculate AOO/EOO. To many buckets");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to calculate AOO/EOO.");
+                throw;
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<FeatureCollection> CalculateAooAndEooArticle17Async(
+           int? roleId,
+           string? authorizationApplicationIdentifier,
+           SearchFilter filter,
+           int gridCellsInMeters,
+           int maxDistance,
+           MetricCoordinateSys metricCoordinateSys,
+           CoordinateSys coordinateSystem)
+        {
+            try
+            {
+                var gridCellsMetric = await GetGridCellsAync(roleId, authorizationApplicationIdentifier, filter, gridCellsInMeters, metricCoordinateSys);
+                if (!gridCellsMetric.Any())
+                {
+                    return null!;
+                }
+
+                var metaData = CalculateMetadata(gridCellsMetric);
+                var gridCellEnvelope = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY));
+
+                // We need features to return later so we create them now 
+                var gridCellFeaturesMetric = gridCellsMetric.Select(gc => gc.MetricBoundingBox
+                    .ToPolygon()
+                    .ToFeature(new Dictionary<string, object>()
+                    {
+                        {  "id", GeoJsonHelper.GetGridCellId(gridCellsInMeters, (int)gc.MetricBoundingBox.TopLeft.X, (int)gc.MetricBoundingBox.BottomRight.Y) },
+                        {  "observationsCount", gc.ObservationsCount! },
+                        {  "taxaCount", gc.TaxaCount! }
+                    })
+                ).ToDictionary(f => (string)f.Attributes["id"], f => f);
+                
+                // Add empty cells
+                GeoJsonHelper.FillInBlanks(
+                   gridCellFeaturesMetric,
+                   gridCellsInMeters, new[] {
+                            new KeyValuePair<string, object>("observationsCount", 0),
+                            new KeyValuePair<string, object>("taxaCount", 0)
+                   }
+               );
+
+                var futureCollection = new FeatureCollection
+                {
+                    BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)
+                };
+
+                var triangels = gridCellsMetric
+                    .Select(gc => new XYBoundingBox() { 
+                        BottomRight = new XYCoordinate(gc.MetricBoundingBox.BottomRight.X, gc.MetricBoundingBox.BottomRight.Y),
+                        TopLeft = new XYCoordinate(gc.MetricBoundingBox.TopLeft.X, gc.MetricBoundingBox.TopLeft.Y)
+                    } 
+                    .ToPolygon())
+                        .ToArray()
+                            .CalculateTraiangels(true, maxDistance);
+
+                if (triangels != null)
+                {
+                    var linesInRange = new HashSet<LineString>();
+                    var triangelsInRange = new HashSet<Geometry>();
+
+                    foreach (var triangle in triangels)
+                    {
+                        foreach (var corrdinate in triangle.Coordinates)
+                        {
+                            // Save triangels and sides shorter than alpha value
+                            var sidesAdded = 0;
+                            if (triangle.Coordinates[0].Distance(triangle.Coordinates[1]) <= maxDistance)
+                            {
+                                linesInRange.Add(new LineString(new Coordinate[] { triangle.Coordinates[0], triangle.Coordinates[1] }));
+                                sidesAdded++;
+                            }
+                            if (triangle.Coordinates[1].Distance(triangle.Coordinates[2]) <= maxDistance)
+                            {
+                                linesInRange.Add(new LineString(new Coordinate[] { triangle.Coordinates[1], triangle.Coordinates[2] }));
+                                sidesAdded++;
+                            }
+                            if (triangle.Coordinates[2].Distance(triangle.Coordinates[3]) <= maxDistance)
+                            {
+                                linesInRange.Add(new LineString(new Coordinate[] { triangle.Coordinates[2], triangle.Coordinates[3] }));
+                                sidesAdded++;
+                            }
+                            if (sidesAdded == 3)
+                            {
+                                triangelsInRange.Add(triangle);
+                            }
+                        }
+                    }
+                    // Get all cells intersecting with triangle or line
+                    var eooCellFeaturesMetric = new HashSet<IFeature>();
+                    foreach (var gridCellFeature in gridCellFeaturesMetric)
+                    {
+                        var gridCell = gridCellFeature.Value;
+
+                        foreach (var line in linesInRange)
+                        {
+                            if (gridCell.Geometry.Intersects(line))
+                            {
+                                eooCellFeaturesMetric.Add(gridCell);
+                            }
+                        }
+                        foreach (var triangle in triangelsInRange)
+                        {
+                            if (gridCell.Geometry.Intersects(triangle))
+                            {
+                                eooCellFeaturesMetric.Add(gridCell);
+                            }
+                        }
+                    }
+
+                    // Transform features to requested coordinate system and add it to collection
+                    foreach (var gridCellFeatureMetric in eooCellFeaturesMetric)
+                    {
+                        if (coordinateSystem != (CoordinateSys)metricCoordinateSys)
+                        {
+                            gridCellFeatureMetric.Geometry = gridCellFeatureMetric.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
+                        }
+
+                        futureCollection.Add(gridCellFeatureMetric);
+                    }
+
+                    var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
+                    var eoo = Math.Round((double)eooCellFeaturesMetric.Count() * gridCellArea, 0);
+                    var aoo = Math.Round((double)gridCellsMetric.Count() * gridCellArea, 0);
+                    var eooGeometry = new MultiPolygon(eooCellFeaturesMetric.Select(cf => cf.Geometry as Polygon).ToArray());
+
+                    futureCollection.Add(new Feature(
+                        eooGeometry,
+                        new AttributesTable(new KeyValuePair<string, object>[] {
+                            new KeyValuePair<string, object>("id", "eoo"),
+                            new KeyValuePair<string, object>("aoo", (int)aoo),
+                            new KeyValuePair<string, object>("eoo", (int)eoo),
+                            new KeyValuePair<string, object>("gridCellArea", gridCellArea),
+                            new KeyValuePair<string, object>("gridCellAreaUnit", "km2"),
+                            new KeyValuePair<string, object>("observationsCount", metaData.ObservationsCount)
+                            }
+                        )
+                    ));
+                   /* Debug
+                    futureCollection.Add(new Feature(
+                       new MultiPolygon(triangelsInRange.Select(t => t as Polygon).ToArray()).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem),
+                       new AttributesTable(new KeyValuePair<string, object>[] {
+                            new KeyValuePair<string, object>("id", "triangels")
+                           }
+                       )
+                   ));
+                   futureCollection.Add(new Feature(
+                       new MultiLineString(linesInRange.ToArray()).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem),
+                       new AttributesTable(new KeyValuePair<string, object>[] {
+                            new KeyValuePair<string, object>("id", "lines")
+                           }
+                       )
+                   ));*/
                 }
 
                 return futureCollection;
