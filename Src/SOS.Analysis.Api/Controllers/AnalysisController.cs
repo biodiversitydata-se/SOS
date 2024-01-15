@@ -320,7 +320,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
-            [FromQuery] int maxDistance,
+            [FromQuery] int? maxDistance = 50000,
             [FromQuery] int? gridCellSizeInMeters = 2000,
             [FromQuery] MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
             [FromQuery] CoordinateSys? coordinateSystem = CoordinateSys.WGS84)
@@ -334,7 +334,7 @@ namespace SOS.Analysis.Api.Controllers
                 var validationResult = Result.Combine(
 
                     maxDistance > 0 ? Result.Success() : Result.Failure("You must state max distance"),
-                    ValidateInt(maxDistance, minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
+                    ValidateInt(maxDistance.Value, minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
                     ValidateSearchFilter(searchFilter!),
                     ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
                     await ValidateMetricTilesLimitAsync(
@@ -353,7 +353,7 @@ namespace SOS.Analysis.Api.Controllers
                     authorizationApplicationIdentifier,
                     filter,
                     gridCellSizeInMeters!.Value,
-                    maxDistance,
+                    maxDistance!.Value,
                     metricCoordinateSys!.Value,
                     coordinateSystem!.Value
                 );

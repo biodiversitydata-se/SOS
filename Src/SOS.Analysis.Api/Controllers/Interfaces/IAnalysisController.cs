@@ -118,7 +118,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             int? roleId,
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto searchFilter,
-            int maxDistance,
+            int? maxDistance = 50000,
             int? gridCellSizeInMeters = 2000,
             MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
             CoordinateSys? coordinateSystem = CoordinateSys.WGS84);

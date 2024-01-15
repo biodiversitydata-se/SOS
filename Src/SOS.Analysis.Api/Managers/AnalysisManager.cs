@@ -343,7 +343,7 @@ namespace SOS.Analysis.Api.Managers
                 {
                     BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)
                 };
-
+                
                 var triangels = gridCellsMetric
                     .Select(gc => new XYBoundingBox() { 
                         BottomRight = new XYCoordinate(gc.MetricBoundingBox.BottomRight.X, gc.MetricBoundingBox.BottomRight.Y),
@@ -355,9 +355,7 @@ namespace SOS.Analysis.Api.Managers
 
                 if (triangels != null)
                 {
-                    var linesInRange = new HashSet<LineString>();
-                    var triangelsInRange = new HashSet<Geometry>();
-
+                    var polygonsInRange = new HashSet<Polygon>();
                     foreach (var triangle in triangels)
                     {
                         foreach (var corrdinate in triangle.Coordinates)
@@ -366,65 +364,40 @@ namespace SOS.Analysis.Api.Managers
                             var sidesAdded = 0;
                             if (triangle.Coordinates[0].Distance(triangle.Coordinates[1]) <= maxDistance)
                             {
-                                linesInRange.Add(new LineString(new Coordinate[] { triangle.Coordinates[0], triangle.Coordinates[1] }));
+                                polygonsInRange.Add(new Polygon(new LinearRing(new Coordinate[] { triangle.Coordinates[0], triangle.Coordinates[1], triangle.Coordinates[0] })));
                                 sidesAdded++;
                             }
                             if (triangle.Coordinates[1].Distance(triangle.Coordinates[2]) <= maxDistance)
                             {
-                                linesInRange.Add(new LineString(new Coordinate[] { triangle.Coordinates[1], triangle.Coordinates[2] }));
+                                polygonsInRange.Add(new Polygon(new LinearRing(new Coordinate[] { triangle.Coordinates[1], triangle.Coordinates[2], triangle.Coordinates[1] })));
                                 sidesAdded++;
                             }
                             if (triangle.Coordinates[2].Distance(triangle.Coordinates[3]) <= maxDistance)
                             {
-                                linesInRange.Add(new LineString(new Coordinate[] { triangle.Coordinates[2], triangle.Coordinates[3] }));
+                                polygonsInRange.Add(new Polygon(new LinearRing(new Coordinate[] { triangle.Coordinates[2], triangle.Coordinates[3], triangle.Coordinates[2] })));
                                 sidesAdded++;
                             }
                             if (sidesAdded == 3)
                             {
-                                triangelsInRange.Add(triangle);
-                            }
-                        }
-                    }
-                    // Get all cells intersecting with triangle or line
-                    var eooCellFeaturesMetric = new HashSet<IFeature>();
-                    foreach (var gridCellFeature in gridCellFeaturesMetric)
-                    {
-                        var gridCell = gridCellFeature.Value;
-
-                        foreach (var line in linesInRange)
-                        {
-                            if (gridCell.Geometry.Intersects(line))
-                            {
-                                eooCellFeaturesMetric.Add(gridCell);
-                            }
-                        }
-                        foreach (var triangle in triangelsInRange)
-                        {
-                            if (gridCell.Geometry.Intersects(triangle))
-                            {
-                                eooCellFeaturesMetric.Add(gridCell);
+                                polygonsInRange.Add((Polygon)triangle);
                             }
                         }
                     }
 
-                    // Transform features to requested coordinate system and add it to collection
-                    foreach (var gridCellFeatureMetric in eooCellFeaturesMetric)
-                    {
-                        if (coordinateSystem != (CoordinateSys)metricCoordinateSys)
-                        {
-                            gridCellFeatureMetric.Geometry = gridCellFeatureMetric.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
-                        }
+                    // Create a multipolygon showing matching polygons
+                    var eooGeometry = new MultiPolygon(polygonsInRange.ToArray());
 
-                        futureCollection.Add(gridCellFeatureMetric);
-                    }
-
+                    // Add all intersections gridcells to feature collection. Add nagative buffer when intersection to prevent gridcell touching corner match
+                    gridCellFeaturesMetric
+                        .Where(gc => gc.Value.Geometry.Buffer(-1).Intersects(eooGeometry))
+                            .ForEach(gc => futureCollection.Add(gc.Value));
+                    
                     var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
-                    var eoo = Math.Round((double)eooCellFeaturesMetric.Count() * gridCellArea, 0);
+                    var eoo = Math.Round((double)futureCollection.Count() * gridCellArea, 0);
                     var aoo = Math.Round((double)gridCellsMetric.Count() * gridCellArea, 0);
-                    var eooGeometry = new MultiPolygon(eooCellFeaturesMetric.Select(cf => cf.Geometry as Polygon).ToArray());
-
+                   
                     futureCollection.Add(new Feature(
-                        eooGeometry,
+                        eooGeometry.Boundary,
                         new AttributesTable(new KeyValuePair<string, object>[] {
                             new KeyValuePair<string, object>("id", "eoo"),
                             new KeyValuePair<string, object>("aoo", (int)aoo),
@@ -435,21 +408,12 @@ namespace SOS.Analysis.Api.Managers
                             }
                         )
                     ));
-                   /* Debug
-                    futureCollection.Add(new Feature(
-                       new MultiPolygon(triangelsInRange.Select(t => t as Polygon).ToArray()).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem),
-                       new AttributesTable(new KeyValuePair<string, object>[] {
-                            new KeyValuePair<string, object>("id", "triangels")
-                           }
-                       )
-                   ));
-                   futureCollection.Add(new Feature(
-                       new MultiLineString(linesInRange.ToArray()).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem),
-                       new AttributesTable(new KeyValuePair<string, object>[] {
-                            new KeyValuePair<string, object>("id", "lines")
-                           }
-                       )
-                   ));*/
+
+                    // Make sure all geometries is in requested coordinate system
+                    foreach (var feature in futureCollection)
+                    {
+                        feature.Geometry = feature.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
+                    }
                 }
 
                 return futureCollection;
