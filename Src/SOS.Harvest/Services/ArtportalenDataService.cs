@@ -46,7 +46,7 @@ namespace SOS.Harvest.Services
 
 
         /// <inheritdoc />
-        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic? parameters = null, bool live = false)
+        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic? parameters = null, bool live = false, CommandType commandType = CommandType.Text)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace SOS.Harvest.Services
                         parameters,
                         transaction,
                         10 * 60, // 10 minutes. Test environemt is slow. Querys taking < 30 sek in prod can take +5 min in test
-                        CommandType.Text,
+                        commandType,
                         CommandFlags.NoCache
                     )
                 )).ToArray();

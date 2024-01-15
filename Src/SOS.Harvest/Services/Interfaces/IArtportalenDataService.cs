@@ -1,4 +1,5 @@
 ﻿using SOS.Lib.Configuration.Import;
+using System.Data;
 
 namespace SOS.Harvest.Services.Interfaces
 {
@@ -24,7 +25,8 @@ namespace SOS.Harvest.Services.Interfaces
         /// <param name="query"></param>
         /// <param name="parameters"></param>
         /// <param name="live"></param>
+        /// <param name="commandType"></param>
         /// <returns></returns>
-        Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic? parameters = null, bool live = false);
+        Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic? parameters = null, bool live = false, CommandType commandType = CommandType.Text);
     }
 }

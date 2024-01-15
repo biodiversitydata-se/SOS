@@ -3,6 +3,7 @@ using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Enums.Artportalen;
 using SOS.Lib.Enums.VocabularyValues;
+using System.Data;
 
 namespace SOS.Harvest.Repositories.Source.Artportalen
 {
@@ -75,9 +76,9 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic? parameters = null!)
+        public async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic? parameters = null!, CommandType commandType = CommandType.Text)
         {
-            return await DataService.QueryAsync<E>(query, parameters, Live);
+            return await DataService.QueryAsync<E>(query, parameters, Live, commandType);
         }
 
         /// <inheritdoc />

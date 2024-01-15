@@ -1,4 +1,6 @@
-﻿namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
+﻿using System.Data;
+
+namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
 {
     /// <summary>
     ///     Base repository interface
@@ -11,9 +13,9 @@
         /// <typeparam name="E"></typeparam>
         /// <param name="query"></param>
         /// <param name="parameters"></param>
-        /// <param name="live"></param>
+        /// <param name="commandType"></param>
         /// <returns></returns>
-        Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters);
+        Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters, CommandType commandType);
 
         /// <summary>
         /// True if live data base should be used

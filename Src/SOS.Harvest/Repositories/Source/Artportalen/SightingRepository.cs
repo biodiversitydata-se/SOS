@@ -299,37 +299,12 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         {
             try
             {
-                var query = $@"SELECT DISTINCT TOP({limit})   
-	                s.SightingId AS Id /*,
-                    MAX(CASE 
-		                WHEN sc.CreationTime > s.EditDate AND sc.CreationTime > mfc.CreationTime THEN sc.CreationTime
-		                WHEN mfc.CreationTime > s.EditDate AND mfc.CreationTime > sc.CreationTime THEN mfc.CreationTime
-		                ELSE s.EditDate
-	                END) AS SortDate*/
-                FROM
-	                {SightingsFromBasics}
-                    LEFT JOIN SightingComment sc ON s.SightingId = sc.SightingId
-	                LEFT JOIN MediaFile mf ON s.SightingId = mf.SightingId 
-	                LEFT JOIN MediaFileComment mfc ON mf.Id = mfc.MediaFileId
-                WHERE
-	                {SightingWhereBasics}
-                    AND (
-		                s.EditDate > @modifiedSince 
-		                OR sc.CreationTime > @modifiedSince 
-		                OR mfc.CreationTime > @modifiedSince
-	                )
-                /*GROUP BY
-	                s.SightingId
-                ORDER BY
-                    SortDate*/";
-
-                var result = await QueryAsync<int>(query, new { modifiedSince = modifiedSince.ToLocalTime() });
+                var result = await QueryAsync<int>("GetNewAndEditedSightingIds", new { modifiedSince = modifiedSince.ToLocalTime() }, System.Data.CommandType.StoredProcedure);
 
                 Logger.LogInformation($"GetModifiedIdsAsync({modifiedSince.ToLocalTime()}, {limit}, Live={Live}) returned {result?.Count() ?? 0} sightingIds.");
-                Logger.LogDebug(query);
                 if (!result?.Any() ?? true)
                 {
-                    Logger.LogInformation($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}, Query: {query}");
+                    Logger.LogInformation($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}");
                 }
                 return result!;
             }
