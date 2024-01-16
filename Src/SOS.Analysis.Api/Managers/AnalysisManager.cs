@@ -232,16 +232,13 @@ namespace SOS.Analysis.Api.Managers
                         return null!;
                     }
                     metricEooGeometries.Add(alphaValue, eooGeometry);
-                    var area = eooGeometry.Area / 1000000; //Calculate area in km2
-                    var eoo = Math.Round(area, 0);
-                    var transformedEooGeometry = eooGeometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
 
-                    var gridCellCount = gridCells.Count();
                     var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
-                    var aoo = Math.Round((double)gridCellCount * gridCellArea, 0);
+                    var aoo = Math.Round((double)gridCells.Count() * gridCellArea, 0);
+                    var eoo = Math.Round(eooGeometry.Area / 1000000, 0);
 
                     futureCollection.Add(new Feature(
-                        transformedEooGeometry,
+                        eooGeometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem),
                         new AttributesTable(new KeyValuePair<string, object>[] {
                                 new KeyValuePair<string, object>("id", $"eoo-{alphaValue.ToString(CultureInfo.InvariantCulture).Replace(',', '.')}"),
                                 new KeyValuePair<string, object>("aoo", (int)aoo),
@@ -274,14 +271,10 @@ namespace SOS.Analysis.Api.Managers
                 }
 
                 // Add all grid cells features
-                foreach (var gridCellFeatureMetric in gridCellFeaturesMetric.OrderBy(gc => gc.Key))
+                foreach (var gridCellFeatureMetric in gridCellFeaturesMetric.OrderBy(gc => gc.Key).Select(f => f.Value))
                 {
-                    if (coordinateSystem != (CoordinateSys)metricCoordinateSys)
-                    {
-                        gridCellFeatureMetric.Value.Geometry = gridCellFeatureMetric.Value.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
-                    }
-
-                    futureCollection.Add(gridCellFeatureMetric.Value);
+                    gridCellFeatureMetric.Geometry = gridCellFeatureMetric.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
+                    futureCollection.Add(gridCellFeatureMetric);
                 }
 
                 return futureCollection;
@@ -318,7 +311,7 @@ namespace SOS.Analysis.Api.Managers
 
                 var metaData = CalculateMetadata(gridCellsMetric);
                 
-                // We need features to return later so we create them now 
+                // We need features to return later so we create them now and don't need to create the polygon more than once
                 var gridCellFeaturesMetric = gridCellsMetric.Select(gc => gc.MetricBoundingBox
                     .ToPolygon()
                     .ToFeature(new Dictionary<string, object>()
@@ -387,11 +380,12 @@ namespace SOS.Analysis.Api.Managers
                     var inRangeGeometry = new MultiPolygon(polygonsInRange.ToArray());
 
                     // Add all intersections gridcells to feature collection. Add nagative buffer when intersect to prevent gridcell touching corner match
-                    var matchingGridCellFeaturesMetric = gridCellFeaturesMetric.Where(gc => gc.Value.Geometry.Buffer(-1).Intersects(inRangeGeometry)).Select(f => f.Value);
-                    matchingGridCellFeaturesMetric
+                    var eooGridCellFeaturesMetric = gridCellFeaturesMetric.Where(gc => gc.Value.Geometry.Buffer(-1).Intersects(inRangeGeometry)).Select(f => f.Value);
+                    // Add aoo features to collection
+                    eooGridCellFeaturesMetric
                         .Where(f => long.Parse(f.Attributes["observationsCount"]?.ToString() ?? "0") > 0)
                             .ForEach(f => futureCollection.Add(f!));
-                    var eooGeometry = new MultiPolygon(matchingGridCellFeaturesMetric.Select(f => f.Geometry as Polygon).ToArray());
+                    var eooGeometry = new MultiPolygon(eooGridCellFeaturesMetric.Select(f => f.Geometry as Polygon).ToArray());
 
                     var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
                     var aoo = Math.Round((double)gridCellsMetric.Count() * gridCellArea, 0);
