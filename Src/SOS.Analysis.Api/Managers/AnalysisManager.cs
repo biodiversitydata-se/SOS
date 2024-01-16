@@ -385,19 +385,21 @@ namespace SOS.Analysis.Api.Managers
                     }
 
                     // Create a multipolygon showing matching polygons
-                    var eooGeometry = new MultiPolygon(polygonsInRange.ToArray());
+                    var inRangeGeometry = new MultiPolygon(polygonsInRange.ToArray());
 
-                    // Add all intersections gridcells to feature collection. Add nagative buffer when intersection to prevent gridcell touching corner match
-                    gridCellFeaturesMetric
-                        .Where(gc => gc.Value.Geometry.Buffer(-1).Intersects(eooGeometry))
-                            .ForEach(gc => futureCollection.Add(gc.Value));
-                    
+                    // Add all intersections gridcells to feature collection. Add nagative buffer when intersect to prevent gridcell touching corner match
+                    var matchingGridCellFeaturesMetric = gridCellFeaturesMetric.Where(gc => gc.Value.Geometry.Buffer(-1).Intersects(inRangeGeometry)).Select(f => f.Value);
+                    matchingGridCellFeaturesMetric
+                        .Where(f => long.Parse(f.Attributes["observationsCount"]?.ToString() ?? "0") > 0)
+                            .ForEach(f => futureCollection.Add(f!));
+                    var eooGeometry = new MultiPolygon(matchingGridCellFeaturesMetric.Select(f => f.Geometry as Polygon).ToArray());
+
                     var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
                     var eoo = Math.Round((double)futureCollection.Count() * gridCellArea, 0);
                     var aoo = Math.Round((double)gridCellsMetric.Count() * gridCellArea, 0);
                    
                     futureCollection.Add(new Feature(
-                        eooGeometry.Boundary,
+                        eooGeometry,
                         new AttributesTable(new KeyValuePair<string, object>[] {
                             new KeyValuePair<string, object>("id", "eoo"),
                             new KeyValuePair<string, object>("aoo", (int)aoo),

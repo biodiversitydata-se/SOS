@@ -323,13 +323,11 @@ namespace SOS.Lib
                         2001, 
                         {internalFilter.Date.StartDate.Value.Month}, 
                         {internalFilter.Date.StartDate.Value.Day}, 
-                        {internalFilter.Date.StartDate.Value.Minute}, 
-                        {internalFilter.Date.StartDate.Value.Second}, 
-                        {internalFilter.Date.StartDate.Value.Millisecond}, 0, ZoneId.of('Europe/Stockholm'));
-                    long diffInNano = Long.parseLong(""{Math.Abs((internalFilter.Date.StartDate.Value - internalFilter.Date.EndDate.Value).TotalNanoseconds)}"");
-                    ZonedDateTime filterEndDate = filterStartDate.plusNanos(diffInNano);
-                            
-                    HashSet daysOfYear = new HashSet(); 
+                        0, 0, 0, 0, ZoneId.of('Europe/Stockholm'));
+                    int diffInDays = {(int)(internalFilter.Date.EndDate.Value - internalFilter.Date.StartDate.Value).TotalDays};
+                    ZonedDateTime filterEndDate = filterStartDate.plusDays(diffInDays);
+
+                    HashSet daysOfYear = new HashSet();
                     while(filterStartDate.equals(filterEndDate) || filterStartDate.isBefore(filterEndDate)){{
                         int dayOfYear = filterStartDate.getDayOfYear();
                         daysOfYear.add(dayOfYear); 
