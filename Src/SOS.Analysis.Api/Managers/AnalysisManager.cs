@@ -317,8 +317,7 @@ namespace SOS.Analysis.Api.Managers
                 }
 
                 var metaData = CalculateMetadata(gridCellsMetric);
-                var gridCellEnvelope = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY));
-
+                
                 // We need features to return later so we create them now 
                 var gridCellFeaturesMetric = gridCellsMetric.Select(gc => gc.MetricBoundingBox
                     .ToPolygon()
@@ -395,9 +394,9 @@ namespace SOS.Analysis.Api.Managers
                     var eooGeometry = new MultiPolygon(matchingGridCellFeaturesMetric.Select(f => f.Geometry as Polygon).ToArray());
 
                     var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
-                    var eoo = Math.Round((double)futureCollection.Count() * gridCellArea, 0);
                     var aoo = Math.Round((double)gridCellsMetric.Count() * gridCellArea, 0);
-                   
+                    var eoo = Math.Round(eooGeometry.Area / 1000000, 0);
+
                     futureCollection.Add(new Feature(
                         eooGeometry,
                         new AttributesTable(new KeyValuePair<string, object>[] {
