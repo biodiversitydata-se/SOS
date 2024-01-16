@@ -40,7 +40,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         public async Task GetAsyncException()
         {
             _artportalenDataServiceMock.Setup(spds =>
-                    spds.QueryAsync<SightingRelationEntity>(It.IsAny<string>(), It.IsAny<object>(), false))
+                    spds.QueryAsync<SightingRelationEntity>(It.IsAny<string>(), It.IsAny<object>(), false, System.Data.CommandType.Text))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             };
 
             _artportalenDataServiceMock.Setup(spds =>
-                    spds.QueryAsync<SightingRelationEntity>(It.IsAny<string>(), It.IsAny<object>(), false))
+                    spds.QueryAsync<SightingRelationEntity>(It.IsAny<string>(), It.IsAny<object>(), false, System.Data.CommandType.Text))
                 .ReturnsAsync(sightingRelations);
 
             //-----------------------------------------------------------------------------------------------------------

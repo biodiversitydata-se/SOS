@@ -40,7 +40,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         public async Task GetChunkAsyncException()
         {
             _artportalenDataServiceMock
-                .Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>(), false))
+                .Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>(), false, System.Data.CommandType.Text))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             };
 
             _artportalenDataServiceMock
-                .Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>(), false))
+                .Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>(), false, System.Data.CommandType.Text))
                 .ReturnsAsync(projects);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetIdSpanAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<(int minId, int maxId)>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<(int minId, int maxId)>(It.IsAny<string>(), null, false, System.Data.CommandType.Text))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         {
             (int minId, int maxId)[] span = new[] { (1, 2) };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<(int minId, int maxId)>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<(int minId, int maxId)>(It.IsAny<string>(), null, false, System.Data.CommandType.Text))
                 .ReturnsAsync(span);
 
             //-----------------------------------------------------------------------------------------------------------

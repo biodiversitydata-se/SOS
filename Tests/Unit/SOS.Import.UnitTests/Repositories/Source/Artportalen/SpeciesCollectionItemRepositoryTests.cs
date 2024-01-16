@@ -40,7 +40,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         public async Task GetAsyncException()
         {
             _artportalenDataServiceMock
-                .Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null, false))
+                .Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null, false, System.Data.CommandType.Text))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
