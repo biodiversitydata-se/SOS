@@ -297,42 +297,36 @@ namespace SOS.Lib
 
                 if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate)
                 {
-                    selector = "(daysOfYear.contains(eventStartDate.getDayOfYear()) && daysOfYear.contains(eventEndDate.getDayOfYear()))";
+                    selector = "(daysOfYear.contains(startDayOfYear) && daysOfYear.contains(endDayOfYear))";
                 }
                 else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OnlyStartDate)
                 {
-                    selector = "(daysOfYear.contains(eventStartDate.getDayOfYear()))";
+                    selector = "(daysOfYear.contains(startDayOfYear))";
                 }
                 else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OnlyEndDate)
                 {
-                    selector = "(daysOfYear.contains(eventEndDate.getDayOfYear()))";
+                    selector = "(daysOfYear.contains(endDayOfYear))";
                 }
                 else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate)
                 {
-                    selector = "(daysOfYear.contains(eventStartDate.getDayOfYear())) || (daysOfYear.contains(eventEndDate.getDayOfYear()))";
+                    selector = "(daysOfYear.contains(startDayOfYear)) || (daysOfYear.contains(endDayOfYear))";
                 }
-    
-                query.AddScript($@"
-                    ZonedDateTime zStartDate = doc['event.startDate'].value;  
-                    ZonedDateTime eventStartDate = zStartDate.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
-                    ZonedDateTime zEndDate = doc['event.endDate'].value;  
-                    ZonedDateTime eventEndDate = zEndDate.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
-                    
-                    // Change filter date in order to make sure it's no leap year
-                    ZonedDateTime filterStartDate = ZonedDateTime.of(
-                        2001, 
-                        {internalFilter.Date.StartDate.Value.Month}, 
-                        {internalFilter.Date.StartDate.Value.Day}, 
-                        0, 0, 0, 0, ZoneId.of('Europe/Stockholm'));
-                    int diffInDays = {(int)(internalFilter.Date.EndDate.Value - internalFilter.Date.StartDate.Value).TotalDays};
-                    ZonedDateTime filterEndDate = filterStartDate.plusDays(diffInDays);
 
-                    HashSet daysOfYear = new HashSet();
-                    while(filterStartDate.equals(filterEndDate) || filterStartDate.isBefore(filterEndDate)){{
-                        int dayOfYear = filterStartDate.getDayOfYear();
-                        daysOfYear.add(dayOfYear); 
-                        filterStartDate = filterStartDate.plusDays(1);
-                    }}
+                var filterStartDate = new DateTime(2001, internalFilter.Date.StartDate.Value.Month, internalFilter.Date.StartDate.Value.Day);
+                var filterEndDate = filterStartDate.AddDays((internalFilter.Date.EndDate.Value - internalFilter.Date.StartDate.Value).Days);
+
+                var daysOfYear = new HashSet<int>();
+                while (filterStartDate <= filterEndDate)
+                {
+                    int dayOfYear = filterStartDate.DayOfYear;
+                    daysOfYear.Add(dayOfYear);
+                    filterStartDate = filterStartDate.AddDays(1);
+                }
+                
+                query.AddScript($@"
+                    HashSet daysOfYear = new HashSet([{string.Join(',', daysOfYear)}]);
+                    int startDayOfYear = (int)doc['event.startDayOfYear'].value;
+                    int endDayOfYear = (int)doc['event.endDayOfYear'].value;
 
                     if({selector})
                         return true;
@@ -878,6 +872,8 @@ namespace SOS.Lib
             {
                 projection.Excludes(e => e
                     .Field("defects")
+                    .Field("event.endDayOfYear")
+                    .Field("event.startDayOfYear")
                     .Field("event.endHistogramWeek")
                     .Field("event.startHistogramWeek")
                     .Field("artportalenInternal.activityCategoryId")
@@ -893,6 +889,8 @@ namespace SOS.Lib
             {
                 projection.Excludes(e => e
                     .Field("defects")
+                    .Field("event.endDayOfYear")
+                    .Field("event.startDayOfYear")
                     .Field("event.endHistogramWeek")
                     .Field("event.startHistogramWeek")
                     .Field("artportalenInternal")

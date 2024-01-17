@@ -78,27 +78,35 @@ namespace SOS.Lib.Extensions
                 )
                 .Number(x => x
                     .Name(nm => nm.EndDay)
-                    .Type(NumberType.Integer)
+                    .Type(NumberType.Byte)
+                )
+                .Number(x => x
+                    .Name(nm => nm.EndDayOfYear)
+                    .Type(NumberType.Short)
                 )
                 .Number(x => x
                     .Name(nm => nm.EndMonth)
-                    .Type(NumberType.Integer)
+                    .Type(NumberType.Byte)
                 )
                 .Number(x => x
                     .Name(nm => nm.EndYear)
-                    .Type(NumberType.Integer)
+                    .Type(NumberType.Short)
                 )
                 .Number(x => x
                     .Name(nm => nm.StartDay)
-                    .Type(NumberType.Integer)
+                    .Type(NumberType.Byte)
+                )
+                .Number(x => x
+                    .Name(nm => nm.StartDayOfYear)
+                    .Type(NumberType.Short)
                 )
                 .Number(x => x
                     .Name(nm => nm.StartMonth)
-                    .Type(NumberType.Integer)
+                    .Type(NumberType.Byte)
                 )
                 .Number(x => x
                     .Name(nm => nm.StartYear)
-                    .Type(NumberType.Integer)
+                    .Type(NumberType.Short)
                 )
                 .Object<VocabularyValue>(t => t
                     .Name(nm => nm.DiscoveryMethod)

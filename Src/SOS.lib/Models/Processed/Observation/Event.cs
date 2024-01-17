@@ -110,6 +110,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime? StartDate { get; set; }
 
         /// <summary>
+        /// Start day of year
+        /// </summary>
+        public int StartDayOfYear => StartDate.HasValue ? StartDate.Value.DayOfYear : 0;
+
+        /// <summary>
         /// Divide year in 48 "weeks"
         /// </summary>
         public int? StartHistogramWeek => CalculateHistogramWeek(StartDate);
@@ -133,6 +138,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     End date/time of the event in W. Europe Standard Time.
         /// </summary>
         public DateTime? EndDate { get; set; }
+
+        /// <summary>
+        /// Start day of year
+        /// </summary>
+        public int EndDayOfYear => EndDate.HasValue ? EndDate.Value.DayOfYear : 0;
 
         /// <summary>
         /// Divide year in 48 weeks 
