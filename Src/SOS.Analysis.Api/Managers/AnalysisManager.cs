@@ -2,9 +2,6 @@
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Index.Strtree;
-using SOS.Analysis.Api.Dtos.Enums;
-using SOS.Analysis.Api.Dtos.Search;
 using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.Cache.Interfaces;
@@ -122,6 +119,7 @@ namespace SOS.Analysis.Api.Managers
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, precisionThreshold, afterKey, take);
 
+            
             return new PagedAggregationResultDto<UserAggregationResponseDto>
             {
                 AfterKey = result.SearchAfter,

@@ -30,7 +30,7 @@
 		<PackageReference Include="NEST" Version="7.17.5" />
 		<PackageReference Include="NLog" Version="5.2.8" />
 		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.8" />
-		<PackageReference Include="xunit" Version="2.6.5" />
+		<PackageReference Include="xunit" Version="2.6.6" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -21,8 +21,12 @@ using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Extensions.Controller;
 using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Shared.Api.Extensions.Controller;
 using SOS.Shared.Api.Validators.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {

@@ -6,9 +6,9 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Swagger;
-using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
+using SOS.Shared.Api.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -17,18 +17,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using SOS.Shared.Api.Dtos;
-using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Observations.Api.Repositories.Interfaces;
-using Newtonsoft.Json;
-using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System.Globalization;
-using SOS.Lib.Enums;
-using SOS.Lib.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {

@@ -16,8 +16,6 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using SOS.Lib.Models.Export;
-using SOS.Lib.Models.Search.Filters;
 using System;
 using System.Threading.Tasks;
 

@@ -2,13 +2,13 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData;
 using SOS.Observations.Api.IntegrationTests.TestData.Factories;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
@@ -37,6 +37,7 @@ public class TaxonFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
+
         var searchFilter = new SearchFilterDto
         {
             Taxon = new TaxonFilterDto
@@ -44,8 +45,7 @@ public class TaxonFilterTests : TestBase
                 RedListCategories = new string[] { "CR", "EN", "VU" }
             }
         };
-
-        // Act
+                // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
@@ -136,7 +136,7 @@ public class TaxonFilterTests : TestBase
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = SearchFilterDtoFactory.CreateWithTaxonListId(
             (int)TaxonListId.ProtectedByLaw, TaxonListOperatorDto.Merge, TaxonIds.Jättebalsamin);
-
+        
         // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();

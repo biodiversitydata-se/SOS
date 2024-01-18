@@ -18,13 +18,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Autofac" Version="7.1.0" />
+		<PackageReference Include="Autofac" Version="8.0.0" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
-		<PackageReference Include="Cronos" Version="0.8.0" />
+		<PackageReference Include="Cronos" Version="0.8.1" />
 		<PackageReference Include="CycleDetection" Version="2.0.0" />
 		<PackageReference Include="DeepCloner" Version="0.10.4" />
 		<PackageReference Include="DotNetCore.Mapping" Version="18.5.0" />
-		<PackageReference Include="EPPlus" Version="7.0.5" />
+		<PackageReference Include="EPPlus" Version="7.0.6" />
 		<PackageReference Include="Hangfire.Core" Version="1.8.7" />
 		<PackageReference Include="MailKit" Version="4.3.0" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />

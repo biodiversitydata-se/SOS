@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	<PackageReference Include="Bogus" Version="35.3.0" />
+	<PackageReference Include="Bogus" Version="35.4.0" />
 	<PackageReference Include="FluentAssertions" Version="6.12.0" />
 	<PackageReference Include="NBuilder" Version="6.1.0" />
 	<PackageReference Include="NSubstitute" Version="5.1.0" />
@@ -33,7 +33,7 @@
 	<PackageReference Include="Testcontainers.MongoDb" Version="3.7.0" />
 	<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="xunit" Version="2.6.5" />
+    <PackageReference Include="xunit" Version="2.6.6" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -48,6 +48,7 @@
     <ProjectReference Include="..\..\..\Src\External\DwC-A_dotnet\DwC-A_dotnet.csproj" />
     <ProjectReference Include="..\..\..\Src\SOS.Harvest\SOS.Harvest.csproj" />
     <ProjectReference Include="..\..\..\Src\SOS.Observations.Api\SOS.Observations.Api.csproj" />
+    <ProjectReference Include="..\..\..\Src\SOS.Shared.Api\SOS.Shared.Api.csproj" />
     <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
   </ItemGroup>
 

@@ -345,20 +345,21 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                CheckAuthorization(searchFilter.ProtectionFilter);
-                searchFilter = await InitializeSearchFilterAsync(searchFilter);
-                var filter = searchFilter?.ToSearchFilter(UserId, "sv-SE")!;
+                this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
+                searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
+                var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
 
                 var validationResult = Result.Combine(
 
                     maxDistance > 0 ? Result.Success() : Result.Failure("You must state max distance"),
-                    ValidateInt(maxDistance.Value, minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
-                    ValidateSearchFilter(searchFilter!),
-                    ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
-                    await ValidateMetricTilesLimitAsync(
+                    _inputValidator.ValidateInt(maxDistance.Value, minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
+                    _inputValidator.ValidateSearchFilter(searchFilter!),
+                    _inputValidator.ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
+                    await _inputValidator.ValidateTilesLimitMetricAsync(
                         searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                         gridCellSizeInMeters.Value,
-                        _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter)
+                        _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter),
+                        true
                     ));
 
                 if (validationResult.IsFailure)

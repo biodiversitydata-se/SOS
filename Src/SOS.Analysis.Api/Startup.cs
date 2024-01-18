@@ -47,6 +47,8 @@ using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Utilities.Objects;
 using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Shared.Api.Validators;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace SOS.Analysis.Api
 {

@@ -1,6 +1,6 @@
 ﻿using Nest;
 using SOS.Shared.Api.Dtos.DataStewardship.Enums;
-using System.Collections.Generic;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
 namespace SOS.Shared.Api.Dtos.DataStewardship

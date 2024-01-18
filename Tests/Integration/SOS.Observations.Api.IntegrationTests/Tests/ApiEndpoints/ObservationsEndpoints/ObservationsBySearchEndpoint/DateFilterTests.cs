@@ -6,6 +6,7 @@ using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
+using SOS.Observations.Api.IntegrationTests.Helpers;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
@@ -133,7 +134,7 @@ public class DateFilterTests : TestBase
                 DateFilterType = DateFilterTypeDto.OnlyEndDate
             }
         };
-
+        
         // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();

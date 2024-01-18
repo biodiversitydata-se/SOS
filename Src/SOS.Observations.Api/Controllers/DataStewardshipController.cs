@@ -12,6 +12,10 @@ using SOS.Shared.Api.Extensions.Dto;
 using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Shared.Api.Extensions.Controller;
 using Result = CSharpFunctionalExtensions.Result;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {

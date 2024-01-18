@@ -1,13 +1,10 @@
 ﻿using FluentAssertions;
-using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.EndToEndTests.Fixtures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using SOS.Shared.Api.Dtos.Filter;
-using SOS.Observations.Api.EndToEndTests.Fixtures;
 using Xunit;
 
 namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search

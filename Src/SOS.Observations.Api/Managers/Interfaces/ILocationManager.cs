@@ -1,6 +1,8 @@
 ﻿using SOS.Lib.Models.Search.Filters;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.Location;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {

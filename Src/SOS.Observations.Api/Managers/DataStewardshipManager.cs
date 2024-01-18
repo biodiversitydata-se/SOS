@@ -16,6 +16,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using SOS.Shared.Api.Dtos.DataStewardship.Extensions;
 using SOS.Shared.Api.Extensions.Dto;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Observations.Api.Managers
 {

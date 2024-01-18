@@ -1,5 +1,4 @@
-﻿using SOS.Analysis.Api.Dtos.Area.Enum;
-using SOS.Lib.Models.Gis;
+﻿using SOS.Lib.Models.Gis;
 using SOS.Shared.Api.Dtos.Enum;
 
 namespace SOS.Shared.Api.Dtos

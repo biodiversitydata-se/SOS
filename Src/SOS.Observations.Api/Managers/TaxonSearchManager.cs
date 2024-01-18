@@ -9,6 +9,7 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Extensions.Dto;
+using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ITaxonSearchManager = SOS.Observations.Api.Managers.Interfaces.ITaxonSearchManager;
 
 namespace SOS.Observations.Api.Managers
 {

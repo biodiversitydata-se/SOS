@@ -6,6 +6,10 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Extensions.Dto;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Controllers
 {

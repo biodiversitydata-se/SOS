@@ -1,13 +1,17 @@
 ﻿using FluentAssertions;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Observations.Api.LiveIntegrationTests.Extensions;
+using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.Filter;
-using Xunit;
+using System;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Xunit;
+
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
@@ -16,7 +20,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
     public class SearchFromJsonTests
     {
         private readonly ApiIntegrationTestFixture _fixture;
-
+        
         public SearchFromJsonTests(ApiIntegrationTestFixture fixture)
         {
             _fixture = fixture;
@@ -47,7 +51,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.ObservationsBySearch(null, null, filter, 0, 2);
             var result = response.GetResult<PagedResultDto<Observation>>();
-
+            
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

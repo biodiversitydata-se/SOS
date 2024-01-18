@@ -1,13 +1,9 @@
 ﻿using Newtonsoft.Json;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
 using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.Filter;
 

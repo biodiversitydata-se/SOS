@@ -1,11 +1,5 @@
 ﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Dtos.Vocabulary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Shared.Api.Dtos.Vocabulary;
 
 namespace SOS.Shared.Api.Dtos.Checklist

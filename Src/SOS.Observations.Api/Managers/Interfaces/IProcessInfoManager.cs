@@ -1,5 +1,4 @@
-﻿using SOS.Observations.Api.Dtos;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SOS.Shared.Api.Dtos;
 
 namespace SOS.Observations.Api.Managers.Interfaces

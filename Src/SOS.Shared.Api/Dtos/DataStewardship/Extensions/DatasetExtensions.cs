@@ -1,14 +1,8 @@
 ﻿using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using ApiEnums = SOS.Observations.Api.Dtos.DataStewardship.Enums;
 using LibEnums = SOS.Lib.Models.Processed.DataStewardship.Enums;
 using ApiEnums = SOS.Shared.Api.Dtos.DataStewardship.Enums;
-using SOS.Lib.Helpers;
-using System.IO;
 
 namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions
 {

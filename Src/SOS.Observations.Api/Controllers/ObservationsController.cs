@@ -19,6 +19,12 @@ using SOS.Shared.Api.Extensions.Controller;
 using SOS.Shared.Api.Extensions.Dto;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers
@@ -1116,7 +1122,7 @@ namespace SOS.Observations.Api.Controllers
 
                
                 var result = await _observationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
-
+             
                 string strJson = result.GetFeatureCollectionGeoJson();
                 var bytes = Encoding.UTF8.GetBytes(strJson);
                 return File(bytes, "application/json", "grid.geojson");
