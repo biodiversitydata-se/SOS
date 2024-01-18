@@ -45,6 +45,16 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
+using SOS.Observations.Api.Services.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Observations.Api.LiveIntegrationTests.Repositories;
+using SOS.Observations.Api.LiveIntegrationTests.Repositories.Interfaces;
+using SOS.Shared.Api.Utilities.Objects.Interfaces;
+using SOS.Shared.Api.Validators;
+using SOS.Shared.Api.Validators.Interfaces;
+using SOS.Shared.Api.Utilities.Objects;
+using SOS.Lib.Cache.Interfaces;
+using SOS.Shared.Api.Configuration;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
 {
@@ -176,6 +186,15 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             return observationApiConfiguration;
         }
 
+
+        protected InputValaidationConfiguration GetInputValaidationConfiguration()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var inputValaidationConfiguration = config.GetSection($"{configPrefix}:InputValaidationConfiguration").Get<InputValaidationConfiguration>();
+            return inputValaidationConfiguration;
+        }
+       
         private async Task Initialize()
         {
             UserAuthenticationToken = GetUserAuthenticationToken();
@@ -223,11 +242,13 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             FilterManager = filterManager;
             ObservationManager = CreateObservationManager((ProcessedObservationRepository)ProcessedObservationRepository, VocabularyValueResolver, processClient, filterManager);
             var taxonSearchManager = CreateTaxonSearchManager(processedTaxonRepository, filterManager);
-
+            var inputValaidationConfiguration = GetInputValaidationConfiguration();
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, dwcArchiveEventFileWriter, excelFileWriter, geojsonFileWriter,
                 ProcessedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
-            ObservationsController = new ObservationsController(ObservationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
+            var inputValidator = new InputValidator(areaCache, taxonManager, inputValaidationConfiguration);
+            var searchFilterUtility = new SearchFilterUtility(areaCache);
+            ObservationsController = new ObservationsController(ObservationManager, taxonSearchManager, searchFilterUtility, inputValidator, observationApiConfiguration, new NullLogger<ObservationsController>());
             var ctx = new ControllerContext() { HttpContext = new DefaultHttpContext() };
             ObservationsController.ControllerContext = ctx;
             VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());
@@ -237,8 +258,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 ProcessedObservationRepository,
                 new NullLogger<DataProvidersController>());
             var cryptoService = new CryptoService(new CryptoConfiguration() { Password = "password", Salt = "salt" });
-            ExportsController = new ExportsController(ObservationManager, blobStorageManagerMock.Object, areaManager,
-                taxonManager, exportManager, cryptoService, fileService, userExportRepository, observationApiConfiguration,
+            ExportsController = new ExportsController(blobStorageManagerMock.Object, exportManager, cryptoService, fileService, userExportRepository, inputValidator, observationApiConfiguration,
                 new NullLogger<ExportsController>());
             ExportsController.ControllerContext.HttpContext = new DefaultHttpContext();
             TaxonManager = taxonManager;
@@ -272,7 +292,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 elasticConfiguration, processedConfigurationCache,
                 new NullLogger<ProcessedLocationRepository>());
             var locationManager = new LocationManager(processedLocationController, filterManager, new NullLogger<LocationManager>());
-            LocationsController = new LocationsController(locationManager, areaManager, observationApiConfiguration, new NullLogger<LocationsController>());
+            LocationsController = new LocationsController(locationManager, inputValidator, observationApiConfiguration, new NullLogger<LocationsController>());
             AreasController = new AreasController(areaManager, new NullLogger<AreasController>());
         }
 

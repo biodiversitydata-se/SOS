@@ -114,6 +114,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Observations.Api.Integr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LiveIntegration", "LiveIntegration", "{FE09BD2E-E0A8-465B-9917-D31AA720E646}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Shared.Api", "Src\SOS.Shared.Api\SOS.Shared.Api.csproj", "{0964ED67-D326-4DC6-9981-722B57941744}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -216,6 +218,10 @@ Global
 		{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0964ED67-D326-4DC6-9981-722B57941744}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0964ED67-D326-4DC6-9981-722B57941744}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0964ED67-D326-4DC6-9981-722B57941744}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0964ED67-D326-4DC6-9981-722B57941744}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -253,6 +259,7 @@ Global
 		{73FCC760-127E-4D45-8DB3-63DC64F3B846} = {E71FD295-A777-4518-AEB9-6E5E8D1097B0}
 		{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81} = {A3C5E4A0-5599-48B7-BE17-07E19D585ACE}
 		{FE09BD2E-E0A8-465B-9917-D31AA720E646} = {7C2C0ABC-542C-47C2-86C0-C3EDE2C0DC90}
+		{0964ED67-D326-4DC6-9981-722B57941744} = {A1FE1227-E3C9-455B-9F43-FEEEFB131B25}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CBCE6ED-CC4F-4B55-913F-1231086E92FE}

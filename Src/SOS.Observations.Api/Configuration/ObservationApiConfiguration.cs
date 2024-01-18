@@ -9,11 +9,6 @@ namespace SOS.Observations.Api.Configuration
     public class ObservationApiConfiguration
     {
         /// <summary>
-        /// Factor used to compute tiles limit
-        /// </summary>
-        public double CountFactor { get; set; }
-
-        /// <summary>
         /// Default max ongoing export jobs for a user
         /// </summary>
         public int DefaultUserExportLimit { get; set; }
@@ -47,20 +42,5 @@ namespace SOS.Observations.Api.Configuration
         /// Response compression level.
         /// </summary>
         public CompressionLevel ResponseCompressionLevel { get; set; } = CompressionLevel.Optimal;
-
-        /// <summary>
-        /// Taxon list id's allowed in signal search
-        /// </summary>
-        public IEnumerable<int> SignalSearchTaxonListIds { get; set; }
-
-        /// <summary>
-        /// Max number of buckets created by aggregations
-        /// </summary>
-        public int TilesLimitInternal { get; set; }
-
-        /// <summary>
-        /// Max number of buckets created by aggregations
-        /// </summary>
-        public int TilesLimitPublic { get; set; }
     }
 }

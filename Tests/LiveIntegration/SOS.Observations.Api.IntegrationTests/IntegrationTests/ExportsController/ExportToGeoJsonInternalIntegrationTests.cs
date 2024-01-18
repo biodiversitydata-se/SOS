@@ -1,8 +1,10 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
-using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using System.Collections.Generic;
@@ -70,7 +72,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
                         259038
                     }
                 },
-                NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.DontIncludeNotRecovered,
+                NotRecoveredFilter = SightingNotRecoveredFilterDto.DontIncludeNotRecovered,
                 ExtendedFilter = new ExtendedFilterDto
                 {
                     SightingTypeSearchGroupIds = new List<int>
@@ -82,7 +84,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
                         128
                     }
                 },
-                DeterminationFilter = SearchFilterBaseDto.SightingDeterminationFilterDto.NotUnsureDetermination,
+                DeterminationFilter = SightingDeterminationFilterDto.NotUnsureDetermination,
                 Output = new OutputFilterExtendedDto
                 {
                     Fields = new List<string>

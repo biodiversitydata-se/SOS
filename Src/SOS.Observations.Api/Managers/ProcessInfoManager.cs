@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Observations.Api.Dtos;
+using SOS.Shared.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 using System;
 using System.Linq;

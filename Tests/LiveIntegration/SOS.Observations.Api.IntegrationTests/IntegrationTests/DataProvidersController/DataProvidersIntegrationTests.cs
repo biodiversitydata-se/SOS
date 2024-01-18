@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using SOS.Observations.Api.Dtos;
+using SOS.Shared.Api.Dtos;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using System.Collections.Generic;

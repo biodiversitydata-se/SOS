@@ -89,7 +89,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// </summary>
         public int? ObservedByUserServiceUserId { get; set; }
 
-        public bool IncludeRealCount { get; set; }
+        public bool? IncludeRealCount { get; set; }
 
         /// <summary>
         /// Only include hits with media associated

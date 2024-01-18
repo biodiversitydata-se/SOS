@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
-using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Dtos.Location;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Location;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using System.Collections.Generic;

@@ -5,6 +5,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
+using SOS.Shared.Api.Configuration;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup;
 
@@ -47,6 +48,7 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Progra
             services.Replace(ServiceDescriptor.Singleton(x => elasticClientManager!)); // Replace Elasticsearch
             services.Replace(ServiceDescriptor.Singleton(x => elasticSearchConfiguration!));
             services.Replace(ServiceDescriptor.Singleton(x => _apiConfiguration));
+            services.Replace(ServiceDescriptor.Singleton(x => _inputValidationConfiguration));
             services.Replace(ServiceDescriptor.Singleton(x => Substitute.For<IBlobStorageService>()));
 
             services.Configure<AuthenticationOptions>(options =>
@@ -68,9 +70,13 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Progra
         DownloadExportObservationsLimit = 50000,
         OrderExportObservationsLimit = 2000000,
         ExportPath = Path.GetTempPath(),
-        SignalSearchTaxonListIds = new int[] { 1, 7, 8, 17, 18 },
         EnableResponseCompression = true,
-        ResponseCompressionLevel = System.IO.Compression.CompressionLevel.Fastest,
+        ResponseCompressionLevel = System.IO.Compression.CompressionLevel.Fastest
+    };
+
+    private InputValaidationConfiguration _inputValidationConfiguration = new InputValaidationConfiguration()
+    {
+        SignalSearchTaxonListIds = new int[] { 1, 7, 8, 17, 18 },
         TilesLimitInternal = 350000,
         TilesLimitPublic = 65535,
         CountFactor = 1.1

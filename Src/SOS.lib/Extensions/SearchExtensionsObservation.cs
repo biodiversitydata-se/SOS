@@ -22,13 +22,13 @@ namespace SOS.Lib
         /// <param name="filter"></param>
         private static void AddAuthorizationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, ExtendedAuthorizationFilter filter)
         {
-            if (filter.ReportedByMe)
+            if (filter.ReportedByMe ?? false)
             {
                 query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
                     filter.UserId);
             }
 
-            if (filter.ObservedByMe)
+            if (filter.ObservedByMe ?? false)
             {
                 query.TryAddNestedTermAndCriteria("artportalenInternal.occurrenceRecordedByInternal", new Dictionary<string, object> {
                     { "userServiceUserId", filter.UserId },

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using SOS.Lib.Enums;
-using SOS.Observations.Api.Dtos.Vocabulary;
+using SOS.Shared.Api.Dtos.Vocabulary;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+
 using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.TestDataTools

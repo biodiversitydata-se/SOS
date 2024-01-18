@@ -1,30 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using NetTopologySuite.Geometries;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Dtos.Observation;
-using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Helpers;
 using SOS.Observations.Api.Managers.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Observation;
+using SOS.Shared.Api.Extensions.Controller;
+using SOS.Shared.Api.Extensions.Dto;
+using SOS.Shared.Api.Utilities.Objects.Interfaces;
+using SOS.Shared.Api.Validators.Interfaces;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers
@@ -34,153 +28,38 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class ObservationsController : ObservationBaseController
+    public class ObservationsController : ControllerBase
     {
+        private readonly IObservationManager _observationManager;
         private readonly ITaxonSearchManager _taxonSearchManager;
-        private readonly int _tilesLimitInternal;
-        private readonly int _tilesLimitPublic;
-        private readonly double _countFactor;
-        private readonly IEnumerable<int> _signalSearchTaxonListIds;
+        private readonly ISearchFilterUtility _searchFilterUtility;
+        private readonly IInputValidator _inputValidator;
+        private readonly ObservationApiConfiguration _observationApiConfiguration;
         private readonly ILogger<ObservationsController> _logger;
-
-        /// <summary>
-        ///  Validate signal search filter
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="validateSearchFilter"></param>
-        /// <param name="areaBuffer"></param>
-        /// <returns></returns>
-        private Result ValidateSignalSearch(SignalFilterDto filter, bool validateSearchFilter, int areaBuffer)
-        {
-            Result validateTaxonLists(TaxonFilterBaseDto filter)
-            {
-                if (!filter?.TaxonListIds?.Any() ?? true)
-                {
-                    return Result.Failure("You have to provide at least one taxon list id");
-                }
-
-                var containsMandatoryTaxonList = filter.TaxonListIds.Any(tlid => _signalSearchTaxonListIds.Contains(tlid));
-                if (!containsMandatoryTaxonList)
-                {
-                    return Result.Failure("You have to provide at least one mandatory signal search taxon list");
-                }
-
-                return Result.Success();
-            }
-
-            return Result.Combine(
-                validateSearchFilter ? ValidateTaxa(filter?.Taxon?.Ids) : Result.Success(),
-                ValidateGeographicalAreaExists(filter?.Geographics),
-                areaBuffer < 0 || areaBuffer > 100
-                    ? Result.Failure("areaBuffer must be between 0 and 100")
-                    : Result.Success(),
-                filter?.StartDate > DateTime.Now.AddYears(-1) ? Result.Failure("Start date must be at least one year back in time") : Result.Success(),
-                validateTaxonLists(filter?.Taxon)
-            );
-        }
-
-        /// <summary>
-        /// Validate tiles limit
-        /// </summary>
-        /// <param name="tilesLimit"></param>
-        /// <param name="maxTilesTot"></param>
-        /// <param name="countTask"></param>
-        /// <returns></returns>
-        private async Task<Result> TryValidateTilesLimitAsync(int tilesLimit,
-            double maxTilesTot,
-            Task<long> countTask)
-        {
-            if (maxTilesTot > tilesLimit)
-            {
-                var count = await countTask;
-
-                if (count > tilesLimit * _countFactor)
-                {
-                    return Result.Failure($"The number of cells that can be returned is too large. The limit is {tilesLimit} cells. Try using larger grid cell size or a smaller bounding box.");
-                }
-            }
-
-            return Result.Success();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="tilesLimit"></param>
-        /// <param name="envelope"></param>
-        /// <param name="gridCellSizeInMeters"></param>
-        /// <param name="countTask"></param>
-        /// <returns></returns>
-        private async Task<Result> ValidateMetricTilesLimitAsync(
-            int tilesLimit,
-            Envelope envelope,
-            int gridCellSizeInMeters,
-            Task<long> countTask)
-        {
-            if (envelope == null)
-            {
-                return Result.Success();
-            }
-
-            var maxLonTiles = Math.Ceiling((envelope.MaxX - envelope.MinX) / gridCellSizeInMeters);
-            var maxLatTiles = Math.Ceiling((envelope.MaxY - envelope.MinY) / gridCellSizeInMeters);
-            var maxTilesTot = maxLonTiles * maxLatTiles;
-
-            return await TryValidateTilesLimitAsync(tilesLimit, maxTilesTot, countTask);
-        }
-
-        /// <summary>
-        /// Validate tiles limit
-        /// </summary>
-        /// <param name="tilesLimit"></param>
-        /// <param name="envelope"></param>
-        /// <param name="zoom"></param>
-        /// <param name="countTask"></param>
-        /// <returns></returns>
-        private async Task<Result> ValidateTilesLimitAsync(
-            int tilesLimit,
-            Envelope envelope,
-            int zoom,
-            Task<long> countTask)
-        {
-            if (envelope == null)
-            {
-                return Result.Success();
-            }
-
-            var maxTilesTot = envelope.CalculateNumberOfTiles(zoom);
-
-            return await TryValidateTilesLimitAsync(tilesLimit, maxTilesTot, countTask);
-        }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="taxonSearchManager"></param>
-        /// <param name="taxonManager"></param>
-        /// <param name="areaManager"></param>
+        /// <param name="searchFilterUtility"></param>
+        /// <param name="inputValidator"></param>
         /// <param name="observationApiConfiguration"></param>
-        /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ObservationsController(
             IObservationManager observationManager,
             ITaxonSearchManager taxonSearchManager,
-            ITaxonManager taxonManager,
-            IAreaManager areaManager,
+            ISearchFilterUtility searchFilterUtility,
+            IInputValidator inputValidator,
             ObservationApiConfiguration observationApiConfiguration,
-            ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ObservationsController> logger) : base(observationManager, areaManager, taxonManager, observationApiConfiguration)
+            ILogger<ObservationsController> logger) 
         {
-
-            _taxonSearchManager = taxonSearchManager ?? throw new ArgumentNullException(nameof(taxonSearchManager));
-            _tilesLimitInternal = observationApiConfiguration?.TilesLimitInternal ?? throw new ArgumentNullException(nameof(elasticConfiguration));
-            _tilesLimitPublic = observationApiConfiguration.TilesLimitPublic;
-            _countFactor = observationApiConfiguration.CountFactor;
-
-            _signalSearchTaxonListIds = (observationApiConfiguration?.SignalSearchTaxonListIds?.Any() ?? false) ? observationApiConfiguration.SignalSearchTaxonListIds : Array.Empty<int>();
-
+            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
+             _taxonSearchManager = taxonSearchManager ?? throw new ArgumentNullException(nameof(taxonSearchManager));
+            _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
+            _searchFilterUtility = searchFilterUtility ?? throw new ArgumentNullException(nameof(searchFilterUtility));
+            _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -215,18 +94,18 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                
                 occurrenceId = WebUtility.UrlDecode(id ?? occurrenceId);
 
-                var observation = await ObservationManager.GetObservationAsync(UserId, roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
+                var observation = await _observationManager.GetObservationAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
                     includeInternalFields: false, false);
 
                 if (observation == null)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
-                LogObservationCount(1);
+                this.LogObservationCount(1);
                 return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
@@ -275,20 +154,21 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
-                filter = await InitializeSearchFilterAsync(filter);
-
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
+                
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
+                
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries));
-
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries));
+                
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, "sv-SE");
-                var matchCount = await ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
-
-                LogObservationCount(matchCount);
+                var searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, "sv-SE");
+                var matchCount = await _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
+                
+                this.LogObservationCount(matchCount);
                 return new OkObjectResult(matchCount);
             }
             catch (AuthenticationRequiredException e)
@@ -371,26 +251,27 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
-                filter = await InitializeSearchFilterAsync(filter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
+
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
-                var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, translationCultureCode);
+                var searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    await ValidateTilesLimitAsync(_tilesLimitPublic, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
+                    _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
+                    await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
                 );
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(
+                var result = await _observationManager.GetGeogridTileAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier, searchFilter, zoom);
 
@@ -451,17 +332,17 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
-                filter = await InitializeSearchFilterAsync(filter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
-                var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, "en-GB");
+                var searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, "en-GB");
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
-                    await ValidateMetricTilesLimitAsync(_tilesLimitPublic, boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
+                    await _inputValidator.ValidateTilesLimitMetricAsync(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
                     );
 
                 if (validationResult.IsFailure)
@@ -469,8 +350,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-
-                var result = await ObservationManager.GetMetricGridAggregationAsync(
+                var result = await _observationManager.GetMetricGridAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters, MetricCoordinateSys.SWEREF99_TM);
 
@@ -550,21 +430,21 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
-                filter = await InitializeSearchFilterAsync(filter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
-                    ValidateSearchPagingArguments(skip, take),
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidatePropertyExists(nameof(sortBy), sortBy),
-                    ValidateTranslationCultureCode(translationCultureCode));
+                    _inputValidator.ValidateSearchPagingArguments(skip, take),
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidatePropertyExists(nameof(sortBy), sortBy),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-                SearchFilter searchFilter = filter.ToSearchFilter(UserId, protectionFilter, translationCultureCode, sortBy, sortOrder);
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
+                SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
+                var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
-                LogObservationCount(dto?.TotalCount ?? 0);
+                this.LogObservationCount(dto?.TotalCount ?? 0);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -637,10 +517,10 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                var searchFilter = new SearchFilterInternal(UserId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public)
+                var searchFilter = new SearchFilterInternal(this.GetUserId(), sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public)
                 {
                     FieldTranslationCultureCode = translationCultureCode,
                     Output = string.IsNullOrEmpty(sortBy) ? new OutputFilter() : new OutputFilter
@@ -706,10 +586,10 @@ namespace SOS.Observations.Api.Controllers
                     searchFilter.DatasourceIds = new List<int> { 1 }; // Artportalen.
                 }
 
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
+                var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 var dtos = result?.Records?.ToObservations().Select(o => o.ToDto());
 
-                LogObservationCount(dtos?.Count() ?? 0);
+                this.LogObservationCount(dtos?.Count() ?? 0);
                 return new OkObjectResult(dtos);
             }
             catch (AuthenticationRequiredException e)
@@ -759,10 +639,10 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 id = WebUtility.UrlDecode(id);
 
-                var observation = await ObservationManager.GetObservationAsync(UserId, roleId, authorizationApplicationIdentifier, id, OutputFieldSet.All, translationCultureCode, sensitiveObservations,
+                var observation = await _observationManager.GetObservationAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, id, OutputFieldSet.All, translationCultureCode, sensitiveObservations,
                     includeInternalFields: false, false);
 
                 if (observation == null)
@@ -772,7 +652,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var dto = new[] { observation }.ToObservations().Select(o => o.ToDto()).FirstOrDefault();
 
-                LogObservationCount(dto == null ? 0 : 1);
+                this.LogObservationCount(dto == null ? 0 : 1);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -830,19 +710,20 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
-                filter = await InitializeSearchFilterAsync(filter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
+
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
-                var searchFilter = filter.ToSearchFilter(UserId, protectionFilter, translationCultureCode);
+                var searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateTaxonAggregationPagingArguments(skip, take),
-                    await ValidateTilesLimitAsync(_tilesLimitPublic, boundingBox, 1, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
+                    _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take),
+                    await _inputValidator.ValidateTilesLimitAsync(boundingBox, 1, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
                 );
 
                 if (validationResult.IsFailure)
@@ -917,11 +798,11 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                
                 occurrenceId = WebUtility.UrlDecode(occurrenceId ?? id);
-                var observation = await ObservationManager.GetObservationAsync(
-                    UserId,
+                var observation = await _observationManager.GetObservationAsync(
+                    this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
                     includeInternalFields: true, ensureArtportalenUpdated);
@@ -929,7 +810,7 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
-                LogObservationCount(1);
+                this.LogObservationCount(1);
                 return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
@@ -978,18 +859,19 @@ namespace SOS.Observations.Api.Controllers
             {
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
-                filter = await InitializeSearchFilterAsync(filter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries));
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                var searchFilter = filter.ToSearchFilterInternal(UserId, "sv-SE");
-                var matchCount = await ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
-                LogObservationCount(matchCount);
+                var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), "sv-SE");
+                var matchCount = await _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
+                this.LogObservationCount(matchCount);
                 return new OkObjectResult(matchCount);
             }
             catch (AuthenticationRequiredException e)
@@ -1030,7 +912,7 @@ namespace SOS.Observations.Api.Controllers
                 var result = await _taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { taxonId });
                 if (!result.Any())
                     return NoContent();
-                LogObservationCount(result.First()?.ObservationCount ?? 0);
+                this.LogObservationCount(result.First()?.ObservationCount ?? 0);
                 return new OkObjectResult(result.First());
             }
             catch (Exception e)
@@ -1060,7 +942,7 @@ namespace SOS.Observations.Api.Controllers
                 if (!result.Any())
                     return NoContent();
 
-                LogObservationCount(result?.Count() ?? 0);
+                this.LogObservationCount(result?.Count() ?? 0);
                 return new OkObjectResult(result);
             }
             catch (Exception e)
@@ -1131,20 +1013,20 @@ namespace SOS.Observations.Api.Controllers
             {
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
 
-                filter = await InitializeSearchFilterAsync(filter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
-                var searchFilter = filter.ToSearchFilterInternal(UserId, translationCultureCode);
+                var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
+                    _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
+                    await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
                 );
 
                 if (validationResult.IsFailure)
@@ -1152,8 +1034,8 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
-
+                var result = await _observationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
+              
                 GeoGridResultDto dto = result.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
                 return new OkObjectResult(dto);
             }
@@ -1211,20 +1093,20 @@ namespace SOS.Observations.Api.Controllers
             {
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
 
-                filter = await InitializeSearchFilterAsync(filter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
-                var searchFilter = filter.ToSearchFilter(UserId, filter.ProtectionFilter, translationCultureCode);
+                var searchFilter = filter.ToSearchFilter(this.GetUserId(), filter.ProtectionFilter, translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
+                    _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
+                    await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
                 );
 
                 if (validationResult.IsFailure)
@@ -1232,8 +1114,8 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
+               
+                var result = await _observationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
 
                 string strJson = result.GetFeatureCollectionGeoJson();
                 var bytes = Encoding.UTF8.GetBytes(strJson);
@@ -1324,20 +1206,20 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
 
-                filter = await InitializeSearchFilterAsync(filter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
-                var searchFilter = filter.ToSearchFilterInternal(UserId, translationCultureCode);
+                var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, zoom, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
+                    _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
+                    await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
                 );
 
                 if (validationResult.IsFailure)
@@ -1400,18 +1282,18 @@ namespace SOS.Observations.Api.Controllers
             {
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
 
-                filter = await InitializeSearchFilterAsync(filter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
-                var searchFilter = filter.ToSearchFilter(UserId, filter.ProtectionFilter, "en-GB");
+                var searchFilter = filter.ToSearchFilter(this.GetUserId(), filter.ProtectionFilter, "en-GB");
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
-                    await ValidateMetricTilesLimitAsync(_tilesLimitInternal, boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
+                    await _inputValidator.ValidateTilesLimitMetricAsync(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
                 );
 
                 if (validationResult.IsFailure)
@@ -1419,8 +1301,8 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-
-                var result = await ObservationManager.GetMetricGridAggregationAsync(
+                
+                var result = await _observationManager.GetMetricGridAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier,
                     searchFilter,
@@ -1505,16 +1387,16 @@ namespace SOS.Observations.Api.Controllers
             {
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
-                filter = await InitializeSearchFilterAsync(filter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidatePropertyExists(nameof(sortBy), sortBy),
-                    ValidateSearchPagingArgumentsInternal(skip, take),
-                    ValidateTranslationCultureCode(translationCultureCode));
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidatePropertyExists(nameof(sortBy), sortBy),
+                    _inputValidator.ValidateSearchPagingArgumentsInternal(skip, take),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 if (outputFormat == OutputFormatDto.GeoJson || outputFormat == OutputFormatDto.GeoJsonFlat)
@@ -1527,9 +1409,9 @@ namespace SOS.Observations.Api.Controllers
                         filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
                     }
                 }
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(UserId, translationCultureCode, sortBy, sortOrder), skip, take);
+                var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode, sortBy, sortOrder), skip, take);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
-                LogObservationCount(dto?.TotalCount ?? 0);
+                this.LogObservationCount(dto?.TotalCount ?? 0);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -1555,8 +1437,8 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                _logger.LogInformation($"User.UserId={UserId}");
-                _logger.LogInformation($"User.Email={UserEmail?.ToString() ?? "[null]"}");
+                _logger.LogInformation($"User.UserId={this.GetUserId()}");
+                _logger.LogInformation($"User.Email={this.GetUserEmail()?.ToString() ?? "[null]"}");
                 if (User?.Claims != null)
                 {
                     foreach (var claim in User.Claims)
@@ -1633,15 +1515,15 @@ namespace SOS.Observations.Api.Controllers
             {
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
-                filter = await InitializeSearchFilterAsync(filter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidateAggregationPagingArguments(skip, take, true),
-                    ValidateTranslationCultureCode(translationCultureCode));
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateAggregationPagingArguments(skip, take, true),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure)
                 {
@@ -1656,7 +1538,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(Result.Failure("You have to limit the time span. Use date.startDate and date.endDate to limit your request"));
                 }
 
-                var result = await ObservationManager.GetAggregatedChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(UserId, translationCultureCode), aggregationType, skip, take);
+                var result = await _observationManager.GetAggregatedChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode), aggregationType, skip, take);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result?.Records);
                 return new OkObjectResult(dto);
             }
@@ -1728,29 +1610,29 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
-                filter = await InitializeSearchFilterAsync(filter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 const int maxTotalCount = 100000;
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     take <= 10000 ? Result.Success() : Result.Failure("You can't take more than 10 000 at a time."),
-                    ValidatePropertyExists(nameof(sortBy), sortBy),
-                    ValidateTranslationCultureCode(translationCultureCode));
+                    _inputValidator.ValidatePropertyExists(nameof(sortBy), sortBy),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                SearchFilter searchFilter = filter.ToSearchFilter(UserId, protectionFilter, translationCultureCode, sortBy, sortOrder);
-                var result = await ObservationManager.GetObservationsByScrollAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, scrollId);
+                SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
+                var result = await _observationManager.GetObservationsByScrollAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, scrollId);
                 if (result.TotalCount > maxTotalCount)
                 {
                     return BadRequest($"Scroll total count limit is maxTotalCount. Your result is {result.TotalCount}. Try use a more specific filter.");
                 }
 
                 ScrollResultDto<dynamic> dto = result.ToScrollResultDto(result.Records);
-                LogObservationCount(dto?.TotalCount ?? 0);
+                this.LogObservationCount(dto?.TotalCount ?? 0);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -1799,19 +1681,19 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                CheckAuthorization(ProtectionFilterDto.Sensitive);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, ProtectionFilterDto.Sensitive);
 
                 var validationResult = Result.Combine(
-                    ValidateSignalSearch(filter, validateSearchFilter, areaBuffer),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                    _inputValidator.ValidateSignalSearch(filter, validateSearchFilter, areaBuffer),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal(UserId, true);
-                var taxonFound = await ObservationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance);
+                var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), true);
+                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance);
 
                 return new OkObjectResult(taxonFound);
             }
@@ -1872,20 +1754,20 @@ namespace SOS.Observations.Api.Controllers
             {
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
 
-                filter = await InitializeSearchFilterAsync(filter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
-                var searchFilter = filter.ToSearchFilterInternal(UserId, translationCultureCode);
+                var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateTaxonAggregationPagingArguments(skip, take),
-                    await ValidateTilesLimitAsync(_tilesLimitInternal, boundingBox, 1, ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
+                    _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take),
+                    await _inputValidator.ValidateTilesLimitAsync(boundingBox, 1, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
                  );
 
                 if (validationResult.IsFailure)
@@ -1957,7 +1839,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var result = await _taxonSearchManager.GetTaxonSumAggregationAsync(
-                    UserId,
+                    this.GetUserId(),
                     taxonFilter.ToTaxonFilterFilter(),
                     skip,
                     take,
@@ -2018,21 +1900,21 @@ namespace SOS.Observations.Api.Controllers
             {
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
-                filter = await InitializeSearchFilterAsync(filter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries),
-                    ValidateTaxonExists(filter),
-                    ValidateGeographicalAreaExists(filter?.Geographics));
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateTaxonExists(filter),
+                    _inputValidator.ValidateGeographicalAreaExists(filter?.Geographics));
 
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal(UserId, "sv-SE");
+                var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), "sv-SE");
                 var taxonFound = await _taxonSearchManager.GetTaxonExistsIndicationAsync(roleId, authorizationApplicationIdentifier, searchFilter);
 
                 return new OkObjectResult(taxonFound);
@@ -2081,9 +1963,9 @@ namespace SOS.Observations.Api.Controllers
             {
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                    ValidateGeometries(filter?.Geographics?.Geometries)
+                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
                 );
 
                 if (validationResult.IsFailure)
@@ -2091,8 +1973,8 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal(UserId, "sv-SE");
-                var yearCounts = await ObservationManager.GetUserYearCountAsync(searchFilter);
+                var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), "sv-SE");
+                var yearCounts = await _observationManager.GetUserYearCountAsync(searchFilter);
 
                 return new OkObjectResult(yearCounts);
             }
@@ -2138,9 +2020,9 @@ namespace SOS.Observations.Api.Controllers
             {
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
-                   validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                   ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                   ValidateGeometries(filter?.Geographics?.Geometries)
+                   validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                   _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                   _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
                 );
 
                 if (validationResult.IsFailure)
@@ -2148,8 +2030,8 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal(UserId, "sv-SE");
-                var yearMonthCounts = await ObservationManager.GetUserYearMonthCountAsync(searchFilter);
+                var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), "sv-SE");
+                var yearMonthCounts = await _observationManager.GetUserYearMonthCountAsync(searchFilter);
 
                 return new OkObjectResult(yearMonthCounts);
             }
@@ -2198,9 +2080,9 @@ namespace SOS.Observations.Api.Controllers
             {
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
-                  validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                  ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                  ValidateGeometries(filter?.Geographics?.Geometries)
+                  validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                  _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                  _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
                );
 
                 if (validationResult.IsFailure)
@@ -2208,8 +2090,8 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal(UserId, "sv-SE");
-                var yearMonthDayCounts = await ObservationManager.GetUserYearMonthDayCountAsync(searchFilter, skip, take);
+                var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), "sv-SE");
+                var yearMonthDayCounts = await _observationManager.GetUserYearMonthDayCountAsync(searchFilter, skip, take);
 
                 return new OkObjectResult(yearMonthDayCounts);
             }

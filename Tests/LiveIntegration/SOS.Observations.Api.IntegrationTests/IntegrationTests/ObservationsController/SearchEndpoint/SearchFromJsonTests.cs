@@ -1,11 +1,9 @@
 ﻿using FluentAssertions;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.LiveIntegrationTests.Extensions;
-using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
-using System.Linq;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Filter;
+using Xunit;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;

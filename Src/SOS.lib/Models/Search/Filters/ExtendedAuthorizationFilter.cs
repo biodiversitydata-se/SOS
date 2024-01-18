@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// <summary>
         /// Only get observations observed by me
         /// </summary>
-        public bool ObservedByMe { get; set; }
+        public bool? ObservedByMe { get; set; }
 
         /// <summary>
         /// Observation protection filter
@@ -26,7 +26,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// <summary>
         /// Only get observations reported by me
         /// </summary>
-        public bool ReportedByMe { get; set; }
+        public bool? ReportedByMe { get; set; }
 
         /// <summary>
         /// Id of user making the request

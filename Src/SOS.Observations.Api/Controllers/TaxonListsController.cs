@@ -2,14 +2,9 @@
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Helpers;
 using SOS.Lib.Swagger;
-using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Dtos;
+using SOS.Shared.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+using SOS.Shared.Api.Configuration;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -28,16 +23,16 @@ namespace SOS.Observations.Api.Controllers
         /// Constructor
         /// </summary>
         /// <param name="taxonListManager"></param>
-        /// <param name="observationApiConfiguration"></param>
+        /// <param name="inputValaidationConfiguration"></param>
         /// <param name="logger"></param>
         public TaxonListsController(
             ITaxonListManager taxonListManager,
-            ObservationApiConfiguration observationApiConfiguration,
+            InputValaidationConfiguration inputValaidationConfiguration,
             ILogger<TaxonListsController> logger)
         {
             _taxonListManager = taxonListManager ?? throw new ArgumentNullException(nameof(taxonListManager));
-            _signalSearchTaxonListIds = observationApiConfiguration?.SignalSearchTaxonListIds ??
-                                        throw new ArgumentNullException(nameof(observationApiConfiguration));
+            _signalSearchTaxonListIds = inputValaidationConfiguration?.SignalSearchTaxonListIds ??
+                                        throw new ArgumentNullException(nameof(inputValaidationConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

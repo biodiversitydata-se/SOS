@@ -4,6 +4,9 @@ using SOS.Observations.Api.EndToEndTests.Fixtures;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
+using SOS.Shared.Api.Dtos.Filter;
+using SOS.Observations.Api.EndToEndTests.Fixtures;
 using Xunit;
 
 namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.TaxonAggregation
@@ -31,8 +34,8 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.TaxonAgg
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                VerificationStatus = Shared.Api.Dtos.Enum.StatusVerificationDto.BothVerifiedAndNotVerified,
+                OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -62,8 +65,8 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.TaxonAgg
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                VerificationStatus = Shared.Api.Dtos.Enum.StatusVerificationDto.BothVerifiedAndNotVerified,
+                OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------

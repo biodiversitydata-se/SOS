@@ -2,11 +2,13 @@
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Dtos.Location;
-using SOS.Observations.Api.Extensions;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Location;
+using SOS.Shared.Api.Extensions.Controller;
+using SOS.Shared.Api.Extensions.Dto;
+using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -22,27 +24,31 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class LocationsController : SearchBaseController
+    public class LocationsController : ControllerBase
     {
         private readonly ILocationManager _locationManager;
+        private readonly IInputValidator _inputValidator;
+        private readonly ObservationApiConfiguration _observationApiConfiguration;
         private readonly ILogger<LocationsController> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="locationManager"></param>
-        /// <param name="areaManager"></param>
+        /// <param name="inputValidator"></param>
         /// <param name="observationApiConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public LocationsController(
             ILocationManager locationManager,
-            IAreaManager areaManager,
+            IInputValidator inputValidator,
             ObservationApiConfiguration observationApiConfiguration,
-            ILogger<LocationsController> logger) : base(areaManager, observationApiConfiguration)
+            ILogger<LocationsController> logger)
         {
             _locationManager = locationManager ??
                                   throw new ArgumentNullException(nameof(locationManager));
+            _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
+            _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -102,13 +108,13 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
 
                 var searchFilter = new SearchFilterBaseDto { Geographics = filter };
                 var validationResult = Result.Combine(
-                    ValidateSearchFilter(searchFilter),
-                    ValidateBoundingBox(filter?.BoundingBox, false),
-                    ValidateSearchPagingArguments(skip, take)
+                    _inputValidator.ValidateSearchFilter(searchFilter),
+                    _inputValidator.ValidateBoundingBox(filter?.BoundingBox, false),
+                    _inputValidator.ValidateSearchPagingArguments(skip, take)
                 );
 
                 if (validationResult.IsFailure)
@@ -116,7 +122,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var locations = await _locationManager.SearchAsync(roleId, authorizationApplicationIdentifier, searchFilter.ToSearchFilter(UserId, protectionFilter, "sv-SE"), skip, take);
+                var locations = await _locationManager.SearchAsync(roleId, authorizationApplicationIdentifier, searchFilter.ToSearchFilter(this.GetUserId(), protectionFilter, "sv-SE"), skip, take);
 
                 return new OkObjectResult(locations);
             }

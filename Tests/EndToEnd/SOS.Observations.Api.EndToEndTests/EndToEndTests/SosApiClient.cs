@@ -6,6 +6,10 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.EndToEndTests.EndToEndTests
 {

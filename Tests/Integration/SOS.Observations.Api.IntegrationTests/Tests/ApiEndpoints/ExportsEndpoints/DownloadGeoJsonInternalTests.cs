@@ -1,7 +1,8 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
@@ -73,9 +74,9 @@ public class DownloadGeoJsonInternalTests : TestBase
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 6);
         var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
         var searchFilter = new SearchFilterInternalDto
-        {
-            ProtectionFilter = Dtos.Enum.ProtectionFilterDto.BothPublicAndSensitive,
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent
+        { 
+            ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,    
+            OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent 
         };
 
         // Act

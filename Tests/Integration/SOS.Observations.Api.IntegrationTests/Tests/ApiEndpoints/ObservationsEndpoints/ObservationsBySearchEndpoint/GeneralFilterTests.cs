@@ -3,8 +3,9 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -124,7 +125,7 @@ public class GeneralFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto { VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.Verified };
+        var searchFilter = new SearchFilterDto { VerificationStatus = StatusVerificationDto.Verified };
 
         // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
@@ -165,7 +166,7 @@ public class GeneralFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto { VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.NotVerified };
+        var searchFilter = new SearchFilterDto { VerificationStatus = StatusVerificationDto.NotVerified };
 
         // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
@@ -190,7 +191,7 @@ public class GeneralFilterTests : TestBase
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = new SearchFilterDto
         {
-            DeterminationFilter = SearchFilterBaseDto.SightingDeterminationFilterDto.NotUnsureDetermination
+            DeterminationFilter = SightingDeterminationFilterDto.NotUnsureDetermination
         };
 
         // Act
@@ -216,7 +217,7 @@ public class GeneralFilterTests : TestBase
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = new SearchFilterDto
         {
-            DeterminationFilter = SearchFilterBaseDto.SightingDeterminationFilterDto.OnlyUnsureDetermination
+            DeterminationFilter = SightingDeterminationFilterDto.OnlyUnsureDetermination
         };
 
         // Act
@@ -242,7 +243,7 @@ public class GeneralFilterTests : TestBase
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = new SearchFilterDto
         {
-            NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.DontIncludeNotRecovered
+            NotRecoveredFilter = SightingNotRecoveredFilterDto.DontIncludeNotRecovered
         };
 
         // Act
@@ -268,7 +269,7 @@ public class GeneralFilterTests : TestBase
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = new SearchFilterDto
         {
-            NotRecoveredFilter = SearchFilterBaseDto.SightingNotRecoveredFilterDto.OnlyNotRecovered
+            NotRecoveredFilter = SightingNotRecoveredFilterDto.OnlyNotRecovered
         };
 
         // Act

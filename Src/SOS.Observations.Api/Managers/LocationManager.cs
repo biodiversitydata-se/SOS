@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Location;
-using SOS.Observations.Api.Extensions;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Location;
+using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 using System;

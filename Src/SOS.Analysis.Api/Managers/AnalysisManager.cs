@@ -15,6 +15,8 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Search;
 using System.Globalization;
 
 namespace SOS.Analysis.Api.Managers

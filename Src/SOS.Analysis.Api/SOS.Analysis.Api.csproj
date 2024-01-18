@@ -24,6 +24,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\SOS.lib\SOS.Lib.csproj" />
+		<ProjectReference Include="..\SOS.Shared.Api\SOS.Shared.Api.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

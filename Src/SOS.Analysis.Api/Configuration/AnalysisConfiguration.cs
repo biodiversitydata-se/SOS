@@ -8,19 +8,9 @@ namespace SOS.Analysis.Api.Configuration
     public class AnalysisConfiguration
     {
         /// <summary>
-        /// Factor used to compute tiles limit
-        /// </summary>
-        public double CountFactor { get; set; }
-
-        /// <summary>
         /// True if response compression shuld be enabled
         /// </summary>
         public bool EnableResponseCompression { get; set; }
-
-        /// <summary>
-        /// Max number of buckets created by aggregations
-        /// </summary>
-        public int TilesLimit { get; set; }
 
         /// <summary>
         /// Protected scope

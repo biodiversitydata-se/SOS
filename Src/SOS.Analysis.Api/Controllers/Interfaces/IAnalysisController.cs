@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SOS.Analysis.Api.Dtos.Enums;
-using SOS.Analysis.Api.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Enums;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
 
 namespace SOS.Analysis.Api.Controllers.Interfaces
 {

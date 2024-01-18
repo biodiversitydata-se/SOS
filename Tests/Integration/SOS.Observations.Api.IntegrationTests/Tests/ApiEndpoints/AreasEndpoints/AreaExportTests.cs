@@ -1,5 +1,5 @@
 ﻿using FluentAssertions.Execution;
-using SOS.Observations.Api.Dtos;
+using SOS.Shared.Api.Dtos;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData;
 using System.IO.Compression;

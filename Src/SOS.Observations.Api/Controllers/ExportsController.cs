@@ -9,23 +9,20 @@ using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Dtos.Enum;
-using SOS.Observations.Api.Dtos.Export;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Extensions;
+using SOS.Shared.Api.Dtos.Export;
+using SOS.Shared.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Extensions.Controller;
+using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+using SOS.Shared.Api.Extensions.Controller;
+using SOS.Shared.Api.Validators.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -34,17 +31,20 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class ExportsController : ObservationBaseController
+    public class ExportsController : ControllerBase
     {
+        private readonly IObservationManager _observationManager;
         private readonly IBlobStorageManager _blobStorageManager;
         private readonly ICryptoService _cryptoService;
         private readonly IExportManager _exportManager;
         private readonly IFileService _fileService;
         private readonly IUserExportRepository _userExportRepository;
+        private readonly IInputValidator _inputValidator;
         private readonly int _defaultUserExportLimit;
         private readonly long _orderExportObservationsLimit;
         private readonly long _downloadExportObservationsLimit;
         private readonly string _exportPath;
+        private readonly ObservationApiConfiguration _observationApiConfiguration;
         private readonly ILogger<ExportsController> _logger;
 
         /// <summary>
@@ -88,8 +88,8 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         private async Task<UserExport> GetUserExportsAsync()
         {
-            var userExport = await _userExportRepository.GetAsync(UserId);
-            return userExport ?? new UserExport { Id = UserId, Limit = _defaultUserExportLimit };
+            var userExport = await _userExportRepository.GetAsync(this.GetUserId());
+            return userExport ?? new UserExport { Id = this.GetUserId(), Limit = _defaultUserExportLimit };
         }
 
         /// <summary>
@@ -129,11 +129,11 @@ namespace SOS.Observations.Api.Controllers
             string applicationIdentifier)
         {
             var validationResults = Result.Combine(
-                validateSearchFilter ? ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
-                ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                ValidateEmail(email),
+                validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
+                _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                _inputValidator.ValidateEmail(email),
                 ValidateUserExport(userExport),
-                ValidateEncryptPassword(encryptPassword, confirmEncryptPassword, protectionFilter ?? ProtectionFilterDto.Public),
+                _inputValidator.ValidateEncryptPassword(encryptPassword, confirmEncryptPassword, protectionFilter ?? ProtectionFilterDto.Public),
                 !protectionFilter.Equals(ProtectionFilterDto.Public) && sendMailFromZendTo ? Result.Failure("You are not allowed to send e-mail from ZendTo when sensitive observations are requested") : Result.Success()
            );
 
@@ -142,8 +142,8 @@ namespace SOS.Observations.Api.Controllers
                 return (Result: BadRequest(validationResults.Error), Count: null);
             }
 
-            var exportFilter = filter.ToSearchFilter(UserId, protectionFilter ?? ProtectionFilterDto.Public, "en-GB");
-            var matchCount = await ObservationManager.GetMatchCountAsync(roleId, applicationIdentifier, exportFilter.Clone());
+            var exportFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter ?? ProtectionFilterDto.Public, "en-GB");
+            var matchCount = await _observationManager.GetMatchCountAsync(roleId, applicationIdentifier, exportFilter.Clone());
             if (matchCount == 0)
             {
                 return (Result: NoContent(), Count: 0);
@@ -153,8 +153,8 @@ namespace SOS.Observations.Api.Controllers
             {
                 return (Result: BadRequest($"Query exceeds limit of {_orderExportObservationsLimit} observations."), Count: matchCount);
             }
-            LogObservationCount(matchCount);
-            return (Result: new OkObjectResult(exportFilter), Count: matchCount);
+            this.LogObservationCount(matchCount);
+            return (Result: new OkObjectResult(exportFilter), Count: matchCount);            
         }
 
         /// <summary>
@@ -174,8 +174,8 @@ namespace SOS.Observations.Api.Controllers
             string applicationIdentifier)
         {
             var validationResults = Result.Combine(
-                validateSearchFilter ? ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
-                ValidateBoundingBox(filter?.Geographics?.BoundingBox, false)
+                validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
+                _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false)
             );
 
             if (validationResults.IsFailure)
@@ -183,8 +183,8 @@ namespace SOS.Observations.Api.Controllers
                 return BadRequest(validationResults);
             }
 
-            var exportFilter = filter.ToSearchFilter(UserId, protectionFilter ?? ProtectionFilterDto.Public, "en-GB");
-            var matchCount = await ObservationManager.GetMatchCountAsync(roleId, applicationIdentifier, exportFilter);
+            var exportFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter ?? ProtectionFilterDto.Public, "en-GB");            
+            var matchCount = await _observationManager.GetMatchCountAsync(roleId, applicationIdentifier, exportFilter);
 
             if (matchCount == 0)
             {
@@ -195,7 +195,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 return BadRequest($"Query exceeds limit of {_downloadExportObservationsLimit} observations.");
             }
-            LogObservationCount(matchCount);
+            this.LogObservationCount(matchCount);
             return new OkObjectResult(exportFilter);
         }
 
@@ -229,29 +229,26 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Constructor
+        /// /Constructor
         /// </summary>
-        /// <param name="observationManager"></param>
         /// <param name="blobStorageManager"></param>
-        /// <param name="areaManager"></param>
-        /// <param name="taxonManager"></param>
         /// <param name="exportManager"></param>
         /// <param name="cryptoService"></param>
         /// <param name="fileService"></param>
         /// <param name="userExportRepository"></param>
+        /// <param name="inputValidator"></param>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public ExportsController(IObservationManager observationManager,
+        public ExportsController(
             IBlobStorageManager blobStorageManager,
-            IAreaManager areaManager,
-            ITaxonManager taxonManager,
             IExportManager exportManager,
             ICryptoService cryptoService,
             IFileService fileService,
             IUserExportRepository userExportRepository,
+            IInputValidator inputValidator,
             ObservationApiConfiguration configuration,
-            ILogger<ExportsController> logger) : base(observationManager, areaManager, taxonManager, configuration)
+            ILogger<ExportsController> logger)
         {
             _blobStorageManager = blobStorageManager ?? throw new ArgumentNullException(nameof(blobStorageManager));
             _exportManager = exportManager ?? throw new ArgumentNullException(nameof(exportManager));
@@ -259,10 +256,8 @@ namespace SOS.Observations.Api.Controllers
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _userExportRepository =
                 userExportRepository ?? throw new ArgumentNullException(nameof(userExportRepository));
-            _defaultUserExportLimit = configuration?.DefaultUserExportLimit ?? throw new ArgumentNullException(nameof(configuration));
-            _orderExportObservationsLimit = configuration.OrderExportObservationsLimit;
-            _downloadExportObservationsLimit = configuration.DownloadExportObservationsLimit;
-            _exportPath = configuration.ExportPath;
+            _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
+            _observationApiConfiguration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -390,8 +385,8 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
-
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
+                
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
 
@@ -465,7 +460,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
                 filter.Output = new OutputFilterDto { FieldSet = OutputFieldSet.All };
 
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
@@ -545,7 +540,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -630,8 +625,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
 
@@ -722,12 +716,12 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -736,7 +730,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Csv, cultureCode, false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Csv, cultureCode, false,
                         propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -807,10 +801,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
 
                 var userExports = await GetUserExportsAsync();
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -820,7 +814,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
                         PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -895,12 +889,12 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -911,7 +905,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
 
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Excel, cultureCode, false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Excel, cultureCode, false,
                         propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -990,12 +984,12 @@ namespace SOS.Observations.Api.Controllers
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                CheckAuthorization(protectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1005,7 +999,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.GeoJson, cultureCode,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.GeoJson, cultureCode,
                         flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -1068,7 +1062,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -1142,7 +1136,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
                 if (validateResult is not OkObjectResult okResult)
@@ -1215,7 +1209,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -1299,7 +1293,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -1390,12 +1384,12 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1405,7 +1399,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Csv, cultureCode, false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Csv, cultureCode, false,
                         propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -1475,10 +1469,10 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 
                 var userExports = await GetUserExportsAsync();
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1488,7 +1482,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
                         PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -1562,12 +1556,12 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1577,7 +1571,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.Excel, cultureCode, false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Excel, cultureCode, false,
                         propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -1655,12 +1649,12 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                CheckAuthorization(filter.ProtectionFilter);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, UserEmail, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1670,7 +1664,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, UserEmail, description, ExportFormat.GeoJson, cultureCode,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.GeoJson, cultureCode,
                         flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo

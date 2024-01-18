@@ -42,8 +42,11 @@ using SOS.Lib.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Globalization;
-using System.Reflection;
-using System.Text.Json.Serialization;
+using SOS.Shared.Api.Configuration;
+using SOS.Shared.Api.Utilities.Objects.Interfaces;
+using SOS.Shared.Api.Utilities.Objects;
+using SOS.Shared.Api.Validators.Interfaces;
+using SOS.Shared.Api.Validators;
 
 namespace SOS.Analysis.Api
 {
@@ -308,6 +311,7 @@ namespace SOS.Analysis.Api
             // Add configuration
             services.AddSingleton(analysisConfiguration!);
             services.AddSingleton(elasticConfiguration!);
+            services.AddSingleton(Configuration.GetSection("InputValaidationConfiguration").Get<InputValaidationConfiguration>()!);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>()!);
 
             // Add security
@@ -337,6 +341,11 @@ namespace SOS.Analysis.Api
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddScoped<IUserService, UserService>();
 
+            // Add Utilites
+            services.AddScoped<ISearchFilterUtility, SearchFilterUtility>();
+
+            // Add Validators
+            services.AddScoped<IInputValidator, InputValidator>();
         }
 
         /// <summary>

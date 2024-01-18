@@ -7,7 +7,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
-using SOS.Observations.Api.Dtos.Filter;
+using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using System.Collections.Generic;
@@ -52,7 +52,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
                     },
                     ConsiderObservationAccuracy = false
                 },
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
                     },
                     ConsiderObservationAccuracy = false
                 },
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------

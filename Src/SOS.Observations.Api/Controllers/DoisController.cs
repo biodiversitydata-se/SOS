@@ -8,9 +8,11 @@ using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Extensions;
+using SOS.Shared.Api.Dtos.Filter;
+using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Shared.Api.Validators.Interfaces;
+using SOS.Shared.Api.Extensions.Controller;
 using System;
 using System.Linq;
 using System.Net;
@@ -24,10 +26,12 @@ namespace SOS.Observations.Api.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize/*(Roles = "Privat")*/]
-    public class DOIsController : ObservationBaseController
+    public class DOIsController : ControllerBase
     {
+        private readonly IObservationManager _observationManager;
         private readonly IDataCiteService _dataCiteService;
         private readonly IBlobStorageService _blobStorageService;
+        private readonly IInputValidator _inputValidator;
         private readonly long _exportObservationsLimit;
         private readonly ILogger<ExportsController> _logger;
 
@@ -39,6 +43,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="taxonManager"></param>
         /// <param name="dataCiteService"></param>
         /// <param name="blobStorageService"></param>
+        /// <param name="inputValidator"></param>
         /// <param name="observationApiConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
@@ -48,12 +53,15 @@ namespace SOS.Observations.Api.Controllers
             ITaxonManager taxonManager,
             IDataCiteService dataCiteService,
             IBlobStorageService blobStorageService,
+            IInputValidator inputValidator,
             ObservationApiConfiguration observationApiConfiguration,
-            ILogger<ExportsController> logger) : base(observationManager, areaManager, taxonManager, observationApiConfiguration)
+            ILogger<ExportsController> logger)
         {
+            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _dataCiteService = dataCiteService ?? throw new ArgumentNullException(nameof(dataCiteService));
             _blobStorageService = blobStorageService ?? throw new ArgumentException(nameof(blobStorageService));
             _exportObservationsLimit = observationApiConfiguration?.OrderExportObservationsLimit ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
+            _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -72,8 +80,8 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var validationResults = Result.Combine(
-                    ValidateSearchFilter(filter),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                    _inputValidator.ValidateSearchFilter(filter),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResults.IsFailure)
                 {
@@ -81,8 +89,8 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var creatorEmail = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
-                var exportFilter = filter.ToSearchFilter(UserId, Dtos.Enum.ProtectionFilterDto.Public, "en-GB");
-                var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter);
+                var exportFilter = filter.ToSearchFilter(this.GetUserId(), Shared.Api.Dtos.Enum.ProtectionFilterDto.Public, "en-GB");
+                var matchCount = await _observationManager.GetMatchCountAsync(0, null, exportFilter);
 
                 if (matchCount == 0)
                 {
