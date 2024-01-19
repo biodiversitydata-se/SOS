@@ -35,7 +35,7 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         ///     Only get data from these providers.
         /// </summary>
-        public DataProviderFilterDto DataProvider { get; set; }
+        public DataProviderFilterDto? DataProvider { get; set; }
 
         /// <summary>
         /// Requested verification status.
@@ -51,17 +51,17 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Checklist specific filter
         /// </summary>
-        public TrendChecklistFilterDto Checklist { get; set; }
+        public TrendChecklistFilterDto? Checklist { get; set; }
 
         /// <summary>
         /// Date filter.
         /// </summary>
-        public DateFilterDto Date { get; set; }
+        public DateFilterDto? Date { get; set; }
 
         /// <summary>
         /// Geographics filter 
         /// </summary>
-        public GeographicsFilterDto Geographics { get; set; }
+        public GeographicsFilterDto? Geographics { get; set; }
 
         // todo - add this in later version
         ///// <summary>

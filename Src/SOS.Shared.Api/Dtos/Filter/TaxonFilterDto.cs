@@ -11,12 +11,12 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// Redlist categories to match.
         /// Possible values are: "DD", "EX", "RE", "CR", "EN", "VU", "NT", "LC", "NA", "NE"
         /// </summary>
-        public IEnumerable<string> RedListCategories { get; set; }
+        public IEnumerable<string>? RedListCategories { get; set; }
 
         /// <summary>
         /// Taxon categories to match.
         /// </summary>
-        public IEnumerable<int> TaxonCategories { get; set; }
+        public IEnumerable<int>? TaxonCategories { get; set; }
 
         /// <summary>
         /// Operator to use when TaxonListIds is specified. The operators are Merge or Filter.

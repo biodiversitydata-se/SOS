@@ -381,10 +381,6 @@ namespace SOS.Analysis.Api.Managers
 
                     // Add all intersections gridcells to feature collection. Add nagative buffer when intersect to prevent gridcell touching corner match
                     var eooGridCellFeaturesMetric = gridCellFeaturesMetric.Where(gc => gc.Value.Geometry.Buffer(-1).Intersects(inRangeGeometry)).Select(f => f.Value);
-                    // Add aoo features to collection
-                    eooGridCellFeaturesMetric
-                        .Where(f => long.Parse(f.Attributes["observationsCount"]?.ToString() ?? "0") > 0)
-                            .ForEach(f => futureCollection.Add(f!));
                     var eooGeometry = new MultiPolygon(eooGridCellFeaturesMetric.Select(f => f.Geometry as Polygon).ToArray());
 
                     var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
@@ -404,6 +400,11 @@ namespace SOS.Analysis.Api.Managers
                         )
                     ));
 
+                    // Add aoo features to collection
+                    eooGridCellFeaturesMetric
+                        .Where(f => long.Parse(f.Attributes["observationsCount"]?.ToString() ?? "0") > 0)
+                            .ForEach(f => futureCollection.Add(f!));
+                    
                     // Make sure all geometries is in requested coordinate system
                     foreach (var feature in futureCollection)
                     {

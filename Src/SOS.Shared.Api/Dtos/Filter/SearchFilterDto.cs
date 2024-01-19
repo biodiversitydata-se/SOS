@@ -8,6 +8,6 @@
         /// <summary>
         /// Response output settings
         /// </summary>
-        public OutputFilterDto Output { get; set; }
+        public OutputFilterDto? Output { get; set; }
     }
 }

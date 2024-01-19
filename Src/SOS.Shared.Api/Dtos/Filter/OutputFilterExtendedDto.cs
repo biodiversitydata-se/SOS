@@ -10,6 +10,6 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Sort result
         /// </summary>
-        public IEnumerable<SortOrderDto> SortOrders { get; set; }
+        public IEnumerable<SortOrderDto>? SortOrders { get; set; }
     }
 }

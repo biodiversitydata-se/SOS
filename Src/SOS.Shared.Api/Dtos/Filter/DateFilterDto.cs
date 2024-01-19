@@ -28,6 +28,6 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Predefined time ranges
         /// </summary>
-        public List<TimeRangeDto> TimeRanges { get; set; }
+        public IEnumerable<TimeRangeDto>? TimeRanges { get; set; }
     }
 }

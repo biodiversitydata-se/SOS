@@ -7,6 +7,6 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Dataset filter
         /// </summary>
-        public IEnumerable<string> DatasetIdentifiers { get; set; }
+        public IEnumerable<string>? DatasetIdentifiers { get; set; }
     }
 }

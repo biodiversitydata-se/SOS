@@ -19,12 +19,12 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         ///     Only get data from these providers.
         /// </summary>
-        public DataProviderFilterDto DataProvider { get; set; }
+        public DataProviderFilterDto? DataProvider { get; set; }
 
         /// <summary>
         /// Geometry filter 
         /// </summary>
-        public GeographicsFilterDto Geographics { get; set; }
+        public GeographicsFilterDto? Geographics { get; set; }
 
         /// <summary>
         ///     Observation start date specified in the ISO 8601 standard. If no timezone is specified, GMT+1 (CEST) is assumed
@@ -34,6 +34,6 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Taxon filter.
         /// </summary>
-        public TaxonFilterBaseDto Taxon { get; set; }
+        public TaxonFilterBaseDto? Taxon { get; set; }
     }
 }

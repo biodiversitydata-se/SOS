@@ -15,11 +15,11 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Dyntaxa taxon id's to match.
         /// </summary>
-        public IEnumerable<int> Ids { get; set; }
+        public IEnumerable<int>? Ids { get; set; }
 
         /// <summary>
         /// Add (merge) or filter taxa by using taxon lists.
         /// </summary>
-        public IEnumerable<int> TaxonListIds { get; set; }
+        public IEnumerable<int>? TaxonListIds { get; set; }
     }
 }

@@ -24,8 +24,8 @@ namespace SOS.Shared.Api.Extensions.Dto
             filter.Taxa = searchFilterBaseDto.Taxon?.ToTaxonFilter();
             filter.DataStewardship = PopulateDataStewardshipFilter(searchFilterBaseDto.DataStewardship);
             filter.Date = PopulateDateFilter(searchFilterBaseDto.Date);
-            filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
-            filter.Event = PopulateEventFilter(searchFilterBaseDto.Event);
+            filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids?.ToList();
+            filter.Event = PopulateEventFilter(searchFilterBaseDto.Event!);
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)(searchFilterBaseDto.NotRecoveredFilter ?? SightingNotRecoveredFilterDto.NoFilter);
             //filter.VerificationStatus = searchFilterBaseDto.ValidationStatus.HasValue ? (SearchFilterBase.StatusVerification)searchFilterBaseDto.ValidationStatus.Value.ToStatusVerification() : (SearchFilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
@@ -33,7 +33,7 @@ namespace SOS.Shared.Api.Extensions.Dto
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
-            filter.Location = PopulateLocationFilter(searchFilterBaseDto.Geographics);
+            filter.Location = PopulateLocationFilter(searchFilterBaseDto.Geographics!);
             filter.ModifiedDate = searchFilterBaseDto.ModifiedDate == null
                 ? null
                 : new ModifiedDateFilter
@@ -384,7 +384,7 @@ namespace SOS.Shared.Api.Extensions.Dto
             var searchFilter = new SearchFilterInternal(userId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public)
             {
                 BirdNestActivityLimit = searchFilterDto.BirdNestActivityLimit,
-                DataProviderIds = searchFilterDto.DataProvider?.Ids,
+                DataProviderIds = searchFilterDto.DataProvider?.Ids?.ToList(),
                 Location = new LocationFilter
                 {
                     Areas = searchFilterDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }).ToList(),

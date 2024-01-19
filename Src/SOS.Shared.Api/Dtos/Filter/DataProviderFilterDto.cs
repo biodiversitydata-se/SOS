@@ -10,6 +10,6 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         ///    Data provider id's
         /// </summary>
-        public List<int> Ids { get; set; }
+        public IEnumerable<int>? Ids { get; set; }
     }
 }

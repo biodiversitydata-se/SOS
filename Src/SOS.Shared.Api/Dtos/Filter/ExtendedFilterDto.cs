@@ -44,7 +44,7 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Field diary group Id's
         /// </summary>
-        public IEnumerable<int> FieldDiaryGroupIds { get; set; }
+        public IEnumerable<int>? FieldDiaryGroupIds { get; set; }
 
         /// <summary>
         /// Reported by Artportalen user id.
@@ -69,7 +69,7 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Id of sex to match
         /// </summary>
-        public IEnumerable<int> SexIds { get; set; }
+        public IEnumerable<int>? SexIds { get; set; }
 
         /// <summary>
         /// Only include hits with media associated
@@ -93,13 +93,13 @@ namespace SOS.Shared.Api.Dtos.Filter
         public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.DoNotShowMerged;
 
         public bool UsePeriodForAllYears { get; set; }
-        public IEnumerable<int> Months { get; set; }
+        public IEnumerable<int>? Months { get; set; }
         public DateFilterComparisonDto MonthsComparison { get; set; } = DateFilterComparisonDto.StartDate;
-        public IEnumerable<int> DiscoveryMethodIds { get; set; }
+        public IEnumerable<int>? DiscoveryMethodIds { get; set; }
 
-        public IEnumerable<int> LifeStageIds { get; set; }
+        public IEnumerable<int>? LifeStageIds { get; set; }
 
-        public IEnumerable<int> ActivityIds { get; set; }
+        public IEnumerable<int>? ActivityIds { get; set; }
 
 
         /*[Obsolete]
@@ -110,28 +110,28 @@ namespace SOS.Shared.Api.Dtos.Filter
         public bool HasTriggeredVerificationRuleWithWarning { get; set; }
 
         public int? Length { get; set; }
-        public string LengthOperator { get; set; }
+        public string? LengthOperator { get; set; }
         public int? Weight { get; set; }
-        public string WeightOperator { get; set; }
+        public string? WeightOperator { get; set; }
 
         public int? Quantity { get; set; }
-        public string QuantityOperator { get; set; }
+        public string? QuantityOperator { get; set; }
 
         /*[Obsolete]
         public IEnumerable<int> ValidationStatusIds { get; set; }
         [Obsolete]
         public IEnumerable<int> ExcludeValidationStatusIds { get; set; }*/
 
-        public IEnumerable<int> VerificationStatusIds { get; set; }
-        public IEnumerable<int> ExcludeVerificationStatusIds { get; set; }
+        public IEnumerable<int>? VerificationStatusIds { get; set; }
+        public IEnumerable<int>? ExcludeVerificationStatusIds { get; set; }
 
         public SightingUnspontaneousFilterDto UnspontaneousFilter { get; set; }
 
-        public string SpeciesCollectionLabel { get; set; }
+        public string? SpeciesCollectionLabel { get; set; }
 
-        public string PublicCollection { get; set; }
+        public string? PublicCollection { get; set; }
 
-        public string PrivateCollection { get; set; }
+        public string? PrivateCollection { get; set; }
 
         public int? SubstrateSpeciesId { get; set; }
         public int? SubstrateId { get; set; }
@@ -142,30 +142,30 @@ namespace SOS.Shared.Api.Dtos.Filter
 
         public bool OnlySecondHandInformation { get; set; }
 
-        public IEnumerable<int> PublishTypeIdsFilter { get; set; }
+        public IEnumerable<int>? PublishTypeIdsFilter { get; set; }
 
-        public IEnumerable<int> RegionalSightingStateIdsFilter { get; set; }
+        public IEnumerable<int>? RegionalSightingStateIdsFilter { get; set; }
 
-        public IEnumerable<int> TriggeredObservationRuleFrequencyIds { get; set; }
+        public IEnumerable<int>? TriggeredObservationRuleFrequencyIds { get; set; }
 
-        public IEnumerable<int> TriggeredObservationRuleReproductionIds { get; set; }
+        public IEnumerable<int>? TriggeredObservationRuleReproductionIds { get; set; }
 
         public IEnumerable<int> SiteIds { get; set; }
 
-        public IEnumerable<int> SiteProjectIds { get; set; }
+        public IEnumerable<int>? SiteProjectIds { get; set; }
 
-        public IEnumerable<int> SpeciesFactsIds { get; set; }
-        public string InstitutionId { get; set; }
+        public IEnumerable<int>? SpeciesFactsIds { get; set; }
+        public string? InstitutionId { get; set; }
 
-        public IEnumerable<int> DatasourceIds { get; set; }
+        public IEnumerable<int>? DatasourceIds { get; set; }
 
         /*[Obsolete("Use geographics.locationNameFilter")]
         public string LocationNameFilter { get; set; }
         */
-        public IEnumerable<int> Years { get; set; }
+        public IEnumerable<int>? Years { get; set; }
 
         public DateFilterComparisonDto YearsComparison { get; set; } = DateFilterComparisonDto.StartDate;
 
-        public IEnumerable<int> SightingTypeSearchGroupIds { get; set; }
+        public IEnumerable<int>? SightingTypeSearchGroupIds { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Name of field to sort by
         /// </summary>
-        public string SortBy { get; set; }
+        public string? SortBy { get; set; }
 
         /// <summary>
         /// Sort order, asc or desc

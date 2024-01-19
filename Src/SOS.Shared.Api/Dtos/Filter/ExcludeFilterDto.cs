@@ -7,6 +7,6 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Exclude observations with listed occurrence id's
         /// </summary>
-        public IEnumerable<string> OccurrenceIds { get; set; }
+        public IEnumerable<string>? OccurrenceIds { get; set; }
     }
 }
