@@ -16,7 +16,7 @@
 			<organizationName>SLU Swedish Species Information Centre (SLU Artdatabanken)</organizationName>
 			<individualName>
 				<givenName>Johan</givenName>
-				<surName>Liljeblad</surName>
+				<surName>Liljebld</surName>
 			</individualName>
 			<electronicMailAddress>artdatabanken@slu.se</electronicMailAddress>
             <onlineUrl>https://www.inaturalist.se/</onlineUrl>
@@ -24,8 +24,8 @@
 		</creator>
 			<metadataProvider>
 			<individualName>
-				<givenName>Johan</givenName>
-				<surName>Liljebld</surName>
+				<givenName>Mora</givenName>
+				<surName>Aronsson</surName>	
 			</individualName>
 			<organizationName>SLU Artdatabanken</organizationName>
 		</metadataProvider>
@@ -43,9 +43,7 @@
 			</individualName>
 			<organizationName>iNaturalist</organizationName>
 			<electronicMailAddress>artdatabanken@slu.se</electronicMailAddress>
-			<onlineUrl>
-				https://www.inaturalist.se/
-			</onlineUrl>
+			<onlineUrl>https://www.inaturalist.se/</onlineUrl>
 		</contact>
 		<pubDate>2023-03-14</pubDate>
 		<coverage>
