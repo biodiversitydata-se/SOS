@@ -12,6 +12,6 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Sort order, asc or desc
         /// </summary>
-        public SearchSortOrder SortOrder { get; set; }
+        public SearchSortOrder SortOrder { get; set; } 
     }
 }

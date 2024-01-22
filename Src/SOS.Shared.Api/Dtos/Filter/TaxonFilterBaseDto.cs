@@ -10,7 +10,7 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// If true, also include the underlying hierarchical taxa in search.
         /// E.g. If ids=[4000104](Aves) and includeUnderlyingTaxa=true, then you search for all birds.
         /// </summary>
-        public bool IncludeUnderlyingTaxa { get; set; }
+        public bool? IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
         /// Dyntaxa taxon id's to match.

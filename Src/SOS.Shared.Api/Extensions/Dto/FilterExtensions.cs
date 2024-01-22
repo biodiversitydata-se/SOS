@@ -256,7 +256,7 @@ namespace SOS.Shared.Api.Extensions.Dto
             var filter = new TaxonFilter
             {
                 Ids = filterDto.Ids,
-                IncludeUnderlyingTaxa = filterDto.IncludeUnderlyingTaxa,
+                IncludeUnderlyingTaxa = filterDto.IncludeUnderlyingTaxa ?? false,
                 ListIds = filterDto.TaxonListIds,
                 TaxonListOperator = TaxonFilter.TaxonListOp.Merge
             };
@@ -429,7 +429,7 @@ namespace SOS.Shared.Api.Extensions.Dto
             var filter = new TaxonFilter
             {
                 Ids = filterDto.Ids,
-                IncludeUnderlyingTaxa = filterDto.IncludeUnderlyingTaxa,
+                IncludeUnderlyingTaxa = filterDto.IncludeUnderlyingTaxa ?? false,
                 ListIds = filterDto.TaxonListIds,
                 TaxonListOperator = TaxonFilter.TaxonListOp.Merge,
             };

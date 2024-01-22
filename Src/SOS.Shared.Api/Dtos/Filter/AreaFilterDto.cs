@@ -15,6 +15,6 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         ///    Feature
         /// </summary>
-        public string FeatureId { get; set; }
+        public string FeatureId { get; set; } = string.Empty;
     }
 }

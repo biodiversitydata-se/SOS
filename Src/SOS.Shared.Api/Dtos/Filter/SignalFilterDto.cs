@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace SOS.Shared.Api.Dtos.Filter
 {
     /// <summary>

@@ -12,7 +12,7 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Only get data from these providers.
         /// </summary>
-        public DataProviderFilterDto DataProvider { get; set; }
+        public DataProviderFilterDto? DataProvider { get; set; }
 
         /// <summary>
         /// Minimum spent time to find the taxa
@@ -40,7 +40,7 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Requested verification status.
         /// </summary>
-        public StatusVerificationDto VerificationStatus { get; set; }
+        public StatusVerificationDto VerificationStatus { get; set; } = StatusVerificationDto.BothVerifiedAndNotVerified;
     }
 
     /// <summary>

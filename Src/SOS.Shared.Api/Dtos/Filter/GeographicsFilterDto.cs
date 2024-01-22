@@ -22,14 +22,14 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// but close enough when disturbance sensitivity of species
         /// are considered, will be included in the result.
         /// </summary>
-        public bool ConsiderDisturbanceRadius { get; set; }
+        public bool ConsiderDisturbanceRadius { get; set; } = false;
 
         /// <summary>
         /// If true, observations that are outside Geometries polygons
         /// but possibly inside when accuracy (coordinateUncertaintyInMeters)
         /// of observation is considered, will be included in the result.
         /// </summary>
-        public bool ConsiderObservationAccuracy { get; set; }
+        public bool ConsiderObservationAccuracy { get; set; } = false;
 
         /// <summary>
         /// If Geometries is of point type, this property must be set to a value greater than 0.

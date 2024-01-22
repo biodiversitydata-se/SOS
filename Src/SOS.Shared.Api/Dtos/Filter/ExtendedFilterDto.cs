@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SOS.Shared.Api.Dtos.Filter
+﻿namespace SOS.Shared.Api.Dtos.Filter
 {
     public class ExtendedFilterDto
     {
@@ -74,25 +71,25 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// <summary>
         /// Only include hits with media associated
         /// </summary>
-        public bool OnlyWithMedia { get; set; }
+        public bool OnlyWithMedia { get; set; } = false;
         /// <summary>
         /// Only include hits with notes attached to them
         /// </summary>
-        public bool OnlyWithNotes { get; set; }
+        public bool OnlyWithNotes { get; set; } = false;
 
-        public bool OnlyWithNotesOfInterest { get; set; }
+        public bool OnlyWithNotesOfInterest { get; set; } = false;
         /// <summary>
         /// Only include hits that have user comments on them
         /// </summary>
         public bool OnlyWithUserComments { get; set; } = false;
 
-        public bool OnlyWithBarcode { get; set; }
+        public bool OnlyWithBarcode { get; set; } = false;
 
         public DateTime? ReportedDateFrom { get; set; }
         public DateTime? ReportedDateTo { get; set; }
         public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.DoNotShowMerged;
 
-        public bool UsePeriodForAllYears { get; set; }
+        public bool UsePeriodForAllYears { get; set; } = false;
         public IEnumerable<int>? Months { get; set; }
         public DateFilterComparisonDto MonthsComparison { get; set; } = DateFilterComparisonDto.StartDate;
         public IEnumerable<int>? DiscoveryMethodIds { get; set; }
@@ -106,8 +103,8 @@ namespace SOS.Shared.Api.Dtos.Filter
         public bool? HasTriggerdValidationRule { get; set; }
         [Obsolete]
         public bool? HasTriggerdValidationRuleWithWarning { get; set; }*/
-        public bool HasTriggeredVerificationRule { get; set; }
-        public bool HasTriggeredVerificationRuleWithWarning { get; set; }
+        public bool HasTriggeredVerificationRule { get; set; } = false;
+        public bool HasTriggeredVerificationRuleWithWarning { get; set; } = false;
 
         public int? Length { get; set; }
         public string? LengthOperator { get; set; }
@@ -125,7 +122,7 @@ namespace SOS.Shared.Api.Dtos.Filter
         public IEnumerable<int>? VerificationStatusIds { get; set; }
         public IEnumerable<int>? ExcludeVerificationStatusIds { get; set; }
 
-        public SightingUnspontaneousFilterDto UnspontaneousFilter { get; set; }
+        public SightingUnspontaneousFilterDto UnspontaneousFilter { get; set; } = SightingUnspontaneousFilterDto.NoFilter;
 
         public string? SpeciesCollectionLabel { get; set; }
 
@@ -138,9 +135,9 @@ namespace SOS.Shared.Api.Dtos.Filter
 
         public int? BiotopeId { get; set; }
 
-        public SightingNotPresentFilterDto NotPresentFilter { get; set; }
+        public SightingNotPresentFilterDto NotPresentFilter { get; set; } = SightingNotPresentFilterDto.NoFilter;
 
-        public bool OnlySecondHandInformation { get; set; }
+        public bool OnlySecondHandInformation { get; set; } = false;
 
         public IEnumerable<int>? PublishTypeIdsFilter { get; set; }
 
@@ -150,7 +147,7 @@ namespace SOS.Shared.Api.Dtos.Filter
 
         public IEnumerable<int>? TriggeredObservationRuleReproductionIds { get; set; }
 
-        public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int>? SiteIds { get; set; }
 
         public IEnumerable<int>? SiteProjectIds { get; set; }
 

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SOS.Shared.Api.Dtos.Filter
+﻿namespace SOS.Shared.Api.Dtos.Filter
 {
     public class ExcludeFilterDto
     {
