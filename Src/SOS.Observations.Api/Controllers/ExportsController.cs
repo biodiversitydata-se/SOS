@@ -233,8 +233,9 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// /Constructor
+        /// Constructor
         /// </summary>
+        /// <param name="observationManager"></param>
         /// <param name="blobStorageManager"></param>
         /// <param name="exportManager"></param>
         /// <param name="cryptoService"></param>
@@ -245,6 +246,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ExportsController(
+            IObservationManager observationManager,
             IBlobStorageManager blobStorageManager,
             IExportManager exportManager,
             ICryptoService cryptoService,
@@ -254,6 +256,7 @@ namespace SOS.Observations.Api.Controllers
             ObservationApiConfiguration configuration,
             ILogger<ExportsController> logger)
         {
+            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _blobStorageManager = blobStorageManager ?? throw new ArgumentNullException(nameof(blobStorageManager));
             _exportManager = exportManager ?? throw new ArgumentNullException(nameof(exportManager));
             _cryptoService = cryptoService ?? throw new ArgumentNullException(nameof(cryptoService));
@@ -262,6 +265,10 @@ namespace SOS.Observations.Api.Controllers
                 userExportRepository ?? throw new ArgumentNullException(nameof(userExportRepository));
             _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
             _observationApiConfiguration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _defaultUserExportLimit = configuration?.DefaultUserExportLimit ?? throw new ArgumentNullException(nameof(configuration));
+            _orderExportObservationsLimit = configuration.OrderExportObservationsLimit;
+            _downloadExportObservationsLimit = configuration.DownloadExportObservationsLimit;
+            _exportPath = configuration.ExportPath;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

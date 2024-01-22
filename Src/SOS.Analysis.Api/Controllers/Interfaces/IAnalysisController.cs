@@ -14,6 +14,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
+        /// <param name="validateFilter"></param>
         /// <param name="aggregationField"></param>
         /// <param name="precisionThreshold"></param>
         /// <param name="afterKey"></param>
@@ -23,6 +24,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             int? roleId,
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto searchFilter,
+            bool? validateFilter,
             string aggregationField,
             int? precisionThreshold,
             string? afterKey,
@@ -34,6 +36,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
+        /// <param name="validateFilter"></param>
         /// <param name="aggregationField"></param>
         /// <param name="precisionThreshold"></param>
         /// <param name="take"></param>
@@ -43,6 +46,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             int? roleId,
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto filter,
+           bool? validateFilter,
             string aggregationField,
             int? precisionThreshold,
             int take,
@@ -54,13 +58,16 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
+        /// <param name="validateFilter"></param>
         /// <param name="atlasSize"></param>
         /// <returns></returns>
         Task<IActionResult> AtlasAggregateAsync(
             int? roleId,
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto searchFilter,
-            AtlasAreaSizeDto atlasSize = AtlasAreaSizeDto.Km10x10);
+            bool? validateFilter,
+            AtlasAreaSizeDto atlasSize = AtlasAreaSizeDto.Km10x10
+           );
 
         /// <summary>
         /// Calculate AOO and EOO and get geometry showing coverage 
@@ -68,6 +75,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
+        /// <param name="validateFilter"></param>
         /// <param name="alphaValues">One or more alpha values used to calculate AOO and EEO</param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="useCenterPoint">If true, grid cell center point will be used, else grid cell corner points will be used.</param>
@@ -89,6 +97,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             int? roleId,
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto searchFilter,
+            bool? validateFilter,
             double[] alphaValues,
             int? gridCellSizeInMeters = 2000,
             bool? useCenterPoint = true,
@@ -105,6 +114,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
+        /// <param name="validateFilter"></param>
         /// <param name="maxDistance">Max distance between occurrence grid cells</param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
@@ -118,6 +128,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             int? roleId,
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto searchFilter,
+            bool? validateFilter,
             int? maxDistance = 50000,
             int? gridCellSizeInMeters = 2000,
             MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,

@@ -45,15 +45,8 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
-using SOS.Observations.Api.Services.Interfaces;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Observations.Api.LiveIntegrationTests.Repositories;
-using SOS.Observations.Api.LiveIntegrationTests.Repositories.Interfaces;
-using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators;
-using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Shared.Api.Utilities.Objects;
-using SOS.Lib.Cache.Interfaces;
 using SOS.Shared.Api.Configuration;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures

@@ -79,6 +79,10 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Progra
         SignalSearchTaxonListIds = new int[] { 1, 7, 8, 17, 18 },
         TilesLimitInternal = 350000,
         TilesLimitPublic = 65535,
-        CountFactor = 1.1
+        CountFactor = 1.1,
+        ElasticSearchMaxRecordsInternal = 5000,
+        ElasticSearchMaxRecordsPublic = 5000,
+        MaxBatchSize = 5000,
+        MaxNrElasticSearchAggregationBuckets = 5000
     };
 }

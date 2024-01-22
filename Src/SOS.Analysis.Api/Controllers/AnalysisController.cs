@@ -8,7 +8,6 @@ using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Swagger;
-using SOS.Shared.Api.Configuration;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
 using SOS.Shared.Api.Dtos.Search;
@@ -43,7 +42,6 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="searchFilterUtility"></param>
         /// <param name="inputValidator"></param>
         /// <param name="analysisConfiguration"></param>
-        /// <param name="inputValaidationConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public AnalysisController(
@@ -51,7 +49,6 @@ namespace SOS.Analysis.Api.Controllers
             ISearchFilterUtility searchFilterUtility,
             IInputValidator inputValidator,
             AnalysisConfiguration analysisConfiguration,
-            InputValaidationConfiguration inputValaidationConfiguration,
             ILogger<AnalysisController> logger) 
         {
             _analysisManager = analysisManager ?? throw new ArgumentNullException(nameof(analysisManager));
@@ -71,6 +68,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
+            [FromQuery] bool? validateFilter,
             [FromQuery] string aggregationField,
             [FromQuery] int? precisionThreshold,
             [FromQuery] string? afterKey,
@@ -81,7 +79,7 @@ namespace SOS.Analysis.Api.Controllers
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var validationResult = Result.Combine(
-                    _inputValidator.ValidateSearchFilter(searchFilter!), 
+                    validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
                     _inputValidator.ValidateFields(new[] { aggregationField })
                 );
 
@@ -124,6 +122,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
+            [FromQuery] bool? validateFilter,
             [FromQuery] string aggregationField,
             [FromQuery] int? precisionThreshold,
             [FromQuery] int take = 10,
@@ -135,7 +134,7 @@ namespace SOS.Analysis.Api.Controllers
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
 
                 var validationResult = Result.Combine(
-                    _inputValidator.ValidateSearchFilter(searchFilter!),
+                    validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
                     _inputValidator.ValidateFields(new[] { aggregationField }),
                     _inputValidator.ValidateInt(take, 1, 250, "take"));
 
@@ -179,13 +178,14 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
+            [FromQuery] bool? validateFilter,
             [FromQuery] AtlasAreaSizeDto atlasSize = AtlasAreaSizeDto.Km10x10)
         {
             try
             {
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
-                var validationResult = _inputValidator.ValidateSearchFilter(searchFilter!);
+                var validationResult = validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success();
 
                 if (validationResult.IsFailure)
                 {
@@ -220,6 +220,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
+        /// <param name="validateFilter"></param>
         /// <param name="alphaValues">One or more alpha values used to calculate AOO and EEO</param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="useCenterPoint">If true, grid cell center point will be used, else grid cell corner points will be used.</param>
@@ -244,6 +245,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
+            [FromQuery] bool? validateFilter,
             [FromQuery] double[] alphaValues,
             [FromQuery] int? gridCellSizeInMeters = 2000,
             [FromQuery] bool? useCenterPoint = true,
@@ -275,8 +277,8 @@ namespace SOS.Analysis.Api.Controllers
 
                 var validationResult = Result.Combine(
                     edgeLengthValidation,
+                    validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
                     alphaValues?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one alpha value"),
-                    _inputValidator.ValidateSearchFilter(searchFilter!),
                     _inputValidator.ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
                     await _inputValidator.ValidateTilesLimitMetricAsync(
                         searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), 
@@ -323,6 +325,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
+        /// <param name="validateFilter"></param>
         /// <param name="maxDistance">Max distance between occurrence grid cells</param>
         /// <param name="gridCellSizeInMeters">Grid cell size in meters </param>
         /// <param name="metricCoordinateSys">Coordinate system used to calculate the grid</param>
@@ -338,6 +341,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
+            [FromQuery] bool? validateFilter,
             [FromQuery] int? maxDistance = 50000,
             [FromQuery] int? gridCellSizeInMeters = 2000,
             [FromQuery] MetricCoordinateSys? metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
@@ -353,7 +357,7 @@ namespace SOS.Analysis.Api.Controllers
 
                     maxDistance > 0 ? Result.Success() : Result.Failure("You must state max distance"),
                     _inputValidator.ValidateInt(maxDistance.Value, minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
-                    _inputValidator.ValidateSearchFilter(searchFilter!),
+                    validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
                     _inputValidator.ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
                     await _inputValidator.ValidateTilesLimitMetricAsync(
                         searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
