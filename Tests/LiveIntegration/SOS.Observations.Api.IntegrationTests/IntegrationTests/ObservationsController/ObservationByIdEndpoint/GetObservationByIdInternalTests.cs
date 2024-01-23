@@ -35,7 +35,6 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
                 null,
                 OutputFieldSet.All,
                 "sv-SE",
-                false,
                 false);
 
             var result = response.GetResult<object>();

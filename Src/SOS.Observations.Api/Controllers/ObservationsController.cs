@@ -105,7 +105,7 @@ namespace SOS.Observations.Api.Controllers
                 occurrenceId = WebUtility.UrlDecode(id ?? occurrenceId);
 
                 var observation = await _observationManager.GetObservationAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
-                    includeInternalFields: false, false);
+                    includeInternalFields: false);
 
                 if (observation == null)
                 {
@@ -649,7 +649,7 @@ namespace SOS.Observations.Api.Controllers
                 id = WebUtility.UrlDecode(id);
 
                 var observation = await _observationManager.GetObservationAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, id, OutputFieldSet.All, translationCultureCode, sensitiveObservations,
-                    includeInternalFields: false, false);
+                    includeInternalFields: false);
 
                 if (observation == null)
                 {
@@ -782,7 +782,6 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, sensitive observations index is queried if you have access rights.</param>
-        /// <param name="ensureArtportalenUpdated">
         /// If true, a harvest and process job for that observation will be enqued to Hangfire, this action will wait for and return the updated result.
         /// </param>        
         /// <returns></returns>
@@ -799,8 +798,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string occurrenceId,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool sensitiveObservations = false,
-            [FromQuery] bool ensureArtportalenUpdated = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -811,7 +809,7 @@ namespace SOS.Observations.Api.Controllers
                     this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
-                    includeInternalFields: true, ensureArtportalenUpdated);
+                    includeInternalFields: true);
                 if (observation == null)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);

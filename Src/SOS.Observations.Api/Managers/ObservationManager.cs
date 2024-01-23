@@ -400,30 +400,8 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<dynamic> GetObservationAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet,
-            string translationCultureCode, bool protectedObservations, bool includeInternalFields, bool ensureArtportalenUpdated = false)
+            string translationCultureCode, bool protectedObservations, bool includeInternalFields)
         {
-            if (ensureArtportalenUpdated && (occurrenceId?.Contains("artportalen", StringComparison.CurrentCultureIgnoreCase) ?? false))
-            {
-                var regex = new Regex(@"\d+$");
-                var match = regex.Match(occurrenceId);
-                if (int.TryParse(match.Value, out var sightingId))
-                {
-                    var jobId = BackgroundJob.Enqueue<IObservationsHarvestJobIncremental>(
-                        job => job.RunHarvestArtportalenObservationsAsync(new List<int> { sightingId },
-                        JobCancellationToken.Null));
-
-                    using var connection = JobStorage.Current?.GetConnection();
-                    var stateData = connection?.GetStateData(jobId);
-
-                    while ((stateData?.Name?.Equals("Enqueued", StringComparison.CurrentCultureIgnoreCase) ?? false) ||
-                            (stateData?.Name?.Equals("Processing", StringComparison.CurrentCultureIgnoreCase) ?? false))
-                    {
-                        Thread.Sleep(100);
-                        stateData = connection.GetStateData(jobId);
-                    }
-                }
-            }
-
             var protectionFilter = protectedObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public;
             var filter = includeInternalFields ?
                 new SearchFilterInternal(userId ?? 0, protectionFilter) { NotPresentFilter = SightingNotPresentFilter.IncludeNotPresent } :
