@@ -243,7 +243,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        private ProjectParameter CastProjectParameterEntityToVerbatim(ProjectParameterEntity entity)
+        private ProjectParameter CastProjectParameterEntityToVerbatim(ProjectParameterSightingEntity entity)
         {
             if (entity == null)
             {
@@ -252,7 +252,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             return new ProjectParameter
             {
-                Id = entity.ProjectParameterId,
+                Id = entity.Id,
                 DataType = entity.DataType,
                 Description = entity.Description,
                 Name = entity.Name.Clean(),

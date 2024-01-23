@@ -170,46 +170,29 @@ namespace SOS.Harvest.Harvesters.Artportalen
             Logger.LogDebug($"Start getting Artportalen sightings ({mode})");
 
             // If no from date is passed, we start from last harvested sighting 
-            var harvestFromDate = fromDate ?? (await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1)).AddMinutes(-5);
-            // When we force fetching data from AP (get one observation), we mess up the logic. Back track 5 min to make sure we get all modified obseervations
-
+            var harvestFromDate = fromDate ?? (await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1));
+            
             // Get list of id's to Make sure we don't harvest more than #limit 
-            var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(harvestFromDate, _artportalenConfiguration.CatchUpLimit))?.ToArray();
-            Logger.LogDebug($"Number of Artportalen Ids to harvest: {idsToHarvest?.Length ?? 0}, lastModifiedQuery={harvestFromDate} ({mode})");
-
-            if ((idsToHarvest?.Length ?? 0) == 0)
-            {
-                return 0;
-            }
-
-            // Decrease chunk size for incremental harvest since the SQL query is slower 
-            var harvestBatchTasks = new List<Task<int>>();
-
-            var idBatch = idsToHarvest!.Skip(0).Take(_artportalenConfiguration.IncrementalChunkSize);
+            var idBatch = (await _sightingRepository.GetModifiedIdsAsync(harvestFromDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray();
             var batchCount = 0;
-
-            // Loop until all sightings are fetched
-            while (idBatch.Any())
+            var nrSightingsHarvested = 0;
+            while ((idBatch?.Length ?? 0) != 0)
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-
-                await _semaphore.WaitAsync();
-
                 batchCount++;
+                var getObservationsTask = _sightingRepository.GetChunkAsync(idBatch!);
+                await _semaphore.WaitAsync();
+                var observationCount = await HarvestBatchAsync(harvestFactory, getObservationsTask, batchCount);
+                nrSightingsHarvested += observationCount;
+                
+                if (nrSightingsHarvested >= _artportalenConfiguration.CatchUpLimit)
+                {
+                    break;
+                }
 
-                // Add batch task to list
-                harvestBatchTasks.Add(HarvestBatchAsync(harvestFactory,
-                    _sightingRepository.GetChunkAsync(idBatch),
-                    batchCount));
-
-                idBatch = idsToHarvest!.Skip(batchCount * _artportalenConfiguration.IncrementalChunkSize).Take(_artportalenConfiguration.IncrementalChunkSize);
+                idBatch = observationCount > 0 ? 
+                    (await _sightingRepository.GetModifiedIdsAsync(getObservationsTask!.Result!.LastOrDefault()!.EditDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray() : new int[0];
             }
-
-            // Execute harvest tasks, no of parallel threads running is handled by semaphore
-            await Task.WhenAll(harvestBatchTasks);
-
-            // Sum each batch harvested
-            var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
             Logger.LogDebug($"Finish getting Artportalen sightings ({mode}) (NrSightingsHarvested={nrSightingsHarvested:N0})");
             Logger.LogInformation($"Finish Artportalen HarvestIncrementalAsync(). NrSightingsHarvested={nrSightingsHarvested:N0}");

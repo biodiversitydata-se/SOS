@@ -51,6 +51,11 @@
         public string? Owner { get; set; }
 
         /// <summary>
+        /// Project parameters
+        /// </summary>
+        public ICollection<ProjectParameterEntity>? Parameters { get; set; }
+
+        /// <summary>
         ///     Web address that leads to more information about the project.
         /// </summary>
         // ReSharper disable once InconsistentNaming

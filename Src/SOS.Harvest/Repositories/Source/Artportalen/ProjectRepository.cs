@@ -43,6 +43,54 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                LEFT JOIN Person pn ON u.PersonId = pn.Id";
 
 
+        private async Task AddProjectParameters(IEnumerable<ProjectEntity> projects)
+        {
+            if (!projects?.Any() ?? true)
+            {
+                return;
+            }
+
+            var projectDictionary = projects.ToDictionary(p => p.Id, p => p);
+            var query = @"SELECT 
+	                    pp.Id,
+	                    pp.ProjectId,
+	                    pp.Name,
+	                    pp.Description,
+	                    pp.Unit,
+                        CASE pp.ProjectParameterTypeId
+		                    WHEN 3 
+		                    THEN 'double' 
+		                    ELSE 'string' 
+                        END AS DataType   
+                    FROM 
+	                    ProjectParameter pp
+                         INNER JOIN @tvp tvp ON pp.ProjectId = tvp.Id 
+                    WHERE
+	                    pp.IsDeleted = 0";
+
+            var projectParams = await QueryAsync<ProjectParameterProjectEntity>(
+                    query,
+                    new { tvp = projects!.Select(p => p.Id).ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
+
+            if (!projectParams?.Any() ?? true)
+            {
+                return;
+            }
+           
+            foreach(var projectParam in projectParams!)
+            {
+                if(projectDictionary.TryGetValue(projectParam.ProjectId, out var project))
+                {
+                    if (!project.Parameters?.Any() ?? true)
+                    {
+                        project.Parameters = new HashSet<ProjectParameterEntity>();
+                    }
+                    project.Parameters!.Add(projectParam);
+                }
+            }
+
+        }
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -58,7 +106,10 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         {
             try
             {
-                return await QueryAsync<ProjectEntity>(SelectSql, null!);
+                var projects = await QueryAsync<ProjectEntity>(SelectSql, null!);
+                await AddProjectParameters(projects);
+      
+                return projects;
             }
             catch (Exception e)
             {
@@ -74,7 +125,10 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 var query = $@"{SelectSql} WHERE p.Id = @ProjectId";
 
-                return (await QueryAsync<ProjectEntity>(query, new { ProjectId = projectId }))?.FirstOrDefault();
+                var projects = await QueryAsync<ProjectEntity>(query, new { ProjectId = projectId });
+                await AddProjectParameters(projects);
+
+                return projects?.FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -84,7 +138,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProjectParameterEntity>?> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds)
+        public async Task<IEnumerable<ProjectParameterSightingEntity>?> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds)
         {
             try
             {
@@ -95,9 +149,9 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
                 var query = $@"
                 SELECT 
+                    pp.Id, 
                     ss.SightingId AS SightingId, 
 	                p.Id AS ProjectId, 
-	                pp.Id AS ProjectParameterId, 
 	                pp.Name, 
 	                pp.Description, 
 	                pp.Unit, 
@@ -126,7 +180,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 		            AND pp.IsDeleted = 0 
 		            AND p.IsHideAll = 0";
 
-                return await QueryAsync<ProjectParameterEntity>(
+                return await QueryAsync<ProjectParameterSightingEntity>(
                     query,
                     new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
             }

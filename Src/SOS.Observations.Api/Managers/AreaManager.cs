@@ -185,7 +185,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                var result = await _areaCache.GetAreasAsync(areaTypes.Select(at => (AreaType)at), searchString, skip, take);
+                var result = await _areaCache.GetAreasAsync(areaTypes?.Select(at => (AreaType)at), searchString, skip, take);
 
                 return new PagedResult<AreaBaseDto>
                 {

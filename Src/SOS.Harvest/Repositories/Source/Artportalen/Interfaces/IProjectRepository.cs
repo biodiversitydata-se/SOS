@@ -23,6 +23,6 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <param name="sightingIds"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProjectParameterEntity>?> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds);
+        Task<IEnumerable<ProjectParameterSightingEntity>?> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds);
     }
 }

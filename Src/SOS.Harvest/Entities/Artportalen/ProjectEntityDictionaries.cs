@@ -7,6 +7,6 @@
     {
         public IDictionary<int, ProjectEntity>? ProjectEntityById { get; set; }
         public IDictionary<int, IEnumerable<ProjectEntity>>? ProjectEntitiesBySightingId { get; set; }
-        public IDictionary<int, IEnumerable<ProjectParameterEntity>>? ProjectParameterEntitiesBySightingId { get; set; }
+        public IDictionary<int, IEnumerable<ProjectParameterSightingEntity>>? ProjectParameterEntitiesBySightingId { get; set; }
     }
 }

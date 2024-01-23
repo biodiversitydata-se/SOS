@@ -299,7 +299,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         {
             try
             {
-                var result = await QueryAsync<int>("GetNewAndEditedSightingIds", new { modifiedSince = modifiedSince.ToLocalTime() }, System.Data.CommandType.StoredProcedure);
+                var result = await QueryAsync<int>("GetNewAndEditedSightingIds", new { modifiedSince = modifiedSince.ToLocalTime(), maxReturnRows = limit }, System.Data.CommandType.StoredProcedure);
 
                 Logger.LogInformation($"GetModifiedIdsAsync({modifiedSince.ToLocalTime()}, {limit}, Live={Live}) returned {result?.Count() ?? 0} sightingIds.");
                 if (!result?.Any() ?? true)
