@@ -334,15 +334,10 @@ namespace SOS.Analysis.Api.Managers
                     } 
                     .ToPolygon())
                         .ToArray()
-                            .CalculateTraiangels(true, maxDistance);
+                            .CalculateTraiangels(true);
 
                 var polygonsInRange = new HashSet<Polygon>();
-                if (triangels == null)
-                {
-                    // Less than tree grid cells, triangulation can't be made, use grid cells to decide EOO
-                    gridCellFeaturesMetric.ForEach(gc => polygonsInRange.Add((Polygon)gc.Value.Geometry));
-                }
-                else
+                if (triangels != null)
                 {
                     foreach (var triangle in triangels)
                     {
@@ -416,8 +411,7 @@ namespace SOS.Analysis.Api.Managers
                 {
                     feature.Geometry = feature.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
                 }
-                
-
+   
                 return futureCollection;
             }
             catch (ArgumentOutOfRangeException e)

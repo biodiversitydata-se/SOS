@@ -320,11 +320,11 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="polygons">metric coorinates</param>
         /// <param name="useCenterPoint"></param>
-        /// <param name="maxDistance"></param>
         /// <returns></returns>
-        public static MultiPolygon CalculateTraiangels(this Polygon[] polygons, bool useCenterPoint = true, int maxDistance = 0)
+        public static MultiPolygon CalculateTraiangels(this Polygon[] polygons, bool useCenterPoint = true)
         {
-            var points = polygons.CalculationPoints(useCenterPoint);
+            // If less than 3 polygons, use all polygon coordinates
+            var points = polygons.CalculationPoints(useCenterPoint && (polygons?.Length ?? 0) > 2);
 
             // we need at least tree points to make a traingle
             if ((points?.Count() ?? 0) < 3)
