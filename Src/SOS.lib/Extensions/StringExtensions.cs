@@ -13,7 +13,22 @@ namespace SOS.Lib.Extensions
         private static readonly Regex RxUntilNonAlfanumeric = new Regex(@"\w+", RegexOptions.Compiled);
         private static readonly Regex RxNewLineTab = new Regex(@"\r\n?|\n|\t", RegexOptions.Compiled);
         private static readonly Regex RxIllegalCharacters = new Regex(@"\p{C}+", RegexOptions.Compiled); // Match all control characters and other non-printable characters
+        private static readonly Regex RxEnlosingQuotes = new Regex(@"^\"".*\""$", RegexOptions.Compiled);
 
+        private static string CleanEnclosingQuotes(this string value)
+        {
+            if ((value?.Length ?? 0) < 2)
+            {
+                return value;
+            }
+
+            if (RxEnlosingQuotes.IsMatch(value))
+            {
+                value = value.Substring(1, value.Length - 2);
+            }
+
+            return value;
+        }
         /// <summary>
         /// Remove unprintable characters 
         /// </summary>
@@ -32,7 +47,7 @@ namespace SOS.Lib.Extensions
                     return " ";
                 else
                     return "";
-            }).Trim();
+            }).CleanEnclosingQuotes().Trim();
         }
 
         /// <summary>

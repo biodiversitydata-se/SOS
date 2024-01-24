@@ -323,7 +323,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 var eventId = $"{verbatimObservation.Site?.Id ?? 0}:{$"{(startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : "")}{(endDate.HasValue ? $"-{endDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}" : "")}"}:{(obs.Projects?.Any() ?? false ? string.Join(',', obs.Projects.Select(p => p.Id)) : "N/A")}".ToHash();
                 obs.Event.EventId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}:event:{eventId}";
                 obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation.DiscoveryMethod, VocabularyId.DiscoveryMethod);
-                obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation);
+                obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation).Clean();
                 obs.Event.Weather = TryGetWeather(verbatimObservation.DiaryEntry);
 
                 // Identification
@@ -331,7 +331,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Identification.ConfirmedBy = verbatimObservation.ConfirmedBy?.Clean();
                 obs.Identification.ConfirmedDate = verbatimObservation.ConfirmationYear?.ToString();
                 obs.Identification.DateIdentified = verbatimObservation.DeterminationYear.ToString();
-                obs.Identification.IdentifiedBy = verbatimObservation.DeterminedBy;
+                obs.Identification.IdentifiedBy = verbatimObservation.DeterminedBy.Clean();
                 obs.Identification.VerifiedBy = verbatimObservation.VerifiedBy?.Clean();
                 obs.Identification.Verified = _validationStatusIdIds.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);
                 obs.Identification.UncertainIdentification = verbatimObservation.UnsureDetermination;
@@ -375,7 +375,7 @@ namespace SOS.Harvest.Processors.Artportalen
                         taxon?.Attributes?.DisturbanceRadius
                     );
                 }
-                obs.Location.VerbatimLocality = obs.Location.Locality;
+                obs.Location.VerbatimLocality = obs.Location.Locality.Clean();
 
                 // Occurrence
                 obs.Occurrence = new Occurrence();
@@ -399,9 +399,9 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
                 //obs.Occurrence.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.Occurrence.SensitivityCategory = CalculateSensitivityCategory(taxon!, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
-                obs.Occurrence.ReportedBy = verbatimObservation.ReportedBy;
+                obs.Occurrence.ReportedBy = verbatimObservation.ReportedBy.Clean();
                 obs.Occurrence.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
-                obs.Occurrence.RecordedBy = verbatimObservation.Observers;
+                obs.Occurrence.RecordedBy = verbatimObservation.Observers.Clean();
                 obs.Occurrence.RecordNumber = verbatimObservation.Label.Clean();
                 obs.Occurrence.OccurrenceRemarks = verbatimObservation.Comment?.Clean();
                 obs.Occurrence.OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered

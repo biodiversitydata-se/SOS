@@ -1,28 +1,27 @@
 [
     {
-        "Id": 1,
-        "Identifier": "Artportalen",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportChecklists": true,
-        "SupportIncrementalHarvest": true,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000,
-        "Type": "ArtportalenObservations",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Species Observation System (Artportalen)"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Artportalen"
-            }
+        "Categories": [
+            "DataHostesship",
+            "RegionalInventory",
+            "CitizenSciencePlatform",
+            "Atlas",
+            "Terrestrial",
+            "Freshwater",
+            "Marine",
+            "Vertebrates",
+            "Arthropods",
+            "Microorganisms",
+            "Plants_Bryophytes_Lichens",
+            "Fungi",
+            "Algae"
         ],
+        "CoordinateUncertaintyInMeters": 5000,
+        "ContactPerson": {
+            "FirstName": "Johan",
+            "LastName": "Liljeblad",
+            "Email": "Johan.Liljeblad@slu.se"
+        },
+        "CreateEventDwC": false,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -31,6 +30,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Artportalen administreras av SLU Artdatabanken och innehåller fynddata för alla slags organismer. Artportalen är ett webbaserat system för fynd av Sveriges växter, djur och svampar. Här samlas uppgifter om artfynd rapporterade från både allmänhet och föreningar såväl som länsstyrelser, kommuner, konsultfirmor och andra myndigheter och organisationer. De flesta data är publika, med undantag för information om särskilt känsliga arter som är skyddsklassade."
+            }
+        ],
+        "HarvestFailPreventProcessing": true,
+        "HarvestSchedule": "* * * * *",
+        "Id": 1,
+        "Identifier": "Artportalen",
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Species Observation System (Artportalen)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Artportalen"
             }
         ],
         "Organizations": [
@@ -53,55 +70,29 @@
                 "path": [ "SLU Artdatabanken", "Artportalen" ]
             }
         ],
-        "Url": "https://www.artportalen.se/",
-        "ContactPerson": {
-            "FirstName": "Johan",
-            "LastName": "Liljeblad",
-            "Email": "Johan.Liljeblad@slu.se"
-        },
-        "Categories": [
-            "DataHostesship",
-            "RegionalInventory",
-            "CitizenSciencePlatform",
-            "Atlas",
-            "Terrestrial",
-            "Freshwater",
-            "Marine",
-            "Vertebrates",
-            "Arthropods",
-            "Microorganisms",
-            "Plants_Bryophytes_Lichens",
-            "Fungi",
-            "Algae"
-        ],
-        "HarvestSchedule": "* * * * *",
+        "SupportChecklists": true,
         "SupportDatasets": true,
+        "SupportDynamicEml": false,
         "SupportEvents": true,
-        "CreateEventDwC": false
+        "SupportIncrementalHarvest": true,
+        "Type": "ArtportalenObservations",
+        "Url": "https://www.artportalen.se/",
+        "UseVerbatimFileInExport": false
     },
     {
-        "Id": 3,
-        "Identifier": "KUL",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000,
-        "Type": "KULObservations",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "The database for coastal fish (KUL)"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Kustfiskdatabasen (KUL)"
-            }
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Marine",
+            "Vertebrates"
         ],
+        "ContactPerson": {
+            "FirstName": "Peter",
+            "LastName": "Ljungberg",
+            "Email": "peter.ljungberg@slu.se"
+        },
+        "CoordinateUncertaintyInMeters": 5000,
+        "CreateEventDwC": false,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -110,6 +101,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Kustlaboratoriets databas KUL innehåller kvalitetssäkrade fångstdata av fisk. I basen lagras också stickprovsinformation som könsfördelning och uppgifter om enskilda fiskar som längd, vikt, ålder och likande. Databasen kompletterar Kustlaboratoriets interna provfiskedatabas FiRRe som lagrar fångstuppgifter som insamlats sedan 1960-talet. Ett kontinuerligt arbete pågår med att föra över äldre data till KUL. Administreras av Kustlaboratoriet, Institutionen för akvatiska resurser, SLU."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 3,
+        "Identifier": "KUL",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The database for coastal fish (KUL)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Kustfiskdatabasen (KUL)"
             }
         ],
         "Organizations": [
@@ -132,46 +141,33 @@
                 "path": [ "Kustlaboratoriet, Institutionen för akvatiska resurser", "Kustfiskdatabasen" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": false,
+        "SupportIncrementalHarvest": false,
+        "Type": "KULObservations",
         "Url": "https://www.slu.se/kul/",
-        "ContactPerson": {
-            "FirstName": "Peter",
-            "LastName": "Ljungberg",
-            "Email": "peter.ljungberg@slu.se"
-        },
+        "UseVerbatimFileInExport": false
+    },
+    {
         "Categories": [
             "DataHostesship",
             "NationalInventory",
-            "Marine",
-            "Vertebrates"
+            "Freshwater",
+            "Vertebrates",
+            "Invertebrates",
+            "Arthropods",
+            "Microorganisms",
+            "Plants_Bryophytes_Lichens",
+            "Algae"
         ],
-        "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": false,
-        "CreateEventDwC": false
-    },
-    {
-        "Id": 4,
-        "Identifier": "MVM",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
+        "ContactPerson": {
+            "FirstName": "Lars",
+            "LastName": "Sonesten",
+            "Email": "Lars.Sonesten@slu.se"
+        },
         "CoordinateUncertaintyInMeters": 5000,
-        "Type": "MvmObservations",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Environmental data MVM"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Miljödata MVM"
-            }
-        ],
+        "CreateEventDwC": false,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -180,6 +176,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "MVM står för Mark, Vatten och Miljödata. De delar av databasen som utgörs av artobservationer är tillgängliga via SLU Artdatabanken and the Swedish Biodiversity Data Infrastructure SBDI. Här finns data om till exempel växtplankton, bottenfauna, makrofyter och kiselalger."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 4,
+        "Identifier": "MVM",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Environmental data MVM"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Miljödata MVM"
             }
         ],
         "Organizations": [
@@ -202,51 +216,28 @@
                 "path": [ "Miljödata MVM", "MVM" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportEvents": false,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": false,
+        "Type": "MvmObservations",
         "Url": "https://miljodata.slu.se/mvm/",
-        "ContactPerson": {
-            "FirstName": "Lars",
-            "LastName": "Sonesten",
-            "Email": "Lars.Sonesten@slu.se"
-        },
+        "UseVerbatimFileInExport": false
+    },
+    {
         "Categories": [
             "DataHostesship",
             "NationalInventory",
             "Freshwater",
-            "Vertebrates",
-            "Invertebrates",
-            "Arthropods",
-            "Microorganisms",
-            "Plants_Bryophytes_Lichens",
-            "Algae"
+            "Vertebrates"
         ],
-        "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": false,
-        "CreateEventDwC": false
-    },
-    {
-        "Id": 5,
-        "Identifier": "NORS",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
+        "ContactPerson": {
+            "FirstName": "Anders",
+            "LastName": "Kinnerbäck",
+            "Email": "anders.kinnerback@slu.se"
+        },
         "CoordinateUncertaintyInMeters": 5000,
-        "Type": "NorsObservations",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "The National Register of Survey test-fishing (NORS)"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Sjöprovfiskedatabasen NORS"
-            }
-        ],
+        "CreateEventDwC": false,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -255,6 +246,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Innehåller data från nätprovfiske i svenska sjöar. Administrerades tidigare av Fiskeriverket, numera av Institutionen för akvatiska resurser vid SLU."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 5,
+        "Identifier": "NORS",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The National Register of Survey test-fishing (NORS)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Sjöprovfiskedatabasen NORS"
             }
         ],
         "Organizations": [
@@ -277,46 +286,28 @@
                 "path": [ "Institutionen för akvatiska resurser", "Sjöprovfiskedatabasen" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": false,
+        "SupportIncrementalHarvest": false,
+        "Type": "NorsObservations",
         "Url": "https://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/",
-        "ContactPerson": {
-            "FirstName": "Anders",
-            "LastName": "Kinnerbäck",
-            "Email": "anders.kinnerback@slu.se"
-        },
+        "UseVerbatimFileInExport": false
+    },
+    {
         "Categories": [
             "DataHostesship",
             "NationalInventory",
             "Freshwater",
             "Vertebrates"
         ],
-        "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": false,
-        "CreateEventDwC": false
-    },
-    {
-        "Id": 6,
-        "Identifier": "SERS",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
+        "ContactPerson": {
+            "FirstName": "Erik",
+            "LastName": "Myrstener",
+            "Email": "SERS@slu.se"
+        },
         "CoordinateUncertaintyInMeters": 5000,
-        "Type": "SersObservations",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "The Database for electrofishing in streams (SERS)"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Elfiskeregistret SERS"
-            }
-        ],
+        "CreateEventDwC": false,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -325,6 +316,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Innehåller data från provfiske med elaggregat i svenska vattendrag. Administrerades tidigare av Fiskeriverket, numera av Institutionen för akvatiska resurser vid SLU."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 6,
+        "Identifier": "SERS",
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The Database for electrofishing in streams (SERS)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Elfiskeregistret SERS"
             }
         ],
         "Organizations": [
@@ -347,46 +356,31 @@
                 "path": [ "Institutionen för akvatiska resurser", "Elfiskeregistret" ]
             }
         ],
-        "Url": "https://www.slu.se/en/departments/aquatic-resources1/databases/database-for-testfishing-in-streams/",
-        "ContactPerson": {
-            "FirstName": "Erik",
-            "LastName": "Myrstener",
-            "Email": "SERS@slu.se"
-        },
-        "Categories": [
-            "DataHostesship",
-            "NationalInventory",
-            "Freshwater",
-            "Vertebrates"
-        ],
-        "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
+        "SupportDynamicEml": false,
         "SupportEvents": false,
-        "CreateEventDwC": false
+        "SupportIncrementalHarvest": false,
+        "Type": "SersObservations",
+        "Url": "https://www.slu.se/en/departments/aquatic-resources1/databases/database-for-testfishing-in-streams/",
+        "UseVerbatimFileInExport": false
     },
     {
-        "Id": 7,
-        "Identifier": "VirtualHerbarium",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000,
-        "Type": "VirtualHerbariumObservations",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Swedish Virtual Herbarium"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Virtuella Herbariet"
-            }
+        "Categories": [
+            "HerbariaCollections",
+            "Terrestrial",
+            "Freshwater",
+            "Marine",
+            "Plants_Bryophytes_Lichens",
+            "Fungi",
+            "Algae"
         ],
+        "ContactPerson": {
+            "FirstName": "Nils",
+            "LastName": "Ericson",
+            "Email": "mossnisse@hotmail.com"
+        },
+        "CoordinateUncertaintyInMeters": 5000,
+        "CreateEventDwC": false,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -395,6 +389,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "De sex största herbarierna i Sverige är samlade i Virtuella Herbariet. Herbarium Göteborg (GB), Botaniska Museet Lund (LD), Biologiska museet Oskarshamn (OHN), Naturhistoriska riksmuseet Stockholm (S), Herbarium Umeå (UME), Evolutionsmuseet Uppsala (UPS)."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 7,
+        "Identifier": "VirtualHerbarium",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Swedish Virtual Herbarium"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Virtuella Herbariet"
             }
         ],
         "Organizations": [
@@ -417,49 +429,33 @@
                 "path": [ "Umeå universitet", "Virtuella Herbariet" ]
             }
         ],
-        "Url": "http://herbarium.emg.umu.se",
-        "ContactPerson": {
-            "FirstName": "Nils",
-            "LastName": "Ericson",
-            "Email": "mossnisse@hotmail.com"
-        },
-        "Categories": [
-            "HerbariaCollections",
-            "Terrestrial",
-            "Freshwater",
-            "Marine",
-            "Plants_Bryophytes_Lichens",
-            "Fungi",
-            "Algae"
-        ],
-        "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
+        "SupportDynamicEml": false,
         "SupportEvents": false,
-        "CreateEventDwC": false
+        "SupportIncrementalHarvest": false,
+        "Type": "VirtualHerbariumObservations",
+        "Url": "http://herbarium.emg.umu.se",
+        "UseVerbatimFileInExport": false
     },
     {
-        "Id": 8,
-        "Identifier": "SHARK",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 1200,
-        "Type": "SharkObservations",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "SHARK SMHI"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "SHARK SMHI"
-            }
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "RegionalInventory",
+            "Marine",
+            "Vertebrates",
+            "Invertebrates",
+            "Arthropods",
+            "Microorganisms",
+            "Algae"
         ],
+        "ContactPerson": {
+            "LastName": "SHARK",
+            "FirstName": "",
+            "Email": "shark@smhi.se"
+        },
+        "CoordinateUncertaintyInMeters": 1200,
+        "CreateEventDwC": false,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -468,6 +464,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Artobservationsdata från Svenskt HavsARKiv innehåller marina miljöövervakningsdata från de hav som omger Sverige. Innehåller bland annat data från provtagning av mjukbottenfauna (zoobenthos), bottenvegetation (phytobenthos), djur-, växt- och bakterieplankton, samt förekomst av vikaresäl, gråsäl och knubbsäl. SHARK administreras av SMHI."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 8,
+        "Identifier": "SHARK",
+        "IsActive": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "SHARK SMHI"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "SHARK SMHI"
             }
         ],
         "Organizations": [
@@ -490,49 +504,31 @@
                 "path": [ "SMHI", "Shark" ]
             }
         ],
-        "Url": "https://sharkweb.smhi.se/",
-        "ContactPerson": {
-            "LastName": "SHARK",
-            "FirstName": "",
-            "Email": "shark@smhi.se"
-        },
-        "Categories": [
-            "DataHostesship",
-            "NationalInventory",
-            "RegionalInventory",
-            "Marine",
-            "Vertebrates",
-            "Invertebrates",
-            "Arthropods",
-            "Microorganisms",
-            "Algae"
-        ],
-        "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
+        "SupportDynamicEml": false,
         "SupportEvents": false,
-        "CreateEventDwC": false
+        "SupportIncrementalHarvest": false,
+        "Type": "SharkObservations",
+        "UseVerbatimFileInExport": false,
+        "Url": "https://sharkweb.smhi.se/"
     },
     {
-        "Id": 9,
-        "Identifier": "BirdRingingCentre",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
+        "Categories": [ "Terrestrial", "Vertebrates" ],
+        "ContactPerson": {
+            "FirstName": "",
+            "LastName": "",
+            "Email": ""
+        },
         "CoordinateUncertaintyInMeters": 5000,
-        "Type": "DwcA",
-        "Names": [
+        "CreateEventDwC": false,
+        "Datasets": [
             {
-                "CultureCode": "en-GB",
-                "Value": "Bird ringing centre in Sweden via GBIF"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Ringmärkningscentralen via GBIF"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=nrm-ringedbirds",
+                "identifier": "nrm-ringedbirds",
+                "isActive": true,
+                "name": "Bird Ringing Centre in Sweden (NRM)",
+                "type": "Observations"
             }
         ],
         "Descriptions": [
@@ -543,6 +539,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Databasen innehåller Ringmärkningscentralens uppgifter om fåglar ringmärkta i Sverige från 1911 och framåt (dock ej uppgifter om återfynd) som har digitaliserats."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 9,
+        "Identifier": "BirdRingingCentre",
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Bird ringing centre in Sweden via GBIF"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Ringmärkningscentralen via GBIF"
             }
         ],
         "Organizations": [
@@ -565,49 +579,37 @@
                 "path": [ "Naturhistoriska riksmuseet", "Ringmärkningscentralen" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": false,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
         "Url": "https://www.nrm.se/forskningochsamlingar/miljoforskningochovervakning/ringmarkningscentralen.214.html",
+        "UseVerbatimFileInExport": false
+    },
+    {
+        "Categories": [
+            "MuseumCollections",
+            "Terrestrial",
+            "Freshwater",
+            "Invertebrates",
+            "Arthropods"
+        ],
         "ContactPerson": {
             "FirstName": "",
             "LastName": "",
             "Email": ""
         },
+        "CoordinateUncertaintyInMeters": 5000,
+        "CreateEventDwC": false,
         "Datasets": [
             {
-                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
-                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=nrm-ringedbirds",
-                "identifier": "nrm-ringedbirds",
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=nhrs-nrm",
+                "identifier": "nhrs-nrm",
                 "isActive": true,
-                "name": "Bird Ringing Centre in Sweden (NRM)",
+                "name": "Entomological Collections (NHRS), Swedish Museum of Natural History (NRM)",
                 "type": "Observations"
-            }
-        ],
-        "Categories": [ "Terrestrial", "Vertebrates" ],
-        "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": false,
-        "CreateEventDwC": false
-    },
-    {
-        "Id": 10,
-        "Identifier": "EntomologicalCollection",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000,
-        "Type": "DwcA",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Entomological Collections (NHRS) from GBIF"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Entomologiska samlingarna (NHRS) via GBIF"
             }
         ],
         "Descriptions": [
@@ -618,6 +620,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Denna datamängd representerar digitala innehav av insekter, kvalster (kvalster och spindlar) och myriapods (tusenfotingar) vid Naturhistoriska riksmuseet. Dessa samlingar omfattar över tre miljoner exemplar, har internationella omfattning, och har en bred systematisk och geografisk täckning. SLU Artdatabanken i samarbete inom Svens biodiversitetsinfrastrukturen SBDI tillhandahåller georefererade observationer av taxa som inkluderas i svensk taxonomisk databas Dyntaxa insamlade i Sverige."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 10,
+        "Identifier": "EntomologicalCollection",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Entomological Collections (NHRS) from GBIF"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Entomologiska samlingarna (NHRS) via GBIF"
             }
         ],
         "Organizations": [
@@ -640,55 +660,37 @@
                 "path": [ "Naturhistoriska riksmuseet", "Entomologiska samlingarna" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": false,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
         "Url": "https://www.gbif.org/dataset/9940af5a-3271-4e6a-ad71-ced986b9a9a5",
+        "UseVerbatimFileInExport": false
+    },
+    {
+        "Categories": [
+            "NationalInventory",
+            "MuseumCollections",
+            "Terrestrial",
+            "Invertebrates",
+            "Arthropods"
+        ],
         "ContactPerson": {
             "FirstName": "",
             "LastName": "",
             "Email": ""
         },
+        "CoordinateUncertaintyInMeters": 5000,
+        "CreateEventDwC": true,
         "Datasets": [
             {
-                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
-                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=nhrs-nrm",
-                "identifier": "nhrs-nrm",
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=smtp-nrm",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=smtp-nrm",
+                "identifier": "smtp-nrm",
                 "isActive": true,
-                "name": "Entomological Collections (NHRS), Swedish Museum of Natural History (NRM)",
+                "name": "Swedish Malaise Trap Project (SMTP) from GBIF",
                 "type": "Observations"
-            }
-        ],
-        "Categories": [
-            "MuseumCollections",
-            "Terrestrial",
-            "Freshwater",
-            "Invertebrates",
-            "Arthropods"
-        ],
-        "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": false,
-        "CreateEventDwC": false
-    },
-    {
-        "Id": 11,
-        "Identifier": "MalaiseTrap",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000,
-        "Type": "DwcA",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Swedish Malaise Trap Project (SMTP) from GBIF"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Svenska Malaisefälle projektet (SMTP) via GBIF"
             }
         ],
         "Descriptions": [
@@ -699,6 +701,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Svenska Malaisefälle projektet (SMTP) syftar till att artbestämma 80 miljoner insektsexemplar som erhållits från malaisefälleprovtagning kontinuerligt under en treårsperiod (2003-2006). Mer än 500 obeskrivna arter har upptäckts i dessa prover, och nytt rekord har nåtts för arter som inte tidigare varit kända i Sverige. Prover i denna samling är nålade eller lagras i 96% etanol. Insamlingen beräknas utgöra 50-60% av den svenska insektsfaunan och är särskilt rik på arter av Diptera och Hymenoptera."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 11,
+        "Identifier": "MalaiseTrap",
+        "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Swedish Malaise Trap Project (SMTP) from GBIF"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Svenska Malaisefälle projektet (SMTP) via GBIF"
             }
         ],
         "Organizations": [
@@ -721,55 +741,35 @@
                 "path": [ "Stiftelsen Station Linné", "Svenska Malaisefälle projektet" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": true,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
         "Url": "https://www.gbif.org/dataset/38c1351d-9cfe-42c0-97da-02d2c8be141c",
+        "UseVerbatimFileInExport": false
+    },
+    {
+        "Categories": [
+            "MuseumCollections",
+            "Marine",
+            "Vertebrates"
+        ],
         "ContactPerson": {
             "FirstName": "",
             "LastName": "",
             "Email": ""
         },
+        "CoordinateUncertaintyInMeters": 5000,
+        "CreateEventDwC": false,
         "Datasets": [
             {
-                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=smtp-nrm",
-                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=smtp-nrm",
-                "identifier": "smtp-nrm",
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=nrm-porpoises",
+                "identifier": "nrm-porpoises",
                 "isActive": true,
-                "name": "Swedish Malaise Trap Project (SMTP) from GBIF",
+                "name": "Porpoise Observation Database (NRM)",
                 "type": "Observations"
-            }
-        ],
-        "Categories": [
-            "NationalInventory",
-            "MuseumCollections",
-            "Terrestrial",
-            "Invertebrates",
-            "Arthropods"
-        ],
-        "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": true,
-        "CreateEventDwC": true
-    },
-    {
-        "Id": 12,
-        "Identifier": "Porpoises",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000,
-        "Type": "DwcA",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Porpoises (NRM) via GBIF"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Tumlare (NRM) via GBIF"
             }
         ],
         "Descriptions": [
@@ -780,6 +780,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Databasen omfattar observationer av levande och döda tumlare som rapporterats till Naturhistoriska museet."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 12,
+        "Identifier": "Porpoises",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Porpoises (NRM) via GBIF"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Tumlare (NRM) via GBIF"
             }
         ],
         "Organizations": [
@@ -802,45 +820,53 @@
                 "path": [ "Naturhistoriska riksmuseet", "Tumlare" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": false,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
         "Url": "https://www.gbif.org/dataset/6aa7c400-0c66-11dd-84d2-b8a03c50a862",
+        "UseVerbatimFileInExport": false
+    },
+    {
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Terrestrial",
+            "Invertebrates",
+            "Arthropods"
+        ],
         "ContactPerson": {
             "FirstName": "",
             "LastName": "",
             "Email": ""
         },
+        "CoordinateUncertaintyInMeters": 5000,
+        "CreateEventDwC": true,
         "Datasets": [
             {
-                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
-                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=nrm-porpoises",
-                "identifier": "nrm-porpoises",
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sebms",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sebms",
+                "identifier": "lu_sebms",
                 "isActive": true,
-                "name": "Porpoise Observation Database (NRM)",
+                "name": "Swedish Butterfly Monitoring Scheme (SeBMS)",
                 "type": "Observations"
             }
         ],
-        "Categories": [
-            "MuseumCollections",
-            "Marine",
-            "Vertebrates"
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The SeBMS is a standarised monitoring scheme for butterflies in Sweden. This dataset includes records from fixed transect sites, often called ‘Pollard Walks’, and point site counts which cover a set area for a standardised visit time. The SeBMS is run by Lund University for the Swedish Environmental Protection Agency, in partnership with the Entomological Society of Sweden, the Swedish Environmental Protection Agency, Lund University, the Swedish University of Agricultural Sciences, the Swedish Transport Administration and the Swedish County Administration Boards. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
+            }
         ],
+        "HarvestFailPreventProcessing": false,
         "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": false,
-        "CreateEventDwC": false
-    },
-    {
         "Id": 13,
         "Identifier": "ButterflyMonitoring",
         "IsActive": true,
-        "IncludeInScheduledHarvest": true,
         "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
         "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": true,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000,
-        "Type": "DwcA",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -849,12 +875,6 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Svensk Dagfjärilsövervakning"
-            }
-        ],
-        "Descriptions": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "The SeBMS is a standarised monitoring scheme for butterflies in Sweden. This dataset includes records from fixed transect sites, often called ‘Pollard Walks’, and point site counts which cover a set area for a standardised visit time. The SeBMS is run by Lund University for the Swedish Environmental Protection Agency, in partnership with the Entomological Society of Sweden, the Swedish Environmental Protection Agency, Lund University, the Swedish University of Agricultural Sciences, the Swedish Transport Administration and the Swedish County Administration Boards. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
             }
         ],
         "Organizations": [
@@ -877,57 +897,28 @@
                 "path": [ "Lunds universitet", "Svensk Dagfjärilsövervakning" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": true,
+        "SupportEvents": true,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
         "Url": "https://www.dagfjarilar.lu.se/",
-        "ContactPerson": {
-            "FirstName": "",
-            "LastName": "",
-            "Email": ""
-        },
-        "Datasets": [
-            {
-                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sebms",
-                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sebms",
-                "identifier": "lu_sebms",
-                "isActive": true,
-                "name": "Swedish Butterfly Monitoring Scheme (SeBMS)",
-                "type": "Observations"
-            }
-        ],
+        "UseVerbatimFileInExport": false
+    },
+    {
         "Categories": [
             "DataHostesship",
-            "NationalInventory",
-            "Terrestrial",
+            "RegionalInventory",
+            "Marine",
             "Invertebrates",
             "Arthropods"
         ],
-        "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": true,
-        "CreateEventDwC": true
-    },
-    {
-        "Id": 14,
-        "Identifier": "SharkZooplankton",
-        "IsActive": false,
-        "IncludeInScheduledHarvest": false,
-        "IncludeInHealthCheck": false,
-        "IncludeInSearchByDefault": false,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
+        "ContactPerson": {
+            "FirstName": "Lisa",
+            "LastName": "Sundqvist",
+            "Email": "shark@smhi.se"
+        },
         "CoordinateUncertaintyInMeters": 5000,
-        "Type": "DwcA",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "SHARK - National zooplankton monitoring in Sweden since 1979"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "SHARK - Nationell zooplankton övervakning i Sverige sedan 1979"
-            }
-        ],
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -936,6 +927,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Zooplankton har övervakats i Sverige sedan 1979. Det nationella övervakningsprogrammet initierades av Naturvårdsverket och finansieras nu av Havs- och vattenmyndigheten. Övervakningen utförs av Stockholms universitet, Umeå universitet och Meteorologiska och hydrologiska institutet och Göteborgs universitet. Data lagras i Svenska havsarkivdatabasen (SHARK), av SMHI."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 14,
+        "Identifier": "SharkZooplankton",
+        "IsActive": false,
+        "IncludeInHealthCheck": false,
+        "IncludeInScheduledHarvest": false,
+        "IncludeInSearchByDefault": false,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "SHARK - National zooplankton monitoring in Sweden since 1979"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "SHARK - Nationell zooplankton övervakning i Sverige sedan 1979"
             }
         ],
         "Organizations": [
@@ -958,46 +967,27 @@
                 "path": [ "SMHI", "SHARK - Nationell zooplankton övervakning i Sverige sedan 1979" ]
             }
         ],
-        "Url": "https://sharkdata.se/",
-        "ContactPerson": {
-            "FirstName": "Lisa",
-            "LastName": "Sundqvist",
-            "Email": "shark@smhi.se"
-        },
-        "Categories": [
-            "DataHostesship",
-            "RegionalInventory",
-            "Marine",
-            "Invertebrates",
-            "Arthropods"
-        ],
-        "HarvestSchedule": "* * * * *",
         "SupportDatasets": true,
-        "SupportEvents": true
+        "SupportDynamicEml": false,
+        "SupportEvents": true,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
+        "Url": "https://sharkdata.se/",
+        "UseVerbatimFileInExport": false
     },
     {
-        "Id": 15,
-        "Identifier": "Fishdata2",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000,
-        "Type": "FishDataObservations",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Fishdata2 (FD2)"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Fiskdata2 (FD2)"
-            }
+        "Categories": [
+            "RegionalInventory",
+            "Marine",
+            "Vertebrates"
         ],
+        "ContactPerson": {
+            "FirstName": "Malin",
+            "LastName": "Werner",
+            "Email": "Malin.Werner@slu.se"
+        },
+        "CoordinateUncertaintyInMeters": 5000,
+        "CreateEventDwC": true,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -1006,6 +996,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Databasen Fiskdata 2 innehåller kvalitetssäkrad fångstdata och individdata om fisk och skaldjur insamlade under miljöövervakningsundersökningar eller fiskeriundersökningar. Fiskdata2 är den nationella plattformen för hantering av data som samlas in under EUs datainsamlingsförordning (DCF) och vidarebefodrar data till bl.a. Internationella havsforskningsrådets (ICES) arbete med beståndsuppskattning av fisk och skaldjur. Databasen administreras av Havsfiskelaboratoriet, Institutionen för akvatiska resurser, SLU."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 15,
+        "Identifier": "Fishdata2",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Fishdata2 (FD2)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Fiskdata2 (FD2)"
             }
         ],
         "Organizations": [
@@ -1028,45 +1036,27 @@
                 "path": [ "Havsfiskelaboratoriet, Institutionen för akvatiska resurser", "Fiskdata2" ]
             }
         ],
-        "Url": "https://www.slu.se/forskning/framgangsrik-forskning/forskningsinfrastruktur/databaser-och-biobanker/Databasen-for-fiske-i-havet/",
-        "ContactPerson": {
-            "FirstName": "Malin",
-            "LastName": "Werner",
-            "Email": "Malin.Werner@slu.se"
-        },
-        "Categories": [
-            "RegionalInventory",
-            "Marine",
-            "Vertebrates"
-        ],
-        "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
+        "SupportDynamicEml": false,
         "SupportEvents": true,
-        "CreateEventDwC": true
+        "SupportIncrementalHarvest": false,
+        "Type": "FishDataObservations",
+        "Url": "https://www.slu.se/forskning/framgangsrik-forskning/forskningsinfrastruktur/databaser-och-biobanker/Databasen-for-fiske-i-havet/",
+        "UseVerbatimFileInExport": false
     },
     {
-        "Id": 16,
-        "Identifier": "ForestInventory",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": false,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000,
-        "Type": "DwcA",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Swedish National Forest Inventory (NFI), SLU"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "SLU Riksskogstaxeringen"
-            }
+        "Categories": [
+            "NationalInventory",
+            "Terrestrial",
+            "Plants_Bryophytes_Lichens"
         ],
+        "ContactPerson": {
+            "FirstName": "Jonas",
+            "LastName": "Dahlgren",
+            "Email": "riksskogstaxeringen@slu.se"
+        },
+        "CoordinateUncertaintyInMeters": 5000,
+        "CreateEventDwC": true,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -1075,6 +1065,25 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Riksskogstaxeringen (RT) är en stickprovsinventering som utförs av Sveriges lantbruksuniversitet (SLU). Den årliga inventeringen utförs på provytor som utgör underlag för officiell statistik. Data samlas in över hela Sverige och statistic produceras för alla ägoslag undantaget bebygd mark, sjöar och hav. Datainsamlingen fokuseras på  skogsmark. Sedan 2003 inventeras även provytor inom formellt skyddade områden, och från 2016 även provytor I fjällen, dock ej på kalfjäll.  Provytorna är cirkulära och klustrade I så kallade trakter. Trakterna är till formen rektangulära med olika sidlängd I olika delar av Sverige. Även antalet provytor per trakt varierar över landet. Generellt ökar stickprovstätheten från norr till söder Två tredjedelar av trakterna är permanenta (återinventeras var 5:e år) och en tredjedel är tillfälliga (inventeras bara en gang) De exakta positionerna för de permanenta provytorna är sekretesskyddade varför positionerna på observationerna i detta dataset är slumpvis förskjutna med 200-1000 m"
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 16,
+        "Identifier": "ForestInventory",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": false,
+
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Swedish National Forest Inventory (NFI), SLU"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "SLU Riksskogstaxeringen"
             }
         ],
         "Organizations": [
@@ -1097,45 +1106,34 @@
                 "path": [ "Riksskogstaxeringen", "Förekomst/icke förekomst. Vegetationsdata" ]
             }
         ],
-        "Url": "https://www.slu.se/riksskogstaxeringen",
-        "ContactPerson": {
-            "FirstName": "Jonas",
-            "LastName": "Dahlgren",
-            "Email": "riksskogstaxeringen@slu.se"
-        },
-        "Categories": [
-            "NationalInventory",
-            "Terrestrial",
-            "Plants_Bryophytes_Lichens"
-        ],
-        "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
+        "SupportDynamicEml": false,
         "SupportEvents": true,
-        "CreateEventDwC": true
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
+        "Url": "https://www.slu.se/riksskogstaxeringen",
+        "UseVerbatimFileInExport": false
     },
     {
-        "Id": 17,
-        "Identifier": "ObservationDatabase",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": false,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 1131,
-        "Type": "ObservationDatabase",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Observation database of Redlisted species"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Observationsdatabasen"
-            }
+        "Categories": [
+            "MuseumCollections",
+            "Terrestrial",
+            "Freshwater",
+            "Marine",
+            "Vertebrates",
+            "Invertebrates",
+            "Arthropods",
+            "Plants_Bryophytes_Lichens",
+            "Fungi",
+            "Algae"
         ],
+        "ContactPerson": {
+            "FirstName": "Jan",
+            "LastName": "Edelsjö",
+            "Email": "Jan.Edelsjo@slu.se"
+        },
+        "CoordinateUncertaintyInMeters": 1131,
+        "CreateEventDwC": false,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -1144,6 +1142,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Observationsdatabasen administreras av SLU Artdatabanken och samlar fynddata från en mängd olika härkomst, huvudsakligen för naturvårdsintressanta arter. Förutom sammanställningar av historiska fynd från både litteratur och museisamlingar ryms även mer aktuella data från främst privatpersoner, ideella föreningar, konsultfirmor samt myndigheter som länsstyrelserna och kommuner. Databasen inkluderar även data från olika regionala inventeringsprojekt och några äldre Atlasinventeringar på exempelvis fåglar. En stor del av framförallt äldre fynd saknade originalkoordinater varför koordinater i efterhand har satts utifrån lokalbeskrivningen. Sett över tid innehåller databasen 148 000 fynd från före år 1950 (20%), 96 700 från åren 1950-1969 (13%), 215 600 fynd från 1970-1989 (30%), 196 600 från 1990-1999 (27%), samt 71 700 från 2000-2009 (10%). Databasen innehåller fynddata för framförallt rödlistade eller före detta rödlistade arter. Den innehåller ca 202 600 fynd för ryggradslösa djur (26%), 161 500 fynd för svampar (21%), 145 900 för fåglar (19%), 141 000 för kärlväxter (18%), 717 00 för lavar (9%), 188 00 för mossor (3%), 14 100 för grod- och kräldjur (2%), 8 800 för fiskar (1%), 2 000 för fladdermus (<1%), 1100 för andra däggdjur och 600 för alger. Observationsdatabasen användes främst före Artportalens tillkomst och har varit stängd för inläggning av data sedan 2009, men innehåller mycket material som ännu saknas i Artportalen. Ett långsiktigt arbete pågår dock med att överföra material från Observationsdatabasen till Artportalen. Fynduppgifterna som ligger samlade i Observationsdatabasen är idag inte tillgängliga för publik visning på grund av att de ofta lämnats till Artdatabanken under premisserna att de inte får offentliggöras eller spridas vidare annat än till naturvårdsrelaterade ändamål. Vid förfrågan om utlämnande av fynduppgifter görs sekretessprövning enligt Offentlighets- och sekretesslagen."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 17,
+        "Identifier": "ObservationDatabase",
+        "IncludeInHealthCheck": false,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Observation database of Redlisted species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Observationsdatabasen"
             }
         ],
         "Organizations": [
@@ -1166,52 +1182,36 @@
                 "path": [ "SLU Artdatabanken", "Observationsdatabasen" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": false,
+        "SupportIncrementalHarvest": false,
+
+        "Type": "ObservationDatabase",
         "Url": "https://www.artdatabanken.se/det-har-gor-vi/fynddata/insamling-och-lagring-av-fynduppgifter/",
-        "ContactPerson": {
-            "FirstName": "Jan",
-            "LastName": "Edelsjö",
-            "Email": "Jan.Edelsjo@slu.se"
-        },
+        "UseVerbatimFileInExport": false
+    },
+    {
         "Categories": [
-            "MuseumCollections",
+            "CitizenSciencePlatform",
             "Terrestrial",
             "Freshwater",
             "Marine",
             "Vertebrates",
             "Invertebrates",
             "Arthropods",
+            "Microorganisms",
             "Plants_Bryophytes_Lichens",
             "Fungi",
             "Algae"
         ],
-        "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": false,
-        "CreateEventDwC": false
-    },
-    {
-        "Id": 18,
-        "Identifier": "Biologg",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": false,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
+        "ContactPerson": {
+            "FirstName": "Daniel",
+            "LastName": "Eriksson",
+            "Email": "info@biologg.se"
+        },
         "CoordinateUncertaintyInMeters": 5000,
-        "Type": "BiologgObservations",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Biologg"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Biologg"
-            }
-        ],
+        "CreateEventDwC": false,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -1220,6 +1220,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Biologg är ett mobilspel som går ut på att logga observationer av arter ute i naturen. I spelet kan man samla poäng, levla up i olika artgrupper och göra utmaningar. Den data som samlas in kommer senare att kunna användas för forskning och naturvård."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 18,
+        "Identifier": "Biologg",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": false,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Biologg"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Biologg"
             }
         ],
         "Organizations": [
@@ -1242,53 +1260,17 @@
                 "path": [ "Overstellar Solutions AB", "Biologg" ]
             }
         ],
-        "Url": "https://www.biologg.se/",
-        "ContactPerson": {
-            "FirstName": "Daniel",
-            "LastName": "Eriksson",
-            "Email": "info@biologg.se"
-        },
-        "Categories": [
-            "CitizenSciencePlatform",
-            "Terrestrial",
-            "Freshwater",
-            "Marine",
-            "Vertebrates",
-            "Invertebrates",
-            "Arthropods",
-            "Microorganisms",
-            "Plants_Bryophytes_Lichens",
-            "Fungi",
-            "Algae"
-        ],
-        "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
+        "SupportDynamicEml": false,
         "SupportEvents": false,
-        "CreateEventDwC": false
+        "SupportIncrementalHarvest": false,
+        "Type": "BiologgObservations",
+        "Url": "https://www.biologg.se/",
+        "UseVerbatimFileInExport": false
     },
     {
-        "Id": 19,
-        "Identifier": "iNaturalist",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
         "CoordinateUncertaintyInMeters": 5000,
-        "Type": "iNaturalistObservations",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "iNaturalist Sweden"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "iNaturalist Sverige"
-            }
-        ],
+        "CreateEventDwC": false,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -1297,6 +1279,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "iNaturalist.se är en online-community där naturälskare över hela världen kan lära sig om arter på ett roligt sätt tillsammans. De laddar upp bilder på sina artobservationer och låter andra art- och naturintresserade hjälpa till med artbestämningen. De kan hålla koll på sina och andras fynd, läs fakta om arterna och lär sig känna igen fler arter i Sveriges natur. Fynd som tillhandahålls här är bara de som uppnått forskningsklass – d.v.s. att de uppfyller ett antal kriterier, varav ett är att minst 2/3 av de användare som bidrar med artbestämning är överens. De skördas dagligen från GBIF som i sin tur får exporter från iNaturalist.org en gång per vecka. iNaturalist.Se är den svenska delen av det internationella iNaturalist-nätverket, som är ett gemensamt initiativ av California Academy of Sciences och National Geographic Society. SLU Artdatabanken är medlem i nätverket och ansvarar för den svenska noden. "
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 19,
+        "Identifier": "iNaturalist",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "iNaturalist Sweden"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "iNaturalist Sverige"
             }
         ],
         "Organizations": [
@@ -1319,43 +1319,52 @@
                 "path": [ "SLU Artdatabanken", "iNaturalist Sverige" ]
             }
         ],
-        "Url": "https://www.inaturalist.se/",
-        "ContactPerson": {
-            "FirstName": "Mora",
-            "LastName": "Aronsson",
-            "Email": "artdatabanken@slu.se"
-        },
-        "Categories": [
-            "CitizenSciencePlatform",
-            "Terrestrial",
-            "Freshwater",
-            "Marine",
-            "Vertebrates",
-            "Invertebrates",
-            "Arthropods",
-            "Microorganisms",
-            "Plants_Bryophytes_Lichens",
-            "Fungi",
-            "Algae"
-        ],
-        "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
+        "SupportDynamicEml": false,
         "SupportEvents": false,
-        "CreateEventDwC": false
+        "SupportIncrementalHarvest": false,
+        "Type": "iNaturalistObservations",
+        "Url": "https://www.inaturalist.se/",
+        "UseVerbatimFileInExport": false
     },
     {
+        "Categories": [
+            "DataHostesship",
+            "NationalInventory",
+            "Terrestrial",
+            "Vertebrates"
+        ],
+        "ContactPerson": {
+            "FirstName": "Fredrik",
+            "LastName": "Haas",
+            "Email": "fageltaxering@biol.lu.se"
+        },
+        "CoordinateUncertaintyInMeters": 3500,
+        "CreateEventDwC": true,
+        "Datasets": [
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_kfr",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sft_kfr",
+                "identifier": "lu_sft_kfr",
+                "isActive": true,
+                "name": "Swedish Bird Survey: Swedish coastal bird monitoring programme (Nationella kustfågelövervakningen)",
+                "type": "Observations"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The Swedish coastal bird monitoring programme (aka the ”Archipelago squares”, ”Kustfågelrutorna”) is one of several schemes within the Swedish Bird Survey, run by the Department of Biology at Lund University. The survey scheme was initiated in 2015 as a standardized method for detecting and reporting changes in the abundance of coastal and archipelagic birds and their distributions in Sweden over time. The 200 archipelago squares are distributed along the Swedish coastline and are surveyed during the breeding season. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
         "Id": 20,
         "Identifier": "SBS-BirdMonitoringProgramme",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
         "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
         "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 3500,
-        "Type": "DwcA",
+        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1364,12 +1373,6 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Fågeltaxeringen: Nationella kustfågelövervakningen"
-            }
-        ],
-        "Descriptions": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "The Swedish coastal bird monitoring programme (aka the ”Archipelago squares”, ”Kustfågelrutorna”) is one of several schemes within the Swedish Bird Survey, run by the Department of Biology at Lund University. The survey scheme was initiated in 2015 as a standardized method for detecting and reporting changes in the abundance of coastal and archipelagic birds and their distributions in Sweden over time. The 200 archipelago squares are distributed along the Swedish coastline and are surveyed during the breeding season. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
             }
         ],
         "Organizations": [
@@ -1392,46 +1395,52 @@
                 "path": [ "Lunds universitet", "Fågeltaxeringen: Nationella kustfågelövervakningen" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": true,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
         "Url": "https://www.naturdatavardskap.lu.se/start",
-        "ContactPerson": {
-            "FirstName": "Fredrik",
-            "LastName": "Haas",
-            "Email": "fageltaxering@biol.lu.se"
-        },
-        "Datasets": [
-            {
-                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_kfr",
-                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sft_kfr",
-                "identifier": "lu_sft_kfr",
-                "isActive": true,
-                "name": "Swedish Bird Survey: Swedish coastal bird monitoring programme (Nationella kustfågelövervakningen)",
-                "type": "Observations"
-            }
-        ],
+        "UseVerbatimFileInExport": false
+    },
+    {
         "Categories": [
             "DataHostesship",
             "NationalInventory",
             "Terrestrial",
             "Vertebrates"
         ],
+        "ContactPerson": {
+            "FirstName": "Åke",
+            "LastName": "Lindström",
+            "Email": "fageltaxering@biol.lu.se"
+        },
+        "CoordinateUncertaintyInMeters": 17700,
+        "CreateEventDwC": true,
+        "Datasets": [
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_spkt",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sft_spkt",
+                "identifier": "lu_sft_spkt",
+                "isActive": true,
+                "name": "Swedish Bird Survey: Summer point count routes (Sommarpunktrutterna)",
+                "type": "Observations"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The summer point count routes (“punktrutterna”) is one of several schemes within the Swedish Bird Survey, run by the Department of Biology at Lund University. The summer point count routes were initiated in 1975 as a standardised method for detecting and reporting changes in the abundance of birds and their distributions in Sweden over time. The surveys are initiated and carried out by volunteer ornithologists who use standardised methods to count birds along routes of their own choice. More than 3000 point count routes have been surveyed at least once up to and including the year 2019, and approximately 1200 of these have been surveyed during the summer. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
         "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": true,
-        "CreateEventDwC": true
-    },
-    {
         "Id": 21,
         "Identifier": "SBS-SummerPointCountRoutes",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
         "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
         "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 17700,
-        "Type": "DwcA",
+        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1440,12 +1449,6 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Fågeltaxeringen: Sommarpunktrutterna"
-            }
-        ],
-        "Descriptions": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "The summer point count routes (“punktrutterna”) is one of several schemes within the Swedish Bird Survey, run by the Department of Biology at Lund University. The summer point count routes were initiated in 1975 as a standardised method for detecting and reporting changes in the abundance of birds and their distributions in Sweden over time. The surveys are initiated and carried out by volunteer ornithologists who use standardised methods to count birds along routes of their own choice. More than 3000 point count routes have been surveyed at least once up to and including the year 2019, and approximately 1200 of these have been surveyed during the summer. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
             }
         ],
         "Organizations": [
@@ -1468,46 +1471,52 @@
                 "path": [ "Lunds universitet", "Fågeltaxeringen: Sommarpunktrutterna" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": true,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
         "Url": "https://www.fageltaxering.lu.se/inventera/metoder/punktrutter",
-        "ContactPerson": {
-            "FirstName": "Åke",
-            "LastName": "Lindström",
-            "Email": "fageltaxering@biol.lu.se"
-        },
-        "Datasets": [
-            {
-                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_spkt",
-                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sft_spkt",
-                "identifier": "lu_sft_spkt",
-                "isActive": true,
-                "name": "Swedish Bird Survey: Summer point count routes (Sommarpunktrutterna)",
-                "type": "Observations"
-            }
-        ],
+        "UseVerbatimFileInExport": false
+    },
+    {
         "Categories": [
             "DataHostesship",
             "NationalInventory",
             "Terrestrial",
             "Vertebrates"
         ],
+        "ContactPerson": {
+            "FirstName": "Åke",
+            "LastName": "Lindström",
+            "Email": "fageltaxering@biol.lu.se"
+        },
+        "CoordinateUncertaintyInMeters": 17700,
+        "CreateEventDwC": true,
+        "Datasets": [
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_std",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sft_std",
+                "identifier": "lu_sft_std",
+                "isActive": true,
+                "name": "Swedish Bird Survey: Fixed routes (Standardrutterna)",
+                "type": "Observations"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The fixed routes (standardrutterna) is one of several schemes within the Swedish Bird Survey, run by the Department of Biology at Lund University, on behalf of the Swedish Environmental Protection Agency. The fixed routes were initiated in 1996 as a standardized method for detecting and reporting changes in the abundance of birds (since 1996) and mammals (since 2011), and their distributions in Sweden over time. This is possible due to the routes being distributed across Sweden in such a way that all main habitats are surveyed in a representative manner, and by counting birds and mammals using the same methods, in the same locations, year after year. The surveys are carried out by volunteer ornithologists. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
         "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": true,
-        "CreateEventDwC": true
-    },
-    {
         "Id": 22,
         "Identifier": "SBS-FixedRoutes",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
         "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
         "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 17700,
-        "Type": "DwcA",
+        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1516,12 +1525,6 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Fågeltaxeringen: Standardrutterna"
-            }
-        ],
-        "Descriptions": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "The fixed routes (standardrutterna) is one of several schemes within the Swedish Bird Survey, run by the Department of Biology at Lund University, on behalf of the Swedish Environmental Protection Agency. The fixed routes were initiated in 1996 as a standardized method for detecting and reporting changes in the abundance of birds (since 1996) and mammals (since 2011), and their distributions in Sweden over time. This is possible due to the routes being distributed across Sweden in such a way that all main habitats are surveyed in a representative manner, and by counting birds and mammals using the same methods, in the same locations, year after year. The surveys are carried out by volunteer ornithologists. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
             }
         ],
         "Organizations": [
@@ -1544,46 +1547,53 @@
                 "path": [ "Lunds universitet", "Fågeltaxeringen: Standardrutterna" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": true,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
         "Url": "https://www.fageltaxering.lu.se/inventera/metoder/standardrutter",
+        "UseVerbatimFileInExport": false
+    },
+    {
+        "Categories": [
+            "DataHostesship",
+            "RegionalInventory",
+            "Terrestrial",
+            "Marine",
+            "Vertebrates"
+        ],
         "ContactPerson": {
-            "FirstName": "Åke",
-            "LastName": "Lindström",
-            "Email": "fageltaxering@biol.lu.se"
+            "FirstName": "Peter",
+            "LastName": "Nilsson",
+            "Email": "peter.nilsson@lansstyrelsen.se"
         },
+        "CoordinateUncertaintyInMeters": 1400,
+        "CreateEventDwC": true,
         "Datasets": [
             {
-                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_std",
-                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_sft_std",
-                "identifier": "lu_sft_std",
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_kbv",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_kbv",
+                "identifier": "lu_kbv",
                 "isActive": true,
-                "name": "Swedish Bird Survey: Fixed routes (Standardrutterna)",
+                "name": "Coastal birds in the Gulf of Bothnia",
                 "type": "Observations"
             }
         ],
-        "Categories": [
-            "DataHostesship",
-            "NationalInventory",
-            "Terrestrial",
-            "Vertebrates"
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Coastal birds in the Gulf of Bothnia (Kustfåglar i Bottniska Viken) is a joint subprogramme (gemensamt delprogram) within the regional environmental monitoring in Sweden. The programme is run by the four County Administrative Boards (Länsstyrelsen) of Norrbotten, Västerbotten, Västernorrland and Gävleborg. The programme was developed in 2009-2010, and its purpose is to register the presence and population sizes of breeding bird species characteristic of coastal and archipelagic areas in the Gulf of Bothnia, thus enabling changes of these to be monitored. The work is carried out in collaboration with, and is supported by, the Swedish Environmental Protection Agency. The surveys are carried out by employees at the County Administrative Boards as well as hired consultants and experienced ornithologists. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
+            }
         ],
+        "HarvestFailPreventProcessing": false,
         "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": true,
-        "CreateEventDwC": true
-    },
-    {
         "Id": 23,
         "Identifier": "BirdsInTheGulf",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
         "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
         "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 1400,
-        "Type": "DwcA",
+        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1592,12 +1602,6 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Kustfåglar i Bottniska viken"
-            }
-        ],
-        "Descriptions": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Coastal birds in the Gulf of Bothnia (Kustfåglar i Bottniska Viken) is a joint subprogramme (gemensamt delprogram) within the regional environmental monitoring in Sweden. The programme is run by the four County Administrative Boards (Länsstyrelsen) of Norrbotten, Västerbotten, Västernorrland and Gävleborg. The programme was developed in 2009-2010, and its purpose is to register the presence and population sizes of breeding bird species characteristic of coastal and archipelagic areas in the Gulf of Bothnia, thus enabling changes of these to be monitored. The work is carried out in collaboration with, and is supported by, the Swedish Environmental Protection Agency. The surveys are carried out by employees at the County Administrative Boards as well as hired consultants and experienced ornithologists. SLU Artdatabanken in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides from this database the georeferenced records from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
             }
         ],
         "Organizations": [
@@ -1620,55 +1624,34 @@
                 "path": [ "Lunds universitet", "Kustfåglar i Bottniska viken" ]
             }
         ],
-        "Url": "",
-        "ContactPerson": {
-            "FirstName": "Peter",
-            "LastName": "Nilsson",
-            "Email": "peter.nilsson@lansstyrelsen.se"
-        },
-        "Datasets": [
-            {
-                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=lu_kbv",
-                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=lu_kbv",
-                "identifier": "lu_kbv",
-                "isActive": true,
-                "name": "Coastal birds in the Gulf of Bothnia",
-                "type": "Observations"
-            }
-        ],
-        "Categories": [
-            "DataHostesship",
-            "RegionalInventory",
-            "Terrestrial",
-            "Marine",
-            "Vertebrates"
-        ],
-        "HarvestSchedule": "* * * * *",
         "SupportDatasets": false,
+        "SupportDynamicEml": false,
         "SupportEvents": true,
-        "CreateEventDwC": true
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
+        "Url": "",
+        "UseVerbatimFileInExport": false
     },
     {
-        "Id": 24,
-        "Identifier": "TUVA",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
+        "Categories": [
+            "NationalInventory",
+            "Terrestrial",
+            "Plants_Bryophytes_Lichens"
+        ],
+        "ContactPerson": {
+            "FirstName": "Susanne",
+            "LastName": "Lindh",
+            "Email": "Susanne.lindh@jordbruksverket.se"
+        },
         "CoordinateUncertaintyInMeters": 1000,
-        "Type": "DwcA",
-        "Names": [
+        "Datasets": [
             {
-                "CultureCode": "en-GB",
-                "Value": "National Meadow and Pasture Inventory (TUVA)"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Nationell ängs- och betesinventering (TUVA)"
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=sjv-tuva",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=sjv-tuva",
+                "identifier": "sjv-tuva",
+                "isActive": true,
+                "name": "National Meadow and Pasture Inventory (TUVA)",
+                "type": "Observations"
             }
         ],
         "Descriptions": [
@@ -1679,6 +1662,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Ängs- och betesinventeringen är en svensk nationell inventering av biologiskt värdefulla ängar och betesmarker. Inventeringen samlar in information om ett antal natur- och kulturmiljöer som innehåller flora och andra organismer som är starkt beroende av hö- eller betande djur. I inventeringen bedöms endast naturvärden kopplade till slåtter eller bete. Informationen från inventeringen är öppen för alla och samlad i Jordbruksverkets databas TUVA (www.jordbruksverket.se/tuva). TUVA-databasen innehåller information om: 1. Fullt inventerade betesmarker och ängar (klassificerade som slått äng, öppen hage, skogshage och fjällmark), 2. Ängar och betesmarker som är restaurerbara, 3. Ej tillämpbara ängar och betesmarker. En underklassificering av de behandlade ängarna och betesmarkerna gjordes också med hjälp av livsmiljödirektivet. Rådets direktiv 92/43/EEG, eller så klassificerades de som utvecklings- eller andra typer av fält. Inventeringar av indikatorarter (kärlväxter), ängssvampar, träd och buskar, kulturella element, vattenförekomster och status för nuvarande förvaltning utfördes också. Majoriteten av ängarna och betesmarkerna i TUVA inventerades mellan åren 2002 och 2004. Inventeringar har sedan dess och fram till 2012 utförts i mindre skala. Från 2016 och framåt har den nationella inventeringen öppnats igen med fokus på att utföra upprepad övervakning av redan inventerade ängar och betesmarker. Informationen från ängs- och betesinventeringen används för att övervaka miljökvalitetsmålet som den svenska regeringen har satt upp; ’Ett rikt jordbrukslandskap’. Det används också för utvärdering av landsbygdsprogram och för rapportering till EU: s habitatdirektiv. Inventeringen används också som grund för nationella, regionala och lokala strategier och program för miljöledning, fysisk planering och ärendehantering. Data från inventeringen har också använts för forskning."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 24,
+        "Identifier": "TUVA",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "National Meadow and Pasture Inventory (TUVA)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Nationell ängs- och betesinventering (TUVA)"
             }
         ],
         "Organizations": [
@@ -1701,54 +1702,28 @@
                 "Path": [ "Naturhistoriska riksmuseet", "Nationell ängs- och betesinventering (TUVA)" ]
             }
         ],
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": false,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
         "Url": "",
-        "ContactPerson": {
-            "FirstName": "Susanne",
-            "LastName": "Lindh",
-            "Email": "Susanne.lindh@jordbruksverket.se"
-        },
-        "Datasets": [
-            {
-                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=sjv-tuva",
-                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=sjv-tuva",
-                "identifier": "sjv-tuva",
-                "isActive": true,
-                "name": "National Meadow and Pasture Inventory (TUVA)",
-                "type": "Observations"
-            }
-        ],
+        "UseVerbatimFileInExport": false
+    },
+    {
         "Categories": [
+            "DataHostesship",
             "NationalInventory",
             "Terrestrial",
             "Plants_Bryophytes_Lichens"
         ],
-        "HarvestSchedule": "* * * * *",
-        "SupportDatasets": false,
-        "SupportEvents": false
-    },
-    {
-        "Id": 25,
-        "Identifier": "NILS",
-        "IsActive": false,
-        "IncludeInScheduledHarvest": false,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
+        "ContactPerson": {
+            "FirstName": "Marcus",
+            "LastName": "Andersson",
+            "Email": "marcus.andersson@slu.se"
+        },
         "CoordinateUncertaintyInMeters": 5000,
-        "Type": "DwcA",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "National Inventories of Landscapes in Sweden (NILS)"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Nationella inventeringar av landskapet i Sverige (NILS)"
-            }
-        ],
+        "CreateEventDwC": true,
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
@@ -1757,6 +1732,24 @@
             {
                 "CultureCode": "sv-SE",
                 "Value": "Nationella inventeringar av landskapet i Sverige (NILS) är ett paraply för nationella miljöövervakningsprogram med ett flertal inventeringar vars syfte är att samla, analysera och presentera data om hur landskap ser ut och förändras över tid. Inventeringarna samlar in data som ligger till grund för Artikel 17 rapporteringen samt uppföljningen av miljökvalitetsmål såväl som Agenda 2030 målen."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 25,
+        "Identifier": "NILS",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": false,
+        "IncludeInSearchByDefault": true,
+        "IsActive": false,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "National Inventories of Landscapes in Sweden (NILS)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Nationella inventeringar av landskapet i Sverige (NILS)"
             }
         ],
         "Organizations": [
@@ -1779,82 +1772,24 @@
                 "path": [ "SLU", "Nationella inventeringar av landskapet i Sverige (NILS)" ]
             }
         ],
-        "Url": "https://www.slu.se/centrumbildningar-och-projekt/nils/",
-        "ContactPerson": {
-            "FirstName": "Marcus",
-            "LastName": "Andersson",
-            "Email": "marcus.andersson@slu.se"
-        },
-        "Categories": [
-            "DataHostesship",
-            "NationalInventory",
-            "Terrestrial",
-            "Plants_Bryophytes_Lichens"
-        ],
-        "HarvestSchedule": "* * * * *",
         "SupportDatasets": true,
+        "SupportDynamicEml": false,
         "SupportEvents": true,
-        "CreateEventDwC": true
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
+        "Url": "https://www.slu.se/centrumbildningar-och-projekt/nils/",
+        "UseVerbatimFileInExport": false
     },
     {
-        "Id": 26,
-        "Identifier": "GNM",
-        "IsActive": true,
-        "IncludeInScheduledHarvest": true,
-        "IncludeInHealthCheck": true,
-        "IncludeInSearchByDefault": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "HarvestFailPreventProcessing": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000,
-        "Type": "DwcA",
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Gothenburg Natural History Mueum (GNM)"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Göteborgs naturhistoriska museum (GNM)"
-            }
+        "Categories": [
         ],
-        "Descriptions": [
-            {
-                "CultureCode": "en-GB",
-                "Value": ""
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": ""
-            }
-        ],
-        "Organizations": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "SLU"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "SLU"
-            }
-        ],
-        "Paths": [
-            {
-                "CultureCode": "en-GB",
-                "path": [ "Gothenburg Natural History Mueum" ]
-            },
-            {
-                "CultureCode": "sv-SE",
-                "path": [ "Göteborgs naturhistoriska museum" ]
-            }
-        ],
-        "Url": "https://www.gnm.se/",
         "ContactPerson": {
             "FirstName": "",
             "LastName": "",
             "Email": ""
         },
+        "CoordinateUncertaintyInMeters": 5000,
+        "CreateEventDwC": false,
         "Datasets": [
             {
                 "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-ent",
@@ -1889,11 +1824,60 @@
                 "type": "Observations"
             }
         ],
-        "Categories": [
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": ""
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": ""
+            }
         ],
+        "HarvestFailPreventProcessing": false,
         "HarvestSchedule": "* * * * *",
+        "Id": 26,
+        "Identifier": "GNM",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Gothenburg Natural History Mueum (GNM)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Göteborgs naturhistoriska museum (GNM)"
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "SLU"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "SLU"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Gothenburg Natural History Mueum" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "Göteborgs naturhistoriska museum" ]
+            }
+        ],
         "SupportDatasets": false,
+        "SupportDynamicEml": false,
         "SupportEvents": false,
-        "CreateEventDwC": false
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
+        "Url": "https://www.gnm.se/",
+        "UseVerbatimFileInExport": false
     }
 ]

@@ -102,18 +102,18 @@ namespace SOS.Lib.Extensions
             IEnumerable<ExtendedMeasurementOrFactRow> eventEmof = null;
             if (observation.MeasurementOrFacts != null)
             {
-                occurrenceEmof = observation.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Occurrence.OccurrenceId, observation.Event.EventId));
+                occurrenceEmof = observation.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Occurrence.OccurrenceId, observation.Event?.EventId));
             }
 
             if (observation.Event?.MeasurementOrFacts != null)
             {
                 if (eventCore)
                 {
-                    eventEmof = observation.Event.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(m.OccurrenceID, observation.Event.EventId));
+                    eventEmof = observation.Event.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(m.OccurrenceID, observation.Event?.EventId));
                 }
                 else
                 {
-                    eventEmof = observation.Event.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Occurrence?.OccurrenceId, observation.Event.EventId));
+                    eventEmof = observation.Event.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Occurrence?.OccurrenceId, observation.Event?.EventId));
                 }
             }
 

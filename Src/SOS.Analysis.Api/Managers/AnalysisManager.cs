@@ -322,15 +322,6 @@ namespace SOS.Analysis.Api.Managers
                     })
                 ).ToDictionary(f => (string)f.Attributes["id"], f => f);
                 
-                // Add empty cells
-                GeoJsonHelper.FillInBlanks(
-                   gridCellFeaturesMetric,
-                   gridCellsInMeters, new[] {
-                            new KeyValuePair<string, object>("observationsCount", 0),
-                            new KeyValuePair<string, object>("taxaCount", 0)
-                   }
-               );
-
                 var futureCollection = new FeatureCollection
                 {
                     BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)
@@ -345,9 +336,14 @@ namespace SOS.Analysis.Api.Managers
                         .ToArray()
                             .CalculateTraiangels(true, maxDistance);
 
-                if (triangels != null)
+                var polygonsInRange = new HashSet<Polygon>();
+                if (triangels == null)
                 {
-                    var polygonsInRange = new HashSet<Polygon>();
+                    // Less than tree grid cells, triangulation can't be made, use grid cells to decide EOO
+                    gridCellFeaturesMetric.ForEach(gc => polygonsInRange.Add((Polygon)gc.Value.Geometry));
+                }
+                else
+                {
                     foreach (var triangle in triangels)
                     {
                         foreach (var corrdinate in triangle.Coordinates)
@@ -375,42 +371,52 @@ namespace SOS.Analysis.Api.Managers
                             }
                         }
                     }
-
-                    // Create a multipolygon showing matching polygons
-                    var inRangeGeometry = new MultiPolygon(polygonsInRange.ToArray());
-
-                    // Add all intersections gridcells to feature collection. Add nagative buffer when intersect to prevent gridcell touching corner match
-                    var eooGridCellFeaturesMetric = gridCellFeaturesMetric.Where(gc => gc.Value.Geometry.Buffer(-1).Intersects(inRangeGeometry)).Select(f => f.Value);
-                    var eooGeometry = new MultiPolygon(eooGridCellFeaturesMetric.Select(f => f.Geometry as Polygon).ToArray());
-
-                    var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
-                    var aoo = Math.Round((double)gridCellsMetric.Count() * gridCellArea, 0);
-                    var eoo = Math.Round(eooGeometry.Area / 1000000, 0);
-
-                    futureCollection.Add(new Feature(
-                        eooGeometry,
-                        new AttributesTable(new KeyValuePair<string, object>[] {
-                            new KeyValuePair<string, object>("id", "eoo"),
-                            new KeyValuePair<string, object>("aoo", (int)aoo),
-                            new KeyValuePair<string, object>("eoo", (int)eoo),
-                            new KeyValuePair<string, object>("gridCellArea", gridCellArea),
-                            new KeyValuePair<string, object>("gridCellAreaUnit", "km2"),
-                            new KeyValuePair<string, object>("observationsCount", metaData.ObservationsCount)
-                            }
-                        )
-                    ));
-
-                    // Add aoo features to collection
-                    eooGridCellFeaturesMetric
-                        .Where(f => long.Parse(f.Attributes["observationsCount"]?.ToString() ?? "0") > 0)
-                            .ForEach(f => futureCollection.Add(f!));
-                    
-                    // Make sure all geometries is in requested coordinate system
-                    foreach (var feature in futureCollection)
-                    {
-                        feature.Geometry = feature.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
-                    }
                 }
+
+                // Create a multipolygon showing matching polygons
+                var inRangeGeometry = new MultiPolygon(polygonsInRange.ToArray());
+
+                // Add empty cells
+                GeoJsonHelper.FillInBlanks(
+                   gridCellFeaturesMetric,
+                   gridCellsInMeters, new[] {
+                            new KeyValuePair<string, object>("observationsCount", 0),
+                            new KeyValuePair<string, object>("taxaCount", 0)
+                   }
+               );
+
+                // Add all intersections gridcells to feature collection. Add nagative buffer when intersect to prevent gridcell touching corner match
+                var eooGridCellFeaturesMetric = gridCellFeaturesMetric.Where(gc => gc.Value.Geometry.Intersects(inRangeGeometry)).Select(f => f.Value);
+                var eooGeometry = new MultiPolygon(eooGridCellFeaturesMetric.Select(f => f.Geometry as Polygon).ToArray());
+
+                var gridCellArea = (long)(gridCellsInMeters * (long)gridCellsInMeters) / 1000000; //Calculate area in km2
+                var aoo = Math.Round((double)gridCellsMetric.Count() * gridCellArea, 0);
+                var eoo = Math.Round(eooGeometry.Area / 1000000, 0);
+
+                futureCollection.Add(new Feature(
+                    eooGeometry,
+                    new AttributesTable(new KeyValuePair<string, object>[] {
+                        new KeyValuePair<string, object>("id", "eoo"),
+                        new KeyValuePair<string, object>("aoo", (int)aoo),
+                        new KeyValuePair<string, object>("eoo", (int)eoo),
+                        new KeyValuePair<string, object>("gridCellArea", gridCellArea),
+                        new KeyValuePair<string, object>("gridCellAreaUnit", "km2"),
+                        new KeyValuePair<string, object>("observationsCount", metaData.ObservationsCount)
+                        }
+                    )
+                ));
+
+                // Add aoo features to collection
+                eooGridCellFeaturesMetric
+                    .Where(f => long.Parse(f.Attributes["observationsCount"]?.ToString() ?? "0") > 0)
+                        .ForEach(f => futureCollection.Add(f!));
+                    
+                // Make sure all geometries is in requested coordinate system
+                foreach (var feature in futureCollection)
+                {
+                    feature.Geometry = feature.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
+                }
+                
 
                 return futureCollection;
             }
