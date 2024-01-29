@@ -113,6 +113,7 @@ namespace SOS.Export.Managers
             bool sensitiveObservations,
             bool sendMailFromZendTo,
             string encryptPassword,
+            bool dynamicProjectDataFields,
             IJobCancellationToken cancellationToken)
         {
             FileExportResult fileExportResult = null;
@@ -123,7 +124,7 @@ namespace SOS.Export.Managers
                 fileExportResult = exportFormat switch
                 {
                     ExportFormat.Csv => await CreateCsvExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, cancellationToken),
-                    ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, cancellationToken),
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, dynamicProjectDataFields, cancellationToken),
                     ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken),
                     _ => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), false, cancellationToken)
                 };
@@ -298,6 +299,7 @@ namespace SOS.Export.Managers
             string fileName,
             string culture,
             PropertyLabelType propertyLabelType,
+            bool dynamicProjectDataFields,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -308,6 +310,7 @@ namespace SOS.Export.Managers
                     fileName,
                     culture,
                     propertyLabelType,
+                    dynamicProjectDataFields,
                     gzip: true,
                     cancellationToken);
 

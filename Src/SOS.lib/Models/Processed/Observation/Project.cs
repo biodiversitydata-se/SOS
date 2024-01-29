@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SOS.Lib.Models.Processed.Observation
+﻿namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     ///     Artportalen project information.
@@ -15,10 +13,7 @@ namespace SOS.Lib.Models.Processed.Observation
 
         }
 
-        /// <summary>
-        ///     Project parameters.
-        /// </summary>
-        public IEnumerable<ProjectParameter> ProjectParameters { get; set; }
+        
         public override string ToString()
         {
             string strProjectParameters = ProjectParameters == null ? null : string.Join(", ", ProjectParameters);

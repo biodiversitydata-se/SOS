@@ -27,6 +27,7 @@ namespace SOS.Export.Managers.Interfaces
         /// <param name="sensitiveObservations"></param>
         /// <param name="sendMailFromZendTo"></param>
         /// <param name="encryptPassword"></param>
+        /// <param name="dynamicProjectDataFields"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ZendToResponse> ExportAndSendAsync(
@@ -43,6 +44,7 @@ namespace SOS.Export.Managers.Interfaces
             bool sensitiveObservations,
             bool sendMailFromZendTo,
             string encryptPassword,
+            bool dynamicProjectDataFields,
             IJobCancellationToken cancellationToken);
 
         /// <summary>

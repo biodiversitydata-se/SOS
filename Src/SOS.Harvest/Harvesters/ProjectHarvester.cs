@@ -94,7 +94,12 @@ namespace SOS.Harvest.Harvesters
 
         private ProjectInfo CastToProjectInfo(ProjectEntity projectEntity)
         {
-            ProjectInfo projectInfo = new ProjectInfo
+            if (projectEntity == null)
+            {
+                return null!;
+            }
+
+            var projectInfo = new ProjectInfo
             {
                 Id = projectEntity.Id,
                 Name = projectEntity.Name,
@@ -105,6 +110,14 @@ namespace SOS.Harvest.Harvesters
                 Description = projectEntity.Description?.Clean(),
                 IsPublic = projectEntity.IsPublic,
                 Owner = projectEntity.Owner,
+                ProjectParameters = projectEntity.Parameters?.Select(p => new ProjectParameterValue
+                {
+                    DataType = p.DataType,
+                    Description = p.Description,
+                    Id = p.Id,
+                    Name = p.Name,
+                    Unit = p.Unit
+                }),
                 ProjectURL = projectEntity.ProjectURL,
                 SurveyMethod = projectEntity.SurveyMethod,
                 SurveyMethodUrl = projectEntity.SurveyMethodUrl

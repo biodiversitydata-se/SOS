@@ -16,6 +16,7 @@ namespace SOS.Lib.IO.Excel.Interfaces
         /// <param name="fileName"></param>
         /// <param name="culture"></param>
         /// <param name="propertyLabelType"></param>
+        /// <param name="dynamicProjectDataFields"></param>
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -24,6 +25,7 @@ namespace SOS.Lib.IO.Excel.Interfaces
             string fileName,
             string culture,
             PropertyLabelType propertyLabelType,
+            bool dynamicProjectDataFields,
             bool gzip,
             IJobCancellationToken cancellationToken);
     }

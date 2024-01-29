@@ -22,9 +22,9 @@ namespace SOS.Lib.UnitTests.Helpers
                 {
                     new Project
                     {
-                        ProjectParameters = new List<ProjectParameter>
+                        ProjectParameters = new List<ProjectParameterValue>
                         {
-                            new ProjectParameter
+                            new ProjectParameterValue
                             {
                                 Value = "test\twith tab"
                             }

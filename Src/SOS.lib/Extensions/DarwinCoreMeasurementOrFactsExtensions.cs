@@ -130,7 +130,7 @@ namespace SOS.Lib.Extensions
         private static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(
             Project project, string occurrenceId)
         {
-            if (project?.ProjectParameters == null || !project.ProjectParameters.Any())
+            if (!project?.ProjectParameters?.Any() ?? true)
             {
                 return Enumerable.Empty<ExtendedMeasurementOrFactRow>();
             }
@@ -163,7 +163,7 @@ namespace SOS.Lib.Extensions
         private static ExtendedMeasurementOrFactRow ToExtendedMeasurementOrFactRow(
             string occurrenceId,
             Project project,
-            ProjectParameter projectParameter)
+            ProjectParameterValue projectParameter)
         {
             var row = new ExtendedMeasurementOrFactRow();
             row.OccurrenceID = occurrenceId;

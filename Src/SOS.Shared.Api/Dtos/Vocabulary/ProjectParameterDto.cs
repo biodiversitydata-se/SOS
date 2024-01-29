@@ -1,9 +1,9 @@
-﻿namespace SOS.Lib.Models.Processed.Observation
+﻿namespace SOS.Shared.Api.Dtos.Vocabulary
 {
     /// <summary>
     /// Artportalen project parameter.
     /// </summary>
-    public class ProjectParameter
+    public class ProjectParameterDto
     {
         /// <summary>
         /// Id.
@@ -29,10 +29,5 @@
         /// Data type.
         /// </summary>
         public string DataType { get; set; }
-
-        public override string ToString()
-        {
-            return Name;
-        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using SOS.Lib.Models.Interfaces;
 using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -58,6 +59,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Name of person or organization that owns the project.
         /// </summary>
         public string Owner { get; set; }
+
+        /// <summary>
+        /// Project parameters
+        /// </summary>
+        public IEnumerable<ProjectParameterValue> ProjectParameters { get; set; }
 
         /// <summary>
         ///     Web address that leads to more information about the

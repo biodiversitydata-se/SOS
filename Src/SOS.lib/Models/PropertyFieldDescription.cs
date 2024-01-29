@@ -7,6 +7,15 @@ namespace SOS.Lib.Models
 {
     public class PropertyFieldDescription
     {
+        /// <summary>
+        /// Used for i.e. to handle projects
+        /// </summary>
+        public bool IsDynamicCreated { get; set; }
+        /// <summary>
+        /// Used for i.e. to handle project parameters
+        /// </summary>
+        public IEnumerable<int> DynamicIds { get; set; }
+
         public string PropertyName { get; set; }
         public string PropertyPath { get; set; }
         public string SwedishTitle { get; set; }

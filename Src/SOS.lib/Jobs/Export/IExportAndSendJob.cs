@@ -28,6 +28,7 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="sensitiveObservations"></param>
         /// <param name="sendMailFromZendTo"></param>
         /// <param name="encryptedPassword"></param>
+        /// <param name="dynamicProjectDataFields"></param>
         /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -50,6 +51,7 @@ namespace SOS.Lib.Jobs.Export
             bool sensitiveObservations,
             bool sendMailFromZendTo,
             string encryptedPassword,
+            bool dynamicProjectDataFields,
             PerformContext context,
             IJobCancellationToken cancellationToken);
     }

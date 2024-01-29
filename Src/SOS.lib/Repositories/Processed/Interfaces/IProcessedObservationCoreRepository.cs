@@ -168,6 +168,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<IEnumerable<Observation>> GetObservationsAsync(IEnumerable<string> occurrenceIds, bool protectedIndex);
 
         /// <summary>
+        /// Get all project id's matching filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<IEnumerable<int>> GetProjectIdsAsync(SearchFilter filter);
+
+        /// <summary>
         /// Get measurement or facts by using search after
         /// </summary>
         /// <param name="filter"></param>

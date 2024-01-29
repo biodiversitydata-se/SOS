@@ -3,9 +3,17 @@ using SOS.Shared.Api.Dtos.Vocabulary;
 
 namespace SOS.Shared.Api.Extensions.Dto
 {
+    /// <summary>
+    /// Extension methods for project
+    /// </summary>
     public static class ProjectExtensions
     {
       
+        /// <summary>
+        /// Cast object to dto
+        /// </summary>
+        /// <param name="projectInfo"></param>
+        /// <returns></returns>
         public static ProjectDto ToDto(this ProjectInfo projectInfo)
         {
             if (projectInfo == null)
@@ -24,12 +32,27 @@ namespace SOS.Shared.Api.Extensions.Dto
                 Description = projectInfo.Description,
                 IsPublic = projectInfo.IsPublic,
                 Owner = projectInfo.Owner,
+                Parameters = projectInfo.ProjectParameters?.Select(p => 
+                    new ProjectParameterDto
+                    {
+                        DataType = p.DataType,
+                        Description = p.Description,
+                        Id = p.Id,
+                        Name = p.Name,
+                        Unit = p.Unit
+                    }
+                ),
                 ProjectURL = projectInfo.ProjectURL,
                 SurveyMethod = projectInfo.SurveyMethod,
                 SurveyMethodUrl = projectInfo.SurveyMethodUrl
             };
         }
 
+        /// <summary>
+        /// Cast multiple project objects to dto's
+        /// </summary>
+        /// <param name="projectInfos"></param>
+        /// <returns></returns>
         public static IEnumerable<ProjectDto> ToProjectDtos(this IEnumerable<ProjectInfo> projectInfos)
         {
             return projectInfos.Select(vocabulary => vocabulary.ToDto());

@@ -6,6 +6,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.Excel.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
@@ -29,6 +30,7 @@ namespace SOS.Lib.IO.Excel
     public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
     {
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
+        private readonly IProjectManager _projectManager;
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ILogger<ExcelFileWriter> _logger;
@@ -56,11 +58,13 @@ namespace SOS.Lib.IO.Excel
         /// Constructor
         /// </summary>
         /// <param name="processedObservationRepository"></param>
+        /// <param name="projectManager"></param>
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ExcelFileWriter(IProcessedObservationCoreRepository processedObservationRepository,
+            IProjectManager projectManager,
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
             ILogger<ExcelFileWriter> logger)
@@ -68,6 +72,7 @@ namespace SOS.Lib.IO.Excel
             _processedObservationRepository = processedObservationRepository ??
                                                     throw new ArgumentNullException(
                                                         nameof(processedObservationRepository));
+            _projectManager = projectManager ?? throw new ArgumentNullException(nameof(projectManager));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _vocabularyValueResolver = vocabularyValueResolver ??
                                        throw new ArgumentNullException(nameof(vocabularyValueResolver));
@@ -79,6 +84,7 @@ namespace SOS.Lib.IO.Excel
             string fileName,
             string culture,
             PropertyLabelType propertyLabelType,
+            bool dynamicProjectDataFields,
             bool gzip,
             IJobCancellationToken cancellationToken)
         {
@@ -88,7 +94,12 @@ namespace SOS.Lib.IO.Excel
             {
                 string excelFilePath = null;
                 int nrObservations = 0;
-                var propertyFields =
+                var projectIds = await _processedObservationRepository.GetProjectIdsAsync(filter);
+                var projects = await _projectManager.GetAsync(projectIds);
+
+                var propertyFields = dynamicProjectDataFields && (projects?.Any() ?? false) ? 
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, projects: projects) 
+                    :
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
@@ -143,7 +154,7 @@ namespace SOS.Lib.IO.Excel
                         int columnIndex = 1;
                         foreach (var propertyField in propertyFields)
                         {
-                            var value = flatObservation.GetValue(propertyField);
+                            var value = dynamicProjectDataFields && propertyField.IsDynamicCreated ? flatObservation.GetDynamicValue(propertyField) : flatObservation.GetValue(propertyField);
                             object val = value == null ? null : propertyField.DataTypeEnum switch
                             {
                                 PropertyFieldDataType.Boolean => ((bool?)value)?.ToString(CultureInfo.InvariantCulture),

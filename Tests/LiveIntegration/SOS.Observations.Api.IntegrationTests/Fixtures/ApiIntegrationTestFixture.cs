@@ -224,7 +224,9 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 VocabularyValueResolver, new NullLogger<CsvFileWriter>());
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(VocabularyValueResolver, processClient);
             var dwcArchiveEventFileWriter = CreateDwcArchiveEventFileWriter(VocabularyValueResolver, processClient);
-            var excelFileWriter = new ExcelFileWriter(ProcessedObservationRepository, fileService,
+            var excelFileWriter = new ExcelFileWriter(ProcessedObservationRepository,
+                projectManger,
+                fileService,
                 VocabularyValueResolver, new NullLogger<ExcelFileWriter>());
             var geojsonFileWriter = new GeoJsonFileWriter(ProcessedObservationRepository, fileService,
                 VocabularyValueResolver, new NullLogger<GeoJsonFileWriter>());

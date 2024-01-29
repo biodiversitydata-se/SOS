@@ -142,6 +142,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="fileName"></param>
         /// <param name="culture"></param>
         /// <param name="propertyLabelType"></param>
+        /// <param name="dynamicProjectDataFields"></param>
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -150,6 +151,7 @@ namespace SOS.Observations.Api.Managers
             string fileName,
             string culture,
             PropertyLabelType propertyLabelType,
+            bool dynamicProjectDataFields,
             bool gzip,
             IJobCancellationToken cancellationToken)
         {
@@ -161,6 +163,7 @@ namespace SOS.Observations.Api.Managers
                     fileName,
                     culture,
                     propertyLabelType,
+                    dynamicProjectDataFields,
                     gzip,
                     cancellationToken);
 
@@ -282,6 +285,7 @@ namespace SOS.Observations.Api.Managers
             bool flatOut,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
+            bool dynamicProjectDataFields,
             bool gzip,
             IJobCancellationToken cancellationToken)
         {
@@ -293,7 +297,7 @@ namespace SOS.Observations.Api.Managers
                 {
                     ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, propertyLabelType, gzip, cancellationToken),
                     ExportFormat.DwCEvent => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken, true),
-                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, propertyLabelType, gzip, cancellationToken),
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, propertyLabelType, dynamicProjectDataFields, gzip, cancellationToken),
                     ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, gzip, cancellationToken),
                     _ => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken)
                 };

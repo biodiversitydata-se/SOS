@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -759,11 +760,48 @@ namespace SOS.Lib.Models.Processed.Observation
                 "organism.previousidentifications" => OrganismPreviousIdentifications,
                 "organism.organismremarks" => OrganismOrganismRemarks,
                 "location.pointradiusspatialfit" => _observation?.Location?.PointRadiusSpatialFit,
-                _ => throw new ArgumentException($"Field is not mapped: \"{propertyField.PropertyPath}\"")
+                _ => propertyField.IsDynamicCreated ? null! : throw new ArgumentException($"Field is not mapped: \"{propertyField.PropertyPath}\"")
             };
         }
 
-        public string GetStringValue(PropertyFieldDescription propertyField)
+        public object GetDynamicValue(PropertyFieldDescription propertyField)
+        {
+            var propertyPath = propertyField.PropertyPath.ToLower();
+            var regexp = new Regex("^project-\\d+");
+            if ((_observation?.Projects?.Any() ?? false) && regexp.Match(propertyPath).Length != 0)
+            {
+                var projectId = propertyField.DynamicIds.ElementAt(0);
+                var project = _observation.Projects.FirstOrDefault(p => p.Id.Equals(projectId));
+                if (project != null)
+                {
+                    regexp = new Regex("^project-\\d+.name$");
+                    if (regexp.Match(propertyPath).Length != 0)
+                    {
+                        return project.Name;
+                    }
+                    regexp = new Regex("^project-\\d+.category");
+                    if (regexp.Match(propertyPath).Length != 0)
+                    {
+                        return project.Category;
+                    }
+                    regexp = new Regex("^project-\\d+.url");
+                    if (regexp.Match(propertyPath).Length != 0)
+                    {
+                        return project.ProjectURL;
+                    }
+                    regexp = new Regex("^project-\\d+.parameter-\\d+$");
+                    if (regexp.Match(propertyPath).Length != 0)
+                    {
+                        var parameterId = propertyField.DynamicIds.ElementAt(1);
+                        var parameter = project.ProjectParameters?.FirstOrDefault(pp => pp.Id.Equals(parameterId));
+                        return parameter?.Value;
+                    }
+                }
+            }
+
+            return null;
+        }
+            public string GetStringValue(PropertyFieldDescription propertyField)
         {
             var value = GetValue(propertyField);
             var stringValue = value == null ? string.Empty : propertyField.DataTypeEnum switch

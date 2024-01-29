@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
-namespace SOS.Observations.Api.Managers
+namespace SOS.Lib.Managers
 {
     /// <summary>
     ///     Vocabulary manager.
@@ -29,9 +30,20 @@ namespace SOS.Observations.Api.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <inheritdoc>/>
         public async Task<IEnumerable<ProjectInfo>> GetAllAsync()
         {
             return await _projectCache.GetAllAsync();
+        }
+
+        /// <inheritdoc>/>
+        public async Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds)
+        {
+            if (!projectIds?.Any() ?? true)
+            {
+                return null!;
+            }
+            return (await GetAllAsync()).Where(p => projectIds.Contains(p.Id));
         }
     }
 }

@@ -420,6 +420,7 @@ namespace SOS.Observations.Api.Controllers
                         false,
                         propertyLabelType,
                         false,
+                        false,
                         gzip,
                         JobCancellationToken.Null);
 
@@ -492,6 +493,7 @@ namespace SOS.Observations.Api.Controllers
                         false,
                         PropertyLabelType.PropertyPath,
                         false,
+                        false,
                         true,
                         JobCancellationToken.Null);
 
@@ -527,6 +529,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="dynamicProjectDataFields">Use dynamic added project related fields. Only for Excel export</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
@@ -542,6 +545,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
+            [FromQuery] bool dynamicProjectDataFields = false,
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
@@ -575,6 +579,7 @@ namespace SOS.Observations.Api.Controllers
                         false,
                         propertyLabelType,
                         false,
+                        dynamicProjectDataFields,
                         gzip,
                         JobCancellationToken.Null);
 
@@ -659,6 +664,7 @@ namespace SOS.Observations.Api.Controllers
                         flat,
                         propertyLabelType,
                         excludeNullValues,
+                        false,
                         gzip,
                         JobCancellationToken.Null);
 
@@ -742,7 +748,7 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Csv, cultureCode, false,
-                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -826,7 +832,7 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
-                        PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
+                        PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -917,7 +923,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Excel, cultureCode, false,
-                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -1011,7 +1017,7 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.GeoJson, cultureCode,
-                        flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
+                        flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -1097,6 +1103,7 @@ namespace SOS.Observations.Api.Controllers
                         false,
                         propertyLabelType,
                         false,
+                        false,
                         gzip,
                         JobCancellationToken.Null);
 
@@ -1167,6 +1174,7 @@ namespace SOS.Observations.Api.Controllers
                         false,
                         PropertyLabelType.PropertyPath,
                         false,
+                        false,
                         true,
                         JobCancellationToken.Null);
 
@@ -1197,6 +1205,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        ///<param name="dynamicProjectDataFields">Use dynamic added project related fields. Only for Excel export</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <returns></returns>
@@ -1212,6 +1221,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
+            [FromQuery] bool dynamicProjectDataFields = false,
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
@@ -1244,6 +1254,7 @@ namespace SOS.Observations.Api.Controllers
                         false,
                         propertyLabelType,
                         false,
+                        dynamicProjectDataFields,
                         gzip,
                         JobCancellationToken.Null);
 
@@ -1328,6 +1339,7 @@ namespace SOS.Observations.Api.Controllers
                         flat,
                         propertyLabelType,
                         excludeNullValues,
+                        false,
                         gzip,
                         JobCancellationToken.Null);
 
@@ -1411,7 +1423,7 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Csv, cultureCode, false,
-                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -1494,7 +1506,7 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
-                        PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
+                        PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -1583,7 +1595,7 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Excel, cultureCode, false,
-                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -1676,7 +1688,7 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.GeoJson, cultureCode,
-                        flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, null, JobCancellationToken.Null));
+                        flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {

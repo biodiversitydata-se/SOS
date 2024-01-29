@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Models.Processed.Observation
+﻿using System.Collections.Generic;
+
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     ///     Artportalen projects summary.
@@ -19,6 +21,11 @@
         /// Project 1 category.
         /// </summary>
         public string Project1Category { get; set; }
+
+        /// <summary>
+        /// Project 1 parameters
+        /// </summary>
+        public IEnumerable<ProjectParameter> Project1Parameters { get; set; }
 
         /// <summary>
         /// Project 1 URL.
@@ -44,6 +51,11 @@
         /// Project 2 category.
         /// </summary>
         public string Project2Category { get; set; }
+
+        /// <summary>
+        /// Project 2 parameters
+        /// </summary>
+        public IEnumerable<ProjectParameter> Project2Parameters { get; set; }
 
         /// <summary>
         /// Project 2 URL.

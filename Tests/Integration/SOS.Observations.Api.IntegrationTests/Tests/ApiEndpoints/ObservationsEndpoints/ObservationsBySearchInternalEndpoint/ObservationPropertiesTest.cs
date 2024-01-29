@@ -406,7 +406,7 @@ public class ObservationPropertiesTest : TestBase
                     IsPublic = true,
                     Name = "N",
                     Owner = "O",
-                    ProjectParameters = new []{ new Lib.Models.Processed.Observation.ProjectParameter
+                    ProjectParameters = new []{ new Lib.Models.Processed.Observation.ProjectParameterValue
                         {
                             DataType = "DT",
                             Description = "D",

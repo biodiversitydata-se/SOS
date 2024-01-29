@@ -130,6 +130,7 @@ namespace SOS.Export.Jobs
             bool sensitiveObservations,
             bool sendMailFromZendTo,
             string encryptedPassword,
+            bool dynamicProjectDataFields,
             PerformContext context,
             IJobCancellationToken cancellationToken)
         {
@@ -141,7 +142,7 @@ namespace SOS.Export.Jobs
                 Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
                 await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
                 var password = await _cryptoService.DecryptAsync(encryptedPassword);
-                var response = await _observationManager.ExportAndSendAsync(roleId, authorizationApplicationIdentifier, filter, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, password, cancellationToken);
+                var response = await _observationManager.ExportAndSendAsync(roleId, authorizationApplicationIdentifier, filter, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, password, dynamicProjectDataFields, cancellationToken);
 
                 _logger.LogInformation($"End export and send job. Success: {response.Success}");
                 await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);

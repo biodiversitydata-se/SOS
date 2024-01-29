@@ -75,8 +75,12 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                 new ProcessedConfigurationCache(processedConfigurationRepository),
                 new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
-
-            var excelWriter = new ExcelFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
+            var projectInfoRepository = new ProjectInfoRepository(processClient, new NullLogger<ProjectInfoRepository>());
+            var projectInfoCache = new ProjectCache(projectInfoRepository);
+            var projectManager = new ProjectManager(projectInfoCache, new NullLogger<ProjectManager>());
+            var excelWriter = new ExcelFileWriter(processedObservationRepository,
+                projectManager,
+                new FileService(), vocabularyValueResolver,
                 new NullLogger<ExcelFileWriter>());
             var geoJsonlWriter = new GeoJsonFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
                 new NullLogger<GeoJsonFileWriter>());
@@ -175,6 +179,7 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                     false,
                     false,
                     null,
+                    false,
                     JobCancellationToken.Null
                 );
 
@@ -219,7 +224,9 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                     }
                 }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false, PropertyLabelType.PropertyPath, false, false,
                     false,
-                    null, JobCancellationToken.Null);
+                    null, 
+                    false,
+                    JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -23,6 +23,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="flatOut">Only applicable when GeoJson is selected as export format</param>
         /// <param name="propertyLabelType"></param>
         /// <param name="excludeNullValues"></param>
+        /// <param name="dynamicProjectDataFields"></param>
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -36,6 +37,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
             bool flatOut,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
+            bool dynamicProjectDataFields,
             bool gzip,
             IJobCancellationToken cancellationToken);
     }

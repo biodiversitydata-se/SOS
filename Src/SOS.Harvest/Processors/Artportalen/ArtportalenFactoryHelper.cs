@@ -43,6 +43,7 @@ namespace SOS.Harvest.Processors.Artportalen
             projectsSummary.Project1Id = project1.Id;
             projectsSummary.Project1Category = project1.CategorySwedish;
             projectsSummary.Project1Name = project1.Name;
+            projectsSummary.Project1Parameters = project1.ProjectParameters;
             projectsSummary.Project1Url = project1.ProjectURL;
             projectsSummary.Project1Values = project1.ProjectParameters != null ? string.Join(", ", project1.ProjectParameters.Select(m => $"[{m.Name}={m.Value}]")) : null;
 
@@ -52,6 +53,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 projectsSummary.Project2Id = project2.Id;
                 projectsSummary.Project2Category = project2.CategorySwedish;
                 projectsSummary.Project2Name = project2.Name;
+                projectsSummary.Project2Parameters = project2.ProjectParameters;
                 projectsSummary.Project2Url = project2.ProjectURL;
                 projectsSummary.Project2Values = project2.ProjectParameters != null ? string.Join(", ", project2.ProjectParameters.Select(m => $"[{m.Name}={m.Value}]")) : null;
             }
@@ -64,21 +66,21 @@ namespace SOS.Harvest.Processors.Artportalen
         /// </summary>
         /// <param name="projectParameter"></param>
         /// <returns></returns>
-        public static Lib.Models.Processed.Observation.ProjectParameter? CreateProcessedProjectParameter(ProjectParameter projectParameter)
+        public static ProjectParameterValue? CreateProcessedProjectParameter(ProjectParameter projectParameter)
         {
             if (projectParameter == null)
             {
                 return null;
             }
 
-            return new Lib.Models.Processed.Observation.ProjectParameter
+            return new ProjectParameterValue
             {
-                Value = projectParameter.Value,
                 DataType = projectParameter.DataType,
                 Description = projectParameter.Description,
                 Name = projectParameter.Name,
                 Id = projectParameter.Id,
-                Unit = projectParameter.Unit
+                Unit = projectParameter.Unit,
+                Value = projectParameter.Value
             };
         }
     }

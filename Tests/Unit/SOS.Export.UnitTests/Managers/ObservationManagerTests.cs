@@ -123,6 +123,7 @@ namespace SOS.Export.UnitTests.Managers
                 It.IsAny<bool>(),
                 It.IsAny<bool>(),
                 It.IsAny<string>(),
+                It.IsAny<bool>(),
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -161,6 +162,7 @@ namespace SOS.Export.UnitTests.Managers
                 It.IsAny<bool>(),
                 It.IsAny<bool>(),
                 It.IsAny<string>(),
+                It.IsAny<bool>(),
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
