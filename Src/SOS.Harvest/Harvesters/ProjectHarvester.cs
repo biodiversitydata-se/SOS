@@ -110,7 +110,7 @@ namespace SOS.Harvest.Harvesters
                 Description = projectEntity.Description?.Clean(),
                 IsPublic = projectEntity.IsPublic,
                 Owner = projectEntity.Owner,
-                ProjectParameters = projectEntity.Parameters?.Select(p => new ProjectParameterValue
+                ProjectParameters = projectEntity.Parameters?.Select(p => new ProjectParameter
                 {
                     DataType = p.DataType,
                     Description = p.Description,

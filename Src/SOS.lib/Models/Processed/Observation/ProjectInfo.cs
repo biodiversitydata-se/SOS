@@ -63,7 +63,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Project parameters
         /// </summary>
-        public IEnumerable<ProjectParameterValue> ProjectParameters { get; set; }
+        public IEnumerable<ProjectParameter> ProjectParameters { get; set; }
 
         /// <summary>
         ///     Web address that leads to more information about the

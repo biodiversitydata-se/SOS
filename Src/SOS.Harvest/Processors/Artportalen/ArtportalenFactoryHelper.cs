@@ -64,14 +64,14 @@ namespace SOS.Harvest.Processors.Artportalen
         /// </summary>
         /// <param name="projectParameter"></param>
         /// <returns></returns>
-        public static ProjectParameterValue? CreateProcessedProjectParameter(ProjectParameter projectParameter)
+        public static Lib.Models.Processed.Observation.ProjectParameter? CreateProcessedProjectParameter(ProjectParameter projectParameter)
         {
             if (projectParameter == null)
             {
                 return null;
             }
 
-            return new ProjectParameterValue
+            return new Lib.Models.Processed.Observation.ProjectParameter
             {
                 DataType = projectParameter.DataType,
                 Description = projectParameter.Description,

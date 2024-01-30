@@ -163,7 +163,7 @@ namespace SOS.Lib.Extensions
         private static ExtendedMeasurementOrFactRow ToExtendedMeasurementOrFactRow(
             string occurrenceId,
             Project project,
-            ProjectParameterValue projectParameter)
+            ProjectParameter projectParameter)
         {
             var row = new ExtendedMeasurementOrFactRow();
             row.OccurrenceID = occurrenceId;
