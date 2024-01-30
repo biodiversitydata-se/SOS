@@ -47,12 +47,7 @@
         ///     Name of person or organization that owns the project.
         /// </summary>
         public string Owner { get; set; }
-
-        /// <summary>
-        /// Project parameters
-        /// </summary>
-        public IEnumerable<ProjectParameterDto> Parameters { get; set; }
-
+        
         /// <summary>
         ///     Web address that leads to more information about the project.
         /// </summary>

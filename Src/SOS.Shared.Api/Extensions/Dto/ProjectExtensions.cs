@@ -32,16 +32,6 @@ namespace SOS.Shared.Api.Extensions.Dto
                 Description = projectInfo.Description,
                 IsPublic = projectInfo.IsPublic,
                 Owner = projectInfo.Owner,
-                Parameters = projectInfo.ProjectParameters?.Select(p => 
-                    new ProjectParameterDto
-                    {
-                        DataType = p.DataType,
-                        Description = p.Description,
-                        Id = p.Id,
-                        Name = p.Name,
-                        Unit = p.Unit
-                    }
-                ),
                 ProjectURL = projectInfo.ProjectURL,
                 SurveyMethod = projectInfo.SurveyMethod,
                 SurveyMethodUrl = projectInfo.SurveyMethodUrl
