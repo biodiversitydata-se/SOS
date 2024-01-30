@@ -42,8 +42,7 @@ namespace SOS.Harvest.Processors.Artportalen
             var project1 = projectsList[0];
             projectsSummary.Project1Id = project1.Id;
             projectsSummary.Project1Category = project1.CategorySwedish;
-            projectsSummary.Project1Name = project1.Name;
-            projectsSummary.Project1Parameters = project1.ProjectParameters;
+            projectsSummary.Project1Name = project1.Name;            
             projectsSummary.Project1Url = project1.ProjectURL;
             projectsSummary.Project1Values = project1.ProjectParameters != null ? string.Join(", ", project1.ProjectParameters.Select(m => $"[{m.Name}={m.Value}]")) : null;
 
@@ -52,8 +51,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 var project2 = projectsList[1];
                 projectsSummary.Project2Id = project2.Id;
                 projectsSummary.Project2Category = project2.CategorySwedish;
-                projectsSummary.Project2Name = project2.Name;
-                projectsSummary.Project2Parameters = project2.ProjectParameters;
+                projectsSummary.Project2Name = project2.Name;                
                 projectsSummary.Project2Url = project2.ProjectURL;
                 projectsSummary.Project2Values = project2.ProjectParameters != null ? string.Join(", ", project2.ProjectParameters.Select(m => $"[{m.Name}={m.Value}]")) : null;
             }
