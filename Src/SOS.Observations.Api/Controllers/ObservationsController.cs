@@ -782,8 +782,6 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, sensitive observations index is queried if you have access rights.</param>
-        /// If true, a harvest and process job for that observation will be enqued to Hangfire, this action will wait for and return the updated result.
-        /// </param>        
         /// <returns></returns>
         [HttpGet("Internal/{id?}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
