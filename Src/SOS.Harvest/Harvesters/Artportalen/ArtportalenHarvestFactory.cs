@@ -97,6 +97,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.TriggeredObservationRuleFrequencyId = entity.TriggeredObservationRuleFrequencyId;
                 observation.TriggeredObservationRuleReproductionId = entity.TriggeredObservationRuleReproductionId;
                 observation.TriggeredObservationRuleUnspontaneous = entity.TriggeredObservationRuleUnspontaneous;
+               // observation.TriggeredObservationRuleRegionalSightingState = entity.TriggeredObservationRuleRegionalSightingState;
                 observation.Unit = _artportalenMetadataContainer.TryGetUnit(entity.UnitId);
                 observation.Unspontaneous = entity.Unspontaneous;
                 observation.UnsureDetermination = entity.UnsureDetermination;

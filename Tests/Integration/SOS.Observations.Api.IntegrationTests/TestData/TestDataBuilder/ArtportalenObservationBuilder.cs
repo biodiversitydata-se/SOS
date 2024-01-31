@@ -355,6 +355,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
                 obs.TriggeredObservationRuleFrequencyId = sourceObservation.TriggeredObservationRuleFrequencyId;
                 obs.TriggeredObservationRuleReproductionId = sourceObservation.TriggeredObservationRuleReproductionId;
                 obs.TriggeredObservationRuleUnspontaneous = sourceObservation.TriggeredObservationRuleUnspontaneous;
+                //obs.TriggeredObservationRuleRegionalSightingState = sourceObservation.TriggeredObservationRuleRegionalSightingState;
             });
 
             return operable;

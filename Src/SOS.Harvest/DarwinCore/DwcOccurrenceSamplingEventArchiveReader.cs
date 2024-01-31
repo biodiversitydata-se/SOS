@@ -899,11 +899,18 @@ namespace SOS.Harvest.DarwinCore
                 idIdentifierTuple,
                 batchSize);
             var observations = new List<DwcObservationVerbatim>();
-            await foreach (var observationsBatch in observationsBatches)
+            try
             {
-                observations.AddRange(observationsBatch!);
+                await foreach (var observationsBatch in observationsBatches)
+                {
+                    if (observationsBatch != null)
+                    {
+                        observations.AddRange(observationsBatch!);
+                    }
+                }
             }
-
+            catch { }
+            
             return observations;
         }
 

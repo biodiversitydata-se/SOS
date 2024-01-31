@@ -46,7 +46,8 @@ namespace SOS.Import.LiveIntegrationTests.DarwinCore
         ///     Reading all observations and storing them in RAM will use more than 10GB, so reading in batches is necessary.
         /// </summary>
         /// <returns></returns>
-        [Fact]
+
+        [Fact(Skip = "Require local file")]
         public async Task Read_local_large_occurrence_dwca_in_batches()
         {
             //-----------------------------------------------------------------------------------------------------------

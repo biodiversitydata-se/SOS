@@ -285,6 +285,8 @@
 
         public bool? TriggeredObservationRuleUnspontaneous { get; set; }
 
+       // public int? TriggeredObservationRuleRegionalSightingState { get; set; }
+
         public string? SightingPublishTypeIds { get; set; }
 
         public string? SpeciesFactsIds { get; set; }

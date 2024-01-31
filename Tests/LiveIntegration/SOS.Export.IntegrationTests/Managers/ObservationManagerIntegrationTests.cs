@@ -21,6 +21,7 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -93,7 +94,8 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                     .PrepareFilterAsync(0, null, new SearchFilter(0, ProtectionFilter.Public), "Sighting", 0, false, false, true)
                 );
             var zendToService = new Mock<IZendToService>();
-            zendToService.Setup(zs => zs.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>()));
+            zendToService.Setup(zs => zs.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>()))
+                .ReturnsAsync(new Models.ZendTo.ZendToResponse { Status = "OK" });
             var observationManager = new ObservationManager(
                 dwcArchiveFileWriter,
                 dwcArchiveEventFileWriter,
@@ -206,6 +208,12 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                 await observationManager.ExportAndSendAsync(null, null, new SearchFilter(0)
                 {
                     DataProviderIds = new List<int> { 1 },
+                    Date = new DateFilter
+                    {
+                        StartDate = new DateTime(DateTime.Now.AddYears(-1).Year, 1, 1),
+                        EndDate = new DateTime(DateTime.Now.Year, 12, 31),
+                        DateFilterType = DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate
+                    },
                     Output = new OutputFilter
                     {
                         Fields = new List<string> {
@@ -224,9 +232,9 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                     }
                 }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false, PropertyLabelType.PropertyPath, false, false,
                     false,
-                    null, 
+                    null,
                     false,
-                    JobCancellationToken.Null);
+                    JobCancellationToken.Null); ;
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

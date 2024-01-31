@@ -495,6 +495,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ArtportalenInternal.TriggeredObservationRuleFrequencyId = verbatimObservation.TriggeredObservationRuleFrequencyId;
                 obs.ArtportalenInternal.TriggeredObservationRuleReproductionId = verbatimObservation.TriggeredObservationRuleReproductionId;
                 obs.ArtportalenInternal.TriggeredObservationRuleUnspontaneous = verbatimObservation.TriggeredObservationRuleUnspontaneous;
+               // obs.ArtportalenInternal.TriggeredObservationRuleRegionalSightingState = verbatimObservation.TriggeredObservationRuleRegionalSightingState;
 
                 var eventMonths = new HashSet<int>();
                 if (startDate.HasValue)

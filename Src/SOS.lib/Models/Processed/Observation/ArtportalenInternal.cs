@@ -198,5 +198,10 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [SwaggerExclude]
         public bool? TriggeredObservationRuleUnspontaneous { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule Regional Sighting State
+        /// </summary>
+       // public int? TriggeredObservationRuleRegionalSightingState { get; set; }
     }
 }

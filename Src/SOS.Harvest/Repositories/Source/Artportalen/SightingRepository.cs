@@ -37,6 +37,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 triggerRuleSelect = @"tor.FrequencyId AS TriggeredObservationRuleFrequencyId,
                 tor.ReproductionId AS TriggeredObservationRuleReproductionId,
                 tor.Unspontaneous AS TriggeredObservationRuleUnspontaneous";
+                //ISNULL(tor.RegionalSightingState, 0) AS TriggeredObservationRuleRegionalSightingState";
                 triggerRuleFrom = @"LEFT JOIN TriggeredObservationRule tor ON tor.SightingId = si.Id ";
             }
 
