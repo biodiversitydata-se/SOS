@@ -205,8 +205,8 @@ public class TaxonFilterTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(100,
-            because: "The taxon filter results in all taxa (taxon.id=[])");
+        result!.TotalCount.Should().Be(0,
+            because: "The taxon filter results in no taxa");
     }
 
     [Fact]

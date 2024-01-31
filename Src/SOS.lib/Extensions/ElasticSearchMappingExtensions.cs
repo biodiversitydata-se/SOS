@@ -274,7 +274,7 @@ namespace SOS.Lib.Extensions
                 .KeyWordLowerCase(kwlc => kwlc.Description, false)
                 .KeyWordLowerCase(kwlc => kwlc.SurveyMethod, false)
                 .KeyWordLowerCase(kwlc => kwlc.SurveyMethodUrl, false)
-                .Nested<ProjectParameterValue>(n => n
+                .Nested<ProjectParameter>(n => n
                     .AutoMap()
                     .Name(nm => nm.ProjectParameters)
                     .Properties(ps => ps
