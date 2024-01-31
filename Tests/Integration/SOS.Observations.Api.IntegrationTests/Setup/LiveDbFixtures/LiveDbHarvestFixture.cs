@@ -46,7 +46,7 @@ public class LiveDbHarvestFixture : IHarvestFixture
         // return ST settings
         return new MongoDbConfiguration()
         {
-            Hosts = new MongoDbServer[] { new MongoDbServer { Name = "artmongo2-1-test.artdata.slu.se", Port = 27017 } },
+            Hosts = new MongoDbServer[] { new MongoDbServer { Name = "artmongo-t-1.artdata.slu.se", Port = 27017 } },
             DatabaseName = "sos-harvest-st",
             AuthenticationDb = "admin",
             ReadBatchSize = 10000,
