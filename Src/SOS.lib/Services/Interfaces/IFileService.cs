@@ -8,30 +8,22 @@
         /// <summary>
         /// Compress directory
         /// </summary>
-        /// <param name="folderPath"></param>
+        /// <param name="sourcePath"></param>
         /// <param name="targetPath"></param>
-        void CompressDirectory(string folderPath, string targetPath);
-
-        /// <summary>
-        ///     Compress folder content
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="folderName"></param>
-        string CompressFolder(string path, string folderName);
-
-        /// <summary>
-        ///     Create a new folder
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="folder"></param>
-        /// <returns></returns>
-        void CreateFolder(string path, string folder);
+        void CompressDirectory(string sourcePath, string targetPath);
 
         /// <summary>
         ///     Creates a new folder.
         /// </summary>
         /// <param name="folderPath">The folder path.</param>
-        void CreateFolder(string folderPath);
+        void CreateDirectory(string folderPath);
+
+        /// <summary>
+        ///     Delete a folder
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        void DeleteDirectory(string path);
 
         /// <summary>
         ///     Delete a file
@@ -41,10 +33,17 @@
         void DeleteFile(string path);
 
         /// <summary>
-        ///     Delete a folder
+        /// Check if directory is empty
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="directoryPath"></param>
         /// <returns></returns>
-        void DeleteFolder(string path);
+        bool IsDirectoryEmpty(string directoryPath);
+
+        /// <summary>
+        /// Move a file
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="targetPath"></param>
+        void MoveFile(string sourcePath, string targetPath);
     }
 }

@@ -17,6 +17,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SOS.Export.Managers
@@ -39,6 +40,199 @@ namespace SOS.Export.Managers
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IZendToService _zendToService;
+
+        /// <summary>
+        /// Create a csv export file
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="exportPath"></param>
+        /// <param name="fileName"></param>
+        /// <param name="culture"></param>
+        /// <param name="propertyLabelType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<FileExportResult> CreateCsvExportAsync(
+            SearchFilter filter,
+            string exportPath,
+            string fileName,
+            string culture,
+            PropertyLabelType propertyLabelType,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                var gzip = true;
+               
+                var fileExportResult = await _csvWriter.CreateFileAync(
+                    filter,
+                    exportPath,
+                    fileName,
+                    culture,
+                    propertyLabelType,
+                    gzip,
+                    cancellationToken);
+
+                return fileExportResult;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Export sightings to Csv was canceled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings to Csv");
+                throw;
+            }
+        }
+
+        /// <summary>
+        ///  Create a Darwin Core Archive file
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="exportPath"></param>
+        /// <param name="fileName"></param>
+        /// <param name="eventDwC"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<FileExportResult> CreateDWCExportAsync(SearchFilter filter, 
+            string exportPath, 
+            string fileName, 
+            bool eventDwC,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
+                
+                if (eventDwC)
+                {
+                    return await _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileAsync(
+                       DataProvider.FilterSubsetDataProvider,
+                       filter,
+                       fileName,
+                       _processedObservationRepository,
+                       processInfo,
+                       exportPath,
+                       cancellationToken);
+                }
+
+                var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
+                return await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                    DataProvider.FilterSubsetDataProvider,
+                    filter,
+                    fileName,
+                    _processedObservationRepository,
+                    fieldDescriptions,
+                    processInfo,
+                    exportPath,
+                    cancellationToken);
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Export sightings was canceled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create excel export
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="exportPath"></param>
+        /// <param name="fileName"></param>
+        /// <param name="culture"></param>
+        /// <param name="propertyLabelType"></param>
+        /// <param name="dynamicProjectDataFields"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<FileExportResult> CreateExcelExportAsync(SearchFilter filter,
+            string exportPath,
+            string fileName,
+            string culture,
+            PropertyLabelType propertyLabelType,
+            bool dynamicProjectDataFields,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                var fileExportResult = await _excelWriter.CreateFileAync(
+                    filter,
+                    exportPath,
+                    fileName,
+                    culture,
+                    propertyLabelType,
+                    dynamicProjectDataFields,
+                    gzip: true,
+                    cancellationToken);
+
+                return fileExportResult;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Export sightings to Excel was canceled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings to Excel");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create geo json export 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="exportPath"></param>
+        /// <param name="fileName"></param>
+        /// <param name="culture"></param>
+        /// <param name="flatOut"></param>
+        /// <param name="propertyLabelType"></param>
+        /// <param name="excludeNullValues"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<FileExportResult> CreateGeoJsonExportAsync(SearchFilter filter,
+            string exportPath,
+            string fileName,
+            string culture,
+            bool flatOut,
+            PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                bool gzip = true;
+                var fileExportResult = await _geoJsonWriter.CreateFileAync(
+                   filter,
+                   exportPath,
+                   fileName,
+                   culture,
+                   flatOut,
+                   propertyLabelType,
+                   excludeNullValues,
+                   gzip,
+                   cancellationToken);
+
+                return fileExportResult;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Export sightings to GeoJson was canceled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings to GeoJson");
+                throw;
+            }
+        }
 
         /// <summary>
         /// Constructor
@@ -117,16 +311,17 @@ namespace SOS.Export.Managers
             IJobCancellationToken cancellationToken)
         {
             FileExportResult fileExportResult = null;
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-
+                var fileName = $"Observations {DateTime.Now.ToString("yyyy-MM-dd hh.mm")} SOS export";
                 fileExportResult = exportFormat switch
                 {
-                    ExportFormat.Csv => await CreateCsvExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, cancellationToken),
-                    ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, dynamicProjectDataFields, cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken),
-                    _ => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), false, cancellationToken)
+                    ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, fileName, culture, propertyLabelType, cancellationToken),
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, fileName, culture, propertyLabelType, dynamicProjectDataFields, cancellationToken),
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, fileName, culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken),
+                    _ => await CreateDWCExportAsync(filter, exportPath, fileName, false, cancellationToken)
                 };
 
                 // zend file to user
@@ -147,7 +342,7 @@ namespace SOS.Export.Managers
             }
             finally
             {
-                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -170,10 +365,11 @@ namespace SOS.Export.Managers
             IJobCancellationToken cancellationToken)
         {
             FileExportResult fileExportResult = null;
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
             {
                 await _filterManager.PrepareFilterAsync(null, null, filter);
-                fileExportResult = await CreateDWCExportAsync(filter, fileName, false, cancellationToken);
+                fileExportResult = await CreateDWCExportAsync(filter, exportPath, fileName, false, cancellationToken);
 
                 // Blob Storage Containers must be in lower case
                 blobStorageContainer = blobStorageContainer?.ToLower();
@@ -199,168 +395,7 @@ namespace SOS.Export.Managers
             }
             finally
             {
-                // Remove local file
-                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
-            }
-        }
-
-        /// <summary>
-        /// Create a csv export file
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="fileName"></param>
-        /// <param name="culture"></param>
-        /// <param name="propertyLabelType"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        private async Task<FileExportResult> CreateCsvExportAsync(
-            SearchFilter filter,
-            string fileName,
-            string culture,
-            PropertyLabelType propertyLabelType,
-            IJobCancellationToken cancellationToken)
-        {
-            try
-            {
-                bool gzip = true;
-                var fileExportResult = await _csvWriter.CreateFileAync(
-                    filter,
-                    _exportPath,
-                    fileName,
-                    culture,
-                    propertyLabelType,
-                    gzip,
-                    cancellationToken);
-
-                return fileExportResult;
-            }
-            catch (JobAbortedException)
-            {
-                _logger.LogInformation("Export sightings to Csv was canceled.");
-                throw;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to export sightings to Csv");
-                throw;
-            }
-        }
-
-        /// <summary>
-        ///  Create a Darwin Core Archive file
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="fileName"></param>
-        /// <param name="eventDwC"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        private async Task<FileExportResult> CreateDWCExportAsync(SearchFilter filter, string fileName, bool eventDwC,
-            IJobCancellationToken cancellationToken)
-        {
-            try
-            {
-                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
-                if (eventDwC)
-                {
-                    return await _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileAsync(
-                       DataProvider.FilterSubsetDataProvider,
-                       filter,
-                       fileName,
-                       _processedObservationRepository,
-                       processInfo,
-                       _exportPath,
-                       cancellationToken);
-                }
-
-                var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
-                return await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
-                    DataProvider.FilterSubsetDataProvider,
-                    filter,
-                    fileName,
-                    _processedObservationRepository,
-                    fieldDescriptions,
-                    processInfo,
-                    _exportPath,
-                    cancellationToken);
-            }
-            catch (JobAbortedException)
-            {
-                _logger.LogInformation("Export sightings was canceled.");
-                throw;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to export sightings");
-                throw;
-            }
-        }
-
-        private async Task<FileExportResult> CreateExcelExportAsync(SearchFilter filter,
-            string fileName,
-            string culture,
-            PropertyLabelType propertyLabelType,
-            bool dynamicProjectDataFields,
-            IJobCancellationToken cancellationToken)
-        {
-            try
-            {
-                var fileExportResult = await _excelWriter.CreateFileAync(
-                    filter,
-                    _exportPath,
-                    fileName,
-                    culture,
-                    propertyLabelType,
-                    dynamicProjectDataFields,
-                    gzip: true,
-                    cancellationToken);
-
-                return fileExportResult;
-            }
-            catch (JobAbortedException)
-            {
-                _logger.LogInformation("Export sightings to Excel was canceled.");
-                throw;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to export sightings to Excel");
-                throw;
-            }
-        }
-
-        private async Task<FileExportResult> CreateGeoJsonExportAsync(SearchFilter filter,
-            string fileName,
-            string culture,
-            bool flatOut,
-            PropertyLabelType propertyLabelType,
-            bool excludeNullValues,
-            IJobCancellationToken cancellationToken)
-        {
-            try
-            {
-                bool gzip = true;
-                var fileExportResult = await _geoJsonWriter.CreateFileAync(
-                   filter,
-                   _exportPath,
-                   fileName,
-                   culture,
-                   flatOut,
-                   propertyLabelType,
-                   excludeNullValues,
-                   gzip,
-                   cancellationToken);
-
-                return fileExportResult;
-            }
-            catch (JobAbortedException)
-            {
-                _logger.LogInformation("Export sightings to GeoJson was canceled.");
-                throw;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to export sightings to GeoJson");
-                throw;
+                _fileService.DeleteDirectory(exportPath);
             }
         }
     }

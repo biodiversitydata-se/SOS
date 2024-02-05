@@ -4,7 +4,6 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
-using static SOS.Lib.Models.Search.Filters.SearchFilterBase;
 
 namespace SOS.Shared.Api.Extensions.Dto
 {

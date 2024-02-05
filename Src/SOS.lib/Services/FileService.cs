@@ -10,28 +10,27 @@ namespace SOS.Lib.Services
     public class FileService : IFileService
     {
         /// <inheritdoc />
-        public void CompressDirectory(string folderPath, string targetPath)
+        public void CompressDirectory(string sourcePath, string targetPath)
         {
-            ZipFile.CreateFromDirectory(folderPath, targetPath);
-        }
-
-        public string CompressFolder(string path, string folderName)
-        {
-            var zipFilePath = Path.Join(path, $"{folderName}.zip");
-            CompressDirectory($"{path}/{folderName}", zipFilePath);
-            return zipFilePath;
+            ZipFile.CreateFromDirectory(sourcePath, targetPath);
         }
 
         /// <inheritdoc />
-        public void CreateFolder(string path, string folder)
+        public void CreateDirectory(string folderPath)
         {
-            Directory.CreateDirectory($"{path}/{folder}");
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
         }
 
         /// <inheritdoc />
-        public void CreateFolder(string folderPath)
+        public void DeleteDirectory(string path)
         {
-            Directory.CreateDirectory(folderPath);
+            if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
         }
 
         /// <inheritdoc />
@@ -44,12 +43,19 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public void DeleteFolder(string path)
+        public bool IsDirectoryEmpty(string directoryPath)
         {
-            if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
+            return (Directory.GetFiles(directoryPath)?.Length ?? 0) == 0;
+        }
+
+        /// <inheritdoc />
+        public void MoveFile(string sourcePath, string targetPath)
+        {
+            if (!string.IsNullOrEmpty(sourcePath) && File.Exists(sourcePath))
             {
-                Directory.Delete(path, true);
+                File.Move(sourcePath, targetPath, true);
             }
         }
+        
     }
 }

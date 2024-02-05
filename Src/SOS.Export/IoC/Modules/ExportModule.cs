@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Autofac.Core;
 using SOS.Export.Jobs;
 using SOS.Export.Managers;
 using SOS.Export.Managers.Interfaces;
@@ -23,6 +24,7 @@ using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -82,12 +84,14 @@ namespace SOS.Export.IoC.Modules
             // Add cache
             builder.RegisterType<AreaCache>().As<IAreaCache>().SingleInstance();
             builder.RegisterType<ProcessedConfigurationCache>().As<ICache<string, ProcessedConfiguration>>().SingleInstance();
+            builder.RegisterType<ProjectCache>().As<ICache<int, ProjectInfo>>().SingleInstance();
 
             // Add managers
-            builder.RegisterType<ObservationManager>().As<IObservationManager>().InstancePerLifetimeScope();
-            builder.RegisterType<TaxonManager>().As<ITaxonManager>().InstancePerLifetimeScope();
             builder.RegisterType<FilterManager>().As<IFilterManager>().InstancePerLifetimeScope();
-
+            builder.RegisterType<ObservationManager>().As<IObservationManager>().InstancePerLifetimeScope();
+            builder.RegisterType<ProjectManager>().As<IProjectManager>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonManager>().As<ITaxonManager>().InstancePerLifetimeScope();
+           
             // Repositories elastic
             builder.RegisterType<ProcessedObservationCoreRepository>().As<IProcessedObservationCoreRepository>()
                 .InstancePerLifetimeScope();

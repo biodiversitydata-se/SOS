@@ -35,6 +35,29 @@ namespace SOS.Lib.IO.Excel
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ILogger<ExcelFileWriter> _logger;
 
+        private void FormatColumns(ExcelWorksheet worksheet, List<PropertyFieldDescription> propertyFields)
+        {
+            const int firstDataRow = 2;
+            //// ObservationId
+            //worksheet.Cells[firstDataRow, 1, lastDataRow, 1].Style.Numberformat.Format = "0";
+
+            int columnIndex = 1;
+            // Format columns
+            foreach (var fieldDescription in propertyFields)
+            {
+                var format = fieldDescription.DataType switch
+                {
+                    "DateTime" => "",  // Since Excel doesn't handle dates before 1900 we can't set date format
+                    //"Double" => "#.###############",
+                    "Int32" or "Int64" => "0",
+                    _ => "General"
+                };
+
+                worksheet.Cells[firstDataRow, columnIndex, 500000 + 1, columnIndex].Style.Numberformat.Format = format;
+                columnIndex++;
+            }
+        }
+
         /// <summary>
         /// Try to save Excel packagec# async method not 
         /// </summary>
@@ -52,6 +75,29 @@ namespace SOS.Lib.IO.Excel
             await package.SaveAsync();
             _logger.LogDebug($"Finish save Excel export. {package.File.FullName}");
             package.Dispose();
+        }
+
+        private void WriteHeader(ExcelWorksheet sheet, IEnumerable<PropertyFieldDescription> propertyFields, PropertyLabelType propertyLabelType)
+        {
+            if (!propertyFields?.Any() ?? true)
+            {
+                return;
+            }
+            _logger.LogDebug($"Start write Excel header");
+            int columnIndex = 1;
+            foreach (var propertyField in propertyFields)
+            {
+                string title =
+                    ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(propertyField, propertyLabelType);
+                sheet.Cells[1, columnIndex].Value = title;
+                sheet.Cells[1, columnIndex].Style.Font.Bold = true;
+                sheet.Cells[1, columnIndex].Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));
+                sheet.Cells[1, columnIndex].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                sheet.Cells[1, columnIndex].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
+                sheet.Column(columnIndex).AutoFit(10, 70);
+                columnIndex++;
+            }
+            _logger.LogDebug($"Finish write Excel header");
         }
 
         /// <summary>
@@ -88,7 +134,7 @@ namespace SOS.Lib.IO.Excel
             bool gzip,
             IJobCancellationToken cancellationToken)
         {
-            string temporaryZipExportFolderPath = null;
+            var temporaryZipExportFolderPath = Path.Combine(exportPath, "zip");
 
             try
             {
@@ -101,11 +147,8 @@ namespace SOS.Lib.IO.Excel
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, projects: projects) 
                     :
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
-                temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
-                if (!Directory.Exists(temporaryZipExportFolderPath))
-                {
-                    Directory.CreateDirectory(temporaryZipExportFolderPath);
-                }
+
+                _fileService.CreateDirectory(temporaryZipExportFolderPath);
 
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var stopwatch = Stopwatch.StartNew();
@@ -143,7 +186,7 @@ namespace SOS.Lib.IO.Excel
 
                             // Create new file
                             fileCount++;
-                            excelFilePath = Path.Combine(temporaryZipExportFolderPath, $"{fileCount}-Observations.xlsx");
+                            excelFilePath = Path.Combine(temporaryZipExportFolderPath, $"{fileName}{(fileCount > 1 ? $" ({fileCount})" : string.Empty)}.xlsx");
                             var file = new FileInfo(excelFilePath);
                             package = new ExcelPackage(file);
                             sheet = package.Workbook.Worksheets.Add("Observations");
@@ -187,16 +230,14 @@ namespace SOS.Lib.IO.Excel
                 packageSaveTasks.Add(TrySavePackageAync(package));
                 await Task.WhenAll(packageSaveTasks);
 
-                if (gzip)
+                // If more than one file created, we must return zip file
+                if (gzip || fileCount > 1)
                 {
                     await StoreFilterAsync(temporaryZipExportFolderPath, filter);
-                    if ((Directory.GetFiles(temporaryZipExportFolderPath)?.Length ?? 0) == 0)
-                    {
-                        throw new Exception($"No files to compress in '{temporaryZipExportFolderPath}'");
-                    }
-
-                    var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
-
+                   
+                    var zipFilePath = Path.Join(exportPath, $"{fileName}.zip");
+                    _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
+                    
                     return new FileExportResult
                     {
                         FilePath = zipFilePath,
@@ -206,7 +247,7 @@ namespace SOS.Lib.IO.Excel
                 else
                 {
                     var destinationFilePath = Path.Combine(exportPath, $"{fileName}.xlsx");
-                    File.Move(excelFilePath, destinationFilePath);
+                    _fileService.MoveFile(excelFilePath, destinationFilePath);
                     return new FileExportResult
                     {
                         FilePath = destinationFilePath,
@@ -221,53 +262,7 @@ namespace SOS.Lib.IO.Excel
             }
             finally
             {
-                _fileService.DeleteFolder(temporaryZipExportFolderPath);
-            }
-        }
-
-        private void WriteHeader(ExcelWorksheet sheet, IEnumerable<PropertyFieldDescription> propertyFields, PropertyLabelType propertyLabelType)
-        {
-            if (!propertyFields?.Any() ?? true)
-            {
-                return;
-            }
-            _logger.LogDebug($"Start write Excel header");
-            int columnIndex = 1;
-            foreach (var propertyField in propertyFields)
-            {
-                string title =
-                    ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(propertyField, propertyLabelType);
-                sheet.Cells[1, columnIndex].Value = title;
-                sheet.Cells[1, columnIndex].Style.Font.Bold = true;
-                sheet.Cells[1, columnIndex].Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));
-                sheet.Cells[1, columnIndex].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                sheet.Cells[1, columnIndex].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
-                sheet.Column(columnIndex).AutoFit(10, 70);
-                columnIndex++;
-            }
-            _logger.LogDebug($"Finish write Excel header");
-        }
-
-        private void FormatColumns(ExcelWorksheet worksheet, List<PropertyFieldDescription> propertyFields)
-        {
-            const int firstDataRow = 2;
-            //// ObservationId
-            //worksheet.Cells[firstDataRow, 1, lastDataRow, 1].Style.Numberformat.Format = "0";
-
-            int columnIndex = 1;
-            // Format columns
-            foreach (var fieldDescription in propertyFields)
-            {
-                var format = fieldDescription.DataType switch
-                {
-                    "DateTime" => "",  // Since Excel doesn't handle dates before 1900 we can't set date format
-                    //"Double" => "#.###############",
-                    "Int32" or "Int64" => "0",
-                    _ => "General"
-                };
-
-                worksheet.Cells[firstDataRow, columnIndex, 500000 + 1, columnIndex].Style.Numberformat.Format = format;
-                columnIndex++;
+                _fileService.DeleteDirectory(temporaryZipExportFolderPath);
             }
         }
     }

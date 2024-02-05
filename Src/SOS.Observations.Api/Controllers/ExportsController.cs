@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -226,9 +227,10 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="fileName"></param>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        private IActionResult GetFile(string filePath, string fileName, string contentType)
+        private IActionResult GetFile(string filePath, string contentType)
         {
             var bytes = System.IO.File.ReadAllBytes(filePath);
+            var fileName = filePath.Substring(filePath.LastIndexOf(@"\") + 1);
             return File(bytes, contentType, fileName);
         }
 
@@ -392,6 +394,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             FileExportResult fileExportResult = null;
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
             {
                 // SearchFilterDto don't support protection filter, declare it localy
@@ -409,14 +412,15 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-
+                
                 fileExportResult =
                     await _exportManager.CreateExportFileAsync(
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.Csv,
-                        _exportPath, cultureCode,
+                        exportPath, 
+                        cultureCode,
                         false,
                         propertyLabelType,
                         false,
@@ -425,9 +429,9 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "Observations_Csv.zip", "application/zip");
+                    return GetFile(fileExportResult.FilePath, "application/zip");
                 else
-                    return GetFile(fileExportResult.FilePath, "Observations.csv", "text/tab-separated-values"); // or "text/csv"?                
+                    return GetFile(fileExportResult.FilePath, "text/tab-separated-values"); // or "text/csv"?                
             }
             catch (AuthenticationRequiredException)
             {
@@ -440,7 +444,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -467,7 +471,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             FileExportResult fileExportResult = null;
-
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
             {
                 // SearchFilterDto don't support protection filter, declare it localy
@@ -488,7 +492,7 @@ namespace SOS.Observations.Api.Controllers
                         authorizationApplicationIdentifier,
                         exportFilter,
                         eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
-                        _exportPath,
+                        exportPath,
                         Cultures.en_GB,
                         false,
                         PropertyLabelType.PropertyPath,
@@ -502,7 +506,7 @@ namespace SOS.Observations.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
-                return GetFile(fileExportResult.FilePath, "Observations_DwC.zip", "application/zip");
+                return GetFile(fileExportResult.FilePath, "application/zip");
             }
             catch (AuthenticationRequiredException)
             {
@@ -515,7 +519,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -550,7 +554,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             FileExportResult fileExportResult = null;
-
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
             {
                 // SearchFilterDto don't support protection filter, declare it localy
@@ -574,7 +578,7 @@ namespace SOS.Observations.Api.Controllers
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.Excel,
-                        _exportPath,
+                        exportPath,
                         cultureCode,
                         false,
                         propertyLabelType,
@@ -584,9 +588,9 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "Observations_Excel.zip", "application/zip");
+                    return GetFile(fileExportResult.FilePath, "application/zip");
                 else
-                    return GetFile(fileExportResult.FilePath, "Observations.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                    return GetFile(fileExportResult.FilePath, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             }
             catch (AuthenticationRequiredException)
             {
@@ -599,7 +603,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -636,6 +640,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             FileExportResult fileExportResult = null;
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
 
             try
             {
@@ -659,7 +664,7 @@ namespace SOS.Observations.Api.Controllers
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.GeoJson,
-                        _exportPath,
+                        exportPath,
                         cultureCode,
                         flat,
                         propertyLabelType,
@@ -669,9 +674,9 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "Observations_GeoJson.zip", "application/zip");
+                    return GetFile(fileExportResult.FilePath, "application/zip");
                 else
-                    return GetFile(fileExportResult.FilePath, "Observations.geojson", "application/geo+json");
+                    return GetFile(fileExportResult.FilePath, "application/geo+json");
             }
             catch (AuthenticationRequiredException)
             {
@@ -684,7 +689,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -1076,6 +1081,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             FileExportResult fileExportResult = null;
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
@@ -1099,7 +1105,8 @@ namespace SOS.Observations.Api.Controllers
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.Csv,
-                        _exportPath, cultureCode,
+                        exportPath, 
+                        cultureCode,
                         false,
                         propertyLabelType,
                         false,
@@ -1108,9 +1115,9 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "Observations_Csv.zip", "application/zip");
+                    return GetFile(fileExportResult.FilePath, "application/zip");
                 else
-                    return GetFile(fileExportResult.FilePath, "Observations.csv", "text/tab-separated-values"); // or "text/csv"?                
+                    return GetFile(fileExportResult.FilePath, "text/tab-separated-values"); // or "text/csv"?                
             }
             catch (AuthenticationRequiredException)
             {
@@ -1123,7 +1130,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -1150,7 +1157,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             FileExportResult fileExportResult = null;
-
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
@@ -1169,7 +1176,7 @@ namespace SOS.Observations.Api.Controllers
                         authorizationApplicationIdentifier,
                         exportFilter,
                         eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
-                        _exportPath,
+                        exportPath,
                         Cultures.en_GB,
                         false,
                         PropertyLabelType.PropertyPath,
@@ -1178,7 +1185,7 @@ namespace SOS.Observations.Api.Controllers
                         true,
                         JobCancellationToken.Null);
 
-                return GetFile(fileExportResult.FilePath, "Observations_DwC.zip", "application/zip");
+                return GetFile(fileExportResult.FilePath, "application/zip");
             }
             catch (AuthenticationRequiredException)
             {
@@ -1191,7 +1198,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -1226,7 +1233,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             FileExportResult fileExportResult = null;
-
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
@@ -1249,7 +1256,7 @@ namespace SOS.Observations.Api.Controllers
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.Excel,
-                        _exportPath,
+                        exportPath,
                         cultureCode,
                         false,
                         propertyLabelType,
@@ -1259,9 +1266,9 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "Observations_Excel.zip", "application/zip");
+                    return GetFile(fileExportResult.FilePath, "application/zip");
                 else
-                    return GetFile(fileExportResult.FilePath, "Observations.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                    return GetFile(fileExportResult.FilePath, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             }
             catch (AuthenticationRequiredException)
             {
@@ -1274,7 +1281,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -1311,7 +1318,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             FileExportResult fileExportResult = null;
-
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
@@ -1334,7 +1341,7 @@ namespace SOS.Observations.Api.Controllers
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.GeoJson,
-                        _exportPath,
+                        exportPath,
                         cultureCode,
                         flat,
                         propertyLabelType,
@@ -1344,9 +1351,9 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "Observations_GeoJson.zip", "application/zip");
+                    return GetFile(fileExportResult.FilePath, "application/zip");
                 else
-                    return GetFile(fileExportResult.FilePath, "Observations.geojson", "application/geo+json");
+                    return GetFile(fileExportResult.FilePath, "application/geo+json");
             }
             catch (AuthenticationRequiredException)
             {
@@ -1359,7 +1366,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
+                 _fileService.DeleteDirectory(exportPath);
             }
         }
 

@@ -334,7 +334,7 @@ namespace SOS.Lib.IO.DwcArchive
 
             if (!Directory.Exists(dwcaFilePartsInfo.ExportFolder))
             {
-                _fileService.CreateFolder(dwcaFilePartsInfo.ExportFolder);
+                _fileService.CreateDirectory(dwcaFilePartsInfo.ExportFolder);
             }
             else
             {

@@ -73,7 +73,8 @@ namespace SOS.Export.Services
             await using var fileStream = File.OpenRead(filePath);
             using var fileContent = new StreamContent(File.OpenRead(filePath));
             fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
-            string fileName = GetFilename(exportFormat, fileCreationDate);
+           // string fileName = GetFilename(exportFormat, fileCreationDate);
+            var fileName = filePath.Substring(filePath.LastIndexOf(@"\") + 1);
             form.Add(fileContent, "file_1", fileName);
 
             // Post form to ZendTo

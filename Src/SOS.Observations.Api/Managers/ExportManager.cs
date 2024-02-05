@@ -292,14 +292,14 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-
+                var fileName = $"Observations {DateTime.Now.ToString("yyyy-MM-dd hh.mm")} SOS export";
                 var fileExportResult = exportFormat switch
                 {
-                    ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, propertyLabelType, gzip, cancellationToken),
-                    ExportFormat.DwCEvent => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken, true),
-                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, propertyLabelType, dynamicProjectDataFields, gzip, cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, gzip, cancellationToken),
-                    _ => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken)
+                    ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, fileName, culture, propertyLabelType, gzip, cancellationToken),
+                    ExportFormat.DwCEvent => await CreateDWCExportAsync(filter, exportPath, fileName, cancellationToken, true),
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, fileName, culture, propertyLabelType, dynamicProjectDataFields, gzip, cancellationToken),
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, fileName, culture, flatOut, propertyLabelType, excludeNullValues, gzip, cancellationToken),
+                    _ => await CreateDWCExportAsync(filter, exportPath, fileName, cancellationToken)
                 };
 
                 return fileExportResult;

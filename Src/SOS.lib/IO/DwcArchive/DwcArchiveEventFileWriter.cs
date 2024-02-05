@@ -372,12 +372,11 @@ namespace SOS.Lib.IO.DwcArchive
             string exportFolderPath,
             IJobCancellationToken cancellationToken)
         {
-            string temporaryZipExportFolderPath = null;
+            var temporaryZipExportFolderPath = Path.Combine(exportFolderPath, "zip");
 
             try
             {
-                temporaryZipExportFolderPath = Path.Combine(exportFolderPath, fileName);
-                _fileService.CreateFolder(temporaryZipExportFolderPath);
+                _fileService.CreateDirectory(temporaryZipExportFolderPath);
                 var eventCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "event.txt");
                 var occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.txt");
                 var emofCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "extendedMeasurementOrFact.txt");
@@ -479,9 +478,8 @@ namespace SOS.Lib.IO.DwcArchive
                     DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
                     processInfoFileStream.Close();
                 }
-
-                var zipFilePath = _fileService.CompressFolder(exportFolderPath, fileName);
-                _fileService.DeleteFolder(temporaryZipExportFolderPath);
+                var zipFilePath = Path.Join(exportFolderPath, $"{fileName}.zip");
+                _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
                 return new FileExportResult
                 {
                     FilePath = zipFilePath,
@@ -500,7 +498,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
             finally
             {
-                _fileService.DeleteFolder(temporaryZipExportFolderPath);
+                _fileService.DeleteDirectory(temporaryZipExportFolderPath);
             }
         }
 
@@ -518,7 +516,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // Create the DwC-A file
                 await CreateEventDwcArchiveFileAsync(dataProvider, new[] { dwcaFilePartsInfo }, tempFilePath);
 
-                File.Move(tempFilePath, filePath, true);
+                _fileService.MoveFile(tempFilePath, filePath);
                 _logger.LogInformation($"A new .zip({filePath}) was created.");
 
                 return filePath;
@@ -530,7 +528,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
             finally
             {
-                if (tempFilePath != null && File.Exists(tempFilePath)) File.Delete(tempFilePath);
+                _fileService.DeleteFile(tempFilePath);
             }
         }
     }

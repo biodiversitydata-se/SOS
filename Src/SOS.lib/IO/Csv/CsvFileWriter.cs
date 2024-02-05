@@ -57,20 +57,16 @@ namespace SOS.Lib.IO.Excel
             bool gzip,
             IJobCancellationToken cancellationToken)
         {
-            string temporaryZipExportFolderPath = null;
+            var temporaryZipExportFolderPath = Path.Combine(exportPath, "zip");
 
             try
             {
                 var nrObservations = 0;
                 var propertyFields =
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
-                temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
-                if (!Directory.Exists(temporaryZipExportFolderPath))
-                {
-                    Directory.CreateDirectory(temporaryZipExportFolderPath);
-                }
+                _fileService.CreateDirectory(temporaryZipExportFolderPath);
 
-                var observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "Observations.csv");
+                var observationsFilePath = Path.Combine(temporaryZipExportFolderPath, $"{fileName}.csv");
                 await using var fileStream = File.Create(observationsFilePath);
                 using var csvFileHelper = new CsvFileHelper();
                 csvFileHelper.InitializeWrite(fileStream, "\t");
@@ -122,7 +118,8 @@ namespace SOS.Lib.IO.Excel
                 if (gzip)
                 {
                     await StoreFilterAsync(temporaryZipExportFolderPath, filter);
-                    var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
+                    var zipFilePath = Path.Join(exportPath, $"{fileName}.zip");
+                    _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
                     return new FileExportResult
                     {
                         NrObservations = nrObservations,
@@ -132,7 +129,7 @@ namespace SOS.Lib.IO.Excel
                 else
                 {
                     var destinationFilePath = Path.Combine(exportPath, $"{fileName}.csv");
-                    File.Move(observationsFilePath, destinationFilePath);
+                    _fileService.MoveFile(observationsFilePath, destinationFilePath);
                     return new FileExportResult
                     {
                         NrObservations = nrObservations,
@@ -147,7 +144,7 @@ namespace SOS.Lib.IO.Excel
             }
             finally
             {
-                _fileService.DeleteFolder(temporaryZipExportFolderPath);
+                _fileService.DeleteDirectory(temporaryZipExportFolderPath);
             }
         }
     }

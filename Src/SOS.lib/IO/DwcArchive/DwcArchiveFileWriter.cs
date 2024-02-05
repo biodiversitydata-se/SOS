@@ -36,6 +36,67 @@ namespace SOS.Lib.IO.DwcArchive
         private readonly IDataProviderRepository _dataProviderRepository;
         private readonly ILogger<DwcArchiveFileWriter> _logger;
 
+
+        private async Task CreateDwcArchiveFileAsync(DataProvider dataProvider, DwcaFilePartsInfo dwcaFilePartsInfo,
+            string tempFilePath)
+        {
+            await CreateDwcArchiveFileAsync(dataProvider, new[] { dwcaFilePartsInfo }, tempFilePath);
+        }
+
+        private ICollection<string> GetFilePaths(IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos, string searchPattern)
+        {
+            var filePaths = new List<string>();
+            foreach (var dwcaFilePartsInfo in dwcaFilePartsInfos)
+            {
+                if (Directory.Exists(dwcaFilePartsInfo.ExportFolder))
+                {
+                    filePaths.AddRange(Directory.EnumerateFiles(
+                    dwcaFilePartsInfo.ExportFolder,
+                    searchPattern,
+                    SearchOption.TopDirectoryOnly));
+                }
+            }
+
+            return filePaths;
+        }
+
+        private void ValidateObservations(IEnumerable<DarwinCore> dwcObservations)
+        {
+            if (dwcObservations == null) return;
+            foreach (var dwcObservation in dwcObservations)
+            {
+                string validation = DwcaFileValidator.Validate(dwcObservation);
+                if (validation != null)
+                {
+                    _logger.LogInformation(validation);
+                }
+            }
+        }
+
+        private void ValidateEmofRows(IEnumerable<ExtendedMeasurementOrFactRow> emofRows)
+        {
+            foreach (var emofRow in emofRows)
+            {
+                string validation = DwcaFileValidator.Validate(emofRow);
+                if (validation != null)
+                {
+                    _logger.LogInformation(validation);
+                }
+            }
+        }
+
+        private void ValidateMultimediaRows(IEnumerable<SimpleMultimediaRow> multimediaRows)
+        {
+            foreach (var multimediaRow in multimediaRows)
+            {
+                string validation = DwcaFileValidator.Validate(multimediaRow);
+                if (validation != null)
+                {
+                    _logger.LogInformation(validation);
+                }
+            }
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -99,12 +160,11 @@ namespace SOS.Lib.IO.DwcArchive
             string exportFolderPath,
             IJobCancellationToken cancellationToken)
         {
-            string temporaryZipExportFolderPath = null;
+            var temporaryZipExportFolderPath = Path.Combine(exportFolderPath, "zip"); ;
 
             try
             {
-                temporaryZipExportFolderPath = Path.Combine(exportFolderPath, fileName);
-                _fileService.CreateFolder(temporaryZipExportFolderPath);
+                _fileService.CreateDirectory(temporaryZipExportFolderPath);
                 var occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.txt");
                 var emofCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "extendedMeasurementOrFact.txt");
                 var multimediaCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "multimedia.txt");
@@ -154,8 +214,8 @@ namespace SOS.Lib.IO.DwcArchive
                 }
 
                 // Delete extension files if not used.
-                if (!emofFileCreated && File.Exists(emofCsvFilePath)) File.Delete(emofCsvFilePath);
-                if (!multimediaFileCreated && File.Exists(multimediaCsvFilePath)) File.Delete(multimediaCsvFilePath);
+                if (!emofFileCreated && File.Exists(emofCsvFilePath)) _fileService.DeleteFile(emofCsvFilePath);
+                if (!multimediaFileCreated && File.Exists(multimediaCsvFilePath)) _fileService.DeleteFile(multimediaCsvFilePath);
 
                 // Create meta.xml
                 using (var fileStream = File.Create(metaXmlFilePath))
@@ -185,9 +245,9 @@ namespace SOS.Lib.IO.DwcArchive
                     DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
                     processInfoFileStream.Close();
                 }
-
-                var zipFilePath = _fileService.CompressFolder(exportFolderPath, fileName);
-                _fileService.DeleteFolder(temporaryZipExportFolderPath);
+                var zipFilePath = Path.Join(exportFolderPath, $"{fileName}.zip");
+                _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
+   
                 return new FileExportResult
                 {
                     FilePath = zipFilePath,
@@ -206,7 +266,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
             finally
             {
-                _fileService.DeleteFolder(temporaryZipExportFolderPath);
+                _fileService.DeleteDirectory(temporaryZipExportFolderPath);
             }
         }
 
@@ -276,43 +336,6 @@ namespace SOS.Lib.IO.DwcArchive
             };
         }
 
-        private void ValidateObservations(IEnumerable<DarwinCore> dwcObservations)
-        {
-            if (dwcObservations == null) return;
-            foreach (var dwcObservation in dwcObservations)
-            {
-                string validation = DwcaFileValidator.Validate(dwcObservation);
-                if (validation != null)
-                {
-                    _logger.LogInformation(validation);
-                }
-            }
-        }
-
-        private void ValidateEmofRows(IEnumerable<ExtendedMeasurementOrFactRow> emofRows)
-        {
-            foreach (var emofRow in emofRows)
-            {
-                string validation = DwcaFileValidator.Validate(emofRow);
-                if (validation != null)
-                {
-                    _logger.LogInformation(validation);
-                }
-            }
-        }
-
-        private void ValidateMultimediaRows(IEnumerable<SimpleMultimediaRow> multimediaRows)
-        {
-            foreach (var multimediaRow in multimediaRows)
-            {
-                string validation = DwcaFileValidator.Validate(multimediaRow);
-                if (validation != null)
-                {
-                    _logger.LogInformation(validation);
-                }
-            }
-        }
-
         public async Task<string> CreateDwcArchiveFileAsync(
             DataProvider dataProvider,
             string exportFolderPath,
@@ -327,7 +350,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // Create the DwC-A file
                 await CreateDwcArchiveFileAsync(dataProvider, dwcaFilePartsInfo, tempFilePath);
 
-                File.Move(tempFilePath, filePath, true);
+                _fileService.MoveFile(tempFilePath, filePath);
                 _logger.LogInformation($"A new .zip({filePath}) was created.");
 
                 return filePath;
@@ -339,10 +362,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
             finally
             {
-                if (tempFilePath != null && File.Exists(tempFilePath))
-                {
-                    File.Delete(tempFilePath);
-                }
+                _fileService.DeleteFile(tempFilePath);
             }
         }
 
@@ -369,17 +389,8 @@ namespace SOS.Lib.IO.DwcArchive
             }
             finally
             {
-                if (tempFilePath != null && File.Exists(tempFilePath))
-                {
-                    File.Delete(tempFilePath);
-                }
+                _fileService.DeleteFile(tempFilePath);
             }
-        }
-
-        private async Task CreateDwcArchiveFileAsync(DataProvider dataProvider, DwcaFilePartsInfo dwcaFilePartsInfo,
-            string tempFilePath)
-        {
-            await CreateDwcArchiveFileAsync(dataProvider, new[] { dwcaFilePartsInfo }, tempFilePath);
         }
 
         public async Task CreateDwcArchiveFileAsync(DataProvider dataProvider,
@@ -471,23 +482,6 @@ namespace SOS.Lib.IO.DwcArchive
                 await emlFile.SaveAsync(enlFileStream, SaveOptions.None, CancellationToken.None);
                 enlFileStream.Close();
             }
-        }
-
-        private ICollection<string> GetFilePaths(IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos, string searchPattern)
-        {
-            var filePaths = new List<string>();
-            foreach (var dwcaFilePartsInfo in dwcaFilePartsInfos)
-            {
-                if (Directory.Exists(dwcaFilePartsInfo.ExportFolder))
-                {
-                    filePaths.AddRange(Directory.EnumerateFiles(
-                    dwcaFilePartsInfo.ExportFolder,
-                    searchPattern,
-                    SearchOption.TopDirectoryOnly));
-                }
-            }
-
-            return filePaths;
         }
     }
 }
