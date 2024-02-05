@@ -349,7 +349,8 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <param name="expectedRecordsCount"></param>
         /// <param name="timeout"></param>
+        /// <param name="protectedIndex"></param>
         /// <returns></returns>
-        Task WaitForPublicIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null);
+        Task WaitForPublicIndexCreationAsync(long expectedRecordsCount, TimeSpan? timeout = null, bool protectedIndex = false);
     }
 }

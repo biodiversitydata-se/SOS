@@ -385,12 +385,15 @@ namespace SOS.Harvest.Jobs
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        protected override async Task PostProcessingAsync(IEnumerable<DataProvider> dataProvidersToProcess, IDictionary<int, Taxon> taxonById, int publicCount, IJobCancellationToken cancellationToken)
+        protected override async Task PostProcessingAsync(IEnumerable<DataProvider> dataProvidersToProcess, IDictionary<int, Taxon> taxonById, (int publicCount, int protectedCount) indexCounts, IJobCancellationToken cancellationToken)
         {
             try
             {
-                await _processedObservationRepository.WaitForPublicIndexCreation(publicCount, TimeSpan.FromMinutes(10));
-
+                Task.WaitAll(new[] {
+                    _processedObservationRepository.WaitForPublicIndexCreationAsync(indexCounts.publicCount, TimeSpan.FromMinutes(10)),
+                    _processedObservationRepository.WaitForPublicIndexCreationAsync(indexCounts.protectedCount, TimeSpan.FromMinutes(10), true)
+                });
+                
                 //---------------------------------------------------------------
                 //  Start harvest of Artportalen observations that has been
                 //    added during the day and doesn't exist in the backup db

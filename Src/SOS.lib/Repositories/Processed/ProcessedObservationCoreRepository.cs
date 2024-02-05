@@ -1834,7 +1834,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task WaitForPublicIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null)
+        public async Task WaitForPublicIndexCreationAsync(long expectedRecordsCount, TimeSpan? timeout = null, bool protectedIndex = false)
         {
             Logger.LogInformation($"Begin waiting for index creation. Index={IndexName}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
             if (timeout == null) timeout = TimeSpan.FromMinutes(10);
@@ -1849,7 +1849,7 @@ namespace SOS.Lib.Repositories.Processed
             {
                 iterations++; // Safety to prevent infinite loop.                                
                 await Task.Delay(sleepTime);
-                docCount = await IndexCountAsync(false);
+                docCount = await IndexCountAsync(protectedIndex);
             }
 
             if (iterations == nrIterations)

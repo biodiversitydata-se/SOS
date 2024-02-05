@@ -433,7 +433,7 @@ namespace SOS.Harvest.Jobs
         /// <param name="publicCount"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected virtual async Task PostProcessingAsync(IEnumerable<DataProvider> dataProvidersToProcess, IDictionary<int, Taxon> taxonById, int publicCount, IJobCancellationToken cancellationToken)
+        protected virtual async Task PostProcessingAsync(IEnumerable<DataProvider> dataProvidersToProcess, IDictionary<int, Taxon> taxonById, (int publicCount, int protectedCount) indexCounts, IJobCancellationToken cancellationToken)
         {
             if (!await _processedObservationRepository.EnsureNoDuplicatesAsync())
             {
@@ -506,7 +506,7 @@ namespace SOS.Harvest.Jobs
                 {
                     // Update dynamic provider data
                     await UpdateProvidersMetadataAsync(dataProvidersToProcess);
-                    await PostProcessingAsync(dataProvidersToProcess, taxonById!, result.Sum(s => s.Value.PublicCount), cancellationToken!);
+                    await PostProcessingAsync(dataProvidersToProcess, taxonById!, (result.Sum(s => s.Value.PublicCount), result.Sum(s => s.Value.ProtectedCount)), cancellationToken!);
                 }
 
                 _logger.LogInformation($"Processing done: {success} {mode}");

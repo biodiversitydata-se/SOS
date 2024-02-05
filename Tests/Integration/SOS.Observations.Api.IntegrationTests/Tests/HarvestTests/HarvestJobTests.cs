@@ -52,7 +52,7 @@ public class HarvestJobTests : TestBase
         // Act
         await dwcObservationHarvester.HarvestObservationsAsync(@"Resources/Dwca/dwca-datastewardship-single-dataset.zip", dataProvider, JobCancellationToken.Null);
         await dwcaObservationProcessor.ProcessAsync(dataProvider, TestFixture.ProcessFixture.TaxonById, JobRunModes.Full, JobCancellationToken.Null);
-        await processedObservationRepository.WaitForPublicIndexCreation(15, TimeSpan.FromSeconds(15));
+        await processedObservationRepository.WaitForPublicIndexCreationAsync(15, TimeSpan.FromSeconds(15));
         var observations = await processedObservationRepository.GetAllAsync();
 
         // Assert

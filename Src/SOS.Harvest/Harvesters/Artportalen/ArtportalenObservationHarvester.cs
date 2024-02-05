@@ -184,7 +184,15 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 await _semaphore.WaitAsync();
                 var observationCount = await HarvestBatchAsync(harvestFactory, getObservationsTask, batchCount);
                 nrSightingsHarvested += observationCount;
-                
+
+                // Delete observations we can't find
+                var deletedIds = idBatch!.Where(i => !getObservationsTask?.Result?.Select(o => o.Id).Contains(i) ?? true).Select(i => i);
+                if (deletedIds?.Any() ?? false)
+                {
+                    await _processedObservationRepository.DeleteByOccurrenceIdAsync(deletedIds.Select(i => $"urn:lsid:artportalen.se:sighting:{i}"), false);
+                    await _processedObservationRepository.DeleteByOccurrenceIdAsync(deletedIds.Select(i => $"urn:lsid:artportalen.se:sighting:{i}"), true);
+                }
+
                 if (nrSightingsHarvested >= _artportalenConfiguration.CatchUpLimit)
                 {
                     break;
