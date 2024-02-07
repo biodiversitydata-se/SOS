@@ -306,8 +306,9 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 if (!result?.Any() ?? true)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}");
+                    return null!;
                 }
-                return result!;
+                return result!.Distinct();
             }
             catch (Exception e)
             {
