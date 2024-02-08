@@ -471,6 +471,17 @@
         "operationId": "DataProviders_GetDataProviders",
         "parameters": [
           {
+            "name": "categories",
+            "in": "query",
+            "description": "Category/ies to match. DataHostesship, RegionalInventory, CitizenSciencePlatform, Atlas, \r\n            Terrestrial, Freshwater, Marine, Vertebrates, Arthropods, Microorganisms, Plants_Bryophytes_Lichens,\r\n            Fungi, Algae",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/DataProviderCategory"
+              }
+            }
+          },
+          {
             "name": "cultureCode",
             "in": "query",
             "description": "Culture code.",
@@ -2517,6 +2528,15 @@
             "schema": {
               "type": "string",
               "default": "sv-SE"
+            }
+          },
+          {
+            "name": "dynamicProjectDataFields",
+            "in": "query",
+            "description": "Use dynamic added project related fields. Only for Excel export",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           },
           {
@@ -7589,6 +7609,28 @@
         "additionalProperties": false,
         "description": "The category of information pertaining to the existence of an Organism (sensu http://rs.tdwg.org/dwc/terms/Organism) at a particular place at a particular time."
       },
+      "DataProviderCategory": {
+        "enum": [
+          "DataHostesship",
+          "NationalInventory",
+          "RegionalInventory",
+          "MuseumCollections",
+          "HerbariaCollections",
+          "CitizenSciencePlatform",
+          "Atlas",
+          "Terrestrial",
+          "Freshwater",
+          "Marine",
+          "Vertebrates",
+          "Invertebrates",
+          "Arthropods",
+          "Microorganisms",
+          "Plants_Bryophytes_Lichens",
+          "Fungi",
+          "Algae"
+        ],
+        "type": "string"
+      },
       "DataProviderDto": {
         "type": "object",
         "properties": {
@@ -11344,6 +11386,12 @@
             "format": "date-time",
             "nullable": true
           },
+          "startDayOfYear": {
+            "type": "integer",
+            "description": "Start day of year",
+            "format": "int32",
+            "readOnly": true
+          },
           "startHistogramWeek": {
             "type": "integer",
             "description": "Divide year in 48 \"weeks\"",
@@ -11374,6 +11422,12 @@
             "description": "End date/time of the event in W. Europe Standard Time.",
             "format": "date-time",
             "nullable": true
+          },
+          "endDayOfYear": {
+            "type": "integer",
+            "description": "Start day of year",
+            "format": "int32",
+            "readOnly": true
           },
           "endHistogramWeek": {
             "type": "integer",
@@ -11570,7 +11624,8 @@
           },
           "observedByMe": {
             "type": "boolean",
-            "description": "Only get observations observed by me"
+            "description": "Only get observations observed by me",
+            "nullable": true
           },
           "occurrenceStatus": {
             "$ref": "#/components/schemas/OccurrenceStatusFilterValuesDto"
@@ -11586,7 +11641,8 @@
           },
           "reportedByMe": {
             "type": "boolean",
-            "description": "Only get observations reported by me"
+            "description": "Only get observations reported by me",
+            "nullable": true
           },
           "taxon": {
             "$ref": "#/components/schemas/TaxonFilterDto"
@@ -12320,6 +12376,12 @@
       "Location": {
         "type": "object",
         "properties": {
+          "atlas5x5": {
+            "$ref": "#/components/schemas/Area"
+          },
+          "atlas10x10": {
+            "$ref": "#/components/schemas/Area"
+          },
           "attributes": {
             "$ref": "#/components/schemas/LocationAttributes"
           },
@@ -13871,6 +13933,14 @@
             "description": "Name of person or organization that owns the project.",
             "nullable": true
           },
+          "projectParameters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectParameter"
+            },
+            "description": "Project parameters",
+            "nullable": true
+          },
           "projectURL": {
             "type": "string",
             "description": "Web address that leads to more information about the\r\nproject. The information should be accessible\r\nfrom the most commonly used web browsers.",
@@ -13890,14 +13960,6 @@
           "surveyMethodUrl": {
             "type": "string",
             "description": "Survey method URL.",
-            "nullable": true
-          },
-          "projectParameters": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectParameter"
-            },
-            "description": "Project parameters.",
             "nullable": true
           }
         },
@@ -13995,14 +14057,14 @@
             "description": "Unit for this species observation project parameter..",
             "nullable": true
           },
-          "value": {
-            "type": "string",
-            "description": "Value of the data in string format.",
-            "nullable": true
-          },
           "dataType": {
             "type": "string",
             "description": "Data type.",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "description": "Value of the data in string format.",
             "nullable": true
           }
         },
@@ -14297,7 +14359,8 @@
           },
           "observedByMe": {
             "type": "boolean",
-            "description": "Only get observations observed by me"
+            "description": "Only get observations observed by me",
+            "nullable": true
           },
           "occurrenceStatus": {
             "$ref": "#/components/schemas/OccurrenceStatusFilterValuesDto"
@@ -14313,7 +14376,8 @@
           },
           "reportedByMe": {
             "type": "boolean",
-            "description": "Only get observations reported by me"
+            "description": "Only get observations reported by me",
+            "nullable": true
           },
           "taxon": {
             "$ref": "#/components/schemas/TaxonFilterDto"
@@ -14371,7 +14435,8 @@
           },
           "observedByMe": {
             "type": "boolean",
-            "description": "Only get observations observed by me"
+            "description": "Only get observations observed by me",
+            "nullable": true
           },
           "occurrenceStatus": {
             "$ref": "#/components/schemas/OccurrenceStatusFilterValuesDto"
@@ -14387,7 +14452,8 @@
           },
           "reportedByMe": {
             "type": "boolean",
-            "description": "Only get observations reported by me"
+            "description": "Only get observations reported by me",
+            "nullable": true
           },
           "taxon": {
             "$ref": "#/components/schemas/TaxonFilterDto"
@@ -14445,7 +14511,8 @@
           },
           "observedByMe": {
             "type": "boolean",
-            "description": "Only get observations observed by me"
+            "description": "Only get observations observed by me",
+            "nullable": true
           },
           "occurrenceStatus": {
             "$ref": "#/components/schemas/OccurrenceStatusFilterValuesDto"
@@ -14461,7 +14528,8 @@
           },
           "reportedByMe": {
             "type": "boolean",
-            "description": "Only get observations reported by me"
+            "description": "Only get observations reported by me",
+            "nullable": true
           },
           "taxon": {
             "$ref": "#/components/schemas/TaxonFilterDto"
@@ -14496,7 +14564,8 @@
         "enum": [
           "NoFilter",
           "OnlyNotRecovered",
-          "DontIncludeNotRecovered"
+          "DontIncludeNotRecovered",
+          "IncludeNotRecovered"
         ],
         "type": "string"
       },
@@ -14997,7 +15066,8 @@
         "properties": {
           "includeUnderlyingTaxa": {
             "type": "boolean",
-            "description": "If true, also include the underlying hierarchical taxa in search.\r\nE.g. If ids=[4000104](Aves) and includeUnderlyingTaxa=true, then you search for all birds."
+            "description": "If true, also include the underlying hierarchical taxa in search.\r\nE.g. If ids=[4000104](Aves) and includeUnderlyingTaxa=true, then you search for all birds.",
+            "nullable": true
           },
           "ids": {
             "type": "array",
