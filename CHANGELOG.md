@@ -12,6 +12,9 @@
 - Artportalen DwC-A trailing space and quotes.
 - Search by `UsePeriodForAllYears` filter bug.
 
+### `Other`
+- Improved Artportalen incremental harvest performance.
+
 ## [2023.12.20] - Hotfix
 
 ### `Fixed`
