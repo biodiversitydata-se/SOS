@@ -43,6 +43,11 @@ namespace SOS.Shared.Api.Extensions.Controller
         /// <summary>
         /// Get id of current user
         /// </summary>
-        public static int GetUserId(this ControllerBase controller) => int.Parse(controller?.User?.Claims?.FirstOrDefault(c => c.Type.Contains("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", StringComparison.CurrentCultureIgnoreCase) || c.Type.Contains("client_uaid", StringComparison.CurrentCultureIgnoreCase))?.Value ?? "0");
+        public static int GetUserId(this ControllerBase controller) => controller?.User?.GetUserId() ?? 0;
+
+        /// <summary>
+        /// Get id of current user
+        /// </summary>
+        public static int GetUserId(this ClaimsPrincipal claimsPrincipal) => int.Parse(claimsPrincipal?.Claims?.FirstOrDefault(c => c.Type.Contains("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", StringComparison.CurrentCultureIgnoreCase) || c.Type.Contains("client_uaid", StringComparison.CurrentCultureIgnoreCase))?.Value ?? "0");
     }
 }
