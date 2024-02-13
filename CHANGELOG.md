@@ -1,5 +1,20 @@
 # Changelog
 
+## [2024.02.06]
+
+### `Added`
+- Support for export of Artportalen project parameters to Excel.
+
+### `Changed`
+- File names in zip exports now include date.
+
+### `Fixed`
+- Artportalen DwC-A trailing space and quotes.
+- Search by `UsePeriodForAllYears` filter bug.
+
+### `Other`
+- Improved Artportalen incremental harvest performance.
+
 ## [2023.12.20] - Hotfix
 
 ### `Fixed`

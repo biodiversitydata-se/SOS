@@ -316,6 +316,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ProjectsSummary = ArtportalenFactoryHelper.CreateProjectsSummary(obs.Projects);
                 obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
+                obs.RightsHolder = obs.RightsHolder?.Clean();
                 obs.Type = null;
 
                 // Event
