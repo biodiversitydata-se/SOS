@@ -177,7 +177,6 @@ public class LiveDbProcessFixture : IProcessFixture
             Export_Container = "sos-export",
             MinObservationCount = 0,
             MinObservationProtectedCount = 0,
-            MinPercentObservationCount = 0,
             ArtportalenUrl = "https://www.artportalen.se",
             ProcessUserObservation = false,
             ProcessDataset = true

@@ -75,10 +75,5 @@
         /// Minimum protected observations processed for switching active instance
         /// </summary>
         public long MinObservationProtectedCount { get; set; }
-
-        /// <summary>
-        /// Minimum percent observations processed compared to last processing for switching active instance
-        /// </summary>
-        public int MinPercentObservationCount { get; set; } = 99;
     }
 }

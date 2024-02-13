@@ -143,7 +143,6 @@ namespace SOS.Hangfire.JobServer
                                     // ConnectionCheckTimeout = TimeSpan.FromSeconds(5),
                                     //  DistributedLockLifetime = TimeSpan.FromSeconds(30),
                                     JobExpirationCheckInterval = TimeSpan.FromMinutes(10),
-                                    InvisibilityTimeout = null,
                                     // MigrationLockTimeout = TimeSpan.FromMinutes(1),
                                     MigrationOptions = new MongoMigrationOptions
                                     {

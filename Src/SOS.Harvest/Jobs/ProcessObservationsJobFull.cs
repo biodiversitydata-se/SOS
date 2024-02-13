@@ -235,18 +235,18 @@ namespace SOS.Harvest.Jobs
             {
                 var providerActive = processInfoActive!.ProvidersInfo.FirstOrDefault(p => p.DataProviderId.Equals(providerInactive.DataProviderId));
 
-                if (providerActive != null)
+                if ((providerActive?.PreviousProcessLimit ?? 0) > 0)
                 {
-                    double percentLimit = _processConfiguration.MinPercentObservationCount / 100.0;
+                    double percentLimit = providerActive!.PreviousProcessLimit / 100.0;
                     if (providerActive.PublicProcessCount > 0 && providerInactive.PublicProcessCount <= percentLimit * providerActive.PublicProcessCount)
                     {
-                        _logger.LogError($"Validation failed. Public observation count for {providerInactive.DataProviderIdentifier} is less than {_processConfiguration.MinPercentObservationCount}% of last run. Count this time={providerInactive.PublicProcessCount}. Count previous time={providerActive.PublicProcessCount}.");
+                        _logger.LogError($"Validation failed. Public observation count for {providerInactive.DataProviderIdentifier} is less than {providerActive!.PreviousProcessLimit}% of last run. Count this time={providerInactive.PublicProcessCount}. Count previous time={providerActive.PublicProcessCount}.");
                         return false;
                     }
 
                     if (providerActive.ProtectedProcessCount > 0 && providerInactive.ProtectedProcessCount <= percentLimit * providerActive.ProtectedProcessCount)
                     {
-                        _logger.LogError($"Validation failed. Protected observation count for {providerInactive.DataProviderIdentifier} is less than {_processConfiguration.MinPercentObservationCount}% of last run. Count this time={providerInactive.ProtectedProcessCount}. Count previous time={providerActive.ProtectedProcessCount}.");
+                        _logger.LogError($"Validation failed. Protected observation count for {providerInactive.DataProviderIdentifier} is less than {providerActive!.PreviousProcessLimit}% of last run. Count this time={providerInactive.ProtectedProcessCount}. Count previous time={providerActive.ProtectedProcessCount}.");
                         return false;
                     }
                 }

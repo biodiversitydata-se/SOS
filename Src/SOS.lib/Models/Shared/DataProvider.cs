@@ -32,11 +32,6 @@ namespace SOS.Lib.Models.Shared
         public int CoordinateUncertaintyInMeters { get; set; }
 
         /// <summary>
-        ///     Decides whether the data provider should be included in search when no data provider filter is set.
-        /// </summary>
-        public bool IncludeInSearchByDefault { get; set; }
-
-        /// <summary>
         ///     Some providers have multiple dataset 
         /// </summary>
         public IEnumerable<DataProviderDataset> Datasets { get; set; }
@@ -65,6 +60,12 @@ namespace SOS.Lib.Models.Shared
         ///     A unique identifer that is easier to understand than an Id number.
         /// </summary>
         public string Identifier { get; set; }
+
+        /// <summary>
+        ///     Decides whether the data provider should be included in search when no data provider filter is set.
+        /// </summary>
+        public bool IncludeInSearchByDefault { get; set; }
+
 
         /// <summary>
         /// Use this provider in healthy check
@@ -101,6 +102,11 @@ namespace SOS.Lib.Models.Shared
         /// 
         /// </summary>
         public IEnumerable<DataProviderPath> Paths { get; set; }
+
+        /// <summary>
+        /// Minimum amount processed observations in % compared to prevoius run. 0 = disable check
+        /// </summary>
+        public byte? PreviousProcessLimit { get; set; }
 
         /// <summary>
         /// Time stamp according to data source, used to see if data set has changed
