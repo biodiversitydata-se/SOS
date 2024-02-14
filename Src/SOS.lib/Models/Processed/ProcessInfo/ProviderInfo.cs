@@ -19,6 +19,7 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         {
             DataProviderId = dataProvider.Id;
             DataProviderIdentifier = dataProvider.Identifier;
+            PreviousProcessLimit = dataProvider.PreviousProcessLimit ?? 95;
         }
 
         public int? DataProviderId { get; set; }
@@ -75,6 +76,12 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// Last incremental process start 
         /// </summary>
         public DateTime? LatestIncrementalStart { get; set; }
+
+        /// <summary>
+        /// Minimum amount processed observations in % compared to prevoius run. 0 = disable check
+        /// </summary>
+        public byte PreviousProcessLimit { get; set; }
+
 
         public int? ProcessFailCount { get; set; }
 

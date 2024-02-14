@@ -70,6 +70,7 @@
                 "path": [ "SLU Artdatabanken", "Artportalen" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportChecklists": true,
         "SupportDatasets": true,
         "SupportDynamicEml": false,
@@ -141,6 +142,7 @@
                 "path": [ "Kustlaboratoriet, Institutionen för akvatiska resurser", "Kustfiskdatabasen" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -216,6 +218,7 @@
                 "path": [ "Miljödata MVM", "MVM" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportEvents": false,
         "SupportIncrementalHarvest": false,
@@ -286,6 +289,7 @@
                 "path": [ "Institutionen för akvatiska resurser", "Sjöprovfiskedatabasen" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -356,6 +360,7 @@
                 "path": [ "Institutionen för akvatiska resurser", "Elfiskeregistret" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -429,6 +434,7 @@
                 "path": [ "Umeå universitet", "Virtuella Herbariet" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -504,6 +510,7 @@
                 "path": [ "SMHI", "Shark" ]
             }
         ],
+        "PreviousProcessLimit": 90,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -579,6 +586,7 @@
                 "path": [ "Naturhistoriska riksmuseet", "Ringmärkningscentralen" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -660,6 +668,7 @@
                 "path": [ "Naturhistoriska riksmuseet", "Entomologiska samlingarna" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -741,6 +750,7 @@
                 "path": [ "Stiftelsen Station Linné", "Svenska Malaisefälle projektet" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": true,
@@ -820,6 +830,7 @@
                 "path": [ "Naturhistoriska riksmuseet", "Tumlare" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -897,6 +908,7 @@
                 "path": [ "Lunds universitet", "Svensk Dagfjärilsövervakning" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": true,
         "SupportEvents": true,
@@ -967,6 +979,7 @@
                 "path": [ "SMHI", "SHARK - Nationell zooplankton övervakning i Sverige sedan 1979" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": true,
         "SupportDynamicEml": false,
         "SupportEvents": true,
@@ -1036,6 +1049,7 @@
                 "path": [ "Havsfiskelaboratoriet, Institutionen för akvatiska resurser", "Fiskdata2" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": true,
@@ -1106,6 +1120,7 @@
                 "path": [ "Riksskogstaxeringen", "Förekomst/icke förekomst. Vegetationsdata" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": true,
@@ -1182,6 +1197,7 @@
                 "path": [ "SLU Artdatabanken", "Observationsdatabasen" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -1260,6 +1276,7 @@
                 "path": [ "Overstellar Solutions AB", "Biologg" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -1319,6 +1336,7 @@
                 "path": [ "SLU Artdatabanken", "iNaturalist Sverige" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -1395,6 +1413,7 @@
                 "path": [ "Lunds universitet", "Fågeltaxeringen: Nationella kustfågelövervakningen" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": true,
@@ -1471,6 +1490,7 @@
                 "path": [ "Lunds universitet", "Fågeltaxeringen: Sommarpunktrutterna" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": true,
@@ -1547,6 +1567,7 @@
                 "path": [ "Lunds universitet", "Fågeltaxeringen: Standardrutterna" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": true,
@@ -1624,6 +1645,7 @@
                 "path": [ "Lunds universitet", "Kustfåglar i Bottniska viken" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": true,
@@ -1702,6 +1724,7 @@
                 "Path": [ "Naturhistoriska riksmuseet", "Nationell ängs- och betesinventering (TUVA)" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
@@ -1772,6 +1795,7 @@
                 "path": [ "SLU", "Nationella inventeringar av landskapet i Sverige (NILS)" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": true,
         "SupportDynamicEml": false,
         "SupportEvents": true,
@@ -1872,6 +1896,7 @@
                 "path": [ "Göteborgs naturhistoriska museum" ]
             }
         ],
+        "PreviousProcessLimit": 95,
         "SupportDatasets": false,
         "SupportDynamicEml": false,
         "SupportEvents": false,
