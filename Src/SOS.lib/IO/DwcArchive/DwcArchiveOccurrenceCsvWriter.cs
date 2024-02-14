@@ -144,7 +144,7 @@ namespace SOS.Lib.IO.DwcArchive
             if (writeField[(int)FieldDescriptionId.CatalogNumber]) csvFileHelper.WriteField(dwcObservation.Occurrence.CatalogNumber);
             if (writeField[(int)FieldDescriptionId.Disposition]) csvFileHelper.WriteField(dwcObservation.Occurrence.Disposition);
             if (writeField[(int)FieldDescriptionId.EstablishmentMeans]) csvFileHelper.WriteField(dwcObservation.Occurrence.EstablishmentMeans);
-            if (writeField[(int)FieldDescriptionId.IndividualCount]) csvFileHelper.WriteField(dwcObservation.Occurrence.IndividualCount);
+            if (writeField[(int)FieldDescriptionId.IndividualCount]) csvFileHelper.WriteField(dwcObservation.Occurrence.OccurrenceStatus?.Equals("absent", StringComparison.CurrentCultureIgnoreCase) ?? false ? string.Empty : dwcObservation.Occurrence.IndividualCount);
             if (writeField[(int)FieldDescriptionId.LifeStage]) csvFileHelper.WriteField(dwcObservation.Occurrence.LifeStage);
             if (writeField[(int)FieldDescriptionId.AccessRights]) csvFileHelper.WriteField(dwcObservation.AccessRights);
             if (writeField[(int)FieldDescriptionId.OccurrenceRemarks]) csvFileHelper.WriteField(dwcObservation.Occurrence.OccurrenceRemarks);
