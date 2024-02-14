@@ -1207,6 +1207,18 @@
     "FieldSet": "Extended"
   },
   {
+    "PropertyName": "ExternalId",
+    "PropertyPath": "Location.Attributes.ExternalId",
+    "SwedishTitle": "Plats extern id",
+    "EnglishTitle": "Location external ID",
+    "DataType": "String",
+    "DataTypeIsNullable": false,
+    "DwcName": null,
+    "DwcIdentifier": null,
+    "DependsOn": "Location.Attributes.ExternalId",
+    "FieldSet": "AllWithValues"
+  },
+  {
     "PropertyName": "Locality",
     "PropertyPath": "Location.Locality",
     "SwedishTitle": "Lokal",

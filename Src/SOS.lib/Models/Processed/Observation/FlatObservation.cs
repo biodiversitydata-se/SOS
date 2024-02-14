@@ -177,6 +177,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string LocationLocality => _observation?.Location?.Locality;
         public string LocationLocationAccordingTo => _observation?.Location?.LocationAccordingTo;
         public string LocationLocationId => _observation?.Location?.LocationId;
+        public string LocationAttributesExternalId => _observation?.Location?.Attributes?.ExternalId;
         public string LocationLocationRemarks => _observation?.Location?.LocationRemarks;
         public double? LocationMaximumDepthInMeters => _observation?.Location?.MaximumDepthInMeters;
         public double? LocationMaximumDistanceAboveSurfaceInMeters => _observation?.Location?.MaximumDistanceAboveSurfaceInMeters;
@@ -512,6 +513,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "location.geodeticdatum" => LocationGeodeticDatum,
                 "location.coordinateuncertaintyinmeters" => LocationCoordinateUncertaintyInMeters,
                 "location.locationid" => LocationLocationId,
+                "location.attributes.externalid" => LocationAttributesExternalId,
                 "location.locality" => LocationLocality,
                 "location.locationremarks" => LocationLocationRemarks,
                 "location.municipality" => LocationMunicipality,
