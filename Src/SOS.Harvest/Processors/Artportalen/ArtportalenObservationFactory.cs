@@ -367,11 +367,11 @@ namespace SOS.Harvest.Processors.Artportalen
 
                     AddPositionData(
                         obs.Location,
-                        site.XCoord,
-                        site.YCoord,
+                        diffuse && site.DiffusionId > 0 ? site.XCoordDiffused : site.XCoord,
+                        diffuse && site.DiffusionId > 0 ? site.YCoordDiffused : site.YCoord,
                         CoordinateSys.WebMercator,
-                        (Point)(diffuse ? site.DiffusedPoint : site.Point)?.ToGeometry()!,
-                        diffuse ? site.DiffusedPointWithBuffer! : site.PointWithBuffer!,
+                        (Point)(diffuse && site.DiffusionId > 0 ? site.PointDiffused : site.Point)?.ToGeometry()!,
+                        diffuse && site.DiffusionId > 0 ? site.PointWithBufferDiffused : site.PointWithBuffer,
                         site.Accuracy,
                         taxon?.Attributes?.DisturbanceRadius
                     );
