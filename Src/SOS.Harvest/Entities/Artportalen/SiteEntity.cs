@@ -61,6 +61,16 @@
         public string? Name { get; set; }
 
         /// <summary>
+        ///     Real X coordinate of site if position is diffused
+        /// </summary>
+        public int TrueXCoord { get; set; }
+
+        /// <summary>
+        ///     Real Y coordinate of site if position is diffused
+        /// </summary>
+        public int TrueYCoord { get; set; }
+
+        /// <summary>
         ///     X coordinate of site
         /// </summary>
         public int XCoord { get; set; }

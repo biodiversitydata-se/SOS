@@ -135,14 +135,23 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
 
             Point? wgs84Point = null;
+            Point? wgs84PointDiffused = null;
             const int defaultAccuracy = 100;
 
-            if (entity.XCoord > 0 && entity.YCoord > 0)
+            if (entity.TrueXCoord > 0 && entity.TrueYCoord > 0)
+            {
+                // We process point here since site is added to observation verbatim. One site can have multiple observations and by 
+                // doing it here we only have to convert the point once
+                var webMercatorPoint = new Point(entity.TrueXCoord, entity.TrueYCoord);
+                wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+            }
+
+            if (entity.DiffusionId > 0 && entity.XCoord > 0 && entity.YCoord > 0)
             {
                 // We process point here since site is added to observation verbatim. One site can have multiple observations and by 
                 // doing it here we only have to convert the point once
                 var webMercatorPoint = new Point(entity.XCoord, entity.YCoord);
-                wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+                wgs84PointDiffused = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
             }
 
             Geometry? siteGeometry = null;
@@ -164,13 +173,17 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 IsPrivate = entity.IsPrivate,
                 PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),
+                PointDiffused = wgs84PointDiffused?.ToGeoJson(),
                 PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : wgs84Point.ToCircle(accuracy))?.ToGeoJson(),
+                PointWithBufferDiffused = wgs84PointDiffused?.ToCircle(accuracy)?.ToGeoJson(),
                 Name = entity.Name,
                 ParentSiteId = entity.ParentSiteId,
                 ParentSiteName = entity.ParentSiteName,
                 ProjectId = entity.ProjectId,
-                XCoord = entity.XCoord,
-                YCoord = entity.YCoord,
+                XCoord = entity.TrueXCoord,
+                XCoordDiffused = entity.XCoord,
+                YCoord = entity.TrueYCoord,
+                YCoordDiffused = entity.YCoord,
                 VerbatimCoordinateSystem = CoordinateSys.WebMercator
             };
 

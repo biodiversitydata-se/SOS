@@ -45,16 +45,6 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string CountyPartIdByCoordinate { get; set; }
 
         /// <summary>
-        ///     Diffused Point (WGS84)
-        /// </summary>
-        public GeoJsonGeometry<GeoJson2DCoordinates> DiffusedPoint { get; set; }
-
-        /// <summary>
-        ///   Diffused Point with accuracy buffer (WGS84)
-        /// </summary>
-        public GeoJsonGeometry<GeoJson2DCoordinates> DiffusedPointWithBuffer { get; set; }
-
-        /// <summary>
         ///     Id of diffusion, 0 if no diffusion
         /// </summary>
         public int DiffusionId { get; set; }
@@ -110,9 +100,19 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public GeoJsonGeometry<GeoJson2DCoordinates> Point { get; set; }
 
         /// <summary>
+        ///     Diffused Point (WGS84)
+        /// </summary>
+        public GeoJsonGeometry<GeoJson2DCoordinates> PointDiffused { get; set; }
+
+        /// <summary>
         ///     Point with accuracy buffer (WGS84)
         /// </summary>
         public GeoJsonGeometry<GeoJson2DCoordinates> PointWithBuffer { get; set; }
+
+        /// <summary>
+        ///   Diffused Point with accuracy buffer (WGS84)
+        /// </summary>
+        public GeoJsonGeometry<GeoJson2DCoordinates> PointWithBufferDiffused { get; set; }
 
         /// <summary>
         ///     Protected Nature
@@ -145,9 +145,19 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int XCoord { get; set; }
 
         /// <summary>
+        ///     X coordinate of site
+        /// </summary>
+        public int? XCoordDiffused { get; set; }
+
+        /// <summary>
         ///     Y coordinate of site
         /// </summary>
         public int YCoord { get; set; }
+
+        /// <summary>
+        ///     Y coordinate of site
+        /// </summary>
+        public int? YCoordDiffused { get; set; }
 
         public CoordinateSys VerbatimCoordinateSystem { get; set; }
 
