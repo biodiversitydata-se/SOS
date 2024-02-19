@@ -292,7 +292,7 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-                var fileName = $"Observations {DateTime.Now.ToString("yyyy-MM-dd hh.mm")} SOS export";
+                var fileName = $"Observations {DateTime.Now.ToString("yyyy-MM-dd HH.mm")} SOS export";
                 var fileExportResult = exportFormat switch
                 {
                     ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, fileName, culture, propertyLabelType, gzip, cancellationToken),
