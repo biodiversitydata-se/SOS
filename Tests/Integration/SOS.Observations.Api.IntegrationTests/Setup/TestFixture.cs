@@ -15,7 +15,7 @@ namespace SOS.Observations.Api.IntegrationTests.Setup;
 public class TestFixture : IAsyncLifetime
 {
     private DbHostingMode _processFixtureDbMode = DbHostingMode.ContainerDb;
-
+   
     // Change this to LiveDb when creating test data.
     private DbHostingMode _harvestFixtureDbMode = DbHostingMode.ContainerDb;
 

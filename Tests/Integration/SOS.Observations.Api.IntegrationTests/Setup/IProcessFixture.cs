@@ -32,8 +32,8 @@ public interface IProcessFixture
     Task InitializeElasticsearchIndices();
     Task CleanElasticsearchIndices();
     Task ProcessAndAddChecklistsToElasticSearch(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists);
-    Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations);
+    Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations, bool enableDiffusion = false);
     List<Checklist> ProcessChecklists(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists);
-    List<Observation> ProcessObservations(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations);
+    List<Observation> ProcessObservations(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations, bool enableDiffusion = false);
     List<Observation> ProcessObservations(IEnumerable<DwcObservationVerbatim> verbatimObservations, bool initAreaHelper = false);
 }

@@ -253,21 +253,27 @@ public class LiveDbProcessFixture : IProcessFixture
         await _processedChecklistRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
     }
 
-    public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+    public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations, bool enableDiffusion = false)
     {
-        var processedObservations = ProcessObservations(verbatimObservations);
+        var processedObservations = ProcessObservations(verbatimObservations, enableDiffusion);
         await AddObservationsToElasticsearchAsync(processedObservations, true, 0);
         return processedObservations;
     }
 
-    public List<Observation> ProcessObservations(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+    public List<Observation> ProcessObservations(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations, bool enableDiffusion = false)
     {
         var processedObservations = new List<Observation>();
-        bool diffuseIfSupported = false;
+
         foreach (var verbatimObservation in verbatimObservations)
         {
-            var processedObservation = _artportalenObservationFactory!.CreateProcessedObservation(verbatimObservation, diffuseIfSupported);
+            var processedObservation = _artportalenObservationFactory!.CreateProcessedObservation(verbatimObservation, false);
             processedObservations.Add(processedObservation);
+
+            if (enableDiffusion && verbatimObservation.ProtectedBySystem)
+            {
+                processedObservation = _artportalenObservationFactory!.CreateProcessedObservation(verbatimObservation, true);
+                processedObservations.Add(processedObservation);
+            }
         }
 
         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, true);

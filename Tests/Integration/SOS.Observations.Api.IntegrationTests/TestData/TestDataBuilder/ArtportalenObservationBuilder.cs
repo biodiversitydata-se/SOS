@@ -499,6 +499,22 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
             return operable.IsInDateSpan(spanStartDate, spanEndDate);
         }
 
+        public static IOperable<ArtportalenObservationVerbatim> IsDiffused(this IOperable<ArtportalenObservationVerbatim> operable, int diffusionId)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.ProtectedBySystem = true;
+                obs.Site.DiffusionId = diffusionId;
+                obs.Site.PointDiffused = obs.Site.Point;
+                obs.Site.PointWithBufferDiffused = obs.Site.PointDiffused;
+                obs.Site.XCoordDiffused = obs.Site.XCoord + diffusionId;
+                obs.Site.YCoordDiffused = obs.Site.YCoord + diffusionId;
+            });
+            
+            return operable;
+        }
+
         public static IOperable<ArtportalenObservationVerbatim> HaveTaxonSensitivityCategory(this IOperable<ArtportalenObservationVerbatim> operable, int sensitivityCategory)
         {
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;

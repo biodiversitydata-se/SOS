@@ -273,8 +273,7 @@ namespace SOS.Harvest.Processors.Artportalen
         {
             try
             {
-                var diffuseFactor = verbatimObservation.Site?.DiffusionId ?? 0;
-                var diffuse = diffuseIfSupported && diffuseFactor > 0;
+                var diffuse = diffuseIfSupported && (verbatimObservation.Site?.DiffusionId ?? 0) > 0;
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
                                   (verbatimObservation.Site?.YCoord ?? 0) > 0;
 
@@ -296,7 +295,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 // Record level
                 obs.DataProviderId = DataProvider.Id;
-                obs.AccessRights = verbatimObservation.ProtectedBySystem || verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) > DateTime.Now
+                obs.AccessRights = (verbatimObservation.ProtectedBySystem || verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) > DateTime.Now) && !diffuse
                     ? new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage }
                     : new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
                 obs.BasisOfRecord = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
@@ -367,11 +366,11 @@ namespace SOS.Harvest.Processors.Artportalen
 
                     AddPositionData(
                         obs.Location,
-                        diffuse && site.DiffusionId > 0 ? site.XCoordDiffused : site.XCoord,
-                        diffuse && site.DiffusionId > 0 ? site.YCoordDiffused : site.YCoord,
+                        diffuse ? site.XCoordDiffused : site.XCoord,
+                        diffuse ? site.YCoordDiffused : site.YCoord,
                         CoordinateSys.WebMercator,
-                        (Point)(diffuse && site.DiffusionId > 0 ? site.PointDiffused : site.Point)?.ToGeometry()!,
-                        diffuse && site.DiffusionId > 0 ? site.PointWithBufferDiffused : site.PointWithBuffer,
+                        (Point)(diffuse ? site.PointDiffused : site.Point)?.ToGeometry()!,
+                        diffuse ? site.PointWithBufferDiffused : site.PointWithBuffer,
                         site.Accuracy,
                         taxon?.Attributes?.DisturbanceRadius
                     );
@@ -399,7 +398,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
                 obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
                 //obs.Occurrence.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
-                obs.Occurrence.SensitivityCategory = CalculateSensitivityCategory(taxon!, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
+                obs.Occurrence.SensitivityCategory = diffuse ? 1 : CalculateSensitivityCategory(taxon!, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.Occurrence.ReportedBy = verbatimObservation.ReportedBy.Clean();
                 obs.Occurrence.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
                 obs.Occurrence.RecordedBy = verbatimObservation.Observers.Clean();

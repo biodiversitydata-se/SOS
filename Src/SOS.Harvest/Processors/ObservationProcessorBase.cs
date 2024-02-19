@@ -303,7 +303,7 @@ namespace SOS.Harvest.Processors
                 foreach (var verbatimObservation in verbatimObservationsBatch!)
                 {
                     var processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
-                    var observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
+                    var observation = observationFactory.CreateProcessedObservation(verbatimObservation, !EnableDiffusion);
                     TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
 
                     if (observation == null)
