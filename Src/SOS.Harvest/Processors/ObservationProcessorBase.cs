@@ -86,12 +86,12 @@ namespace SOS.Harvest.Processors
         /// <param name="occurrenceIds"></param>
         /// <returns></returns>
         private async Task<bool> DeleteBatchAsync(
-            bool protectedObservations,
+            bool sensitiveObservations,
             ICollection<string> occurrenceIds)
         {
             try
             {
-                return await ProcessedObservationRepository.DeleteByOccurrenceIdAsync(occurrenceIds, protectedObservations);
+                return await ProcessedObservationRepository.DeleteByOccurrenceIdAsync(occurrenceIds, sensitiveObservations);
             }
             catch (Exception e)
             {
@@ -298,7 +298,7 @@ namespace SOS.Harvest.Processors
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({batchId})");
 
                 var publicObservations = new ConcurrentDictionary<string, Observation>();
-                var protectedObservations = new ConcurrentDictionary<string, Observation>();
+                var sensitiveObservations = new ConcurrentDictionary<string, Observation>();
 
                 foreach (var verbatimObservation in verbatimObservationsBatch!)
                 {
@@ -326,11 +326,20 @@ namespace SOS.Harvest.Processors
                     if (observation.ShallBeProtected())
                     {
                         observation.Sensitive = true;
-                        protectedObservations.TryAdd(observation.Occurrence!.OccurrenceId, observation);
+                        sensitiveObservations.TryAdd(observation.Occurrence!.OccurrenceId, observation);
 
                         //If it is a protected sighting, public users should not be possible to find it in the current month 
-                        if (!EnableDiffusion || (observation.Occurrence.SensitivityCategory > 2 && (observation.Event?.StartDate?.Year ?? 0) == DateTime.Now.Year || (observation?.Event?.EndDate?.Year ?? 0) == DateTime.Now.Year) &&
-                            ((observation!.Event?.StartDate?.Month ?? 0) == DateTime.Now.Month || (observation?.Event?.EndDate?.Month ?? 0) == DateTime.Now.Month))
+                        if (!EnableDiffusion || 
+                            (
+                                observation.Occurrence.SensitivityCategory > 2 && 
+                                (observation.Event?.StartDate?.Year ?? 0) == DateTime.Now.Year || 
+                                (observation?.Event?.EndDate?.Year ?? 0) == DateTime.Now.Year
+                            ) &&
+                            (
+                                (observation!.Event?.StartDate?.Month ?? 0) == DateTime.Now.Month || 
+                                (observation?.Event?.EndDate?.Month ?? 0) == DateTime.Now.Month
+                            )
+                        )
                         {
                             continue;
                         }
@@ -344,6 +353,10 @@ namespace SOS.Harvest.Processors
                         // If provider don't support diffusion, we provide it for them
                         if (observation!.DiffusionStatus != DiffusionStatus.DiffusedByProvider)
                         {
+                            if (!dataProvider.AllowSystemDiffusion)
+                            {
+                                continue;
+                            }
                             var diffuseTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.Diffuse);
 
                             // Diffuse protected observation before adding it to public index. 
@@ -365,7 +378,7 @@ namespace SOS.Harvest.Processors
                 {
                     Logger.LogDebug($"Start deleting {dataProvider.Identifier} data {batchId}");
                     var occurrenceIds = publicObservations.Select(o => o.Key).ToHashSet();
-                    occurrenceIds.UnionWith(protectedObservations.Select(o => o.Key));
+                    occurrenceIds.UnionWith(sensitiveObservations.Select(o => o.Key));
 
                     var elasticSearchDeleteTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ElasticsearchDelete);
 
@@ -385,7 +398,7 @@ namespace SOS.Harvest.Processors
                 var validateAndStoreTasks = new[]
                 {
                     ValidateAndStoreObservations(dataProvider, mode, false, publicObservations.Values, $"{batchId}"),
-                    ValidateAndStoreObservations(dataProvider, mode, true, protectedObservations.Values, $"{batchId}")
+                    ValidateAndStoreObservations(dataProvider, mode, true, sensitiveObservations.Values, $"{batchId}")
                 };
 
                 await Task.WhenAll(validateAndStoreTasks);
@@ -408,7 +421,7 @@ namespace SOS.Harvest.Processors
             }
         }
 
-        protected async Task<(int SuccessCount, int FailedCount)> ValidateAndStoreObservations(DataProvider dataProvider, JobRunModes mode, bool protectedObservations, ICollection<Observation> observations, string batchId)
+        protected async Task<(int SuccessCount, int FailedCount)> ValidateAndStoreObservations(DataProvider dataProvider, JobRunModes mode, bool sensitiveObservations, ICollection<Observation> observations, string batchId)
         {
             if (!observations?.Any() ?? true)
             {
@@ -427,16 +440,16 @@ namespace SOS.Harvest.Processors
                 return (0, preValidationCount);
             }
 
-            var processedCount = await CommitBatchAsync(dataProvider, protectedObservations, observations!, batchId);
+            var processedCount = await CommitBatchAsync(dataProvider, sensitiveObservations, observations!, batchId);
 
-            if (mode == JobRunModes.Full && !protectedObservations && dwcArchiveFileWriterCoordinator.Enabled)
+            if (mode == JobRunModes.Full && !sensitiveObservations && dwcArchiveFileWriterCoordinator.Enabled)
             {
                 await WriteObservationsToDwcaCsvFiles(observations!, dataProvider, batchId);
             }
 
-            if (ProcessConfiguration.ProcessUserObservation && mode == JobRunModes.Full && dataProvider.Id == DataProviderIdentifiers.ArtportalenId && !protectedObservations)
+            if (ProcessConfiguration.ProcessUserObservation && mode == JobRunModes.Full && dataProvider.Id == DataProviderIdentifiers.ArtportalenId && !sensitiveObservations)
             {
-                Logger.LogDebug($"Add User Observations. BatchId={batchId}, Protected={protectedObservations}, Count={observations!.Count}");
+                Logger.LogDebug($"Add User Observations. BatchId={batchId}, Protected={sensitiveObservations}, Count={observations!.Count}");
                 var userObservations = observations.ToUserObservations();
                 await _userObservationRepository.AddManyAsync(userObservations);
             }

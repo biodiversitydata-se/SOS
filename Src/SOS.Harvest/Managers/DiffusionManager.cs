@@ -2,6 +2,7 @@
 using Nest;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
@@ -137,6 +138,7 @@ namespace SOS.Harvest.Managers
                 return;
             }
 
+            observation.AccessRights =  new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
             observation.DiffusionStatus = DiffusionStatus.DiffusedBySystem;
             observation.DataGeneralizations += " All data related to the exact location of the observation has been diffused or removed. Native data is available with extended privileges.";
 

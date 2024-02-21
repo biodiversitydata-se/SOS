@@ -17,6 +17,11 @@ namespace SOS.Lib.Models.Shared
     public class DataProvider : IEntity<int>, IIdIdentifierTuple
     {
         /// <summary>
+        /// Allow SOS system to diffuse observations
+        /// </summary>
+        public bool AllowSystemDiffusion { get; set; }
+
+        /// <summary>
         /// Categories
         /// </summary>
         public IEnumerable<DataProviderCategory> Categories { get; set; }
