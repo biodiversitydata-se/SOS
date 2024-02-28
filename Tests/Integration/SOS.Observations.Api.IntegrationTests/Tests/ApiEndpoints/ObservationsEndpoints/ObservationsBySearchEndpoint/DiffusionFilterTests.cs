@@ -178,6 +178,46 @@ public class DiffusionFilterTests : TestBase
         result!.Records.Count(o => o.DiffusionStatus == DiffusionStatus.NotDiffused).Should().Be(40, because: "Diffused observations are not return when quering both public and sensitive index");
     }
 
+    [Fact (Skip = "Suggested change to test above")]
+    public async Task ChangeSuggestion_ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByDiffusionPublicAndSensitiveNoAccess()
+    {
+        const int userId = TestAuthHandler.DefaultTestUserId;
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(20)
+                .IsDiffused(100)
+            .TheNext(20)
+                .IsDiffused(500)
+            .TheNext(20)
+                .IsDiffused(1000)
+            .TheNext(40)
+                .With(o => o.ProtectedBySystem = false)
+                .With(o => o.Site.DiffusionId = 0)
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations, true);
+
+        var searchFilter = new SearchFilterInternalDto
+        {
+            ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
+            Output = new OutputFilterExtendedDto
+            {
+                Fields = new[] { "diffusionStatus" }
+            }
+        };
+        var apiClient = TestFixture.CreateApiClient();
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(100);
+        result.Records.Count(m => m.DiffusionStatus == DiffusionStatus.NotDiffused).Should().Be(40);
+        result.Records.Count(m => m.DiffusionStatus == DiffusionStatus.DiffusedByProvider).Should().Be(60, because: "diffused observations should be prioritized");
+    }
+
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsCorrectDiffusion()
     {
