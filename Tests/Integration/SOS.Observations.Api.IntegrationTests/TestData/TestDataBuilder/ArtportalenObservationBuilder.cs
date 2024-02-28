@@ -2,6 +2,7 @@
 using FizzWare.NBuilder.Implementation;
 using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Geometries;
+using SOS.Lib.Enums;
 using SOS.Lib.Enums.Artportalen;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
@@ -505,11 +506,12 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
             builder.With((obs, index) =>
             {
                 obs.ProtectedBySystem = true;
-                obs.Site.DiffusionId = diffusionId;
-                obs.Site.PointDiffused = obs.Site.Point;
-                obs.Site.PointWithBufferDiffused = obs.Site.PointDiffused;
+                obs.Site.DiffusionId = diffusionId;                
                 obs.Site.XCoordDiffused = obs.Site.XCoord + diffusionId;
                 obs.Site.YCoordDiffused = obs.Site.YCoord + diffusionId;
+                Point? diffusedWebMercatorPoint = new Point(obs.Site.XCoordDiffused.Value, obs.Site.YCoordDiffused.Value);
+                obs.Site.PointDiffused = diffusedWebMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoJson(); ;
+                obs.Site.PointWithBufferDiffused = obs.Site.PointDiffused;
             });
             
             return operable;
