@@ -1120,6 +1120,77 @@ public class ExtendedFilterTests : TestBase
     }
 
     [Fact]
+    public async Task GetObservationsWithQuantityGreaterThanOne()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All()
+               .HaveValuesFromPredefinedObservations()
+           .TheFirst(40)
+                .With(o => o.Quantity = 2)
+            .TheNext(20)
+                 .With(o => o.Quantity = 3)
+            .TheNext(20)
+                 .With(o => o.Quantity = 1)
+            .TheNext(20)
+                 .With(o => o.Quantity = null)
+           .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                Quantity = 2,
+                QuantityOperator = "gte"
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60);
+    }
+
+    [Fact]
+    public async Task GetObservationsWithMissingQuantity()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All()
+               .HaveValuesFromPredefinedObservations()
+           .TheFirst(60)
+                .With(o => o.Quantity = null)
+            .TheNext(20)
+                 .With(o => o.Quantity = 3)
+            .TheNext(20)
+                 .With(o => o.Quantity = 1)            
+           .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                QuantityOperator = "missing"
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60);
+    }
+
+    [Fact]
     public async Task GetObservationsWithTriggeredObservationRuleReproductionIds()
     {
         // Arrange

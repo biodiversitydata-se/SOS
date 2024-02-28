@@ -237,6 +237,10 @@ namespace SOS.Lib
             {
                 query.AddNumericFilterWithRelationalOperator("occurrence.organismQuantityInt", internalFilter.Quantity.Value, internalFilter.QuantityOperator);
             }
+            if (internalFilter.QuantityOperator?.ToLower() == "missing")
+            {
+                query.AddNotExistsCriteria("occurrence.organismQuantityInt");
+            }
 
             query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateFrom, SearchExtensionsGeneric.RangeTypes.GreaterThanOrEquals);
             query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateTo, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
