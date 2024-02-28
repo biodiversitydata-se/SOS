@@ -177,4 +177,59 @@ public class DiffusionFilterTests : TestBase
         result!.TotalCount.Should().Be(40, because: "40 are public and not diffused");
         result!.Records.Count(o => o.DiffusionStatus == DiffusionStatus.NotDiffused).Should().Be(40, because: "Diffused observations are not return when quering both public and sensitive index");
     }
+
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsCorrectDiffusion()
+    {
+        const int userId = TestAuthHandler.DefaultTestUserId;
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(20)
+                .IsDiffused(100)
+                .With(o => o.ReportedByUserServiceUserId = userId)
+            .TheNext(20)
+                .IsDiffused(500)
+                .With(o => o.ReportedByUserServiceUserId = userId)
+            .TheNext(20)
+                .IsDiffused(1000)
+                .With(o => o.ReportedByUserServiceUserId = userId)
+            .TheNext(40)
+                .With(o => o.ProtectedBySystem = false)
+                .With(o => o.Site.DiffusionId = 0)
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations, true);
+
+        var searchFilterSensitive = new SearchFilterInternalDto
+        {
+            ProtectionFilter = ProtectionFilterDto.Sensitive,
+            Output = new OutputFilterExtendedDto
+            {
+                FieldSet = Lib.Enums.OutputFieldSet.AllWithValues
+            }
+        };
+        var searchFilterPublic = new SearchFilterInternalDto
+        {
+            ProtectionFilter = ProtectionFilterDto.Public,
+            Output = new OutputFilterExtendedDto
+            {
+                FieldSet = Lib.Enums.OutputFieldSet.AllWithValues
+            }
+        };
+        var apiClient = TestFixture.CreateApiClient();
+
+        // Act
+        var responseSensitive = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilterSensitive));
+        var resultSensitive = await responseSensitive.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var responsePublic = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilterPublic));
+        var resultPublic = await responsePublic.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        var sensitiveObs = resultSensitive.Records.First(m => m.Occurrence.OccurrenceId == "urn:lsid:artportalen.se:sighting:1");
+        var publicObs = resultPublic.Records.First(m => m.Occurrence.OccurrenceId == "urn:lsid:artportalen.se:sighting:1");
+
+        sensitiveObs.Location.DecimalLatitude.Should().NotBe(publicObs.Location.DecimalLatitude, because: "the observation is diffused in public index");
+        sensitiveObs.DiffusionStatus.Should().Be(DiffusionStatus.NotDiffused);
+        publicObs.DiffusionStatus.Should().Be(DiffusionStatus.DiffusedByProvider);
+    }
 }
