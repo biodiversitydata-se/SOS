@@ -47,7 +47,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureInternalApi]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetUserInformation(
             [FromQuery] string applicationIdentifier = null,
             [FromQuery] string cultureCode = "sv-SE")

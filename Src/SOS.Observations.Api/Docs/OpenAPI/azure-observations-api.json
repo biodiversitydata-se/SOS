@@ -2287,6 +2287,256 @@
         }
       }
     },
+    "/Locations": {
+      "post": {
+        "tags": [
+          "Locations"
+        ],
+        "description": "Get locations by id",
+        "operationId": "Locations_GetLocationsByIds",
+        "parameters": [
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/Locations/search": {
+      "post": {
+        "tags": [
+          "Locations"
+        ],
+        "description": "Search for locations",
+        "operationId": "Locations_Search",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "Pagination start index.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "description": "Number of items to return.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "sensitiveObservations",
+            "in": "query",
+            "description": "If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "roleId",
+            "in": "query",
+            "description": "Limit user authorization too specified role.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "authorizationApplicationIdentifier",
+            "in": "query",
+            "description": "Name of application used in authorization.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The search filter.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeographicsFilterDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeographicsFilterDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeographicsFilterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LocationSearchResultDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LocationSearchResultDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LocationSearchResultDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
     "/Observations/{id}": {
       "get": {
         "tags": [
@@ -3803,6 +4053,725 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/Systems/ProcessInformation": {
+      "get": {
+        "tags": [
+          "Systems"
+        ],
+        "description": "Get information about observation processing",
+        "operationId": "Systems_GetProcessInfo",
+        "parameters": [
+          {
+            "name": "active",
+            "in": "query",
+            "description": "True: get information about last processing, false get information about previous processing",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessInfoDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessInfoDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessInfoDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/TaxonLists": {
+      "get": {
+        "tags": [
+          "TaxonLists"
+        ],
+        "description": "Get all Taxon list definitions.",
+        "operationId": "TaxonLists_GetTaxonLists",
+        "parameters": [
+          {
+            "name": "cultureCode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "sv-SE"
+            }
+          },
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaxonListDefinitionDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaxonListDefinitionDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaxonListDefinitionDto"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/TaxonLists/{taxonListId}/Taxa": {
+      "get": {
+        "tags": [
+          "TaxonLists"
+        ],
+        "description": "Get all taxa in a taxon list.",
+        "operationId": "TaxonLists_GetTaxa",
+        "parameters": [
+          {
+            "name": "taxonListId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaxonListTaxonInformationDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaxonListTaxonInformationDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaxonListTaxonInformationDto"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/User/Information": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "Get user information. Add an authorization header to get information about the user.",
+        "operationId": "User_GetUserInformation",
+        "parameters": [
+          {
+            "name": "applicationIdentifier",
+            "in": "query",
+            "description": "Application identifier making the request, used for retrieve roles and authorizations for the application you use.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cultureCode",
+            "in": "query",
+            "description": "The culture code used for translating role descriptions.",
+            "schema": {
+              "type": "string",
+              "default": "sv-SE"
+            }
+          },
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserInformationDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserInformationDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserInformationDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/Vocabularies/Projects": {
+      "get": {
+        "tags": [
+          "Vocabularies"
+        ],
+        "description": "Get all Artportalen projects.",
+        "operationId": "Vocabularies_GetProjects",
+        "parameters": [
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectDto"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/Vocabularies/ObservationProperties": {
+      "get": {
+        "tags": [
+          "Vocabularies"
+        ],
+        "description": "Get all observation properties.",
+        "operationId": "Vocabularies_GetObservationProperties",
+        "parameters": [
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PropertyFieldDescriptionDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PropertyFieldDescriptionDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PropertyFieldDescriptionDto"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/Vocabularies/ObservationProperties/{fieldSet}": {
+      "get": {
+        "tags": [
+          "Vocabularies"
+        ],
+        "description": "Get observation properties that is part of a specific field set.",
+        "operationId": "Vocabularies_GetObservationPropertiesByFieldSet",
+        "parameters": [
+          {
+            "name": "fieldSet",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/OutputFieldSet"
+            }
+          },
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PropertyFieldDescriptionDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PropertyFieldDescriptionDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PropertyFieldDescriptionDto"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/Vocabularies": {
+      "get": {
+        "tags": [
+          "Vocabularies"
+        ],
+        "description": "Get all vocabularies.",
+        "operationId": "Vocabularies_GetVocabularies",
+        "parameters": [
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VocabularyDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VocabularyDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VocabularyDto"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/Vocabularies/ZipFile": {
+      "get": {
+        "tags": [
+          "Vocabularies"
+        ],
+        "description": "Get all vocabularies as zip file.",
+        "operationId": "Vocabularies_GetVocabulariesAsZipFile",
+        "parameters": [
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/Vocabularies/{vocabularyId}": {
+      "get": {
+        "tags": [
+          "Vocabularies"
+        ],
+        "description": "Get a specific vocabulary.",
+        "operationId": "Vocabularies_GetVocabularyById",
+        "parameters": [
+          {
+            "name": "vocabularyId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/VocabularyIdDto"
+            }
+          },
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VocabularyDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VocabularyDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VocabularyDto"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
           },
           "500": {
             "description": "Server Error"
@@ -5715,6 +6684,75 @@
         "additionalProperties": false,
         "description": "Measurement or facts for an observation or event."
       },
+      "ExternalSystemIdDto": {
+        "enum": [
+          "Artportalen",
+          "DarwinCore",
+          "SwedishSpeciesObservationService"
+        ],
+        "type": "string"
+      },
+      "ExternalSystemMappingDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ExternalSystemIdDto"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "mappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalSystemMappingFieldDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExternalSystemMappingFieldDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The key in the external system.",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalSystemMappingValueDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExternalSystemMappingValueDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "description": "Value in data provider.",
+            "nullable": true
+          },
+          "sosId": {
+            "type": "integer",
+            "description": "Id in SOS (Species Observation System).",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "File": {
         "type": "object",
         "properties": {
@@ -6148,6 +7186,23 @@
         "additionalProperties": false,
         "description": "Identification information about an species observation."
       },
+      "Int32IdValueDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id of item",
+            "format": "int32"
+          },
+          "value": {
+            "type": "string",
+            "description": "The value.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Id value dto"
+      },
       "LatLonBoundingBox": {
         "type": "object",
         "properties": {
@@ -6508,6 +7563,146 @@
         },
         "additionalProperties": false,
         "description": "Location attributes."
+      },
+      "LocationDto": {
+        "type": "object",
+        "properties": {
+          "continent": {
+            "$ref": "#/components/schemas/Int32IdValueDto"
+          },
+          "coordinatePrecision": {
+            "type": "number",
+            "description": "A decimal representation of the precision of the coordinates\r\ngiven in the DecimalLatitude and DecimalLongitude.",
+            "format": "double",
+            "nullable": true
+          },
+          "coordinateUncertaintyInMeters": {
+            "type": "integer",
+            "description": "The horizontal distance (in meters) from the given\r\nCoordinateX and CoordinateY describing the\r\nsmallest circle containing the whole of the Location.\r\nLeave the value empty if the uncertainty is unknown, cannot\r\nbe estimated, or is not applicable (because there are\r\nno coordinates). Zero is not a valid value for this term.",
+            "format": "int32",
+            "nullable": true
+          },
+          "country": {
+            "$ref": "#/components/schemas/Int32IdValueDto"
+          },
+          "countryRegion": {
+            "$ref": "#/components/schemas/StringIdValueDto"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "The standard code for the country in which the\r\nLocation occurs.\r\nRecommended best practice is to use ISO 3166-1-alpha-2\r\ncountry codes.",
+            "nullable": true
+          },
+          "county": {
+            "$ref": "#/components/schemas/StringIdValueDto"
+          },
+          "municipality": {
+            "$ref": "#/components/schemas/StringIdValueDto"
+          },
+          "parish": {
+            "$ref": "#/components/schemas/StringIdValueDto"
+          },
+          "province": {
+            "$ref": "#/components/schemas/StringIdValueDto"
+          },
+          "decimalLatitude": {
+            "type": "number",
+            "description": "The geographic latitude (in decimal degrees, using\r\nthe spatial reference system given in geodeticDatum)\r\nof the geographic center of a Location. Positive values\r\nare north of the Equator, negative values are south of it.\r\nLegal values lie between -90 and 90, inclusive.",
+            "format": "double",
+            "nullable": true
+          },
+          "decimalLongitude": {
+            "type": "number",
+            "description": "The geographic longitude (in decimal degrees, using\r\nthe spatial reference system given in geodeticDatum)\r\nof the geographic center of a Location. Positive\r\nvalues are east of the Greenwich Meridian, negative\r\nvalues are west of it. Legal values lie between -180\r\nand 180, inclusive.",
+            "format": "double",
+            "nullable": true
+          },
+          "externalId": {
+            "type": "string",
+            "description": "External Id of site",
+            "nullable": true
+          },
+          "locality": {
+            "type": "string",
+            "description": "The specific description of the place. Less specific\r\ngeographic information can be provided in other\r\ngeographic terms (higherGeography, continent, country,\r\nstateProvince, county, municipality, waterBody, island,\r\nislandGroup). This term may contain information modified\r\nfrom the original to correct perceived errors or\r\nstandardize the description.",
+            "nullable": true
+          },
+          "locationAccordingTo": {
+            "type": "string",
+            "description": "Information about the source of this Location information.\r\nCould be a publication (gazetteer), institution,\r\nor team of individuals.",
+            "nullable": true
+          },
+          "locationId": {
+            "type": "string",
+            "description": "An identifier for the set of location information\r\n(data associated with dcterms:Location).\r\nMay be a global unique identifier or an identifier\r\nspecific to the data set.",
+            "nullable": true
+          },
+          "locationRemarks": {
+            "type": "string",
+            "description": "Comments or notes about the Location.",
+            "nullable": true
+          },
+          "point": {
+            "$ref": "#/components/schemas/PointGeoShape"
+          },
+          "pointWithBuffer": {
+            "$ref": "#/components/schemas/PolygonGeoShape"
+          },
+          "pointWithDisturbanceBuffer": {
+            "$ref": "#/components/schemas/PolygonGeoShape"
+          },
+          "projectId": {
+            "type": "integer",
+            "description": "Id of project",
+            "format": "int32",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/LocationType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LocationSearchResultDto": {
+        "type": "object",
+        "properties": {
+          "county": {
+            "type": "string",
+            "description": "County",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "description": "Id of location",
+            "nullable": true
+          },
+          "latitude": {
+            "type": "number",
+            "description": "Location latitude in WGS 84",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "description": "Location longitude in WGS 84",
+            "format": "double"
+          },
+          "municipality": {
+            "type": "string",
+            "description": "Municipality",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of location",
+            "nullable": true
+          },
+          "parish": {
+            "type": "string",
+            "description": "Parish",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "LocationType": {
         "enum": [
@@ -7206,6 +8401,59 @@
         "type": "object",
         "additionalProperties": {}
       },
+      "ProcessInfoDto": {
+        "type": "object",
+        "properties": {
+          "publicCount": {
+            "type": "integer",
+            "description": "Item processed",
+            "format": "int32"
+          },
+          "protectedCount": {
+            "type": "integer",
+            "description": "Protected observations count",
+            "format": "int32"
+          },
+          "end": {
+            "type": "string",
+            "description": "Harvest end date and time",
+            "format": "date-time"
+          },
+          "metadataInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProcessInfoDto"
+            },
+            "description": "Provider information about meta data",
+            "nullable": true
+          },
+          "providersInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProviderInfoDto"
+            },
+            "description": "Information about providers",
+            "nullable": true
+          },
+          "start": {
+            "type": "string",
+            "description": "Harvest start date and time",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "Running status",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "description": "Id, equals updated instance (0 or 1)",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Dto"
+      },
       "Project": {
         "type": "object",
         "properties": {
@@ -7281,6 +8529,74 @@
         },
         "additionalProperties": false,
         "description": "Artportalen project information."
+      },
+      "ProjectDto": {
+        "type": "object",
+        "properties": {
+          "isPublic": {
+            "type": "boolean",
+            "description": "Indicates if species observations that are reported in\r\na project are publicly available or not."
+          },
+          "category": {
+            "type": "string",
+            "description": "Information about the type of project,\r\nfor example 'Environmental monitoring'.",
+            "nullable": true
+          },
+          "categorySwedish": {
+            "type": "string",
+            "description": "Information about the type of project in Swedish,\r\nfor example 'Miljöövervakning'.",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of a project.",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Date when the project ends.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "description": "An identifier for the project.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the project.",
+            "nullable": true
+          },
+          "owner": {
+            "type": "string",
+            "description": "Name of person or organization that owns the project.",
+            "nullable": true
+          },
+          "projectURL": {
+            "type": "string",
+            "description": "Web address that leads to more information about the project.",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Date when the project starts.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "surveyMethod": {
+            "type": "string",
+            "description": "Survey method used in a project to\r\nretrieve species observations.",
+            "nullable": true
+          },
+          "surveyMethodUrl": {
+            "type": "string",
+            "description": "Survey method URL.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Information about a project in Artportalen."
       },
       "ProjectParameter": {
         "type": "object",
@@ -7378,6 +8694,73 @@
         "additionalProperties": false,
         "description": "Artportalen projects summary."
       },
+      "PropertyFieldDataType": {
+        "enum": [
+          "Boolean",
+          "DateTime",
+          "Double",
+          "Int32",
+          "Int64",
+          "String",
+          "TimeSpan"
+        ],
+        "type": "string"
+      },
+      "PropertyFieldDescriptionDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Property name.",
+            "nullable": true
+          },
+          "propertyPath": {
+            "type": "string",
+            "description": "Property path.",
+            "nullable": true
+          },
+          "swedishTitle": {
+            "type": "string",
+            "description": "Swedish title.",
+            "nullable": true
+          },
+          "englishTitle": {
+            "type": "string",
+            "description": "English title.",
+            "nullable": true
+          },
+          "dwcName": {
+            "type": "string",
+            "description": "Darwin Core name.",
+            "nullable": true
+          },
+          "dwcIdentifier": {
+            "type": "string",
+            "description": "Darwin Core identifier.",
+            "nullable": true
+          },
+          "dataType": {
+            "$ref": "#/components/schemas/PropertyFieldDataType"
+          },
+          "dataTypeNullable": {
+            "type": "boolean",
+            "description": "Indicates whether the data type is nullable."
+          },
+          "fieldSet": {
+            "$ref": "#/components/schemas/OutputFieldSet"
+          },
+          "partOfFieldSets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OutputFieldSet"
+            },
+            "description": "The field sets this property is part of.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Information about a property field."
+      },
       "PropertyLabelType": {
         "enum": [
           "PropertyName",
@@ -7387,6 +8770,112 @@
         ],
         "type": "string",
         "description": "Property label type."
+      },
+      "ProviderInfoDto": {
+        "type": "object",
+        "properties": {
+          "dataProviderId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "dataProviderIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "harvestCount": {
+            "type": "integer",
+            "description": "Number of items harvested",
+            "format": "int32",
+            "nullable": true
+          },
+          "harvestEnd": {
+            "type": "string",
+            "description": "Harvest end date and time",
+            "format": "date-time",
+            "nullable": true
+          },
+          "harvestNotes": {
+            "type": "string",
+            "description": "Harvest note",
+            "nullable": true
+          },
+          "harvestStart": {
+            "type": "string",
+            "description": "Harvest start date and time",
+            "format": "date-time",
+            "nullable": true
+          },
+          "harvestStatus": {
+            "type": "string",
+            "description": "Status of harvest",
+            "nullable": true
+          },
+          "latestIncrementalPublicCount": {
+            "type": "integer",
+            "description": "Last incremental process count",
+            "format": "int32",
+            "nullable": true
+          },
+          "latestIncrementalProtectedCount": {
+            "type": "integer",
+            "description": "Last incremental process count",
+            "format": "int32",
+            "nullable": true
+          },
+          "latestIncrementalEnd": {
+            "type": "string",
+            "description": "Last incremental process end",
+            "format": "date-time",
+            "nullable": true
+          },
+          "latestIncrementalStatus": {
+            "type": "string",
+            "description": "Last incremental process status",
+            "nullable": true
+          },
+          "latestIncrementalStart": {
+            "type": "string",
+            "description": "Last incremental process start",
+            "format": "date-time",
+            "nullable": true
+          },
+          "publicProcessCount": {
+            "type": "integer",
+            "description": "Number of items processed",
+            "format": "int32",
+            "nullable": true
+          },
+          "protectedProcessCount": {
+            "type": "integer",
+            "description": "Number of items processed",
+            "format": "int32",
+            "nullable": true
+          },
+          "processEnd": {
+            "type": "string",
+            "description": "Process end date and time",
+            "format": "date-time",
+            "nullable": true
+          },
+          "processStart": {
+            "type": "string",
+            "description": "Process start date and time",
+            "format": "date-time"
+          },
+          "processStatus": {
+            "type": "string",
+            "description": "Status of processing",
+            "nullable": true
+          },
+          "dataProviderType": {
+            "type": "string",
+            "description": "Id of data provider",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
       },
       "SearchFilterAggregationDto": {
         "type": "object",
@@ -7677,6 +9166,23 @@
           "NotVerified"
         ],
         "type": "string"
+      },
+      "StringIdValueDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id of item",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "description": "The value.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Id value dto"
       },
       "Substrate": {
         "type": "object",
@@ -8169,6 +9675,33 @@
         "additionalProperties": false,
         "description": "Taxon filter."
       },
+      "TaxonListDefinitionDto": {
+        "type": "object",
+        "properties": {
+          "canBeUsedInSignalSearch": {
+            "type": "boolean",
+            "description": "Is the list allowed in signal search?"
+          },
+          "id": {
+            "type": "integer",
+            "description": "The Id of the taxon list.",
+            "format": "int32"
+          },
+          "parentId": {
+            "type": "integer",
+            "description": "The parent Id of the taxon list.",
+            "format": "int32",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the taxon list.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Taxon list definition."
+      },
       "TaxonListOperatorDto": {
         "enum": [
           "Merge",
@@ -8176,6 +9709,28 @@
         ],
         "type": "string",
         "description": "Operator to use when TaxonListIds is specified."
+      },
+      "TaxonListTaxonInformationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Dyntaxa taxon id.",
+            "format": "int32"
+          },
+          "scientificName": {
+            "type": "string",
+            "description": "Scientific name.",
+            "nullable": true
+          },
+          "swedishName": {
+            "type": "string",
+            "description": "Swedish name.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Taxon information."
       },
       "TaxonSynonymName": {
         "type": "object",
@@ -8339,6 +9894,99 @@
         "type": "string",
         "description": "Unit for a certain amount of organisms (given in the attribute quantity) or\r\nUnit for a reported measurement (given in the attribute \"vädermått\").."
       },
+      "UserAreaDto": {
+        "type": "object",
+        "properties": {
+          "areaType": {
+            "$ref": "#/components/schemas/AreaTypeDto"
+          },
+          "featureId": {
+            "type": "string",
+            "description": "Area FeatureId.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Area name.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "User role authority area."
+      },
+      "UserAuthorityDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Authority id.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Authority name.",
+            "nullable": true
+          },
+          "areas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserAreaDto"
+            },
+            "description": "Authority areas.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "User role authority."
+      },
+      "UserInformationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "User id.",
+            "format": "int32"
+          },
+          "userName": {
+            "type": "string",
+            "description": "Username.",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "description": "First name.",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Last name.",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "description": "Email.",
+            "nullable": true
+          },
+          "hasSensitiveSpeciesAuthority": {
+            "type": "boolean",
+            "description": "Indicates whether the user has any role with sensitive species observation authority."
+          },
+          "hasSightingIndicationAuthority": {
+            "type": "boolean",
+            "description": "Indicates whether the use user has any role with sighting indication authority."
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRoleDto"
+            },
+            "description": "User roles.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "User information."
+      },
       "UserInternal": {
         "type": "object",
         "properties": {
@@ -8375,6 +10023,48 @@
         },
         "additionalProperties": false
       },
+      "UserRoleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Role id.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Role name.",
+            "nullable": true
+          },
+          "shortName": {
+            "type": "string",
+            "description": "Role short name.",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Role description.",
+            "nullable": true
+          },
+          "hasSensitiveSpeciesAuthority": {
+            "type": "boolean",
+            "description": "Indicates whether this role has sensitive species observation authority."
+          },
+          "hasSightingIndicationAuthority": {
+            "type": "boolean",
+            "description": "Indicates whether this role has sighting indication authority."
+          },
+          "authorities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserAuthorityDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "User role."
+      },
       "Visibility": {
         "enum": [
           "Fog1Km",
@@ -8385,6 +10075,72 @@
         ],
         "type": "string",
         "description": "States the visibility conditions during the survey event."
+      },
+      "VocabularyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "enumId": {
+            "$ref": "#/components/schemas/VocabularyIdDto"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "localized": {
+            "type": "boolean"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VocabularyValueInfoDto"
+            },
+            "nullable": true
+          },
+          "externalSystemsMapping": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalSystemMappingDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VocabularyIdDto": {
+        "enum": [
+          "Sex",
+          "Activity",
+          "LifeStage",
+          "Biotope",
+          "Substrate",
+          "VerificationStatus",
+          "Institution",
+          "Unit",
+          "BasisOfRecord",
+          "Continent",
+          "EstablishmentMeans",
+          "OccurrenceStatus",
+          "AccessRights",
+          "Country",
+          "Type",
+          "AreaType",
+          "DiscoveryMethod",
+          "DeterminationMethod",
+          "ReproductiveCondition",
+          "Behavior",
+          "SensitivityCategory",
+          "BirdNestActivity",
+          "TaxonCategory"
+        ],
+        "type": "string"
       },
       "VocabularyValue": {
         "type": "object",
@@ -8402,6 +10158,83 @@
         },
         "additionalProperties": false,
         "description": "Describes a value associated with a vocabulary."
+      },
+      "VocabularyValueInfoCategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "localized": {
+            "type": "boolean"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VocabularyValueTranslationDto"
+            },
+            "description": "Translations.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VocabularyValueInfoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "localized": {
+            "type": "boolean"
+          },
+          "category": {
+            "$ref": "#/components/schemas/VocabularyValueInfoCategoryDto"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VocabularyValueTranslationDto"
+            },
+            "description": "Translations.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VocabularyValueTranslationDto": {
+        "type": "object",
+        "properties": {
+          "cultureCode": {
+            "type": "string",
+            "description": "Culture code. I.e. en-GB, sv-SE",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "description": "Translation",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "Weather": {
         "type": "object",

@@ -52,7 +52,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureInternalApi]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetProjects()
         {
             try
@@ -82,7 +82,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<PropertyFieldDescriptionDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureInternalApi]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetObservationProperties()
         {
             try
@@ -117,7 +117,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<PropertyFieldDescriptionDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureInternalApi]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetObservationPropertiesByFieldSet([FromRoute] OutputFieldSet fieldSet)
         {
             try
@@ -152,7 +152,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<VocabularyDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureInternalApi]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetVocabularies()
         {
             try
@@ -182,7 +182,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureInternalApi]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetVocabulariesAsZipFile()
         {
             try
@@ -212,7 +212,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(VocabularyDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureInternalApi]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetVocabularyById(
             [FromRoute] VocabularyIdDto vocabularyId)
         {

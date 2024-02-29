@@ -93,7 +93,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("ProcessInformation")]
         [ProducesResponseType(typeof(ProcessInfoDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureInternalApi]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetProcessInfo([FromQuery] bool active)
         {
             try

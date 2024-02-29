@@ -49,7 +49,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<TaxonListDefinitionDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureInternalApi]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetTaxonLists([FromQuery] string cultureCode = "sv-SE")
         {
             try
@@ -80,7 +80,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<TaxonListTaxonInformationDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureInternalApi]
+        [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetTaxa([FromRoute] int taxonListId)
         {
             try
