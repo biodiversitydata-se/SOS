@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://api.artdatabanken.se/species-observation-system-internal/v1"
+      "url": "https://api2.artdata.slu.se/species-observation-system/v1/"
     }
   ],
   "paths": {
