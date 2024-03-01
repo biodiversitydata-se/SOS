@@ -197,14 +197,44 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int? QuantityOfSubstrate { get; set; }
 
         /// <summary>
-        /// Triggered observation rule reproduction id
+        /// Triggered observation rule activity id
         /// </summary>
-        public int? TriggeredObservationRuleFrequencyId { get; set; }
+        public int? TriggeredObservationRuleActivityRuleId { get; set; }
 
         /// <summary>
         /// Triggered observation rule frequency id
         /// </summary>
+        public int? TriggeredObservationRuleFrequencyId { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule period id
+        /// </summary>
+        public int? TriggeredObservationRulePeriodRuleId { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule promt rule id
+        /// </summary>
+        public int? TriggeredObservationRulePromptRuleId { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule promts
+        /// </summary>
+        public bool? TriggeredObservationRulePrompts { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule regional sighting state
+        /// </summary>
+        public int? TriggeredObservationRuleRegionalSightingState { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule reproduction id
+        /// </summary>
         public int? TriggeredObservationRuleReproductionId { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule status rule
+        /// </summary>
+        public int? TriggeredObservationRuleStatusRuleId { get; set; }
 
         /// <summary>
         /// Triggered observation rule unspontaneous

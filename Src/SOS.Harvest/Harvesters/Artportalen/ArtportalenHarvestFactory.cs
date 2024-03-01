@@ -94,10 +94,15 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.SubstrateSpeciesId = entity.SubstrateSpeciesId;
                 observation.Summary = _artportalenMetadataContainer.TryGetSummary(entity.Summary, entity.IsFreeTextSummary);
                 observation.TaxonId = entity.TaxonId;
+                observation.TriggeredObservationRuleActivityRuleId = entity.TriggeredObservationRuleActivityRuleId;
                 observation.TriggeredObservationRuleFrequencyId = entity.TriggeredObservationRuleFrequencyId;
+                observation.TriggeredObservationRulePeriodRuleId = entity.TriggeredObservationRulePeriodRuleId;
+                observation.TriggeredObservationRulePromptRuleId = entity.TriggeredObservationRulePromptRuleId;
+                observation.TriggeredObservationRulePrompts= entity.TriggeredObservationRulePrompts;
+                observation.TriggeredObservationRuleRegionalSightingState = entity.TriggeredObservationRuleRegionalSightingState;
                 observation.TriggeredObservationRuleReproductionId = entity.TriggeredObservationRuleReproductionId;
+                observation.TriggeredObservationRuleStatusRuleId = entity.TriggeredObservationRuleStatusRuleId;
                 observation.TriggeredObservationRuleUnspontaneous = entity.TriggeredObservationRuleUnspontaneous;
-               // observation.TriggeredObservationRuleRegionalSightingState = entity.TriggeredObservationRuleRegionalSightingState;
                 observation.Unit = _artportalenMetadataContainer.TryGetUnit(entity.UnitId);
                 observation.Unspontaneous = entity.Unspontaneous;
                 observation.UnsureDetermination = entity.UnsureDetermination;

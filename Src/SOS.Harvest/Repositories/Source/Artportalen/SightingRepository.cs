@@ -34,8 +34,14 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
             if (DataService.Configuration?.UseTriggeredObservationRule ?? false)
             {
-                triggerRuleSelect = @"tor.FrequencyId AS TriggeredObservationRuleFrequencyId,
+                triggerRuleSelect = @"tor.ActivityRuleId AS TriggeredObservationRuleActivityRuleId,
+                tor.FrequencyId AS TriggeredObservationRuleFrequencyId,
+                tor.PeriodRuleId AS TriggeredObservationRulePeriodRuleId,
+                tor.PromptRuleId AS TriggeredObservationRulePromptRuleId,
+                CASE WHEN tor.Prompts IS NULL THEN NULL WHEN LEN(tor.Prompts) = 0 THEN 0 ELSE 1 END AS TriggeredObservationRulePrompts,
+                tor.RegionalSightingState AS TriggeredObservationRuleRegionalSightingState,
                 tor.ReproductionId AS TriggeredObservationRuleReproductionId,
+                tor.StatusRuleId AS TriggeredObservationRuleStatusRuleId,
                 tor.Unspontaneous AS TriggeredObservationRuleUnspontaneous";
                 //ISNULL(tor.RegionalSightingState, 0) AS TriggeredObservationRuleRegionalSightingState";
                 triggerRuleFrom = @"LEFT JOIN TriggeredObservationRule tor ON tor.SightingId = si.Id ";

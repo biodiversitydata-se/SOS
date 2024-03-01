@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Geometries;
+﻿using CSharpFunctionalExtensions;
+using NetTopologySuite.Geometries;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
@@ -492,10 +493,15 @@ namespace SOS.Harvest.Processors.Artportalen
                     ((verbatimObservation.ObserversInternal == null || verbatimObservation.ObserversInternal.Count() == 0) ||
                     (verbatimObservation.ObserversInternal?.Any(oi => oi.Id == verbatimObservation.ReportedByUserId) ?? false));
                 obs.ArtportalenInternal.Summary = verbatimObservation.Summary;
+                obs.ArtportalenInternal.TriggeredObservationRuleActivityRuleId = verbatimObservation.TriggeredObservationRuleActivityRuleId;
                 obs.ArtportalenInternal.TriggeredObservationRuleFrequencyId = verbatimObservation.TriggeredObservationRuleFrequencyId;
+                obs.ArtportalenInternal.TriggeredObservationRulePeriodRuleId = verbatimObservation.TriggeredObservationRulePeriodRuleId;
+                obs.ArtportalenInternal.TriggeredObservationRulePromptRuleId = verbatimObservation.TriggeredObservationRulePromptRuleId;
+                obs.ArtportalenInternal.TriggeredObservationRulePrompts = verbatimObservation.TriggeredObservationRulePrompts;
+                obs.ArtportalenInternal.TriggeredObservationRuleRegionalSightingState = verbatimObservation.TriggeredObservationRuleRegionalSightingState;
                 obs.ArtportalenInternal.TriggeredObservationRuleReproductionId = verbatimObservation.TriggeredObservationRuleReproductionId;
+                obs.ArtportalenInternal.TriggeredObservationRuleStatusRuleId = verbatimObservation.TriggeredObservationRuleStatusRuleId;
                 obs.ArtportalenInternal.TriggeredObservationRuleUnspontaneous = verbatimObservation.TriggeredObservationRuleUnspontaneous;
-               // obs.ArtportalenInternal.TriggeredObservationRuleRegionalSightingState = verbatimObservation.TriggeredObservationRuleRegionalSightingState;
 
                 var eventMonths = new HashSet<int>();
                 if (startDate.HasValue)
