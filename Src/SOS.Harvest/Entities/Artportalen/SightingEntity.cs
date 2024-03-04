@@ -268,17 +268,6 @@
         public int SightingTypeId { get; set; }
         public int SightingTypeSearchGroupId { get; set; }
 
-        public int? DeterminerUserId { get; set; }
-
-        public int? DeterminationYear { get; set; }
-
-        public int? ConfirmatorUserId { get; set; }
-
-        public int? ConfirmationYear { get; set; }
-
-        //[Obsolete("This is too be deleted")]
-        //public int? RegionalSightingStateId { get; set; }
-
         /// <summary>
         /// Triggered observation rule activity id
         /// </summary>

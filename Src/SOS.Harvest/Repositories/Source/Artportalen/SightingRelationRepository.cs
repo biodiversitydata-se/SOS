@@ -25,8 +25,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                sr.UserId,
 	                sr.SightingRelationTypeId,
                     sr.Discover,
-	                sr.Sort,
-	                sr.IsPublic,	                
+	                sr.Sort,              
 	                sr.DeterminationYear
                 FROM
 	                [SightingRelation] sr

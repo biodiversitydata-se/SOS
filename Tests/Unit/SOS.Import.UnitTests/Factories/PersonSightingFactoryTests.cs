@@ -23,7 +23,7 @@ namespace SOS.Import.UnitTests.Managers
             var speciesCollectionItemsBySightingId = new Dictionary<int, ICollection<SpeciesCollectionItemEntity>>();
             var sightingRelations = new List<SightingRelation>()
             {
-                new SightingRelation { SightingId=1, UserId=1, SightingRelationTypeId = (int)SightingRelationTypeId.Reporter, IsPublic = true }
+                new SightingRelation { SightingId=1, UserId=1, SightingRelationTypeId = (int)SightingRelationTypeId.Reporter }
             };
             var personByUserId = new Dictionary<int, Person>()
             {

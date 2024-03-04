@@ -5,6 +5,10 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
 {
     public class PersonSighting
     {
+        public string ConfirmedBy { get; set; }
+        public int? ConfirmationYear { get; set; }
+        public string DeterminedBy { get; set; }
+        public int? DeterminationYear { get; set; }
         public string Observers { get; set; }
         public IEnumerable<UserInternal> ObserversInternal { get; set; }
         public string VerifiedBy { get; set; }

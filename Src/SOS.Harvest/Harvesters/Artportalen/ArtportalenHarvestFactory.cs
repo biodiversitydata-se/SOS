@@ -112,11 +112,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 observation.Projects = projects;
                 observation.SightingTypeId = entity.SightingTypeId;
                 observation.SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId;
-                observation.DeterminedBy = (await _artportalenMetadataContainer.TryGetPersonByUserIdAsync(entity.DeterminerUserId))?.FullName;
-                observation.DeterminationYear = entity.DeterminationYear;
-                observation.ConfirmedBy = (await _artportalenMetadataContainer.TryGetPersonByUserIdAsync(entity.ConfirmatorUserId))?.FullName;
-                observation.ConfirmationYear = entity.ConfirmationYear;
-
+                
                 //observation.RegionalSightingStateId = entity.RegionalSightingStateId;
                 observation.SightingPublishTypeIds = ConvertCsvStringToListOfIntegers(entity.SightingPublishTypeIds);
                 observation.SpeciesFactsIds = ConvertCsvStringToListOfIntegers(entity.SpeciesFactsIds);
@@ -134,6 +130,10 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 if (personSighting != null)
                 {
+                    observation.ConfirmedBy = personSighting.ConfirmedBy;
+                    observation.ConfirmationYear = personSighting.ConfirmationYear;
+                    observation.DeterminedBy = personSighting.DeterminedBy;
+                    observation.DeterminationYear = personSighting.DeterminationYear;
                     observation.VerifiedBy = personSighting.VerifiedBy;
                     observation.VerifiedByInternal = personSighting.VerifiedByInternal;
                     observation.Observers = personSighting.Observers;
@@ -353,12 +353,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
             return from e in entities
                    select new SightingRelation
                    {
+                       Id = e.Id,
                        DeterminationYear = e.DeterminationYear,
                        Discover = e.Discover,
-                       EditDate = e.EditDate,
-                       Id = e.Id,
-                       IsPublic = e.IsPublic,
-                       RegisterDate = e.RegisterDate,
                        SightingId = e.SightingId,
                        SightingRelationTypeId = e.SightingRelationTypeId,
                        Sort = e.Sort,

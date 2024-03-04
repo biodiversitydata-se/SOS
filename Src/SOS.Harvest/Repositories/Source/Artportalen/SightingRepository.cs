@@ -102,10 +102,6 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     s.FieldDiaryGroupId,
                     ssu.Summary,
                     ISNULL(ssu.FreeTextSummary, 0) AS IsFreeTextSummary,
-	                srDeterminer.UserId AS DeterminerUserId,
-	                srDeterminer.DeterminationYear AS DeterminationYear,
-	                srConfirmator.UserId AS ConfirmatorUserId,
-	                srConfirmator.DeterminationYear AS ConfirmationYear,
 	                {triggerRuleSelect},
                     (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = si.Id group by SightingId) AS SightingPublishTypeIds,
                     (select string_agg(SpeciesFactId , ',') from SpeciesFactTaxon sft where sft.TaxonId = s.TaxonId AND sft.IsSearchFilter = 1 group by sft.TaxonId) AS SpeciesFactsIds,
@@ -122,8 +118,6 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 					LEFT JOIN SightingDescription sdb ON sdb.Id = si.SightingBiotopeDescriptionId
 					LEFT JOIN SightingDescription sds ON sds.Id = si.SightingSubstrateDescriptionId 
 					LEFT JOIN SightingDescription sdss ON sdss.Id = si.SightingSubstrateSpeciesDescriptionId
-                    LEFT JOIN SightingRelation srDeterminer ON srDeterminer.SightingId = si.Id AND srDeterminer.IsPublic = 1 AND srDeterminer.SightingRelationTypeId = 3
-                    LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = si.Id AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
                     LEFT JOIN SightingSummary ssu ON ssu.Id = si.SightingSummaryId
                     {triggerRuleFrom}
                     LEFT JOIN SightingDatasource sdc ON sdc.SightingId = si.Id 

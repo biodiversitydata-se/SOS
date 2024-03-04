@@ -97,29 +97,13 @@ namespace SOS.Harvest.Factories
             }
 
             //------------------------------------------------------------------------------
-            // Add ReportedBy values
+            // Add ConfirmedBy, DeterminedBy and ReportedBy values
             //------------------------------------------------------------------------------
-            var reportedBySightingId = CreateReportedByDictionary(
+            Populate(
+                personSightingBySightingId,
                 sightingRelations!,
                 personsByUserId);
-
-            if (reportedBySightingId?.Any() ?? false)
-            {
-                foreach (var pair in reportedBySightingId)
-                {
-                    if (!personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
-                    {
-                        personSighting = new PersonSighting();
-                        personSightingBySightingId.Add(pair.Key, personSighting);
-                    }
-
-                    personSighting.ReportedBy = pair.Value.FullName;
-                    personSighting.ReportedByUserId = pair.Value.UserId;
-                    personSighting.ReportedByUserServiceUserId = pair.Value.UserServiceUserId;
-                    personSighting.ReportedByUserAlias = pair.Value.Alias;
-
-                }
-            }
+            
 
             //------------------------------------------------------------------------------
             // Set Observers to ReportedBy when Observers value is null
@@ -133,6 +117,75 @@ namespace SOS.Harvest.Factories
             }
 
             return personSightingBySightingId;
+        }
+
+        private static void Populate(
+            IDictionary<int, PersonSighting> personSightingBySightingId,
+            IEnumerable<SightingRelation>? sightingRelations,
+            IDictionary<int, Person>? personsByUserId)
+        {
+           
+            if ((!sightingRelations?.Any() ?? true) || (!personsByUserId?.Any() ?? true))
+            {
+                return;
+            }
+            
+            foreach (var sightingRelation in sightingRelations!)
+            {
+                if (personsByUserId!.TryGetValue(sightingRelation.UserId, out var person))
+                {
+                    if (!personSightingBySightingId.TryGetValue(sightingRelation.SightingId, out var personSighting))
+                    {
+                        personSighting = new PersonSighting();
+                        personSightingBySightingId.Add(sightingRelation.SightingId, personSighting);
+                    }
+
+                    switch ((SightingRelationTypeId)sightingRelation.SightingRelationTypeId)
+                    {
+                        case SightingRelationTypeId.Confirmator:
+                            personSighting.ConfirmedBy = person.FullName;
+                            personSighting.ConfirmationYear = sightingRelation.DeterminationYear;
+                            break;
+                        case SightingRelationTypeId.Determiner:
+                            personSighting.DeterminedBy = person.FullName;
+                            personSighting.DeterminationYear = sightingRelation.DeterminationYear;
+                            break;
+                        case SightingRelationTypeId.Reporter:
+                            personSighting.ReportedBy = person.FullName;
+                            personSighting.ReportedByUserId = person.UserId;
+                            personSighting.ReportedByUserServiceUserId = person.UserServiceUserId;
+                            personSighting.ReportedByUserAlias = person.Alias;
+                            break;
+                    }
+                }
+            }
+        }
+
+        private static IDictionary<int, (Person Person, int? determinationYear)> CreateSightingRelationDictionary(SightingRelationTypeId sightingRelationType,
+           IEnumerable<SightingRelation>? sightingRelations,
+           IDictionary<int, Person>? personsByUserId)
+        {
+            var reportedBySightingId = new Dictionary<int, (Person Person, int? determinationYear)>();
+
+            if ((!sightingRelations?.Any() ?? true) || (!personsByUserId?.Any() ?? true))
+            {
+                return reportedBySightingId;
+            }
+
+            var query = sightingRelations!
+                .Where(y => y.SightingRelationTypeId == (int)sightingRelationType);
+            foreach (var sightingRelation in query)
+            {
+                if (personsByUserId!.TryGetValue(sightingRelation.UserId, out var person))
+                {
+                    if (!reportedBySightingId.ContainsKey(sightingRelation.SightingId))
+                    {
+                        reportedBySightingId.Add(sightingRelation.SightingId, (person, sightingRelation.DeterminationYear));
+                    }
+                }
+            }
+
+            return reportedBySightingId;
         }
 
         private static Dictionary<int, string> CreateSpeciesCollectionDictionary(
@@ -196,7 +249,7 @@ namespace SOS.Harvest.Factories
             }
 
             var query = sightingRelations!
-                .Where(y => y.SightingRelationTypeId == (int)SightingRelationTypeId.Observer && y.IsPublic)
+                .Where(y => y.SightingRelationTypeId == (int)SightingRelationTypeId.Observer)
                 .GroupBy(y => y.SightingId);
             foreach (var grouping in query)
             {
@@ -217,33 +270,6 @@ namespace SOS.Harvest.Factories
             }
 
             return observersBySightingId;
-        }
-
-        private static IDictionary<int, Person> CreateReportedByDictionary(
-            IEnumerable<SightingRelation>? sightingRelations,
-            IDictionary<int, Person>? personsByUserId)
-        {
-            var reportedBySightingId = new Dictionary<int, Person>();
-
-            if ((!sightingRelations?.Any() ?? true) || (!personsByUserId?.Any() ?? true))
-            {
-                return reportedBySightingId;
-            }
-
-            var query = sightingRelations!
-                .Where(y => y.SightingRelationTypeId == (int)SightingRelationTypeId.Reporter && y.IsPublic);
-            foreach (var sightingRelation in query)
-            {
-                if (personsByUserId!.TryGetValue(sightingRelation.UserId, out var person))
-                {
-                    if (!reportedBySightingId.ContainsKey(sightingRelation.SightingId))
-                    {
-                        reportedBySightingId.Add(sightingRelation.SightingId, person);
-                    }
-                }
-            }
-
-            return reportedBySightingId;
         }
 
 
@@ -277,7 +303,6 @@ namespace SOS.Harvest.Factories
 
             var determinerQuery = sightingRelations!.Where(x =>
                 x.SightingRelationTypeId == (int)SightingRelationTypeId.Determiner
-                && x.IsPublic
                 && x.Sort == 0);
 
             foreach (var determinerRelation in determinerQuery)
@@ -311,7 +336,6 @@ namespace SOS.Harvest.Factories
 
             var confirmatorQuery = sightingRelations!.Where(x =>
                 x.SightingRelationTypeId == (int)SightingRelationTypeId.Confirmator
-                && x.IsPublic
                 && x.Sort == 0);
 
             foreach (var confirmatorRelation in confirmatorQuery)
