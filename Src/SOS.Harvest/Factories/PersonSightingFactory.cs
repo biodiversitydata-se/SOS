@@ -1,5 +1,4 @@
 ﻿using SOS.Harvest.Entities.Artportalen;
-using SOS.Harvest.Extensions;
 using SOS.Harvest.Repositories.Source.Artportalen.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -75,36 +74,13 @@ namespace SOS.Harvest.Factories
             }
 
             //------------------------------------------------------------------------------
-            // Add Observers values
+            // Add ConfirmedBy, DeterminedBy, Observers and ReportedBy
             //------------------------------------------------------------------------------
-            var observersBySightingId = CreateObserversDictionary(
-                sightingRelations!,
-                personsByUserId);
-
-            if (observersBySightingId?.Any() ?? false)
-            {
-                foreach (var pair in observersBySightingId)
-                {
-                    if (!personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
-                    {
-                        personSighting = new PersonSighting();
-                        personSightingBySightingId.Add(pair.Key, personSighting);
-                    }
-
-                    personSighting.Observers = pair.Value.names;
-                    personSighting.ObserversInternal = pair.Value.users;
-                }
-            }
-
-            //------------------------------------------------------------------------------
-            // Add ConfirmedBy, DeterminedBy and ReportedBy values
-            //------------------------------------------------------------------------------
-            Populate(
+            PopulateRelations(
                 personSightingBySightingId,
                 sightingRelations!,
                 personsByUserId);
             
-
             //------------------------------------------------------------------------------
             // Set Observers to ReportedBy when Observers value is null
             //------------------------------------------------------------------------------
@@ -117,75 +93,6 @@ namespace SOS.Harvest.Factories
             }
 
             return personSightingBySightingId;
-        }
-
-        private static void Populate(
-            IDictionary<int, PersonSighting> personSightingBySightingId,
-            IEnumerable<SightingRelation>? sightingRelations,
-            IDictionary<int, Person>? personsByUserId)
-        {
-           
-            if ((!sightingRelations?.Any() ?? true) || (!personsByUserId?.Any() ?? true))
-            {
-                return;
-            }
-            
-            foreach (var sightingRelation in sightingRelations!)
-            {
-                if (personsByUserId!.TryGetValue(sightingRelation.UserId, out var person))
-                {
-                    if (!personSightingBySightingId.TryGetValue(sightingRelation.SightingId, out var personSighting))
-                    {
-                        personSighting = new PersonSighting();
-                        personSightingBySightingId.Add(sightingRelation.SightingId, personSighting);
-                    }
-
-                    switch ((SightingRelationTypeId)sightingRelation.SightingRelationTypeId)
-                    {
-                        case SightingRelationTypeId.Confirmator:
-                            personSighting.ConfirmedBy = person.FullName;
-                            personSighting.ConfirmationYear = sightingRelation.DeterminationYear;
-                            break;
-                        case SightingRelationTypeId.Determiner:
-                            personSighting.DeterminedBy = person.FullName;
-                            personSighting.DeterminationYear = sightingRelation.DeterminationYear;
-                            break;
-                        case SightingRelationTypeId.Reporter:
-                            personSighting.ReportedBy = person.FullName;
-                            personSighting.ReportedByUserId = person.UserId;
-                            personSighting.ReportedByUserServiceUserId = person.UserServiceUserId;
-                            personSighting.ReportedByUserAlias = person.Alias;
-                            break;
-                    }
-                }
-            }
-        }
-
-        private static IDictionary<int, (Person Person, int? determinationYear)> CreateSightingRelationDictionary(SightingRelationTypeId sightingRelationType,
-           IEnumerable<SightingRelation>? sightingRelations,
-           IDictionary<int, Person>? personsByUserId)
-        {
-            var reportedBySightingId = new Dictionary<int, (Person Person, int? determinationYear)>();
-
-            if ((!sightingRelations?.Any() ?? true) || (!personsByUserId?.Any() ?? true))
-            {
-                return reportedBySightingId;
-            }
-
-            var query = sightingRelations!
-                .Where(y => y.SightingRelationTypeId == (int)sightingRelationType);
-            foreach (var sightingRelation in query)
-            {
-                if (personsByUserId!.TryGetValue(sightingRelation.UserId, out var person))
-                {
-                    if (!reportedBySightingId.ContainsKey(sightingRelation.SightingId))
-                    {
-                        reportedBySightingId.Add(sightingRelation.SightingId, (person, sightingRelation.DeterminationYear));
-                    }
-                }
-            }
-
-            return reportedBySightingId;
         }
 
         private static Dictionary<int, string> CreateSpeciesCollectionDictionary(
@@ -237,41 +144,68 @@ namespace SOS.Harvest.Factories
             return speciesCollectionBySightingId;
         }
 
-        private static IDictionary<int, (string? names, IEnumerable<UserInternal> users)> CreateObserversDictionary(
+        private static void PopulateRelations(
+            IDictionary<int, PersonSighting> personSightingBySightingId,
             IEnumerable<SightingRelation>? sightingRelations,
             IDictionary<int, Person>? personsByUserId)
         {
-            var observersBySightingId = new Dictionary<int, (string? names, IEnumerable<UserInternal> alias)>();
 
             if ((!sightingRelations?.Any() ?? true) || (!personsByUserId?.Any() ?? true))
             {
-                return observersBySightingId;
+                return;
             }
 
-            var query = sightingRelations!
-                .Where(y => y.SightingRelationTypeId == (int)SightingRelationTypeId.Observer)
-                .GroupBy(y => y.SightingId);
-            foreach (var grouping in query)
+            foreach (var sightingRelation in sightingRelations!)
             {
-                var persons = grouping.Where(p => personsByUserId!.ContainsKey(p.UserId))
-                    .OrderByDescending(ob => ob.Sort)
-                    .Select(v => (person: personsByUserId![v.UserId], viewAccess: v.SightingRelationTypeId.Equals(2), discover: v.Discover));
-                var observers = string.Join(", ", persons.Select(n => n.person.FullName)).WithMaxLength(256);
-                observersBySightingId.Add(grouping.Key,
-                    (observers, persons.Select(g => new UserInternal
+                if (personsByUserId!.TryGetValue(sightingRelation.UserId, out var person))
+                {
+                    if (!personSightingBySightingId.TryGetValue(sightingRelation.SightingId, out var personSighting))
                     {
-                        Discover = g.discover,
-                        Id = g.person.UserId,
-                        PersonId = g.person.Id,
-                        UserServiceUserId = g.person.UserServiceUserId,
-                        UserAlias = g.person.Alias,
-                        ViewAccess = g.viewAccess
-                    })));
+                        personSighting = new PersonSighting();
+                        personSightingBySightingId.Add(sightingRelation.SightingId, personSighting);
+                    }
+
+                    switch ((SightingRelationTypeId)sightingRelation.SightingRelationTypeId)
+                    {
+                        case SightingRelationTypeId.Confirmator:
+                            personSighting.ConfirmedBy = person.FullName;
+                            personSighting.ConfirmationYear = sightingRelation.DeterminationYear;
+                            break;
+                        case SightingRelationTypeId.Determiner:
+                            personSighting.DeterminedBy = person.FullName;
+                            personSighting.DeterminationYear = sightingRelation.DeterminationYear;
+                            break;
+                        case SightingRelationTypeId.Observer:
+                            if (!personSighting.ObserversInternal?.Any() ?? true)
+                            {
+                                personSighting.ObserversInternal = new List<UserInternal>();
+                            }
+                            personSighting.ObserversInternal!.Add(new UserInternal
+                            {
+                                Discover = sightingRelation.Discover,
+                                Id = person.UserId,
+                                PersonId = person.Id,
+                                UserServiceUserId = person.UserServiceUserId,
+                                UserAlias = person.Alias,
+                                ViewAccess = true
+                            });
+
+                            if ((personSighting.Observers?.Length ?? 0) < 256)
+                            {
+                                personSighting.Observers += $"{(string.IsNullOrEmpty(personSighting.Observers) ? "" : ", ")}{person.FullName}";
+                            }
+
+                            break;
+                        case SightingRelationTypeId.Reporter:
+                            personSighting.ReportedBy = person.FullName;
+                            personSighting.ReportedByUserId = person.UserId;
+                            personSighting.ReportedByUserServiceUserId = person.UserServiceUserId;
+                            personSighting.ReportedByUserAlias = person.Alias;
+                            break;
+                    }
+                }
             }
-
-            return observersBySightingId;
         }
-
 
         private static Dictionary<int, (string? names, UserInternal? determiner, UserInternal? confirmator)>?
             CreateVerifiedByStringDictionary(

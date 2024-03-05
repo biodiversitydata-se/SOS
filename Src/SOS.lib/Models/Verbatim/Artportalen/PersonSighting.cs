@@ -10,9 +10,9 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string DeterminedBy { get; set; }
         public int? DeterminationYear { get; set; }
         public string Observers { get; set; }
-        public IEnumerable<UserInternal> ObserversInternal { get; set; }
+        public ICollection<UserInternal> ObserversInternal { get; set; }
         public string VerifiedBy { get; set; }
-        public IEnumerable<UserInternal> VerifiedByInternal { get; set; }
+        public ICollection<UserInternal> VerifiedByInternal { get; set; }
         public string ReportedBy { get; set; }
         public int ReportedByUserId { get; set; }
         public int? ReportedByUserServiceUserId { get; set; }
