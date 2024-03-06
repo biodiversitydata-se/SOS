@@ -365,6 +365,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string AccessRights => _observation?.AccessRights?.ToString();
         public int? AccessRightsId => _observation?.AccessRights?.Id;
         public string AccessRightsValue => _observation?.AccessRights?.Value;
+        public bool? IsGeneralized => _observation?.IsGeneralized;
         public string BasisOfRecord => _observation?.BasisOfRecord?.ToString();
         public int? BasisOfRecordId => _observation?.BasisOfRecord?.Id;
         public string BasisOfRecordValue => _observation?.BasisOfRecord?.Value;
@@ -445,6 +446,7 @@ namespace SOS.Lib.Models.Processed.Observation
                 "accessrights" => AccessRights,
                 "accessrights.id" => AccessRightsId,
                 "accessrights.value" => AccessRightsValue,
+                "isgeneralized" => IsGeneralized,
                 "basisofrecord" => BasisOfRecord,
                 "basisofrecord.id" => BasisOfRecordId,
                 "basisofrecord.value" => BasisOfRecordValue,

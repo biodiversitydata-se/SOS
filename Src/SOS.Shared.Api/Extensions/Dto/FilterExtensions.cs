@@ -48,7 +48,7 @@ namespace SOS.Shared.Api.Extensions.Dto
             {
                 isOnlyNotPresentOrRecoveredFilterSet = true;
             }
-
+            
             filter.DiffusionStatuses = searchFilterBaseDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus)dsd)?.ToList();
             filter.DeterminationFilter = (SightingDeterminationFilter)(searchFilterBaseDto.DeterminationFilter ?? SightingDeterminationFilterDto.NoFilter);
             filter.Output = new OutputFilter();
@@ -75,6 +75,24 @@ namespace SOS.Shared.Api.Extensions.Dto
                     filterInternal.Output.PopulateFields(searchFilterInternalDto.Output?.FieldSet);
                     filterInternal.Output.SortOrders = searchFilterInternalDto.Output?.SortOrders?.Select(so => new SortOrderFilter { SortBy = so.SortBy, SortOrder = so.SortOrder });
                 }
+
+                filter.IncludeSensitiveGeneralizedObservations = searchFilterInternalBaseDto?.GeneralizationFilter?.SensitiveGeneralizationFilter switch
+                {
+                    SensitiveGeneralizationFilterDto.DontIncludeGeneralizedObservations => false,
+                    SensitiveGeneralizationFilterDto.OnlyGeneralizedObservations => true,
+                    SensitiveGeneralizationFilterDto.IncludeGeneralizedObservations => null,
+                    null => false,
+                    _ => false
+                };
+
+                filter.IsPublicGeneralizedObservation = searchFilterInternalBaseDto?.GeneralizationFilter?.PublicGeneralizationFilter switch
+                {
+                    PublicGeneralizationFilterDto.DontIncludeGeneralized => false,
+                    PublicGeneralizationFilterDto.OnlyGeneralized => true,
+                    PublicGeneralizationFilterDto.NoFilter => null,
+                    null => null,
+                    _ => null
+                };
             }
 
             if (searchFilterBaseDto.OccurrenceStatus != null)

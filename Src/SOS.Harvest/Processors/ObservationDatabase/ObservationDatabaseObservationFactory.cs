@@ -9,6 +9,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.FishData;
 using SOS.Lib.Models.Verbatim.ObservationDatabase;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
@@ -240,6 +241,16 @@ namespace SOS.Harvest.Processors.ObservationDatabase
             }
 
             return dic;
+        }
+
+        public bool IsVerbatimObservationDiffusedByProvider(FishDataObservationVerbatim verbatim)
+        {
+            return false;
+        }
+
+        public bool IsVerbatimObservationDiffusedByProvider(ObservationDatabaseVerbatim verbatim)
+        {
+            return false;
         }
     }
 }

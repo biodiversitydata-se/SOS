@@ -291,12 +291,13 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 var obs = new Observation
                 {
-                    DiffusionStatus = diffuse ? DiffusionStatus.DiffusedByProvider : DiffusionStatus.NotDiffused
+                    DiffusionStatus = diffuse ? DiffusionStatus.DiffusedByProvider : DiffusionStatus.NotDiffused,
+                    IsGeneralized = diffuse
                 };
 
                 // Record level
                 obs.DataProviderId = DataProvider.Id;
-                obs.AccessRights = (verbatimObservation.ProtectedBySystem || verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) > DateTime.Now) && !diffuse
+                obs.AccessRights = (verbatimObservation.ProtectedBySystem || verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) > DateTime.Now) // && !diffuse
                     ? new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage }
                     : new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
                 obs.BasisOfRecord = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
@@ -372,7 +373,7 @@ namespace SOS.Harvest.Processors.Artportalen
                         CoordinateSys.WebMercator,
                         (Point)(diffuse ? site.PointDiffused : site.Point)?.ToGeometry()!,
                         diffuse ? site.PointWithBufferDiffused : site.PointWithBuffer,
-                        site.Accuracy,
+                        diffuse ? site.DiffusionId : site.Accuracy,
                         taxon?.Attributes?.DisturbanceRadius
                     );
                 }
@@ -399,7 +400,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
                 obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
                 //obs.Occurrence.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
-                obs.Occurrence.SensitivityCategory = diffuse ? 1 : CalculateSensitivityCategory(taxon!, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
+                obs.Occurrence.SensitivityCategory = CalculateSensitivityCategory(taxon!, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.Occurrence.ReportedBy = verbatimObservation.ReportedBy.Clean();
                 obs.Occurrence.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
                 obs.Occurrence.RecordedBy = verbatimObservation.Observers.Clean();
@@ -983,6 +984,11 @@ namespace SOS.Harvest.Processors.Artportalen
             }
 
             return datasetMapping;
+        }
+
+        public bool IsVerbatimObservationDiffusedByProvider(ArtportalenObservationVerbatim verbatim)
+        {
+            return (verbatim.Site?.DiffusionId ?? 0) > 0;
         }
 
         public class DatasetMapping

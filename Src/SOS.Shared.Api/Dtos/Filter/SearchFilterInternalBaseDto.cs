@@ -13,6 +13,11 @@ namespace SOS.Shared.Api.Dtos.Filter
         public ExtendedFilterDto? ExtendedFilter{ get; set; }
 
         /// <summary>
+        /// Generalization filter.
+        /// </summary>
+        public GeneralizationFilterDto? GeneralizationFilter { get; set; }        
+
+        /// <summary>
         /// Observation protection filter
         /// </summary>
         public ProtectionFilterDto? ProtectionFilter { get; set; }

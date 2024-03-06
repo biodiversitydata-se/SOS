@@ -504,9 +504,9 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
         {
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
             builder.With((obs, index) =>
-            {
-                obs.ProtectedBySystem = true;
-                obs.Site.DiffusionId = diffusionId;                
+            {                
+                obs.Site.DiffusionId = diffusionId;
+                obs.Site.Accuracy = diffusionId / 10;
                 obs.Site.XCoordDiffused = obs.Site.XCoord + diffusionId;
                 obs.Site.YCoordDiffused = obs.Site.YCoord + diffusionId;
                 Point? diffusedWebMercatorPoint = new Point(obs.Site.XCoordDiffused.Value, obs.Site.YCoordDiffused.Value);

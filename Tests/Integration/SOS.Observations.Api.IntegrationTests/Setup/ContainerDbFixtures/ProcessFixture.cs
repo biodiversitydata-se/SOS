@@ -4,6 +4,7 @@ using SOS.Harvest.DarwinCore;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Cache;
@@ -30,12 +31,14 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
+using System.Collections.Concurrent;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
 public class ProcessFixture : IProcessFixture
@@ -207,6 +210,22 @@ public class ProcessFixture : IProcessFixture
         await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: false, waitForCompletion: true);
         await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: true, waitForCompletion: true);
         await _processedChecklistRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
+    }
+
+    public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearchUsingObservationProcessor(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+    {
+        ConcurrentDictionary<string, Observation> publicObservations;
+        ConcurrentDictionary<string, Observation> sensitiveObservations;
+        ObservationProcessorBase<ArtportalenObservationProcessor, ArtportalenObservationVerbatim, IArtportalenVerbatimRepository>.ProcessObservationsBatch(
+            verbatimObservations,
+            _artportalenObservationFactory,
+            out publicObservations,
+            out sensitiveObservations);
+        var processedObservations = publicObservations.Values.Concat(sensitiveObservations.Values).ToList();
+
+        //var processedObservations = ProcessObservations(verbatimObservations, enableDiffusion);
+        await AddObservationsToElasticsearchAsync(processedObservations, true, 0);
+        return processedObservations;
     }
 
     public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations, bool enableDiffusion = false)

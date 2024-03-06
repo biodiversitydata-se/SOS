@@ -51,6 +51,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public DiffusionStatus DiffusionStatus { get; set; }
 
         /// <summary>
+        /// Indicates whether the location is generalized.
+        /// </summary>
+        public bool IsGeneralized { get; set; }
+
+        /// <summary>
+        /// Indicates whether there exists a generalized location in other index.
+        /// </summary>
+        public bool HasGeneralizedObservationInOtherIndex { get; set; }
+
+        /// <summary>
         ///     The category of information pertaining to an event (an
         ///     action that occurs at a place and during a period of time).
         /// </summary>

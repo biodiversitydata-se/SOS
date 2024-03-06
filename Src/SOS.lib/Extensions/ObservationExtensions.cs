@@ -22,7 +22,7 @@ namespace SOS.Lib.Extensions
 
         public static bool ShallBeProtected(this Observation observation)
         {
-            return observation.DiffusionStatus == DiffusionStatus.NotDiffused && (observation.Occurrence.SensitivityCategory > 2 || observation.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage);
+            return observation.Occurrence.SensitivityCategory > 2 || observation.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage;
         }
 
         /// <summary>

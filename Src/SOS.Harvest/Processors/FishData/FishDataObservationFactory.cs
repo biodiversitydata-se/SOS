@@ -136,5 +136,10 @@ namespace SOS.Harvest.Processors.FishData
         {
             return dyntaxaTaxonId != 0;
         }
+
+        public bool IsVerbatimObservationDiffusedByProvider(FishDataObservationVerbatim verbatim)
+        {
+            return false;
+        }
     }
 }

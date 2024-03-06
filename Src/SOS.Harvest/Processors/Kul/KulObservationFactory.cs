@@ -7,6 +7,7 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.FishData;
 using SOS.Lib.Models.Verbatim.Kul;
 
 namespace SOS.Harvest.Processors.Kul
@@ -136,6 +137,16 @@ namespace SOS.Harvest.Processors.Kul
         private bool GetIsPositiveObservation(int dyntaxaTaxonId)
         {
             return dyntaxaTaxonId != 0;
+        }
+
+        public bool IsVerbatimObservationDiffusedByProvider(FishDataObservationVerbatim verbatim)
+        {
+            return false;
+        }
+
+        public bool IsVerbatimObservationDiffusedByProvider(KulObservationVerbatim verbatim)
+        {
+            return false;
         }
     }
 }

@@ -3255,6 +3255,18 @@
     "FieldSet": "Extended"
   },
   {
+    "PropertyName": "IsGeneralized",
+    "PropertyPath": "IsGeneralized",
+    "SwedishTitle": "Diffuserad",
+    "EnglishTitle": "Generalized",
+    "DataType": "Boolean",
+    "DataTypeIsNullable": false,
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "IsGeneralized",
+    "FieldSet": "AllWithValues"
+  },
+  {
     "PropertyName": "DiffusionStatus",
     "PropertyPath": "DiffusionStatus",
     "SwedishTitle": "Diffusionsstatus",

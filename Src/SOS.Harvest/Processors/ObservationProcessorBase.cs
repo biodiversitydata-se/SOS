@@ -8,6 +8,7 @@ using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
@@ -296,82 +297,20 @@ namespace SOS.Harvest.Processors
                 }
 
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({batchId})");
-
-                var publicObservations = new ConcurrentDictionary<string, Observation>();
-                var sensitiveObservations = new ConcurrentDictionary<string, Observation>();
-
-                foreach (var verbatimObservation in verbatimObservationsBatch!)
-                {
-                    var processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
-                    var observation = observationFactory.CreateProcessedObservation(verbatimObservation, !EnableDiffusion);
-                    TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
-
-                    if (observation == null)
-                    {
-                        continue;
-                    }
-
-                    if (_logGarbageCharFields)
-                    {
-                        var objectHelper = new ObjectHelper();
-                        var propsWithGarabageChars = objectHelper.GetPropertiesWithGarbageChars(observation);
-
-                        if (propsWithGarabageChars.Any())
-                        {
-                            Logger.LogDebug($"Garbage chars {dataProvider.Identifier}, id: {observation.Occurrence?.OccurrenceId}, field/s: {string.Join('|', propsWithGarabageChars)}");
-                        }
-                    }
-
-                    // If observation is protected
-                    if (observation.ShallBeProtected())
-                    {
-                        observation.Sensitive = true;
-                        sensitiveObservations.TryAdd(observation.Occurrence!.OccurrenceId, observation);
-
-                        //If it is a protected sighting, public users should not be possible to find it in the current month 
-                        if (!EnableDiffusion || 
-                            (
-                                observation.Occurrence.SensitivityCategory > 2 && 
-                                (observation.Event?.StartDate?.Year ?? 0) == DateTime.Now.Year || 
-                                (observation?.Event?.EndDate?.Year ?? 0) == DateTime.Now.Year
-                            ) &&
-                            (
-                                (observation!.Event?.StartDate?.Month ?? 0) == DateTime.Now.Month || 
-                                (observation?.Event?.EndDate?.Month ?? 0) == DateTime.Now.Month
-                            )
-                        )
-                        {
-                            continue;
-                        }
-
-                        // Recreate observation, diffused if provider supports diffusing 
-                        processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
-                        observation = observationFactory.CreateProcessedObservation(verbatimObservation, true);
-
-                        TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
-
-                        // If provider don't support diffusion, we provide it for them
-                        if (observation!.DiffusionStatus != DiffusionStatus.DiffusedByProvider)
-                        {
-                            if (!dataProvider.AllowSystemDiffusion)
-                            {
-                                continue;
-                            }
-                            var diffuseTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.Diffuse);
-
-                            // Diffuse protected observation before adding it to public index. 
-                            _diffusionManager.DiffuseObservation(observation);
-
-                            TimeManager.Stop(ProcessTimeManager.TimerTypes.Diffuse, diffuseTimerSessionId);
-                        }
-                    }
-
-                    // Add public observation
-                    publicObservations.TryAdd(observation.Occurrence!.OccurrenceId, observation);
-                }
+                ConcurrentDictionary<string, Observation> publicObservations, sensitiveObservations;
+                ProcessObservationsBatch(                    
+                    verbatimObservationsBatch, 
+                    observationFactory,                     
+                    out publicObservations, 
+                    out sensitiveObservations);
                 verbatimObservationsBatch = null!;
 
                 Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({batchId})");
+
+                if (_logGarbageCharFields)
+                {                    
+                    LogGarbageCharFields(dataProvider, publicObservations.Values, sensitiveObservations.Values);
+                }
 
                 // If incremental harvest
                 if (mode != JobRunModes.Full)
@@ -418,6 +357,122 @@ namespace SOS.Harvest.Processors
             {
                 Logger.LogError(e, $"Process {dataProvider.Identifier} observations, batch {batchId} failed");
                 throw;
+            }
+        }
+
+        public static void ProcessObservationsBatch(                
+                IEnumerable<TVerbatim> verbatimObservationsBatch, 
+                IObservationFactory<TVerbatim> observationFactory,                
+                out ConcurrentDictionary<string, Observation> publicObservations, 
+                out ConcurrentDictionary<string, Observation> sensitiveObservations)
+        {
+            publicObservations = new ConcurrentDictionary<string, Observation>();
+            sensitiveObservations = new ConcurrentDictionary<string, Observation>();
+            foreach (var verbatimObservation in verbatimObservationsBatch!)
+            {
+                Observation? observation;
+                if (observationFactory.IsVerbatimObservationDiffusedByProvider(verbatimObservation))
+                {
+                    observation = observationFactory.CreateProcessedObservation(verbatimObservation, true);
+                    if (observation.ShallBeProtected())
+                    {
+                        // If the observation shall be protected, then create the observation with real coordinates.
+                        observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
+                    }
+                    else
+                    {
+                        // Add duplicate observation with real coordinates to sensitive index.
+                        var observationWithRealCoordinates = observationFactory.CreateProcessedObservation(verbatimObservation, false);
+                        if (observationWithRealCoordinates != null)
+                        {
+                            observationWithRealCoordinates.Sensitive = true;
+                            observationWithRealCoordinates.HasGeneralizedObservationInOtherIndex = true;
+                            observationWithRealCoordinates.Occurrence.SensitivityCategory = 3;
+                            observationWithRealCoordinates.AccessRights = new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage };
+                            sensitiveObservations.TryAdd(observationWithRealCoordinates.Occurrence!.OccurrenceId, observationWithRealCoordinates);
+                        }
+                    }
+                }
+                else
+                {
+                    observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
+                }
+
+                if (observation == null)
+                {
+                    continue;
+                }
+
+                // If observation is protected
+                if (observation.ShallBeProtected())
+                {
+                    observation.Sensitive = true;
+                    sensitiveObservations.TryAdd(observation.Occurrence!.OccurrenceId, observation);
+
+                    // Don't support system diffusion for now. Maybe later.
+                    ////If it is a protected sighting, public users should not be possible to find it in the current month 
+                    //if (!EnableDiffusion ||
+                    //    (
+                    //        observation.Occurrence.SensitivityCategory > 2 &&
+                    //        (observation.Event?.StartDate?.Year ?? 0) == DateTime.Now.Year ||
+                    //        (observation?.Event?.EndDate?.Year ?? 0) == DateTime.Now.Year
+                    //    ) &&
+                    //    (
+                    //        (observation!.Event?.StartDate?.Month ?? 0) == DateTime.Now.Month ||
+                    //        (observation?.Event?.EndDate?.Month ?? 0) == DateTime.Now.Month
+                    //    )
+                    //)
+                    //{
+                    //    continue;
+                    //}
+
+                    //// Recreate observation, diffused if provider supports diffusing 
+                    //processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
+                    //observation = observationFactory.CreateProcessedObservation(verbatimObservation, true);
+
+                    //// If provider don't support diffusion, we provide it for them
+                    //if (observation!.DiffusionStatus != DiffusionStatus.DiffusedByProvider)
+                    //{
+                    //    if (!dataProvider.AllowSystemDiffusion)
+                    //    {
+                    //        continue;
+                    //    }
+                    //    var diffuseTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.Diffuse);
+
+                    //    // Diffuse protected observation before adding it to public index. 
+                    //    _diffusionManager.DiffuseObservation(observation);
+                    //}
+                }
+                else
+                {
+                    // Add public observation
+                    publicObservations.TryAdd(observation.Occurrence!.OccurrenceId, observation);
+                }
+            }
+        }        
+
+        private void LogGarbageCharFields(
+            DataProvider dataProvider, 
+            ICollection<Observation> publicObservations,
+            ICollection<Observation> sensitiveObservations)
+        {
+            var objectHelper = new ObjectHelper();            
+            foreach (var observation in publicObservations)
+            {
+                var propsWithGarabageChars = objectHelper.GetPropertiesWithGarbageChars(observation);
+                if (propsWithGarabageChars.Any())
+                {
+                    Logger.LogDebug($"Garbage chars {dataProvider.Identifier}, id: {observation.Occurrence?.OccurrenceId}, field/s: {string.Join('|', propsWithGarabageChars)}");
+                }
+            }
+
+            foreach (var observation in sensitiveObservations)
+            {
+                var propsWithGarabageChars = objectHelper.GetPropertiesWithGarbageChars(observation);
+                if (propsWithGarabageChars.Any())
+                {
+                    Logger.LogDebug($"Garbage chars {dataProvider.Identifier}, id: {observation.Occurrence?.OccurrenceId}, field/s: {string.Join('|', propsWithGarabageChars)}");
+                }
             }
         }
 

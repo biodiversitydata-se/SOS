@@ -364,5 +364,10 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         {
             return dyntaxaTaxonId != 0;
         }
+
+        public bool IsVerbatimObservationDiffusedByProvider(VirtualHerbariumObservationVerbatim verbatim)
+        {
+            return false;
+        }
     }
 }

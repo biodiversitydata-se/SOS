@@ -147,5 +147,10 @@ namespace SOS.Harvest.Processors.Mvm
         {
             return dyntaxaTaxonId != 0;
         }
+        
+        public bool IsVerbatimObservationDiffusedByProvider(MvmObservationVerbatim verbatim)
+        {
+            return false;
+        }
     }
 }

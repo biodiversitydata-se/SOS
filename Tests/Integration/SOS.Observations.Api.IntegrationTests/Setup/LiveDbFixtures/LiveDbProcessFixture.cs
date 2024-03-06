@@ -627,4 +627,9 @@ public class LiveDbProcessFixture : IProcessFixture
             return taxa;
         }
     }
+
+    public Task<List<Observation>> ProcessAndAddObservationsToElasticSearchUsingObservationProcessor(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -1,6 +1,5 @@
 [
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "RegionalInventory",
@@ -82,7 +81,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "NationalInventory",
@@ -154,7 +152,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "NationalInventory",
@@ -231,7 +228,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "NationalInventory",
@@ -303,7 +299,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "NationalInventory",
@@ -375,7 +370,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "HerbariaCollections",
             "Terrestrial",
@@ -450,7 +444,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "NationalInventory",
@@ -527,7 +520,6 @@
         "Url": "https://sharkweb.smhi.se/"
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [ "Terrestrial", "Vertebrates" ],
         "ContactPerson": {
             "FirstName": "",
@@ -604,7 +596,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "MuseumCollections",
             "Terrestrial",
@@ -687,7 +678,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "NationalInventory",
             "MuseumCollections",
@@ -770,7 +760,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "MuseumCollections",
             "Marine",
@@ -851,7 +840,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "NationalInventory",
@@ -930,7 +918,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "RegionalInventory",
@@ -1002,7 +989,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "RegionalInventory",
             "Marine",
@@ -1073,7 +1059,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "NationalInventory",
             "Terrestrial",
@@ -1145,7 +1130,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "MuseumCollections",
             "Terrestrial",
@@ -1224,7 +1208,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "CitizenSciencePlatform",
             "Terrestrial",
@@ -1303,7 +1286,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "CoordinateUncertaintyInMeters": 5000,
         "CreateEventDwC": false,
         "Descriptions": [
@@ -1364,7 +1346,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "NationalInventory",
@@ -1442,7 +1423,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "NationalInventory",
@@ -1520,7 +1500,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "NationalInventory",
@@ -1598,7 +1577,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "RegionalInventory",
@@ -1677,7 +1655,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "NationalInventory",
             "Terrestrial",
@@ -1757,7 +1734,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
             "DataHostesship",
             "NationalInventory",
@@ -1829,7 +1805,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "AllowSystemDiffusion": true,
         "Categories": [
         ],
         "ContactPerson": {

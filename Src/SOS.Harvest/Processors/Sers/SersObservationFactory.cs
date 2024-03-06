@@ -136,5 +136,10 @@ namespace SOS.Harvest.Processors.Sers
         {
             return dyntaxaTaxonId != 0;
         }
+
+        public bool IsVerbatimObservationDiffusedByProvider(SersObservationVerbatim verbatim)
+        {
+            return false;
+        }
     }
 }

@@ -45,7 +45,7 @@ namespace SOS.Lib
 
             // A observation can exists in both public (as diffused) and in protected (as not diffused) index.
             // If we only get non diffused observations, we make sure we don't get a observation twice when searching both indexes
-            query.TryAddTermCriteria("diffusionStatus", 0);
+            //query.TryAddTermCriteria("diffusionStatus", 0);
 
             // At least on of the sub queries in authorized querys must match
             var authorizeQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
@@ -756,7 +756,7 @@ namespace SOS.Lib
             {
                 // A observation can exists in both public (as diffused) and in protected (as not diffused) index.
                 // If we only get non diffused observations, we make sure we don't get a observation twice when searching both indexes
-                query.TryAddTermCriteria("diffusionStatus", 0);
+                //query.TryAddTermCriteria("diffusionStatus", 0);
             }
             else
             {
@@ -781,7 +781,16 @@ namespace SOS.Lib
             query.TryAddValidationStatusFilter(filter);
             query.TryAddTaxonCriteria(filter.Taxa);
 
-            query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));
+            //query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));            
+            
+            // Only possible to use generalization filter when searching sensitive observations.
+            if (filter.ExtendedAuthorization?.ProtectionFilter == ProtectionFilter.Public || filter.ExtendedAuthorization?.ProtectionFilter == ProtectionFilter.BothPublicAndSensitive)
+            {
+                filter.IncludeSensitiveGeneralizedObservations = false;
+            }
+            
+            query.TryAddTermCriteria("hasGeneralizedObservationInOtherIndex", filter.IncludeSensitiveGeneralizedObservations);
+            query.TryAddTermCriteria("isGeneralized", filter.IsPublicGeneralizedObservation);
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DataStewardshipDatasetIds);
             if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))

@@ -72,6 +72,22 @@ namespace SOS.Lib.Models.Search.Filters
         public List<DiffusionStatus> DiffusionStatuses { get; set; }
 
         /// <summary>
+        /// Determines whether sensitive generalized observations should be searched. Default is false.
+        /// </summary>
+        /// <remarks>
+        /// This filter is only used when searching sensitive observations.
+        /// </remarks>
+        public bool? IncludeSensitiveGeneralizedObservations { get; set; }
+
+        /// <summary>
+        /// Search for public generalized observations. Default is null.
+        /// </summary>
+        /// <remarks>
+        /// This filter is only used when searching public observations.
+        /// </remarks>
+        public bool? IsPublicGeneralizedObservation { get; set; }
+
+        /// <summary>
         /// Event related filters
         /// </summary>
         public EventFilter Event { get; set; }

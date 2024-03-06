@@ -555,5 +555,10 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 validationRemarksBuilder.NrMissingIdentificationVerificationStatus++;
             }
         }
+
+        public bool IsVerbatimObservationDiffusedByProvider(DwcObservationVerbatim verbatim)
+        {
+            return false;
+        }
     }
 }

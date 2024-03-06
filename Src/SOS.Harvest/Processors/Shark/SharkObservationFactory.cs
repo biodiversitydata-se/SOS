@@ -139,5 +139,10 @@ namespace SOS.Harvest.Processors.Shark
         {
             return dyntaxaTaxonId != 0;
         }
+
+        public bool IsVerbatimObservationDiffusedByProvider(SharkObservationVerbatim verbatim)
+        {
+            return false;
+        }
     }
 }
