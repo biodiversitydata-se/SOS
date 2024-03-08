@@ -110,7 +110,7 @@ namespace SOS.Observations.Api.Managers
                 var propertyFields =
                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter?.Output?.Fields);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().
-                   Where(fd => propertyFields.Select(pf => pf.DwcIdentifier.ToLower()).Contains(fd.DwcIdentifier.ToLower()));
+                   Where(fd => propertyFields.Select(pf => pf?.DwcIdentifier?.ToLower()).Contains(fd?.DwcIdentifier?.ToLower()));
 
                 return await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,

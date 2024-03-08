@@ -160,7 +160,7 @@ namespace SOS.Lib.IO.DwcArchive
             string exportFolderPath,
             IJobCancellationToken cancellationToken)
         {
-            var temporaryZipExportFolderPath = Path.Combine(exportFolderPath, "zip"); ;
+            var temporaryZipExportFolderPath = Path.Combine(exportFolderPath, "zip");
 
             try
             {

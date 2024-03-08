@@ -59,7 +59,7 @@ public class GeneralizationFilterTests : TestBase
         var verbatimObservations = CreateTestData(userId);
 
         // Act
-        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearchUsingObservationProcessor(verbatimObservations);        
+        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);        
 
         // Assert - number of public and sensitive observations
         int expectedNumberOfPublicObserations = 11 + 18 + 21;
@@ -91,7 +91,7 @@ public class GeneralizationFilterTests : TestBase
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
         var verbatimObservations = CreateTestData(userId);
-        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearchUsingObservationProcessor(verbatimObservations);        
+        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);        
         var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
         
@@ -182,7 +182,7 @@ public class GeneralizationFilterTests : TestBase
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
         var verbatimObservations = CreateTestData(userId);
-        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearchUsingObservationProcessor(verbatimObservations);        
+        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);        
         var apiClientWithAccessToLevel3 = TestFixture.CreateApiClientWithReplacedService(
             UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3));
 
@@ -225,7 +225,7 @@ public class GeneralizationFilterTests : TestBase
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
         var verbatimObservations = CreateTestData(userId);
-        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearchUsingObservationProcessor(verbatimObservations);
+        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
 
@@ -265,7 +265,7 @@ public class GeneralizationFilterTests : TestBase
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
         var verbatimObservations = CreateTestData(userId);
-        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearchUsingObservationProcessor(verbatimObservations);
+        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
         
@@ -288,7 +288,7 @@ public class GeneralizationFilterTests : TestBase
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
         var verbatimObservations = CreateTestData(userId);
-        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearchUsingObservationProcessor(verbatimObservations);
+        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
 

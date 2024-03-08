@@ -253,9 +253,9 @@ public class LiveDbProcessFixture : IProcessFixture
         await _processedChecklistRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
     }
 
-    public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations, bool enableDiffusion = false)
+    public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
     {
-        var processedObservations = ProcessObservations(verbatimObservations, enableDiffusion);
+        var processedObservations = ProcessObservations(verbatimObservations, false);
         await AddObservationsToElasticsearchAsync(processedObservations, true, 0);
         return processedObservations;
     }

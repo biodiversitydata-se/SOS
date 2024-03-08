@@ -212,7 +212,7 @@ public class ProcessFixture : IProcessFixture
         await _processedChecklistRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
     }
 
-    public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearchUsingObservationProcessor(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+    public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
     {
         ConcurrentDictionary<string, Observation> publicObservations;
         ConcurrentDictionary<string, Observation> sensitiveObservations;
@@ -222,18 +222,18 @@ public class ProcessFixture : IProcessFixture
             out publicObservations,
             out sensitiveObservations);
         var processedObservations = publicObservations.Values.Concat(sensitiveObservations.Values).ToList();
-
+        _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, true);
         //var processedObservations = ProcessObservations(verbatimObservations, enableDiffusion);
         await AddObservationsToElasticsearchAsync(processedObservations, true, 0);
         return processedObservations;
     }
 
-    public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations, bool enableDiffusion = false)
-    {
-        var processedObservations = ProcessObservations(verbatimObservations, enableDiffusion);
-        await AddObservationsToElasticsearchAsync(processedObservations, true, 0);
-        return processedObservations;
-    }
+    //public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations, bool enableDiffusion = false)
+    //{
+    //    var processedObservations = ProcessObservations(verbatimObservations, enableDiffusion);
+    //    await AddObservationsToElasticsearchAsync(processedObservations, true, 0);
+    //    return processedObservations;
+    //}
 
     public List<Observation> ProcessObservations(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations, bool enableDiffusion = false)
     {
