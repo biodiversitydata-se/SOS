@@ -27,6 +27,7 @@ public class GeneralizationFilterTests : TestBase
                 .With(o => o.ProtectedBySystem = false)
             .TheNext(14) // Diffused observations that will only be in sensitive index
                 .IsDiffused(1000)
+                .HaveTaxonSensitivityCategory(3)
                 .With(o => o.ReportedByUserServiceUserId = userId)
                 .With(o => o.ProtectedBySystem = true)
             .TheNext(18) // Observations that will be diffused in public index, and real coordinates in sensitive index. The user doesn't have access to sensitive obs.
@@ -35,6 +36,7 @@ public class GeneralizationFilterTests : TestBase
                 .With(o => o.ProtectedBySystem = false)
             .TheNext(7) // Diffused observations that will only be in sensitive index. The user doesn't have access to sensitive obs.
                 .IsDiffused(1000)
+                .HaveTaxonSensitivityCategory(3)
                 .With(o => o.ReportedByUserServiceUserId = userId + 1)
                 .With(o => o.ProtectedBySystem = true)
             .TheNext(20) // Sensitive observations with user access
@@ -178,11 +180,11 @@ public class GeneralizationFilterTests : TestBase
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingSensitiveObservationsWithAccessToProtectionLevel3()
-    {
+    {        
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
         var verbatimObservations = CreateTestData(userId);
-        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);        
+        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClientWithAccessToLevel3 = TestFixture.CreateApiClientWithReplacedService(
             UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3));
 
@@ -197,7 +199,7 @@ public class GeneralizationFilterTests : TestBase
             }
         };
         var response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();            
         result!.TotalCount.Should().Be(14 + 7 + 20 + 9);
         var generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
@@ -213,7 +215,7 @@ public class GeneralizationFilterTests : TestBase
             }
         };
         response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();            
         result!.TotalCount.Should().Be(11 + 14 + 18 + 7 + 20 + 9);
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);

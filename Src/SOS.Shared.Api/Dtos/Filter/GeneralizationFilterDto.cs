@@ -1,4 +1,6 @@
-﻿namespace SOS.Shared.Api.Dtos.Enum
+﻿using SOS.Shared.Api.Dtos.Enum;
+
+namespace SOS.Shared.Api.Dtos.Filter
 {
     /// <summary>
     /// Generalization filter.
