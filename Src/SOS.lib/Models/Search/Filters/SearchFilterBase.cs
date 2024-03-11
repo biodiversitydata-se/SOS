@@ -80,6 +80,11 @@ namespace SOS.Lib.Models.Search.Filters
         public bool? IncludeSensitiveGeneralizedObservations { get; set; }
 
         /// <summary>
+        /// Try get the real coordinate. Only possible if the user has access.
+        /// </summary>
+        public bool TryGetRealGeneralizedObservation { get; set; }
+
+        /// <summary>
         /// Search for public generalized observations. Default is null.
         /// </summary>
         /// <remarks>

@@ -16,5 +16,10 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// Public observations generalizations filter.
         /// </summary>
         public PublicGeneralizationFilterDto? PublicGeneralizationFilter { get; set; }
+
+        /// <summary>
+        /// Try get real coordinate if the user has access.
+        /// </summary>
+        public bool? TryGetRealCoordinate { get; set; }
     }
 }

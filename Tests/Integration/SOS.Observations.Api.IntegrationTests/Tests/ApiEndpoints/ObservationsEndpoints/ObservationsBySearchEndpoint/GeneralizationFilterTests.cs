@@ -86,6 +86,82 @@ public class GeneralizationFilterTests : TestBase
         numberOfSensitiveObservationWithGeneralizedObsInOtherIndex.Should().Be(expectedNumberOfObservationWithGeneralizedObsInOtherIndex);
     }
 
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservationsWithCorrectCoordinates_WhenSearchingSensitiveObservationsWithUserAccess()
+    {
+        // Arrange
+        const int userId = TestAuthHandler.DefaultTestUserId;
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(1) // Observations that will be diffused in public index, and real coordinates in sensitive index.
+                .IsDiffused(1000)
+                .With(o => o.ReportedByUserServiceUserId = userId)
+                .With(o => o.ProtectedBySystem = false)            
+            .TheNext(1) // Observations that will be diffused in public index, and real coordinates in sensitive index. The user doesn't have access to sensitive obs.
+                .IsDiffused(1000)
+                .With(o => o.ReportedByUserServiceUserId = userId + 1)
+                .With(o => o.ProtectedBySystem = false)            
+            .Build();
+        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
+            UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
+        var verbatimObsWithUserAccess = verbatimObservations.First();
+        var verbatimObsWithoutUserAccess = verbatimObservations.Last();
+        var processedPublicObsWithUserAccess = processedObservations.First(m => m.Occurrence.CatalogNumber == verbatimObsWithUserAccess.SightingId.ToString() && m.IsGeneralized);
+        var processedSensitiveObsWithUserAccess = processedObservations.First(m => m.Occurrence.CatalogNumber == verbatimObsWithUserAccess.SightingId.ToString() && !m.IsGeneralized);
+        var processedPublicObsWithoutUserAccess = processedObservations.First(m => m.Occurrence.CatalogNumber == verbatimObsWithoutUserAccess.SightingId.ToString() && m.IsGeneralized);
+        var processedSensitiveObsWithoutUserAccess = processedObservations.First(m => m.Occurrence.CatalogNumber == verbatimObsWithoutUserAccess.SightingId.ToString() && !m.IsGeneralized);
+
+        // Act - Get public observations (with user access to one observation)
+        var searchFilter = new SearchFilterInternalDto
+        {
+            ProtectionFilter = ProtectionFilterDto.Public,
+            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
+            GeneralizationFilter = new GeneralizationFilterDto
+            {
+                TryGetRealCoordinate = true
+            }
+        };
+        var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();        
+
+        // Assert - observation without user access
+        var searchedObsWithoutUserAccess = result.Records.First(m => m.Occurrence.OccurrenceId == processedPublicObsWithoutUserAccess.Occurrence.OccurrenceId);
+        searchedObsWithoutUserAccess.IsGeneralized.Should().BeTrue(because: "The user has not access and should get the public observation");
+        searchedObsWithoutUserAccess.Location.CoordinateUncertaintyInMeters.Should().Be(processedPublicObsWithoutUserAccess.Location.CoordinateUncertaintyInMeters);
+
+        // Assert - observation with user access
+        var searchedObsWithUserAccess = result.Records.First(m => m.Occurrence.OccurrenceId == processedPublicObsWithUserAccess.Occurrence.OccurrenceId);
+        searchedObsWithUserAccess.IsGeneralized.Should().BeFalse(because: "The user has access and should get the sensitive observation");
+        searchedObsWithUserAccess.Location.CoordinateUncertaintyInMeters.Should().Be(processedSensitiveObsWithUserAccess.Location.CoordinateUncertaintyInMeters);
+
+
+        //// Get public observations (without access to real coordinates)
+        //var apiClient = TestFixture.CreateApiClient();
+        //var searchFilter2 = new SearchFilterInternalDto
+        //{
+        //    ProtectionFilter = ProtectionFilterDto.Public,
+        //    Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
+        //};
+        //var response2 = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter2));
+        //var result2 = await response2.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        //result2!.TotalCount.Should().Be(2);
+
+
+        //// Get public observations (with access to real coordinates)
+        //var apiClientWithAccessToLevel3 = TestFixture.CreateApiClientWithReplacedService(
+        //    UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3));
+        //var searchFilter3 = new SearchFilterInternalDto
+        //{
+        //    ProtectionFilter = ProtectionFilterDto.Public,
+        //    Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
+        //};
+        //var response3 = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter3));
+        //var result3 = await response3.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        //result3!.TotalCount.Should().Be(2);
+
+    }
+
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingSensitiveObservationsWithUserAccess()

@@ -93,6 +93,8 @@ namespace SOS.Shared.Api.Extensions.Dto
                     null => null,
                     _ => null
                 };
+
+                filter.TryGetRealGeneralizedObservation = searchFilterInternalBaseDto?.GeneralizationFilter?.TryGetRealCoordinate == null ? false : searchFilterInternalBaseDto.GeneralizationFilter.TryGetRealCoordinate.GetValueOrDefault(false);
             }
 
             if (searchFilterBaseDto.OccurrenceStatus != null)
