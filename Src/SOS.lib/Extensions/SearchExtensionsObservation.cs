@@ -112,7 +112,6 @@ namespace SOS.Lib
             );
         }
 
-
         /// <summary>
         /// Add internal filters to query
         /// </summary>
@@ -788,9 +787,10 @@ namespace SOS.Lib
             {
                 filter.IncludeSensitiveGeneralizedObservations = false;
             }
-            
-            query.TryAddTermCriteria("hasGeneralizedObservationInOtherIndex", filter.IncludeSensitiveGeneralizedObservations);
-            query.TryAddTermCriteria("isGeneralized", filter.IsPublicGeneralizedObservation);
+
+            query.TryAddGeneralizationsCriteria(filter.IncludeSensitiveGeneralizedObservations, filter.IsPublicGeneralizedObservation);
+            //query.TryAddTermCriteria("hasGeneralizedObservationInOtherIndex", filter.IncludeSensitiveGeneralizedObservations);            
+            //query.TryAddTermCriteria("isGeneralized", filter.IsPublicGeneralizedObservation);
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DataStewardshipDatasetIds);
             if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))

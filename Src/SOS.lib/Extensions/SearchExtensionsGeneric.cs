@@ -653,6 +653,52 @@ namespace SOS.Lib.Extensions
             }
         }
 
+        public static void TryAddGeneralizationsCriteria<TQueryContainer>(
+            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, bool? includeSensitiveGeneralizedObservations, bool? isGeneralized) where TQueryContainer : class
+        {
+            if (includeSensitiveGeneralizedObservations.HasValue)
+            {
+                query.Add(q => q
+                    .Bool(p => p
+                        .Should(s => s
+                            .Term(t => t
+                                .Field("hasGeneralizedObservationInOtherIndex")
+                                .Value(includeSensitiveGeneralizedObservations)),
+                            s => s
+                            .Bool(t => t
+                                .MustNot(s => s
+                                  .Exists(e => 
+                                    e.Field("hasGeneralizedObservationInOtherIndex")                                
+                                    )
+                                  )
+                                )
+                            )
+                        )
+                    );
+            }
+
+            if (isGeneralized.HasValue)
+            {
+                query.Add(q => q
+                    .Bool(p => p
+                        .Should(s => s
+                            .Term(t => t
+                                .Field("isGeneralized")
+                                .Value(isGeneralized)),
+                            s => s
+                            .Bool(t => t
+                                .MustNot(s => s
+                                  .Exists(e =>
+                                    e.Field("isGeneralized")
+                                    )
+                                  )
+                                )
+                            )
+                        )
+                    );
+            }
+        }
+
         /// <summary>
         /// Try to add query criteria where property must match a specified value
         /// </summary>
