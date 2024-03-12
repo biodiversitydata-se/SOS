@@ -172,6 +172,17 @@ namespace SOS.Harvest.Harvesters.Artportalen
             // If no from date is passed, we start from last harvested sighting 
             var harvestFromDate = fromDate ?? (await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1));
             
+            // Don't harvest too many days
+            if (_artportalenConfiguration.MaxNumberOfDaysHarvested.HasValue)
+            {
+                int daysToHarvest = (DateTime.Now - harvestFromDate).Days;
+                if (daysToHarvest > _artportalenConfiguration.MaxNumberOfDaysHarvested.Value)
+                {
+                    Logger.LogWarning($"Artportalen incremental harvest cancelled. harvestFromDate is too old: {harvestFromDate.ToLongDateString()}. Limit is {_artportalenConfiguration.MaxNumberOfDaysHarvested.Value} days");
+                    return 0;
+                }
+            }
+
             // Get list of id's to Make sure we don't harvest more than #limit 
             var idBatch = (await _sightingRepository.GetModifiedIdsAsync(harvestFromDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray();
             var batchCount = 0;
