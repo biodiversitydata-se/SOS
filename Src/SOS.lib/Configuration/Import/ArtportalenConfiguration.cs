@@ -42,6 +42,12 @@ namespace SOS.Lib.Configuration.Import
         public int? MaxNumberOfSightingsHarvested { get; set; } = null;
 
         /// <summary>
+        ///     The number of days that should be maximum harvested.
+        ///     If set to null all sightings will be fetched.
+        /// </summary>
+        public int? MaxNumberOfDaysHarvested { get; set; } = null;
+
+        /// <summary>
         ///     The number of checklists that should be harvested.
         ///     If set to null all checklists will be fetched.
         /// </summary>
