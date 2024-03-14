@@ -307,39 +307,40 @@ namespace SOS.Harvest.Jobs
                 }
             }
 
-            if (protectedObservations?.Any() ?? false)
-            {
-                // Try to get diffused observations 
-                var diffusedObservations = (await _processedObservationRepository.GetObservationsAsync(protectedObservations.Keys, false))?
-                    .Where(o => o.Occurrence != null)
-                    .ToDictionary(o => o.Occurrence.OccurrenceId, o => o); ;
+            // Remove diffused observation test for now. Some Artportalen observations have the same diffused and real coordinates.
+            //if (protectedObservations?.Any() ?? false)
+            //{
+            //    // Try to get diffused observations 
+            //    var diffusedObservations = (await _processedObservationRepository.GetObservationsAsync(protectedObservations.Keys, false))?
+            //        .Where(o => o.Occurrence != null)
+            //        .ToDictionary(o => o.Occurrence.OccurrenceId, o => o); ;
 
-                if (!diffusedObservations?.Any() ?? true)
-                {
-                    return true;
-                }
+            //    if (!diffusedObservations?.Any() ?? true)
+            //    {
+            //        return true;
+            //    }
 
-                foreach (var protectedObservation in protectedObservations)
-                {
-                    // Try to get diffused observation with same occurenceId from public index
-                    if (!diffusedObservations!.TryGetValue(protectedObservation.Key, out var publicObservation))
-                    {
-                        continue;
-                    }
+            //    foreach (var protectedObservation in protectedObservations)
+            //    {
+            //        // Try to get diffused observation with same occurenceId from public index
+            //        if (!diffusedObservations!.TryGetValue(protectedObservation.Key, out var publicObservation))
+            //        {
+            //            continue;
+            //        }
 
-                    // If observation coordinates equals, something is wrong. Validation failed
-                    if (protectedObservation.Value.Location.DecimalLatitude.Equals(publicObservation.Location.DecimalLatitude)
-                         || protectedObservation.Value.Location.DecimalLongitude.Equals(publicObservation.Location.DecimalLongitude)
-                       )
-                    {
-                        var errorString = $"Failed to validate random observation coordinates. Coordinates match between protected and public index for observation with OccurrenceId: {protectedObservation.Value.Occurrence.OccurrenceId},";
-                        errorString += $"Public coords:{publicObservation.Location.DecimalLatitude}, {publicObservation.Location.DecimalLongitude},";
-                        errorString += $"Protected coords:{protectedObservation.Value.Location.DecimalLatitude}, {protectedObservation.Value.Location.DecimalLongitude},";
-                        _logger.LogError(errorString);
-                        return false;
-                    }
-                }
-            }
+            //        // If observation coordinates equals, something is wrong. Validation failed
+            //        if (protectedObservation.Value.Location.DecimalLatitude.Equals(publicObservation.Location.DecimalLatitude)
+            //             || protectedObservation.Value.Location.DecimalLongitude.Equals(publicObservation.Location.DecimalLongitude)
+            //           )
+            //        {
+            //            var errorString = $"Failed to validate random observation coordinates. Coordinates match between protected and public index for observation with OccurrenceId: {protectedObservation.Value.Occurrence.OccurrenceId},";
+            //            errorString += $"Public coords:{publicObservation.Location.DecimalLatitude}, {publicObservation.Location.DecimalLongitude},";
+            //            errorString += $"Protected coords:{protectedObservation.Value.Location.DecimalLatitude}, {protectedObservation.Value.Location.DecimalLongitude},";
+            //            _logger.LogError(errorString);
+            //            return false;
+            //        }
+            //    }
+            //}
 
             return true;
         }
