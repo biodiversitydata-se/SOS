@@ -40,7 +40,7 @@ xml:lang="eng">
 		</pubDate>
 		<language>eng</language>
 		<abstract>
-			<para>This database contains information about bird ringing in Sweden.</para>
+			<para>Occurrence data from birds ringed in Sweden. The database is maintained by the Swedish Bird Ringing Centre at the Swedish Museum of Natural History.</para>
 		</abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
