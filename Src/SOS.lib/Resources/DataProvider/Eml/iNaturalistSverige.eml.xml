@@ -11,14 +11,14 @@
 	<dataset>
 		<identifier></identifier>
 		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:iNaturalist</alternateIdentifier>
-		<title>iNaturalist Sverige</title>
+		<title>iNaturalist Research-grade Observations Sweden</title>
 		<creator>
-			<organizationName>SLU Swedish Species Information Centre (SLU Artdatabanken)</organizationName>
+			<organizationName>iNaturalist.org</organizationName>
 			<individualName>
-				<givenName>Johan</givenName>
-				<surName>Liljebld</surName>
+				<givenName>iNaturalist</givenName>
+				<surName></surName>
 			</individualName>
-			<electronicMailAddress>artdatabanken@slu.se</electronicMailAddress>
+			<electronicMailAddress>help@inaturalist.org</electronicMailAddress>
             <onlineUrl>https://www.inaturalist.se/</onlineUrl>
             <sos:contactNameType>Organizational</sos:contactNameType>
 		</creator>
@@ -38,10 +38,10 @@
 		</resourceType>
 		<contact>
 			<individualName>
-				<givenName>iNaturalist</givenName>
-				<surName>Sverige</surName>
+				<givenName>Mora</givenName>
+				<surName>Aronsson</surName>
 			</individualName>
-			<organizationName>iNaturalist</organizationName>
+			<organizationName>SLU Species Information Centre</organizationName>
 			<electronicMailAddress>artdatabanken@slu.se</electronicMailAddress>
 			<onlineUrl>https://www.inaturalist.se/</onlineUrl>
 		</contact>
