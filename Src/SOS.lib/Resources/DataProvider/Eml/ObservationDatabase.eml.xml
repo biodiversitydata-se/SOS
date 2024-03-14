@@ -50,9 +50,7 @@
 			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
 		</keywordSet>
 		<intellectualRights>
-			<para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="https://creativecommons.org/publicdomain/zero/1.0/legalcode">
-					<citetitle>Public Domain (CC0 1.0)</citetitle>
-				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
+			<para>These data are not available to the public. Request for using these records can be made to SLU Artdatabanken. When requests are approved users may not copy, modify or distribute the data, and only use for the stated purpose.</para>
 		</intellectualRights>
 		<coverage>
 			<geographicCoverage>
@@ -85,10 +83,10 @@
 		</maintenance>
 		<contact>
             <individualName>
-                <givenName>Jan</givenName>
-                <surName>Edelsjö</surName>
+                <givenName>Niklas</givenName>
+                <surName>Lönnell</surName>
             </individualName>
-            <electronicMailAddress>Jan.Edelsjo@slu.se</electronicMailAddress>
+            <electronicMailAddress>Niklas.Lonnell@slu.se</electronicMailAddress>
             <organizationName>SLU Swedish Species Information Centre (SLU Artdatabanken)</organizationName>
 			<address>
 				<city>Uppsala</city>
