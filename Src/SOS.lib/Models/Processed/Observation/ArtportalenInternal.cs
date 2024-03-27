@@ -24,6 +24,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? ActivityCategoryId { get; set; }
 
         /// <summary>
+        ///  Associated media file
+        /// </summary>
+        public string AssociatedMedia { get; set; }
+
+        /// <summary>
         /// Bird validation areas.
         /// </summary>
         public IEnumerable<string> BirdValidationAreaIds { get; set; }
@@ -77,6 +82,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     HasUserComments
         /// </summary>
         public bool HasUserComments { get; set; }
+
+        /// <summary>
+        /// Media files
+        /// </summary>
+        public ICollection<Multimedia> Media { get; set; }
 
         /// <summary>
         ///     Note of Interest.

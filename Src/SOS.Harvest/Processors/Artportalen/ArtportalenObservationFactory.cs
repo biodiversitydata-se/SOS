@@ -381,9 +381,9 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 // Occurrence
                 obs.Occurrence = new Occurrence();
-                obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages && verbatimObservation.FirstImageId > 0
-                    ? $"https://www.artportalen.se/Image/{verbatimObservation.FirstImageId}" //verbatimObservation.Media?.FirstOrDefault(m => m.FileUri?.StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ?? true).FileUri
-                    : "";
+               // obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages && verbatimObservation.FirstImageId > 0
+               //     ? $"https://www.artportalen.se/Image/{verbatimObservation.FirstImageId}" //verbatimObservation.Media?.FirstOrDefault(m => m.FileUri?.StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ?? true).FileUri
+               //     : "";
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
                 obs.Occurrence.Biotope = GetSosIdFromMetadata(verbatimObservation.Biotope!, VocabularyId.Biotope);
                 obs.Occurrence.BiotopeDescription = verbatimObservation.BiotopeDescription?.Clean();
@@ -433,32 +433,15 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Occurrence.Length = verbatimObservation.Length;
                 obs.Occurrence.Weight = verbatimObservation.Weight;
 
-                if (verbatimObservation.Media?.Any() ?? false)
-                {
-                    obs.Occurrence.Media = verbatimObservation.Media.Select(m => new Multimedia
-                    {
-                        Comments = m.Comments?.Select(c => new MultimediaComment
-                        {
-                            Comment = c.Comment?.Clean(),
-                            CommentBy = c.CommentBy?.Clean(),
-                            Created = c.CommentCreated
-                        }),
-                        Created = m.UploadDateTime?.ToShortDateString(),
-                        Format = (m.FileUri?.LastIndexOf('.') ?? -1) > 0 ? m.FileUri?.Substring(m.FileUri.LastIndexOf('.'))?.Clean() : string.Empty,
-                        Identifier = GetMediaUrl(m.FileUri)?.Clean(),
-                        License = string.IsNullOrEmpty(m.CopyrightText) ? "© all rights reserved" : m.CopyrightText?.Clean(),
-                        References = $"{_artPortalenUrl}/Image/{m.Id}",
-                        RightsHolder = m.RightsHolder?.Clean(),
-                        Type = m.FileType
-                    }).ToList();
-                }
-
                 // Taxon
                 obs.Taxon = taxon;
 
                 // ArtportalenInternal
                 obs.ArtportalenInternal = new ArtportalenInternal();
                 obs.ArtportalenInternal.ActivityCategoryId = verbatimObservation.Activity?.Category?.Id;
+                obs.ArtportalenInternal.AssociatedMedia = verbatimObservation.HasImages && verbatimObservation.FirstImageId > 0
+                    ? $"https://www.artportalen.se/Image/{verbatimObservation.FirstImageId}" //verbatimObservation.Media?.FirstOrDefault(m => m.FileUri?.StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ?? true).FileUri
+                    : "";
                 obs.ArtportalenInternal.BirdValidationAreaIds = verbatimObservation.Site?.BirdValidationAreaIds;
                 obs.ArtportalenInternal.ChecklistId = verbatimObservation.ChecklistId;
                 obs.ArtportalenInternal.ConfirmationYear = verbatimObservation.ConfirmationYear;
@@ -503,6 +486,26 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ArtportalenInternal.TriggeredObservationRuleReproductionId = verbatimObservation.TriggeredObservationRuleReproductionId;
                 obs.ArtportalenInternal.TriggeredObservationRuleStatusRuleId = verbatimObservation.TriggeredObservationRuleStatusRuleId;
                 obs.ArtportalenInternal.TriggeredObservationRuleUnspontaneous = verbatimObservation.TriggeredObservationRuleUnspontaneous;
+
+                if (verbatimObservation.Media?.Any() ?? false)
+                {
+                    obs.ArtportalenInternal.Media = verbatimObservation.Media.Select(m => new Multimedia
+                    {
+                        Comments = m.Comments?.Select(c => new MultimediaComment
+                        {
+                            Comment = c.Comment?.Clean(),
+                            CommentBy = c.CommentBy?.Clean(),
+                            Created = c.CommentCreated
+                        }),
+                        Created = m.UploadDateTime?.ToShortDateString(),
+                        Format = (m.FileUri?.LastIndexOf('.') ?? -1) > 0 ? m.FileUri?.Substring(m.FileUri.LastIndexOf('.'))?.Clean() : string.Empty,
+                        Identifier = GetMediaUrl(m.FileUri)?.Clean(),
+                        License = string.IsNullOrEmpty(m.CopyrightText) ? "© all rights reserved" : m.CopyrightText?.Clean(),
+                        References = $"{_artPortalenUrl}/Image/{m.Id}",
+                        RightsHolder = m.RightsHolder?.Clean(),
+                        Type = m.FileType
+                    }).ToList();
+                }
 
                 var eventMonths = new HashSet<int>();
                 if (startDate.HasValue)
