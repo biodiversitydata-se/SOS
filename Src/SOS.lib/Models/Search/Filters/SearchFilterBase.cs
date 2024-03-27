@@ -103,6 +103,11 @@ namespace SOS.Lib.Models.Search.Filters
         public ExcludeFilter ExcludeFilter { get; set; }
 
         /// <summary>
+        /// Observations must match listed occurrence id's
+        /// </summary>
+        public IEnumerable<string> OccurrenceIds { get; set; }
+
+        /// <summary>
         /// Filter used to give user extended authorization
         /// </summary>
         public ExtendedAuthorizationFilter ExtendedAuthorization { get; set; }
