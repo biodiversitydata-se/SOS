@@ -121,12 +121,20 @@ namespace SOS.Observations.Api.Managers
                 var protectedFilter = filter.Clone();
                 protectedFilter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Sensitive;
                 protectedFilter.IncludeSensitiveGeneralizedObservations = true;
+                protectedFilter.IsPublicGeneralizedObservation = false;
                 protectedFilter.OccurrenceIds = generalizedOccurrenceIds;
-                protectedFilter.Output = new OutputFilter
-                {
-                    Fields = ["occurrence.occurrenceId", "isGeneralized", "hasGeneralizedObservationInOtherIndex", "location.coordinateUncertaintyInMeters",
-                          "location.decimalLatitude", "location.decimalLongitude"]
-                };
+                if (protectedFilter.Output.Fields != null) 
+                { 
+                    if (!protectedFilter.Output.Fields.Contains("Occurrence.OccurrenceId"))
+                    {
+                        protectedFilter.Output.Fields.Add("Occurrence.OccurrenceId");
+                    }
+                    if (!protectedFilter.Output.Fields.Contains("IsGeneralized"))
+                    {
+                        protectedFilter.Output.Fields.Add("IsGeneralized");
+                    }
+                }
+                
                 await _filterManager.PrepareFilterAsync(null, null, protectedFilter); // todo - add role and applicationId
                 var dynamicSensitiveObservationsResult = await _processedObservationRepository.GetChunkAsync(protectedFilter, 0, 1000);
 
@@ -223,9 +231,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         private void UpdateGeneralizedWithRealValues(IDictionary<string, object> obs, IDictionary<string, object> realObs)
-        {
-            // Record
-            
+        {            
             // isGeneralized
             if (obs.ContainsKey("isGeneralized"))
             {                               
@@ -235,50 +241,22 @@ namespace SOS.Observations.Api.Managers
                 }                
             }
 
-            // Location
-            if (realObs.TryGetValue(nameof(Observation.Location).ToLower(), out var realObsLocationObject))
+            if (obs.ContainsKey("location"))
             {
-                var realObsLocationDictionary = realObsLocationObject as IDictionary<string, object>;
-
-                // decimalLatitude
-                if (realObsLocationDictionary.ContainsKey("decimalLatitude"))
+                if (realObs.ContainsKey("location"))
                 {
-                    if (obs.TryGetValue(nameof(Observation.Location).ToLower(), out var locationObject))
-                    {
-                        var locationDictionary = locationObject as IDictionary<string, object>;
-                        if (locationDictionary.ContainsKey("decimalLatitude"))
-                        {
-                            locationDictionary["decimalLatitude"] = realObsLocationDictionary["decimalLatitude"];
-                        }
-                    }
-                }
-
-                // decimalLongitude
-                if (realObsLocationDictionary.ContainsKey("decimalLongitude"))
-                {
-                    if (obs.TryGetValue(nameof(Observation.Location).ToLower(), out var locationObject))
-                    {
-                        var locationDictionary = locationObject as IDictionary<string, object>;
-                        if (locationDictionary.ContainsKey("decimalLongitude"))
-                        {
-                            locationDictionary["decimalLongitude"] = realObsLocationDictionary["decimalLongitude"];
-                        }
-                    }
-                }
-
-                // coordinateUncertaintyInMeters
-                if (realObsLocationDictionary.ContainsKey("coordinateUncertaintyInMeters"))
-                {
-                    if (obs.TryGetValue(nameof(Observation.Location).ToLower(), out var locationObject))
-                    {
-                        var locationDictionary = locationObject as IDictionary<string, object>;
-                        if (locationDictionary.ContainsKey("coordinateUncertaintyInMeters"))
-                        {
-                            locationDictionary["coordinateUncertaintyInMeters"] = realObsLocationDictionary["coordinateUncertaintyInMeters"];
-                        }
-                    }
+                    obs["location"] = realObs["location"];
                 }
             }
+
+            // Replace all fields
+            //foreach (var key in obs.Keys)
+            //{
+            //    if (realObs.ContainsKey(key))
+            //    {
+            //        obs[key] = realObs[key];
+            //    }
+            //}
         }
 
         private List<string> GetOccurrenceIds(List<IDictionary<string, object>> observations)

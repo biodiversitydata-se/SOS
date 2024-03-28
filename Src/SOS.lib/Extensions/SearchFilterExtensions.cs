@@ -45,9 +45,9 @@ namespace SOS.Lib.Extensions
         private static void EnsureIsGeneralizedObservationIsRetrievedFromDb(OutputFilter outputFilter)
         {
             if (outputFilter?.Fields == null) return;
-            if (!outputFilter.Fields.Any(f => f.Equals("isGeneralized", StringComparison.CurrentCultureIgnoreCase)))
+            if (!outputFilter.Fields.Any(f => f.Equals("IsGeneralized", StringComparison.CurrentCultureIgnoreCase)))
             {
-                outputFilter.Fields.Add("isGeneralized");
+                outputFilter.Fields.Add("IsGeneralized");
             }
         }
     }

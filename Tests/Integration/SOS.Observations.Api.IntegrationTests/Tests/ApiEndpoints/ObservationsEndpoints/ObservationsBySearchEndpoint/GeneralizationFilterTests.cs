@@ -7,6 +7,9 @@ using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
+using SOS.Lib.Enums;
+using NetTopologySuite.Geometries;
+using SOS.Lib.Extensions;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
@@ -91,31 +94,35 @@ public class GeneralizationFilterTests : TestBase
     {
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
             .TheFirst(1) // Observations that will be diffused in public index, and real coordinates in sensitive index.
                 .IsDiffused(1000)
                 .With(o => o.ReportedByUserServiceUserId = userId)
-                .With(o => o.ProtectedBySystem = false)            
+                .With(o => o.ProtectedBySystem = false)
             .TheNext(1) // Observations that will be diffused in public index, and real coordinates in sensitive index. The user doesn't have access to sensitive obs.
                 .IsDiffused(1000)
                 .With(o => o.ReportedByUserServiceUserId = userId + 1)
-                .With(o => o.ProtectedBySystem = false)            
+                .With(o => o.ProtectedBySystem = false)
+            .TheNext(1) // Sensitive observations with user access
+                .HaveTaxonSensitivityCategory(3)
+                .With(o => o.ReportedByUserServiceUserId = userId)
+            .TheNext(1) // Sensitive observations without user access
+                .HaveTaxonSensitivityCategory(3)
+                .With(o => o.ReportedByUserServiceUserId = userId + 1)
+            .TheNext(1) // Public observations with no diffusion
+                .With(o => o.ProtectedBySystem = false)
+                .With(o => o.Site.DiffusionId = 0)
             .Build();
+
         var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
-        var verbatimObsWithUserAccess = verbatimObservations.First();
-        var verbatimObsWithoutUserAccess = verbatimObservations.Last();
-        var processedPublicObsWithUserAccess = processedObservations.First(m => m.Occurrence.CatalogNumber == verbatimObsWithUserAccess.SightingId.ToString() && m.IsGeneralized);
-        var processedSensitiveObsWithUserAccess = processedObservations.First(m => m.Occurrence.CatalogNumber == verbatimObsWithUserAccess.SightingId.ToString() && !m.IsGeneralized);
-        var processedPublicObsWithoutUserAccess = processedObservations.First(m => m.Occurrence.CatalogNumber == verbatimObsWithoutUserAccess.SightingId.ToString() && m.IsGeneralized);
-        var processedSensitiveObsWithoutUserAccess = processedObservations.First(m => m.Occurrence.CatalogNumber == verbatimObsWithoutUserAccess.SightingId.ToString() && !m.IsGeneralized);
 
         // Act - Get public observations (with user access to one observation)
         var searchFilter = new SearchFilterInternalDto
         {
-            ProtectionFilter = ProtectionFilterDto.Public,
+            ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
             Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
             GeneralizationFilter = new GeneralizationFilterDto
             {
@@ -123,45 +130,35 @@ public class GeneralizationFilterTests : TestBase
             }
         };
         var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();        
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var diffusedObsWithAccess = (Verbatim: verbatimObservations.ElementAt(0), Processed: result.Records.First(m => m.Occurrence.OccurrenceId == $"urn:lsid:artportalen.se:sighting:{verbatimObservations.ElementAt(0).SightingId}"));
+        var diffusedObsWithoutAccess = (Verbatim: verbatimObservations.ElementAt(1), Processed: result.Records.First(m => m.Occurrence.OccurrenceId == $"urn:lsid:artportalen.se:sighting:{verbatimObservations.ElementAt(1).SightingId}"));
+        var publicObservation = (Verbatim: verbatimObservations.ElementAt(4), Processed: result.Records.First(m => m.Occurrence.OccurrenceId == $"urn:lsid:artportalen.se:sighting:{verbatimObservations.ElementAt(4).SightingId}"));
 
-        // Assert - observation without user access
-        var searchedObsWithoutUserAccess = result.Records.First(m => m.Occurrence.OccurrenceId == processedPublicObsWithoutUserAccess.Occurrence.OccurrenceId);
-        searchedObsWithoutUserAccess.IsGeneralized.Should().BeTrue(because: "The user has not access and should get the public observation");
-        searchedObsWithoutUserAccess.Location.CoordinateUncertaintyInMeters.Should().Be(processedPublicObsWithoutUserAccess.Location.CoordinateUncertaintyInMeters);
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.TotalCount.Should().Be(4);
 
-        // Assert - observation with user access
-        var searchedObsWithUserAccess = result.Records.First(m => m.Occurrence.OccurrenceId == processedPublicObsWithUserAccess.Occurrence.OccurrenceId);
-        searchedObsWithUserAccess.IsGeneralized.Should().BeFalse(because: "The user has access and should get the sensitive observation");
-        searchedObsWithUserAccess.Location.CoordinateUncertaintyInMeters.Should().Be(processedSensitiveObsWithUserAccess.Location.CoordinateUncertaintyInMeters);
+        // Assert - diffused observation without user access
+        diffusedObsWithoutAccess.Processed.IsGeneralized.Should().BeTrue();
+        diffusedObsWithoutAccess.Processed.Location.CoordinateUncertaintyInMeters.Should().Be(diffusedObsWithoutAccess.Verbatim.Site.DiffusionId, because: "the user has not access to the real coordinates");
+        var point = new Point(diffusedObsWithoutAccess.Verbatim.Site.XCoordDiffused.Value, diffusedObsWithoutAccess.Verbatim.Site.YCoordDiffused.Value);
+        var transformedPoint = point.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+        diffusedObsWithoutAccess.Processed.Location.DecimalLongitude.Should().BeApproximately(transformedPoint.X, 0.1);
+        diffusedObsWithoutAccess.Processed.Location.DecimalLatitude.Should().BeApproximately(transformedPoint.Y, 0.1);
 
+        // Assert - diffused observation with user access
+        diffusedObsWithAccess.Processed.IsGeneralized.Should().BeFalse();
+        diffusedObsWithAccess.Processed.Location.CoordinateUncertaintyInMeters.Should().Be(diffusedObsWithAccess.Verbatim.Site.Accuracy, because: "the user has access to the real coordinates");
+        point = new Point(diffusedObsWithAccess.Verbatim.Site.XCoord, diffusedObsWithAccess.Verbatim.Site.YCoord);
+        transformedPoint = point.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+        diffusedObsWithAccess.Processed.Location.DecimalLongitude.Should().BeApproximately(transformedPoint.X, 0.1);
+        diffusedObsWithAccess.Processed.Location.DecimalLatitude.Should().BeApproximately(transformedPoint.Y, 0.1);
 
-        //// Get public observations (without access to real coordinates)
-        //var apiClient = TestFixture.CreateApiClient();
-        //var searchFilter2 = new SearchFilterInternalDto
-        //{
-        //    ProtectionFilter = ProtectionFilterDto.Public,
-        //    Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
-        //};
-        //var response2 = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter2));
-        //var result2 = await response2.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-        //result2!.TotalCount.Should().Be(2);
-
-
-        //// Get public observations (with access to real coordinates)
-        //var apiClientWithAccessToLevel3 = TestFixture.CreateApiClientWithReplacedService(
-        //    UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3));
-        //var searchFilter3 = new SearchFilterInternalDto
-        //{
-        //    ProtectionFilter = ProtectionFilterDto.Public,
-        //    Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
-        //};
-        //var response3 = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter3));
-        //var result3 = await response3.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-        //result3!.TotalCount.Should().Be(2);
-
+        // Assert - public observation
+        publicObservation.Processed.IsGeneralized.Should().BeFalse();
+        publicObservation.Processed.Location.CoordinateUncertaintyInMeters.Should().Be(publicObservation.Verbatim.Site.Accuracy);
     }
-
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingSensitiveObservationsWithUserAccess()
@@ -436,263 +433,4 @@ public class GeneralizationFilterTests : TestBase
         realObservation.Location.DecimalLongitude.Should().NotBe(generalizedObservation.Location.DecimalLongitude);
         realObservation.Location.CoordinateUncertaintyInMeters.Should().BeLessThan(generalizedObservation.Location.CoordinateUncertaintyInMeters!.Value);
     }
-
-
-    //[Fact]
-    //public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByDiffusionPublic()
-    //{
-    //    const int userId = TestAuthHandler.DefaultTestUserId;
-    //    // Arrange
-    //    var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-    //        .All().HaveValuesFromPredefinedObservations()
-    //        .TheFirst(20)
-    //            .IsDiffused(100)
-    //        .TheNext(20)
-    //            .IsDiffused(500)
-    //        .TheNext(20)
-    //            .IsDiffused(1000)
-    //        .TheNext(40)
-    //            .With(o => o.ProtectedBySystem = false)
-    //            .With(o => o.Site.DiffusionId = 0)
-    //        .Build();
-    //    await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations, true);
-
-    //    var searchFilter = new SearchFilterInternalDto { 
-    //        ProtectionFilter = ProtectionFilterDto.Public,
-    //        Output = new OutputFilterExtendedDto
-    //        {
-    //            Fields = new[] { "diffusionStatus" }
-    //        }
-    //    };
-    //    var apiClient = TestFixture.CreateApiClient();
-
-    //    // Act
-    //    var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-    //    var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-
-    //    // Assert
-    //    response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //    result!.TotalCount.Should().Be(100, because: "100 observations added to Elasticsearch are public");
-    //    result!.Records.Count(o => o.DiffusionStatus != DiffusionStatus.NotDiffused).Should().Be(60, because: "60 observations added to Elasticsearch are diffused");
-    //}
-
-    //[Fact]
-    //public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByDiffusionSensitive()
-    //{
-    //    const int userId = TestAuthHandler.DefaultTestUserId;
-    //    // Arrange
-    //    var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-    //        .All().HaveValuesFromPredefinedObservations()
-    //        .TheFirst(20)
-    //            .IsDiffused(100)
-    //            .With(o => o.ReportedByUserServiceUserId = userId)
-    //        .TheNext(20)
-    //            .IsDiffused(500)
-    //            .With(o => o.ReportedByUserServiceUserId = userId)
-    //        .TheNext(20)
-    //            .IsDiffused(1000)
-    //            .With(o => o.ReportedByUserServiceUserId = userId)
-    //        .TheNext(40)
-    //            .With(o => o.ProtectedBySystem = false)
-    //            .With(o => o.Site.DiffusionId = 0)
-    //        .Build();
-    //    await ProcessFixture.NewProcessAndAddObservationsToElasticSearch(verbatimObservations);
-
-    //    //await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations, true);
-
-    //    var searchFilter = new SearchFilterInternalDto
-    //    {
-    //        ProtectionFilter = ProtectionFilterDto.Sensitive,
-    //        Output = new OutputFilterExtendedDto
-    //        {
-    //            Fields = new[] { "diffusionStatus" }
-    //        }
-    //    };
-    //    var apiClient = TestFixture.CreateApiClient();
-
-    //    // Act
-    //    var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-    //    var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-
-    //    // Assert
-    //    response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //    result!.TotalCount.Should().Be(60, because: "60 observations added to Elasticsearch are sensitive");
-    //    result!.Records.Count(o => o.DiffusionStatus == DiffusionStatus.NotDiffused).Should().Be(60, because: "Sensitive observations added to Elasticsearch are not diffused");
-    //}
-
-    //[Fact]
-    //public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByDiffusionPublicAndSensitive()
-    //{
-    //    const int userId = TestAuthHandler.DefaultTestUserId;
-    //    // Arrange
-    //    var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-    //        .All().HaveValuesFromPredefinedObservations()
-    //        .TheFirst(20)
-    //            .IsDiffused(100)
-    //            .With(o => o.ReportedByUserServiceUserId = userId)
-    //        .TheNext(20)
-    //            .IsDiffused(500)
-    //            .With(o => o.ReportedByUserServiceUserId = userId)
-    //        .TheNext(20)
-    //            .IsDiffused(1000)
-    //            .With(o => o.ReportedByUserServiceUserId = userId)
-    //        .TheNext(40)
-    //            .With(o => o.ProtectedBySystem = false)
-    //            .With(o => o.Site.DiffusionId = 0)
-    //        .Build();
-    //    await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations, true);
-
-    //    var searchFilter = new SearchFilterInternalDto
-    //    {
-    //        ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
-    //        Output = new OutputFilterExtendedDto
-    //        {
-    //            Fields = new[] { "diffusionStatus" }
-    //        }
-    //    };
-    //    var apiClient = TestFixture.CreateApiClient();
-
-    //    // Act
-    //    var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-    //    var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-
-    //    // Assert
-    //    response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //    result!.TotalCount.Should().Be(100, because: "60 observations added to Elasticsearch are sensitive and 40 are public");
-    //    result!.Records.Count(o => o.DiffusionStatus == DiffusionStatus.NotDiffused).Should().Be(100, because: "Diffused observations are not return when quering both public and sensitive index");
-    //}
-
-    //[Fact]
-    //public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByDiffusionPublicAndSensitiveNoAccess()
-    //{
-    //    const int userId = TestAuthHandler.DefaultTestUserId;
-    //    // Arrange
-    //    var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-    //        .All().HaveValuesFromPredefinedObservations()
-    //        .TheFirst(20)
-    //            .IsDiffused(100)
-    //        .TheNext(20)
-    //            .IsDiffused(500)
-    //        .TheNext(20)
-    //            .IsDiffused(1000)
-    //        .TheNext(40)
-    //            .With(o => o.ProtectedBySystem = false)
-    //            .With(o => o.Site.DiffusionId = 0)
-    //        .Build();
-    //    await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations, true);
-
-    //    var searchFilter = new SearchFilterInternalDto
-    //    {
-    //        ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
-    //        Output = new OutputFilterExtendedDto
-    //        {
-    //            Fields = new[] { "diffusionStatus" }
-    //        }
-    //    };
-    //    var apiClient = TestFixture.CreateApiClient();
-
-    //    // Act
-    //    var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-    //    var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-
-    //    // Assert
-    //    response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //    result!.TotalCount.Should().Be(40, because: "40 are public and not diffused");
-    //    result!.Records.Count(o => o.DiffusionStatus == DiffusionStatus.NotDiffused).Should().Be(40, because: "Diffused observations are not return when quering both public and sensitive index");
-    //}
-
-    //[Fact (Skip = "Suggested change to test above")]
-    //public async Task ChangeSuggestion_ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByDiffusionPublicAndSensitiveNoAccess()
-    //{
-    //    const int userId = TestAuthHandler.DefaultTestUserId;
-    //    // Arrange
-    //    var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-    //        .All().HaveValuesFromPredefinedObservations()
-    //        .TheFirst(20)
-    //            .IsDiffused(100)
-    //        .TheNext(20)
-    //            .IsDiffused(500)
-    //        .TheNext(20)
-    //            .IsDiffused(1000)
-    //        .TheNext(40)
-    //            .With(o => o.ProtectedBySystem = false)
-    //            .With(o => o.Site.DiffusionId = 0)
-    //        .Build();
-    //    await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations, true);
-
-    //    var searchFilter = new SearchFilterInternalDto
-    //    {
-    //        ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
-    //        Output = new OutputFilterExtendedDto
-    //        {
-    //            Fields = new[] { "diffusionStatus" }
-    //        }
-    //    };
-    //    var apiClient = TestFixture.CreateApiClient();
-
-    //    // Act
-    //    var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-    //    var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-
-    //    // Assert
-    //    response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //    result!.TotalCount.Should().Be(100);
-    //    result.Records.Count(m => m.DiffusionStatus == DiffusionStatus.NotDiffused).Should().Be(40);
-    //    result.Records.Count(m => m.DiffusionStatus == DiffusionStatus.DiffusedByProvider).Should().Be(60, because: "diffused observations should be prioritized");
-    //}
-
-    //[Fact]
-    //public async Task ObservationsBySearchEndpoint_ReturnsCorrectDiffusion()
-    //{
-    //    const int userId = TestAuthHandler.DefaultTestUserId;
-    //    // Arrange
-    //    var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-    //        .All().HaveValuesFromPredefinedObservations()
-    //        .TheFirst(20)
-    //            .IsDiffused(100)
-    //            .With(o => o.ReportedByUserServiceUserId = userId)
-    //        .TheNext(20)
-    //            .IsDiffused(500)
-    //            .With(o => o.ReportedByUserServiceUserId = userId)
-    //        .TheNext(20)
-    //            .IsDiffused(1000)
-    //            .With(o => o.ReportedByUserServiceUserId = userId)
-    //        .TheNext(40)
-    //            .With(o => o.ProtectedBySystem = false)
-    //            .With(o => o.Site.DiffusionId = 0)
-    //        .Build();
-    //    await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations, true);
-
-    //    var searchFilterSensitive = new SearchFilterInternalDto
-    //    {
-    //        ProtectionFilter = ProtectionFilterDto.Sensitive,
-    //        Output = new OutputFilterExtendedDto
-    //        {
-    //            FieldSet = Lib.Enums.OutputFieldSet.AllWithValues
-    //        }
-    //    };
-    //    var searchFilterPublic = new SearchFilterInternalDto
-    //    {
-    //        ProtectionFilter = ProtectionFilterDto.Public,
-    //        Output = new OutputFilterExtendedDto
-    //        {
-    //            FieldSet = Lib.Enums.OutputFieldSet.AllWithValues
-    //        }
-    //    };
-    //    var apiClient = TestFixture.CreateApiClient();
-
-    //    // Act
-    //    var responseSensitive = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilterSensitive));
-    //    var resultSensitive = await responseSensitive.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-    //    var responsePublic = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilterPublic));
-    //    var resultPublic = await responsePublic.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-
-    //    // Assert
-    //    var sensitiveObs = resultSensitive.Records.First(m => m.Occurrence.OccurrenceId == "urn:lsid:artportalen.se:sighting:1");
-    //    var publicObs = resultPublic.Records.First(m => m.Occurrence.OccurrenceId == "urn:lsid:artportalen.se:sighting:1");
-
-    //    sensitiveObs.Location.DecimalLatitude.Should().NotBe(publicObs.Location.DecimalLatitude, because: "the observation is diffused in public index");
-    //    sensitiveObs.DiffusionStatus.Should().Be(DiffusionStatus.NotDiffused);
-    //    publicObs.DiffusionStatus.Should().Be(DiffusionStatus.DiffusedByProvider);
-    //}
 }
