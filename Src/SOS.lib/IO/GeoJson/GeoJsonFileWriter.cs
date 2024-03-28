@@ -262,7 +262,7 @@ namespace SOS.Lib.IO.GeoJson
                 var nrObservations = 0;
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
                 var propertyFields =
-                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, true);
                 EnsureCoordinatesAreRetrievedFromDb(filter.Output);
                 JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
                 

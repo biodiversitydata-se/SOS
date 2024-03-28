@@ -422,7 +422,7 @@ namespace SOS.Lib.Helpers
 
         public static List<PropertyFieldDescription> GetExportFieldsFromOutputFields(IEnumerable<string> outputFields, IEnumerable<ProjectInfo> projects, bool removeDuplicates = false)
         {
-            var propertyFields = GetExportFieldsFromOutputFields(outputFields, removeDuplicates);
+            var propertyFields = GetExportFieldsFromOutputFields(outputFields?.Distinct(), removeDuplicates);
 
             if (!projects?.Any() ?? true)
             {
@@ -442,7 +442,7 @@ namespace SOS.Lib.Helpers
             }
             else
             {
-                propertyFields = GetPropertyFieldsFromOutputFields(outputFields);
+                propertyFields = GetPropertyFieldsFromOutputFields(outputFields.Distinct());
             }
 
             if (removeDuplicates)
