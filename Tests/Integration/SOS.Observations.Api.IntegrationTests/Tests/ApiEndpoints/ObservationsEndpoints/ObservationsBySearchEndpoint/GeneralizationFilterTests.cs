@@ -123,11 +123,7 @@ public class GeneralizationFilterTests : TestBase
         var searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
-            GeneralizationFilter = new GeneralizationFilterDto
-            {
-                TryGetRealCoordinate = true
-            }
+            Output = new OutputFilterExtendedDto { FieldSet = OutputFieldSet.AllWithValues }
         };
         var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
@@ -354,7 +350,7 @@ public class GeneralizationFilterTests : TestBase
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
         result!.TotalCount.Should().Be(11 + 18 + 14 + 20 + 21, because: "Observations that is in both public and sensitive index, will only return observations from public index.");
         var generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
-        generalizedObservationsCount.Should().Be(11 + 18);
+        generalizedObservationsCount.Should().Be(18, because: "11 generalized observations will be resolved and 18 not");
     }
 
     [Fact]

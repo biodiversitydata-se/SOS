@@ -98,8 +98,8 @@ namespace SOS.Observations.Api.Managers
                     _protectedLogRepository.AddAsync(protectedLog);
                 }
                 
-                // Get real coordinates for diffused observations
-                if (filter.TryGetRealGeneralizedObservation && filter.ExtendedAuthorization != null && filter.ExtendedAuthorization.UserId != 0)
+                // Get real coordinates for diffused observations                
+                if (protectionFilter == ProtectionFilter.BothPublicAndSensitive && filter.ExtendedAuthorization != null && filter.ExtendedAuthorization.UserId != 0)
                 {
                     await ResolveGeneralizedObservations(filter, observations);
                 }
@@ -151,13 +151,17 @@ namespace SOS.Observations.Api.Managers
         {
             var obsByOccurrenceId = CreateObservationsByOccurrenceId(observations);
             var realObsByOccurrenceId = CreateObservationsByOccurrenceId(realObservations);
+            int nrUpdated = 0;
             foreach (var kvp in realObsByOccurrenceId)
             {
                 if (obsByOccurrenceId.TryGetValue(kvp.Key, out var observation))
                 {
                     UpdateGeneralizedWithRealValues(observation, kvp.Value);
+                    nrUpdated++;
                 }
             }
+
+            _logger.LogInformation($"{nrUpdated} generalized observations were updated with real coordinates.");
         }
 
         private Dictionary<string, IDictionary<string, object>> CreateObservationsByOccurrenceId(List<IDictionary<string, object>> observations)

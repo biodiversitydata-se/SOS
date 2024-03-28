@@ -77,12 +77,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// <remarks>
         /// This filter is only used when searching sensitive observations.
         /// </remarks>
-        public bool? IncludeSensitiveGeneralizedObservations { get; set; }
-
-        /// <summary>
-        /// Try get the real coordinate. Only possible if the user has access.
-        /// </summary>
-        public bool TryGetRealGeneralizedObservation { get; set; }
+        public bool? IncludeSensitiveGeneralizedObservations { get; set; }        
 
         /// <summary>
         /// Search for public generalized observations. Default is null.
