@@ -198,13 +198,18 @@ namespace SOS.Lib
 
             query.TryAddTermsCriteria("location.attributes.projectId", internalFilter.SiteProjectIds);
 
-
             query.TryAddTermsCriteria("occurrence.activity.id", internalFilter.ActivityIds);
 
             if (internalFilter.OnlyWithMedia)
             {
-                query.AddMustExistsCriteria("occurrence.associatedMedia");
-                //    query.TryAddWildcardCriteria("occurrence.associatedMedia", "http*");
+                var mediaQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                mediaQuerys.AddMustExistsCriteria("occurrence.associatedMedia");
+                mediaQuerys.AddMustExistsCriteria("artportalenInternal.associatedMedia");
+                query.Add(q => q
+                    .Bool(b => b
+                        .Should(mediaQuerys)
+                    )
+                );
             }
 
             query.TryAddTermCriteria("occurrence.biotope.id", internalFilter.BiotopeId);
