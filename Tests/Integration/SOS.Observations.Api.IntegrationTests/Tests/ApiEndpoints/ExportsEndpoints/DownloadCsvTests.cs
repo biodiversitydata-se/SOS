@@ -149,6 +149,6 @@ public class DownloadCsvTests : TestBase
         var fileEntries = CsvHelper.ReadCsvFile(contentBytes);
         var fileEntry = fileEntries.Single(m => m["OccurrenceId"] == occurrenceId);
         fileEntry["Projects"].Should().NotBeNullOrEmpty();
-        fileEntry["Media"].Should().NotBeNullOrEmpty();
+        fileEntry["ArtportalenInternal.Media"].Should().NotBeNullOrEmpty();
     }
 }
