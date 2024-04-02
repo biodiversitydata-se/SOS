@@ -37,6 +37,7 @@ namespace SOS.Observations.Api.Managers
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ITaxonObservationCountCache _taxonObservationCountCache;
         private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
+        private readonly IGeneralizationResolver _generalizationResolver;
         private readonly ILogger<ObservationManager> _logger;
 
         private async Task<long> GetProvinceCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
@@ -95,15 +96,10 @@ namespace SOS.Observations.Api.Managers
                                 StringComparison.CurrentCultureIgnoreCase)).Select(c => c.Value).FirstOrDefault(),
                         OccurenceIds = occurenceIds
                     };
-                    _protectedLogRepository.AddAsync(protectedLog);
-                }
-                
-                // Get real coordinates for diffused observations                
-                if (protectionFilter == ProtectionFilter.BothPublicAndSensitive && filter.ExtendedAuthorization != null && filter.ExtendedAuthorization.UserId != 0)
-                {
-                    await ResolveGeneralizedObservations(filter, observations);
+                    await _protectedLogRepository.AddAsync(protectedLog);
                 }
 
+                await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, observations);
             }
             catch (Exception e)
             {
@@ -319,6 +315,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="httpContextAccessor"></param>
         /// <param name="taxonObservationCountCache"></param>
         /// <param name="taxonSumAggregationCache"></param>
+        /// <param name="generalizationResolver"></param>
         /// <param name="logger"></param>
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
@@ -328,6 +325,7 @@ namespace SOS.Observations.Api.Managers
             IHttpContextAccessor httpContextAccessor,
             ITaxonObservationCountCache taxonObservationCountCache,
             IClassCache<Dictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
+            IGeneralizationResolver generalizationResolver,
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -339,7 +337,7 @@ namespace SOS.Observations.Api.Managers
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
             _taxonSumAggregationCache = taxonSumAggregationCache ?? throw new ArgumentNullException(nameof(taxonSumAggregationCache));
-
+            _generalizationResolver = generalizationResolver ?? throw new ArgumentNullException(nameof(generalizationResolver));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Make sure we are working with live data

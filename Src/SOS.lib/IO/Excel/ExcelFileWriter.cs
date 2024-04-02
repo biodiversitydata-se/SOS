@@ -33,6 +33,7 @@ namespace SOS.Lib.IO.Excel
         private readonly IProjectManager _projectManager;
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
+        private readonly IGeneralizationResolver _generalizationResolver;
         private readonly ILogger<ExcelFileWriter> _logger;
 
         private void FormatColumns(ExcelWorksheet worksheet, List<PropertyFieldDescription> propertyFields)
@@ -107,12 +108,14 @@ namespace SOS.Lib.IO.Excel
         /// <param name="projectManager"></param>
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
+        /// <param name="generalizationResolver"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ExcelFileWriter(IProcessedObservationCoreRepository processedObservationRepository,
             IProjectManager projectManager,
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
+            IGeneralizationResolver generalizationResolver,
             ILogger<ExcelFileWriter> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -122,6 +125,7 @@ namespace SOS.Lib.IO.Excel
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _vocabularyValueResolver = vocabularyValueResolver ??
                                        throw new ArgumentNullException(nameof(vocabularyValueResolver));
+            _generalizationResolver = generalizationResolver ?? throw new ArgumentNullException(nameof(generalizationResolver));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -174,6 +178,7 @@ namespace SOS.Lib.IO.Excel
 
                     // Resolve vocabulary values.
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
+                    await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedObservations);
 
                     // Write occurrence rows to CSV file.
                     foreach (var observation in processedObservations)

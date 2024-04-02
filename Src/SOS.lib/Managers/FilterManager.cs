@@ -405,6 +405,15 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task PrepareFilterAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
+            if (filter.ExtendedAuthorization.ProtectionFilter == ProtectionFilter.BothPublicAndSensitive && filter.ExtendedAuthorization != null && filter.ExtendedAuthorization.UserId != 0)
+            {
+                var searchFilter = filter as SearchFilter;
+                if (searchFilter != null)
+                {
+                    EnsureIsGeneralizedObservationIsRetrievedFromDb(searchFilter.Output);
+                }
+            }
+
             if (!filter.ExtendedAuthorization.ProtectionFilter.Equals(ProtectionFilter.Public))
             {
                 filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(filter.ExtendedAuthorization.UserId, roleId ?? 0, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
@@ -433,6 +442,15 @@ namespace SOS.Lib.Managers
             }
 
             PrepareTaxonFilter(filter.Taxa);
+        }
+
+        private static void EnsureIsGeneralizedObservationIsRetrievedFromDb(OutputFilter outputFilter)
+        {
+            if (outputFilter?.Fields == null) return;
+            if (!outputFilter.Fields.Any(f => f.Equals("IsGeneralized", StringComparison.CurrentCultureIgnoreCase)))
+            {
+                outputFilter.Fields.Add("IsGeneralized");
+            }
         }
 
         /// <inheritdoc />

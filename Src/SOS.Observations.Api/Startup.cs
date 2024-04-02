@@ -551,6 +551,7 @@ namespace SOS.Observations.Api
 
             // Add Utilites
             services.AddScoped<ISearchFilterUtility, SearchFilterUtility>();
+            services.AddScoped<IGeneralizationResolver, GeneralizationResolver>();
 
             // Add Validators
             services.AddScoped<IInputValidator, InputValidator>();

@@ -38,17 +38,7 @@ namespace SOS.Lib.Extensions
                 outputFields.AddRange(filter.Fields.Where(of => !outputFields.Contains(of, StringComparer.CurrentCultureIgnoreCase)));
             }
             
-            filter.Fields = outputFields;
-            EnsureIsGeneralizedObservationIsRetrievedFromDb(filter);
-        }
-
-        private static void EnsureIsGeneralizedObservationIsRetrievedFromDb(OutputFilter outputFilter)
-        {
-            if (outputFilter?.Fields == null) return;
-            if (!outputFilter.Fields.Any(f => f.Equals("IsGeneralized", StringComparison.CurrentCultureIgnoreCase)))
-            {
-                outputFilter.Fields.Add("IsGeneralized");
-            }
+            filter.Fields = outputFields;                        
         }
     }
 }

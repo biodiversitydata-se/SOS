@@ -28,6 +28,7 @@ namespace SOS.Lib.IO.GeoJson
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
+        private readonly IGeneralizationResolver _generalizationResolver;
         private readonly ILogger<GeoJsonFileWriter> _logger;
 
         private void EnsureCoordinatesAreRetrievedFromDb(OutputFilter outputFilter)
@@ -227,11 +228,13 @@ namespace SOS.Lib.IO.GeoJson
         /// <param name="processedObservationRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
+        /// <param name="generalizationResolver"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public GeoJsonFileWriter(IProcessedObservationCoreRepository processedObservationRepository,
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
+            IGeneralizationResolver generalizationResolver,
             ILogger<GeoJsonFileWriter> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -240,9 +243,9 @@ namespace SOS.Lib.IO.GeoJson
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _vocabularyValueResolver = vocabularyValueResolver ??
                                        throw new ArgumentNullException(nameof(vocabularyValueResolver));
+            _generalizationResolver = generalizationResolver ?? throw new ArgumentNullException(nameof(generalizationResolver));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
 
         /// <inheritdoc />
         public async Task<FileExportResult> CreateFileAync(SearchFilter filter,
@@ -296,6 +299,7 @@ namespace SOS.Lib.IO.GeoJson
                         var processedObservations = CastDynamicsToObservations(searchAfterResult.Records);
 
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
+                        await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedObservations);
 
                         foreach (var observation in processedObservations)
                         {
@@ -308,6 +312,7 @@ namespace SOS.Lib.IO.GeoJson
                         var processedRecords = searchAfterResult.Records.Cast<IDictionary<string, object>>();
 
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
+                        await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedRecords);
 
                         LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);
                         foreach (var record in processedRecords)
