@@ -136,7 +136,7 @@ public class DownloadCsvTests : TestBase
             Output = new OutputFilterDto
             {
                 FieldSet = OutputFieldSet.Extended,
-                Fields = new List<string> { "Occurrence.Media" }
+                Fields = new List<string> { "ArtportalenInternal.Media" }
             }
         };
 
