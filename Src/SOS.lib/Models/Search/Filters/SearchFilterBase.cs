@@ -77,7 +77,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// <remarks>
         /// This filter is only used when searching sensitive observations.
         /// </remarks>
-        public bool? IncludeSensitiveGeneralizedObservations { get; set; }
+        public bool? IncludeSensitiveGeneralizedObservations { get; set; }        
 
         /// <summary>
         /// Search for public generalized observations. Default is null.
@@ -96,6 +96,11 @@ namespace SOS.Lib.Models.Search.Filters
         /// Exclude filter
         /// </summary>
         public ExcludeFilter ExcludeFilter { get; set; }
+
+        /// <summary>
+        /// Observations must match listed occurrence id's
+        /// </summary>
+        public IEnumerable<string> OccurrenceIds { get; set; }
 
         /// <summary>
         /// Filter used to give user extended authorization

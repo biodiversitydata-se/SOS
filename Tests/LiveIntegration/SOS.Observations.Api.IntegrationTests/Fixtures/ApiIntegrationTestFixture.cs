@@ -48,6 +48,7 @@ using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using SOS.Shared.Api.Validators;
 using SOS.Shared.Api.Utilities.Objects;
 using SOS.Shared.Api.Configuration;
+using SOS.Lib.Helpers.Interfaces;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
 {
@@ -220,16 +221,17 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, ProcessedObservationRepository, new NullLogger<DataProviderManager>());
             var fileService = new FileService();
             VocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
+            var generalizationResolverMock = new Mock<GeneralizationResolver>();
             var csvFileWriter = new CsvFileWriter(ProcessedObservationRepository, fileService,
-                VocabularyValueResolver, new NullLogger<CsvFileWriter>());
+                VocabularyValueResolver, generalizationResolverMock.Object, new NullLogger<CsvFileWriter>());
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(VocabularyValueResolver, processClient);
             var dwcArchiveEventFileWriter = CreateDwcArchiveEventFileWriter(VocabularyValueResolver, processClient);
             var excelFileWriter = new ExcelFileWriter(ProcessedObservationRepository,
                 projectManger,
                 fileService,
-                VocabularyValueResolver, new NullLogger<ExcelFileWriter>());
+                VocabularyValueResolver, generalizationResolverMock.Object, new NullLogger<ExcelFileWriter>());
             var geojsonFileWriter = new GeoJsonFileWriter(ProcessedObservationRepository, fileService,
-                VocabularyValueResolver, new NullLogger<GeoJsonFileWriter>());
+                VocabularyValueResolver, generalizationResolverMock.Object, new NullLogger<GeoJsonFileWriter>());
             var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
             var areaCache = new AreaCache(areaRepository);
             var userService = CreateUserService();
@@ -358,6 +360,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 new HttpContextAccessor(),
                 new TaxonObservationCountCache(),
                 new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions())) { CacheDuration = TimeSpan.FromHours(4) },
+                new Mock<IGeneralizationResolver>().Object,
                 new NullLogger<ObservationManager>());
 
             return observationsManager;

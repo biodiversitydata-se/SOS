@@ -1,5 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
@@ -8,7 +7,6 @@ using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Log;
@@ -23,8 +21,6 @@ using SOS.Observations.Api.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers
@@ -41,6 +37,7 @@ namespace SOS.Observations.Api.Managers
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ITaxonObservationCountCache _taxonObservationCountCache;
         private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
+        private readonly IGeneralizationResolver _generalizationResolver;
         private readonly ILogger<ObservationManager> _logger;
 
         private async Task<long> GetProvinceCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
@@ -49,7 +46,7 @@ namespace SOS.Observations.Api.Managers
             return await _processedObservationRepository.GetProvinceCountAsync(filter);
         }
 
-        private void PostProcessObservations(ProtectionFilter protectionFilter, IEnumerable<dynamic> processedObservations, string cultureCode)
+        private async Task PostProcessObservations(SearchFilter filter, ProtectionFilter protectionFilter, IEnumerable<dynamic> processedObservations, string cultureCode)
         {
             if (!processedObservations?.Any() ?? true)
             {
@@ -99,14 +96,213 @@ namespace SOS.Observations.Api.Managers
                                 StringComparison.CurrentCultureIgnoreCase)).Select(c => c.Value).FirstOrDefault(),
                         OccurenceIds = occurenceIds
                     };
-                    _protectedLogRepository.AddAsync(protectedLog);
+                    await _protectedLogRepository.AddAsync(protectedLog);
                 }
+
+                await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, observations);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error in postprocessing observations");
                 throw;
             }
+        }
+
+        private async Task ResolveGeneralizedObservations(SearchFilter filter, List<IDictionary<string, object>> observations)
+        {
+            try
+            {
+                List<IDictionary<string, object>> generalizedObservations = GetGeneralizedObservations(observations);
+                var generalizedOccurrenceIds = GetOccurrenceIds(generalizedObservations);
+                var protectedFilter = filter.Clone();
+                protectedFilter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Sensitive;
+                protectedFilter.IncludeSensitiveGeneralizedObservations = true;
+                protectedFilter.IsPublicGeneralizedObservation = false;
+                protectedFilter.OccurrenceIds = generalizedOccurrenceIds;
+                if (protectedFilter.Output.Fields != null) 
+                { 
+                    if (!protectedFilter.Output.Fields.Contains("Occurrence.OccurrenceId"))
+                    {
+                        protectedFilter.Output.Fields.Add("Occurrence.OccurrenceId");
+                    }
+                    if (!protectedFilter.Output.Fields.Contains("IsGeneralized"))
+                    {
+                        protectedFilter.Output.Fields.Add("IsGeneralized");
+                    }
+                }
+                
+                await _filterManager.PrepareFilterAsync(null, null, protectedFilter); // todo - add role and applicationId
+                var dynamicSensitiveObservationsResult = await _processedObservationRepository.GetChunkAsync(protectedFilter, 0, 1000);
+
+                List<IDictionary<string, object>> sensitiveObservations = dynamicSensitiveObservationsResult.Records.Cast<IDictionary<string, object>>().ToList();
+                UpdateGeneralizedWithRealValues(generalizedObservations, sensitiveObservations);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error when resolving generalized observations");
+            }
+        }
+
+        private void UpdateGeneralizedWithRealValues(List<IDictionary<string, object>> observations, List<IDictionary<string, object>> realObservations)
+        {
+            var obsByOccurrenceId = CreateObservationsByOccurrenceId(observations);
+            var realObsByOccurrenceId = CreateObservationsByOccurrenceId(realObservations);
+            int nrUpdated = 0;
+            foreach (var kvp in realObsByOccurrenceId)
+            {
+                if (obsByOccurrenceId.TryGetValue(kvp.Key, out var observation))
+                {
+                    UpdateGeneralizedWithRealValues(observation, kvp.Value);
+                    nrUpdated++;
+                }
+            }
+
+            _logger.LogInformation($"{nrUpdated} generalized observations were updated with real coordinates.");
+        }
+
+        private Dictionary<string, IDictionary<string, object>> CreateObservationsByOccurrenceId(List<IDictionary<string, object>> observations)
+        {
+            var dict = new Dictionary<string, IDictionary<string, object>>();
+            foreach(var obs in observations)
+            {
+                string? occurrenceId = GetValue<string?>(obs, "occurrence.occurrenceId");
+                if (occurrenceId != null)
+                {
+                    dict.Add(occurrenceId, obs);
+                }
+            }
+
+            return dict;
+        }
+
+        private T? GetValue<T>(IDictionary<string, object> obs, string propertyPath)
+        {
+            var parts = propertyPath
+                .Split(".")                
+                .Select(m => m.ToCamelCase());
+
+            var currentVal = obs;
+            foreach (var part in parts)
+            {
+                if (currentVal.TryGetValue(part, out var currentValObject))
+                {
+                    if (currentValObject is IDictionary<string, object>)
+                    {
+                        currentVal = (IDictionary<string, object>)currentValObject;
+                    }
+                    else
+                    {
+                        return (T)currentValObject;
+                    }                    
+                }
+            }
+
+            return default;
+        }
+
+        private void UpdateValue<T>(IDictionary<string, object> obs, string propertyPath, T newValue)
+        {
+            var parts = propertyPath
+                .Split(".")
+                .Select(m => m.ToCamelCase())
+                .ToList();
+
+            var currentVal = obs;
+            for (int i = 0; i < parts.Count; i++)
+            {
+                string part = parts[i];
+                if (i == parts.Count-1)
+                {
+                    if (currentVal.ContainsKey(part))
+                    {
+                        currentVal[part] = newValue;
+                    }
+                    return;
+                }
+
+                if (currentVal.TryGetValue(part, out var currentValObject))
+                {
+                    if (currentValObject is IDictionary<string, object>)
+                    {
+                        currentVal = (IDictionary<string, object>)currentValObject;
+                    }
+                }
+            }
+        }
+
+        private void UpdateGeneralizedWithRealValues(IDictionary<string, object> obs, IDictionary<string, object> realObs)
+        {            
+            // isGeneralized
+            if (obs.ContainsKey("isGeneralized"))
+            {                               
+                if (realObs.ContainsKey("isGeneralized"))
+                {
+                    obs["isGeneralized"] = realObs["isGeneralized"];
+                }                
+            }
+
+            if (obs.ContainsKey("location"))
+            {
+                if (realObs.ContainsKey("location"))
+                {
+                    obs["location"] = realObs["location"];
+                }
+            }
+
+            // Replace all fields
+            //foreach (var key in obs.Keys)
+            //{
+            //    if (realObs.ContainsKey(key))
+            //    {
+            //        obs[key] = realObs[key];
+            //    }
+            //}
+        }
+
+        private List<string> GetOccurrenceIds(List<IDictionary<string, object>> observations)
+        {
+            var occurrenceIds = new List<string>();
+            foreach (var obs in observations)
+            {
+                // Occurrence
+                if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
+                                out var occurrenceObject))
+                {
+                    var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
+                    if (occurrenceDictionary.TryGetValue("occurrenceId", out var occurrenceId))
+                    {
+                        occurrenceIds.Add((string)occurrenceId);
+                    }
+                }
+            }
+
+            return occurrenceIds;
+        }
+
+        private List<IDictionary<string, object>> GetGeneralizedObservations(List<IDictionary<string, object>> observations)
+        {
+            var generalizedObservations = new List<IDictionary<string, object>>();
+            try
+            {
+                foreach (var obs in observations)
+                {
+                    if (obs == null) continue;
+                    if (obs.ContainsKey("isGeneralized"))
+                    {
+                        bool isGeneralized = (bool)obs["isGeneralized"];
+                        if (isGeneralized)
+                        {
+                            generalizedObservations.Add(obs);
+                        }
+                    }
+                }
+            } 
+            catch(Exception e) 
+            {
+                _logger.LogError(e, "Error when getting generalized observations");
+            }
+
+            return generalizedObservations;
         }
 
         /// <summary>
@@ -119,6 +315,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="httpContextAccessor"></param>
         /// <param name="taxonObservationCountCache"></param>
         /// <param name="taxonSumAggregationCache"></param>
+        /// <param name="generalizationResolver"></param>
         /// <param name="logger"></param>
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
@@ -128,6 +325,7 @@ namespace SOS.Observations.Api.Managers
             IHttpContextAccessor httpContextAccessor,
             ITaxonObservationCountCache taxonObservationCountCache,
             IClassCache<Dictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
+            IGeneralizationResolver generalizationResolver,
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -139,7 +337,7 @@ namespace SOS.Observations.Api.Managers
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
             _taxonSumAggregationCache = taxonSumAggregationCache ?? throw new ArgumentNullException(nameof(taxonSumAggregationCache));
-
+            _generalizationResolver = generalizationResolver ?? throw new ArgumentNullException(nameof(generalizationResolver));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Make sure we are working with live data
@@ -162,7 +360,7 @@ namespace SOS.Observations.Api.Managers
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetChunkAsync(filter, skip, take);
-                PostProcessObservations(filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
+                await PostProcessObservations(filter, filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
 
                 return processedObservations;
             }
@@ -195,7 +393,7 @@ namespace SOS.Observations.Api.Managers
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, scrollId);
-                PostProcessObservations(filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
+                await PostProcessObservations(filter, filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
                 return processedObservations;
             }
             catch (AuthenticationRequiredException)
@@ -413,7 +611,7 @@ namespace SOS.Observations.Api.Managers
 
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
 
-            PostProcessObservations(protectionFilter, processedObservation, translationCultureCode);
+            await PostProcessObservations(filter, protectionFilter, processedObservation, translationCultureCode);
 
             return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
         }
