@@ -136,7 +136,7 @@ public class DownloadCsvTests : TestBase
             Output = new OutputFilterDto
             {
                 FieldSet = OutputFieldSet.Extended,
-                Fields = new List<string> { "ArtportalenInternal.Media" }
+                Fields = new List<string> { "Occurrence.Media" }
             }
         };
 
@@ -149,6 +149,6 @@ public class DownloadCsvTests : TestBase
         var fileEntries = CsvHelper.ReadCsvFile(contentBytes);
         var fileEntry = fileEntries.Single(m => m["OccurrenceId"] == occurrenceId);
         fileEntry["Projects"].Should().NotBeNullOrEmpty();
-        fileEntry["ArtportalenInternal.Media"].Should().NotBeNullOrEmpty();
+        fileEntry["Media"].Should().BeNullOrEmpty(); // Media files from AP are not exported
     }
 }
