@@ -177,8 +177,18 @@ namespace SOS.Lib.IO.Excel
                     var processedObservations = searchResult.Records.ToArray();
 
                     // Resolve vocabulary values.
+                    var debugObs = processedObservations.FirstOrDefault(m => m.Occurrence.OccurrenceId == "urn:lsid:artportalen.se:sighting:75884919");
+                    if (debugObs != null)
+                    {
+                        _logger.LogInformation($"Values before generalization resolve: CoordinateUncertaintyInMeters={debugObs.Location.CoordinateUncertaintyInMeters}, DecimalLongitude={debugObs.Location.DecimalLongitude}, DecimalLatitude={debugObs.Location.DecimalLatitude}");
+                    }
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
                     await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedObservations);
+                    debugObs = processedObservations.FirstOrDefault(m => m.Occurrence.OccurrenceId == "urn:lsid:artportalen.se:sighting:75884919");
+                    if (debugObs != null)
+                    {
+                        _logger.LogInformation($"Values after generalization resolve: CoordinateUncertaintyInMeters={debugObs.Location.CoordinateUncertaintyInMeters}, DecimalLongitude={debugObs.Location.DecimalLongitude}, DecimalLatitude={debugObs.Location.DecimalLatitude}");
+                    }
 
                     // Write occurrence rows to CSV file.
                     foreach (var observation in processedObservations)

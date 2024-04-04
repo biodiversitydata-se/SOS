@@ -598,9 +598,13 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<dynamic> GetObservationAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet,
-            string translationCultureCode, bool protectedObservations, bool includeInternalFields)
+            string translationCultureCode, bool protectedObservations, bool includeInternalFields, bool resolveGeneralizedObservations)
         {
             var protectionFilter = protectedObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public;
+            if (!protectedObservations && resolveGeneralizedObservations)
+            {
+                protectionFilter = ProtectionFilter.BothPublicAndSensitive;
+            }
             var filter = includeInternalFields ?
                 new SearchFilterInternal(userId ?? 0, protectionFilter) { NotPresentFilter = SightingNotPresentFilter.IncludeNotPresent } :
                 new SearchFilter(userId ?? 0, protectionFilter);

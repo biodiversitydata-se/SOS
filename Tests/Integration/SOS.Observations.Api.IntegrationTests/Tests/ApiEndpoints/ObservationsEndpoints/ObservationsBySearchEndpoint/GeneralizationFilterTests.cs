@@ -10,6 +10,7 @@ using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Lib.Enums;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
+using SOS.Observations.Api.IntegrationTests.Helpers;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
@@ -155,6 +156,118 @@ public class GeneralizationFilterTests : TestBase
         publicObservation.Processed.IsGeneralized.Should().BeFalse();
         publicObservation.Processed.Location.CoordinateUncertaintyInMeters.Should().Be(publicObservation.Verbatim.Site.Accuracy);
     }
+
+    [Fact]
+    public async Task ObservationByIdEndpoint_ReturnsExpectedObservationsWithCorrectCoordinates_WhenFetchingSensitiveObservationWithUserAccess()
+    {
+        // Arrange
+        const int userId = TestAuthHandler.DefaultTestUserId;
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(1) // Observations that will be diffused in public index, and real coordinates in sensitive index.
+                .IsDiffused(1000)
+                .With(o => o.ReportedByUserServiceUserId = userId)
+                .With(o => o.ProtectedBySystem = false)
+            .TheNext(1) // Observations that will be diffused in public index, and real coordinates in sensitive index. The user doesn't have access to sensitive obs.
+                .IsDiffused(1000)
+                .With(o => o.ReportedByUserServiceUserId = userId + 1)
+                .With(o => o.ProtectedBySystem = false)
+            .TheNext(1) // Sensitive observations with user access
+                .HaveTaxonSensitivityCategory(3)
+                .With(o => o.ReportedByUserServiceUserId = userId)
+            .TheNext(1) // Sensitive observations without user access
+                .HaveTaxonSensitivityCategory(3)
+                .With(o => o.ReportedByUserServiceUserId = userId + 1)
+            .TheNext(1) // Public observations with no diffusion
+                .With(o => o.ProtectedBySystem = false)
+                .With(o => o.Site.DiffusionId = 0)
+            .Build();
+
+        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
+            UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
+
+        // Act, Assert - Get public observations (with user access to one observation)
+        var verbatimDiffusedObsWithAccess = verbatimObservations.ElementAt(0);
+        var response = await apiClientWithAccessToUser.GetAsync($"/observations/internal?occurrenceId=urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithAccess.SightingId}&resolveGeneralizedObservations=true");
+        var diffusedObsWithAccess = await response.Content.ReadFromJsonAsync<Observation>();
+        diffusedObsWithAccess!.IsGeneralized.Should().BeFalse();
+        diffusedObsWithAccess.Location.CoordinateUncertaintyInMeters.Should().Be(verbatimDiffusedObsWithAccess.Site.Accuracy, because: "the user has access to the real coordinates");
+        var point = new Point(verbatimDiffusedObsWithAccess.Site.XCoord, verbatimDiffusedObsWithAccess.Site.YCoord);
+        var transformedPoint = point.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+        diffusedObsWithAccess.Location.DecimalLongitude.Should().BeApproximately(transformedPoint.X, 0.1);
+        diffusedObsWithAccess.Location.DecimalLatitude.Should().BeApproximately(transformedPoint.Y, 0.1);
+
+        // Act, Assert - Get public observations (with user access to one observation) - no resolve
+        response = await apiClientWithAccessToUser.GetAsync($"/observations/internal?occurrenceId=urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithAccess.SightingId}&resolveGeneralizedObservations=false");
+        var diffusedObsWithAccessNoResolve = await response.Content.ReadFromJsonAsync<Observation>();
+        diffusedObsWithAccessNoResolve!.IsGeneralized.Should().BeFalse();
+        diffusedObsWithAccessNoResolve.Location.CoordinateUncertaintyInMeters.Should().Be(verbatimDiffusedObsWithAccess.Site.DiffusionId, because: "the user has access to the real coordinates");
+        point = new Point(verbatimDiffusedObsWithAccess.Site.XCoordDiffused!.Value, verbatimDiffusedObsWithAccess.Site.YCoordDiffused!.Value);
+        transformedPoint = point.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+        diffusedObsWithAccessNoResolve.Location.DecimalLongitude.Should().BeApproximately(transformedPoint.X, 0.1);
+        diffusedObsWithAccessNoResolve.Location.DecimalLatitude.Should().BeApproximately(transformedPoint.Y, 0.1);
+
+        // Act, Assert - diffused observation without user access
+        var verbatimDiffusedObsWithoutAccess = verbatimObservations.ElementAt(1);
+        response = await apiClientWithAccessToUser.GetAsync($"/observations/internal?occurrenceId=urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithoutAccess.SightingId}&resolveGeneralizedObservations=true");
+        var diffusedObsWithoutAccess = await response.Content.ReadFromJsonAsync<Observation>();
+        diffusedObsWithoutAccess!.IsGeneralized.Should().BeTrue();
+        diffusedObsWithoutAccess.Location.CoordinateUncertaintyInMeters.Should().Be(verbatimDiffusedObsWithoutAccess.Site.DiffusionId, because: "the user has not access to the real coordinates");
+        point = new Point(verbatimDiffusedObsWithoutAccess.Site.XCoordDiffused!.Value, verbatimDiffusedObsWithoutAccess.Site.YCoordDiffused!.Value);
+        transformedPoint = point.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+        diffusedObsWithoutAccess.Location.DecimalLongitude.Should().BeApproximately(transformedPoint.X, 0.1);
+        diffusedObsWithoutAccess.Location.DecimalLatitude.Should().BeApproximately(transformedPoint.Y, 0.1);
+    }
+
+    [Fact]
+    public async Task DownloadCsvFileEndpoint_ReturnsExpectedObservationsWithCorrectCoordinates_WhenSearchingSensitiveObservationsWithUserAccess()
+    {
+        // Arrange
+        const int userId = TestAuthHandler.DefaultTestUserId;
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(1) // Observations that will be diffused in public index, and real coordinates in sensitive index.
+                .IsDiffused(1000)
+                .With(o => o.ReportedByUserServiceUserId = userId)
+                .With(o => o.ProtectedBySystem = false)
+            .TheNext(1) // Observations that will be diffused in public index, and real coordinates in sensitive index. The user doesn't have access to sensitive obs.
+                .IsDiffused(1000)
+                .With(o => o.ReportedByUserServiceUserId = userId + 1)
+                .With(o => o.ProtectedBySystem = false)
+            .TheNext(1) // Sensitive observations with user access
+                .HaveTaxonSensitivityCategory(3)
+                .With(o => o.ReportedByUserServiceUserId = userId)
+            .TheNext(1) // Sensitive observations without user access
+                .HaveTaxonSensitivityCategory(3)
+                .With(o => o.ReportedByUserServiceUserId = userId + 1)
+            .TheNext(1) // Public observations with no diffusion
+                .With(o => o.ProtectedBySystem = false)
+                .With(o => o.Site.DiffusionId = 0)
+            .Build();
+
+        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
+            UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
+        var searchFilter = new SearchFilterInternalDto
+        {
+            ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
+            Output = new OutputFilterExtendedDto { FieldSet = OutputFieldSet.AllWithValues }
+        };       
+
+        // Act
+        var response = await apiClientWithAccessToUser.PostAsync($"/exports/internal/download/csv?gzip=false", JsonContent.Create(searchFilter));
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+
+        // Assert
+        var verbatimDiffusedObsWithAccess = verbatimObservations.ElementAt(0);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var fileEntries = CsvHelper.ReadCsvFile(contentBytes);
+        fileEntries.Count.Should().Be(4);
+        var fileEntry = fileEntries.Single(m => m["OccurrenceId"] == $"urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithAccess.SightingId}");
+        fileEntry["CoordinateUncertaintyInMeters"].Should().Be(verbatimDiffusedObsWithAccess.Site.Accuracy.ToString());  
+    }
+
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingSensitiveObservationsWithUserAccess()

@@ -123,6 +123,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="translationCultureCode"></param>
         /// <param name="protectedObservations"></param>
         /// <param name="includeInternalFields"></param>
+        /// <param name="resolveGeneralizedObservations"></param>
         /// <returns></returns>
         Task<dynamic> GetObservationAsync(
             int? userId,
@@ -132,7 +133,8 @@ namespace SOS.Observations.Api.Managers.Interfaces
             OutputFieldSet outputFieldSet,
             string translationCultureCode,
             bool protectedObservations,
-            bool includeInternalFields);
+            bool includeInternalFields,
+            bool resolveGeneralizedObservations);
 
         /// <summary>
         /// Get user year counts
