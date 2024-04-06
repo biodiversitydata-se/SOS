@@ -57,7 +57,7 @@ namespace SOS.Lib.Helpers
                     }
                 }
 
-                await _filterManager.PrepareFilterAsync(null, null, protectedFilter); // todo - add role and applicationId
+                await _filterManager.PrepareFilterAsync(protectedFilter.RoleId, protectedFilter.AuthorizationApplicationIdentifier, protectedFilter);
                 var dynamicSensitiveObservationsResult = await _processedObservationRepository.GetChunkAsync(protectedFilter, 0, 1000);
 
                 List<IDictionary<string, object>> sensitiveObservations = dynamicSensitiveObservationsResult.Records.Cast<IDictionary<string, object>>().ToList();
@@ -99,7 +99,7 @@ namespace SOS.Lib.Helpers
                     }
                 }
 
-                await _filterManager.PrepareFilterAsync(null, null, protectedFilter); // todo - add role and applicationId
+                await _filterManager.PrepareFilterAsync(filter.RoleId, filter.AuthorizationApplicationIdentifier, protectedFilter);
                 var dynamicSensitiveObservationsResult = await _processedObservationRepository.GetChunkAsync(protectedFilter, 0, 1000);
 
                 var sensitiveObservations = CastDynamicsToObservations(dynamicSensitiveObservationsResult.Records);
@@ -125,7 +125,10 @@ namespace SOS.Lib.Helpers
                 }
             }
 
-            _logger.LogInformation($"{nrUpdated} generalized observations were updated with real coordinates.");
+            if (nrUpdated > 0)
+            {
+                _logger.LogInformation($"{nrUpdated} generalized observations were updated with real coordinates.");
+            }
         }       
 
         private void UpdateGeneralizedWithRealValues(List<Observation> observations, List<Observation> realObservations)
@@ -142,7 +145,10 @@ namespace SOS.Lib.Helpers
                 }
             }
 
-            _logger.LogInformation($"{nrUpdated} generalized observations were updated with real coordinates.");
+            if (nrUpdated > 0)
+            {
+                _logger.LogInformation($"{nrUpdated} generalized observations were updated with real coordinates.");
+            }
         }
 
         private Dictionary<string, IDictionary<string, object>> GetObservationsByOccurrenceIdDictionary(List<IDictionary<string, object>> observations)

@@ -405,6 +405,9 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task PrepareFilterAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
+            filter.RoleId = roleId;
+            filter.AuthorizationApplicationIdentifier = authorizationApplicationIdentifier;
+
             if (filter.ExtendedAuthorization.ProtectionFilter == ProtectionFilter.BothPublicAndSensitive && filter.ExtendedAuthorization != null && filter.ExtendedAuthorization.UserId != 0)
             {
                 var searchFilter = filter as SearchFilter;

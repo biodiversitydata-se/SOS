@@ -51,6 +51,9 @@ namespace SOS.Lib.Models.Search.Filters
             NotVerified
         }
 
+        public int? RoleId { get; set; }
+        public string AuthorizationApplicationIdentifier { get; set; }
+
         /// <summary>
         ///     Only get data from these providers
         /// </summary>
