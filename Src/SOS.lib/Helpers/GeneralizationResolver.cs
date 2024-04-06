@@ -239,6 +239,42 @@ namespace SOS.Lib.Helpers
                     obs["location"] = realObs["location"];
                 }
             }
+            
+            if (obs.ContainsKey("sensitive"))
+            {
+                if (realObs.ContainsKey("sensitive"))
+                {
+                    obs["sensitive"] = realObs["sensitive"];
+                }
+            }
+
+            if (obs.ContainsKey("sensitive"))
+            {
+                if (realObs.ContainsKey("sensitive"))
+                {
+                    obs["sensitive"] = realObs["sensitive"];
+                }
+            }
+            
+            if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
+                            out var occurrenceObject))
+            {
+                var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
+                if (occurrenceDictionary.TryGetValue("sensitivityCategory", out var sensitivityCategory))
+                {
+                    if (realObs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
+                            out var realOccurrenceObject))
+                    {
+                        var realOccurrenceDictionary = realOccurrenceObject as IDictionary<string, object>;
+                        if (realOccurrenceDictionary.ContainsKey("sensitivityCategory"))
+                        {
+                            realOccurrenceDictionary["sensitivityCategory"] = sensitivityCategory;
+                        }
+                    }
+                }
+            }
+
+
 
             // Replace all fields
             //foreach (var key in obs.Keys)
@@ -255,6 +291,8 @@ namespace SOS.Lib.Helpers
             // isGeneralized                        
             obs.IsGeneralized = realObs.IsGeneralized;
             obs.Location = realObs.Location;
+            obs.Sensitive = realObs.Sensitive;
+            obs.Occurrence.SensitivityCategory = realObs.Occurrence.SensitivityCategory;
         }       
 
         private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)
