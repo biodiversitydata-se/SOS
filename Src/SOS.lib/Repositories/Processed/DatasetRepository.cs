@@ -46,6 +46,7 @@ namespace SOS.Lib.Repositories.Processed
                         .KeyWordLowerCase(kwlc => kwlc.Title, false)
                         .KeyWordLowerCase(kwlc => kwlc.ProgrammeArea, false)
                         .KeyWordLowerCase(kwlc => kwlc.DescriptionAccessRights, false)
+                        .KeyWordLowerCase(kwlc => kwlc.License, false)
                         .KeyWordLowerCase(kwlc => kwlc.Description, false)
                         .KeyWordLowerCase(kwlc => kwlc.Spatial, false)
                         .KeyWordLowerCase(kwlc => kwlc.Language, false)

@@ -103,6 +103,12 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         public string DescriptionAccessRights { get; set; }
 
         /// <summary>
+        /// States which Creative Commons license that is applied to the dataset.
+        /// Note that any attachments included in the dataset have their own separate licenses.
+        /// </summary>
+        public string License { get; set; }
+
+        /// <summary>
         /// The language that is used when writing metadata about the dataset.
         /// </summary>
         public string Metadatalanguage { get; set; }

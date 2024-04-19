@@ -55,6 +55,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     StartDate = verbatimDataset.StartDate.HasValue ? verbatimDataset.StartDate.Value.ToUniversalTime() : null,
                     Title = verbatimDataset.Title?.Clean(),
                     DescriptionAccessRights = verbatimDataset.DescriptionAccessRights?.Clean(),
+                    License = verbatimDataset.License?.Clean(),
                 };
 
                 return observationDataset;
