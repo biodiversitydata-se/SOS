@@ -499,7 +499,7 @@ namespace SOS.Harvest.DarwinCore
             var jsonSerializerOptions = new JsonSerializerOptions()
             {
                 PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter() }
+                Converters = { new JsonStringEnumConverterWithAttributeSupport() }
             };
 
             var observationDatasets = JsonSerializer.Deserialize<List<DwcVerbatimDataset>>(jsonFileStream, jsonSerializerOptions);
