@@ -526,7 +526,10 @@ namespace SOS.Lib.Repositories.Processed
                 );
 
                 var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                return epoch.AddMilliseconds(res.Aggregations?.Max("latestModified")?.Value ?? 0);
+
+                var latestModified = epoch.AddMilliseconds(res.Aggregations?.Max("latestModified")?.Value ?? 0);
+                // If there is incorrect data from the futeure, get data from 5 min back in time
+                return latestModified > DateTime.UtcNow ? DateTime.UtcNow.AddMinutes(-5) : latestModified;
             }
             catch (Exception e)
             {
@@ -736,6 +739,7 @@ namespace SOS.Lib.Repositories.Processed
             {
                 CheckNodes(elasticConfiguration.Clusters.First().Hosts?.Count() ?? 0);
             }
+           
             _taxonManager = taxonManager;
         }
 

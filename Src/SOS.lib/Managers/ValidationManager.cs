@@ -83,6 +83,14 @@ namespace SOS.Lib.Managers
         {
             var observationValidation = new InvalidObservation(observation.DataProviderId.ToString(), dataProvider.Names.Translate("en-GB"), observation.Occurrence.OccurrenceId);
 
+            if (observation.Modified.HasValue && observation.Modified.Value > DateTime.UtcNow)
+            {
+                observationValidation.Defects.Add(new ObservationDefect(
+                    ObservationDefect.ObservationDefectType.LogicError,
+                    "Modified date is in the future")
+                );
+            }
+
             if (observation.Event?.StartDate == null || observation.Event.EndDate == null)
             {
                 observationValidation.Defects.Add(new ObservationDefect(
