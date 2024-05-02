@@ -51,7 +51,7 @@ namespace SOS.Harvest.Processors
 
         private string GetAreaKey(AreaType areatype, string? featureId) => $"{areatype}-{featureId}";
 
-        private Lib.Models.Processed.Observation.Taxon GetTaxonByName(string name, bool ignoreDuplicates = false)
+        private Lib.Models.Processed.Observation.Taxon GetTaxonByName(string name, string? scientificNameAuthorship, bool ignoreDuplicates = false)
         {
             if (string.IsNullOrEmpty(name)) return null!;
             name = name.ToLower();
@@ -74,6 +74,24 @@ namespace SOS.Harvest.Processors
                 }
             }
 
+            // Get by scientific name - author
+            string? nameWithoutAuthor = null;
+            if (!string.IsNullOrEmpty(scientificNameAuthorship))
+            {
+                nameWithoutAuthor = name.Replace(scientificNameAuthorship, "", StringComparison.InvariantCultureIgnoreCase).Trim();                
+            }            
+            if (nameWithoutAuthor != null)
+            {
+                if (_taxonByScientificName.TryGetValues(nameWithoutAuthor, out taxa))
+                {
+                    if (taxa.Count == 1 || ignoreDuplicates)
+                    {
+                        return taxa.First();
+                    }
+                }
+            }
+
+
             // Get by synonyme
             if (_taxonBySynonymName.TryGetValues(name, out taxa))
             {
@@ -89,6 +107,18 @@ namespace SOS.Harvest.Processors
                 if (taxa.Count == 1 || ignoreDuplicates)
                 {
                     return taxa.First();
+                }
+            }
+
+            // Get by synonyme - author            
+            if (nameWithoutAuthor != null)
+            {
+                if (_taxonBySynonymName.TryGetValues(nameWithoutAuthor, out taxa))
+                {
+                    if (taxa.Count == 1 || ignoreDuplicates)
+                    {
+                        return taxa.First();
+                    }
                 }
             }
 
@@ -156,7 +186,8 @@ namespace SOS.Harvest.Processors
         /// <param name="verbatimId"></param>
         /// <param name="verbatimName"></param>
         /// <returns></returns>
-        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!, bool ignoreDuplicates = false, string? verbatimId = null, string? verbatimName = null)
+        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!, string? scientificNameAuthorship = null,
+            bool ignoreDuplicates = false, string? verbatimId = null, string? verbatimName = null)
         {
             Lib.Models.Processed.Observation.Taxon? taxon = null;
             var taxonFound = taxonId < 0 ? false : Taxa.TryGetValue(taxonId, out taxon);
@@ -165,7 +196,7 @@ namespace SOS.Harvest.Processors
                 // If we can't find taxon by id or taxon id is 0 (biota), try by name/s if passed
                 foreach (var name in names)
                 {
-                    taxon = GetTaxonByName(name, ignoreDuplicates);
+                    taxon = GetTaxonByName(name, scientificNameAuthorship, ignoreDuplicates);
                     if (taxon != null)
                     {
                         break;

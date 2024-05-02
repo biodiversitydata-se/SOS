@@ -46,6 +46,7 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyValueResolver =
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
+            var generalizationResolverMock = new Mock<GeneralizationResolver>();
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     vocabularyValueResolver,
@@ -81,11 +82,11 @@ namespace SOS.Export.LiveIntegrationTests.Managers
             var projectManager = new ProjectManager(projectInfoCache, new NullLogger<ProjectManager>());
             var excelWriter = new ExcelFileWriter(processedObservationRepository,
                 projectManager,
-                new FileService(), vocabularyValueResolver,
+                new FileService(), vocabularyValueResolver, generalizationResolverMock.Object,
                 new NullLogger<ExcelFileWriter>());
-            var geoJsonlWriter = new GeoJsonFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
+            var geoJsonlWriter = new GeoJsonFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver, generalizationResolverMock.Object,
                 new NullLogger<GeoJsonFileWriter>());
-            var csvWriter = new CsvFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
+            var csvWriter = new CsvFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver, generalizationResolverMock.Object,
                 new NullLogger<CsvFileWriter>());
 
             var filterManager = new Mock<IFilterManager>();

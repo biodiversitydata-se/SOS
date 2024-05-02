@@ -784,9 +784,10 @@ namespace SOS.Lib
             query.TryAddNotRecoveredFilter(filter);
             query.TryAddValidationStatusFilter(filter);
             query.TryAddTaxonCriteria(filter.Taxa);
+            query.TryAddTermsCriteria("occurrence.occurrenceId", filter.OccurrenceIds);
 
             //query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));            
-            
+
             // Only possible to use generalization filter when searching sensitive observations.
             if (filter.ExtendedAuthorization?.ProtectionFilter == ProtectionFilter.Public || filter.ExtendedAuthorization?.ProtectionFilter == ProtectionFilter.BothPublicAndSensitive)
             {

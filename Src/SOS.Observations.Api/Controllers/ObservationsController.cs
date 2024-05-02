@@ -82,6 +82,7 @@ namespace SOS.Observations.Api.Controllers
         /// If true, and the requested observation is sensitive (protected), then the original data will be returned (this requires authentication and authorization).
         /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.
         /// </param>
+        /// <param name="resolveGeneralizedObservations">If true, then try get real coordinates for generalized observations.</param>
         /// <returns></returns>
         [HttpGet("{id?}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
@@ -96,7 +97,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string occurrenceId,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool sensitiveObservations = false)
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool resolveGeneralizedObservations = false)
         {
             try
             {
@@ -105,7 +107,7 @@ namespace SOS.Observations.Api.Controllers
                 occurrenceId = WebUtility.UrlDecode(id ?? occurrenceId);
 
                 var observation = await _observationManager.GetObservationAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
-                    includeInternalFields: false);
+                    includeInternalFields: false, resolveGeneralizedObservations);
 
                 if (observation == null)
                 {
@@ -649,7 +651,7 @@ namespace SOS.Observations.Api.Controllers
                 id = WebUtility.UrlDecode(id);
 
                 var observation = await _observationManager.GetObservationAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, id, OutputFieldSet.All, translationCultureCode, sensitiveObservations,
-                    includeInternalFields: false);
+                    includeInternalFields: false, false);
 
                 if (observation == null)
                 {
@@ -782,6 +784,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, sensitive observations index is queried if you have access rights.</param>
+        /// <param name="resolveGeneralizedObservations">If true, then try get real coordinates for generalized observations.</param>
         /// <returns></returns>
         [HttpGet("Internal/{id?}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
@@ -796,7 +799,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string occurrenceId,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool sensitiveObservations = false)
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool resolveGeneralizedObservations = false)
         {
             try
             {
@@ -807,7 +811,7 @@ namespace SOS.Observations.Api.Controllers
                     this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
-                    includeInternalFields: true);
+                    includeInternalFields: true, resolveGeneralizedObservations);
                 if (observation == null)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);

@@ -14,6 +14,11 @@ namespace SOS.Lib.Models.Search.Filters
         public List<ExtendedAuthorizationAreaFilter> ExtendedAreas { get; set; }
 
         /// <summary>
+        /// Exclude generalized occurrence ids from public index and get them from sensitive index.
+        /// </summary>
+        public List<string> ExcludeGeneralizedOccurrenceIds { get; set; }
+
+        /// <summary>
         /// Only get observations observed by me
         /// </summary>
         public bool? ObservedByMe { get; set; }

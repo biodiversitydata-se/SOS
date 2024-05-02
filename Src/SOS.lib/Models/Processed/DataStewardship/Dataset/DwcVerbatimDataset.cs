@@ -3,6 +3,7 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Enums;
 using System;
 using System.Collections.Generic;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
 {
@@ -97,6 +98,12 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         /// When the dataset is not public or access is restricted  (see the property accessRights), how and/or why is described here.
         /// </summary>
         public string DescriptionAccessRights { get; set; }
+
+        /// <summary>
+        /// States which Creative Commons license that is applied to the dataset.
+        /// Note that any attachments included in the dataset have their own separate licenses.
+        /// </summary>
+        public string License { get; set; }
 
         /// <summary>
         /// The language that is used when writing metadata about the dataset.

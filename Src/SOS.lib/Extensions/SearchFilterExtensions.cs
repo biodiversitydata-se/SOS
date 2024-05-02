@@ -37,8 +37,8 @@ namespace SOS.Lib.Extensions
             {
                 outputFields.AddRange(filter.Fields.Where(of => !outputFields.Contains(of, StringComparer.CurrentCultureIgnoreCase)));
             }
-
-            filter.Fields = outputFields;
+            
+            filter.Fields = outputFields;                        
         }
     }
 }

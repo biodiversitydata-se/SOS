@@ -462,12 +462,12 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     }
                 }
             }
-
-            return GetTaxon(parsedTaxonId, new[]
-            {
+            
+            return GetTaxon(parsedTaxonId,
+            [
                 verbatim.ScientificName,
                 verbatim.Species
-            }, true, verbatim.TaxonID);
+            ], verbatim.ScientificNameAuthorship, true, verbatim.TaxonID);
         }
 
         private VocabularyValue? GetSosId(string val,

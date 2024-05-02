@@ -92,7 +92,7 @@ namespace SOS.Shared.Api.Extensions.Dto
                     PublicGeneralizationFilterDto.NoFilter => null,
                     null => null,
                     _ => null
-                };
+                };                
             }
 
             if (searchFilterBaseDto.OccurrenceStatus != null)
