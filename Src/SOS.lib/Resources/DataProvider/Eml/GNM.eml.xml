@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml
+    xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+    xmlns:dc="https://purl.org/dc/terms/"
+    xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+    xmlns:sos="https://sos-search.artdata.slu.se/"
+    xmlns:gbif="https://gbif.org/"
+    xmlns:snd="https://snd.gu.se/"
+    xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
+    packageId="33b4a8ce-5810-d1fb-fd4f-adad1f53d9fa" system="https://sos-search.artdata.slu.se/"
+    scope="system" xml:lang="en">
+	<dataset>
+		<alternateIdentifier>4508bed1-d45d-4a2d-9790-34cc99ee8cce</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=gnm-ent</alternateIdentifier>
+		<title xml:lang="eng">Entomological Collection (GNM)</title>
+		<creator>
+			<individualName>
+				<givenName>Charlotte</givenName>
+				<surName>Jonsson</surName>
+			</individualName>
+			<organizationName>Gothenburg Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<deliveryPoint>Museivägen 10</deliveryPoint>
+				<city>Gothenburg</city>
+				<postalCode>41311</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>charlotte.g.jonsson@vgregion.se</electronicMailAddress>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Charlotte</givenName>
+				<surName>Jonsson</surName>
+			</individualName>
+			<organizationName>Gothenburg Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<deliveryPoint>Museivägen 10</deliveryPoint>
+				<city>Gothenburg</city>
+				<postalCode>41311</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>charlotte.g.jonsson@vgregion.se</electronicMailAddress>
+		</metadataProvider>
+		<associatedParty>
+			<individualName>
+				<givenName>Kevin</givenName>
+				<surName>Holston</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<deliveryPoint>Frescativägen 40</deliveryPoint>
+				<city>Stockholm, Sweden</city>
+				<postalCode>114 18</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>kevin.holston@nrm.se</electronicMailAddress>
+			<userId directory="http://orcid.org/">0000-0002-0786-4069</userId>
+			<role>curator</role>
+		</associatedParty>
+		<associatedParty>
+			<individualName>
+				<givenName>Manash</givenName>
+				<surName>Shah</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Database Developer</positionName>
+			<address>
+				<deliveryPoint>Frescativägen 40</deliveryPoint>
+				<city>Stockholm</city>
+				<postalCode>114 18</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>manash.shah@nrm.se</electronicMailAddress>
+			<role>programmer</role>
+		</associatedParty>
+		<pubDate> 2024-04-29 </pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>The insect collection at Gothenburg Natural History Museum (GNM) contains several million specimens of insects from many areas of the world. The oldest specimens date are from the early 19th century. Some of the collections were donated to the museum by private individuals, and we also have specimens from inventories carried out by museum staff, mainly at localities in Sweden. The vast majority of the Swedish material comes from the museum's ”Terrestrial invertebrate faunistic research program”, which was carried out from the 1920s until 1981. This has contributed to high numbers and a rich diversity of ground-dwelling insects in the collection, such as Carabidae (ground beetles) and Staphylinidae (rove beetles).</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Specimen</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the
+				<ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>
+				. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">https://www.gnm.se/en/samlingar--forskning-eng/our-collections/the-insect-collection/</url>
+			</online>
+		</distribution>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>The collection consists of specimens from the entire globe, but with main focus on the southwest region of Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>-180</westBoundingCoordinate>
+					<eastBoundingCoordinate>180</eastBoundingCoordinate>
+					<northBoundingCoordinate>90</northBoundingCoordinate>
+					<southBoundingCoordinate>-90</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>Insects (Insecta)</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Insecta</taxonRankValue>
+					<commonName>Insects</commonName>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para/>
+			</description>
+			<maintenanceUpdateFrequency>irregular</maintenanceUpdateFrequency>
+		</maintenance>
+		<contact>
+			<individualName>
+				<givenName>Charlotte</givenName>
+				<surName>Jonsson</surName>
+			</individualName>
+			<organizationName>Gothenburg Museum of Natural History</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<deliveryPoint>Museivägen 10</deliveryPoint>
+				<city>Gothenburg</city>
+				<postalCode>41311</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>charlotte.g.jonsson@vgregion.se</electronicMailAddress>
+			<onlineUrl>http://www.gnm.se/samlingar/olika-samlingar/insektssamlingen/</onlineUrl>
+		</contact>
+	</dataset>
+	<dataset>
+		<alternateIdentifier>be07e8c1-0d79-4e39-9697-2a9ec687f8f8</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=gnm-everte</alternateIdentifier>
+		<title xml:lang="eng">Invertebrates of the Gothenburg Natural History Museum (GNM)</title>
+		<creator>
+			<individualName>
+				<givenName>Christian</givenName>
+				<surName>Bohm</surName>
+			</individualName>
+			<organizationName>Natural History Museum</organizationName>
+			<positionName>System administrator</positionName>
+			<address>
+				<city>Göteborg</city>
+				<country>SE</country>
+			</address>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Charlotte</givenName>
+				<surName>Jonsson</surName>
+			</individualName>
+			<organizationName>Gothenburg Natural History Museum</organizationName>
+			<positionName>Administrator</positionName>
+			<address>
+				<city>Gothenburg</city>
+				<country>SE</country>
+			</address>
+		</metadataProvider>
+		<pubDate> 2023-03-23 </pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>This database contains specimens of invertebrates from the Gothenburg natural history museum, collected from the early 1800´s to the present. New specimens are added continuously. The main bulk of the collection consists of ethanol-preserved specimens of marine benthic invertebrates (notably L.A. Jägerskiölds marine survey 1921-1938 and the Swedish Taxonomy Initiative´s marine survey 2004-2009), parasitic worms from the Swedish west coast (notably collections from Peter Olsson and Orvar Nybelin) and dry mollusc shells. However, there are both wet and dry preserved specimens of a wide array of taxa from the entire world.</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the
+				<ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>
+				. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>The collection consists of specimens from the entire globe, but with main focus on the southwest region of Sweden with the Skagerrak and Kattegatt seas.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>-180</westBoundingCoordinate>
+					<eastBoundingCoordinate>-180</eastBoundingCoordinate>
+					<northBoundingCoordinate>90</northBoundingCoordinate>
+					<southBoundingCoordinate>-90</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>Foraminiferan protista and all Metazoa, except Vertebrata, Hexapoda, Myriapoda, Arachnida, Pulmonata and various terrestrial Gastropoda.</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>kingdom</taxonRankName>
+					<taxonRankValue>Animalia</taxonRankValue>
+					<commonName>Animals</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Foraminifera</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Mollusca</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Annelida</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Echinodermata</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Arthropoda</taxonRankValue>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para/>
+			</description>
+			<maintenanceUpdateFrequency>irregular</maintenanceUpdateFrequency>
+		</maintenance>
+		<contact>
+			<individualName>
+				<givenName>Charlotte</givenName>
+				<surName>Jonsson</surName>
+			</individualName>
+			<organizationName>Gothenburg Natural History Museum</organizationName>
+			<positionName>Administrator</positionName>
+			<address>
+				<city>Gothenburg</city>
+				<country>SE</country>
+			</address>
+		</contact>
+	</dataset>
+	<dataset>
+		<alternateIdentifier>7fcf98b0-0c63-11dd-84d0-b8a03c50a862</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=gnm-molluscs</alternateIdentifier>
+		<title xml:lang="eng">Molluscs of the Gothenburg Natural History Museum (GNM)</title>
+		<creator>
+			<individualName>
+				<givenName>Charlotte</givenName>
+				<surName>Jonsson</surName>
+			</individualName>
+			<organizationName>Gothenburg Natural History Museum</organizationName>
+			<positionName>Administrator</positionName>
+			<address>
+				<city>Gothenburg</city>
+				<country>SE</country>
+			</address>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Charlotte</givenName>
+				<surName>Jonsson</surName>
+			</individualName>
+			<organizationName>Gothenburg Natural History Museum</organizationName>
+			<positionName>Administrator</positionName>
+			<address>
+				<city>Gothenburg</city>
+			</address>
+			<electronicMailAddress>charlotte.g.jonsson@vgregion.se</electronicMailAddress>
+		</metadataProvider>
+		<pubDate> 2023-03-17 </pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>The ”Terrestrial invertebrate faunistic research program” at the Göteborg Natural History Museum comprises of land living molluscs /snails and slugs specimens from more than 28.000 localities. Only a small part, specimens from the county of Västerbottens län (724 localities), has so far been exported to GBIF.</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Observation</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the
+				<ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>
+				. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>Specimens from the county of Västerbottens län, Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>10.547</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.258</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.287</northBoundingCoordinate>
+					<southBoundingCoordinate>54.978</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<taxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>phylum</taxonRankName>
+					<taxonRankValue>Mollusca</taxonRankValue>
+					<commonName>Molluscs</commonName>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para/>
+			</description>
+			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+		</maintenance>
+		<contact>
+			<individualName>
+				<givenName>Charlotte</givenName>
+				<surName>Jonsson</surName>
+			</individualName>
+			<organizationName>Gothenburg Natural History Museum</organizationName>
+			<positionName>Administrator</positionName>
+			<address>
+				<city>Gothenburg</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>charlotte.g.jonsson@vgregion.se</electronicMailAddress>
+		</contact>
+	</dataset>
+	<dataset>
+		<alternateIdentifier>ed3dff78-fb73-4b77-909a-b78f9ef78d34</alternateIdentifier>
+		<alternateIdentifier>http://www.gbif.se/ipt/resource?r=gnm-verte</alternateIdentifier>
+		<title xml:lang="eng">Vertebrates of the Gothenburg Natural History Museum (GNM)</title>
+		<creator>
+			<individualName>
+				<givenName>Christian</givenName>
+				<surName>Bohm</surName>
+			</individualName>
+			<organizationName>Natural History Museum</organizationName>
+			<positionName>System administrator</positionName>
+			<address>
+				<city>Göteborg</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>christian.bohm@vgregion.se</electronicMailAddress>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Charlotte</givenName>
+				<surName>Jonsson</surName>
+			</individualName>
+			<organizationName>Gothenburg Natural History Museum</organizationName>
+			<positionName>Administrator</positionName>
+			<address>
+				<city>Gothenburg</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>charlotte.g.jonsson@vgregion.se</electronicMailAddress>
+		</metadataProvider>
+		<pubDate> 2021-03-18 </pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>This database contains specimens of vertebrates from the Gothenburg Natural History Museum, collected from the early 1800's to present. New specimens are added continuously. Most of the birds and mammals are preserved as skins, while most fishes, amphibians and reptiles are preserved in alcohol. There are however, both wet and dry preserved specimens of a wide array of taxa from the entire world. The collections also include eggs and skeletons. The collection contains in total slightly less than 63 000 specimens, of which about half are birds. Fishes, amphibians & reptiles, and mammals are represented by roughly 10 000 specimens each. The bone collection contains about 18 000 skeletons, and the egg collection approximately 10 000 broods of which more than 1000 includes egg from common cuckoo, Cuculus canorus.</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the
+				<ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>
+				. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">http://www.gnm.se/en/Vastarvet---natural-and-cultural-heritage-in-West-Sweden/Subsites/Goteborgs-Naturhistoriska-Museum/Facts/Facts---visningssida/?btid=episerver_59450</url>
+			</online>
+		</distribution>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>The collection consists of specimens from the entire globe, but with main focus on the southwest region of Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>-180</westBoundingCoordinate>
+					<eastBoundingCoordinate>180</eastBoundingCoordinate>
+					<northBoundingCoordinate>90</northBoundingCoordinate>
+					<southBoundingCoordinate>-90</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<temporalCoverage>
+				<rangeOfDates>
+					<beginDate>
+						<calendarDate>1800-01-01</calendarDate>
+					</beginDate>
+					<endDate>
+						<calendarDate>2017-10-25</calendarDate>
+					</endDate>
+				</rangeOfDates>
+			</temporalCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>Pisces, Amphibia, Reptilia, Aves and Mammalia.</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Aves</taxonRankValue>
+					<commonName>Birds</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Pisces</taxonRankValue>
+					<commonName>Fish</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Mammalia</taxonRankValue>
+					<commonName>Mammals</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Amphibia</taxonRankValue>
+					<commonName>Amphibians</commonName>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Reptilia</taxonRankValue>
+					<commonName>Reptiles</commonName>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para/>
+			</description>
+			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+		</maintenance>
+		<contact>
+			<individualName>
+				<givenName>Charlotte</givenName>
+				<surName>Jonsson</surName>
+			</individualName>
+			<organizationName>Gothenburg Natural History Museum</organizationName>
+			<positionName>Administrator</positionName>
+			<address>
+				<city>Gothenburg</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>charlotte.g.jonsson@vgregion.se</electronicMailAddress>
+		</contact>
+	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2018-09-06T03:56:50.748+02:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Jonsson C (2020): Entomological Collection (GNM). v1.1. Gothenburg Natural History Museum (GNM). Dataset/Occurrence. http://www.gbif.se/ipt/resource?r=gnm-ent&amp;v=1.1</citation>
+				<dc:replaces>4508bed1-d45d-4a2d-9790-34cc99ee8cce/v1.171.xml</dc:replaces>
+			</gbif>
+			<gbif>
+				<dateStamp>2012-08-06T02:00:35.101+02:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<dc:replaces>be07e8c1-0d79-4e39-9697-2a9ec687f8f8/v6.5.xml</dc:replaces>
+			</gbif>
+			<gbif>
+				<dateStamp>2015-05-13T02:47:45.606+02:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Jonsson C (2023). Molluscs of the Gothenburg Natural History Museum (GNM). Version 2.6. Gothenburg Natural History Museum (GNM). Occurrence dataset. https://www.gbif.se/ipt/resource?r=gnm-molluscs&v=2.6</citation>
+				<dc:replaces>7fcf98b0-0c63-11dd-84d0-b8a03c50a862/v2.6.xml</dc:replaces>
+			</gbif>
+			<gbif>
+				<dateStamp>2012-08-09T06:15:06.527+02:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Bohm C (2021): Vertebrates of the Gothenburg Natural History Museum (GNM). v4.3. Gothenburg Natural History Museum (GNM). Dataset/Occurrence. http://www.gbif.se/ipt/resource?r=gnm-verte&v=4.3</citation>
+				<dc:replaces>ed3dff78-fb73-4b77-909a-b78f9ef78d34/v4.3.xml</dc:replaces>
+			</gbif>
+		</metadata>
+	</additionalMetadata>
+</eml:eml>
+
