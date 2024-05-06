@@ -462,12 +462,20 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     }
                 }
             }
-            
-            return GetTaxon(parsedTaxonId,
-            [
-                verbatim.ScientificName,
-                verbatim.Species
-            ], verbatim.ScientificNameAuthorship, true, verbatim.TaxonID);
+            var names = new HashSet<string> {
+                verbatim.ScientificName
+            };
+            if (!string.IsNullOrEmpty(verbatim.Species))
+            {
+                names.Add(verbatim.Species);
+            }
+            var braketStart = verbatim.ScientificName?.IndexOf('(') ?? 0;
+            if (braketStart > 0)
+            {
+                names.Add(verbatim.ScientificName!.Substring(0, braketStart - 1).Trim());
+            }
+
+            return GetTaxon(parsedTaxonId, names, verbatim.ScientificNameAuthorship, true, verbatim.TaxonID);
         }
 
         private VocabularyValue? GetSosId(string val,

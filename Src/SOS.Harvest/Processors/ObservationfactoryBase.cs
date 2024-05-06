@@ -91,7 +91,6 @@ namespace SOS.Harvest.Processors
                 }
             }
 
-
             // Get by synonyme
             if (_taxonBySynonymName.TryGetValues(name, out taxa))
             {
