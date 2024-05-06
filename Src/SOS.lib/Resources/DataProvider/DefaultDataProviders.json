@@ -1842,113 +1842,195 @@
     "Url": "https://www.slu.se/centrumbildningar-och-projekt/nils/",
     "UseVerbatimFileInExport": false
   },
-  {
-    "Categories": [
-      "MuseumCollections",
-      "NationalInventory",
-      "Terrestrial",
-      "Freshwater",
-      "Marine",
-      "Vertebrates",
-      "Invertebrates",
-      "Arthropods"
-    ],
-    "ContactPerson": {
-      "FirstName": "Charlotte",
-      "LastName": "Jonsson",
-      "Email": "charlotte.g.jonsson@vgregion.se"
+    {
+        "Categories": [
+            "MuseumCollections",
+            "NationalInventory",
+            "Terrestrial",
+            "Freshwater",
+            "Marine",
+            "Vertebrates",
+            "Invertebrates",
+            "Arthropods"
+        ],
+        "ContactPerson": {
+            "FirstName": "Charlotte",
+            "LastName": "Jonsson",
+            "Email": "charlotte.g.jonsson@vgregion.se"
+        },
+        "CoordinateUncertaintyInMeters": 5000,
+        "CreateEventDwC": false,
+        "Datasets": [
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-ent",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-ent",
+                "identifier": "gnm-ent",
+                "isActive": true,
+                "name": "Entomological Collection (GNM)",
+                "type": "Observations"
+            },
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-everte",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-everte",
+                "identifier": "gnm-everte",
+                "isActive": true,
+                "name": "Invertebrates of the Gothenburg Natural History Museum",
+                "type": "Observations"
+            },
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-molluscs",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-molluscs",
+                "identifier": "gnm-molluscs",
+                "isActive": true,
+                "name": "Molluscs of the Gothenburg Natural History Museum (GNM)",
+                "type": "Observations"
+            },
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-verte",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-verte",
+                "identifier": "gnm-verte",
+                "isActive": true,
+                "name": "Vertebrates of the Gothenburg Natural History Museum (GNM)",
+                "type": "Observations"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Data from the Gothenburg Natural History Museum (GNM) contain georeferenced records of insects from the Entomological Collection, molluscs, invertebrates and vertebrates. The insect collection contains donations to the museum by private individuals, and also specimens from inventories carried out by museum staff, mainly at localities in Sweden. The vast majority of the Swedish material comes from the ”Terrestrial invertebrate faunistic research program” at the Gothenburg Natural History Museum, which was carried out from the 1920s until 1981. This has contributed to high numbers and a rich diversity of ground-dwelling insects in the collection, such as Carabidae (ground beetles) and Staphylinidae (rove beetles). The majority of the Swedish material of molluscs also comes from the ”Terrestrial invertebrate faunistic research program”, comprising of land living molluscs (snails and slugs) specimens from more than 28.000 localities. Only a small part, specimens from the county of Västerbotten (724 localities), has so far been published at GBIF. SLU Swedish Species Information Centre in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides the georeferenced records (records with coordinates) from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": ""
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 26,
+        "Identifier": "GNM",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Collections of the Gothenburg Natural History Museum (GNM), via GBIF"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Samlingar från Göteborgs naturhistoriska museum (GNM), via GBIF"
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Gothenburg Natural History Museum"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Göteborgs naturhistoriska museum"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Gothenburg Natural History Museum", "Collections of the Gothenburg Natural History Museum" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "Göteborgs naturhistoriska museum", "Samlingar från Göteborgs naturhistoriska museum" ]
+            }
+        ],
+        "PreviousProcessLimit": 95,
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": false,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
+        "Url": "https://www.gnm.se/en/samlingar--forskning-eng/our-collections/",
+        "UseVerbatimFileInExport": false
     },
-    "CoordinateUncertaintyInMeters": 5000,
-    "CreateEventDwC": false,
-    "Datasets": [
-      {
-        "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-ent",
-        "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-ent",
-        "identifier": "gnm-ent",
-        "isActive": true,
-        "name": "Entomological Collection (GNM)",
-        "type": "Observations"
-      },
-      {
-        "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-everte",
-        "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-everte",
-        "identifier": "gnm-everte",
-        "isActive": true,
-        "name": "Invertebrates of the Gothenburg Natural History Museum",
-        "type": "Observations"
-      },
-      {
-        "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-molluscs",
-        "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-molluscs",
-        "identifier": "gnm-molluscs",
-        "isActive": true,
-        "name": "Molluscs of the Gothenburg Natural History Museum (GNM)",
-        "type": "Observations"
-      },
-      {
-        "dataUrl": "https://www.gbif.se/ipt/archive.do?r=gnm-verte",
-        "emlUrl": "https://www.gbif.se/ipt/eml.do?r=gnm-verte",
-        "identifier": "gnm-verte",
-        "isActive": true,
-        "name": "Vertebrates of the Gothenburg Natural History Museum (GNM)",
-        "type": "Observations"
-      }
-    ],
-    "Descriptions": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Data from the Gothenburg Natural History Museum (GNM) contain georeferenced records of insects from the Entomological Collection, molluscs, invertebrates and vertebrates. The insect collection contains donations to the museum by private individuals, and also specimens from inventories carried out by museum staff, mainly at localities in Sweden. The vast majority of the Swedish material comes from the ”Terrestrial invertebrate faunistic research program” at the Gothenburg Natural History Museum, which was carried out from the 1920s until 1981. This has contributed to high numbers and a rich diversity of ground-dwelling insects in the collection, such as Carabidae (ground beetles) and Staphylinidae (rove beetles). The majority of the Swedish material of molluscs also comes from the ”Terrestrial invertebrate faunistic research program”, comprising of land living molluscs (snails and slugs) specimens from more than 28.000 localities. Only a small part, specimens from the county of Västerbotten (724 localities), has so far been published at GBIF. SLU Swedish Species Information Centre in collaboration with the Swedish Biodiversity Data Infrastructure SBDI provides the georeferenced records (records with coordinates) from taxa contained in the Swedish taxonomic database Dyntaxa and that have been collected in Sweden. The records are obtained via the web service at GBIF.org."
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": ""
-      }
-    ],
-    "HarvestFailPreventProcessing": false,
-    "HarvestSchedule": "* * * * *",
-    "Id": 26,
-    "Identifier": "GNM",
-    "IncludeInHealthCheck": true,
-    "IncludeInScheduledHarvest": true,
-    "IncludeInSearchByDefault": true,
-    "IsActive": true,
-    "Names": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Collections of the Gothenburg Natural History Museum (GNM), via GBIF"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Samlingar från Göteborgs naturhistoriska museum (GNM), via GBIF"
-      }
-    ],
-    "Organizations": [
-      {
-        "CultureCode": "en-GB",
-        "Value": "Gothenburg Natural History Museum"
-      },
-      {
-        "CultureCode": "sv-SE",
-        "Value": "Göteborgs naturhistoriska museum"
-      }
-    ],
-    "Paths": [
-      {
-        "CultureCode": "en-GB",
-        "path": [ "Gothenburg Natural History Museum", "Collections of the Gothenburg Natural History Museum" ]
-      },
-      {
-        "CultureCode": "sv-SE",
-        "path": [ "Göteborgs naturhistoriska museum", "Samlingar från Göteborgs naturhistoriska museum" ]
-      }
-    ],
-    "PreviousProcessLimit": 95,
-    "SupportDatasets": false,
-    "SupportDynamicEml": false,
-    "SupportEvents": false,
-    "SupportIncrementalHarvest": false,
-    "Type": "DwcA",
-    "Url": "https://www.gnm.se/en/samlingar--forskning-eng/our-collections/",
-    "UseVerbatimFileInExport": false
-  }
+    {
+        "Categories": [
+            "MuseumCollections",
+            "Terrestrial",
+            "Freshwater",
+            "Invertebrates",
+            "Arthropods"
+        ],
+        "ContactPerson": {
+            "FirstName": "Christoffer",
+            "LastName": "Fägerström",
+            "Email": "christoffer.fagerstrom@biol.lu.se"
+        },
+        "CoordinateUncertaintyInMeters": 5000,
+        "CreateEventDwC": false,
+        "Datasets": [
+            {
+                "dataUrl": "https://www.gbif.se/ipt/archive.do?r=mzlu_ento_specimens",
+                "emlUrl": "https://www.gbif.se/ipt/eml.do?r=mzlu_ento_specimens",
+                "identifier": "mzlu_ento_specimens",
+                "isActive": true,
+                "name": "Lund University Biological Museum - Insect collections Specimens",
+                "type": "Observations"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The dataset is based on an indvidual registration database of pinned, dry specimens, microscope slides or wet collection specimens. One record is usually but not always equivalent to one specimen. Some records are multiple specimens on the same pin with the same collecting information or multiple specimens in a vial with ethanol or on a slide, coming from one collecting event. The dataset contains close to 300 000 specimens, of which 83 % originate from Sweden. It is not representative of our collection as it the data were gathered based on special project needs."
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Datauppsättningen är baserad på en individuell registreringsdatabas med monterade insekter, torra prover, objektglas eller våta prover. En post motsvarar vanligtvis men inte alltid ett exemplar. Vissa poster är flera prover på samma stift med samma insamlingsinformation eller flera prover i en flaska med etanol eller på ett objektglas som kommer från en insamlingshändelse. Datauppsättningen innehåller närmare 300 000 exemplar, varav 83 % kommer från Sverige. Det är inte representativt för vår insamling eftersom data samlades in utifrån särskilda projektbehov."
+            }
+        ],
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *",
+        "Id": 27,
+        "Identifier": "MZLU_ENTO_SPECIMENS",
+        "IncludeInHealthCheck": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInSearchByDefault": true,
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Entomological Collections, via university in Lund "
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Entomologiska samlingarna, via Lunds universitet"
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Lund University"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Lunds universitet"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Biological Museum in Lund", "Entomological Collections" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "Lunds biologiska museum", "Entomologiska samlingarna" ]
+            }
+        ],
+        "PreviousProcessLimit": 95,
+        "SupportDatasets": false,
+        "SupportDynamicEml": false,
+        "SupportEvents": false,
+        "SupportIncrementalHarvest": false,
+        "Type": "DwcA",
+        "Url": "https://www.gbif.org/dataset/b23c2479-214f-4160-9f98-bd3831ab131b",
+        "UseVerbatimFileInExport": false
+    }
 ]
