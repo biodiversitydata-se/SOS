@@ -8,7 +8,7 @@ xml:lang="eng">
 	<dataset>
 		<alternateIdentifier>38c1351d-9cfe-42c0-97da-02d2c8be141c</alternateIdentifier>
 		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=smtp-nrm</alternateIdentifier>
-		<title xml:lang="eng">Swedish Malaise Trap Project (SMTP) Collection Inventory</title>
+		<title xml:lang="eng">Swedish Malaise Trap Project (SMTP)</title>
 		<creator>
 			<individualName>
 				<givenName>Kevin</givenName>
@@ -68,7 +68,7 @@ xml:lang="eng">
 				<givenName>Dave</givenName>
 				<surName>Karlsson</surName>
 			</individualName>
-			<organizationName>Swedish Museum of Natural History</organizationName>
+			<organizationName>Station Linné</organizationName>
 			<positionName>Curator</positionName>
 			<address>
 				<city>Farjestaden</city>

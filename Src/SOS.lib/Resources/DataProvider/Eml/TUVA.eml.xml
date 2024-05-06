@@ -20,7 +20,7 @@ xml:lang="eng">
 				<city>Jönköping</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>Susanne.lindh@jordbruksverket.se</electronicMailAddress>
+			<electronicMailAddress>Susanne.Lindh@jordbruksverket.se</electronicMailAddress>
 		</creator>
 		<metadataProvider>
 			<individualName>
@@ -33,7 +33,7 @@ xml:lang="eng">
 				<city>Jönköping</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>Susanne.lindh@jordbruksverket.se</electronicMailAddress>
+			<electronicMailAddress>Susanne.Lindh@jordbruksverket.se</electronicMailAddress>
 		</metadataProvider>
 		<associatedParty>
 			<individualName>
@@ -132,16 +132,16 @@ xml:lang="eng">
 
 		<contact>
 			<individualName>
-				<givenName>Anna</givenName>
-				<surName>Blomquist</surName>
+				<givenName>Susanne</givenName>
+				<surName>Lindh</surName>
 			</individualName>
 			<organizationName>Swedish Board of Agriculture</organizationName>
-			<positionName>Head of TUVA</positionName>
+			<positionName></positionName>
 			<address>
 				<city>Jönköping</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>Anna.Blomquist@jordbruksverket.se</electronicMailAddress>
+			<electronicMailAddress>Susanne.Lindh@jordbruksverket.se</electronicMailAddress>
 		</contact>
 	</dataset>
 	<additionalMetadata>

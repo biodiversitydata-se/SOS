@@ -13,7 +13,7 @@
 		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:ButterflyMonitoring</alternateIdentifier>
 		<title>Swedish Butterfly Monitoring Scheme (SeBMS)</title>
 		<creator>
-			<organizationName>Lund University</organizationName>
+			<organizationName>Department of Biology, Lund University</organizationName>
 			<address>
 				<city>Lund</city>
 				<country>SE</country>
@@ -23,7 +23,7 @@
 			<sos:contactNameType>Organizational</sos:contactNameType>
 		</creator>
 		<metadataProvider>
-			<organizationName>Lund University</organizationName>
+			<organizationName>Department of Biology, Lund University</organizationName>
 			<address>
 				<city>Lund</city>
 				<country>SE</country>
@@ -86,11 +86,11 @@
 		</maintenance>
 		<contact>
 			<individualName>
-				<givenName></givenName>
-				<surName></surName>
+				<givenName>Lars B.</givenName>
+				<surName>Pettersson</surName>
 			</individualName>
-			<electronicMailAddress></electronicMailAddress>
-			<organizationName>Lund University</organizationName>
+			<electronicMailAddress>lars.pettersson@biol.lu.se</electronicMailAddress>
+			<organizationName>Department of Biology, Lund University, Sweden</organizationName>
 			<address>
 				<city>Lund</city>
 				<country>SE</country>

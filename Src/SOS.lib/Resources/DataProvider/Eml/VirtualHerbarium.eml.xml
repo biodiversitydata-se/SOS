@@ -11,7 +11,7 @@
 	<dataset>
 		<identifier>33de556f-5923-ccd5f-3eed-31e55c95a5f7</identifier>
         <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:VirtualHerbarium</alternateIdentifier>
-        <title>Swedish Virtual Herbarium</title>
+        <title>Sweden's Virtual Herbarium</title>
 		<creator>
 			<organizationName>Umeå University</organizationName>
 			<address>
@@ -36,7 +36,7 @@
 		<language>ENGLISH</language>
         <licenseName></licenseName>
 		<abstract>
-			<para>The six largest herbaria in Sweden are gathered in the Virtual Herbarium. Herbarium (GB) - Gothenburg, Botanical Museum (LD) - Lund, Biological Museum (OHN) - Oskarshamn, Swedish Museum of Natural History (S) - Stockholm, Herbarium (UME) - Umeå, Museum of Evolution (UPS) - Uppsala.</para>
+			<para>Records of specimen from the six largest herbaria in Sweden are gathered in the Virtual Herbarium, including Herbarium (GB) - Gothenburg, Botanical Museum (LD) - Lund, Biological Museum (OHN) - Oskarshamn, Swedish Museum of Natural History (S) - Stockholm, Herbarium (UME) - Umeå, Museum of Evolution (UPS) - Uppsala.</para>
 		</abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>

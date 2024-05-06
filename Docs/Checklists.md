@@ -1,5 +1,5 @@
 ﻿# Checklists
-*2022-06-22. These endpoints needs to be revised and are temporarily unavailable. They will be available in the fall of 2022.*
+*2022-06-22. These endpoints needs to be revised and are temporarily unavailable. More information will be found here in the future.*
 
 SOS has support for [Artportalen checklists](https://www.artportalen.se/Home/ChecklistInfo) and [Swedish national forest inventory vegetation data (Riksskogstaxeringens vegetationsdata) checklists](https://www.slu.se/riksskogstaxeringen).
 
