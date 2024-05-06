@@ -510,7 +510,7 @@
         "path": [ "SMHI", "SHARK Svenskt HavsARKiv" ]
       }
     ],
-    "PreviousProcessLimit": 90,
+    "PreviousProcessLimit": 70,
     "SupportDatasets": false,
     "SupportDynamicEml": false,
     "SupportEvents": false,
