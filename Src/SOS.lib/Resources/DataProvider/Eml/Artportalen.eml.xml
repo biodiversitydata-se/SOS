@@ -17,10 +17,10 @@
 		<publisher>SLU Artdatabanken</publisher>
 		<creator>
 			<individualName>
-				<givenName>Johan</givenName>
-				<surName>Liljeblad</surName>
+				<givenName></givenName>
+				<surName></surName>
 			</individualName>
-			<positionName>Systems Manager</positionName>
+			<positionName></positionName>
 			<organizationName>SLU Swedish Species Information Centre</organizationName>
 			<address>
 				<deliveryPoint>PO Box 7007</deliveryPoint>
@@ -28,11 +28,11 @@
 				<postalCode>SE-750 07</postalCode>
 				<country>SWEDEN</country>
 			</address>
-			<phone>+4618671434</phone>
-			<electronicMailAddress>Johan.Liljeblad@slu.se</electronicMailAddress>
+			<phone></phone>
+			<electronicMailAddress>support@artportalen.se</electronicMailAddress>
 			<onlineUrl>https://www.artportalen.se/</onlineUrl>
-			<userId directory="https://orcid.org/">0000-0003-0442-8162</userId>
-			<sos:contactNameType>Personal</sos:contactNameType>
+			<userId></userId>
+			<sos:contactNameType>Organisational</sos:contactNameType>
 		</creator>
 		<metadataProvider>
 			<individualName>
@@ -57,8 +57,15 @@
 		<language>ENGLISH</language>
 		<abstract>
 			<para>
-				Artportalen (Swedish Species Observation System) is a website for reporting and retrieving information on observations of Sweden’s plants, animals and fungi. Observations are entered individually or are part of several thousand subsets/projects (some of which are individually searchable) by individuals and NGOs (95% of data), by public authorities or agencies, and by corporate enterprises. An observation may include not only the species identity, reporter identity, location and date but additional information such as habitat type and weather can also be entered. Ca. 93% of all data contained in the dataset is public (open access), the remainder is sensitive data requiring special permission.
-				Artportalen covers more than 30 000 Swedish species out of the 62 200 recorded in total from the country, including plants (12% of data representing flowering plants and mosses), vertebrates (3 % fishes and herptiles, 74% birds, 0.2% mammals), invertebrates (7%) and fungi (4%). 80% of all data represent observations made from 2001-present, and almost all remaining observations refer to the period 1951-2000. Taxa, nomenclature and hierarchy are sourced from Dyntaxa - The Swedish Taxonomic Database.
+				Artportalen is a website for reporting and retrieving information on observations of Sweden’s plants, animals and fungi. Observations are entered individually or into several thousand subsets/projects (some of which are individually searchable at Artportalen.se) by individuals and NGOs (95% of data), by public authorities or agencies, and by corporate enterprises. An observation may include not only the species identity, reporter identity, location and date but additional information such as habitat type and weather can also be entered.
+			</para>
+			<para>
+				Access to ca. 93% of all data contained in the original dataset is unrestricted, the remainder is data for sensitive species as classified by the national checklist of sensitive species managed by SLU Swedish Species Information Centre. This dataset contains the open data. The restricted data can be retrieved from the original dataset given permission and requiring special log-in credentials.
+			</para>
+			<para>
+				Artportalen covers more than 40 000 Swedish species out of the 62 600 recorded in total from the country, including plants (18% of data representing flowering plants and mosses), vertebrates (0.2% fishes and herptiles, 70% birds, 0.4% mammals), invertebrates (8%) and fungi (4%). 81% of all data represent observations made from 2001-present, and almost all remaining observations refer to the period 1951-2000. Taxa, nomenclature and hierarchy are sourced from Dyntaxa – the Swedish taxonomic database.
+			</para>
+			<para>
 				Artportalen is developed and operated by the SLU Swedish Species Information Centre (SLU Artdatabanken) at the Swedish University of Agricultural Sciences, on behalf of the Swedish Environmental Protection Agency.
 			</para>
 		</abstract>
@@ -105,9 +112,11 @@
 		</coverage>
 		<maintenance>
 			<description>
-				<para/>
-			</description>
-			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+				<para>
+					Observations are added continuesly to the Artportalen database. Errors that may be detected can be corrected any time and records modiefied accordingly continuesly in the database. Records are harvested daily to a species observation datalayer from which updates to GBIF are made weekly.
+				</para>
+				</description>
+			<maintenanceUpdateFrequency>weekly</maintenanceUpdateFrequency>
 		</maintenance>
 		<contact>
 			<individualName>
@@ -163,7 +172,7 @@
 				<gbif>
 					<dateStamp>2021-10-07T08:59:17Z</dateStamp>
 					<hierarchyLevel>dataset</hierarchyLevel>
-					<citation>Shah M, Liljeblad J (2021). Artportalen (Swedish Species Observation System). Version 92.254. SLU Artdatabanken. Occurrence dataset https://doi.org/10.15468/kllkyl accessed via GBIF.org on 2021-10-07.</citation>
+					<citation>SLU Artdatabanken (2021). Artportalen (Swedish Species Observation System). Version 92.254. SLU Artdatabanken. Occurrence dataset https://doi.org/10.15468/kllkyl accessed via GBIF.org on 2021-10-07.</citation>
 				</gbif>
 			</metadata>
 			<sos:dateCreated/>
@@ -176,4 +185,3 @@
 		</additionalMetadata>
 	</dataset>
 </eml:eml>
-
