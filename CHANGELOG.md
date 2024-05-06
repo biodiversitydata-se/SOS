@@ -1,5 +1,21 @@
 # Changelog
 
+## [2024.05.03]
+
+### `Added`
+- Support for Artportalen generalized observations when using `ProtectionFilter.BothPublicAndSensitive`. If you have permission, you will get the correct coordinate, otherwise you will get the generalized coordinate.
+
+### `Changed`
+- Artportalen media is moved from `occurrence.media` to `artportalenInternal.media` due to licenses.
+- Artportalen DwC-A multimedia extension is not using the identifier property anymore due to licenses.
+
+### `Fixed`
+- Prevent duplicate output fields in exports.
+
+### `Other`
+- Improved Artportalen incremental harvest stability.
+
+
 ## [2024.02.06]
 
 ### `Added`
