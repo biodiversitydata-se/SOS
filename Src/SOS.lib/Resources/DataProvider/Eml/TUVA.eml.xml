@@ -1,5 +1,6 @@
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
 		 xmlns:dc="http://purl.org/dc/terms/"
+		 xmlns:sos="https://sos-search.artdata.slu.se/"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
 		 packageId="59bc8df0-0c71-11dd-84d4-b8a03c50a862/v2.4" system="http://gbif.org" scope="system"

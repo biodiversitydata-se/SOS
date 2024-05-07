@@ -1,6 +1,7 @@
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
 		 xmlns:dc="http://purl.org/dc/terms/"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns:sos="https://sos-search.artdata.slu.se/"
 		 xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
 		 packageId="38c1351d-9cfe-42c0-97da-02d2c8be141c/v27.817" system="http://gbif.org" scope="system"
 xml:lang="eng">
@@ -135,11 +136,12 @@ xml:lang="eng">
 					<southBoundingCoordinate>55.27</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
-			            <temporalCoverage>
+			<temporalCoverage>
                 <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
                 <sos:LivingTimePeriod></sos:LivingTimePeriod>		
                 <sos:StartDate>2003</sos:StartDate>
                 <sos:EndDate>2006</sos:EndDate>
+			</temporalCoverage>
 			<taxonomicCoverage>
 				<generalTaxonomicCoverage>The target group is mainly flying insects, but all animals caught are being sorted and in the long run identified to species. For example the material includes large amounts of other terrestral arthropods (spiders, mites, springtails) and scattered specimens of other invertebrates (snails, earthworms etc) (– and even single anecdotal examples of unwanted bycatch of vertebrates).</generalTaxonomicCoverage>
 				<taxonomicClassification>

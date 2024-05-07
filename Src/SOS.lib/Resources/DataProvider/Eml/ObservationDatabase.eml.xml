@@ -37,7 +37,7 @@
         <licenseName></licenseName>
 		<abstract>
 			<para>The Observation database for species of conservation concern is administered by SLU Species Information Centre and is a collection of species observation records from different sources, mainly for species considered relevant for nature conservation. Apart from compilations of historic species observation records from both literature and museum or herbaria collections the database contains also more recent data from mainly private persons, non-profit organisations (NGO’s), nature consultancies (business) and public authorities like County boards and Municipalities. The database includes also data from regional species inventory projects and some older Atlas inventories, for example for birds. A large part of the older original records lacked geographical coordinates. Coordinates have been added when possible based on information provided by the description of the locality.</para>
-			<para> Across time the database contains 148 000 historic records from before year 1950 (20%), 96 700 records from years 1950-1969 (13%), 215 600 records from 1970-1989 (30%), 196 600 from 1990-1999 (27%), and 71 700 from 2000-2009 (10%). The database contains occurrence records of especially red listed or previously red listed species. It contains ca. 202 600 records for invertebrate animals(26%), 161 500 records for fungi (21%), 145 900 records for birds (19%), 141 000 records for vascular plants (18%), 717 00 records for lichens (9%), 188 00 records for mosses (3%), 14 100 records for amphibians and reptiles (2%), 8 800 records for species of fish (1%), 2 000 records for bats (< 1% ), 1100 records for other mammals and 600 records for algae. </para>
+			<para> Across time the database contains 148 000 historic records from before year 1950 (20%), 96 700 records from years 1950-1969 (13%), 215 600 records from 1970-1989 (30%), 196 600 from 1990-1999 (27%), and 71 700 from 2000-2009 (10%). The database contains occurrence records of especially red listed or previously red listed species. It contains ca. 202 600 records for invertebrate animals(26%), 161 500 records for fungi (21%), 145 900 records for birds (19%), 141 000 records for vascular plants (18%), 717 00 records for lichens (9%), 188 00 records for mosses (3%), 14 100 records for amphibians and reptiles (2%), 8 800 records for species of fish (1%), 2 000 records for bats (less than 1% ), 1100 records for other mammals and 600 records for algae. </para>
             <para>This database has been used mainly before the existence of the public reporting database Swedish Species Observation System (Artportalen) and is discontinued now, with the last record entered year 2009. Work is in progress to transfer records to the Artportalen database in the long-term. At present, the old Observation database contains many records that have not been entered yet to Artportalen. </para>
             <para>The species observation records in the old Observation database are not available to the public. This is because these records have often been entrusted to SLU Artdatabanken under the condition that the records are not to be made public or distributed other than to be used for nature conservation related purpose. Request for using these records can be made to SLU Artdatabanken and will be examined for confidentiality according to OSL (Publicity and Privacy Act).</para>
 		</abstract>
@@ -73,8 +73,7 @@
 				<taxonId></taxonId>
 				<sos:TaxonList></sos:TaxonList>
 			</taxonomicCoverage>
-		</coverage>
-		</coverage>
+		</coverage>		
 		<maintenance>
 			<description>
 				<para/>
