@@ -4034,6 +4034,15 @@
             }
           },
           {
+            "name": "resolveGeneralizedObservations",
+            "in": "query",
+            "description": "If true, then try get real coordinates for generalized observations.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
             "name": "X-Api-Version",
             "in": "header",
             "description": "The requested API version",
@@ -5551,6 +5560,15 @@
             "name": "sensitiveObservations",
             "in": "query",
             "description": "If true, sensitive observations index is queried if you have access rights.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "resolveGeneralizedObservations",
+            "in": "query",
+            "description": "If true, then try get real coordinates for generalized observations.",
             "schema": {
               "type": "boolean",
               "default": false
@@ -9010,6 +9028,11 @@
       "ArtportalenInternal": {
         "type": "object",
         "properties": {
+          "associatedMedia": {
+            "type": "string",
+            "description": "Associated media file",
+            "nullable": true
+          },
           "birdValidationAreaIds": {
             "type": "array",
             "items": {
@@ -9073,6 +9096,14 @@
           "hasUserComments": {
             "type": "boolean",
             "description": "HasUserComments"
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Multimedia"
+            },
+            "description": "Media files",
+            "nullable": true
           },
           "noteOfInterest": {
             "type": "boolean",
@@ -9167,15 +9198,50 @@
             "description": "Sighting summary",
             "nullable": true
           },
+          "triggeredObservationRuleActivityRuleId": {
+            "type": "integer",
+            "description": "Triggered observation rule activity id",
+            "format": "int32",
+            "nullable": true
+          },
           "triggeredObservationRuleFrequencyId": {
             "type": "integer",
             "description": "Triggered observation rule frequency id",
             "format": "int32",
             "nullable": true
           },
+          "triggeredObservationRulePeriodRuleId": {
+            "type": "integer",
+            "description": "Triggered observation rule period id",
+            "format": "int32",
+            "nullable": true
+          },
+          "triggeredObservationRulePromptRuleId": {
+            "type": "integer",
+            "description": "Triggered observation rule promt rule id",
+            "format": "int32",
+            "nullable": true
+          },
+          "triggeredObservationRulePrompts": {
+            "type": "boolean",
+            "description": "Triggered observation rule promts",
+            "nullable": true
+          },
+          "triggeredObservationRuleRegionalSightingState": {
+            "type": "integer",
+            "description": "Triggered observation rule regional sighting state",
+            "format": "int32",
+            "nullable": true
+          },
           "triggeredObservationRuleReproductionId": {
             "type": "integer",
             "description": "Triggered observation rule reproduction id",
+            "format": "int32",
+            "nullable": true
+          },
+          "triggeredObservationRuleStatusRuleId": {
+            "type": "integer",
+            "description": "Triggered observation rule status rule",
             "format": "int32",
             "nullable": true
           }
@@ -10153,7 +10219,8 @@
           "Microorganisms",
           "Plants_Bryophytes_Lichens",
           "Fungi",
-          "Algae"
+          "Algae",
+          "DataStewardship"
         ],
         "type": "string"
       },
@@ -11151,6 +11218,19 @@
         },
         "additionalProperties": false,
         "description": "File object"
+      },
+      "GeneralizationFilterDto": {
+        "type": "object",
+        "properties": {
+          "sensitiveGeneralizationFilter": {
+            "$ref": "#/components/schemas/SensitiveGeneralizationFilterDto"
+          },
+          "publicGeneralizationFilter": {
+            "$ref": "#/components/schemas/PublicGeneralizationFilterDto"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Generalization filter."
       },
       "GeoCoordinate": {
         "type": "object",
@@ -12341,6 +12421,14 @@
           "diffusionStatus": {
             "$ref": "#/components/schemas/DiffusionStatus"
           },
+          "isGeneralized": {
+            "type": "boolean",
+            "description": "Indicates whether the location is generalized."
+          },
+          "hasGeneralizedObservationInOtherIndex": {
+            "type": "boolean",
+            "description": "Indicates whether there exists a generalized location in other index."
+          },
           "event": {
             "$ref": "#/components/schemas/Event"
           },
@@ -13456,6 +13544,15 @@
         },
         "additionalProperties": false
       },
+      "PublicGeneralizationFilterDto": {
+        "enum": [
+          "NoFilter",
+          "OnlyGeneralized",
+          "DontIncludeGeneralized"
+        ],
+        "type": "string",
+        "description": "Public observations generalization filter."
+      },
       "SearchFilterAggregationDto": {
         "type": "object",
         "properties": {
@@ -13606,6 +13703,9 @@
           },
           "extendedFilter": {
             "$ref": "#/components/schemas/ExtendedFilterDto"
+          },
+          "generalizationFilter": {
+            "$ref": "#/components/schemas/GeneralizationFilterDto"
           },
           "protectionFilter": {
             "$ref": "#/components/schemas/ProtectionFilterDto"
@@ -13844,6 +13944,9 @@
           "extendedFilter": {
             "$ref": "#/components/schemas/ExtendedFilterDto"
           },
+          "generalizationFilter": {
+            "$ref": "#/components/schemas/GeneralizationFilterDto"
+          },
           "protectionFilter": {
             "$ref": "#/components/schemas/ProtectionFilterDto"
           }
@@ -13926,6 +14029,9 @@
           "extendedFilter": {
             "$ref": "#/components/schemas/ExtendedFilterDto"
           },
+          "generalizationFilter": {
+            "$ref": "#/components/schemas/GeneralizationFilterDto"
+          },
           "protectionFilter": {
             "$ref": "#/components/schemas/ProtectionFilterDto"
           },
@@ -13948,6 +14054,15 @@
         ],
         "type": "string",
         "description": "Sort order enum"
+      },
+      "SensitiveGeneralizationFilterDto": {
+        "enum": [
+          "DontIncludeGeneralizedObservations",
+          "IncludeGeneralizedObservations",
+          "OnlyGeneralizedObservations"
+        ],
+        "type": "string",
+        "description": "Sensitive observations generalization filter."
       },
       "SightingDeterminationFilterDto": {
         "enum": [
