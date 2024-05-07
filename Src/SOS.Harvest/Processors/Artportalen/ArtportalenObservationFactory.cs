@@ -69,9 +69,13 @@ namespace SOS.Harvest.Processors.Artportalen
             var hiddenByProvider = hiddenByProviderUntil.HasValue && hiddenByProviderUntil.Value >= DateTime.Now;
             var taxonProtectionLevel = taxon?.Attributes?.SensitivityCategory?.Id ?? 3;
 
-            if (hiddenByProvider || protectedBySystem)
+            if (protectedBySystem)
             {
                 return Math.Max(3, taxonProtectionLevel);
+            }
+            else if (hiddenByProvider)
+            {
+                return 3;
             }
 
             return 1;
