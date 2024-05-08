@@ -296,11 +296,11 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<int>> GetModifiedIdsAsync(DateTime modifiedSince, int limit)
+        public async Task<IEnumerable<NewAndEditedSightingId>> GetModifiedIdsAsync(DateTime modifiedSince, int limit)
         {
             try
             {
-                var result = await QueryAsync<int>("GetNewAndEditedSightingIds", new { modifiedSince = modifiedSince.ToLocalTime(), maxReturnRows = limit }, System.Data.CommandType.StoredProcedure);
+                var result = await QueryAsync<NewAndEditedSightingId>("GetNewAndEditedSightingIds", new { modifiedSince = modifiedSince.ToLocalTime(), maxReturnRows = limit }, System.Data.CommandType.StoredProcedure);
 
                 Logger.LogInformation($"GetModifiedIdsAsync({modifiedSince.ToLocalTime()}, {limit}, Live={Live}) returned {result?.Count() ?? 0} sightingIds.");
                 if (!result?.Any() ?? true)
@@ -308,7 +308,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     Logger.LogInformation($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}");
                     return null!;
                 }
-                return result!.Distinct();
+                return result!.DistinctBy(m => m.Id);                
             }
             catch (Exception e)
             {

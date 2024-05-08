@@ -191,26 +191,28 @@ namespace SOS.Harvest.Harvesters.Artportalen
             {
                 cancellationToken?.ThrowIfCancellationRequested();
                 batchCount++;
-                var getObservationsTask = _sightingRepository.GetChunkAsync(idBatch!);
+                var idsToHarvest = idBatch!.Select(m => m.Id);
+                var getObservationsTask = _sightingRepository.GetChunkAsync(idsToHarvest);
                 await _semaphore.WaitAsync();
                 var observationCount = await HarvestBatchAsync(harvestFactory, getObservationsTask, batchCount);
                 nrSightingsHarvested += observationCount;
 
                 // Delete observations we can't find
-                var deletedIds = idBatch!.Where(i => !getObservationsTask?.Result?.Select(o => o.Id).Contains(i) ?? true).Select(i => i);
+                var deletedIds = idsToHarvest!.Where(i => !getObservationsTask?.Result?.Select(o => o.Id).Contains(i) ?? true).Select(i => i);
                 if (deletedIds?.Any() ?? false)
                 {
                     await _processedObservationRepository.DeleteByOccurrenceIdAsync(deletedIds.Select(i => $"urn:lsid:artportalen.se:sighting:{i}"), false);
                     await _processedObservationRepository.DeleteByOccurrenceIdAsync(deletedIds.Select(i => $"urn:lsid:artportalen.se:sighting:{i}"), true);
                 }
 
-                if (nrSightingsHarvested >= _artportalenConfiguration.CatchUpLimit)
+                if (observationCount == 0 || nrSightingsHarvested >= _artportalenConfiguration.CatchUpLimit)
                 {
                     break;
                 }
 
-                idBatch = observationCount > 0 ? 
-                    (await _sightingRepository.GetModifiedIdsAsync(getObservationsTask!.Result!.LastOrDefault()!.EditDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray() : new int[0];
+                Logger.LogInformation($"HarvestIncrementalAsync(). getObservationsTask!.Result!.LastOrDefault()!.EditDate={getObservationsTask!.Result!.LastOrDefault()!.EditDate}");
+                Logger.LogInformation($"HarvestIncrementalAsync(). idBatch.Last.EditDate={idBatch!.Last().EditDate}");
+                idBatch = (await _sightingRepository.GetModifiedIdsAsync(idBatch!.Last().EditDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray();
             }
 
             Logger.LogDebug($"Finish getting Artportalen sightings ({mode}) (NrSightingsHarvested={nrSightingsHarvested:N0})");

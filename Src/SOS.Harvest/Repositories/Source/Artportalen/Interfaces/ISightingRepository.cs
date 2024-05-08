@@ -56,7 +56,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// <param name="modifiedSince"></param>
         /// <param name="limit"></param>
         /// <returns></returns>
-        Task<IEnumerable<int>> GetModifiedIdsAsync(DateTime modifiedSince, int limit);
+        Task<IEnumerable<NewAndEditedSightingId>> GetModifiedIdsAsync(DateTime modifiedSince, int limit);
 
         /// <summary>
         /// Get connections between project and sighting
