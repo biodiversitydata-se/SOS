@@ -212,7 +212,13 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 Logger.LogInformation($"HarvestIncrementalAsync(). getObservationsTask!.Result!.LastOrDefault()!.EditDate={getObservationsTask!.Result!.LastOrDefault()!.EditDate}");
                 Logger.LogInformation($"HarvestIncrementalAsync(). idBatch.Last.EditDate={idBatch!.Last().EditDate}");
-                idBatch = (await _sightingRepository.GetModifiedIdsAsync(idBatch!.Last().EditDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray();
+                var harvestDate = idBatch!.Last().EditDate;
+                var harvestDate1 = harvestDate.ToLocalTime();                
+                var harvestDate2 = DateTime.SpecifyKind(harvestDate, DateTimeKind.Local);
+                Logger.LogInformation($"HarvestDate1={harvestDate1}");
+                Logger.LogInformation($"HarvestDate2={harvestDate2}");
+
+                idBatch = (await _sightingRepository.GetModifiedIdsAsync(harvestDate2, _artportalenConfiguration.IncrementalChunkSize))?.ToArray();
             }
 
             Logger.LogDebug($"Finish getting Artportalen sightings ({mode}) (NrSightingsHarvested={nrSightingsHarvested:N0})");
