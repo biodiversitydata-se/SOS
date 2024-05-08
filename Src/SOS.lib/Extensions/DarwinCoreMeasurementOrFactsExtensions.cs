@@ -57,11 +57,23 @@ namespace SOS.Lib.Extensions
         public static IEnumerable<SimpleMultimediaRow> ToSimpleMultimediaRows(this
             Observation observation)
         {
-            return observation?.Occurrence?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Event?.EventId, observation.Occurrence.OccurrenceId)) ?? Enumerable.Empty<SimpleMultimediaRow>();
+            return observation?.Occurrence?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Event?.EventId, observation.Occurrence.OccurrenceId, false)) ?? Enumerable.Empty<SimpleMultimediaRow>();
+        }
+
+        public static IEnumerable<SimpleMultimediaRow> ToArtportalenSimpleMultimediaRows(this
+            IEnumerable<Observation> processedObservations)
+        {
+            return processedObservations?.SelectMany(ToArtportalenSimpleMultimediaRows) ?? Enumerable.Empty<SimpleMultimediaRow>();
+        }
+
+        public static IEnumerable<SimpleMultimediaRow> ToArtportalenSimpleMultimediaRows(this
+            Observation observation)
+        {
+            return observation?.ArtportalenInternal?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Event?.EventId, observation.Occurrence.OccurrenceId, true)) ?? Enumerable.Empty<SimpleMultimediaRow>();
         }
 
         private static SimpleMultimediaRow ToSimpleMultimediaRow(
-            this Multimedia multimedia, string eventId, string occurrenceId)
+            this Multimedia multimedia, string eventId, string occurrenceId, bool emptyIdentifier)
         {
             return new SimpleMultimediaRow
             {
@@ -69,7 +81,7 @@ namespace SOS.Lib.Extensions
                 OccurrenceId = occurrenceId,
                 Type = multimedia.Type,
                 Format = multimedia.Format,
-                Identifier = multimedia.Identifier,
+                Identifier = emptyIdentifier ? "" : multimedia.Identifier,
                 References = multimedia.References,
                 Title = multimedia.Title,
                 Description = multimedia.Description,

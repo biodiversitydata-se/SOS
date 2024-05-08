@@ -315,17 +315,16 @@ namespace SOS.Lib.IO.DwcArchive
 
             // Create Multimedia txt file
             string multimediaCsvFilePath = filePathByFilePart[DwcaFilePart.Multimedia];
-            List<SimpleMultimediaRow> multimediaRows = processedObservations.ToSimpleMultimediaRows().ToList();
+            List<SimpleMultimediaRow> multimediaRows;
             if (dataProvider.Id == 1) // Artportalen
             {
-                if (multimediaRows != null)
-                {
-                    foreach(var row in multimediaRows)
-                    {
-                        row.Identifier = ""; // Don't use identifier for Artportalen media due to licenses.
-                    }
-                }
+                multimediaRows = processedObservations.ToArtportalenSimpleMultimediaRows().ToList();                
             }
+            else
+            {
+                multimediaRows = processedObservations.ToSimpleMultimediaRows().ToList();
+            }
+
             if (checkForIllegalCharacters) ValidateMultimediaRows(multimediaRows);
             if (multimediaRows != null && multimediaRows.Any())
             {
