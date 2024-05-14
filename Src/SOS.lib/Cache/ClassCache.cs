@@ -13,7 +13,7 @@ namespace SOS.Lib.Cache
         private static readonly object InitLock = new object();
         private readonly IMemoryCache _memoryCache;
         private readonly string _cacheKey;
-        protected readonly ILogger Logger;           
+        protected readonly ILogger<ClassCache<TClass>> Logger;
 
         private void OnCacheEviction(object key, object value, EvictionReason reason, object state)
         {
@@ -31,7 +31,7 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="memoryCache"></param>
-        public ClassCache(IMemoryCache memoryCache, ILogger logger)
+        public ClassCache(IMemoryCache memoryCache, ILogger<ClassCache<TClass>> logger)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
             _cacheKey = typeof(TClass).Name;

@@ -31,14 +31,14 @@ namespace SOS.Lib.Cache
         /// </summary>
         protected readonly IRepositoryBase<TEntity, TKey> Repository;
 
-        protected readonly ILogger Logger;
+        protected readonly ILogger<CacheBase<TKey, TEntity>> Logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="repository"></param>
         /// <param name="logger"></param>
-        protected CacheBase(IRepositoryBase<TEntity, TKey> repository, ILogger logger)
+        protected CacheBase(IRepositoryBase<TEntity, TKey> repository, ILogger<CacheBase<TKey, TEntity>> logger)
         {
             Repository = repository ?? throw new ArgumentNullException(nameof(repository));
             Cache = new ConcurrentDictionary<TKey, TEntity>();
