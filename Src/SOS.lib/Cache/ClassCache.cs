@@ -38,7 +38,7 @@ namespace SOS.Lib.Cache
         /// <summary>
         /// Cache duration.
         /// </summary>
-        public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
+        public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(1);
 
         /// <inheritdoc />
         public event EventHandler CacheReleased;
@@ -60,8 +60,7 @@ namespace SOS.Lib.Cache
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetPriority(CacheItemPriority.NeverRemove)
                     .AddExpirationToken(expirationToken)
-                    .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);
-                ;
+                    .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);                
                 _memoryCache.Set(_cacheKey, entity, cacheEntryOptions);
             }
         }

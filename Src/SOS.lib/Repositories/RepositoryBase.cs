@@ -8,6 +8,7 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -452,8 +453,11 @@ namespace SOS.Lib.Repositories
         {
             try
             {
+                Stopwatch sp = Stopwatch.StartNew();
                 var searchFilter = Builders<TEntity>.Filter.Eq("_id", id);
-                return await MongoCollection.FindSync(searchFilter).FirstOrDefaultAsync();
+                var result = await MongoCollection.FindSync(searchFilter).FirstOrDefaultAsync();
+                Logger.LogInformation($"RepositoryBase.GetAsync(collectionName: \"{_collectionName}\", id: {id}). Time elapsed={sp.ElapsedMilliseconds}ms");
+                return result;
             }
             catch (Exception e)
             {
