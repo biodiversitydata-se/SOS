@@ -41,7 +41,7 @@ namespace SOS.Lib.Cache
         /// <summary>
         /// Cache duration.
         /// </summary>
-        public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(1);
+        public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
 
         /// <inheritdoc />
         public event EventHandler CacheReleased;
