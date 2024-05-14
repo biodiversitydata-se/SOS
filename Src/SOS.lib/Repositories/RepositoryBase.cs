@@ -453,10 +453,8 @@ namespace SOS.Lib.Repositories
         {
             try
             {
-                Stopwatch sp = Stopwatch.StartNew();
                 var searchFilter = Builders<TEntity>.Filter.Eq("_id", id);
                 var result = await MongoCollection.FindSync(searchFilter).FirstOrDefaultAsync();
-                Logger.LogInformation($"RepositoryBase.GetAsync(collectionName: \"{_collectionName}\", id: {id}). Time elapsed={sp.ElapsedMilliseconds}ms");
                 return result;
             }
             catch (Exception e)

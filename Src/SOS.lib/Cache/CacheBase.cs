@@ -5,6 +5,7 @@ using SOS.Lib.Repositories.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Cache
@@ -75,13 +76,14 @@ namespace SOS.Lib.Cache
                 return entity;
             }
 
+            Stopwatch sp = Stopwatch.StartNew();
             entity = await Repository.GetAsync(key);
-
             if (entity != null)
             {
                 Cache.TryAdd(key, entity);
             }
-
+            sp.Stop();
+            Logger.LogInformation($"CacheBase.GetAsync updated cache for type={GetType().Name}, key={key}, Time elapsed={sp.ElapsedMilliseconds}ms");
             return entity;
         }
 
