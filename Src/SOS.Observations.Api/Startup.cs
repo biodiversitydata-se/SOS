@@ -19,6 +19,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
@@ -495,7 +497,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
-            var taxonSumAggregationCache = new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions())) { CacheDuration = TimeSpan.FromHours(12) };
+            var taxonSumAggregationCache = new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(12) };
             services.AddSingleton<IClassCache<Dictionary<int, TaxonSumAggregationItem>>>(taxonSumAggregationCache);
             services.AddSingleton<IClassCache<HealthCheckResult>, ClassCache<HealthCheckResult>>();
 

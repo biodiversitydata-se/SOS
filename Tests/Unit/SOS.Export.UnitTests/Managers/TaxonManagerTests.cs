@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Driver;
 using Moq;
 using SOS.Lib.Cache;
@@ -40,8 +41,8 @@ namespace SOS.Export.UnitTests.Managers
         private TaxonManager TestObject => new TaxonManager(
             _processedTaxonRepositoryMock.Object,
             _taxonListRepositoryMock.Object,
-            new ClassCache<TaxonTree<IBasicTaxon>>(new MemoryCache(new MemoryCacheOptions())),
-            new ClassCache<TaxonListSetsById>(new MemoryCache(new MemoryCacheOptions())),
+            new ClassCache<TaxonTree<IBasicTaxon>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<TaxonTree<IBasicTaxon>>>()),
+            new ClassCache<TaxonListSetsById>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<TaxonListSetsById>>()),
             _loggerMock.Object);
 
         /// <summary>

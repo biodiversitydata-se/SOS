@@ -42,7 +42,7 @@ namespace SOS.Export.LiveIntegrationTests.TestDataTools
             var processedObservationRepository = new ProcessedObservationCoreRepository(
                 new ElasticClientManager(elasticSearchConfiguration),
                 new ElasticSearchConfiguration(),
-                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
+                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>()), new NullLogger<ProcessedConfigurationCache>()),
                 new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
 

@@ -74,11 +74,11 @@ namespace SOS.Export.LiveIntegrationTests.Managers
             var processedObservationRepository = new ProcessedObservationCoreRepository(
                 elasticClientManager,
                 elasticConfiguration,
-                new ProcessedConfigurationCache(processedConfigurationRepository),
+                new ProcessedConfigurationCache(processedConfigurationRepository, new NullLogger<ProcessedConfigurationCache>()),
                 new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
             var projectInfoRepository = new ProjectInfoRepository(processClient, new NullLogger<ProjectInfoRepository>());
-            var projectInfoCache = new ProjectCache(projectInfoRepository);
+            var projectInfoCache = new ProjectCache(projectInfoRepository, new NullLogger<ProjectCache>());
             var projectManager = new ProjectManager(projectInfoCache, new NullLogger<ProjectManager>());
             var excelWriter = new ExcelFileWriter(processedObservationRepository,
                 projectManager,

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using SOS.Lib.Cache.Interfaces;
 using System;
@@ -12,6 +13,7 @@ namespace SOS.Lib.Cache
         private static readonly object InitLock = new object();
         private readonly IMemoryCache _memoryCache;
         private readonly string _cacheKey;
+        protected readonly ILogger Logger;           
 
         private void OnCacheEviction(object key, object value, EvictionReason reason, object state)
         {
@@ -21,7 +23,7 @@ namespace SOS.Lib.Cache
             {
                 return;
             }
-
+            Logger.LogInformation($"Cache evicted. Key=\"{key}\"");
             CacheReleased.Invoke(this, EventArgs.Empty);
         }
 
@@ -29,10 +31,11 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="memoryCache"></param>
-        public ClassCache(IMemoryCache memoryCache)
+        public ClassCache(IMemoryCache memoryCache, ILogger logger)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
             _cacheKey = typeof(TClass).Name;
+            Logger = logger;
         }
 
         /// <summary>
@@ -62,6 +65,7 @@ namespace SOS.Lib.Cache
                     .AddExpirationToken(expirationToken)
                     .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);                
                 _memoryCache.Set(_cacheKey, entity, cacheEntryOptions);
+                Logger.LogInformation($"Cache set. Key=\"{_cacheKey}\"");
             }
         }
     }

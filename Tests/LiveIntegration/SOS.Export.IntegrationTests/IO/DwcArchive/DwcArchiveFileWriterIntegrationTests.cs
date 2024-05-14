@@ -64,7 +64,7 @@ namespace SOS.Export.LiveIntegrationTests.IO.DwcArchive
             var processedObservationRepository = new ProcessedObservationCoreRepository(
                 new ElasticClientManager(elasticConfiguration),
                 elasticConfiguration,
-                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new NullLogger<ProcessedConfigurationCache>()),
                 new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
             return processedObservationRepository;

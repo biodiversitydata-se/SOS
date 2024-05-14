@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Processed.Observation;
+﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Lib.Cache
@@ -13,7 +14,7 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="taxonRepository"></param>
-        public TaxonCache(ITaxonRepository taxonRepository) : base(taxonRepository)
+        public TaxonCache(ITaxonRepository taxonRepository, ILogger<TaxonCache> logger) : base(taxonRepository, logger)
         {
 
         }

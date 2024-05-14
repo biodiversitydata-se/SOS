@@ -1,4 +1,6 @@
-﻿using Nest;
+﻿using Amazon.Runtime.Internal.Util;
+using Microsoft.Extensions.Logging;
+using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -26,7 +28,8 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="areaRepository"></param>
-        public AreaCache(IAreaRepository areaRepository) : base(areaRepository)
+        /// <param name="logger"></param>
+        public AreaCache(IAreaRepository areaRepository, ILogger<AreaCache> logger) : base(areaRepository, logger)
         {
             _areaRepository = areaRepository;
             _geometryCache = new ConcurrentDictionary<(AreaType, string), IGeoShape>();

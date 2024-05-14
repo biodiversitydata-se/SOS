@@ -138,7 +138,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
             {
                 processedObservationRepository = new ProcessedObservationCoreRepository(elasticClientManager,
                     new ElasticSearchConfiguration(),
-                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new NullLogger<ProcessedConfigurationCache>()),
                     new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationCoreRepository>());
             }

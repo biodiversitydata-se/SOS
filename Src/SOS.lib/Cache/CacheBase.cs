@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Cache.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Interfaces;
 using System;
@@ -30,15 +31,18 @@ namespace SOS.Lib.Cache
         /// </summary>
         protected readonly IRepositoryBase<TEntity, TKey> Repository;
 
+        protected readonly ILogger Logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="repository"></param>
-        protected CacheBase(IRepositoryBase<TEntity, TKey> repository)
+        /// <param name="logger"></param>
+        protected CacheBase(IRepositoryBase<TEntity, TKey> repository, ILogger logger)
         {
             Repository = repository ?? throw new ArgumentNullException(nameof(repository));
             Cache = new ConcurrentDictionary<TKey, TEntity>();
+            Logger = logger;
         }
 
         /// <inheritdoc />
@@ -51,7 +55,7 @@ namespace SOS.Lib.Cache
 
             Cache.TryRemove(entity.Id, out var deletedEntity);
             Cache.TryAdd(entity.Id, entity);
-
+            Logger.LogInformation($"CacheBase.AddOrUpdateAsync(). Type={GetType().Name}");
             return true;
         }
 
@@ -60,6 +64,7 @@ namespace SOS.Lib.Cache
         {
             Cache.Clear();
             _initialized = false;
+            Logger.LogInformation($"CacheBase.Clear(). Type={GetType().Name}");
         }
 
         /// <inheritdoc />

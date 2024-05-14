@@ -1,4 +1,6 @@
-﻿using SOS.Lib.Models.Processed.Configuration;
+﻿using Amazon.Runtime.Internal.Util;
+using Microsoft.Extensions.Logging;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Lib.Cache
@@ -12,7 +14,7 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="processedConfigurationRepository"></param>
-        public ProcessedConfigurationCache(IProcessedConfigurationRepository processedConfigurationRepository) : base(processedConfigurationRepository)
+        public ProcessedConfigurationCache(IProcessedConfigurationRepository processedConfigurationRepository, ILogger<ProcessedConfigurationCache> logger) : base(processedConfigurationRepository, logger)
         {
 
         }
