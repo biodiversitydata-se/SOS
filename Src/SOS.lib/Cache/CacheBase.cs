@@ -88,15 +88,15 @@ namespace SOS.Lib.Cache
 
         private void OnCacheEviction(object key, object value, EvictionReason reason, object state)
         {
-            Logger.LogInformation($"CacheBase.OnCacheEviction raised for type={GetType().Name}");
-            // Sometimes event is raised even if entity exists in cache.
-            // In order to not bubble event when not needed, check if entity exists in cache
-            if (CacheReleased == null || MemoryCache.TryGetValue(_cacheKey, out var entity))
-            {
-                return;
-            }
+            Logger.LogInformation($"CacheBase.OnCacheEviction raised for type={GetType().Name}, Reason={reason}");
+            //// Sometimes event is raised even if entity exists in cache.
+            //// In order to not bubble event when not needed, check if entity exists in cache
+            //if (CacheReleased == null || MemoryCache.TryGetValue(_cacheKey, out var entity))
+            //{
+            //    return;
+            //}
             
-            CacheReleased.Invoke(this, EventArgs.Empty);
+            //CacheReleased.Invoke(this, EventArgs.Empty);
         }
 
         /// <inheritdoc />
