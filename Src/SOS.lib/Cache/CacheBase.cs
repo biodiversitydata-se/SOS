@@ -40,7 +40,7 @@ namespace SOS.Lib.Cache
 
         public TimeSpan CacheDuration { get; set; } = TimeSpan.FromDays(1);
 
-        private readonly string _cacheKey = "Cache";
+        private string _cacheKey = "Cache";
         public event EventHandler CacheReleased;
         
         /// <summary>
@@ -54,6 +54,7 @@ namespace SOS.Lib.Cache
             Repository = repository ?? throw new ArgumentNullException(nameof(repository));
             MemoryCache = memoryCache;
             Logger = logger;
+            _cacheKey = GetType().Name + "-" + Guid.NewGuid().ToString();
             Logger.LogInformation($"Cache created. Type={GetType().Name}");
         }
 
