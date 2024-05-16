@@ -67,11 +67,12 @@ namespace SOS.Lib.Cache
                 if (dictionary == null)
                 {
                     dictionary = new ConcurrentDictionary<TKey, TEntity>();
-                    var expirationToken = new CancellationChangeToken(
-                        new CancellationTokenSource(CacheDuration).Token);
+                    //var expirationToken = new CancellationChangeToken(
+                    //    new CancellationTokenSource(CacheDuration).Token);                    
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetPriority(CacheItemPriority.NeverRemove)
-                        .AddExpirationToken(expirationToken)
+                        .SetAbsoluteExpiration(CacheDuration)
+                        //.SetPriority(CacheItemPriority.NeverRemove)
+                        //.AddExpirationToken(expirationToken)
                         .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);
                     MemoryCache.Set(_cacheKey, dictionary, cacheEntryOptions);
                     Logger.LogInformation($"Cache set. Key=\"{_cacheKey}\", Type={GetType().Name}");
