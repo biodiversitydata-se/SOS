@@ -1,4 +1,5 @@
 ﻿using Hangfire.Logging;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
@@ -16,7 +17,7 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="vocabularyRepository"></param>
-        public VocabularyCache(IVocabularyRepository vocabularyRepository, ILogger<VocabularyCache> logger) : base(vocabularyRepository, logger)
+        public VocabularyCache(IVocabularyRepository vocabularyRepository, IMemoryCache memoryCache, ILogger<CacheBase<VocabularyId, Vocabulary>> logger) : base(vocabularyRepository, memoryCache, logger)
         {
 
         }

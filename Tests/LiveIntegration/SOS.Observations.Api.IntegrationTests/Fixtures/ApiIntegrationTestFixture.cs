@@ -207,7 +207,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var areaManager = CreateAreaManager(processClient);
             TaxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
             var taxonManager = CreateTaxonManager(processClient, TaxonRepository, memoryCache);
-            var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new NullLogger<ProcessedConfigurationCache>());
+            var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>());
             ProcessedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processedConfigurationCache, taxonManager, processClient, memoryCache);
             EventRepository = new EventRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<EventRepository>());
             InvalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
@@ -217,7 +217,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var projectManger = CreateProjectManager(processClient);
             var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var processInfoManager = new ProcessInfoManager(processInfoRepository, new NullLogger<ProcessInfoManager>());
-            var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), new NullLogger<DataProviderCache>());
+            var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<DataProviderCache>());
             var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, ProcessedObservationRepository, new NullLogger<DataProviderManager>());
             var fileService = new FileService();
             VocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
@@ -233,7 +233,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var geojsonFileWriter = new GeoJsonFileWriter(ProcessedObservationRepository, fileService,
                 VocabularyValueResolver, generalizationResolverMock.Object, new NullLogger<GeoJsonFileWriter>());
             var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
-            var areaCache = new AreaCache(areaRepository, new NullLogger<AreaCache>());
+            var areaCache = new AreaCache(areaRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<AreaCache>());
             var userService = CreateUserService();
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             FilterManager = filterManager;
@@ -325,7 +325,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
         private AreaManager CreateAreaManager(ProcessClient processClient)
         {
             var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
-            var areaCache = new AreaCache(areaRepository, new NullLogger<AreaCache>());
+            var areaCache = new AreaCache(areaRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<AreaCache>());
             var areaManager = new AreaManager(areaCache, new NullLogger<AreaManager>());
             return areaManager;
         }
@@ -401,7 +401,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
 
         private VocabularyManager CreateVocabularyManager(ProcessClient processClient, VocabularyRepository vocabularyRepository)
         {
-            var vocabularyCache = new VocabularyCache(vocabularyRepository, new NullLogger<VocabularyCache>());
+            var vocabularyCache = new VocabularyCache(vocabularyRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<VocabularyCache>());
             var vocabularyManager = new VocabularyManager(vocabularyCache, new NullLogger<VocabularyManager>());
             return vocabularyManager;
         }
@@ -409,7 +409,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
         private ProjectManager CreateProjectManager(ProcessClient processClient)
         {
             var projectInfoRepository = new ProjectInfoRepository(processClient, new NullLogger<ProjectInfoRepository>());
-            var projectInfoCache = new ProjectCache(projectInfoRepository, new NullLogger<ProjectCache>());
+            var projectInfoCache = new ProjectCache(projectInfoRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProjectCache>());
             var projectManager = new ProjectManager(projectInfoCache, new NullLogger<ProjectManager>());
             return projectManager;
         }
@@ -454,7 +454,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var processedTaxonRepository = new ProcessedTaxonRepository(
                 elasticClientManager,
                 elasticConfiguration,
-                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new NullLogger<ProcessedConfigurationCache>()),
+                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
                 taxonManager,
                 new NullLogger<ProcessedTaxonRepository>());
             return processedTaxonRepository;

@@ -1,4 +1,5 @@
 ﻿using Amazon.Runtime.Internal.Util;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
@@ -28,8 +29,9 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="areaRepository"></param>
+        /// <param name="memoryCache"></param>
         /// <param name="logger"></param>
-        public AreaCache(IAreaRepository areaRepository, ILogger<AreaCache> logger) : base(areaRepository, logger)
+        public AreaCache(IAreaRepository areaRepository, IMemoryCache memoryCache, ILogger<CacheBase<string, Area>> logger) : base(areaRepository, memoryCache, logger)
         {
             _areaRepository = areaRepository;
             _geometryCache = new ConcurrentDictionary<(AreaType, string), IGeoShape>();
@@ -54,12 +56,13 @@ namespace SOS.Lib.Cache
         public async Task<IEnumerable<Area>> GetAreasAsync(
             IEnumerable<(AreaType areaType, string featureId)> areaKeys)
         {
+            var cache = await GetCacheAsync();
             if (!areaKeys?.Any() ?? true)
             {
                 return null;
             }
 
-            var missingInCache = areaKeys.Select(k => k.areaType.ToAreaId(k.featureId)).Except(Cache.Keys);
+            var missingInCache = areaKeys.Select(k => k.areaType.ToAreaId(k.featureId)).Except(cache.Keys);
 
             if (missingInCache?.Any() ?? false)
             {
@@ -69,12 +72,12 @@ namespace SOS.Lib.Cache
                 {
                     foreach (var area in areas)
                     {
-                        Cache.TryAdd(area.Id, area);
+                        cache.TryAdd(area.Id, area);
                     }
                 }
             }
 
-            return Cache.Where(gc => areaKeys.Select(k => k.areaType.ToAreaId(k.featureId)).Contains(gc.Key)).Select(gc => gc.Value);
+            return cache.Where(gc => areaKeys.Select(k => k.areaType.ToAreaId(k.featureId)).Contains(gc.Key)).Select(gc => gc.Value);
         }
 
         /// <inheritdoc />

@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Lib.Cache;
@@ -70,7 +71,7 @@ namespace SOS.Export.LiveIntegrationTests.Repositories
                 new ProcessedObservationCoreRepository(
                     new ElasticClientManager(elasticConfiguration),
                     elasticConfiguration,
-                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>()), new NullLogger<ProcessedConfigurationCache>()),
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
                     new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationCoreRepository>());
 

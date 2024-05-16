@@ -1,4 +1,5 @@
 ﻿using Amazon.Runtime.Internal.Util;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource.Interfaces;
@@ -14,7 +15,7 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="projectInfoRepository"></param>
-        public ProjectCache(IProjectInfoRepository projectInfoRepository, ILogger<ProjectCache> logger) : base(projectInfoRepository, logger)
+        public ProjectCache(IProjectInfoRepository projectInfoRepository, IMemoryCache memoryCache, ILogger<CacheBase<int, ProjectInfo>> logger) : base(projectInfoRepository, memoryCache, logger)
         {
 
         }

@@ -1,7 +1,9 @@
 ﻿using Amazon.Runtime.Internal.Util;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System;
 
 namespace SOS.Lib.Cache
 {
@@ -14,9 +16,9 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="processedConfigurationRepository"></param>
-        public ProcessedConfigurationCache(IProcessedConfigurationRepository processedConfigurationRepository, ILogger<ProcessedConfigurationCache> logger) : base(processedConfigurationRepository, logger)
+        public ProcessedConfigurationCache(IProcessedConfigurationRepository processedConfigurationRepository, IMemoryCache memoryCache, ILogger<CacheBase<string, ProcessedConfiguration>> logger) : base(processedConfigurationRepository, memoryCache, logger)
         {
-
+            CacheDuration = TimeSpan.FromSeconds(30);
         }
     }
 }
