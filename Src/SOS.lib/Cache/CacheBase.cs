@@ -54,6 +54,7 @@ namespace SOS.Lib.Cache
             Repository = repository ?? throw new ArgumentNullException(nameof(repository));
             MemoryCache = memoryCache;
             Logger = logger;
+            Logger.LogInformation($"Cache created. Type={GetType().Name}");
         }
 
         protected async Task<ConcurrentDictionary<TKey, TEntity>> GetCacheAsync()
