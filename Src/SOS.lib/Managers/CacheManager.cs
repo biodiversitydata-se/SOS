@@ -54,45 +54,47 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task<bool> ClearAsync(Enums.Cache cache)
         {
-            var success = true;
-            var client = new HttpClient();
-            if (_sosApiConfiguration?.ObservationsApiAddresses?.Any() ?? false)
-            {
-                foreach (var observationsApiAddress in _sosApiConfiguration.ObservationsApiAddresses)
-                {
-                    var requestUri = $"{observationsApiAddress}Caches/{cache}";
-                    success = success && await ClearAsync(client, requestUri);
-                }
-            }
+            _logger.LogInformation($"CacheManager.ClearAsync({cache}) called. Not implemented when testing time based cache.");
+            return true;
+            //var success = true;
+            //var client = new HttpClient();
+            //if (_sosApiConfiguration?.ObservationsApiAddresses?.Any() ?? false)
+            //{
+            //    foreach (var observationsApiAddress in _sosApiConfiguration.ObservationsApiAddresses)
+            //    {
+            //        var requestUri = $"{observationsApiAddress}Caches/{cache}";
+            //        success = success && await ClearAsync(client, requestUri);
+            //    }
+            //}
 
-            if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.ElasticSearchProxyAddresses?.Any() ?? false))
-            {
-                foreach (var elasticSearchProxyAddress in _sosApiConfiguration.ElasticSearchProxyAddresses)
-                {
-                    var requestUri = $"{elasticSearchProxyAddress}Caches/{cache}";
-                    success = success && await ClearAsync(client, requestUri);
-                }
-            }
+            //if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.ElasticSearchProxyAddresses?.Any() ?? false))
+            //{
+            //    foreach (var elasticSearchProxyAddress in _sosApiConfiguration.ElasticSearchProxyAddresses)
+            //    {
+            //        var requestUri = $"{elasticSearchProxyAddress}Caches/{cache}";
+            //        success = success && await ClearAsync(client, requestUri);
+            //    }
+            //}
 
-            if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.AnalysisApiAddresses?.Any() ?? false))
-            {
-                foreach (var analysisApiAddress in _sosApiConfiguration.AnalysisApiAddresses)
-                {
-                    var requestUri = $"{analysisApiAddress}Caches/{cache}";
-                    success = success && await ClearAsync(client, requestUri);
-                }
-            }
+            //if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.AnalysisApiAddresses?.Any() ?? false))
+            //{
+            //    foreach (var analysisApiAddress in _sosApiConfiguration.AnalysisApiAddresses)
+            //    {
+            //        var requestUri = $"{analysisApiAddress}Caches/{cache}";
+            //        success = success && await ClearAsync(client, requestUri);
+            //    }
+            //}
 
-            if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.DataStewardshipApiAddresses?.Any() ?? false))
-            {
-                foreach (var dataStewardshipApiAddress in _sosApiConfiguration.DataStewardshipApiAddresses)
-                {
-                    var requestUri = $"{dataStewardshipApiAddress}Caches/{cache}";
-                    success = success && await ClearAsync(client, requestUri);
-                }
-            }
+            //if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.DataStewardshipApiAddresses?.Any() ?? false))
+            //{
+            //    foreach (var dataStewardshipApiAddress in _sosApiConfiguration.DataStewardshipApiAddresses)
+            //    {
+            //        var requestUri = $"{dataStewardshipApiAddress}Caches/{cache}";
+            //        success = success && await ClearAsync(client, requestUri);
+            //    }
+            //}
 
-            return success;
+            //return success;
         }
     }
 }
