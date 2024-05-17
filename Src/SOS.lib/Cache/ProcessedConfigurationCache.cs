@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Cache
 {
@@ -19,6 +20,13 @@ namespace SOS.Lib.Cache
         public ProcessedConfigurationCache(IProcessedConfigurationRepository processedConfigurationRepository, IMemoryCache memoryCache, ILogger<CacheBase<string, ProcessedConfiguration>> logger) : base(processedConfigurationRepository, memoryCache, logger)
         {
             CacheDuration = TimeSpan.FromSeconds(30);
+        }
+
+        public override async Task<ProcessedConfiguration> GetAsync(string key)
+        {
+            ProcessedConfiguration result = await base.GetAsync(key);
+            Logger.LogInformation($"ProcessedConfiguration retrieved from cache. Value={result.ActiveInstance}");
+            return result;
         }
     }
 }

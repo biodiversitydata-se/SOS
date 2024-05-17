@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System;
 
 namespace SOS.Lib.Cache
 {
@@ -19,7 +20,7 @@ namespace SOS.Lib.Cache
         /// <param name="vocabularyRepository"></param>
         public VocabularyCache(IVocabularyRepository vocabularyRepository, IMemoryCache memoryCache, ILogger<CacheBase<VocabularyId, Vocabulary>> logger) : base(vocabularyRepository, memoryCache, logger)
         {
-
+            CacheDuration = TimeSpan.FromMinutes(10);
         }
     }
 }

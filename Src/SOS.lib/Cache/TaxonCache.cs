@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System;
 
 namespace SOS.Lib.Cache
 {
@@ -18,7 +19,7 @@ namespace SOS.Lib.Cache
         /// <param name="taxonRepository"></param>
         public TaxonCache(ITaxonRepository taxonRepository, IMemoryCache memoryCache, ILogger<CacheBase<int, Taxon>> logger) : base(taxonRepository, memoryCache, logger)
         {
-
+            CacheDuration = TimeSpan.FromMinutes(10);
         }
     }
 }

@@ -38,7 +38,7 @@ namespace SOS.Lib.Cache
 
         protected readonly ILogger<CacheBase<TKey, TEntity>> Logger;
 
-        public TimeSpan CacheDuration { get; set; } = TimeSpan.FromDays(1);
+        public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
 
         private string _cacheKey = "Cache";
         public event EventHandler CacheReleased;
@@ -67,16 +67,12 @@ namespace SOS.Lib.Cache
                 MemoryCache.TryGetValue(_cacheKey, out dictionary);
                 if (dictionary == null)
                 {
-                    dictionary = new ConcurrentDictionary<TKey, TEntity>();
-                    //var expirationToken = new CancellationChangeToken(
-                    //    new CancellationTokenSource(CacheDuration).Token);                    
+                    dictionary = new ConcurrentDictionary<TKey, TEntity>();                    
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetAbsoluteExpiration(CacheDuration)
-                        //.SetPriority(CacheItemPriority.NeverRemove)
-                        //.AddExpirationToken(expirationToken)
+                        .SetAbsoluteExpiration(CacheDuration)                        
                         .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);
                     MemoryCache.Set(_cacheKey, dictionary, cacheEntryOptions);
-                    Logger.LogInformation($"Cache set. Key=\"{_cacheKey}\", Type={GetType().Name}");
+                    Logger.LogInformation($"Cache set. Type={GetType().Name}");
                 }
             }            
             finally
@@ -89,15 +85,7 @@ namespace SOS.Lib.Cache
 
         private void OnCacheEviction(object key, object value, EvictionReason reason, object state)
         {
-            Logger.LogInformation($"CacheBase.OnCacheEviction raised for type={GetType().Name}, Reason={reason}");
-            //// Sometimes event is raised even if entity exists in cache.
-            //// In order to not bubble event when not needed, check if entity exists in cache
-            //if (CacheReleased == null || MemoryCache.TryGetValue(_cacheKey, out var entity))
-            //{
-            //    return;
-            //}
-            
-            //CacheReleased.Invoke(this, EventArgs.Empty);
+            Logger.LogInformation($"CacheBase.OnCacheEviction raised for type={GetType().Name}, Reason={reason}");            
         }
 
         /// <inheritdoc />
@@ -125,7 +113,7 @@ namespace SOS.Lib.Cache
         }
 
         /// <inheritdoc />
-        public async Task<TEntity> GetAsync(TKey key)
+        public virtual async Task<TEntity> GetAsync(TKey key)
         {
             var cache = await GetCacheAsync();
             if (cache.TryGetValue(key, out var entity))

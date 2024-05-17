@@ -8,6 +8,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +36,7 @@ namespace SOS.Lib.Cache
         {
             _areaRepository = areaRepository;
             _geometryCache = new ConcurrentDictionary<(AreaType, string), IGeoShape>();
+            CacheDuration = TimeSpan.FromMinutes(10);
         }
 
         /// <summary>

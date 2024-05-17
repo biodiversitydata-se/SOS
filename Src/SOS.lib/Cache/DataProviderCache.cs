@@ -5,6 +5,7 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -22,7 +23,7 @@ namespace SOS.Lib.Cache
         /// <param name="dataProviderRepository"></param>
         public DataProviderCache(IDataProviderRepository dataProviderRepository, IMemoryCache memoryCache, ILogger<CacheBase<int, DataProvider>> logger) : base(dataProviderRepository, memoryCache, logger)
         {
-
+            CacheDuration = TimeSpan.FromMinutes(5);
         }
 
         /// <inheritdoc />
