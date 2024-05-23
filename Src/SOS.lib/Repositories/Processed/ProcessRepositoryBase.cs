@@ -168,12 +168,11 @@ namespace SOS.Lib.Repositories.Processed
         public byte InActiveInstance => (byte)(ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
-        public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;
+        public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;       
 
-        /// <inheritdoc />
-        public void ClearConfigurationCache()
+        public async Task ClearConfigurationCacheAsync()
         {
-            _processedConfigurationCache.Clear();
+            await _processedConfigurationCache.ClearAsync();
         }
 
         public string IndexName => IndexHelper.GetIndexName<TEntity>(_elasticConfiguration.IndexPrefix, ClientCount == 1, LiveMode ? ActiveInstance : InActiveInstance, false);

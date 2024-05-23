@@ -85,7 +85,7 @@ namespace SOS.Lib.Cache
 
         private void OnCacheEviction(object key, object value, EvictionReason reason, object state)
         {
-            Logger.LogInformation($"CacheBase.OnCacheEviction raised for type={GetType().Name}, Reason={reason}");            
+            Logger.LogDebug($"{GetType().Name}.OnCacheEviction() raised, Reason={reason}");            
         }
 
         /// <inheritdoc />
@@ -99,7 +99,7 @@ namespace SOS.Lib.Cache
 
             cache.TryRemove(entity.Id, out var deletedEntity);
             cache.TryAdd(entity.Id, entity);
-            Logger.LogInformation($"CacheBase.AddOrUpdateAsync(). Type={GetType().Name}");
+            Logger.LogDebug($"{GetType().Name}.AddOrUpdateAsync()");
             return true;
         }
 
@@ -109,7 +109,15 @@ namespace SOS.Lib.Cache
             var cache = GetCacheAsync().Result;
             cache.Clear();
             _initialized = false;
-            Logger.LogInformation($"CacheBase.Clear(). Type={GetType().Name}");
+            Logger.LogDebug($"{GetType().Name}.Clear()");
+        }
+
+        public async Task ClearAsync()
+        {
+            var cache = await GetCacheAsync();
+            cache.Clear();
+            _initialized = false;
+            Logger.LogDebug($"{GetType().Name}.ClearAsync()");
         }
 
         /// <inheritdoc />
@@ -128,7 +136,7 @@ namespace SOS.Lib.Cache
                 cache.TryAdd(key, entity);
             }
             sp.Stop();
-            Logger.LogInformation($"CacheBase.GetAsync updated cache for type={GetType().Name}, key={key}, Time elapsed={sp.ElapsedMilliseconds}ms");
+            Logger.LogDebug($"{GetType().Name}.GetAsync() updated cache, Time elapsed={sp.ElapsedMilliseconds}ms");
             return entity;
         }
 
@@ -144,7 +152,7 @@ namespace SOS.Lib.Cache
 
                 if (entities != null)
                 {
-                    Clear();
+                    await ClearAsync();
                     foreach (var entity in entities)
                     {
                         cache.TryAdd(entity.Id, entity);
@@ -152,7 +160,7 @@ namespace SOS.Lib.Cache
                     _initialized = true;
                 }
                 sp.Stop();
-                Logger.LogInformation($"CacheBase.GetAllAsync updated cache for type={GetType().Name}, Time elapsed={sp.ElapsedMilliseconds}ms");
+                Logger.LogDebug($"CacheBase.GetAllAsync updated cache for type={GetType().Name}, Time elapsed={sp.ElapsedMilliseconds}ms");
             }
 
             return cache.Values;

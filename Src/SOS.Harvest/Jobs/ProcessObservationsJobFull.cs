@@ -622,7 +622,7 @@ namespace SOS.Harvest.Jobs
         public async Task<bool> RunAsync(
             IJobCancellationToken cancellationToken)
         {
-            _dataProviderCache.Clear();
+            await _dataProviderCache.ClearAsync();
 
             var dataProviders = await _dataProviderCache.GetAllAsync();
             var dataProvidersToProcess = dataProviders.Where(dataProvider => dataProvider.IsActive).ToList();

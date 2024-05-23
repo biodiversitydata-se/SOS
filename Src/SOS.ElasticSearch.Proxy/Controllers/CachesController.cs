@@ -37,13 +37,13 @@ namespace SOS.ElasticSearch.Proxy.Controllers
         [HttpDelete("{cache}")]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult DeleteCache([FromRoute] Cache cache)
+        public async Task<IActionResult> DeleteCache([FromRoute] Cache cache)
         {
             try
             {
                 if (cache == Cache.ProcessedConfiguration)
                 {
-                    _processedConfigurationCache.Clear();
+                    await _processedConfigurationCache.ClearAsync();
                     _logger.LogInformation($"The {cache} cache was cleared");
                 }
                 else

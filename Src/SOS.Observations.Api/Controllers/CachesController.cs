@@ -65,29 +65,29 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public IActionResult DeleteCache([FromRoute] Cache cache)
+        public async Task<IActionResult> DeleteCache([FromRoute] Cache cache)
         {
             try
             {
                 switch (cache)
                 {
                     case Cache.Area:
-                        _areaCache.Clear();
+                        await _areaCache.ClearAsync();
                         break;
                     case Cache.DataProviders:
-                        _dataProvidersCache.Clear();
+                        await _dataProvidersCache.ClearAsync();
                         break;
                     case Cache.ProcessedConfiguration:
-                        _processedConfigurationCache.Clear();
+                        await _processedConfigurationCache.ClearAsync();
                         break;
                     case Cache.Projects:
-                        _projectsCache.Clear();
+                        await _projectsCache.ClearAsync();
                         break;
                     case Cache.TaxonLists:
-                        _taxonListCache.Clear();
+                        await _taxonListCache.ClearAsync();
                         break;
                     case Cache.Vocabulary:
-                        _vocabularyCache.Clear();
+                        await _vocabularyCache.ClearAsync();
                         break;
                 }
 

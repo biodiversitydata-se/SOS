@@ -19,11 +19,8 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Return current instance
         /// </summary>
         byte CurrentInstance { get; }
-
-        /// <summary>
-        /// Clear process configuration cache
-        /// </summary>
-        void ClearConfigurationCache();
+        
+        Task ClearConfigurationCacheAsync();
 
         /// <summary>
         ///     Get 0 or 1 depending of witch instance to update

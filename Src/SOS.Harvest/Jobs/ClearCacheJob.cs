@@ -48,40 +48,37 @@ namespace SOS.Harvest.Jobs
         /// <inheritdoc />
         public async Task RunAsync(IEnumerable<Cache> caches)
         {
-            await Task.Run(() =>
+            if (!caches?.Any() ?? true)
             {
-                if (!caches?.Any() ?? true)
-                {
-                    return;
-                }
+                return;
+            }
 
-                if (caches?.Any(c => c == Cache.Area) ?? false)
-                {
-                    _areaCache.Clear();
-                }
+            if (caches?.Any(c => c == Cache.Area) ?? false)
+            {
+                await _areaCache.ClearAsync();
+            }
 
-                if (caches?.Any(c => c == Cache.DataProviders) ?? false)
-                {
-                    _dataProviderCache.Clear();
-                }
+            if (caches?.Any(c => c == Cache.DataProviders) ?? false)
+            {
+                await _dataProviderCache.ClearAsync();
+            }
 
-                if (caches?.Any(c => c == Cache.ProcessedConfiguration) ?? false)
-                {
-                    _processedConfigurationCache.Clear();
-                }
+            if (caches?.Any(c => c == Cache.ProcessedConfiguration) ?? false)
+            {
+                await _processedConfigurationCache.ClearAsync();
+            }
 
-                if (caches?.Any(c => c == Cache.TaxonLists) ?? false)
-                {
-                    _taxonListCache.Clear();
-                }
+            if (caches?.Any(c => c == Cache.TaxonLists) ?? false)
+            {
+                await _taxonListCache.ClearAsync();
+            }
 
-                if (caches?.Any(c => c == Cache.Vocabulary) ?? false)
-                {
-                    _vocabularyCache.Clear();
-                }
+            if (caches?.Any(c => c == Cache.Vocabulary) ?? false)
+            {
+                await _vocabularyCache.ClearAsync();
+            }
 
-                _logger.LogInformation($"Cache/s cleared ({string.Join(',', caches!)})");
-            });
+            _logger.LogInformation($"Cache/s cleared ({string.Join(',', caches!)})");
         }
     }
 }

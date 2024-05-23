@@ -14,6 +14,11 @@ namespace SOS.Lib.Cache.Interfaces
         void Clear();
 
         /// <summary>
+        /// Clear current cache
+        /// </summary>
+        Task ClearAsync();
+
+        /// <summary>
         /// Try to get cached entity
         /// </summary>
         /// <param name="key"></param>

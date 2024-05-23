@@ -13,6 +13,6 @@ namespace SOS.ElasticSearch.Proxy.Controllers.Interfaces
         /// </summary>
         /// <param name="cache"></param>
         /// <returns></returns>
-        IActionResult DeleteCache(Cache cache);
+        Task<IActionResult> DeleteCache(Cache cache);
     }
 }

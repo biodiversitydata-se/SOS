@@ -1,6 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -13,6 +18,12 @@ namespace SOS.Lib.Managers
     {
         private readonly SosApiConfiguration _sosApiConfiguration;
         private readonly ILogger<CacheManager> _logger;
+        private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
+        private readonly ICache<int, ProjectInfo> _projectCache;
+        private readonly IDataProviderCache _dataProviderCache;
+        private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
+        private readonly IAreaCache _areaCache;
+        private readonly ICache<int, TaxonList> _taxonListCache;
 
         private async Task<bool> ClearAsync(HttpClient client, string requestUri)
         {
@@ -54,7 +65,32 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task<bool> ClearAsync(Enums.Cache cache)
         {
-            _logger.LogInformation($"CacheManager.ClearAsync({cache}) called. Not implemented when testing time based cache.");
+            switch(cache)
+            {
+                case Enums.Cache.ProcessedConfiguration:
+                    await _processedConfigurationCache.ClearAsync();
+                    break;
+                case Enums.Cache.TaxonLists:
+                    await _taxonListCache.ClearAsync();
+                    break;
+                case Enums.Cache.Area:
+                    await _areaCache.ClearAsync();
+                    break;
+                case Enums.Cache.Vocabulary:
+                    await _vocabularyCache.ClearAsync();
+                    break;
+                case Enums.Cache.Projects:
+                    await _projectCache.ClearAsync();
+                    break;
+                case Enums.Cache.DataProviders:
+                    await _dataProviderCache.ClearAsync();
+                    break;
+                default:
+                    _logger.LogError($"CacheManager.ClearAsync({cache}) called. No handler implemented.");
+                    break;
+            }
+
+            _logger.LogDebug($"CacheManager.ClearAsync({cache}) called. Distributed cache not implemented, but the local cache is cleared.");
             return true;
             //var success = true;
             //var client = new HttpClient();

@@ -44,7 +44,7 @@ namespace SOS.Harvest.Jobs
         private async Task InitializeElasticSearchAsync(JobRunModes mode)
         {
             // Make sure we get latest info about current instance
-            _processedObservationRepository.ClearConfigurationCache();
+            await _processedObservationRepository.ClearConfigurationCacheAsync();
 
             if (mode == JobRunModes.Full)
             {
@@ -378,7 +378,7 @@ namespace SOS.Harvest.Jobs
 
                     _logger.LogInformation("Finish harvest taxa");
 
-                    _taxonCache.Clear();
+                    await _taxonCache.ClearAsync();
                     _logger.LogInformation("Taxa cache cleared.");
                 }
 
