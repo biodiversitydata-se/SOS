@@ -79,6 +79,8 @@ namespace SOS.Hangfire.JobServer
                 var host = CreateHostBuilder(args).Build();
                 HangfireJobServerContext.Host = host;
                 LogStartupSettings(host.Services.GetService<ILogger<Program>>());
+                LogManager.Logger = host.Services.GetService<ILogger<LogManager>>();
+                LogManager.LogInformation("LogManager created");
                 await host.RunAsync();
             }
         }

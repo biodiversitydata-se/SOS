@@ -1,6 +1,7 @@
 ﻿using Hangfire.Common;
 using Hangfire.States;
 using Hangfire.Storage;
+using SOS.Lib.Managers;
 using System;
 
 namespace SOS.Lib.HangfireAttributes
@@ -17,7 +18,9 @@ namespace SOS.Lib.HangfireAttributes
 
         public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
         {
+            LogManager.LogInformation("START JobExpirationTimeout.OnStateApplied()");
             context.JobExpirationTimeout = TimeSpan.FromMinutes(Minutes);
+            LogManager.LogInformation("STOP JobExpirationTimeout.OnStateApplied()");
         }
 
         public void OnStateUnapplied(

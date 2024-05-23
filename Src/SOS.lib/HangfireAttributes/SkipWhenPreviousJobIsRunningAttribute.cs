@@ -2,6 +2,7 @@
 using Hangfire.Common;
 using Hangfire.States;
 using Hangfire.Storage;
+using SOS.Lib.Managers;
 using System;
 using System.Collections.Generic;
 
@@ -11,6 +12,7 @@ namespace SOS.Lib.HangfireAttributes
     {
         public void OnCreating(CreatingContext context)
         {
+            LogManager.LogInformation("START SkipWhenPreviousJobIsRunning.OnCreating()");
             var connection = context.Connection as JobStorageConnection;
 
             // We can't handle old storages
@@ -39,6 +41,7 @@ namespace SOS.Lib.HangfireAttributes
             {
                 context.Canceled = true;
             }
+            LogManager.LogInformation("STOP SkipWhenPreviousJobIsRunning.OnCreating()");
         }
 
         public void OnCreated(CreatedContext filterContext)
@@ -47,6 +50,7 @@ namespace SOS.Lib.HangfireAttributes
 
         public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
         {
+            LogManager.LogInformation("START SkipWhenPreviousJobIsRunning.OnStateApplied()");
             if (context.NewState is EnqueuedState)
             {
                 var recurringJobId = SerializationHelper.Deserialize<string>(context.Connection.GetJobParameter(context.BackgroundJob.Id, "RecurringJobId"));
@@ -72,6 +76,7 @@ namespace SOS.Lib.HangfireAttributes
                     $"recurring-job:{recurringJobId}",
                     new[] { new KeyValuePair<string, string>("Running", "no") });
             }
+            LogManager.LogInformation("STOP SkipWhenPreviousJobIsRunning.OnStateApplied()");
         }
 
         public void OnStateUnapplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
