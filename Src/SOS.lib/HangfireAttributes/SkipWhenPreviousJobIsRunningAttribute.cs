@@ -12,36 +12,43 @@ namespace SOS.Lib.HangfireAttributes
     {
         public void OnCreating(CreatingContext context)
         {
-            LogManager.LogInformation("START SkipWhenPreviousJobIsRunning.OnCreating()");
-            var connection = context.Connection as JobStorageConnection;
-
-            // We can't handle old storages
-            if (connection == null)
+            try
             {
-                return;
-            };
+                var connection = context.Connection as JobStorageConnection;
 
-            // We should run this filter only for background jobs based on 
-            // recurring ones
-            if (!context.Parameters.ContainsKey("RecurringJobId"))
-            {
-                return;
-            };
+                // We can't handle old storages
+                if (connection == null)
+                {
+                    return;
+                };
 
-            var recurringJobId = context.Parameters["RecurringJobId"] as string;
+                // We should run this filter only for background jobs based on 
+                // recurring ones
+                if (!context.Parameters.ContainsKey("RecurringJobId"))
+                {
+                    return;
+                };
 
-            // RecurringJobId is malformed. This should not happen, but anyway.
-            if (string.IsNullOrWhiteSpace(recurringJobId))
-            {
-                return;
-            };
+                var recurringJobId = context.Parameters["RecurringJobId"] as string;
 
-            var running = connection.GetValueFromHash($"recurring-job:{recurringJobId}", "Running");
-            if ("yes".Equals(running, StringComparison.OrdinalIgnoreCase))
-            {
-                context.Canceled = true;
+                // RecurringJobId is malformed. This should not happen, but anyway.
+                if (string.IsNullOrWhiteSpace(recurringJobId))
+                {
+                    LogManager.LogError("SkipWhenPreviousJobIsRunning.OnCreating(). RecurringJobId is malformed.");
+                    return;
+                };
+
+                var running = connection.GetValueFromHash($"recurring-job:{recurringJobId}", "Running");
+                if ("yes".Equals(running, StringComparison.OrdinalIgnoreCase))
+                {
+                    context.Canceled = true;
+                    LogManager.LogInformation("SkipWhenPreviousJobIsRunning.OnCreating(). Cancel job.");
+                }
             }
-            LogManager.LogInformation("STOP SkipWhenPreviousJobIsRunning.OnCreating()");
+            catch (Exception ex)
+            {
+                LogManager.LogError(ex, "SkipWhenPreviousJobIsRunning.OnCreating() error");
+            }
         }
 
         public void OnCreated(CreatedContext filterContext)
@@ -50,33 +57,40 @@ namespace SOS.Lib.HangfireAttributes
 
         public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
         {
-            LogManager.LogInformation("START SkipWhenPreviousJobIsRunning.OnStateApplied()");
-            if (context.NewState is EnqueuedState)
-            {
-                var recurringJobId = SerializationHelper.Deserialize<string>(context.Connection.GetJobParameter(context.BackgroundJob.Id, "RecurringJobId"));
-                if (String.IsNullOrWhiteSpace(recurringJobId))
+            try
+            { 
+                if (context.NewState is EnqueuedState)
                 {
-                    return;
-                };
+                    var recurringJobId = SerializationHelper.Deserialize<string>(context.Connection.GetJobParameter(context.BackgroundJob.Id, "RecurringJobId"));
+                    if (String.IsNullOrWhiteSpace(recurringJobId))
+                    {
+                        return;
+                    };
 
-                transaction.SetRangeInHash(
-                    $"recurring-job:{recurringJobId}",
-                    new[] { new KeyValuePair<string, string>("Running", "yes") });
-            }
-            else if ((context.NewState.IsFinal && !FailedState.StateName.Equals(context.OldStateName, StringComparison.OrdinalIgnoreCase)) ||
-                        (context.NewState is FailedState))
-            {
-                var recurringJobId = SerializationHelper.Deserialize<string>(context.Connection.GetJobParameter(context.BackgroundJob.Id, "RecurringJobId"));
-                if (string.IsNullOrWhiteSpace(recurringJobId))
+                    LogManager.LogInformation($"SkipWhenPreviousJobIsRunning.OnStateApplied(). Set Running=yes for {recurringJobId}");
+                    transaction.SetRangeInHash(
+                        $"recurring-job:{recurringJobId}",
+                        new[] { new KeyValuePair<string, string>("Running", "yes") });
+                }
+                else if ((context.NewState.IsFinal && !FailedState.StateName.Equals(context.OldStateName, StringComparison.OrdinalIgnoreCase)) ||
+                            (context.NewState is FailedState))
                 {
-                    return;
-                };
+                    var recurringJobId = SerializationHelper.Deserialize<string>(context.Connection.GetJobParameter(context.BackgroundJob.Id, "RecurringJobId"));
+                    if (string.IsNullOrWhiteSpace(recurringJobId))
+                    {
+                        return;
+                    };
 
-                transaction.SetRangeInHash(
-                    $"recurring-job:{recurringJobId}",
-                    new[] { new KeyValuePair<string, string>("Running", "no") });
+                    LogManager.LogInformation($"SkipWhenPreviousJobIsRunning.OnStateApplied(). Set Running=no for {recurringJobId}");
+                    transaction.SetRangeInHash(
+                        $"recurring-job:{recurringJobId}",
+                        new[] { new KeyValuePair<string, string>("Running", "no") });
+                }
             }
-            LogManager.LogInformation("STOP SkipWhenPreviousJobIsRunning.OnStateApplied()");
+            catch (Exception ex)
+            {
+                LogManager.LogError(ex, "SkipWhenPreviousJobIsRunning.OnStateApplied() error");
+            }
         }
 
         public void OnStateUnapplied(ApplyStateContext context, IWriteOnlyTransaction transaction)

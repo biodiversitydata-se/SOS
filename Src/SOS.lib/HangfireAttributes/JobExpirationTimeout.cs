@@ -18,9 +18,8 @@ namespace SOS.Lib.HangfireAttributes
 
         public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
         {
-            LogManager.LogInformation("START JobExpirationTimeout.OnStateApplied()");
+            LogManager.LogInformation($"JobExpirationTimeout.OnStateApplied(). Minutes={Minutes}");
             context.JobExpirationTimeout = TimeSpan.FromMinutes(Minutes);
-            LogManager.LogInformation("STOP JobExpirationTimeout.OnStateApplied()");
         }
 
         public void OnStateUnapplied(
