@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -56,9 +57,21 @@ namespace SOS.Lib.Managers
         /// <param name="logger"></param>
         public CacheManager(
             SosApiConfiguration sosApiConfiguration,
+            ICache<string, ProcessedConfiguration> processedConfigurationCache,
+            ICache<int, ProjectInfo> projectCache,
+            IDataProviderCache dataProviderCache,
+            ICache<VocabularyId, Vocabulary> vocabularyCache,
+            IAreaCache areaCache,
+            ICache<int, TaxonList> taxonListCache,
             ILogger<CacheManager> logger)
         {
             _sosApiConfiguration = sosApiConfiguration ?? throw new ArgumentNullException(nameof(sosApiConfiguration));
+            _processedConfigurationCache = processedConfigurationCache;
+            _projectCache = projectCache;
+            _dataProviderCache = dataProviderCache;
+            _vocabularyCache = vocabularyCache;
+            _areaCache = areaCache;
+            _taxonListCache = taxonListCache;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
