@@ -78,29 +78,36 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task<bool> ClearAsync(Enums.Cache cache)
         {
-            switch(cache)
+            try
             {
-                case Enums.Cache.ProcessedConfiguration:
-                    await _processedConfigurationCache.ClearAsync();
-                    break;
-                case Enums.Cache.TaxonLists:
-                    await _taxonListCache.ClearAsync();
-                    break;
-                case Enums.Cache.Area:
-                    await _areaCache.ClearAsync();
-                    break;
-                case Enums.Cache.Vocabulary:
-                    await _vocabularyCache.ClearAsync();
-                    break;
-                case Enums.Cache.Projects:
-                    await _projectCache.ClearAsync();
-                    break;
-                case Enums.Cache.DataProviders:
-                    await _dataProviderCache.ClearAsync();
-                    break;
-                default:
-                    _logger.LogError($"CacheManager.ClearAsync({cache}) called. No handler implemented.");
-                    break;
+                switch (cache)
+                {
+                    case Enums.Cache.ProcessedConfiguration:
+                        await _processedConfigurationCache.ClearAsync();
+                        break;
+                    case Enums.Cache.TaxonLists:
+                        await _taxonListCache.ClearAsync();
+                        break;
+                    case Enums.Cache.Area:
+                        await _areaCache.ClearAsync();
+                        break;
+                    case Enums.Cache.Vocabulary:
+                        await _vocabularyCache.ClearAsync();
+                        break;
+                    case Enums.Cache.Projects:
+                        await _projectCache.ClearAsync();
+                        break;
+                    case Enums.Cache.DataProviders:
+                        await _dataProviderCache.ClearAsync();
+                        break;
+                    default:
+                        _logger.LogError($"CacheManager.ClearAsync({cache}) called. No handler implemented.");
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"CacheManager.ClearAsync({cache}) error.");
             }
 
             //_logger.LogDebug($"CacheManager.ClearAsync({cache}) called. Distributed cache not implemented, but the local cache is cleared.");
