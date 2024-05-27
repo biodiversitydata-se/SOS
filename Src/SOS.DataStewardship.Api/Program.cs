@@ -65,7 +65,7 @@ catch (Exception ex)
 }
 finally
 {
-    LogManager.Shutdown();
+    NLog.LogManager.Shutdown();
 }
 
 public partial class Program { }
