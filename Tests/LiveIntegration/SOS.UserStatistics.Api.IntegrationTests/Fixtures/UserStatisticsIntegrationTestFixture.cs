@@ -1,4 +1,6 @@
-﻿using SOS.Lib.Managers;
+﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Managers;
+using SOS.Lib.Models.Shared;
 using SOS.UserStatistics.Api.Cache.Managers;
 
 namespace SOS.UserStatistics.Api.IntegrationTests.Fixtures;
@@ -75,14 +77,14 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
         var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
         var taxonManager = CreateTaxonManager(processClient, taxonRepository, memoryCache);
-        var userStatisticsProcessedObservationRepository = CreateUserStatisticsProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient);
+        var userStatisticsProcessedObservationRepository = CreateUserStatisticsProcessedObservationRepository(elasticConfiguration, elasticClientManager, memoryCache, processClient);
 
-        var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()));
+        var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>());
         var userStatisticsObservationRepository = new UserStatisticsObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new NullLogger<UserObservationRepository>());
         var userService = CreateUserService();
         UserStatisticsProcessedObservationRepository = userStatisticsProcessedObservationRepository;
         var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
-        var areaCache = new AreaCache(areaRepository);
+        var areaCache = new AreaCache(areaRepository, memoryCache, new NullLogger<CacheBase<string, Area>>());
         _userManager = new UserManager(userService, areaCache, new NullLogger<UserManager>());
         var userStatisticsCacheManager = new UserStatisticsCacheManager(new MemoryCache(new MemoryCacheOptions()));
         UserStatisticsManager = new UserStatisticsManager(userStatisticsCacheManager, userStatisticsObservationRepository, userStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
@@ -111,12 +113,13 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
     private UserStatisticsProcessedObservationRepository CreateUserStatisticsProcessedObservationRepository(
         ElasticSearchConfiguration elasticConfiguration,
         IElasticClientManager elasticClientManager,
+        IMemoryCache memoryCache,
         IProcessClient processClient)
     {
         var userStatisticsProcessedObservationRepository = new UserStatisticsProcessedObservationRepository(
             elasticClientManager,
             elasticConfiguration,
-            new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+            new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>() ),
             new Mock<ITaxonManager>().Object,
             new NullLogger<ProcessedObservationCoreRepository>());
         return userStatisticsProcessedObservationRepository;
@@ -126,8 +129,8 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
     {
         var taxonListRepository = new TaxonListRepository(processClient, new NullLogger<TaxonListRepository>());
         var taxonManager = new TaxonManager(taxonRepository, taxonListRepository,
-            new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache),
-            new ClassCache<TaxonListSetsById>(memoryCache),
+            new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache, new NullLogger<ClassCache<TaxonTree<IBasicTaxon>>>()),
+            new ClassCache<TaxonListSetsById>(memoryCache, new NullLogger<ClassCache<TaxonListSetsById>>()),
             new NullLogger<TaxonManager>());
         return taxonManager;
     }

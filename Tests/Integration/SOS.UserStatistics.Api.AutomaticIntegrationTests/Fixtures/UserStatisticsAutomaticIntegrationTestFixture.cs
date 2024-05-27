@@ -2,6 +2,7 @@
 using SOS.UserStatistics.Api.Cache.Managers.Interfaces;
 using SOS.UserStatistics.Api.Configuration;
 using SOS.Harvest.Extensions;
+using SOS.Lib.Models.Processed.Configuration;
 
 namespace SOS.UserStatistics.Api.AutomaticIntegrationTests.Fixtures;
 
@@ -56,12 +57,12 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         _taxa = GetUseTaxonZipCollection() ? GetTaxaFromZipFile() : await taxonRepository.GetAllAsync();
         _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
         var basicTaxonTree = TaxonTreeFactory.CreateTaxonTree(_taxaById);
-        var taxonTreeCache = new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache);
+        var taxonTreeCache = new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache, new NullLogger<ClassCache<TaxonTree<IBasicTaxon>>>());
         taxonTreeCache.Set(basicTaxonTree);
         var taxonManager = CreateTaxonManager(_processClient, taxonRepository, memoryCache, taxonTreeCache);
 
         _userStatisticsCacheManager = new UserStatisticsCacheManager(new MemoryCache(new MemoryCacheOptions()));
-        _userStatisticsObservationRepository = CreateUserStatisticsObservationRepository(elasticConfiguration, elasticClientManager, _processClient);
+        _userStatisticsObservationRepository = CreateUserStatisticsObservationRepository(elasticConfiguration, elasticClientManager, memoryCache, _processClient);
         _userStatisticsProcessedObservationRepository = CreateUserStatisticsProcessedObservationRepository(elasticConfiguration, elasticClientManager, _processClient, memoryCache, taxonManager);
 
         _vocabularyRepository = new VocabularyRepository(_processClient, new NullLogger<VocabularyRepository>());
@@ -154,7 +155,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         var taxonListRepository = new TaxonListRepository(processClient, new NullLogger<TaxonListRepository>());
         var taxonManager = new TaxonManager(taxonRepository, taxonListRepository,
             taxonTreeCache,
-            new ClassCache<TaxonListSetsById>(memoryCache),
+            new ClassCache<TaxonListSetsById>(memoryCache, new NullLogger<ClassCache<TaxonListSetsById>>()),
             new NullLogger<TaxonManager>());
         return taxonManager;
     }
@@ -177,21 +178,22 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
         var userStatisticsProcessedObservationRepository = new UserStatisticsProcessedObservationRepository(
             elasticClientManager,
             elasticConfiguration,
-            new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+            new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>()),
             taxonManager,
-            new NullLogger<ProcessedObservationCoreRepository>());
+            null);
         return userStatisticsProcessedObservationRepository;
     }
 
     private UserStatisticsObservationRepository CreateUserStatisticsObservationRepository(
         ElasticSearchConfiguration elasticConfiguration,
         IElasticClientManager elasticClientManager,
+        IMemoryCache memoryCache,
         IProcessClient processClient)
     {
         var userStatisticsObservationRepository = new UserStatisticsObservationRepository(
             elasticClientManager,
             elasticConfiguration,
-            new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+            new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>()),
             new NullLogger<UserObservationRepository>());
 
         return userStatisticsObservationRepository;
