@@ -829,14 +829,14 @@ namespace SOS.Harvest.DarwinCore
                 if (occurrenceRecords.Count % batchSize == 0)
                 {
                     await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
-                    AddDatasetInformation(occurrenceRecords, observationDatasetByEventId, observationDatasets!.FirstOrDefault()!);
+                    AddDatasetInformation(occurrenceRecords, observationDatasetByEventId, observationDatasets == null ? null : observationDatasets.FirstOrDefault());
                     yield return occurrenceRecords;
                     occurrenceRecords.Clear();
                 }
             }
 
             await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
-            AddDatasetInformation(occurrenceRecords, observationDatasetByEventId, observationDatasets!.FirstOrDefault()!);
+            AddDatasetInformation(occurrenceRecords, observationDatasetByEventId, observationDatasets == null ? null : observationDatasets.FirstOrDefault());
             yield return occurrenceRecords;
         }
 
