@@ -1073,7 +1073,7 @@
             "LastName": "Dahlgren",
             "Email": "riksskogstaxeringen@slu.se"
         },
-        "CoordinateUncertaintyInMeters": 1131,
+        "CoordinateUncertaintyInMeters": 800,
         "CreateEventDwC": true,
         "Descriptions": [
             {
@@ -2043,7 +2043,7 @@
             "LastName": "Dahlgren",
             "Email": "riksskogstaxeringen@slu.se"
         },
-        "CoordinateUncertaintyInMeters": 1131,
+        "CoordinateUncertaintyInMeters": 800,
         "CreateEventDwC": true,
         "Descriptions": [
             {
