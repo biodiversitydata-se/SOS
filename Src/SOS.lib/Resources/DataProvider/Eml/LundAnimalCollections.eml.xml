@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml
+    xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+    xmlns:dc="https://purl.org/dc/terms/"
+    xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+    xmlns:sos="https://sos-search.artdata.slu.se/"
+    xmlns:gbif="https://gbif.org/"
+    xmlns:snd="https://snd.gu.se/"
+    xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
+    packageId="33b4a8ce-5810-d1fb-fd4f-adad1f53d9fa" system="https://sos-search.artdata.slu.se/"
+    scope="system" xml:lang="en">
+	<dataset>
+		<alternateIdentifier>b23c2479-214f-4160-9f98-bd3831ab131b</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=mzlu_ento_specimens</alternateIdentifier>
+		<title xml:lang="eng">Lund University Biological Museum - Insect collections Specimens</title>
+		<creator>
+			<individualName>
+				<givenName>Christoffer</givenName>
+				<surName>Fägerström</surName>
+			</individualName>
+			<organizationName>Biological Museum, Lund University</organizationName>
+			<positionName>Database manager</positionName>
+			<address>
+				<deliveryPoint>Sölvegatan 37</deliveryPoint>
+				<city>223 62 Lund</city>
+				<administrativeArea>Skåne</administrativeArea>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>christoffer.fagerstrom@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biologi.lu.se/biologiska-museet</onlineUrl>
+		</creator>
+		<associatedParty>
+			<individualName>
+				<givenName>Manash</givenName>
+				<surName>Shah</surName>
+			</individualName>
+			<address>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>manash.shah@nrm.se</electronicMailAddress>
+			<role>user</role>
+		</associatedParty>
+		<pubDate> 2024-06-02 </pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>The dataset is based on an indvidual registration database of pinned, dry specimens, microscope slides or wet collection specimens. One record is usually but not always equivalent to one specimen. Some records are multiple specimens on the same pin with the same collecting information or multiple specimens in a vial with ethanol or on a slide, coming from one collecting event. The dataset contains close to 300 000 specimens, of which 83 % originate from Sweden. It is not representative of our collection as it the data were gathered based on special project needs.</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Specimen</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				This work is licensed under a
+				<ulink url="http://creativecommons.org/licenses/by-nc/4.0/legalcode">
+					<citetitle>Creative Commons Attribution Non Commercial (CC-BY-NC 4.0) License</citetitle>
+				</ulink>
+				.
+			</para>
+		</intellectualRights>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>Specimens from all continents, with the majority from the western Palaearctic and Sweden in particular.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>-180</westBoundingCoordinate>
+					<eastBoundingCoordinate>180</eastBoundingCoordinate>
+					<northBoundingCoordinate>90</northBoundingCoordinate>
+					<southBoundingCoordinate>-90</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<temporalCoverage>
+				<rangeOfDates>
+					<beginDate>
+						<calendarDate>1800-01-01</calendarDate>
+					</beginDate>
+					<endDate>
+						<calendarDate>2024-01-01</calendarDate>
+					</endDate>
+				</rangeOfDates>
+			</temporalCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>Arthropoda: Insecta</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankValue>Insecta</taxonRankValue>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para/>
+			</description>
+			<maintenanceUpdateFrequency>weekly</maintenanceUpdateFrequency>
+		</maintenance>
+		<contact>
+			<individualName>
+				<givenName>Christoffer</givenName>
+				<surName>Fägerström</surName>
+			</individualName>
+			<organizationName>Biological Museum, Lund University</organizationName>
+			<positionName>Database manager</positionName>
+			<address>
+				<deliveryPoint>Sölvegatan 37</deliveryPoint>
+				<city>223 62 Lund</city>
+				<administrativeArea>Skåne</administrativeArea>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>christoffer.fagerstrom@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biologi.lu.se/biologiska-museet</onlineUrl>
+		</contact>
+	</dataset>
+	<dataset>
+		<alternateIdentifier>427a6290-0c65-11dd-84d2-b8a03c50a862</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=mzlu</alternateIdentifier>
+		<title xml:lang="eng">Lund University Biological Museum - Zoological collections (MZLU)</title>
+		<creator>
+			<individualName>
+				<givenName>Jonas</givenName>
+				<surName>Ekström</surName>
+			</individualName>
+			<organizationName>Biological museum, Lund University</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>jonas.ekstrom@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biologi.lu.se/biologiska.museet</onlineUrl>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Jonas</givenName>
+				<surName>Ekström</surName>
+			</individualName>
+			<organizationName>Biological museum, Lund University</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>jonas.ekstrom@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biologi.lu.se/biologiska.museet</onlineUrl>
+		</metadataProvider>
+		<associatedParty>
+			<individualName>
+				<givenName>Veronika</givenName>
+				<surName>Johansson</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Node manager</positionName>
+			<address>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>veronika.johansson@nrm.se</electronicMailAddress>
+			<role>user</role>
+		</associatedParty>
+		<pubDate> 2024-06-02 </pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>This database contains information on birds, mammals, reptiles, amphibians and invertebrates, except insects, from the Zoological Collections in the Museum of Biology of Lund, Sweden.</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keyword>Specimen</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Specimen</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>
+				This work is licensed under a
+				<ulink url="http://creativecommons.org/licenses/by-nc/4.0/legalcode">
+					<citetitle>Creative Commons Attribution Non Commercial (CC-BY-NC) 4.0 License</citetitle>
+				</ulink>
+				.
+			</para>
+		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">https://www.biology.lu.se/biological-museum/zoological-collections</url>
+			</online>
+		</distribution>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>Specimens from all over the world.. 68% of the material from the Nordic countries (Denmark,Sweden,Norway,Finland and Iceland).</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>-180</westBoundingCoordinate>
+					<eastBoundingCoordinate>-180</eastBoundingCoordinate>
+					<northBoundingCoordinate>90</northBoundingCoordinate>
+					<southBoundingCoordinate>-90</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>Animal groups except insects.</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>kingdom</taxonRankName>
+					<taxonRankValue>Animalia</taxonRankValue>
+					<commonName>Animal</commonName>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para/>
+			</description>
+			<maintenanceUpdateFrequency>weekly</maintenanceUpdateFrequency>
+		</maintenance>
+		<contact>
+			<individualName>
+				<givenName>Maria</givenName>
+				<surName>Mostadius</surName>
+			</individualName>
+			<organizationName>Biological museum, Lund University</organizationName>
+			<positionName>Curator</positionName>
+			<address>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>maria.mostadius@biol.lu.se</electronicMailAddress>
+			<onlineUrl>https://www.biologi.lu.se/biologiska.museet</onlineUrl>
+		</contact>
+	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2024-01-16T00:00:25.026+01:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<dc:replaces>b23c2479-214f-4160-9f98-bd3831ab131b/v1.21.xml</dc:replaces>
+			</gbif>
+			<gbif>
+				<dateStamp>2014-12-01T01:50:17.149+01:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Ekström J (2024). Lund University Biological Museum - Zoological collections (MZLU). Version 353.429. Lund University Biological Museum. Occurrence dataset. https://www.gbif.se/ipt/resource?r=mzlu&v=353.429</citation>
+				<formationPeriod>1735-current</formationPeriod>
+				<dc:replaces>427a6290-0c65-11dd-84d2-b8a03c50a862/v353.429.xml</dc:replaces>
+			</gbif>
+		</metadata>
+	</additionalMetadata>
+</eml:eml>
+
