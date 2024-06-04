@@ -151,7 +151,7 @@ namespace SOS.Lib.Repositories.Verbatim
 
                 var fileStream = new MemoryStream();
                 await _gridFSBucket.DownloadToStreamAsync(id, fileStream, new GridFSDownloadByNameOptions { Seekable = true }, CancellationToken.None);
-
+                fileStream.Position = 0;
                 return fileStream;
             }
             catch (Exception)

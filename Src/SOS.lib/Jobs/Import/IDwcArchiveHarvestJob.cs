@@ -14,7 +14,6 @@ namespace SOS.Lib.Jobs.Import
         [Queue("high")]
         Task<bool> RunAsync(
             int dataProviderId,
-            string archivePath,
             DwcaTarget target,
             IJobCancellationToken cancellationToken);
     }

@@ -7,6 +7,7 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -405,6 +406,18 @@ namespace SOS.Lib.Repositories.Verbatim
             }
 
             return occurrences;
+        }
+
+        /// <inheritdoc/>
+        public async Task<Stream> GetSourceFileAsync()
+        {
+            return await base.GetSourceFileAsync(_dataProvider.Id);
+        }
+
+        /// <inheritdoc/>
+        public async Task<bool> StoreSourceFileAsync(Stream fileStream)
+        {
+            return await base.StoreSourceFileAsync(_dataProvider.Id, fileStream);
         }
     }
 }

@@ -3,15 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Models;
-using SOS.Lib.Configuration.Import;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
 using System;
 using System.IO;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers
@@ -24,21 +23,23 @@ namespace SOS.Administration.Api.Controllers
     public class HarvestChecklistJobController : ControllerBase, IHarvestChecklistJobController
     {
         private readonly IDataProviderManager _dataProviderManager;
-        private readonly DwcaConfiguration _dwcaConfiguration;
+        private readonly IVerbatimClient _verbatimClient;
         private readonly ILogger<HarvestObservationsJobController> _logger;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="dataProviderManager"></param>
+        /// <param name="verbatimClient"></param>
         /// <param name="dwcaConfiguration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public HarvestChecklistJobController(IDataProviderManager dataProviderManager,
-            DwcaConfiguration dwcaConfiguration,
+            IVerbatimClient verbatimClient,
             ILogger<HarvestObservationsJobController> logger)
         {
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
-            _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
+            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -70,22 +71,17 @@ namespace SOS.Administration.Api.Controllers
                 {
                     return new BadRequestObjectResult("No file content");
                 }
-
-                var filename = FilenameHelper.CreateFilenameWithDate(model.DwcaFile.FileName, true);
-                var filePath = Path.Combine(_dwcaConfiguration.ImportPath, filename);
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
-                await using var stream = new FileStream(filePath, FileMode.Create);
+                await using var stream = new MemoryStream();
                 await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);
-                _logger.LogDebug("Start wait for DwC-A file transfer");
-                Thread.Sleep(TimeSpan.FromSeconds(60)); // fix for slow network disk
-                _logger.LogDebug("End wait for DwC-A file transfer");
+                var darwinCoreArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(dataProvider, _verbatimClient, _logger);
+                if (!await darwinCoreArchiveVerbatimRepository.StoreSourceFileAsync(stream))
+                {
+                    return new BadRequestObjectResult("Failed to store sourec file");
+                }
 
                 // process uploaded file
                 BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job =>
-                    job.RunAsync(dataProvider.Id, filePath, DwcaTarget.Checklist, JobCancellationToken.Null));
+                    job.RunAsync(dataProvider.Id, DwcaTarget.Checklist, JobCancellationToken.Null));
                 return new OkObjectResult(
                     $"DwC-A harvest job for data provider: {dataProvider} was enqueued to Hangfire.");
             }
