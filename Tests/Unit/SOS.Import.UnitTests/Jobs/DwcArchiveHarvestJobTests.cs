@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
 using SOS.Harvest.Jobs;
+using SOS.Lib.Configuration.Import;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
@@ -26,6 +28,8 @@ namespace SOS.Import.UnitTests.Managers
             _dwcChecklistHarvesterMock = new Mock<IDwcChecklistHarvester>();
             _dataProviderManagerMock = new Mock<IDataProviderManager>();
             _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
+            _verbatimClient = new Mock<IVerbatimClient>();
+            _dwcaConfiguration = new Mock<DwcaConfiguration>();
             _loggerMock = new Mock<ILogger<DwcArchiveHarvestJob>>();
         }
 
@@ -33,6 +37,9 @@ namespace SOS.Import.UnitTests.Managers
         private readonly Mock<IDwcChecklistHarvester> _dwcChecklistHarvesterMock;
         private readonly Mock<IDataProviderManager> _dataProviderManagerMock;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
+        private readonly Mock<IVerbatimClient> _verbatimClient;
+        private readonly Mock<DwcaConfiguration> _dwcaConfiguration;
+       
         private readonly Mock<ILogger<DwcArchiveHarvestJob>> _loggerMock;
 
         private DwcArchiveHarvestJob TestObject => new DwcArchiveHarvestJob(
@@ -40,6 +47,8 @@ namespace SOS.Import.UnitTests.Managers
             _dwcChecklistHarvesterMock.Object,
             _harvestInfoRepositoryMock.Object,
             _dataProviderManagerMock.Object,
+            _verbatimClient.Object,
+            _dwcaConfiguration.Object,
             _loggerMock.Object);
 
         /// <summary>
@@ -57,7 +66,7 @@ namespace SOS.Import.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.RunAsync(0, "", DwcaTarget.Observation, JobCancellationToken.Null); };
+            Func<Task> act = async () => { await TestObject.RunAsync(0, DwcaTarget.Observation, JobCancellationToken.Null); };
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -88,7 +97,7 @@ namespace SOS.Import.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.RunAsync(0, "", DwcaTarget.Observation, JobCancellationToken.Null); };
+            Func<Task> act = async () => { await TestObject.RunAsync(0, DwcaTarget.Observation, JobCancellationToken.Null); };
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -120,7 +129,7 @@ namespace SOS.Import.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.RunAsync(0, "", DwcaTarget.Observation, JobCancellationToken.Null);
+            var result = await TestObject.RunAsync(0, DwcaTarget.Observation, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

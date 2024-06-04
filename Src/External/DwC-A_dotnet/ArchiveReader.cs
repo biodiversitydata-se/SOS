@@ -71,7 +71,6 @@ namespace DwC_A
             //Create file readers for extensions
             foreach (var extension in MetaData.Extension)
             {
-                var extensionFileName = extension.Files.FirstOrDefault();
                 var extensionFileMetaData = abstractFactory.CreateExtensionMetaData(extension);
                 extensionFiles.Add(CreateFileReader(extensionFileMetaData));
             }

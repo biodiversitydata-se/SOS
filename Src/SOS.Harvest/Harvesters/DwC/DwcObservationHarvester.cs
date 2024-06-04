@@ -139,7 +139,7 @@ namespace SOS.Harvest.Harvesters.DwC
                     await dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
                 }
 
-                if (dataProvider.UseVerbatimFileInExport)
+                if (dataProvider.UseVerbatimFileInExport && (dataProvider.Datasets?.Any() ?? false)) // If no dataset, file must have been manually uploaded and is allready stored
                 {
                     _logger.LogDebug($"Start storing source file for {dataProvider.Identifier}");
                     await using var fileStream = File.OpenRead(archivePath);
@@ -288,7 +288,7 @@ namespace SOS.Harvest.Harvesters.DwC
 
                 dwcCollectionRepository.EndTempMode();
 
-                if (dataProvider.UseVerbatimFileInExport)
+                if (dataProvider.UseVerbatimFileInExport && (dataProvider.Datasets?.Any() ?? false)) // If no dataset, file must have been manually uploaded and is allready stored
                 {
                     _logger.LogDebug($"Start storing source file for {dataProvider.Identifier}");
                     await using var fileStream = File.OpenRead(archivePath);

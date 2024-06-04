@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SOS.Lib.Helpers
 {
@@ -20,6 +21,35 @@ namespace SOS.Lib.Helpers
             return WaitForFile(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
+        /// <summary>
+        /// Save file stream to disk
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="sourceStream"></param>
+        /// <returns></returns>
+        public static async Task<bool> SaveStreamAsync(string filePath, Stream sourceStream)
+        {
+            try
+            {
+                if (!sourceStream?.CanWrite ?? true)
+                {
+                    throw new NullReferenceException(nameof(sourceStream));
+                }
+
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+                using var fileStream = new FileStream(filePath, FileMode.Create);
+                await sourceStream.CopyToAsync(fileStream).ConfigureAwait(true);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        
         /// <summary>
         ///     Initializes a new instance of the FileStream class.
         ///     If the file is locked, this method waits for the file lock to be released.
