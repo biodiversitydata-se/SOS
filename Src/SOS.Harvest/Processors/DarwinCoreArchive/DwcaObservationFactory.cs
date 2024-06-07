@@ -476,6 +476,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
         public static string RemoveAuthorFromString(string input)
         {
+            if (input == null) return null;
             string withoutParentheses = Regex.Replace(input, @"\s*\([^)]*\)", "");
             string withoutCommaYear = @"\b([\wäöåÄÖÅ]+)( & [\wäöåÄÖÅ]+)?,\s*\d{4}\b";
             return Regex.Replace(withoutParentheses, withoutCommaYear, "").Trim();
