@@ -40,6 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7768AF04-8
 		Docs\ObsoleteProperties.md = Docs\ObsoleteProperties.md
 		README.md = README.md
 		Docs\SearchFilter.md = Docs\SearchFilter.md
+		Docs\TaxaMatch.md = Docs\TaxaMatch.md
 		Docs\TrunkBasedBranchingStrategy.md = Docs\TrunkBasedBranchingStrategy.md
 		Docs\Vocabularies.md = Docs\Vocabularies.md
 		Docs\WfsService.md = Docs\WfsService.md
@@ -114,7 +115,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Observations.Api.Integr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LiveIntegration", "LiveIntegration", "{FE09BD2E-E0A8-465B-9917-D31AA720E646}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Shared.Api", "Src\SOS.Shared.Api\SOS.Shared.Api.csproj", "{0964ED67-D326-4DC6-9981-722B57941744}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Shared.Api", "Src\SOS.Shared.Api\SOS.Shared.Api.csproj", "{0964ED67-D326-4DC6-9981-722B57941744}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
