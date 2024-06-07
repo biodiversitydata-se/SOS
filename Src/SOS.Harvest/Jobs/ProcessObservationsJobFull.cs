@@ -626,6 +626,14 @@ namespace SOS.Harvest.Jobs
 
             var dataProviders = await _dataProviderCache.GetAllAsync();
             var dataProvidersToProcess = dataProviders.Where(dataProvider => dataProvider.IsActive).ToList();
+            _logger.LogInformation("Start process observations");
+            if (dataProvidersToProcess != null)
+            {
+                foreach (var dataProvider in dataProvidersToProcess)
+                {
+                    _logger.LogInformation($"{dataProvider}, PreviousProcessLimit={dataProvider.PreviousProcessLimit}");
+                }
+            }
             return await RunAsync(
                 dataProvidersToProcess,
                 JobRunModes.Full,

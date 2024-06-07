@@ -165,7 +165,7 @@ namespace SOS.Harvest.Processors
                 }
                 if (processedTaxon.Attributes?.Synonyms != null)
                 {
-                    foreach (var synonyme in processedTaxon.Attributes.Synonyms)
+                    foreach (var synonyme in processedTaxon.Attributes.Synonyms.Where(m => m.TaxonomicStatus != "misapplied"))
                     {
                         _taxonBySynonymName.Add(synonyme.Name.ToLower(), processedTaxon);
                         _taxonBySynonymNameAuthor.Add(synonyme.Name.ToLower() + " " + synonyme.Author.ToLower(), processedTaxon);
