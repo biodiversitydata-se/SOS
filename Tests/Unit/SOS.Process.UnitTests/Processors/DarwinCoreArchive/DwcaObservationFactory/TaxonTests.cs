@@ -16,6 +16,31 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             _fixture = fixture;
         }
 
+        [Theory]
+        [Trait("Category", "Unit")]
+        [InlineData("Pediobius oviventris Boucek, 1965", "Pediobius oviventris")]
+        [InlineData("Pediobius oviventris Boucek,  1965", "Pediobius oviventris")]
+        [InlineData("Pediobius oviventris Boucek", "Pediobius oviventris Boucek")]
+        [InlineData("Scydmaenus rufus Müller & Kunze,  1822", "Scydmaenus rufus")]
+        [InlineData("Anax junius (Drury, 1773)", "Anax junius")]
+        [InlineData("Cephalops annulipes  (Zetterstedt, 1838)", "Cephalops annulipes")]
+        [InlineData("Leucorrhina", "Leucorrhina")]
+        [InlineData("Leucorrhinia sp.", "Leucorrhinia sp.")]
+        public void TestRemoveAuthorAndYearIfExists(
+            string name,
+            string expected)
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var parsed = SOS.Harvest.Processors.DarwinCoreArchive.DwcaObservationFactory.RemoveAuthorFromString(name);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            parsed.Should().Be(expected);
+        }
+
         /// <remarks>
         /// Only Mammalia taxon and its underlying taxa is available in this unit test to keep the execution time fast.
         /// </remarks>

@@ -468,14 +468,17 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             if (!string.IsNullOrEmpty(verbatim.Species))
             {
                 names.Add(verbatim.Species);
-            }
-            var braketStart = verbatim.ScientificName?.IndexOf('(') ?? 0;
-            if (braketStart > 0)
-            {
-                names.Add(verbatim.ScientificName!.Substring(0, braketStart - 1).Trim());
-            }
+            }            
+            names.Add(RemoveAuthorFromString(verbatim.ScientificName!));            
 
             return GetTaxon(parsedTaxonId, names, verbatim.ScientificNameAuthorship, true, verbatim.TaxonID);
+        }
+
+        public static string RemoveAuthorFromString(string input)
+        {
+            string withoutParentheses = Regex.Replace(input, @"\s*\([^)]*\)", "");
+            string withoutCommaYear = @"\b([\wäöåÄÖÅ]+)( & [\wäöåÄÖÅ]+)?,\s*\d{4}\b";
+            return Regex.Replace(withoutParentheses, withoutCommaYear, "").Trim();
         }
 
         private VocabularyValue? GetSosId(string val,
