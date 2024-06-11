@@ -10,6 +10,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
     public class TestContainersFixture : IAsyncLifetime
     {
+        private bool UseKibanaDebug;
         private const string ELASTIC_PASSWORD = "elastic";
         private const string ELASTIC_IMAGE_NAME = "elasticsearch:8.7.1";
 
@@ -29,6 +30,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 
         public TestContainersFixture()
         {
+            UseKibanaDebug = false;
             ElasticsearchContainer = new ElasticsearchBuilder()
                 .WithImage(ELASTIC_IMAGE_NAME)
                 .WithCleanUp(true)
@@ -71,12 +73,50 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 
         private async Task<ElasticClient> InitializeElasticsearchAsync()
         {
-       
+            if (UseKibanaDebug)
+            {
+                return await InitializeElasticsearchWithKibanaAsync();
+            }
             await ElasticsearchContainer.StartAsync().ConfigureAwait(false);
             var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
                 .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
                 .EnableApiVersioningHeader()
           //      .BasicAuthentication(ELASTIC_USERNAME, ELASTIC_PASSWORD)
+            .EnableDebugMode());
+            return elasticClient;
+        }
+
+        private async Task<ElasticClient> InitializeElasticsearchWithKibanaAsync()
+        {
+            var network = new NetworkBuilder()
+                .WithName(Guid.NewGuid().ToString("D"))
+            .Build();
+
+            ElasticsearchContainer = new ElasticsearchBuilder()
+                .WithImage(ELASTIC_IMAGE_NAME)
+                .WithCleanUp(true)
+                .WithPortBinding(9200, 9200)
+                .WithNetwork(network)
+                .WithNetworkAliases("elastic-test-network")
+                .WithEnvironment("xpack.security.enabled", "false")
+            .Build();
+
+            var kibanaContainer = new ContainerBuilder()
+              .WithName(Guid.NewGuid().ToString("D"))
+              .WithImage("docker.elastic.co/kibana/kibana:8.7.1")
+              .WithPortBinding(5601, 5601)
+              .WithNetwork(network)
+              .WithEnvironment("ELASTICSEARCH_HOSTS", $"http://elastic-test-network:9200")
+            .Build();
+
+            await network.CreateAsync().ConfigureAwait(false);
+            await ElasticsearchContainer.StartAsync().ConfigureAwait(false);
+            await kibanaContainer.StartAsync().ConfigureAwait(false);
+
+            var elasticUri = new UriBuilder(Uri.UriSchemeHttp, ElasticsearchContainer.Hostname, ElasticsearchContainer.GetMappedPublicPort(9200)).ToString();
+            var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(elasticUri))
+                .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
+                .EnableApiVersioningHeader()
             .EnableDebugMode());
             return elasticClient;
         }

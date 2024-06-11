@@ -29,6 +29,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
                     .With(m => m.DataProviderId = 1)
                     .With(m => m.ArtportalenInternal = null)
                     .With(m => m.Sensitive = false)
+                    .With(m => m.HasGeneralizedObservationInOtherIndex = false)
                     .With(m => m.Taxon = new Taxon
                     {
                         Id = _faker.Random.Int(0, 10000)
