@@ -5,7 +5,7 @@
 | Property       | Värde | Kommentar                                                                             |
 | -------------- | ----- | ------------------------------------------------------------------------------------- |
 | Id             | 1     |                                                                                       |
-| DiffusionId    | 1000  | Antal meter som diffuseringen har skett med. Eventuellt är det längden på en kvadrat? |
+| DiffusionId    | 1000  | Antal meter som diffuseringen har skett med. Anger längden på en kvadrat inom vilket den verkliga koordinaten befinner sig. Kan ta värden 100, 500 eller 1000. |
 | Accuracy       | 20    | Koordinatnoggrannhet på den verkliga koordinaten                                      |
 | XCoord         | 10    | Den verkliga koordinaten                                                              |
 | YCoord         | 10    | Den verkliga koordinaten                                                              |
@@ -16,7 +16,7 @@
 | Property                               | Värde | Kommentar                                                           |
 | -------------------------------------- | ----- | ------------------------------------------------------------------- |
 | Id                                     | 1     |                                                                     |
-| Location.CoordinateUncertaintyInMeters | 1000  | Ska värdet egentligen vara `Sqrt(1000^2 + 1000^2)`?                   |
+| Location.CoordinateUncertaintyInMeters | 1000  | Ska värdet egentligen vara `Sqrt(1000^2 + 1000^2)`?                 |
 | Location.XCoord                        | 11    | Diffuserad koordinat                                                |
 | Location.YCoord                        | 9     | Diffuserad koordinat                                                |
 | IsGeneralized                          | true  |                                                                     |
