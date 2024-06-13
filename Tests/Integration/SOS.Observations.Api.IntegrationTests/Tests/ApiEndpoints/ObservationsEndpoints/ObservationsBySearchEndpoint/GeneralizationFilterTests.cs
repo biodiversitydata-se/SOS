@@ -11,6 +11,7 @@ using SOS.Lib.Enums;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
 using SOS.Observations.Api.IntegrationTests.Helpers;
+using SOS.Harvest.Processors.Artportalen;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
@@ -138,7 +139,7 @@ public class GeneralizationFilterTests : TestBase
 
         // Assert - diffused observation without user access
         diffusedObsWithoutAccess.Processed.IsGeneralized.Should().BeTrue();
-        diffusedObsWithoutAccess.Processed.Location.CoordinateUncertaintyInMeters.Should().Be(diffusedObsWithoutAccess.Verbatim.Site.DiffusionId, because: "the user has not access to the real coordinates");
+        diffusedObsWithoutAccess.Processed.Location.CoordinateUncertaintyInMeters.Should().Be(ArtportalenObservationFactory.GetDiffusionCoordinateUncertainty(diffusedObsWithoutAccess.Verbatim.Site.DiffusionId), because: "the user has not access to the real coordinates");
         var point = new Point(diffusedObsWithoutAccess.Verbatim.Site.XCoordDiffused.Value, diffusedObsWithoutAccess.Verbatim.Site.YCoordDiffused.Value);
         var transformedPoint = point.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
         diffusedObsWithoutAccess.Processed.Location.DecimalLongitude.Should().BeApproximately(transformedPoint.X, 0.1);
@@ -202,7 +203,7 @@ public class GeneralizationFilterTests : TestBase
         response = await apiClientWithAccessToUser.GetAsync($"/observations/internal?occurrenceId=urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithAccess.SightingId}&resolveGeneralizedObservations=false");
         var diffusedObsWithAccessNoResolve = await response.Content.ReadFromJsonAsync<Observation>();
         diffusedObsWithAccessNoResolve!.IsGeneralized.Should().BeFalse();
-        diffusedObsWithAccessNoResolve.Location.CoordinateUncertaintyInMeters.Should().Be(verbatimDiffusedObsWithAccess.Site.DiffusionId, because: "the user has access to the real coordinates");
+        diffusedObsWithAccessNoResolve.Location.CoordinateUncertaintyInMeters.Should().Be(ArtportalenObservationFactory.GetDiffusionCoordinateUncertainty(verbatimDiffusedObsWithAccess.Site.DiffusionId), because: "the user has access to the real coordinates");
         point = new Point(verbatimDiffusedObsWithAccess.Site.XCoordDiffused!.Value, verbatimDiffusedObsWithAccess.Site.YCoordDiffused!.Value);
         transformedPoint = point.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
         diffusedObsWithAccessNoResolve.Location.DecimalLongitude.Should().BeApproximately(transformedPoint.X, 0.1);
@@ -213,7 +214,7 @@ public class GeneralizationFilterTests : TestBase
         response = await apiClientWithAccessToUser.GetAsync($"/observations/internal?occurrenceId=urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithoutAccess.SightingId}&resolveGeneralizedObservations=true");
         var diffusedObsWithoutAccess = await response.Content.ReadFromJsonAsync<Observation>();
         diffusedObsWithoutAccess!.IsGeneralized.Should().BeTrue();
-        diffusedObsWithoutAccess.Location.CoordinateUncertaintyInMeters.Should().Be(verbatimDiffusedObsWithoutAccess.Site.DiffusionId, because: "the user has not access to the real coordinates");
+        diffusedObsWithoutAccess.Location.CoordinateUncertaintyInMeters.Should().Be(ArtportalenObservationFactory.GetDiffusionCoordinateUncertainty(verbatimDiffusedObsWithoutAccess.Site.DiffusionId), because: "the user has not access to the real coordinates");
         point = new Point(verbatimDiffusedObsWithoutAccess.Site.XCoordDiffused!.Value, verbatimDiffusedObsWithoutAccess.Site.YCoordDiffused!.Value);
         transformedPoint = point.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
         diffusedObsWithoutAccess.Location.DecimalLongitude.Should().BeApproximately(transformedPoint.X, 0.1);

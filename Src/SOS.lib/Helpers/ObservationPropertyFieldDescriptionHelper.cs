@@ -2,6 +2,7 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Models;
 using SOS.Lib.Models.Processed.Observation;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -252,7 +253,7 @@ namespace SOS.Lib.Helpers
         private static List<PropertyFieldDescription> GetPropertyFieldsFromOutputFields(IEnumerable<string> outputFields)
         {
             List<PropertyFieldDescription> propertyFields = new List<PropertyFieldDescription>();
-            var fieldsSet = new HashSet<string>();
+            var fieldsSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var outputField in outputFields)
             {
                 if (ExportFormatFieldByJsonFormatField.TryGetValue(outputField.ToLower(), out string exportField))
@@ -264,7 +265,7 @@ namespace SOS.Lib.Helpers
                     fieldsSet.Add(outputField);
                 }
             }
-
+            
             foreach (var field in fieldsSet)
             {
                 if (FieldByPropertyPath.TryGetValue(field.ToLower(), out var propertyField))
@@ -329,7 +330,7 @@ namespace SOS.Lib.Helpers
         }
 
         private static void RemoveDuplicates(List<PropertyFieldDescription> propertyFields)
-        {
+        {            
             var propertyFieldsByPropertyPath = propertyFields.ToDictionary(m => m.PropertyPath, m => m);
             foreach (var duplicateProperty in _duplicateProperties)
             {

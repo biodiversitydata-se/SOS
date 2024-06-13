@@ -585,7 +585,7 @@ namespace SOS.Harvest.Processors.Artportalen
             }
         }
 
-        private int GetDiffusionCoordinateUncertainty(int length)
+        public static int GetDiffusionCoordinateUncertainty(int length)
         {
             // calculate hypotenuse
             return (int)Math.Round(Math.Sqrt(Math.Pow(length, 2) + Math.Pow(length, 2)));
