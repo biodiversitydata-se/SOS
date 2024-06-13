@@ -442,7 +442,7 @@ namespace SOS.Lib.Helpers
             }
             else
             {
-                propertyFields = GetPropertyFieldsFromOutputFields(outputFields.Distinct());
+                propertyFields = GetPropertyFieldsFromOutputFields(outputFields.Select(m => m.ToLower()).Distinct());
             }
 
             if (removeDuplicates)
