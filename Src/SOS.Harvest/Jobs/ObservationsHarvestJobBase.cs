@@ -122,7 +122,12 @@ namespace SOS.Harvest.Jobs
                 // 2. Harvest observations 
                 //------------------------------------------------------------------------
                 var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<HarvestInfo>>();
-                _logger.LogDebug($"Start adding harvesters ({mode}).");
+                _logger.LogInformation($"Start adding harvesters ({mode}).");
+                foreach (var dataProvider in dataProviders)
+                {
+                    _logger.LogInformation($"{dataProvider}, PreviousProcessLimit={dataProvider.PreviousProcessLimit}");
+                }
+
                 foreach (var dataProvider in dataProviders)
                 {
                     var harvester = _observationHarvesterManager.GetHarvester(dataProvider.Type);

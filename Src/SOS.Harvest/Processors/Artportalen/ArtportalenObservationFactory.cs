@@ -377,7 +377,7 @@ namespace SOS.Harvest.Processors.Artportalen
                         CoordinateSys.WebMercator,
                         (Point)(diffuse ? site.PointDiffused : site.Point)?.ToGeometry()!,
                         diffuse ? site.PointWithBufferDiffused : site.PointWithBuffer,
-                        diffuse ? site.DiffusionId : site.Accuracy,
+                        diffuse ? GetDiffusionCoordinateUncertainty(site.DiffusionId) : site.Accuracy,
                         taxon?.Attributes?.DisturbanceRadius
                     );
                 }
@@ -583,6 +583,12 @@ namespace SOS.Harvest.Processors.Artportalen
             {
                 throw new Exception($"Error when processing Artportalen verbatim observation with Id={verbatimObservation.Id}, SightingId={verbatimObservation.SightingId}", e);
             }
+        }
+
+        public static int GetDiffusionCoordinateUncertainty(int length)
+        {
+            // calculate hypotenuse
+            return (int)Math.Round(Math.Sqrt(Math.Pow(length, 2) + Math.Pow(length, 2)));
         }
 
         public static void GetStartEndDate(

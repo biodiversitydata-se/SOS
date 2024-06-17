@@ -233,10 +233,12 @@ namespace SOS.Harvest.Harvesters.DwC
                 // Read events
                 try
                 {
+                    _logger.LogInformation($"Start reading DwC-A events for {dataProvider.Identifier}");
                     dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.EventRepository.GetMaxIdAsync());
                     var events = (await dwcArchiveReader.ReadEventsAsync(dwcCollectionArchiveReaderContext))?.ToList();
                     if (events != null && events.Any())
                     {
+                        _logger.LogInformation($"Read {events.Count} events for {dataProvider.Identifier}");
                         observationCount += await CreateAndStoreAbsentObservations(dataProvider, dwcCollectionRepository, events);
                         if (initializeTempCollection)
                         {
@@ -245,7 +247,10 @@ namespace SOS.Harvest.Harvesters.DwC
                         }
                         await dwcCollectionRepository.EventRepository.AddManyAsync(events);
                     }
-
+                    else
+                    {
+                        _logger.LogInformation($"Read 0 events for {dataProvider.Identifier}");
+                    }
                 }
                 catch (Exception ex)
                 {
