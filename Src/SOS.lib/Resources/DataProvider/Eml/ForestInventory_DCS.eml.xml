@@ -1,937 +1,946 @@
-    <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
-             xmlns:dc="http://purl.org/dc/terms/"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
-             packageId="http://localhost:8080/resource?id=vegetationframtill2018_20240524/v1.1" system="http://gbif.org" scope="system"
-    xml:lang="eng">
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+		 xmlns:dc="http://purl.org/dc/terms/"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
+		 packageId="http://localhost:8080/resource?id=vegetationframtill2018_20240524/v1.1" system="http://gbif.org" scope="system"
+xml:lang="eng">
 
-        <dataset>
-                <title xml:lang="eng">Swedish National Forest Inventory: Presence-absence vegetation data (1995-2017, discontinued sample)</title>
-                    <creator>
-            <individualName>
-                    <givenName>Jonas</givenName>
-                <surName>Dahlgren</surName>
-            </individualName>
-            <organizationName>Swedish National Forest Inventory, Department of Forest Resource Management, SLU</organizationName>
-            <positionName>Head of department</positionName>
-            <address>
-                    <deliveryPoint>SLU Umeå</deliveryPoint>
-                    <city>Umeå</city>
-                    <postalCode>901 83</postalCode>
-                    <country>SE</country>
-            </address>
-            <electronicMailAddress>riksskogstaxeringen@slu.se</electronicMailAddress>
-            <onlineUrl>https://www.slu.se/nfi</onlineUrl>
-                    <userId directory="https://orcid.org/">NA</userId>
-                    </creator>
-                    <metadataProvider>
-            <individualName>
-                    <givenName>Jonas</givenName>
-                <surName>Dahlgren</surName>
-            </individualName>
-            <organizationName>Swedish National Forest Inventory, Department of Forest Resource Management, SLU</organizationName>
-            <positionName>Head of department</positionName>
-            <address>
-                    <deliveryPoint>SLU Umeå</deliveryPoint>
-                    <city>Umeå</city>
-                    <postalCode>901 83</postalCode>
-                    <country>SE</country>
-            </address>
-            <electronicMailAddress>riksskogstaxeringen@slu.se</electronicMailAddress>
-            <onlineUrl>https://www.slu.se/nfi</onlineUrl>
-                    <userId directory="https://orcid.org/">NA</userId>
-                    </metadataProvider>
-            <pubDate>
-                    2024-05-24
-            </pubDate>
-            <language>eng</language>
-                <abstract>
-                            <para>The Swedish National Forest Inventory (NFI) is a sample based field inventory performed by the Swedish University of Agricultural Sciences (SLU). The annual inventory is undertaken on sample plots and this forms the basis for a large number of estimates. Data is collected across the whole of Sweden and statistics are published for all land use classes except urban land and sea and fresh water.
+	<dataset>
+		<title xml:lang="eng">Swedish National Forest Inventory: Presence-absence vegetation data (1995-2017, discontinued sample)</title>
+		<creator>
+			<individualName>
+				<givenName>Jonas</givenName>
+				<surName>Dahlgren</surName>
+			</individualName>
+			<organizationName>Swedish National Forest Inventory, Department of Forest Resource Management, SLU</organizationName>
+			<positionName>Head of department</positionName>
+			<address>
+				<deliveryPoint>SLU Umeå</deliveryPoint>
+				<city>Umeå</city>
+				<postalCode>901 83</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>riksskogstaxeringen@slu.se</electronicMailAddress>
+			<onlineUrl>https://www.slu.se/nfi</onlineUrl>
+			<userId directory="https://orcid.org/">NA</userId>
+		</creator>
+		<metadataProvider>
+			<individualName>
+				<givenName>Jonas</givenName>
+				<surName>Dahlgren</surName>
+			</individualName>
+			<organizationName>Swedish National Forest Inventory, Department of Forest Resource Management, SLU</organizationName>
+			<positionName>Head of department</positionName>
+			<address>
+				<deliveryPoint>SLU Umeå</deliveryPoint>
+				<city>Umeå</city>
+				<postalCode>901 83</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>riksskogstaxeringen@slu.se</electronicMailAddress>
+			<onlineUrl>https://www.slu.se/nfi</onlineUrl>
+			<userId directory="https://orcid.org/">NA</userId>
+		</metadataProvider>
+		<pubDate>
+			2024-05-24
+		</pubDate>
+		<language>eng</language>
+		<abstract>
+			<para>
+				The Swedish National Forest Inventory (NFI) is a sample based field inventory performed by the Swedish University of Agricultural Sciences (SLU). The annual inventory is undertaken on sample plots and this forms the basis for a large number of estimates. 
+				Data is collected across the whole of Sweden and statistics are published for all land use classes except urban land and sea and fresh water. The data collection is focused on forest land and particularly productive forest land. 
+				Since year 2003 areas within formally protected land are included and since year 2016 non–coniferous alpine forest are included.  The sample size (number of permanent sample plots where presence/absence registrations are performed) was reduced by 50% from year 2018 and onwards. 
+				This dataset consists of the discontinued sample for the period 1995-2017, and supplements the data from the reduced sample available in the related dataset &apos;Swedish National Forest Inventory: Presence-absence vegetation data (1995-current)&apos;.
+			</para>
+		</abstract>
+		<keywordSet>
+			<keyword>sampling event</keyword>
+			<keyword>forest land</keyword>
+			<keyword>mires</keyword>
+			<keyword>rock surface</keyword>
+			<keyword>subalpine woodland</keyword>
+			<keyword>pasture land</keyword>
+			<keyword>alpine areas</keyword>
+			<keyword>survey</keyword>
+			<keyword>standardised inventory</keyword>
+			<keyword>forest statistics</keyword>
+			<keyword>stratified sampling</keyword>
+			<keyword>presence</keyword>
+			<keyword>absence</keyword>
+			<keyword>field layer</keyword>
+			<keyword>bottom layer</keyword>
+			<keyword>coverage</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Samplingevent</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Observation</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<additionalInfo>
+			<para>
+				Important information for potential users of the Swedish National Forest Inventory sample concerning presence/absence registration of vegetation:
 
-The data collection is focused on forest land and particularly productive forest land. Since year 2003 areas within formally protected land are included and since year 2016 non–coniferous alpine forest are included.
+				The sample size for the national inventory scheme (numbers of permanent sample plots where presence/absence registrations are performed) was reduced by 50 % from year 2018 and onwards. This dataset consists of the discontinued sample for the period 1995-2017, and supplements the data from the reduced sample available in the related dataset &apos;Swedish National Forest Inventory: Presence-absence vegetation data (1995-current)&apos;.
 
-The sample size (number of permanent sample plots where presence/absence registrations are performed) was reduced by 50% from year 2018 and onwards. This dataset consists of the discontinued sample for the period 1995-2017, and supplements the data from the reduced sample available in the related dataset &apos;Swedish National Forest Inventory: Presence-absence vegetation data (1995-current)&apos;.</para>
-                </abstract>
-                        <keywordSet>
-                                    <keyword>sampling event</keyword>
-                                    <keyword>forest land</keyword>
-                                    <keyword>mires</keyword>
-                                    <keyword>rock surface</keyword>
-                                    <keyword>subalpine woodland</keyword>
-                                    <keyword>pasture land</keyword>
-                                    <keyword>alpine areas</keyword>
-                                    <keyword>survey</keyword>
-                                    <keyword>standardised inventory</keyword>
-                                    <keyword>forest statistics</keyword>
-                                    <keyword>stratified sampling</keyword>
-                                    <keyword>presence</keyword>
-                                    <keyword>absence</keyword>
-                                    <keyword>field layer</keyword>
-                                    <keyword>bottom layer</keyword>
-                                    <keyword>coverage</keyword>
-                            <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
-                        </keywordSet>
-                        <keywordSet>
-                                    <keyword>Samplingevent</keyword>
-                            <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
-                        </keywordSet>
-                        <keywordSet>
-                                    <keyword>Observation</keyword>
-                            <keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
-                        </keywordSet>
-                <additionalInfo>
-                    <para>Important information for potential users of the Swedish National Forest Inventory sample concerning presence/absence registration of vegetation:
+				Inventory on landuse class Alpine areas was added from the year 2016 and onwards.
 
-The sample size for the national inventory scheme (numbers of permanent sample plots where presence/absence registrations are performed) was reduced by 50 % from year 2018 and onwards. This dataset consists of the discontinued sample for the period 1995-2017, and supplements the data from the reduced sample available in the related dataset &apos;Swedish National Forest Inventory: Presence-absence vegetation data (1995-current)&apos;.
+				Presence is registered based on the inventory species list containing 242 species/species groups. Listed species that are not detected during the sampling event are treated as &apos;absent&apos;.
+			</para>
+		</additionalInfo>
+		<intellectualRights>
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
+		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">https://www.slu.se/centrumbildningar-och-projekt/riksskogstaxeringen/</url>
+			</online>
+		</distribution>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>Data is collected across the whole of Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>10.371</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.609</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.535</northBoundingCoordinate>
+					<southBoundingCoordinate>55.179</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+			<temporalCoverage>
+				<rangeOfDates>
+					<beginDate>
+						<calendarDate>1995-01-01</calendarDate>
+					</beginDate>
+					<endDate>
+						<calendarDate>2017-12-31</calendarDate>
+					</endDate>
+				</rangeOfDates>
+			</temporalCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>Approximately 240 species or species groups of vascular plants, lichen and mosses occurring in the Swedish landscape.</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankValue>Cetraria</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Cladonia</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Cladonia stellaris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Stereocaulon</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Nephroma arcticum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Peltigera aphthosa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Peltigera</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Plagiochila asplenioides subsp. asplenioides</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Sphagnum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Polytrichum commune</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Dicranum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rhodobryum roseum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Climacium dendroides</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Aulacomnium palustre</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Ptilium crista-castrensis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rhytidiadelphus triquetrus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Pleurozium schreberi</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Hylocomium splendens</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Huperzia selago</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lycopodium annotinum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lycopodium clavatum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Selaginella selaginoides</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Equisetum hyemale</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Equisetum arvense</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Equisetum pratense</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Equisetum palustre</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Equisetum fluviatile</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Equisetum sylvaticum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Pteridium aquilinum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Thelypteris palustris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Phegopteris connectilis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Matteuccia struthiopteris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Dryopteris filix-mas</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Dryopteris carthusiana agg.</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Gymnocarpium dryopteris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Polypodium vulgare</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Urtica dioica</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Bistorta vivipara</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rumex</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rumex acetosa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rumex acetosella</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Moehringia trinervia</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Stellaria nemorum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Stellaria holostea</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Stellaria graminea</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Silene dioica</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Aconitum lycoctonum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Anemone nemorosa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Anemone ranunculoides</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Hepatica nobilis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Actaea</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Trollius europaeus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Caltha palustris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Ficaria verna</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Corydalis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Cardamine bulbifera</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Drosera</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Crassulaceae</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Saxifraga granulata</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Chrysosplenium</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Parnassia palustris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Filipendula vulgaris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Filipendula ulmaria</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rubus chamaemorus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rubus arcticus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rubus saxatilis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Geum rivale</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Geum urbanum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Comarum palustre</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Argentina anserina</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Potentilla erecta</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Fragaria</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Alchemilla</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lupinus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Vicia</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lathyrus vernus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lathyrus linifolius</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Trifolium repens</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Trifolium medium</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Trifolium pratense</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lotus corniculatus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Fabaceae</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Oxalis acetosella</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Geranium sylvaticum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Mercurialis perennis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Hypericum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Viola palustris agg.</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Viola mirabilis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Chamaenerion angustifolium</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Epilobium montanum agg.</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Cornus suecica</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Sanicula europaea</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Anthriscus sylvestris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Aegopodium podagraria</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Angelica sylvestris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Orthilia secunda</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Moneses uniflora</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Erica tetralix</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Calluna vulgaris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rhododendron tomentosum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Andromeda polifolia</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Vaccinium oxycoccos agg.</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Vaccinium vitis-idaea</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Vaccinium myrtillus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Vaccinium uliginosum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Arctostaphylos uva-ursi</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Empetrum nigrum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Primula veris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lysimachia vulgaris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lysimachia thyrsiflora</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lysimachia europaea</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Menyanthes trifoliata</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Galium boreale</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Galium odoratum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Galium verum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Pulmonaria</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Galeopsis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lamiastrum galeobdolon</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Stachys sylvatica</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Scrophularia nodosa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Veronica chamaedrys</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Veronica officinalis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Melampyrum pratense</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Melampyrum sylvaticum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Euphrasia</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Pedicularis sceptrum-carolinum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Pedicularis palustris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Pinguicula</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Plantago major</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Linnaea borealis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Valeriana</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Succisa pratensis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Campanula</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Solidago virgaurea</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Gnaphalium</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Antennaria dioica</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Achillea ptarmica</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Achillea millefolium</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Tripleurospermum inodorum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Leucanthemum vulgare</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Tanacetum vulgare</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Artemisia vulgaris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Tussilago farfara</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Petasites frigidus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Arnica montana</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Senecio</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Saussurea alpina</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Cirsium arvense</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Cirsium vulgare</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Cirsium palustre</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Cirsium heterophyllum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Hypochaeris maculata</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lactuca alpina</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lactuca muralis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Taraxacum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Crepis paludosa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Scheuchzeria palustris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Tofieldia pusilla</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Narthecium ossifragum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Gagea</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Allium ursinum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Convallaria majalis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Maianthemum bifolium</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Paris quadrifolia</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Polygonatum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Juncus filiformis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Juncus conglomeratus agg.</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Luzula campestris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Luzula multiflora</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Luzula pilosa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Poa nemoralis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Melica nutans</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Deschampsia cespitosa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Avenella flexuosa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Anthoxanthum odoratum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Agrostis capillaris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Calamagrostis canescens agg.</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Calamagrostis arundinacea</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Milium effusum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Phragmites australis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Molinia caerulea</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Nardus stricta</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Calla palustris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Typha</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Scirpus sylvaticus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Trichophorum alpinum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Trichophorum cespitosum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Eriophorum angustifolium</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Eriophorum vaginatum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rhynchospora alba</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Carex chordorrhiza</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Carex echinata</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Carex lasiocarpa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Carex rostrata</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Carex panicea agg.</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Carex flava agg.</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Carex digitata</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Carex globularis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Carex pauciflora</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Neottia ovata</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Neottia cordata</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Goodyera repens</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Platanthera</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Dactylorhiza maculata</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Corallorhiza trifida</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Picea abies</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Larix</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Abies</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Pinus sylvestris</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Pinus contorta</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Juniperus communis</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Taxus baccata</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Salix</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Populus tremula</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Myrica gale</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Betula pendula</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Betula pubescens</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Betula nana</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Alnus glutinosa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Alnus incana</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Corylus avellana</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Carpinus betulus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Fagus sylvatica</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Ulmus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Ribes spicatum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Ribes nigrum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Ribes alpinum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rubus idaeus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Rosa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Malus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Sorbus aucuparia</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Sorbus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Crataegus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Prunus spinosa</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Acer platanoides</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Acer pseudoplatanus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Frangula alnus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Tilia</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Daphne mezereum</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Fraxinus excelsior</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Viburnum opulus</taxonRankValue>
+				</taxonomicClassification>
+				<taxonomicClassification>
+					<taxonRankValue>Lonicera xylosteum</taxonRankValue>
+				</taxonomicClassification>
+			</taxonomicCoverage>
+		</coverage>
+		<purpose>
+			<para>The Swedish National Forest Inventory has the task of describing the state and changes in Sweden&apos;s forests. The information collected is used, for example, as a basis for forestry, energy and environmental policy in Sweden.</para>
+		</purpose>
+		<maintenance>
+			<description>
+				<para>This dataset is a finalized dataset for the discontinued sample of sample plots. No new data are added. Data may be updated with corrections as needed.</para>
+			</description>
+			<maintenanceUpdateFrequency>asNeeded</maintenanceUpdateFrequency>
+		</maintenance>
 
-Inventory on landuse class Alpine areas was added from the year 2016 and onwards.
+		<contact>
+			<individualName>
+				<givenName>Jonas</givenName>
+				<surName>Dahlgren</surName>
+			</individualName>
+			<organizationName>Swedish National Forest Inventory, Department of Forest Resource Management, SLU</organizationName>
+			<positionName>Head of department</positionName>
+			<address>
+				<deliveryPoint>SLU Umeå</deliveryPoint>
+				<city>Umeå</city>
+				<postalCode>901 83</postalCode>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>riksskogstaxeringen@slu.se</electronicMailAddress>
+			<onlineUrl>https://www.slu.se/nfi</onlineUrl>
+			<userId directory="https://orcid.org/">NA</userId>
+		</contact>
+		<methods>
+			<methodStep>
+				<description>
+					<para>Sample plots are visited by qualified field personal who survey a number of forest parameters and sample vegetation by recording presence/absence for a specified list of species of vascular plants, mosses and lichens. Species that were detected are recorded as present, species that were not detected are recorded as &apos;absent&apos;. Coverage is record for a subset of the species. The circular samling plot (radius=5.64 m) can be divided into smaller parts if it is crossed by edges between different types of land use classes or forest stand categories. The sample population for presence/absence registration is all forest land (landuse classes Productive forest land, Mires, Rock surface, Subalpine woodland, Pasture land and, since year 2016, Alpine areas).</para>
+				</description>
+			</methodStep>
+			<sampling>
+				<studyExtent>
+					<description>
+						<para>A description of the sampling area (coverage and resolution), sampling frequency and taxa sampled can be found in descriptions of the survey scheme at https://www.slu.se/centrumbildningar-och-projekt/riksskogstaxeringen/om-riksskogstaxeringen/om-inventeringen/ (detailed information available in Swedish only).</para>
+					</description>
+				</studyExtent>
+				<samplingDescription>
+					<para>
+						The Swedish National Forest Inventory sample plots are circular and are, for practical reasons, grouped into clusters (tracts). The tracts are square or rectangular in shape and are of different dimensions in different parts of the country. The density of tracts and the number of sample plots per tract also varies among different parts of the country, with a higher sample density in southern Sweden. Two thirds of the sample consist of permanent tracts and one third are temporary tracts. Sampling is done annually for a subsample of tracts. The permanent tracts are revisited every 5th year and the temporary tracts are only visited once. The true coordinates of the permanent sample plots are protected. The coordinates in this dataset are generalized (randomly obfuscated with 200-1000 m).
 
-Presence is registered based on the inventory species list containing 242 species/species groups. Listed species that are not detected during the sampling event are treated as &apos;absent&apos;.</para>
-                </additionalInfo>
-                <intellectualRights>
-                    <para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode"><citetitle>Public Domain (CC0 1.0)</citetitle></ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
-                </intellectualRights>
-                <distribution scope="document">
-                    <online>
-                        <url function="information">https://www.slu.se/centrumbildningar-och-projekt/riksskogstaxeringen/</url>
-                    </online>
-                </distribution>
-                <coverage>
-                        <geographicCoverage>
-                                <geographicDescription>Data is collected across the whole of Sweden.</geographicDescription>
-                            <boundingCoordinates>
-                                <westBoundingCoordinate>10.371</westBoundingCoordinate>
-                                <eastBoundingCoordinate>24.609</eastBoundingCoordinate>
-                                <northBoundingCoordinate>69.535</northBoundingCoordinate>
-                                <southBoundingCoordinate>55.179</southBoundingCoordinate>
-                            </boundingCoordinates>
-                        </geographicCoverage>
-                                <temporalCoverage>
-                                        <rangeOfDates>
-                                                <beginDate>
-                                                    <calendarDate>1995-01-01</calendarDate>
-                                                </beginDate>
-                                            <endDate>
-                                                <calendarDate>2017-12-31</calendarDate>
-                                            </endDate>
-                                        </rangeOfDates>
-                                </temporalCoverage>
-                                <taxonomicCoverage>
-                                        <generalTaxonomicCoverage>Approximately 240 species or species groups of vascular plants, lichen and mosses occurring in the Swedish landscape.</generalTaxonomicCoverage>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Cetraria</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Cladonia</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Cladonia stellaris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Stereocaulon</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Nephroma arcticum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Peltigera aphthosa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Peltigera</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Plagiochila asplenioides subsp. asplenioides</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Sphagnum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Polytrichum commune</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Dicranum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rhodobryum roseum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Climacium dendroides</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Aulacomnium palustre</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Ptilium crista-castrensis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rhytidiadelphus triquetrus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Pleurozium schreberi</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Hylocomium splendens</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Huperzia selago</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lycopodium annotinum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lycopodium clavatum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Selaginella selaginoides</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Equisetum hyemale</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Equisetum arvense</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Equisetum pratense</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Equisetum palustre</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Equisetum fluviatile</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Equisetum sylvaticum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Pteridium aquilinum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Thelypteris palustris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Phegopteris connectilis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Matteuccia struthiopteris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Dryopteris filix-mas</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Dryopteris carthusiana agg.</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Gymnocarpium dryopteris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Polypodium vulgare</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Urtica dioica</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Bistorta vivipara</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rumex</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rumex acetosa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rumex acetosella</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Moehringia trinervia</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Stellaria nemorum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Stellaria holostea</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Stellaria graminea</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Silene dioica</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Aconitum lycoctonum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Anemone nemorosa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Anemone ranunculoides</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Hepatica nobilis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Actaea</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Trollius europaeus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Caltha palustris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Ficaria verna</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Corydalis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Cardamine bulbifera</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Drosera</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Crassulaceae</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Saxifraga granulata</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Chrysosplenium</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Parnassia palustris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Filipendula vulgaris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Filipendula ulmaria</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rubus chamaemorus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rubus arcticus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rubus saxatilis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Geum rivale</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Geum urbanum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Comarum palustre</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Argentina anserina</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Potentilla erecta</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Fragaria</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Alchemilla</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lupinus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Vicia</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lathyrus vernus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lathyrus linifolius</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Trifolium repens</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Trifolium medium</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Trifolium pratense</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lotus corniculatus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Fabaceae</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Oxalis acetosella</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Geranium sylvaticum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Mercurialis perennis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Hypericum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Viola palustris agg.</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Viola mirabilis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Chamaenerion angustifolium</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Epilobium montanum agg.</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Cornus suecica</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Sanicula europaea</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Anthriscus sylvestris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Aegopodium podagraria</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Angelica sylvestris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Orthilia secunda</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Moneses uniflora</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Erica tetralix</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Calluna vulgaris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rhododendron tomentosum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Andromeda polifolia</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Vaccinium oxycoccos agg.</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Vaccinium vitis-idaea</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Vaccinium myrtillus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Vaccinium uliginosum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Arctostaphylos uva-ursi</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Empetrum nigrum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Primula veris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lysimachia vulgaris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lysimachia thyrsiflora</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lysimachia europaea</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Menyanthes trifoliata</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Galium boreale</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Galium odoratum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Galium verum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Pulmonaria</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Galeopsis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lamiastrum galeobdolon</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Stachys sylvatica</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Scrophularia nodosa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Veronica chamaedrys</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Veronica officinalis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Melampyrum pratense</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Melampyrum sylvaticum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Euphrasia</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Pedicularis sceptrum-carolinum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Pedicularis palustris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Pinguicula</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Plantago major</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Linnaea borealis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Valeriana</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Succisa pratensis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Campanula</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Solidago virgaurea</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Gnaphalium</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Antennaria dioica</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Achillea ptarmica</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Achillea millefolium</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Tripleurospermum inodorum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Leucanthemum vulgare</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Tanacetum vulgare</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Artemisia vulgaris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Tussilago farfara</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Petasites frigidus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Arnica montana</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Senecio</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Saussurea alpina</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Cirsium arvense</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Cirsium vulgare</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Cirsium palustre</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Cirsium heterophyllum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Hypochaeris maculata</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lactuca alpina</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lactuca muralis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Taraxacum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Crepis paludosa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Scheuchzeria palustris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Tofieldia pusilla</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Narthecium ossifragum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Gagea</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Allium ursinum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Convallaria majalis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Maianthemum bifolium</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Paris quadrifolia</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Polygonatum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Juncus filiformis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Juncus conglomeratus agg.</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Luzula campestris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Luzula multiflora</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Luzula pilosa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Poa nemoralis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Melica nutans</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Deschampsia cespitosa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Avenella flexuosa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Anthoxanthum odoratum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Agrostis capillaris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Calamagrostis canescens agg.</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Calamagrostis arundinacea</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Milium effusum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Phragmites australis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Molinia caerulea</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Nardus stricta</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Calla palustris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Typha</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Scirpus sylvaticus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Trichophorum alpinum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Trichophorum cespitosum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Eriophorum angustifolium</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Eriophorum vaginatum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rhynchospora alba</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Carex chordorrhiza</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Carex echinata</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Carex lasiocarpa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Carex rostrata</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Carex panicea agg.</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Carex flava agg.</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Carex digitata</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Carex globularis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Carex pauciflora</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Neottia ovata</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Neottia cordata</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Goodyera repens</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Platanthera</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Dactylorhiza maculata</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Corallorhiza trifida</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Picea abies</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Larix</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Abies</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Pinus sylvestris</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Pinus contorta</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Juniperus communis</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Taxus baccata</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Salix</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Populus tremula</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Myrica gale</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Betula pendula</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Betula pubescens</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Betula nana</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Alnus glutinosa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Alnus incana</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Corylus avellana</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Carpinus betulus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Fagus sylvatica</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Ulmus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Ribes spicatum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Ribes nigrum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Ribes alpinum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rubus idaeus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Rosa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Malus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Sorbus aucuparia</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Sorbus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Crataegus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Prunus spinosa</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Acer platanoides</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Acer pseudoplatanus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Frangula alnus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Tilia</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Daphne mezereum</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Fraxinus excelsior</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Viburnum opulus</taxonRankValue>
-                                        </taxonomicClassification>
-                                        <taxonomicClassification>
-                                            <taxonRankValue>Lonicera xylosteum</taxonRankValue>
-                                        </taxonomicClassification>
-                                </taxonomicCoverage>
-                </coverage>
-                <purpose>
-                    <para>The Swedish National Forest Inventory has the task of describing the state and changes in Sweden&apos;s forests. The information collected is used, for example, as a basis for forestry, energy and environmental policy in Sweden.</para>
-                </purpose>
-                <maintenance>
-                    <description>
-                        <para>This dataset is a finalized dataset for the discontinued sample of sample plots. No new data are added. Data may be updated with corrections as needed.</para>
-                    </description>
-                    <maintenanceUpdateFrequency>asNeeded</maintenanceUpdateFrequency>
-                </maintenance>
+						Vegetation survey on permanent field plots: This dataset consists of presence/absence data for 242 species/species groups (18 ground layer species, 187 field layer species and 37 tree/shrub layer species). Registration of coverage is performed in a separate inventory for 71 species/species groups including “no coverage” (this data is not included in this dataset). The vegetation inventory is undertaken every 10th year on permanent plots. The plot can be divided into smaller parts if it’s crossed by edges between different types of land use classes or forest stand categories. The sample population for presence/absence registration is all forest land (landuse classes Productive forest land, Mires, Rock surface, Subalpine woodland, Pasture land and, since year 2016, Alpine areas).
 
-                    <contact>
-            <individualName>
-                    <givenName>Jonas</givenName>
-                <surName>Dahlgren</surName>
-            </individualName>
-            <organizationName>Swedish National Forest Inventory, Department of Forest Resource Management, SLU</organizationName>
-            <positionName>Head of department</positionName>
-            <address>
-                    <deliveryPoint>SLU Umeå</deliveryPoint>
-                    <city>Umeå</city>
-                    <postalCode>901 83</postalCode>
-                    <country>SE</country>
-            </address>
-            <electronicMailAddress>riksskogstaxeringen@slu.se</electronicMailAddress>
-            <onlineUrl>https://www.slu.se/nfi</onlineUrl>
-                    <userId directory="https://orcid.org/">NA</userId>
-                    </contact>
-                <methods>
-                            <methodStep>
-                                <description>
-                                    <para>Sample plots are visited by qualified field personal who survey a number of forest parameters and sample vegetation by recording presence/absence for a specified list of species of vascular plants, mosses and lichens. Species that were detected are recorded as present, species that were not detected are recorded as &apos;absent&apos;. Coverage is record for a subset of the species. The circular samling plot (radius=5.64 m) can be divided into smaller parts if it is crossed by edges between different types of land use classes or forest stand categories. The sample population for presence/absence registration is all forest land (landuse classes Productive forest land, Mires, Rock surface, Subalpine woodland, Pasture land and, since year 2016, Alpine areas).</para>
-                                </description>
-                            </methodStep>
-                        <sampling>
-                            <studyExtent>
-                                <description>
-                                    <para>A description of the sampling area (coverage and resolution), sampling frequency and taxa sampled can be found in descriptions of the survey scheme at https://www.slu.se/centrumbildningar-och-projekt/riksskogstaxeringen/om-riksskogstaxeringen/om-inventeringen/ (detailed information available in Swedish only).</para>
-                                </description>
-                            </studyExtent>
-                            <samplingDescription>
-                                <para>The Swedish National Forest Inventory sample plots are circular and are, for practical reasons, grouped into clusters (tracts). The tracts are square or rectangular in shape and are of different dimensions in different parts of the country. The density of tracts and the number of sample plots per tract also varies among different parts of the country, with a higher sample density in southern Sweden. Two thirds of the sample consist of permanent tracts and one third are temporary tracts. Sampling is done annually for a subsample of tracts. The permanent tracts are revisited every 5th year and the temporary tracts are only visited once. The true coordinates of the permanent sample plots are protected. The coordinates in this dataset are generalized (randomly obfuscated with 200-1000 m). 
+						The sample size (number of permanent sample plots where presence/absence registrations are performed) was reduced by 50% from year 2018 and onwards. This dataset consists of the reduced sample. The supplement data from the discontinued sample for the period 1995-2017 is available in the related dataset &apos;Swedish National Forest Inventory: Presence-absence vegetation data (1995-2017, supplement sample)&apos;.
 
-Vegetation survey on permanent field plots: This dataset consists of presence/absence data for 242 species/species groups (18 ground layer species, 187 field layer species and 37 tree/shrub layer species). Registration of coverage is performed in a separate inventory for 71 species/species groups including “no coverage” (this data is not included in this dataset). The vegetation inventory is undertaken every 10th year on permanent plots. The plot can be divided into smaller parts if it’s crossed by edges between different types of land use classes or forest stand categories. The sample population for presence/absence registration is all forest land (landuse classes Productive forest land, Mires, Rock surface, Subalpine woodland, Pasture land and, since year 2016, Alpine areas).
-
-The sample size (number of permanent sample plots where presence/absence registrations are performed) was reduced by 50% from year 2018 and onwards. This dataset consists of the reduced sample. The supplement data from the discontinued sample for the period 1995-2017 is available in the related dataset &apos;Swedish National Forest Inventory: Presence-absence vegetation data (1995-2017, supplement sample)&apos;.
-
-Descriptions of the survey scheme can be found on https://www.slu.se/centrumbildningar-och-projekt/riksskogstaxeringen/om-riksskogstaxeringen/om-inventeringen/ (detailed information available in Swedish only).</para>
-                            </samplingDescription>
-                        </sampling>
-                        <qualityControl>
-                            <description>
-                                <para>After the data has been collected in the field it is subjected to a battery of tests and quality controls. Quality control tests are undertaken in the field in the form of probability tests direct in the handheld computers, this gives the field crews the opportunity of correcting the data directly. Both during and after the field season special control crews undertake a full re-inventory of selected sample tracts to double check the collected data. Finally a second battery of probability tests are undertaken at the field office before the data is transferred to its final storage destination.</para>
-                            </description>
-                        </qualityControl>
-                </methods>
-                <project >
-                    <title>Swedish National Forest Inventory</title>
-                        <personnel>
-                            <individualName>
-                                    <givenName>Jonas</givenName>
-                                <surName>Dahlgren</surName>
-                            </individualName>
-                            <role></role>
-                        </personnel>
-                        <abstract>
-                            <para>The Swedish National Forest Inventory has the task of describing the state and changes in Sweden&apos;s forests. The information collected is used, for example, as a basis for forestry, energy and environmental policy in Sweden. Data from the Swedish National Forest Inventory is part of Sweden&apos;s official statistics. At the heart of the Swedish National Forest Inventory is the annual inventory which is undertaken by ca 50 field workers during the snow free period. Every year an inventory is carried out on ca 12 000 sample plots with measurements collected from ca 95 000 trees and a large range of other variables describing the stand, site and history of the sample plot.</para>
-                        </abstract>
-                        <funding>
-                            <para>The major part of the Swedish National Forest Inventory is funded by Swedish University of Agricultural Sciences (SLU), with  a part of the funding accounted for by the Swedish Environmental Protection Agency.</para>
-                        </funding>
-                </project>
-        </dataset>
-            <additionalMetadata>
-                <metadata>
-                    <gbif>
-                            <dateStamp>2024-05-24T08:29:11.054+00:00</dateStamp>
-                            <hierarchyLevel>dataset</hierarchyLevel>
-                            <bibliography>
-                                        <citation identifier="http://dx.doi.org/10.14214/sf.1095">Fridman J., Holm S., Nilsson M., Nilsson P., Ringvall A. H., Ståhl G. (2014). Adapting National Forest Inventories to changing requirements  the case of the Swedish National Forest Inventory at the turn of the 20th century. Silva Fennica vol. 48 no. 3 article id 1095.</citation>
-                            </bibliography>
-                                    <collection>
-                                            <collectionIdentifier>no-id-9999</collectionIdentifier>
-                                        <collectionName>no collection</collectionName>
-                                    </collection>
-                            <dc:replaces>http://localhost:8080/resource?id=vegetationframtill2018_20240524/v1.1.xml</dc:replaces>
-                    </gbif>
-                </metadata>
-            </additionalMetadata>
-    </eml:eml>
+						Descriptions of the survey scheme can be found on https://www.slu.se/centrumbildningar-och-projekt/riksskogstaxeringen/om-riksskogstaxeringen/om-inventeringen/ (detailed information available in Swedish only).
+					</para>
+				</samplingDescription>
+			</sampling>
+			<qualityControl>
+				<description>
+					<para>After the data has been collected in the field it is subjected to a battery of tests and quality controls. Quality control tests are undertaken in the field in the form of probability tests direct in the handheld computers, this gives the field crews the opportunity of correcting the data directly. Both during and after the field season special control crews undertake a full re-inventory of selected sample tracts to double check the collected data. Finally a second battery of probability tests are undertaken at the field office before the data is transferred to its final storage destination.</para>
+				</description>
+			</qualityControl>
+		</methods>
+		<project >
+			<title>Swedish National Forest Inventory</title>
+			<personnel>
+				<individualName>
+					<givenName>Jonas</givenName>
+					<surName>Dahlgren</surName>
+				</individualName>
+				<role></role>
+			</personnel>
+			<abstract>
+				<para>The Swedish National Forest Inventory has the task of describing the state and changes in Sweden&apos;s forests. The information collected is used, for example, as a basis for forestry, energy and environmental policy in Sweden. Data from the Swedish National Forest Inventory is part of Sweden&apos;s official statistics. At the heart of the Swedish National Forest Inventory is the annual inventory which is undertaken by ca 50 field workers during the snow free period. Every year an inventory is carried out on ca 12 000 sample plots with measurements collected from ca 95 000 trees and a large range of other variables describing the stand, site and history of the sample plot.</para>
+			</abstract>
+			<funding>
+				<para>The major part of the Swedish National Forest Inventory is funded by Swedish University of Agricultural Sciences (SLU), with  a part of the funding accounted for by the Swedish Environmental Protection Agency.</para>
+			</funding>
+		</project>
+	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2024-05-24T08:29:11.054+00:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<bibliography>
+					<citation identifier="http://dx.doi.org/10.14214/sf.1095">Fridman J., Holm S., Nilsson M., Nilsson P., Ringvall A. H., Ståhl G. (2014). Adapting National Forest Inventories to changing requirements  the case of the Swedish National Forest Inventory at the turn of the 20th century. Silva Fennica vol. 48 no. 3 article id 1095.</citation>
+				</bibliography>
+				<collection>
+					<collectionIdentifier>no-id-9999</collectionIdentifier>
+					<collectionName>no collection</collectionName>
+				</collection>
+				<dc:replaces>http://localhost:8080/resource?id=vegetationframtill2018_20240524/v1.1.xml</dc:replaces>
+			</gbif>
+		</metadata>
+	</additionalMetadata>
+</eml:eml>

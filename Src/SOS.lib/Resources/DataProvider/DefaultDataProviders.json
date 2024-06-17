@@ -1078,11 +1078,11 @@
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
-                "Value": "The Swedish National Forest Inventory (NFI) is a sample based field inventory performed by the Swedish University of Agricultural Sciences (SLU). The annual inventory is undertaken on sample plots and this forms the basis for a large number of estimates. Data is collected across the whole of Sweden and statistics are published for all land use classes except urban land and sea and fresh water. The data collection is focused on forest land and particularly productive forest land. Since year 2003 areas within formally protected land are included and since year 2016 non–coniferous alpine forest are included. The sample size (number of permanent sample plots where presence/absence registrations are performed) was reduced by 50% from year 2018 and onwards. This dataset consists of the reduced sample. The supplement data from the discontinued sample for the period 1995-2017 is available in the related dataset 'Swedish National Forest Inventory: Presence-absence vegetation data (1995-2017, supplement sample)'."
+                "Value": "The Swedish National Forest Inventory (NFI) is a sample based field inventory performed by the Swedish University of Agricultural Sciences (SLU). The annual inventory is undertaken on sample plots and this forms the basis for a large number of estimates. Data is collected across the whole of Sweden and statistics are published for all land use classes except urban land and sea and fresh water. The data collection is focused on forest land and particularly productive forest land. Since year 2003 areas within formally protected land are included and since year 2016 non–coniferous alpine forest are included. The sample size (number of permanent sample plots where presence/absence registrations are performed) was reduced by 50% from year 2018 and onwards. This dataset consists of the reduced sample. The supplement data from the discontinued sample for the period 1995-2017 is available in the related dataset 'Swedish National Forest Inventory: Presence-absence vegetation data (1995-2017, discontinued sample)'."
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Riksskogstaxeringen (RT) är en stickprovsinventering som utförs av Sveriges lantbruksuniversitet (SLU). Den årliga inventeringen utförs på provytor som utgör underlag för officiell statistik. Data samlas in över hela Sverige och statistic produceras för alla ägoslag undantaget bebygd mark, sjöar och hav. Datainsamlingen fokuseras på  skogsmark. Sedan 2003 inventeras även provytor inom formellt skyddade områden, och från 2016 även provytor I fjällen, dock ej på kalfjäll.  Provytorna är cirkulära och klustrade I så kallade trakter. Trakterna är till formen rektangulära med olika sidlängd I olika delar av Sverige. Även antalet provytor per trakt varierar över landet. Generellt ökar stickprovstätheten från norr till söder Två tredjedelar av trakterna är permanenta (återinventeras var 5:e år) och en tredjedel är tillfälliga (inventeras bara en gang) De exakta positionerna för de permanenta provytorna är sekretesskyddade varför positionerna på observationerna i detta dataset är slumpvis förskjutna med 200-1000 m"
+                "Value": "Riksskogstaxeringen är en stickprovsbaserad standardiserad fältinventering vars främsta syfte är att beskriva tillstånd och förändringar i Sveriges skogar. Riksskogstaxeringen drivs av Sveriges lantbruksuniversitet (SLU). Den årliga stickprovsinventeringen av hela Sveriges areal görs i provytor. Uppgifterna ligger till grund för ett stort antal skattningar. Statistik publiceras för alla markanvändningsklasser utom urban mark samt hav och sötvatten. Datainsamlingen är inriktad på skogsmark och särskilt produktiv skogsmark. Sedan år 2003 ingår arealer inom formellt skyddade områden och sedan år 2016 ingår alpin icke-barrskog. Stickprovet (antal permanenta provytor) där förekomst/icke-förekomst av arter registreras minskades med 50 % från och med år 2018. Detta dataset innehåller data från det reducerade stickprovet, d.v.s. data från provytor som inventerats under hela perioden sedan 1995 till idag. Kompletterande data från stickprovet som upphört för perioden 1995-2017 finns i det relaterade dataset 'Swedish National Forest Inventory: Presence-absence vegetation data (1995-2017, supplement sample)’."
             }
         ],
         "HarvestFailPreventProcessing": false,
@@ -1096,11 +1096,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Swedish National Forest Inventory: Presence-absence vegetation data (1995-current)"
+                "Value": "Swedish National Forest Inventory: Presence-absence vegetation data (1995-current)]"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "SLU Riksskogstaxeringen (1995-2017, reducerade stickprov)"
+                "Value": "Riksskogstaxeringen: vegetationsförekomst"
             }
         ],
         "Organizations": [
@@ -2056,11 +2056,11 @@
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
-                "Value": "The Swedish National Forest Inventory (NFI) is a sample based field inventory performed by the Swedish University of Agricultural Sciences (SLU). The annual inventory is undertaken on sample plots and this forms the basis for a large number of estimates. Data is collected across the whole of Sweden and statistics are published for all land use classes except urban land and sea and fresh water. The data collection is focused on forest land and particularly productive forest land. Since year 2003 areas within formally protected land are included and since year 2016 non–coniferous alpine forest are included. The sample size (number of permanent sample plots where presence/absence registrations are performed) was reduced by 50% from year 2018 and onwards. This dataset consists of the reduced sample. The supplement data from the discontinued sample for the period 1995-2017 is available in the related dataset 'Swedish National Forest Inventory: Presence-absence vegetation data (1995-2017, supplement sample)'"
+                "Value": "The Swedish National Forest Inventory (NFI) is a sample based field inventory performed by the Swedish University of Agricultural Sciences (SLU). The annual inventory is undertaken on sample plots and this forms the basis for a large number of estimates. Data is collected across the whole of Sweden and statistics are published for all land use classes except urban land and sea and fresh water. The data collection is focused on forest land and particularly productive forest land. Since year 2003 areas within formally protected land are included and since year 2016 non–coniferous alpine forest are included.  The sample size (number of permanent sample plots where presence/absence registrations are performed) was reduced by 50% from year 2018 and onwards. This dataset consists of the discontinued sample for the period 1995-2017, and supplements the data from the reduced sample available in the related dataset 'Swedish National Forest Inventory: Presence-absence vegetation data (1995-current)'."
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Riksskogstaxeringen (RT) är en stickprovsinventering som utförs av Sveriges lantbruksuniversitet (SLU). Den årliga inventeringen utförs på provytor som utgör underlag för officiell statistik. Data samlas in över hela Sverige och statistic produceras för alla ägoslag undantaget bebygd mark, sjöar och hav. Datainsamlingen fokuseras på  skogsmark. Sedan 2003 inventeras även provytor inom formellt skyddade områden, och från 2016 även provytor I fjällen, dock ej på kalfjäll.  Provytorna är cirkulära och klustrade I så kallade trakter. Trakterna är till formen rektangulära med olika sidlängd I olika delar av Sverige. Även antalet provytor per trakt varierar över landet. Generellt ökar stickprovstätheten från norr till söder Två tredjedelar av trakterna är permanenta (återinventeras var 5:e år) och en tredjedel är tillfälliga (inventeras bara en gang) De exakta positionerna för de permanenta provytorna är sekretesskyddade varför positionerna på observationerna i detta dataset är slumpvis förskjutna med 200-1000 m"
+                "Value": "Riksskogstaxeringen är en stickprovsbaserad standardiserad fältinventering vars främsta syfte är att beskriva tillstånd och förändringar i Sveriges skogar. Riksskogstaxeringen drivs av Sveriges lantbruksuniversitet (SLU). Den årliga stickprovsinventeringen av hela Sveriges areal görs i provytor. Uppgifterna ligger till grund för ett stort antal skattningar. Statistik publiceras för alla markanvändningsklasser utom urban mark samt hav och sötvatten. Datainsamlingen är inriktad på skogsmark och särskilt produktiv skogsmark. Sedan år 2003 ingår arealer inom formellt skyddade områden och sedan år 2016 ingår alpin icke-barrskog. Stickprovet (antal permanenta provytor) där förekomst/icke-förekomst av arter registreras minskades med 50 % från och med år 2018. Detta dataset innehåller data från stickprovet som upphört (1995-2017), och kompletterar data från det reducerade stickprovet som finns i det relaterade dataset 'Swedish National Forest Inventory: Presence-absence vegetation data (1995-current)’."
             }
         ],
         "HarvestFailPreventProcessing": false,
@@ -2074,11 +2074,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Swedish National Forest Inventory: Presence-absence vegetation data (1995-2017, discontinued sample)"
+                "Value": "Swedish National Forest Inventory: Presence-absence vegetation data (1995-2017, discontinued sample)]"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "SLU Riksskogstaxeringen"
+                "Value": "Riksskogstaxeringen: vegetationsförekomst, upphört stickprov:"
             }
         ],
         "Organizations": [
