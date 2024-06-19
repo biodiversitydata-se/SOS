@@ -165,6 +165,7 @@ namespace SOS.Lib.Repositories.Verbatim
         {
             if (fileStream == null)
             {
+                Logger.LogWarning("StoreSourceFileAsync failed. Filestream is null.");
                 return false;
             }
 
@@ -177,8 +178,9 @@ namespace SOS.Lib.Repositories.Verbatim
 
                 return true;
             }
-            catch
+            catch (Exception e)
             {
+                Logger.LogError(e, "StoreSourceFileAsync failed");
                 return false;
             }
         }
