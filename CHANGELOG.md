@@ -1,5 +1,18 @@
 # Changelog
 
+## [2024.06.19]
+
+### `Added`
+- Lund University Biological Museum - Animal Collections dataset.
+- Swedish National Forest Inventory: Presence-absence vegetation data (1995-2017, discontinued sample)] dataset.
+
+### `Changed`
+- Prepare cache handling and upload files functionality for Kubernetes hosting.
+
+### `Fixed`
+- Taxon synonyms with misapplied status.
+- Diffusion coordinate uncertainty.
+
 ## [2024.05.03]
 
 ### `Added`
