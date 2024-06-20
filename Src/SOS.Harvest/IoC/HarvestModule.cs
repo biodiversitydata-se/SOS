@@ -205,6 +205,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<TaxonCache>().As<ICache<int, Taxon>>().SingleInstance();
             builder.RegisterType<TaxonListCache>().As<ICache<int, TaxonList>>().SingleInstance();
             builder.RegisterType<VocabularyCache>().As<ICache<VocabularyId, Vocabulary>>().SingleInstance();
+            builder.RegisterType<ProjectCache>().As<ICache<int, ProjectInfo>>().SingleInstance();
 
             // Helpers, single instance since static data
             builder.RegisterType<AreaNameMapper>().As<IAreaNameMapper>().SingleInstance();
