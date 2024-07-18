@@ -1986,11 +1986,11 @@
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
-                "Value": "The dataset is based on an indvidual registration database of pinned, dry specimens, microscope slides or wet collection specimens. One record is usually but not always equivalent to one specimen. Some records are multiple specimens on the same pin with the same collecting information or multiple specimens in a vial with ethanol or on a slide, coming from one collecting event. The dataset contains close to 300 000 specimens, of which 83 % originate from Sweden. It is not representative of our collection as it the data were gathered based on special project needs."
+                "Value": "The dataset contains material from the entomological and zoological collections at the Biological Museum, Lund University. It is based on the museum databases of dry specimens, microscope slides and wet collection specimens. One record is usually but not always equivalent to one specimen. Some records are multiple specimens collected in the same sample, coming from the same collecting event. The datasets contains over 500 000 records, of which 83% (entomology) and 70% (zoology) originate from Sweden. https://www.biology.lu.se/biological-museum"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Datauppsättningen är baserad på en individuell registreringsdatabas med monterade insekter, torra prover, objektglas eller våta prover. En post motsvarar vanligtvis men inte alltid ett exemplar. Vissa poster är flera prover på samma stift med samma insamlingsinformation eller flera prover i en flaska med etanol eller på ett objektglas som kommer från en insamlingshändelse. Datauppsättningen innehåller närmare 300 000 exemplar, varav 83 % kommer från Sverige. Det är inte representativt för vår insamling eftersom data samlades in utifrån särskilda projektbehov."
+                "Value": "Datauppsättningen innehåller material från entomologiska och zoologiska samlingar vid Biologiska museet, Lunds universitet. Den är baserad på museets registreringsdatabas med torra prover, objektglas eller våta prover. En post motsvarar vanligtvis men inte alltid ett exemplar. Vissa poster är flera exemplar som kommer från samma insamlingshändelse. Datauppsättningen innehåller över 500 000 poster, varav 83 % (entomologi) och 70 % (zoologi) kommer från Sverige. https://www.biologi.lu.se/biologiska-museet"
             }
         ],
         "HarvestFailPreventProcessing": false,
