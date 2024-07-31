@@ -90,6 +90,7 @@ namespace SOS.Lib.Helpers
         /// <returns></returns>
         public IEnumerable<T> GetRecords<T>(IVariableLengthReaderBuilder<T> mapping)
         {
+            var builder = new StringBuilder();
             const string delimiter = "\t";
             var parser = mapping.Build(delimiter);
 
@@ -98,17 +99,17 @@ namespace SOS.Lib.Helpers
 
             while (_csvReader.Read())
             {
-                var row = string.Empty;
+                builder.Clear();
                 for (var i = 0; i < _csvReader.FieldsCount; i++)
                 {
                     if (i > 0)
                     {
-                        row += delimiter;
+                        builder.Append(delimiter);
                     }
 
-                    row += GetField(i);
+                    builder.Append(GetField(i));
                 }
-                row = row.Replace("\"", "'");
+                var row = builder.Replace("\"", "'").ToString();
                 records.Add(parser.Parse(row));
             }
 
