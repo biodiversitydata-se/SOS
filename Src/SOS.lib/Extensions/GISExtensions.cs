@@ -512,17 +512,20 @@ namespace SOS.Lib.Extensions
             {
                 case OgcGeometryType.Polygon:
                     var polygon = (Polygon)geometry;
-
                     var shell = polygon.Shell.TryMakeRingValid();
                     var holes = polygon.Holes?.Select(h => h.TryMakeRingValid());
-                    return Geometry.DefaultFactory.CreatePolygon(shell, holes?.ToArray()).Buffer(0);
+                    geometry = Geometry.DefaultFactory.CreatePolygon(shell, holes?.ToArray()).Buffer(0);
+                    break;
                 case OgcGeometryType.MultiPolygon:
                     var multiPolygon = (MultiPolygon)geometry;
-
                     var polygons = multiPolygon.Geometries?.Select(g => g.TryMakeValid() as Polygon)?.ToArray();
-                    return Geometry.DefaultFactory.CreateMultiPolygon(polygons);
+                    geometry = Geometry.DefaultFactory.CreateMultiPolygon(polygons);
+                    break;
             }
-
+            if (!geometry.IsValid)
+            {
+                geometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(geometry);
+            }
             return geometry;
         }
 
@@ -660,7 +663,6 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
-
             switch (geometry.OgcGeometryType)
             {
                 case OgcGeometryType.Point:
@@ -706,17 +708,18 @@ namespace SOS.Lib.Extensions
             {
                 return null;
             }
-
+            Geometry geometry = null;
             switch (geoJsonGeometry.Type)
             {
                 case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.Point:
                     var point = (GeoJsonPoint<GeoJson2DCoordinates>)geoJsonGeometry;
-                    return Geometry.DefaultFactory.CreatePoint(new Coordinate(point.Coordinates.X,
+                    geometry = Geometry.DefaultFactory.CreatePoint(new Coordinate(point.Coordinates.X,
                         point.Coordinates.Y));
+                    break;
                 case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.LineString:
                     var linestring = (GeoJsonLineString<GeoJson2DCoordinates>)geoJsonGeometry;
-                    return Geometry.DefaultFactory.CreateLineString(linestring.Coordinates.Positions.Select(c => new Coordinate(c.X, c.Y))?.ToArray());
-
+                    geometry = Geometry.DefaultFactory.CreateLineString(linestring.Coordinates.Positions.Select(c => new Coordinate(c.X, c.Y))?.ToArray());
+                    break;
                 case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.Polygon:
                     var polygon = (GeoJsonPolygon<GeoJson2DCoordinates>)geoJsonGeometry;
                     var exterior = new LinearRing(polygon.Coordinates.Exterior.Positions.Select(p =>
@@ -724,7 +727,8 @@ namespace SOS.Lib.Extensions
                     var holes = polygon.Coordinates.Holes.Select(lr =>
                             new LinearRing(lr.Positions.Select(pnt => new Coordinate(pnt.X, pnt.Y)).ToArray()).TryMakeRingValid())
                         .ToArray();
-                    return Geometry.DefaultFactory.CreatePolygon(exterior, holes);
+                    geometry = Geometry.DefaultFactory.CreatePolygon(exterior, holes);
+                    break;
                 case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.MultiPolygon:
                     var multiPolygons = (GeoJsonMultiPolygon<GeoJson2DCoordinates>)geoJsonGeometry;
                     var polygons = new List<Polygon>();
@@ -735,13 +739,17 @@ namespace SOS.Lib.Extensions
                         polygons.Add((Polygon)geoJsonPolygon.ToGeometry());
                     }
 
-                    return Geometry.DefaultFactory.CreateMultiPolygon(polygons.ToArray());
-                default:
-                    return null;
+                    geometry = Geometry.DefaultFactory.CreateMultiPolygon(polygons.ToArray());
+                    break;  
             }
+
+            if (!geometry.IsValid)
+            {
+                geometry = TryMakeValid(geometry);
+            }
+
+            return geometry;
         }
-
-
 
         /// <summary>
         ///  Cast geo shape to geo json geometry
@@ -906,7 +914,10 @@ namespace SOS.Lib.Extensions
             this string wkt)
         {
             var geometry = _wktReader.Read(wkt);
-
+            if (!geometry.IsValid)
+            {
+                geometry = TryMakeValid(geometry);
+            }
             return geometry;
         }
 
@@ -921,19 +932,23 @@ namespace SOS.Lib.Extensions
             {
                 return null;
             }
-
+            Geometry geometry = null;
+            
             switch (geoShape.Type?.ToLower())
             {
                 case "point":
                     var point = (PointGeoShape)geoShape;
-                    return new Point(point.Coordinates.Longitude, point.Coordinates.Latitude);
+                    geometry = new Point(point.Coordinates.Longitude, point.Coordinates.Latitude);
+                    break;
                 case "multipoint":
                     var multipoint = (MultiPointGeoShape)geoShape;
-                    return Geometry.DefaultFactory.CreateMultiPoint(multipoint.Coordinates.Select(c => new Point(c.Longitude, c.Latitude))?.ToArray());
+                    geometry = Geometry.DefaultFactory.CreateMultiPoint(multipoint.Coordinates.Select(c => new Point(c.Longitude, c.Latitude))?.ToArray());
+                    break;
                 case "linestring":
                 case "linearring":
                     var linestring = (LineStringGeoShape)geoShape;
-                    return Geometry.DefaultFactory.CreateLineString(linestring.Coordinates.Select(c => new Coordinate(c.Longitude, c.Latitude))?.ToArray());
+                    geometry = Geometry.DefaultFactory.CreateLineString(linestring.Coordinates.Select(c => new Coordinate(c.Longitude, c.Latitude))?.ToArray());
+                    break;
                 case "multilinestring":
                     var multiLineString = (MultiLineStringGeoShape)geoShape;
                     var lineStrings = new List<LineString>();
@@ -943,14 +958,16 @@ namespace SOS.Lib.Extensions
                         lineStrings.Add(new LineString(coordinates.Select(c => new Coordinate(c.Longitude, c.Latitude)).ToArray()));
                     }
 
-                    return Geometry.DefaultFactory.CreateMultiLineString(lineStrings.ToArray());
+                    geometry = Geometry.DefaultFactory.CreateMultiLineString(lineStrings.ToArray());
+                    break;
                 case "polygon":
                     var polygon = (PolygonGeoShape)geoShape;
                     var linearRings = polygon.Coordinates.Select(lr =>
                             new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()).TryMakeRingValid())
                         .ToArray();
 
-                    return Geometry.DefaultFactory.CreatePolygon(linearRings.First(), linearRings.Skip(1)?.ToArray());
+                    geometry = Geometry.DefaultFactory.CreatePolygon(linearRings.First(), linearRings.Skip(1)?.ToArray());
+                    break;
                 case "multipolygon":
                     var multiPolygons = (MultiPolygonGeoShape)geoShape;
                     var polygons = new List<Polygon>();
@@ -964,10 +981,15 @@ namespace SOS.Lib.Extensions
                         polygons.Add(new Polygon(lr.First(), lr.Skip(1)?.ToArray()));
                     }
 
-                    return Geometry.DefaultFactory.CreateMultiPolygon(polygons.ToArray());
-                default:
-                    return null;
+                    geometry = Geometry.DefaultFactory.CreateMultiPolygon(polygons.ToArray());
+                    break;
             }
+
+            if (!geometry.IsValid)
+            {
+                geometry = TryMakeValid(geometry);
+            }
+            return geometry;
         }
 
         public static Envelope Transform(
