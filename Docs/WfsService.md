@@ -18,6 +18,7 @@ All public observations that SOS harvests are available in a OGC Web Feature Ser
 | Max paging startIndex | 100 000 |
 
 ## Service details
+- For the moment the only supported WFS version is 1.0.0
 - The service doesn't support the `sortBy` parameter in the `GetFeature` request. The default sorting when paging is to sort by `endDate` descending.
 - The maximum number of observations returned in a request is 5 000. If you need to retrieve more observations, you need to use a filter or paging.
 - The maximum paging startIndex is 100 000. If you need to retrieve more observations, you need to use a filter to split your search into several requests.
