@@ -444,16 +444,10 @@ namespace SOS.Observations.Api
 #if !DEBUG
             if (!_disableHealthCheckInit)
             {
-               services.AddSingleton<IHealthCheckPublisher, HealthReportCachePublisher>();
-               services.Configure<HealthCheckPublisherOptions>(options => {
-                    options.Delay = TimeSpan.FromSeconds(10);
-                    options.Period = TimeSpan.FromSeconds(90); // Create new health check every 90 sek and cache reult
-                    options.Timeout = TimeSpan.FromSeconds(60);
-                });
-
+                services.AddSingleton<IHealthCheckPublisher, HealthReportCachePublisher>();  
                 services.Configure<HealthCheckPublisherOptions>(options => {
                     options.Delay = TimeSpan.FromSeconds(10);
-                    options.Period = TimeSpan.FromSeconds(180); // Create new health check every 3 minutes and cache result
+                    options.Period = TimeSpan.FromSeconds(600); // Create new health check every 10 minutes and cache result
                     options.Timeout = TimeSpan.FromSeconds(60);
                 });
                 var healthChecks = services.AddHealthChecks()
