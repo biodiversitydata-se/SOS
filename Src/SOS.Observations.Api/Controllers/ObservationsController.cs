@@ -323,6 +323,11 @@ namespace SOS.Observations.Api.Controllers
                 var dto = result.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
                 if (cacheKey != null && !geogridAggregationByCacheKey.ContainsKey(cacheKey))
                 {
+                    if (geogridAggregationByCacheKey.Count >= 20000) // prevent too large cache
+                    {
+                        geogridAggregationByCacheKey.Clear();
+                    }
+
                     geogridAggregationByCacheKey.Add(cacheKey, dto);
                 }
                 return new OkObjectResult(dto);
