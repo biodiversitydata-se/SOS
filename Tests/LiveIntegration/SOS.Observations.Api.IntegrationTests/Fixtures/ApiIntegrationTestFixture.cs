@@ -49,6 +49,7 @@ using SOS.Shared.Api.Validators;
 using SOS.Shared.Api.Utilities.Objects;
 using SOS.Shared.Api.Configuration;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Shared.Api.Dtos;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
 {
@@ -245,7 +246,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
             var inputValidator = new InputValidator(areaCache, taxonManager, inputValaidationConfiguration);
             var searchFilterUtility = new SearchFilterUtility(areaCache);
-            ObservationsController = new ObservationsController(ObservationManager, taxonSearchManager, searchFilterUtility, inputValidator, observationApiConfiguration, new NullLogger<ObservationsController>());
+            ObservationsController = new ObservationsController(ObservationManager, taxonSearchManager, searchFilterUtility, inputValidator, observationApiConfiguration, new Mock<ClassCache<Dictionary<string, GeoGridResultDto>>>().Object, new NullLogger<ObservationsController>());
             var ctx = new ControllerContext() { HttpContext = new DefaultHttpContext() };
             ObservationsController.ControllerContext = ctx;
             VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());
