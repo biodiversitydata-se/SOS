@@ -290,6 +290,7 @@ namespace SOS.Observations.Api.Controllers
                 string cacheKey = GenerateGeogridAggregationCacheKey(Request.Path, Request.QueryString.ToString(), filter);                
                 if (cacheKey != null && geogridAggregationByCacheKey.TryGetValue(cacheKey, out GeoGridResultDto cachedResponse))
                 {
+                    _logger.LogInformation("GeoGridAggregation result found in cache and is returned as result");
                     return new OkObjectResult(cachedResponse);                    
                 }
 
