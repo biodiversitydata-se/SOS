@@ -164,6 +164,10 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             if (obs.ShallBeProtected())
             {
                 obs.Sensitive = true;
+
+                if (obs.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage && obs.Occurrence.SensitivityCategory < 3 && (obs.Taxon?.Attributes?.SensitivityCategory?.Id ?? 0) < 3) {
+                    obs.Occurrence.SensitivityCategory = 3;
+                }
             }
 
             // Populate generic data
